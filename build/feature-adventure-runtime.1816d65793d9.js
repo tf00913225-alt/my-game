@@ -81,7 +81,9 @@
             dialogue:clone(state.dialogue||null),
             onboarding:clone(state.onboarding||{active:false,phase:"complete",source:"existing-character"}),
             legacyMigration:state.legacyMigration||null,
-            grantedEquipmentUid:state.grantedEquipmentUid||null
+            grantedEquipmentUid:state.grantedEquipmentUid||null,
+            equipmentLessonFunding:clone(state.equipmentLessonFunding||null),
+            equipmentLessonPurchase:clone(state.equipmentLessonPurchase||null)
         };
         if(chapter.storySchemaVersion===2&&raw&&state.storySchemaVersion!==2){
             const map={n01_arrival:1,n02_roadfight:2,n03_fork:6,n04a_path:6,n04b_gate:6,n05_commission:6,n06_rest:9,n07_chest:8,n08_truth:11,n09_boss:20,n10_finish:20};
@@ -112,6 +114,13 @@
         if((state.objective!=null&&!record(state.objective))||(state.merchant!=null&&(!record(state.merchant)||!record(state.merchant.purchases)))||
            (state.hidden!=null&&!record(state.hidden))||(state.pendingAdventureBuff!=null&&!record(state.pendingAdventureBuff))){throw new Error("Adventure retained state requires recovery.");}
         if(state.storySchemaVersion===2){
+            const funding=state.equipmentLessonFunding,purchase=state.equipmentLessonPurchase;
+            if(funding!=null&&(!record(funding)||funding.source!=="chapter1-equipment-funding-v1"||funding.sourceNodeId!=="c1_03"||funding.definitionId!=="leatherArmor"||!Number.isSafeInteger(funding.amount)||funding.amount<=0||state.rewardClaims.c1_03!=="claimed")){
+                throw new Error("Adventure equipment funding requires recovery.");
+            }
+            if(purchase!=null&&(!record(purchase)||!funding||purchase.source!=="chapter1-equipment-purchase-v1"||purchase.definitionId!==funding.definitionId||typeof purchase.equipmentUid!=="string"||!purchase.equipmentUid||purchase.equipmentUid!==state.grantedEquipmentUid||purchase.paidGold!==funding.amount)){
+                throw new Error("Adventure equipment purchase requires recovery.");
+            }
             if(!chapter.nodes.some(n=>n.id===state.currentNodeId)||!record(state.storyKeys)||!record(state.onboarding)||typeof state.onboarding.active!=="boolean"||
                !["story","battle","guidance","system","retry","complete"].includes(state.onboarding.phase)){
                 throw new Error("Adventure story state requires recovery.");
@@ -331,7 +340,16 @@
                 return {ok:false,message:"背包沒有足夠空間領取獎勵。"};
             }
         }
-        const summary=[];let starterEquipmentUid=null;
+        const summary=[];let starterEquipmentUid=null,equipmentLessonFunding=null;
+        if(reward.starterEquipmentFunding){
+            const state=chapterState(),factory=window.FourSymbolsEquipmentFactory;
+            if(state.grantedEquipmentUid||state.equipmentLessonFunding||state.equipmentLessonPurchase||!factory){return {ok:false,message:"護具教學資金紀錄需要確認。"};}
+            const item=factory.starter(reward.starterEquipmentFunding),amount=factory.prices(item).shop;
+            if(item.definitionId!=="leatherArmor"||!Number.isSafeInteger(amount)||amount<=0||typeof gold==="undefined"){return {ok:false,message:"護具價格尚未就緒。"};}
+            gold+=amount;
+            equipmentLessonFunding={source:"chapter1-equipment-funding-v1",sourceNodeId:"c1_03",definitionId:item.definitionId,amount};
+            summary.push("護具購置金 +"+amount.toLocaleString("zh-TW"));
+        }
         for(const entry of reward.materials||[]){
             const def=window.v132GetOreDefinition?.(entry.id);
             if(!def||!window.v132AddItemToInventory?.(def,integer(entry.count,1))){return {ok:false,message:"材料獎勵尚未加入背包，請整理空間後再試。"};}
@@ -363,7 +381,7 @@
         if(typeof updateGoldDisplay==="function"){ updateGoldDisplay(); }
         if(typeof updateUI==="function"){ updateUI(); }
         if(typeof rebuildInventorySlots==="function"){ rebuildInventorySlots(); }
-        return {ok:true,summary:summary,starterEquipmentUid};
+        return {ok:true,summary:summary,starterEquipmentUid,equipmentLessonFunding};
     }
 
     function grantReward(rewardId){
@@ -416,6 +434,10 @@
         state.rewardClaims[node.id]="claimed";
         state.lastRewardSummary=granted.summary;
         if(granted.starterEquipmentUid){state.grantedEquipmentUid=granted.starterEquipmentUid;}
+        if(granted.equipmentLessonFunding){state.equipmentLessonFunding=granted.equipmentLessonFunding;}
+        if(node.id==="c1_05"&&state.onboarding?.active&&state.onboarding.requiredAction==="recovery"){
+            state.onboarding.preparation={hpCount:getPotionCount("hpPotion10"),spCount:getPotionCount("spPotion10")};
+        }
         });
         if(!committed){return false;}
         if(!granted.ok){ showMessage(granted.message||"獎勵領取失敗。");return false; }
@@ -452,6 +474,9 @@
         const opts=options||{};
         if(opts.chapterId&&CONTENT.chapters[opts.chapterId]){ root.activeChapterId=opts.chapterId; }
         const state=chapterState();
+        if(state?.onboarding?.active&&state.onboarding.requiredAction==="recovery"&&state.currentNodeId==="c1_05"&&!state.rewardClaims.c1_05){
+            if(!commitChange(()=>{markRewardReady(state,nodeById(chapterDefinition(),"c1_05"));})){return false;}
+        }
         if(state?.onboarding?.active&&state.onboarding.phase==="battle"&&!(typeof battleActive!=="undefined"&&battleActive)){
             const o=state.onboarding,node=nodeById(chapterDefinition(),o.battleNodeId);
             if(!commitChange(()=>{
@@ -621,6 +646,12 @@
         }
         return true;
     }
+    function recoveryNeedsPractice(){
+        const state=chapterState(),owner=playerOwner(),stats=getPartyStats(0);
+        return !!(state?.onboarding?.active&&state.onboarding.requiredAction==="recovery"&&
+            !hasTutorialAction("recovery")&&owner&&stats&&owner.hp>=stats.maxHP&&owner.sp>=stats.maxSP&&
+            typeof getPotionCount==="function"&&(getPotionCount("hpPotion10")>0||getPotionCount("spPotion10")>0));
+    }
     function startFreshStory(){
         const owner=playerOwner();if(!owner||!owner.adventureProgress?.pendingStoryOpening){return false;}
         ensureState({persist:false});const state=chapterState();
@@ -658,8 +689,10 @@
         }
         if(["battle","elite","boss"].includes(node.type)){
             if(node.stage===5&&state.onboarding.active&&!state.onboarding.recoveryPrepared){
+                const resumingRecovery=state.onboarding.requiredAction==="recovery"&&state.onboarding.nodeId===node.id;
                 if(!commitChange(()=>{state.dialogue=null;state.onboarding.nodeId=node.id;state.onboarding.requiredAction="recovery";state.onboarding.phase="guidance";
-                    state.onboarding.preparation={hpCount:typeof getPotionCount==="function"?getPotionCount("hpPotion10"):0,spCount:typeof getPotionCount==="function"?getPotionCount("spPotion10"):0};})){return false;}
+                    if(!resumingRecovery||!state.onboarding.preparation){state.onboarding.preparation={hpCount:typeof getPotionCount==="function"?getPotionCount("hpPotion10"):0,spCount:typeof getPotionCount==="function"?getPotionCount("spPotion10"):0};}
+                    markRewardReady(state,node);})){return false;}
                 runtime.activePanel="tutorial";render();return true;
             }
             if(!commitChange(()=>{state.dialogue=null;})){return false;}
@@ -672,11 +705,31 @@
         if(!commitChange(()=>{state.dialogue=null;})){return false;}
         runtime.activePanel=node.type;render();return true;
     }
+    function getEquipmentLessonOfferIntent(){
+        const state=chapterState(),o=state?.onboarding,funding=state?.equipmentLessonFunding;
+        const owner=playerOwner(),ownerUid=window.FourSymbolsAccountSave?.getActiveUid?.();
+        if(!ownerUid||window.FourSymbolsStartupPolicy?.getUid?.()!==ownerUid||!owner||!o?.active||o.requiredAction!=="equipment"||o.nodeId!=="c1_04"||state.currentNodeId!=="c1_04"||
+            !["guidance","system","retry"].includes(o.phase)||state.completedNodes.c1_04||state.rewardClaims.c1_03!=="claimed"||
+            !funding||state.grantedEquipmentUid||state.equipmentLessonPurchase){return null;}
+        return {ownerUid,characterId:owner.id,source:funding.source,definitionId:funding.definitionId,amount:funding.amount};
+    }
+    function recordEquipmentLessonPurchase(instance,cost,intent){
+        const current=getEquipmentLessonOfferIntent(),factory=window.FourSymbolsEquipmentFactory;
+        if(!current||!intent||Object.keys(current).some(key=>current[key]!==intent[key])||!factory?.validUid(instance?.v141Uid)||
+            instance.definitionId!==current.definitionId||factory.prices(instance).shop!==cost||cost!==current.amount){return false;}
+        const state=chapterState();
+        state.grantedEquipmentUid=instance.v141Uid;
+        state.equipmentLessonPurchase={source:"chapter1-equipment-purchase-v1",definitionId:instance.definitionId,equipmentUid:instance.v141Uid,paidGold:cost};
+        return true;
+    }
     function openTutorialSystem(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
             if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=playerOwner().element;}
             hideOverlay();showPage("skill");if(typeof renderSkillLoadout==="function"){renderSkillLoadout();}
+        }else if(o.requiredAction==="equipment"&&!state.grantedEquipmentUid){
+            if(!getEquipmentLessonOfferIntent()){showMessage("請先領取追兵一戰的護具購置金。");return false;}
+            hideOverlay();showPage("home");openHomeFeature("shop");
         }else{
             hideOverlay();showPage("inventory");
             if(typeof renderInventory==="function"){renderInventory();}
@@ -686,11 +739,12 @@
     function returnFromTutorial(){return open({panel:"tutorial"});}
     function continueTutorial(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction||o.nodeId!==state.currentNodeId||state.completedNodes[o.nodeId]){return false;}
-        if(!hasTutorialAction(o.requiredAction)){showMessage(o.requiredAction==="skill"?"請先實際學習並裝上技能。":o.requiredAction==="equipment"?"請先穿上剛取得的護具。":"請使用補品，或先在此確認 HP／SP 與戰前準備。");return false;}
+        const practice=recoveryNeedsPractice();
+        if(!hasTutorialAction(o.requiredAction)&&!practice){showMessage(o.requiredAction==="skill"?"請先實際學習並裝上技能。":o.requiredAction==="equipment"?"請先穿上剛取得的護具。":"請先使用補品完成實作。");return false;}
         if(!commitChange(()=>{
-            o.phase="retry";if(o.requiredAction==="recovery"){o.recoveryPrepared=true;}state.dialogue=null;
+            o.phase="retry";if(o.requiredAction==="recovery"&&!practice){o.recoveryPrepared=true;}state.dialogue=null;
             // Training recovery is explicit and bounded to the onboarding fight.
-            getPartyIndexes().forEach(i=>{const c=getPartyCharacter(i),s=getPartyStats(i);if(c&&s){c.hp=s.maxHP;c.sp=s.maxSP;}});
+            if(!practice){getPartyIndexes().forEach(i=>{const c=getPartyCharacter(i),s=getPartyStats(i);if(c&&s){c.hp=s.maxHP;c.sp=s.maxSP;}});}
         })){return false;}
         return beginBattle(o.nodeId);
     }
@@ -793,7 +847,7 @@
         if(typeof battleActive!=="undefined"&&battleActive){ showMessage("目前正在戰鬥中，無法開始新的冒險戰鬥。");return false; }
         if(typeof window.v132LaunchDungeonBattle!=="function"){ showMessage("正式戰鬥 Runtime 尚未就緒。");return false; }
         if(node.requiresStoryKey&&!state.storyKeys?.[node.requiresStoryKey]){return false;}
-        if(state.onboarding?.active&&state.onboarding.nodeId===node.id&&state.onboarding.requiredAction&&!hasTutorialAction(state.onboarding.requiredAction)){
+        if(state.onboarding?.active&&state.onboarding.nodeId===node.id&&state.onboarding.requiredAction&&!hasTutorialAction(state.onboarding.requiredAction)&&!recoveryNeedsPractice()){
             runtime.activePanel="tutorial";render();return false;
         }
         const roster=node.tutorialEncounterId?buildTutorialEncounter(node):buildEncounter(node.encounterId);
@@ -813,6 +867,11 @@
             runtime.activeAdventureBattle=null;
             if(!battleInfo){ return; }
             if(outcome&&outcome.result==="win"){
+                if(node.stage===5&&state.onboarding.active&&!hasTutorialAction("recovery")){
+                    if(!commitChange(()=>{state.onboarding.phase="guidance";state.dialogue=null;})){return;}
+                    runtime.visible=true;runtime.selectedNodeId=node.id;runtime.activePanel="tutorial";
+                    window.FourSymbolsAdventureUI?.show({focusNodeId:node.id});return;
+                }
                 if(node.stage===3&&state.onboarding.active&&!runtime.tutorialSkillUsed){
                     showMessage("這次請實際使用剛學會的技能，再突破追兵。");
                     runtime.visible=true;runtime.activePanel="map";
@@ -1178,7 +1237,8 @@
             tutorial:state&&state.onboarding||null,
             tutorialProgress:state?.onboarding?.active?{
                 skillReady:hasTutorialAction("skill"),equipmentReady:hasTutorialAction("equipment"),
-                recoveryReady:hasTutorialAction("recovery"),skillUsed:runtime.tutorialSkillUsed,
+                equipmentAcquired:!!state.grantedEquipmentUid,equipmentNeedsPurchase:!!getEquipmentLessonOfferIntent(),
+                recoveryReady:hasTutorialAction("recovery"),recoveryNeedsPractice:recoveryNeedsPractice(),skillUsed:runtime.tutorialSkillUsed,
                 loadout:clone(skillLoadout()),resources:clone(getPartyStats(0))
             }:null,
             chapter:chapter,
@@ -1213,6 +1273,7 @@
     });
 
     window.FourSymbolsAdventure=Object.freeze({
+        getEquipmentLessonOfferIntent,recordEquipmentLessonPurchase,
         stateVersion:STATE_VERSION,
         startFreshStory:startFreshStory,startStory:startStory,advanceDialogue:advanceDialogue,
         continueTutorial:continueTutorial,openTutorialSystem:openTutorialSystem,returnFromTutorial:returnFromTutorial,

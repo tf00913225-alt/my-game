@@ -3855,11 +3855,22 @@
             return Promise.resolve(null);
         }
         monsterPortraitRegistryState="pending";
-        monsterPortraitRegistryPromise=fetch(MONSTER_PORTRAIT_REGISTRY_URL,{cache:"no-cache"})
+        const controller=typeof AbortController==="function"?new AbortController():null;
+        let timeout;
+        const expired=new Promise((_,reject)=>{
+            timeout=setTimeout(()=>{
+                reject(new Error("Monster portrait registry request timed out."));
+                if(controller){controller.abort();}
+            },8000);
+        });
+        const loading=Promise.resolve().then(()=>fetch(MONSTER_PORTRAIT_REGISTRY_URL,{
+            cache:"no-cache",...(controller?{signal:controller.signal}:{})
+        }))
             .then(response=>{
                 if(!response||!response.ok){ throw new Error("HTTP "+(response&&response.status)); }
                 return response.json();
-            })
+            });
+        monsterPortraitRegistryPromise=Promise.race([loading,expired])
             .then(installMonsterPortraitRegistry)
             .catch(error=>{
                 monsterPortraitRegistryState="failed";
@@ -3867,7 +3878,7 @@
                 monsterPortraitRegistryPromise=null;
                 console.warn("[monster-portrait] registry load failed; retry is available on the next dungeon entry.",error);
                 return null;
-            });
+            }).finally(()=>clearTimeout(timeout));
         return monsterPortraitRegistryPromise;
     }
     window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
@@ -7144,6 +7155,53 @@
         const html='<div class="v132-reward-modal-inner v17346-shop-preview-modal item-presentation-frame" data-presentation-mode="shop-preview" data-rarity="'+escapeHtml(item.rarityKey)+'"><h3>'+window.FourSymbolsItemSlot.name(item.name,item)+'</h3><div class="item-presentation-scroll" data-scroll-owner="y"><div class="v17346-shop-preview-art">'+window.FourSymbolsItemSlot.art(item.icon,item)+'</div><div class="v17346-shop-preview-info"><span>'+escapeHtml(SLOT_META[item.type].label)+'</span><strong>'+escapeHtml(statLine(item))+'</strong></div><div class="v17346-shop-preview-price">'+window.FourSymbolsEquipmentFactory.prices(item).shop.toLocaleString("zh-TW")+' 金幣</div>'+(item.reforgeSlots?'<div class="v17346-shop-preview-reforge">[可冶煉]</div>':'')+'</div><div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button><button type="button" onclick="v17346ShowShopOfferAcquisition('+safeIndex+')">獲取途徑</button></div></div>';
         window.v132ShowRewardModal(html);
     };
+    let equipmentLessonOfferCache=null;
+    function equipmentLessonOffer(intent){
+        const key=JSON.stringify(intent);
+        if(equipmentLessonOfferCache?.key!==key){equipmentLessonOfferCache={key,item:window.FourSymbolsEquipmentFactory.starter(intent.definitionId)};}
+        return equipmentLessonOfferCache.item;
+    }
+    function renderEquipmentLessonOffer(){
+        const intent=window.FourSymbolsAdventure?.getEquipmentLessonOfferIntent?.();
+        if(!intent){equipmentLessonOfferCache=null;return "";}
+        const item=equipmentLessonOffer(intent),cost=window.FourSymbolsEquipmentFactory.prices(item).shop;
+        const canBuy=cost===intent.amount&&typeof gold!=="undefined"&&gold>=cost&&window.v132CanAddItemToInventory?.(item,1);
+        return '<article class="v17345-equipment-card v17346-shop-card" data-tutorial-offer="chapter1-armor" data-rarity="'+escapeHtml(item.rarityKey)+'"><div class="v17345-equipment-icon v17346-gear-art">'+window.FourSymbolsItemSlot.art(item.icon,item)+'</div><b class="v17346-shop-name">'+window.FourSymbolsItemSlot.name(item.name,item)+'</b><span class="v17346-shop-slot">新手護具</span><span class="v17346-stat">'+escapeHtml(statLine(item))+'</span><button id="chapter1TutorialArmorBuy" class="v17346-shop-buy" type="button" '+(canBuy?'onclick="FourSymbolsEquipmentShop.buyLessonArmor()"':'disabled aria-disabled="true"')+'>購買護具 · '+cost.toLocaleString("zh-TW")+' 金幣</button></article>';
+    }
+    function buyEquipmentLessonArmor(){
+        if(shopPurchaseInProgress){return false;}
+        const adventure=window.FourSymbolsAdventure,intent=adventure?.getEquipmentLessonOfferIntent?.();
+        if(!intent||typeof player==="undefined"||!window.FourSymbolsEquipmentFactory||typeof window.v132CanAddItemToInventory!=="function"||
+            typeof window.v132RunInventoryTransaction!=="function"||typeof window.v132AddItemToInventory!=="function"||typeof saveGame!=="function"){return false;}
+        const owner=player,originalProgress=owner.adventureProgress,beforeGold=gold;
+        const beforeProgress=JSON.parse(JSON.stringify(originalProgress));
+        const item=equipmentLessonOffer(intent),cost=window.FourSymbolsEquipmentFactory.prices(item).shop;
+        if(cost!==intent.amount||!Number.isFinite(gold)||gold<cost||!window.v132CanAddItemToInventory(item,1)){return false;}
+        let committed=false;
+        shopPurchaseInProgress=true;
+        try{
+            committed=window.v132RunInventoryTransaction(()=>{
+                gold-=cost;
+                if(!window.v132AddItemToInventory(item,1)||!adventure.recordEquipmentLessonPurchase(item,cost,intent)){return false;}
+                return saveGame({source:"chapter1-equipment-lesson-purchase"})===true;
+            });
+        }catch(error){console.error("護具購買未完成。",error);}
+        finally{
+            if(!committed){
+                gold=beforeGold;
+                Object.keys(originalProgress).forEach(key=>delete originalProgress[key]);
+                Object.assign(originalProgress,beforeProgress);
+                owner.adventureProgress=originalProgress;
+            }
+            shopPurchaseInProgress=false;
+        }
+        if(!committed){return false;}
+        if(typeof updateGoldDisplay==="function"){updateGoldDisplay();}
+        if(typeof renderInventoryItems==="function"){renderInventoryItems();}
+        replaceEquipmentShop();
+        document.dispatchEvent(new CustomEvent("four-symbols:adventure-state-change"));
+        return true;
+    }
     function renderEquipmentShop(){
         const state=shopState();
         if(!state){ return '<div class="v17345-equipment-shop"><p role="alert">裝備商店資料無法讀取，購買與刷新已暫停。</p></div>'; }
@@ -7151,7 +7209,7 @@
         const freeRemaining=Math.max(0,5-state.refreshCount);
         const currentGold=typeof gold!=="undefined"?Math.max(0,Math.floor(Number(gold)||0)):0;
         const goldText=currentGold.toLocaleString("zh-TW");
-        return '<div class="v17345-equipment-shop"><div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+offers.map((item,index)=>{
+        return '<div class="v17345-equipment-shop"><div class="v17345-equipment-wallet"><span>目前金幣</span><b>'+goldText+'</b></div><div class="v17345-equipment-grid">'+renderEquipmentLessonOffer()+offers.map((item,index)=>{
             const rarity=RARITY_BY_KEY[item.rarityKey];
             const sold=state.soldOfferIds.includes(item.offerId);
             const canBuy=!sold&&currentGold>=window.FourSymbolsEquipmentFactory.prices(item).shop&&typeof window.v132CanAddItemToInventory==="function"&&window.v132CanAddItemToInventory(item,1);
@@ -7195,7 +7253,7 @@
         if(window.rpgAlert){ void window.rpgAlert("已購買「"+item.name+"」。",{title:"購買成功",tone:"success"}); }
         return true;
     };
-    window.FourSymbolsEquipmentShop=Object.freeze({render:renderEquipmentShop,offers:currentShopOffers,unlimitedRefreshTestMode:SHOP_UNLIMITED_REFRESH_TEST_MODE});
+    window.FourSymbolsEquipmentShop=Object.freeze({render:renderEquipmentShop,offers:currentShopOffers,buyLessonArmor:buyEquipmentLessonArmor,unlimitedRefreshTestMode:SHOP_UNLIMITED_REFRESH_TEST_MODE});
     window.v17345RefreshEquipmentShop=function(){
         if(shopPurchaseInProgress){ return false; }
         const state=shopState();

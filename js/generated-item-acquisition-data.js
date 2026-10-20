@@ -1405,7 +1405,7 @@ window.FourSymbolsItemAcquisitionData={
       "sharedExp": 15
     },
     "story_starter_gear": {
-      "starterEquipment": "leatherArmor"
+      "starterEquipmentFunding": "leatherArmor"
     },
     "story_supplies": {
       "potions": [

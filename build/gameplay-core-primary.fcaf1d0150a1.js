@@ -1657,6 +1657,11 @@
     }
 
     function syncElementBoxForBattle(options){
+        if(window.v132ActiveDungeonRun?.tutorial){
+            elementBoxActive=false;
+            elementBoxLastTick=Date.now();
+            return false;
+        }
         const silent=!!(options && options.silent);
         if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
             stopElementBoxWhenTimeEnds(
@@ -1857,6 +1862,7 @@
     if(typeof toggleAutoBattle==="function"){
         const originalToggleAutoBattle=toggleAutoBattle;
         toggleAutoBattle=function(){
+            if(window.v132ActiveDungeonRun?.tutorial){return false;}
             const isTurningOn=!autoBattle;
             if(isTurningOn && elementBoxState.remainingMs<=0){
                 alert("元素匣目前沒有可用時數，請先觀看廣告取得8小時時數。");
@@ -3963,7 +3969,7 @@
         renderBattle();
         showPage("battle");
 
-        autoBattle=autoConfig.enabled;
+        autoBattle=window.v132ActiveDungeonRun.tutorial?false:autoConfig.enabled;
         if(typeof window.v131SyncElementBoxForBattle==="function"){
             window.v131SyncElementBoxForBattle({silent:true});
         }
@@ -7994,6 +8000,14 @@
         inventoryPageIndex=(inventoryPageIndex+Number(direction)+INVENTORY_PAGE_COUNT)%INVENTORY_PAGE_COUNT;
         renderInventoryItems();
     };
+    // Read-only location from the same filter/page owner used by the renderer.
+    window.v141LocateInventoryItem=function(identity){
+        if(!identity||(!identity.uid&&!identity.id)){return null;}
+        const index=getFilteredInventoryItems().findIndex(item=>identity.uid?item?.v141Uid===identity.uid:item?.id===identity.id);
+        if(index<0){return null;}
+        const page=Math.floor(index/INVENTORY_PAGE_SIZE);
+        return {page,currentPage:inventoryPageIndex,direction:page===inventoryPageIndex?0:page<inventoryPageIndex?-1:1};
+    };
 
     if(typeof renderInventoryItems==="function"){
         renderInventoryItems=function(){
@@ -8019,6 +8033,8 @@
                     window.FourSymbolsItemSlot.apply(box,item);
                     box.classList.add("rarity-"+rarity);
                     box.dataset.rarity=rarity;
+                    box.dataset.itemId=String(item.id||"");
+                    box.dataset.itemUid=String(item.v141Uid||"");
                 }
                 box.draggable=false;
                 box.addEventListener("dragstart",event=>event.preventDefault());

@@ -1931,7 +1931,7 @@
         renderBattle();
         showPage("battle");
 
-        autoBattle=autoConfig.enabled;
+        autoBattle=window.v132ActiveDungeonRun.tutorial?false:autoConfig.enabled;
         if(typeof window.v131SyncElementBoxForBattle==="function"){
             window.v131SyncElementBoxForBattle({silent:true});
         }

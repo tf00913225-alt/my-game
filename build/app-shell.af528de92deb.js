@@ -5645,10 +5645,9 @@ function getPartyCharacterKey(index){
 
 
 function getPartyAutoConfig(index){
-    if(index>=3&&index<6){ return {...HERO_BASIC_ATTACK_CONFIG}; }
-    if(index===1){ return autoConfig2; }
-    if(index===2){ return autoConfig3; }
-    return autoConfig;
+    const config=index>=3&&index<6?HERO_BASIC_ATTACK_CONFIG:index===1?autoConfig2:index===2?autoConfig3:autoConfig;
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){ return {...config,enabled:false}; }
+    return index>=3&&index<6?{...config}:config;
 }
 
 
@@ -20844,6 +20843,7 @@ function applyPotionEffect(potionId,characterIndex,targetAlly){
 ===================================================== */
 
 function toggleAutoBattle(){
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){return;}
 
     /*
        ★ 修正（依照使用者要求，讓巡邏頁面的
@@ -31429,8 +31429,6 @@ function renderInventoryItems(){
             FourSymbolsItemSlot.apply(box,item);
             box.classList.add("rarity-"+rarity);
             box.dataset.rarity=rarity;
-            box.dataset.itemId=String(item.id||"");
-            box.dataset.itemUid=String(item.v141Uid||"");
         }
         box.innerHTML=`<div class="inventory-slot-number">${index+1}</div>`;
 
@@ -36008,7 +36006,7 @@ window.FourSymbolsItemAcquisitionData={
       "sharedExp": 15
     },
     "story_starter_gear": {
-      "starterEquipment": "leatherArmor"
+      "starterEquipmentFunding": "leatherArmor"
     },
     "story_supplies": {
       "potions": [

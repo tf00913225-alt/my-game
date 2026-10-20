@@ -49,8 +49,8 @@ const chapters={
           }
         ],
         "next": "c1_02",
-        "x": 30,
-        "y": 96,
+        "x": 19,
+        "y": 73.3,
         "tutorialEncounterId": "tutorial_1",
         "rewardId": "story_first_growth"
       },
@@ -77,8 +77,8 @@ const chapters={
           }
         ],
         "next": "c1_03",
-        "x": 65,
-        "y": 91.3,
+        "x": 24.8,
+        "y": 70.5,
         "tutorialEncounterId": "tutorial_2",
         "guidance": [
           {
@@ -125,7 +125,7 @@ const chapters={
           {
             "speaker": "npc",
             "name": "旅人",
-            "text": "這件護具是我帶來備用的。等追兵退了，就交給你防身。"
+            "text": "多謝你相助。等追兵退了，我會給你一筆置裝費，到主城商店買件合用的護具。"
           },
           {
             "speaker": "player",
@@ -134,8 +134,8 @@ const chapters={
           }
         ],
         "next": "c1_04",
-        "x": 35,
-        "y": 86.6,
+        "x": 29.7,
+        "y": 67.2,
         "tutorialEncounterId": "tutorial_3",
         "rewardId": "story_starter_gear"
       },
@@ -160,8 +160,8 @@ const chapters={
           }
         ],
         "next": "c1_05",
-        "x": 70,
-        "y": 81.9,
+        "x": 37,
+        "y": 64,
         "tutorialEncounterId": "tutorial_4",
         "guidance": [
           {
@@ -172,12 +172,12 @@ const chapters={
           {
             "speaker": "player",
             "name": "玩家",
-            "text": "有了新護具，沒穿在身上也擋不了刀。"
+            "text": "只顧著練招，還沒把護具備好。"
           },
           {
             "speaker": "npc",
             "name": "守驛人",
-            "text": "先到裝備頁穿好方才取得的護具，再回這裡重試。"
+            "text": "先到主城商店買件護具，再從背包穿上，回來這裡重試。"
           },
           {
             "speaker": "player",
@@ -217,8 +217,8 @@ const chapters={
           }
         ],
         "next": "c1_06",
-        "x": 35,
-        "y": 77.2,
+        "x": 46,
+        "y": 60.4,
         "tutorialEncounterId": "tutorial_5",
         "rewardId": "story_supplies"
       },
@@ -253,8 +253,8 @@ const chapters={
           }
         ],
         "next": "c1_07",
-        "x": 30,
-        "y": 72.5
+        "x": 53,
+        "y": 59
       },
       {
         "id": "c1_07",
@@ -287,8 +287,8 @@ const chapters={
           }
         ],
         "next": "c1_08",
-        "x": 65,
-        "y": 67.8,
+        "x": 60,
+        "y": 57.8,
         "encounterId": "chapter1_enc_7"
       },
       {
@@ -322,8 +322,8 @@ const chapters={
           }
         ],
         "next": "c1_09",
-        "x": 35,
-        "y": 63.1,
+        "x": 68,
+        "y": 56.8,
         "rewardId": "story_road_chest",
         "legacyRewardId": "road_chest"
       },
@@ -359,7 +359,7 @@ const chapters={
         ],
         "next": "c1_10",
         "x": 70,
-        "y": 58.4
+        "y": 55.2
       },
       {
         "id": "c1_10",
@@ -392,8 +392,8 @@ const chapters={
           }
         ],
         "next": "c1_11",
-        "x": 35,
-        "y": 53.699999999999996,
+        "x": 62.5,
+        "y": 53.5,
         "encounterId": "chapter1_enc_10"
       },
       {
@@ -427,8 +427,8 @@ const chapters={
           }
         ],
         "next": "c1_12",
-        "x": 30,
-        "y": 49,
+        "x": 49.5,
+        "y": 50.4,
         "grantsStoryKey": "blackPineToken"
       },
       {
@@ -462,8 +462,8 @@ const chapters={
           }
         ],
         "next": "c1_13",
-        "x": 65,
-        "y": 44.3,
+        "x": 38.2,
+        "y": 47.8,
         "encounterId": "chapter1_enc_12"
       },
       {
@@ -497,8 +497,8 @@ const chapters={
           }
         ],
         "next": "c1_14",
-        "x": 35,
-        "y": 39.599999999999994
+        "x": 51,
+        "y": 45.6
       },
       {
         "id": "c1_14",
@@ -531,8 +531,8 @@ const chapters={
           }
         ],
         "next": "c1_15",
-        "x": 70,
-        "y": 34.9,
+        "x": 66,
+        "y": 42.4,
         "requiresStoryKey": "blackPineToken"
       },
       {
@@ -566,8 +566,8 @@ const chapters={
           }
         ],
         "next": "c1_16",
-        "x": 35,
-        "y": 30.200000000000003,
+        "x": 56,
+        "y": 39.6,
         "encounterId": "chapter1_enc_15"
       },
       {
@@ -601,8 +601,8 @@ const chapters={
           }
         ],
         "next": "c1_17",
-        "x": 30,
-        "y": 25.5
+        "x": 44.6,
+        "y": 36.6
       },
       {
         "id": "c1_17",
@@ -635,8 +635,8 @@ const chapters={
           }
         ],
         "next": "c1_18",
-        "x": 65,
-        "y": 20.799999999999997,
+        "x": 51.5,
+        "y": 33.8,
         "encounterId": "chapter1_enc_17"
       },
       {
@@ -670,8 +670,8 @@ const chapters={
           }
         ],
         "next": "c1_19",
-        "x": 35,
-        "y": 16.099999999999994,
+        "x": 58.7,
+        "y": 30.5,
         "encounterId": "chapter1_enc_18"
       },
       {
@@ -706,7 +706,7 @@ const chapters={
         ],
         "next": "c1_20",
         "x": 70,
-        "y": 11.399999999999991
+        "y": 25
       },
       {
         "id": "c1_20",
@@ -739,8 +739,8 @@ const chapters={
           }
         ],
         "next": null,
-        "x": 35,
-        "y": 6.700000000000003,
+        "x": 76.5,
+        "y": 18.5,
         "encounterId": "chapter1_enc_20",
         "rewardId": "boss_first"
       }
@@ -1198,7 +1198,7 @@ const rewards={
     "sharedExp": 15
   },
   "story_starter_gear": {
-    "starterEquipment": "leatherArmor"
+    "starterEquipmentFunding": "leatherArmor"
   },
   "story_supplies": {
     "potions": [
