@@ -490,3 +490,68 @@ test('raw publication deadlines include preparation resolution and awaited fullr
         }
     }
 });
+
+function rawDecoderProbe(onParse=()=>{}){
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const native=compiled.require.bind(compiled);let parses=0;
+    compiled.require=name=>name==='test-only-json'?{parse:(...args)=>{parses++;onParse();return JSON.parse(...args);},stringify:JSON.stringify}:native(name);
+    compiled._compile('const JSON=require("test-only-json");\n'+readFileSync(filename,'utf8'),filename);
+    return {helper:compiled.exports,parses:()=>parses};
+}
+test('raw expected manifest hash is charged on the decoder private snapshot before parsing; original two-argument path stays exact',async()=>{
+    const f=await rawPreparedFixture(),bytes=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const helper=require('../functions/src/recovery-audit-artifact'),hash=require('node:crypto').createHash;
+    const sha=value=>hash('sha256').update(value).digest('hex');
+    const oldToken=helper.createRecoveryAuditAssemblyBudget(),newToken=helper.createRecoveryAuditAssemblyBudget();
+    const original=helper.decodeRawRecoveryArchive(bytes,oldToken),verified=helper.decodeRawRecoveryArchive(bytes,newToken,sha(bytes));
+    assert.deepEqual(verified,original);
+    const oldUsage=helper.recoveryAuditAssemblyUsage(oldToken),newUsage=helper.recoveryAuditAssemblyUsage(newToken);
+    for(const key of ['nodes','operations','passes','reservedBytes'])assert.equal(newUsage[key],oldUsage[key]);
+    assert.equal(newUsage.bytes,oldUsage.bytes+bytes.length);
+    const probe=rawDecoderProbe();
+    for(const expected of ['0'.repeat(64),null,true,{},sha(bytes)+'\n']){
+        assert.throws(()=>probe.helper.decodeRawRecoveryArchive(bytes,probe.helper.createRecoveryAuditAssemblyBudget(),expected),/expected hash/);
+        assert.equal(probe.parses(),0);
+    }
+    const malformed=Buffer.from(bytes);malformed[10]=0x7e;
+    const errors=[];
+    for(const expected of [undefined,sha(malformed)])try{helper.decodeRawRecoveryArchive(malformed,helper.createRecoveryAuditAssemblyBudget(),expected);}
+    catch(error){errors.push([error.code,error.message]);}
+    assert.equal(errors.length,2);assert.deepEqual(errors[0],errors[1]);
+    const external=Buffer.from(bytes),mutation=rawDecoderProbe(()=>external.fill(0));
+    assert.deepEqual(mutation.helper.decodeRawRecoveryArchive(external,mutation.helper.createRecoveryAuditAssemblyBudget(),sha(bytes)),original);
+    assert(mutation.parses()>0);assert(external.every(byte=>byte===0));
+});
+test('raw publication snapshots through the fixed transport contract and mismatched exact bytes cannot parse, prove or ACK',async()=>{
+    const f=await rawPreparedFixture(),artifact=f.private.publicationArtifactTestValue(f.identity),originalBytes=Buffer.from(artifact.bytes);
+    const create=f.io.createOnly;
+    f.io.createOnly=async input=>{
+        assert.equal(input.bytes,artifact.bytes,'raw owner delegates its original private bytes to the fixed synchronous-copy transport');
+        const pending=create(input);artifact.bytes.fill(0);return pending;
+    };
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.deepEqual([...f.io.objects.values()][0].bytes,originalBytes);
+    await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    const probe=rawDecoderProbe(),bad=await rawPreparedFixture(probe.helper),reads=bad.io.readExact;
+    bad.io.readExact=async input=>{const response=await reads(input);response.bytes[12]^=1;return response;};
+    const before=copy([...bad.h.data]),writes=bad.h.writes,parses=probe.parses();
+    await assert.rejects(bad.private.publishPreparedCandidate(bad.request(),bad.prepared),/expected hash differs/);
+    assert.equal(probe.parses(),parses,'manifest mismatch is refused before parsing or complete proof');
+    assert.deepEqual([...bad.h.data],before);assert.equal(bad.h.writes,writes);
+    assert.equal(bad.h.data.get(bad.root+'/candidatePublications/'+operationId).status,'prepared');
+});
+
+test('raw metadata lookup deadline expires before any create or exact-read side effect',async()=>{
+    const clock={now:0},helper=clockedArtifact(clock),f=await rawPreparedFixture(helper);
+    let release,enter;const pending=new Promise(resolve=>{release=resolve;}),entered=new Promise(resolve=>{enter=resolve;});
+    f.io.lookupMetadata=async()=>{enter();await pending;return null;};
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    const publishing=f.private.publishPreparedCandidate(f.request(),f.prepared);
+    await Promise.race([entered,publishing.then(()=>assert.fail('metadata lookup was not awaited'))]);
+    clock.now=30001;release();
+    await assert.rejects(publishing,/deadline exceeded/);
+    assert.equal(f.io.calls.filter(([kind])=>kind==='create'||kind==='read').length,0);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');
+});

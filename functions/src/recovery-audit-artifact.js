@@ -542,9 +542,11 @@ function encodeRawRecoveryArchive(material,token){
     }
     assemblyCharge(token,"bytes",size);const bytes=Buffer.alloc(size);MAGIC.copy(bytes);writeCandidateFrames(bytes,MAGIC.length,frames,token);return bytes;
 }
-function decodeRawRecoveryArchive(input,token){
+function decodeRawRecoveryArchive(input,token,expectedSha256){
     rawArchiveBudget(token);assemblyCharge(token,"passes",1);
-    const {frames,bytes}=readRecoveryFrames(input,token,true);
+    if(expectedSha256!==undefined&&(typeof expectedSha256!=="string"||expectedSha256.length!==64||!/^[a-f0-9]{64}$/.test(expectedSha256)))
+        bad("raw archive expected hash");
+    const {frames,bytes}=readRecoveryFrames(input,token,true,expectedSha256);
     if(frames.length<5)bad("raw archive header/footer");
     const header=frames[0],footer=frames.at(-1);
     if(header.type!=="header"||header.schemaVersion!==3||header.kind!=="canonical-recovery-raw-archive")bad("raw archive version");
@@ -576,12 +578,16 @@ function decodeRawRecoveryArchive(input,token){
        createHash("sha256").update(bytes.subarray(0,footerOffset)).digest("hex")!==footer.framesSha256)bad("raw archive frames hash");
     return material;
 }
-function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false){
+function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false,expectedSha256){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
     // Copy before parsing: a caller cannot mutate the verified byte array later.
     if(rawArchive)assemblyCharge(assemblyBudget,"bytes",bytes.length);
     bytes=Buffer.from(bytes);
+    if(expectedSha256!==undefined){
+        assemblyCharge(assemblyBudget,"bytes",bytes.length);
+        if(createHash("sha256").update(bytes).digest("hex")!==expectedSha256)bad("raw archive expected hash differs");
+    }
     const frames=[];let offset=MAGIC.length,nodeCount=0;
     while(offset<bytes.length){
         if(frames.length>=LIMITS.frames||offset+4>bytes.length)bad("frame boundary");

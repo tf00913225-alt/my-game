@@ -1973,16 +1973,20 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         if(manifest.status==="acknowledged")metadata={...name,generation:manifest.generation,size:manifest.objectSize};
         else{
             metadata=await immutableCandidateIO.lookupMetadata({...name});
+            if(readBudget)recoveryAuditAssemblyUsage(readBudget);
             if(metadata===null){
                 let created;
                 try{
-                    if(readBudget)chargeRecoveryAuditAssembly(readBudget,"bytes",artifact.bytes.length);
+                    // The fixed transport snapshots raw bytes synchronously before
+                    // its first await; the original private artifact has no caller.
                     created=publicationMetadata(await immutableCandidateIO.createOnly({...name,
-                        bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
+                        bytes:encodingVersion===3?artifact.bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
                 }catch(error){
                     if(!["ALREADY_EXISTS","UNKNOWN_COMMIT"].includes(error.code))throw error;
                 }
+                if(readBudget)recoveryAuditAssemblyUsage(readBudget);
                 metadata=await immutableCandidateIO.lookupMetadata({...name});
+                if(readBudget)recoveryAuditAssemblyUsage(readBudget);
                 if(metadata===null)fail("unavailable","Original immutable candidate object is not available.");
                 if(created&&metadata.generation!==created.generation)fail("data-loss","Created candidate generation changed.");
             }
@@ -1999,18 +2003,17 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
         if(observed.generation!==metadata.generation||!Buffer.isBuffer(response.bytes)||response.bytes.length!==tuple.artifactByteLength)
             fail("data-loss","Exact candidate generation or bytes differ.");
-        if(readBudget)chargeRecoveryAuditAssembly(readBudget,"bytes",response.bytes.length);
-        const generation=observed.generation,bytes=Buffer.from(response.bytes);
-        if(readBudget)chargeRecoveryAuditAssembly(readBudget,"bytes",bytes.length);
-        if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
+        const generation=observed.generation;
         if(encodingVersion===2){
+            const bytes=Buffer.from(response.bytes);
+            if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
             const result=await verifyRecoveryAuditArtifact({uid:tuple.ownerUid,expectedRevision:tuple.sourceRevision,artifactBytes:bytes});
             if(result.candidateProofValid!==true||result.trustedCaptureVerified!==false||result.restoreAuthorized!==false||
                result.authoritativeStateReady!==false||result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
                result.sourceSha256!==tuple.sourceSha256||result.snapshotSha256!==tuple.snapshotSha256)
                 fail("data-loss","Immutable candidate original proof differs.");
         }else{
-            const input=decodeRawRecoveryArchive(bytes,readBudget);
+            const input=decodeRawRecoveryArchive(response.bytes,readBudget,tuple.artifactSha256);
             if(input.binding.ownerUid!==tuple.ownerUid||input.binding.auditId!==tuple.auditId||input.binding.epoch!==tuple.epoch||
                input.binding.sourceRevision!==tuple.sourceRevision||input.binding.inventoryStateSha256!==tuple.inventoryStateSha256||
                input.run.sourceSha256!==tuple.sourceSha256||input.run.snapshotSha256!==tuple.snapshotSha256||
@@ -2026,7 +2029,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             recoveryAuditAssemblyUsage(readBudget);
         }
         return publicationIdentity(publicationReadProofs,{identity,tupleSha256:snapshotDigest(tuple),
-            generation,size:bytes.length,sha256:tuple.artifactSha256,consumed:false,unusable:false});
+            generation,size:tuple.artifactByteLength,sha256:tuple.artifactSha256,consumed:false,unusable:false});
     }
     async function ackCandidatePublication(request,identity,readIdentity){
         requirePublicationPreparation();
