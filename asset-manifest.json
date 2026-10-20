@@ -23,7 +23,7 @@
           "build/app-shell.704efd934a28.js"
         ],
         "styles": [
-          "build/app-shell.801bc1a9895d.css"
+          "build/app-shell.f92dc8f762e5.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -53,7 +53,7 @@
           "build/gameplay-core-secondary.6c041330753f.js"
         ],
         "styles": [
-          "build/gameplay-core.354aa4cf2ab9.css"
+          "build/gameplay-core.f70ab632339c.css"
         ],
         "dependencies": [
           "app-shell",
@@ -570,9 +570,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.801bc1a9895d.css",
-        "sha256": "801bc1a9895d",
-        "bytes": 90552,
+        "path": "build/app-shell.f92dc8f762e5.css",
+        "sha256": "f92dc8f762e5",
+        "bytes": 90920,
         "priority": "P1",
         "type": "style",
         "decode": false
@@ -818,16 +818,16 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core.354aa4cf2ab9.css",
-        "sha256": "354aa4cf2ab9",
-        "bytes": 432695,
+        "path": "build/gameplay-core.f70ab632339c.css",
+        "sha256": "f70ab632339c",
+        "bytes": 433066,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "57b4aa9bfded",
-    "totalBytes": 24030850,
+    "manifestHash": "726af96f368c",
+    "totalBytes": 24031589,
     "totalResources": 79
   },
   "assets": {
@@ -887,13 +887,13 @@
       "sha256": "a3dd09a9d243",
       "bytes": 205537
     },
-    "build/app-shell.801bc1a9895d.css": {
-      "sha256": "801bc1a9895d",
-      "bytes": 90552
+    "build/app-shell.f92dc8f762e5.css": {
+      "sha256": "f92dc8f762e5",
+      "bytes": 90920
     },
-    "build/gameplay-core.354aa4cf2ab9.css": {
-      "sha256": "354aa4cf2ab9",
-      "bytes": 432695
+    "build/gameplay-core.f70ab632339c.css": {
+      "sha256": "f70ab632339c",
+      "bytes": 433066
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",

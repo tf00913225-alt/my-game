@@ -1502,12 +1502,17 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
 #game-ui #homeFeatureModal .home-feature-modal-box,
 .v132-reward-modal-inner.v141-affix-modal{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
+#game-ui #trainingZoneModal{
+    --skill-header-height:calc(44 * var(--ui-length-unit,1px));
+    --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
+    --skill-header-text:#ffe0a1;
+}
 #game-ui #homeFeatureModal{
     --skill-header-height:calc(38 * var(--ui-length-unit,1px));
     --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
     --skill-header-text:#ffe0a1;
 }
-#game-ui #homeFeatureModal .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
 #game-ui #homeFeatureModal #homeFeatureModalTitle{
     flex:0 1 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
     display:grid;grid-template-columns:30% minmax(0,60%) 10%;align-items:center;justify-items:center;
@@ -1519,22 +1524,22 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) .home-feature-modal-title{flex-wrap:wrap;}
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) #homeFeatureModalTitle{flex-basis:100%;letter-spacing:.02em;}
 #game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) .character-header-actions{display:flex;justify-content:flex-end;flex:1 0 100%;}
-#game-ui #homeFeatureModal .home-feature-close-btn{
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-close-btn{
     position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
     flex:0 0 auto;white-space:nowrap;
     box-sizing:border-box;height:var(--skill-header-height);min-height:var(--skill-header-height);margin:0;
     padding:0 calc(12 * var(--ui-length-unit,1px));border:0;border-radius:0;
     background:transparent;box-shadow:none;color:var(--skill-header-text);font-size:calc(16 * var(--ui-length-unit,1px));line-height:1;
 }
-#game-ui #homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)::before{content:'‹';margin-right:calc(5 * var(--ui-length-unit,1px));font-size:1.5em;line-height:1;}
-#game-ui #homeFeatureModal .home-feature-close-btn::after{
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-close-btn:not(#statusHelpButton)::before{content:'‹';margin-right:calc(5 * var(--ui-length-unit,1px));font-size:1.5em;line-height:1;}
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-close-btn::after{
     content:'';position:absolute;z-index:-1;inset:var(--skill-header-inset) 0;pointer-events:none;
     border:calc(1 * var(--ui-length-unit,1px)) solid #a78245;border-radius:calc(3 * var(--ui-length-unit,1px));
     background:linear-gradient(135deg,#a0793c33,transparent 45%),linear-gradient(180deg,#503a20,#2c2012 48%,#19130b);
     box-shadow:inset 0 0 0 calc(2 * var(--ui-length-unit,1px)) #21180e,inset 0 calc(3 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) #d7ad5d33,0 calc(1 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #000;
 }
-#game-ui #homeFeatureModal .home-feature-close-btn:hover::after{border-color:#d2af6d;}
-#game-ui #homeFeatureModal .home-feature-close-btn:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(2 * var(--ui-length-unit,1px));}
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-close-btn:hover::after{border-color:#d2af6d;}
+#game-ui :is(#homeFeatureModal,#trainingZoneModal) .home-feature-close-btn:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(2 * var(--ui-length-unit,1px));}
 #game-ui #homeFeatureModal #homeFeatureModalBody{background:transparent;box-shadow:none;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-showcase-avatar{background-size:230%;background-position:center 12%;}
 #game-ui #homeFeatureModal .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
@@ -1594,6 +1599,7 @@ body > .v169-rpg-dialog-layer{
 #game-stage .v132-reward-modal-title,
 .v132-reward-modal-inner:not(.v141-affix-modal) > h3,
 .v132-reward-modal .v17363-preview-heading,
+#game-stage #trainingZoneModalTitle,
 #game-ui #itemModal .v17351-compare-header,
 .v169-rpg-dialog h2,
 .v141-reward-toast > strong,

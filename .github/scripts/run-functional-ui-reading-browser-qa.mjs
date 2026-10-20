@@ -182,6 +182,14 @@ try{
  await c.eval("(async()=>{await FourSymbolsFeatures.ensure('dungeon','functional-reading');await FourSymbolsFeatures.ensure('abyss','functional-reading');await FourSymbolsFeatures.ensure('adventure','functional-reading');await FourSymbolsFeatures.ensure('patrol','functional-reading')})()");
  for(const page of ['training','dungeon','boss']){
   await c.eval(`closeHomeFeature();showPage(${JSON.stringify(page)})`);await capture(page,'#'+page+'Page');
+  if(page==='training'){
+   const count=await c.eval("document.querySelectorAll('#trainingPage .training-zone-item[onclick]').length");assert.equal(count,10);
+   for(let i=0;i<count;i++){
+    await tap('#trainingPage .training-zone-item:nth-child('+(i+1)+')');await capture('training-zone-'+i,'#trainingZoneModal');
+    const title=await c.eval("(()=>{const e=document.querySelector('#trainingZoneModalTitle'),r=e.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(e);const t=range.getBoundingClientRect(),b=document.querySelector('#trainingZoneModal .home-feature-close-btn').getBoundingClientRect();return {centerError:Math.abs((r.left+r.right-t.left-t.right)/2),returnHeight:b.height};})()");
+    assert.ok(title.centerError<=4&&title.returnHeight>=43,'training title/return: '+JSON.stringify(title));await tap('#trainingZoneModal .home-feature-close-btn');
+   }
+  }
  }
  await c.eval("showPage('dungeon');switchDungeonTab('daily')");
  for(const type of ['exp','material','gold','equipment']){

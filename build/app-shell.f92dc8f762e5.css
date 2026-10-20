@@ -2046,8 +2046,24 @@ html, body{
 }
 #game-stage #trainingZoneModal .home-feature-modal-title{
     flex:0 0 auto !important;
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    align-items:center;
+    gap:8px;
     font-size:22px !important;
     margin-bottom:12px !important;
+}
+#game-stage #trainingZoneModalTitle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-width:0;
+    min-height:44px;
+    padding:6px 8px;
+    border:1px solid transparent;
+    font-size:22px;
+    line-height:1.25;
+    text-align:center;
 }
 #game-stage #trainingZoneModal #trainingZoneModalBody{
     flex:1 1 auto !important;
