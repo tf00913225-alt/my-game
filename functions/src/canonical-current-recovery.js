@@ -10,6 +10,8 @@ const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {verifySkillLearningEvidence,skillLearningEvidenceReadBudget}=require("./canonical-skill-learning");
+const {verifySkillLoadoutEvidence,skillLoadoutEvidenceReadBudget}=require("./canonical-skill-loadout");
+const {classifyRetainedCanonicalOperation}=require("./canonical-operation-classifier");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
@@ -1154,17 +1156,15 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         // Debit receipts survive independently of their ledger. Every known
         // purchase/allocation must reach the original full debit proof below,
         // even when its ledger was lost with the current canonical sources.
-        const ledgerIds=new Set((await recoveryIndex(ledgers,()=>true)).keys());
+        const ledgerIds=new Set((await recoveryIndex(ledgers,()=>true)).keys()),loadoutEdges=new Map();
         for await(const doc of recoveryRows(operations)){
             const value=doc.data();
-            if(value.schemaVersion!==1||value.ownerUid!==uid){
-                fail("data-loss","Operation inventory identity blocks recovery.");
-            }
-            if(value.kind==="forest-patrol-settlement"){
+            const category=classifyRetainedCanonicalOperation(value,doc.id,uid,expectedRevision,fail);
+            if(category==="patrol"){
                 if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
                     fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
                 }
-            }else if(value.kind==="account-mode-time"){
+            }else if(category==="mode"){
                 if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
                 }
@@ -1172,7 +1172,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     await modeEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
                 }
                 verifiedModeOperations.add(doc.id);
-            }else if(["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(value.kind)){
+            }else if(category==="debit"){
                 if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A debit receipt without its original ledger blocks recovery.");
                 }
@@ -1180,7 +1180,16 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
                     fail("data-loss","A source operation overlaps economic evidence.");
                 }
-                if(value.kind==="canonical-current-recovery"){
+                if(category==="loadout"){
+                    if(!records.account.slots.includes(value.characterId))fail("data-loss","Retained skill loadout target is not owned.");
+                    const edge=await verifySkillLoadoutEvidence({tx:recoveryUnit(tx),root,uid,operationId:doc.id,currentRevision:expectedRevision,receipt:value,fail});
+                    const scope=segmentedScopes.get(tx);
+                    if(scope){
+                        chargeRecoveryAuditAssembly(scope.budget,"operations",1);
+                        encodeProofPayload(edge,scope.budget);
+                    }
+                    loadoutEdges.set(doc.id,edge);
+                }else if(category==="recovery"){
                     if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                        !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
                        !Number.isSafeInteger(value.restoredRevision)||
@@ -1215,6 +1224,29 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     else await sourceEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc);
                 }
             }
+        }
+        // Every retained non-economic loadout operation must belong to the
+        // unique original-marker chain ending at today's preserved head.
+        // Each unit was fully proved above; closure never recursively re-proves.
+        const head=records.progress.playableState?.loadoutSource;
+        if(!head){if(loadoutEdges.size)fail("data-loss","Skill loadout history lacks its current source binding.");}
+        else{
+            const visited=new Set(),revisions=new Set();
+            let id=head.operationId,resultRevision=head.resultRevision,policySha256=head.policySha256;
+            while(id!==null){
+                const scope=segmentedScopes.get(tx);
+                if(scope){chargeRecoveryAuditAssembly(scope.budget,"operations",5);chargeRecoveryAuditAssembly(scope.budget,"nodes",2);}
+                const edge=loadoutEdges.get(id);
+                if(!edge||visited.has(id)||revisions.has(edge.resultRevision)||
+                   edge.resultRevision!==resultRevision||edge.policySha256!==policySha256)
+                    fail("data-loss","Skill loadout history has a missing, cyclic or mismatched edge.");
+                visited.add(id);revisions.add(edge.resultRevision);
+                if(edge.previousOperationId!==null){
+                    if(edge.previousResultRevision>=edge.resultRevision)fail("data-loss","Skill loadout predecessor revision is inconsistent.");
+                }
+                id=edge.previousOperationId;resultRevision=edge.previousResultRevision;policySha256=edge.previousPolicySha256;
+            }
+            if(visited.size!==loadoutEdges.size)fail("data-loss","An orphaned or branched skill loadout operation blocks recovery.");
         }
         // Events survive independently of grants. Losing a grant must not
         // hide an original reward observation or authorize recreating it.
@@ -1445,7 +1477,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
-                (doc.get("kind")==="canonical-current-recovery"?8:
+                (doc.get("kind")==="skill-loadout"?skillLoadoutEvidenceReadBudget():doc.get("kind")==="canonical-current-recovery"?8:
                     doc.get("kind")==="forest-patrol-settlement"?0:
                     doc.get("kind")==="account-mode-time"?
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
@@ -1683,7 +1715,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                actual.typedDataSha256!==witness.typedDataSha256||actual.typedDataByteLength!==witness.typedDataByteLength)return false;
             metrics.settlementReuseHits++;return true;
         };
-        segmentedScopes.set(tx,{unit,completeTicket,reuseSettlement});
+        segmentedScopes.set(tx,{unit,completeTicket,reuseSettlement,budget});
         const rows=(name,filter=null)=>{
             const path=root.path+"/"+name,ids=namespaces.get(path);
             if(!ids)fail("data-loss","Segmented inventory namespace differs.");

@@ -875,6 +875,7 @@ test('actual twenty-battle active and current-loss raw captures assemble through
 
 test('genuine twenty-battle skill learn/upgrade and secondary learn survive full raw current-loss candidate without source replacement',async()=>{
     const {createCanonicalSkillLearning}=require('../functions/src/canonical-skill-learning');
+    const {createCanonicalSkillLoadout}=require('../functions/src/canonical-skill-loadout');
     let primaryId,secondaryId,learnIntent,learnResult;
     const make=async fault=>fixture({three:false,currentLoss:false,beforeAudit:async(h,{deps,request})=>{
         const writer=createCanonicalSkillLearning(deps),slots=h.data.get(h.root+'/account/current').slots;
@@ -898,6 +899,30 @@ test('genuine twenty-battle skill learn/upgrade and secondary learn survive full
         assert.equal(complete.characters[1].state.skillPoints,0);
         const writes=h.writes;
         assert.deepEqual(await writer.learnOrUpgrade(request(),learnIntent),{...learnResult,unchanged:true});assert.equal(h.writes,writes);
+        const loadout=createCanonicalSkillLoadout(deps),mutate=(id,characterId,action,skillId)=>loadout.mutateLoadout(request(),{
+            operationId:id,expectedRevision:h.revision,characterId,action,skillId});
+        const states=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.characters.map(row=>copy(row.state));
+        await mutate('skill-earned-primary-equip-01',primaryId,'equip','flameSlash');
+        await mutate('skill-earned-primary-select01',primaryId,'select-auto-action','flameSlash');
+        await mutate('skill-earned-secondary-equip1',secondaryId,'equip','flameSlash');
+        await mutate('skill-earned-secondary-select',secondaryId,'select-auto-action','flameSlash');
+        await mutate('skill-earned-secondary-remove',secondaryId,'remove','flameSlash');
+        const final=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+        assert.deepEqual(final.characters.map(row=>row.state),states);
+        assert(final.characters.every(row=>row.serverRevision===h.revision));
+        assert.deepEqual(final.characters[0].skillLoadout.equippedSkills,['flameSlash']);
+        assert.deepEqual(final.characters[1].skillLoadout.equippedSkills,[]);
+        assert.equal(final.progress.playableState.preferencesVersion,2);
+        // The actual formal DOM lacks the legacy secondary select; its stale
+        // explicit preference survives removal, without granting that skill.
+        assert.equal(final.progress.playableState.autoConfig2.skill,'flameSlash');
+        assert.equal(final.progress.playableState.autoConfig2.v136LastSkill,'flameSlash');
+        assert.equal(Object.hasOwn(final.progress.playableState.autoConfig3,'v136ActionIntent'),false);
+        const head=copy(final.progress.playableState.loadoutSource);
+        await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-later-learn-001',
+            expectedRevision:h.revision,skillId:'fireCritical'});
+        assert.deepEqual(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.progress.playableState.loadoutSource,head);
+        assert(head.resultRevision<h.revision,'another actual writer preserves the older exact head revision');
         if(fault)fault(h,learnIntent.operationId);
         for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
             .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
@@ -917,7 +942,10 @@ test('genuine twenty-battle skill learn/upgrade and secondary learn survive full
     assert.equal(JSON.stringify(material),input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
     for(const fault of [
         (h,id)=>{h.data.get(h.root+'/ledgerEntries/'+id).amount--;},
-        (h,id)=>{for(const collection of ['operations','ledgerEntries'])h.data.get(h.root+'/'+collection+'/'+id).policySha256='f'.repeat(64);}
+        (h,id)=>{for(const collection of ['operations','ledgerEntries'])h.data.get(h.root+'/'+collection+'/'+id).policySha256='f'.repeat(64);},
+        h=>{h.data.get(h.root+'/operations/skill-earned-secondary-remove').policySha256='f'.repeat(64);},
+        h=>{h.data.set(h.root+'/ledgerEntries/skill-earned-secondary-remove',{schemaVersion:1,kind:'skill-loadout',ownerUid:h.uid,operationId:'skill-earned-secondary-remove'});},
+        h=>{h.data.delete(h.root+'/operations/skill-earned-secondary-remove');}
     ]){
         const corrupt=await make(fault),sealed=await completeRawMaterial(corrupt);
         await unchanged(corrupt,()=>privateRawInspector(corrupt,'verifySegmentedRawRecoveryProof')(sealed),error=>error.code==='data-loss');
@@ -1467,4 +1495,23 @@ test('indexed row byte exhaustion refuses before hashing or parsing the qualifie
     assert.equal(hashes,0);assert.equal(parses,0);
     assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
     assert.equal(hashes,0);assert.equal(parses,0);
+});
+
+test('versioned raw archive syntax roundtrips genuine two-battle capture bytes without source authority or old-reader acceptance',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await fixture({battles:2,three:true}),material=await completeRawMaterial(f);
+    const before=copy([...f.h.data]),original=JSON.stringify(material),writes=f.h.writes,budget=helper.createRecoveryAuditAssemblyBudget();
+    const bytes=helper.encodeRawRecoveryArchive(material,budget),decoded=helper.decodeRawRecoveryArchive(bytes,budget);
+    for(const name of ['binding','run','inventoryState','rawState'])assert.deepEqual(helper.encodeProofPayload(decoded[name]),helper.encodeProofPayload(material[name]));
+    for(const name of ['inventoryPages','rawReceipts','rawChunks']){
+        assert.deepEqual(decoded[name].map(row=>row.id),material[name].map(row=>row.id));
+        for(let i=0;i<decoded[name].length;i++){
+            const {payloadBytes:a,...left}=decoded[name][i].row,{payloadBytes:b,...right}=material[name][i].row;
+            assert.deepEqual(helper.encodeProofPayload(left),helper.encodeProofPayload(right));if(a)assert.deepEqual(a,b);
+        }
+    }
+    assert.deepEqual(helper.encodeRawRecoveryArchive(decoded,budget),bytes);
+    assert.throws(()=>helper.decodeRecoveryAuditArtifact(bytes,{uid:f.h.uid,expectedRevision:f.h.revision,db:candidateQueryDb(f.h.dependencies.db)}));
+    assert.equal(JSON.stringify(material),original);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.deepEqual(Object.keys(decoded).sort(),Object.keys(material).sort());
+    t.diagnostic(JSON.stringify({archiveBytes:bytes.length,...helper.recoveryAuditAssemblyUsage(budget)}));
 });

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {createHash} from 'node:crypto';
 import {parse} from 'acorn';
+import {verifySkillLoadoutPolicy} from './skill-learning-policy.mjs';
 
 export const CATALOG_PATH='functions/src/generated/player-skill-config-catalog.json';
 const MAIN='js/00-main.js',FINAL='js/60-v173.64-skill-progression-rebalance.js';
@@ -89,13 +90,61 @@ function rooted(node,names){
     while(node?.type==='MemberExpression')node=node.object;
     return node?.type==='Identifier'&&names.has(node.name);
 }
+function retainedLoadoutReader(node){
+    const callee=node.callee,owner=callee?.object;
+    return node.type==='CallExpression'&&!node.optional&&callee?.type==='MemberExpression'&&!callee.computed&&!callee.optional&&
+        callee.property?.type==='Identifier'&&callee.property.name==='getLoadoutRulesForVersion'&&
+        owner?.type==='MemberExpression'&&!owner.computed&&!owner.optional&&owner.object?.type==='Identifier'&&owner.object.name==='window'&&
+        owner.property?.type==='Identifier'&&owner.property.name==='FourSymbolsSkillProgressionCore'&&
+        node.arguments.length===2&&node.arguments[0]?.type==='Literal'&&node.arguments[0].value==='v1'&&
+        node.arguments[1]?.type==='Identifier'&&node.arguments[1].name==='skillDatabase';
+}
+// Closed compatibility for this mechanical delegation only. These are AST
+// data-provenance identities, not hashes of the new raw source files.
+const LOADOUT_DELEGATES={
+    'js/00-main.js':{owner:null,selectors:['function:removeEquippedSkill','function:populateAutoSkillOptions'],sha256:'69768ee1c1563aa860de7803e386ca60ec32c4feaa4c9b90e13cfc44403645ba'},
+    'js/31-v136-auto-battle-fix.js':{owner:'installV136AutoBattleFix',selectors:['const:loadoutRules','function:normalizeAction',
+        'function:isUnsupportedAutoCategory','function:rememberExplicitAction','function:migrateCurrentIntent',
+        'function:restoreSkillAfterLegacySync','function:saveCurrentActionFromPanel','if:saveAutoSettingsFormToCharacter',
+        'if:populateAutoSkillOptions','if:populateAutoSkillOptions2','migration'],sha256:'ff5691f28bbf4c2028a18f3b3b6a9ea9f9664b15afcc516616887d68ee546d6b',
+        footprint:'fec835377b38d6a63d56c14f427545e7c3c13242b4ae9c74a400ad34e0d58e9a'},
+    'js/60-v173.64-skill-progression-rebalance.js':{owner:'installV17364SkillProgression',selectors:['const:loadoutRules',
+        'function:normalizeCrossElementEquip','function:normalizeAllCrossElementEquips','if:equipSkill'],sha256:'fe3d8105ecdca4bd3010d66f2f661d56e91ce2186a51e255291de72524f407b1',
+        footprint:'1ae65815063a6979a56a0e1d326ad65adaef9d0979b3b6eee4e5a9852470fe75'}
+};
+function delegateLabel(node){
+    if(node?.type==='FunctionDeclaration')return 'function:'+node.id.name;
+    if(node?.type==='VariableDeclaration'&&node.kind==='const'&&node.declarations.length===1)return 'const:'+node.declarations[0].id.name;
+    if(node?.type==='IfStatement'&&node.test?.type==='BinaryExpression'&&node.test.left?.type==='UnaryExpression'&&
+        node.test.left.operator==='typeof'&&node.test.left.argument.type==='Identifier')return 'if:'+node.test.left.argument.name;
+    const call=node?.expression;
+    if(call?.type==='CallExpression'&&call.callee?.type==='MemberExpression'&&call.callee.object?.type==='ArrayExpression'&&
+        property(call.callee)==='forEach'&&call.arguments[0]?.name==='migrateCurrentIntent')return 'migration';
+    return node?.type??null;
+}
+function loadoutDelegateShape(ast,file){
+    const policy=LOADOUT_DELEGATES[file];if(!policy)fail('unsupported loadout reader location');
+    const owner=policy.owner?one(ast.body.filter(n=>n.type==='ExpressionStatement'&&n.expression?.type==='CallExpression'&&
+        n.expression.callee?.type==='FunctionExpression'&&n.expression.callee.id?.name===policy.owner),'loadout lifecycle Owner').expression.callee.body:ast;
+    const protectedNames=new Set(policy.selectors.filter(key=>key!=='migration').map(key=>key.split(':')[1])),allowedAssignments=new WeakSet(),readers=new Set();
+    const selected=policy.selectors.map(label=>{
+        const found=owner.body.map((node,index)=>({node,index})).filter(({node})=>delegateLabel(node)===label);
+        const {node,index}=one(found,'loadout delegate '+label);
+        walk(node,child=>{if(child.type==='AssignmentExpression'&&child.left.type==='Identifier'&&protectedNames.has(child.left.name))allowedAssignments.add(child);});
+        walk(node,child=>{if(retainedLoadoutReader(child))readers.add(child);});
+        return {label,before:delegateLabel(owner.body[index-1]),after:delegateLabel(owner.body[index+1]),node:semantic(node)};
+    });
+    walk(ast,node=>{if(node.type==='AssignmentExpression'&&node.left.type==='Identifier'&&protectedNames.has(node.left.name)&&!allowedAssignments.has(node)||
+        node.type==='UpdateExpression'&&node.argument.type==='Identifier'&&protectedNames.has(node.argument.name))fail('loadout delegate cannot be rebound');});
+    return {sha256:hash(selected),readers};
+}
 // Closed source-change guard, not an interpreter: existing runtime data
 // mutators remain in their original Owners and are never executed here.
 function mutationShapes(root,asts,apply){
     const build=parse(fs.readFileSync(path.join(root,'scripts/build-production.mjs'),'utf8'),{ecmaVersion:'latest',sourceType:'module'});
     const files=['appScripts','gameplayScripts'].flatMap(name=>literal(variable(build.body,name)));
     if(files.filter(file=>file===MAIN).length!==1||files.filter(file=>file===FINAL).length!==1||files.indexOf(MAIN)>files.indexOf(FINAL))fail('ambiguous formal load order');
-    const result={};
+    const result={},checkedLoadoutDelegates=new Map();
     for(const file of files){
         if(typeof file!=='string'||file.includes('..')||!file.endsWith('.js'))fail('unsupported source path');
         const ast=asts[file]||parse(fs.readFileSync(path.join(root,file),'utf8'),{ecmaVersion:'latest'});
@@ -117,6 +166,15 @@ function mutationShapes(root,asts,apply){
             if(left?.type==='MemberExpression'&&rooted(left,aliases)&&
                (left.object.name==='skillDatabase'||FIELDS.has(property(left))||property(left)===null))rows.push(semantic(n));
             if(n.type!=='CallExpression')return;
+            if(retainedLoadoutReader(n)){
+                if(!checkedLoadoutDelegates.has(file)){
+                    const sealed=loadoutDelegateShape(ast,file);
+                    if(sealed.sha256!==LOADOUT_DELEGATES[file].sha256)fail('unsupported loadout delegate lifecycle');
+                    checkedLoadoutDelegates.set(file,sealed.readers);
+                }
+                if(!checkedLoadoutDelegates.get(file).has(n))fail('unsupported loadout reader location');
+                return;
+            }
             if(n.callee.type==='Identifier'&&n.callee.name==='patchSkill'){
                 if(n.arguments.length!==2)fail('unsupported historical patch call');
                 rows.push({patchSkill:literal(n.arguments[0]),fields:projection(n.arguments[1],'historical patch fields')});
@@ -134,11 +192,17 @@ function mutationShapes(root,asts,apply){
         });
         if(rows.length)result[file]=hash(rows);
     }
-    if(JSON.stringify(Object.keys(result))!==JSON.stringify(Object.keys(MUTATION_SHAPES))||JSON.stringify(stable(result))!==JSON.stringify(stable(MUTATION_SHAPES)))fail('unsupported skill data mutator footprint');
+    if(JSON.stringify(Object.keys(result))!==JSON.stringify(Object.keys(MUTATION_SHAPES)))fail('unsupported skill data mutator footprint');
+    for(const file of Object.keys(result))if(result[file]!==MUTATION_SHAPES[file]){
+        if(!checkedLoadoutDelegates.has(file)||!LOADOUT_DELEGATES[file].footprint||result[file]!==LOADOUT_DELEGATES[file].footprint)
+            fail('unsupported skill data mutator footprint');
+        result[file]=MUTATION_SHAPES[file];
+    }
     return result;
 }
 
 export async function buildPlayerSkillConfigCatalog(root){
+    try{verifySkillLoadoutPolicy(root);}catch(error){fail(error.message);}
     const source=Object.fromEntries([MAIN,FINAL].map(file=>[file,fs.readFileSync(path.join(root,file),'utf8')]));
     const main=parse(source[MAIN],{ecmaVersion:'latest'}),final=parse(source[FINAL],{ecmaVersion:'latest'});
     const owner=one(final.body.filter(n=>n.type==='ExpressionStatement'&&n.expression.type==='CallExpression'&&n.expression.callee.type==='FunctionExpression'),'final data Owner').expression.callee.body.body;
