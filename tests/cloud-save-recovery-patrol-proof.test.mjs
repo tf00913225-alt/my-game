@@ -1358,12 +1358,23 @@ test('segmented private proof rejects semantic orphans, lost economic pairs and 
 
 test('segmented private chunk copies isolate external mutation and charge one sticky whole-lifecycle budget',async()=>{
     const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
-    let builds=0,token,metadataChecks=0,qualifiedReads=0;const tokens=new Set(),wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
-        inventoryDocumentMetadata:(...args)=>{metadataChecks++;return helper.inventoryDocumentMetadata(...args);},
+    let builds=0,token,metadataChecks=0,qualifiedReads=0;const tokens=new Set(),initialMembershipChecks=new Map(),reuseMetadataChecks=new Map();
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
+        inventoryDocumentMetadata:(...args)=>{metadataChecks++;assert.equal(args[2],token);
+            // Complete raw membership precedes every indexed point read. Later
+            // metadata work is the fresh exact-row check on a reuse candidate.
+            const checks=qualifiedReads===0?initialMembershipChecks:reuseMetadataChecks,path=args[0].ref.path;
+            checks.set(path,(checks.get(path)??0)+1);return helper.inventoryDocumentMetadata(...args);},
         decodeIndexedRawProofRow:(...args)=>{qualifiedReads++;return helper.decodeIndexedRawProofRow(...args);},
         chargeRecoveryAuditAssembly:(budget,...args)=>{tokens.add(budget);return helper.chargeRecoveryAuditAssembly(budget,...args);}};
     const expected=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
-    assert.equal(metadataChecks,inventoryOrder(f).length,'each initial raw row reaches original membership validation exactly once');
+    const inventoryPaths=inventoryOrder(f).map(row=>row.path),settlementPaths=inventoryPaths.filter(path=>path.startsWith(f.h.root+'/patrolSettlements/'));
+    assert.deepEqual([...initialMembershipChecks.keys()].sort(),inventoryPaths.slice().sort());
+    assert([...initialMembershipChecks.values()].every(count=>count===1),'each initial raw row reaches original membership validation exactly once');
+    assert.deepEqual([...reuseMetadataChecks.keys()].sort(),settlementPaths.slice().sort());
+    assert([...reuseMetadataChecks.values()].every(count=>count===1),'each reused settlement freshly rechecks its exact raw metadata once');
+    assert.equal(reuseMetadataChecks.size,expected.residentUsage.settlementReuseHits);
+    assert.equal(metadataChecks,initialMembershipChecks.size+reuseMetadataChecks.size);
     assert.equal(qualifiedReads,expected.residentUsage.rowDecodes);assert(qualifiedReads>metadataChecks);
     const privateBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
     assert.equal(expected.residentUsage.privateChunkBytes,privateBytes);assert.equal(expected.residentUsage.copyChargedBytes,privateBytes);
