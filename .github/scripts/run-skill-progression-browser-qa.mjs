@@ -202,7 +202,11 @@ async function runViewport(chrome,url,width,height,capture){
             const titleStyle=getComputedStyle(title),titleRect=rect(title);
             const range=document.createRange();range.selectNodeContents(title);
             const textRect=range.getBoundingClientRect(),scale=titleRect.w/title.offsetWidth;
-            const center=titleRect.x+(parseFloat(titleStyle.paddingLeft)+(title.offsetWidth-parseFloat(titleStyle.paddingLeft)-parseFloat(titleStyle.paddingRight))/2)*scale;
+            const tracks=titleStyle.gridTemplateColumns.split(/\s+/).map(Number.parseFloat);
+            const gap=titleStyle.columnGap==='normal'?0:parseFloat(titleStyle.columnGap);
+            const contentLeft=titleRect.x+(parseFloat(titleStyle.borderLeftWidth)+parseFloat(titleStyle.paddingLeft))*scale;
+            // The first track holds the dragon ornament; real text occupies track 2.
+            const center=contentLeft+(tracks[0]+gap+tracks[1]/2)*scale;
             const plaque=new Image();plaque.src=chrome[1];await plaque.decode();
             const artHeight=titleRect.w*plaque.naturalHeight/plaque.naturalWidth;
             const artTop=titleRect.y+(titleRect.h-artHeight)/2;
@@ -212,7 +216,7 @@ async function runViewport(chrome,url,width,height,capture){
             const baseline=textRect.top+ink.fontBoundingBoxAscent*scale;
             // Clear interior of the actual bronze artwork, excluding dragon and trim.
             const safe={left:titleRect.x+titleRect.w*.31,right:titleRect.x+titleRect.w*.80,top:artTop+artHeight*.30,bottom:artTop+artHeight*.69};
-            const header={title:titleRect,back:rect(back),row:rect(title.parentElement),centerError:Math.abs(textRect.x+textRect.width/2-center),text:{left:textRect.left,right:textRect.right,top:baseline-ink.actualBoundingBoxAscent*scale,bottom:baseline+ink.actualBoundingBoxDescent*scale},safe};
+            const header={title:titleRect,back:rect(back),row:rect(title.parentElement),tracks,gap,direction:titleStyle.direction,center,rangeCenter:textRect.x+textRect.width/2,centerError:Math.abs(textRect.x+textRect.width/2-center),text:{left:textRect.left,right:textRect.right,top:baseline-ink.actualBoundingBoxAscent*scale,bottom:baseline+ink.actualBoundingBoxDescent*scale},safe};
             const selected=modal.dataset.characterTab;
             closeHomeFeature();const cleared=!modal.hasAttribute('data-character-tab');
             openHomeFeature('character');switchCharacterTab('skill');selectedSkillElementTab='water';renderSkillLoadout();
@@ -221,7 +225,12 @@ async function runViewport(chrome,url,width,height,capture){
         assert.ok(Math.abs(skin.header.title.h-skin.header.back.h)<.1,'skill title and return must share a height');
         assert.ok(skin.header.title.w/skin.header.row.w<=.71,'skill plaque must reserve the return action');
         assert.ok(skin.header.title.x+skin.header.title.w<skin.header.back.x,'title overlaps return');
-        assert.ok(skin.header.centerError<4,'skill text must center inside its usable plaque region');
+        assert.equal(skin.header.direction,'ltr','plaque writing-area measurement requires its formal left-to-right grid');
+        assert.equal(skin.header.tracks.length,3,'skill plaque must retain its three artwork tracks');
+        const trackWidth=skin.header.tracks.reduce((sum,width)=>sum+width,0);
+        for(const [index,ratio] of [.3,.6,.1].entries())assert.ok(Number.isFinite(skin.header.tracks[index])&&Math.abs(skin.header.tracks[index]/trackWidth-ratio)<.002,'skill plaque artwork tracks changed');
+        assert.equal(skin.header.gap,0,'skill plaque artwork tracks must remain contiguous');
+        assert.ok(skin.header.centerError<4,'skill text must center inside its usable plaque region: '+JSON.stringify(skin.header));
         for(const edge of ['left','top'])assert.ok(skin.header.text[edge]>=skin.header.safe[edge],`skill title ${edge} escapes the artwork interior: ${JSON.stringify(skin.header)}`);
         for(const edge of ['right','bottom'])assert.ok(skin.header.text[edge]<=skin.header.safe[edge],`skill title ${edge} escapes the artwork interior`);
         assert.equal(skin.selected,'skill');assert.equal(skin.cleared,true,'skill chrome leaks after closing');

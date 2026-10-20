@@ -2272,7 +2272,7 @@
       "label": "能力值說明",
       "entry": "showStatusHelp()",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "短內容",
         "長內容",
@@ -2403,6 +2403,46 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "既有雕框／文字／關閉保留"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4231,7 +4271,7 @@
       "label": "合成 talisman",
       "entry": "v141SwitchSynthesisTab('talisman')",
       "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "滿資料",
@@ -4284,6 +4324,48 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "數量增減2",
+          "最大1234隔離fixture",
+          "捲動至材料／金幣／開始合成完整可見"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4291,7 +4373,7 @@
       "label": "合成 fragment",
       "entry": "v141SwitchSynthesisTab('fragment')",
       "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "滿資料",
@@ -4344,6 +4426,48 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "獨立數量列",
+          "不足／disabled合成按鈕可讀",
+          "末項可達"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4411,7 +4535,7 @@
       "label": "任務 daily",
       "entry": "openHomeFeature('quest'); 正式任務TAB",
       "owner": "index.html; js/00-main.js; css/25-stage-v90-quest-interface-core.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未完成",
         "可領取",
@@ -4463,6 +4587,47 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "鎖定完成度獎勵文字",
+          "正確任務容器捲至末項"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4529,7 +4694,7 @@
       "label": "英雄 overview",
       "entry": "主城英雄→正式 overview 控制",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "已擁有",
@@ -4582,6 +4747,46 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "正式唯讀transport名單可達"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4589,7 +4794,7 @@
       "label": "英雄 detail",
       "entry": "主城英雄→正式 detail 控制",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "已擁有",
@@ -4642,6 +4847,46 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "實際詳情及返回"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4649,7 +4894,7 @@
       "label": "英雄 formation",
       "entry": "主城英雄→正式 formation 控制",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "空資料",
         "已擁有",
@@ -4702,6 +4947,46 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "可進入／candidate選中／返回，未放置或儲存"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -4890,7 +5175,7 @@
       "label": "秘寶 tabs",
       "entry": "openHomeFeature('relic'); 正式 tabs 控制",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "未取得",
@@ -4944,6 +5229,48 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-6",
+        "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+        "states": [
+          "八分類真touch選中保持可見",
+          "左右橫捲",
+          "標題與祖先捲動位置"
+        ],
+        "devices": {
+          "360x640": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/360x640/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "393x873": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/393x873/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "412x915": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/412x915/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          },
+          "1280x800": {
+            "report": "artifacts/ui-skill-standard/segment6-resumed-2fa32658/1280x800/report.json",
+            "sourceUnchanged": true,
+            "cleanSnapshot": true
+          }
+        },
+        "reviews": {
+          "art": "四尺寸34張實圖，限定通過",
+          "interaction": "四尺寸真touch/scroll/return限定通過",
+          "scope": "四尺寸代表after與before/diff，限定通過"
+        },
+        "notVerified": [
+          "真實裝置",
+          "交易／合成執行",
+          "獎勵領取／結算",
+          "未列出的其他業務狀態"
+        ]
       }
     },
     {
@@ -10780,6 +11107,24 @@
         "未驗Boss/非空狀態/正式符咒/實體裝置",
         "未驗reward dismiss",
         "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+      ]
+    },
+    {
+      "segment": "segment-6",
+      "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+      "sourceHead": "a0d8d30779f5e48648a9bd4649a12876d4b3dfef",
+      "result": "三類獨立審核限定通過，非全UI完成",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "screenshots": 112,
+      "pending": [
+        "Auto393/412 sticky上緣露背後字細線",
+        "其餘清單狀態",
+        "最新Head CI與部署"
       ]
     }
   ],

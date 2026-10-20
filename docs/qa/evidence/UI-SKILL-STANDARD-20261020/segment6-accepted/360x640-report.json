@@ -1,0 +1,5152 @@
+{
+  "head": "2fa326580bdf09095e2e515d95e818d3fed7fe56",
+  "viewport": [
+    360,
+    640
+  ],
+  "scenes": [
+    {
+      "name": "relic-start",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-tabs-end",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-last-selected",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-1",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-2",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-3",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-4",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-5",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-6",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-7",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-category-8",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 20.5,
+            "width": 229.59896850585938,
+            "height": 38,
+            "top": 20.5,
+            "right": 245.59896850585938,
+            "bottom": 58.5,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 16,
+            "y": 18,
+            "width": 328,
+            "height": 44,
+            "top": 18,
+            "right": 344,
+            "bottom": 62,
+            "left": 16
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 10,
+            "width": 344,
+            "height": 620,
+            "top": 10,
+            "right": 352,
+            "bottom": 630,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "quest-locked",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 27.359375,
+            "y": 36,
+            "width": 213.69271850585938,
+            "height": 38,
+            "top": 36,
+            "right": 241.05209350585938,
+            "bottom": 74,
+            "left": 27.359375
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 27.359375,
+            "y": 36,
+            "width": 305.27606201171875,
+            "height": 38,
+            "top": 36,
+            "right": 332.63543701171875,
+            "bottom": 74,
+            "left": 27.359375
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 15.359375,
+            "y": 24,
+            "width": 329.27606201171875,
+            "height": 592,
+            "top": 24,
+            "right": 344.63543701171875,
+            "bottom": 616,
+            "left": 15.359375
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "任務",
+      "box": {
+        "x": 27.359375,
+        "y": 36,
+        "width": 213.69271850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.72917175292969,
+        "y": 35.333335876464844,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "quest-bottom",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 27.359375,
+            "y": 36,
+            "width": 213.69271850585938,
+            "height": 38,
+            "top": 36,
+            "right": 241.05209350585938,
+            "bottom": 74,
+            "left": 27.359375
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 27.359375,
+            "y": 36,
+            "width": 305.27606201171875,
+            "height": 38,
+            "top": 36,
+            "right": 332.63543701171875,
+            "bottom": 74,
+            "left": 27.359375
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 15.359375,
+            "y": 24,
+            "width": 329.27606201171875,
+            "height": 592,
+            "top": 24,
+            "right": 344.63543701171875,
+            "bottom": 616,
+            "left": 15.359375
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "任務",
+      "box": {
+        "x": 27.359375,
+        "y": 36,
+        "width": 213.69271850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.72917175292969,
+        "y": 35.333335876464844,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "synthesis-quantity",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "synthesis-quantity-after",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "synthesis-multidigit",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "synthesis-bottom",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "fragment-controls",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "fragment-bottom",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 217,
+            "height": 38,
+            "top": 25,
+            "right": 242,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 25,
+            "y": 25,
+            "width": 310,
+            "height": 38,
+            "top": 25,
+            "right": 335,
+            "bottom": 63,
+            "left": 25
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 8,
+            "y": 8,
+            "width": 344,
+            "height": 544,
+            "top": 8,
+            "right": 352,
+            "bottom": 552,
+            "left": 8
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "合成",
+      "box": {
+        "x": 25,
+        "y": 25,
+        "width": 217,
+        "height": 38
+      },
+      "textBox": {
+        "x": 127.35417175292969,
+        "y": 24.33333396911621,
+        "width": 55.68229675292969,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "status-help",
+      "ancestors": [
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 40.333335876464844,
+            "y": 64.33333587646484,
+            "width": 279.3333435058594,
+            "height": 40,
+            "top": 64.33333587646484,
+            "right": 319.6666793823242,
+            "bottom": 104.33333587646484,
+            "left": 40.333335876464844
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 26,
+            "y": 50,
+            "width": 308,
+            "height": 540,
+            "top": 50,
+            "right": 334,
+            "bottom": 590,
+            "left": 26
+          }
+        },
+        {
+          "id": "statusHelpModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "\n    屬性說明\n",
+      "box": {
+        "x": 40.333335876464844,
+        "y": 64.33333587646484,
+        "width": 279.3333435058594,
+        "height": 40
+      },
+      "textBox": {
+        "x": 140,
+        "y": 69.66667175292969,
+        "width": 80,
+        "height": 29
+      },
+      "inside": true
+    },
+    {
+      "name": "auto-top",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 63,
+            "width": 278,
+            "height": 38,
+            "top": 63,
+            "right": 319,
+            "bottom": 101,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 39,
+            "y": 63,
+            "width": 282,
+            "height": 85,
+            "top": 63,
+            "right": 321,
+            "bottom": 148,
+            "left": 39
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 26,
+            "y": 50,
+            "width": 308,
+            "height": 540,
+            "top": 50,
+            "right": 334,
+            "bottom": 590,
+            "left": 26
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "自動戰鬥設定",
+      "box": {
+        "x": 41,
+        "y": 63,
+        "width": 278,
+        "height": 38
+      },
+      "textBox": {
+        "x": 134.3541717529297,
+        "y": 62.333335876464844,
+        "width": 146.8802032470703,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "auto-bottom",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 63,
+            "width": 278,
+            "height": 38,
+            "top": 63,
+            "right": 319,
+            "bottom": 101,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 39,
+            "y": 63,
+            "width": 282,
+            "height": 85,
+            "top": 63,
+            "right": 321,
+            "bottom": 148,
+            "left": 39
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 26,
+            "y": 50,
+            "width": 308,
+            "height": 540,
+            "top": 50,
+            "right": 334,
+            "bottom": 590,
+            "left": 26
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "自動戰鬥設定",
+      "box": {
+        "x": 41,
+        "y": 63,
+        "width": 278,
+        "height": 38
+      },
+      "textBox": {
+        "x": 134.3541717529297,
+        "y": 62.333335876464844,
+        "width": 146.8802032470703,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-ready",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 194.59896850585938,
+            "height": 38,
+            "top": 41,
+            "right": 235.59896850585938,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 278,
+            "height": 38,
+            "top": 41,
+            "right": 319,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 24,
+            "width": 312,
+            "height": 592,
+            "top": 24,
+            "right": 336,
+            "bottom": 616,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "英雄",
+      "box": {
+        "x": 41,
+        "y": 41,
+        "width": 194.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 129.91146850585938,
+        "y": 40.333335876464844,
+        "width": 55.682281494140625,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-list",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 194.59896850585938,
+            "height": 38,
+            "top": 41,
+            "right": 235.59896850585938,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 278,
+            "height": 38,
+            "top": 41,
+            "right": 319,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 24,
+            "width": 312,
+            "height": 592,
+            "top": 24,
+            "right": 336,
+            "bottom": 616,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "英雄",
+      "box": {
+        "x": 41,
+        "y": 41,
+        "width": 194.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 129.91146850585938,
+        "y": 40.333335876464844,
+        "width": 55.682281494140625,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-detail",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 194.59896850585938,
+            "height": 38,
+            "top": 41,
+            "right": 235.59896850585938,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 278,
+            "height": 38,
+            "top": 41,
+            "right": 319,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 24,
+            "width": 312,
+            "height": 592,
+            "top": 24,
+            "right": 336,
+            "bottom": 616,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "英雄",
+      "box": {
+        "x": 41,
+        "y": 41,
+        "width": 194.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 129.91146850585938,
+        "y": 40.333335876464844,
+        "width": 55.682281494140625,
+        "height": 35
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-formation",
+      "ancestors": [
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 37,
+            "y": 103.66667175292969,
+            "width": 286,
+            "height": 480.66668701171875,
+            "top": 103.66667175292969,
+            "right": 323,
+            "bottom": 584.3333587646484,
+            "left": 37
+          }
+        },
+        {
+          "id": "homeFeatureModalBody",
+          "scrollTop": 0,
+          "rect": {
+            "x": 37,
+            "y": 103.66667175292969,
+            "width": 286,
+            "height": 480.66668701171875,
+            "top": 103.66667175292969,
+            "right": 323,
+            "bottom": 584.3333587646484,
+            "left": 37
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 42.66666793823242,
+            "width": 312,
+            "height": 554.6666870117188,
+            "top": 42.66666793823242,
+            "right": 336,
+            "bottom": 597.3333549499512,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "‹ 返回點擊角色再點格位，或拖曳交換位置。前排空位QA 火角色QA 水角色後排空位空位空位神犬紅包金剛天王移出英雄尚未保存佈陣；首次操作將建立紀錄。同步佈陣",
+      "box": {
+        "x": 37,
+        "y": 103.66667175292969,
+        "width": 286,
+        "height": 480.66668701171875
+      },
+      "textBox": {
+        "x": 37,
+        "y": 103.66667175292969,
+        "width": 286,
+        "height": 480.66668701171875
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-formation-draft",
+      "ancestors": [
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 37,
+            "y": 103.66667175292969,
+            "width": 286,
+            "height": 480.66668701171875,
+            "top": 103.66667175292969,
+            "right": 323,
+            "bottom": 584.3333587646484,
+            "left": 37
+          }
+        },
+        {
+          "id": "homeFeatureModalBody",
+          "scrollTop": 0,
+          "rect": {
+            "x": 37,
+            "y": 103.66667175292969,
+            "width": 286,
+            "height": 480.66668701171875,
+            "top": 103.66667175292969,
+            "right": 323,
+            "bottom": 584.3333587646484,
+            "left": 37
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 42.66666793823242,
+            "width": 312,
+            "height": 554.6666870117188,
+            "top": 42.66666793823242,
+            "right": 336,
+            "bottom": 597.3333549499512,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "‹ 返回點擊角色再點格位，或拖曳交換位置。前排空位QA 火角色QA 水角色後排空位空位空位神犬紅包金剛天王移出英雄尚未保存佈陣；首次操作將建立紀錄。同步佈陣",
+      "box": {
+        "x": 37,
+        "y": 103.66667175292969,
+        "width": 286,
+        "height": 480.66668701171875
+      },
+      "textBox": {
+        "x": 37,
+        "y": 103.66667175292969,
+        "width": 286,
+        "height": 480.66668701171875
+      },
+      "inside": true
+    },
+    {
+      "name": "hero-formation-return",
+      "ancestors": [
+        {
+          "id": "homeFeatureModalTitle",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 194.59896850585938,
+            "height": 38,
+            "top": 41,
+            "right": 235.59896850585938,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 41,
+            "y": 41,
+            "width": 278,
+            "height": 38,
+            "top": 41,
+            "right": 319,
+            "bottom": 79,
+            "left": 41
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 24,
+            "y": 24,
+            "width": 312,
+            "height": 592,
+            "top": 24,
+            "right": 336,
+            "bottom": 616,
+            "left": 24
+          }
+        },
+        {
+          "id": "homeFeatureModal",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "scrollTop": 0,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 360,
+            "height": 640,
+            "top": 0,
+            "right": 360,
+            "bottom": 640,
+            "left": 0
+          }
+        }
+      ],
+      "text": "英雄",
+      "box": {
+        "x": 41,
+        "y": 41,
+        "width": 194.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 129.91146850585938,
+        "y": 40.333335876464844,
+        "width": 55.682281494140625,
+        "height": 35
+      },
+      "inside": true
+    }
+  ],
+  "actions": [
+    {
+      "relicTabs": [
+        {
+          "text": "全部",
+          "onclick": "v174SetRelicFilter('all')"
+        },
+        {
+          "text": "攻擊",
+          "onclick": "v174SetRelicFilter('attack')"
+        },
+        {
+          "text": "回復",
+          "onclick": "v174SetRelicFilter('recovery')"
+        },
+        {
+          "text": "防禦",
+          "onclick": "v174SetRelicFilter('defense')"
+        },
+        {
+          "text": "增益",
+          "onclick": "v174SetRelicFilter('buff')"
+        },
+        {
+          "text": "控制",
+          "onclick": "v174SetRelicFilter('control')"
+        },
+        {
+          "text": "元素聯動",
+          "onclick": "v174SetRelicFilter('element')"
+        },
+        {
+          "text": "特殊",
+          "onclick": "v174SetRelicFilter('special')"
+        }
+      ]
+    },
+    {
+      "relicBeforeTap": {
+        "x": 582,
+        "width": 936,
+        "scroll": 1518
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:last-child",
+      "x": 308,
+      "y": 256.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('special')\">特殊</button>"
+    },
+    {
+      "relicAfterTap": {
+        "x": 579,
+        "selected": [
+          "特殊"
+        ]
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(1)",
+      "x": 52,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('all')\">全部</button>"
+    },
+    {
+      "relicCategory": 1,
+      "state": {
+        "selected": [
+          "全部"
+        ],
+        "scroll": 0,
+        "bounds": {
+          "active": {
+            "x": 25,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 79,
+            "bottom": 296.66668701171875,
+            "left": 25
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(2)",
+      "x": 112,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('attack')\">攻擊</button>"
+    },
+    {
+      "relicCategory": 2,
+      "state": {
+        "selected": [
+          "攻擊"
+        ],
+        "scroll": 0,
+        "bounds": {
+          "active": {
+            "x": 85,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 139,
+            "bottom": 296.66668701171875,
+            "left": 85
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(3)",
+      "x": 172,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('recovery')\">回復</button>"
+    },
+    {
+      "relicCategory": 3,
+      "state": {
+        "selected": [
+          "回復"
+        ],
+        "scroll": 0,
+        "bounds": {
+          "active": {
+            "x": 145,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 199,
+            "bottom": 296.66668701171875,
+            "left": 145
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(4)",
+      "x": 232,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('defense')\">防禦</button>"
+    },
+    {
+      "relicCategory": 4,
+      "state": {
+        "selected": [
+          "防禦"
+        ],
+        "scroll": 0,
+        "bounds": {
+          "active": {
+            "x": 205,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 259,
+            "bottom": 296.66668701171875,
+            "left": 205
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(5)",
+      "x": 292,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('buff')\">增益</button>"
+    },
+    {
+      "relicCategory": 5,
+      "state": {
+        "selected": [
+          "增益"
+        ],
+        "scroll": 0,
+        "bounds": {
+          "active": {
+            "x": 265,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 319,
+            "bottom": 296.66668701171875,
+            "left": 265
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(6)",
+      "x": 158,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('control')\">控制</button>"
+    },
+    {
+      "relicCategory": 6,
+      "state": {
+        "selected": [
+          "控制"
+        ],
+        "scroll": 129,
+        "bounds": {
+          "active": {
+            "x": 282,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 336,
+            "bottom": 296.66668701171875,
+            "left": 282
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(7)",
+      "x": 233,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('element')\">元素聯動</button>"
+    },
+    {
+      "relicCategory": 7,
+      "state": {
+        "selected": [
+          "元素聯動"
+        ],
+        "scroll": 399,
+        "bounds": {
+          "active": {
+            "x": 252,
+            "y": 257,
+            "width": 84,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 336,
+            "bottom": 296.66668701171875,
+            "left": 252
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:nth-child(8)",
+      "x": 308,
+      "y": 276.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('special')\">特殊</button>"
+    },
+    {
+      "relicCategory": 8,
+      "state": {
+        "selected": [
+          "特殊"
+        ],
+        "scroll": 579,
+        "bounds": {
+          "active": {
+            "x": 282,
+            "y": 257,
+            "width": 54,
+            "height": 39.66668701171875,
+            "top": 257,
+            "right": 336,
+            "bottom": 296.66668701171875,
+            "left": 282
+          },
+          "strip": {
+            "x": 24,
+            "y": 255,
+            "width": 312,
+            "height": 49.66668701171875,
+            "top": 255,
+            "right": 336,
+            "bottom": 304.66668701171875,
+            "left": 24
+          },
+          "inside": true
+        }
+      }
+    },
+    {
+      "questEnd": {
+        "top": 2597,
+        "client": 512,
+        "height": 3109,
+        "end": true
+      }
+    },
+    {
+      "selector": ".v141-quantity button:nth-child(1)",
+      "x": 58,
+      "y": 525.8958587646484,
+      "hit": true,
+      "target": "<button onclick=\"v141AdjustTalismanQty(-1)\">－</button>"
+    },
+    {
+      "selector": ".v141-quantity button:nth-child(3)",
+      "x": 245,
+      "y": 525.8958587646484,
+      "hit": true,
+      "target": "<button onclick=\"v141AdjustTalismanQty(1)\">＋</button>"
+    },
+    {
+      "selector": ".v141-quantity button:last-child",
+      "x": 298,
+      "y": 525.8958587646484,
+      "hit": true,
+      "target": "<button onclick=\"v141AdjustTalismanQty('max')\">最大</button>"
+    },
+    {
+      "quantityGeometry": [
+        {
+          "text": "－",
+          "rect": {
+            "x": 36,
+            "y": 503.8958435058594,
+            "width": 44,
+            "height": 44.000030517578125,
+            "top": 503.8958435058594,
+            "right": 80,
+            "bottom": 547.8958740234375,
+            "left": 36
+          }
+        },
+        {
+          "text": "1234",
+          "rect": {
+            "x": 85,
+            "y": 503.8958435058594,
+            "width": 133,
+            "height": 44.000030517578125,
+            "top": 503.8958435058594,
+            "right": 218,
+            "bottom": 547.8958740234375,
+            "left": 85
+          }
+        },
+        {
+          "text": "＋",
+          "rect": {
+            "x": 223,
+            "y": 503.8958435058594,
+            "width": 44,
+            "height": 44.000030517578125,
+            "top": 503.8958435058594,
+            "right": 267,
+            "bottom": 547.8958740234375,
+            "left": 223
+          }
+        },
+        {
+          "text": "最大",
+          "rect": {
+            "x": 272,
+            "y": 503.8958435058594,
+            "width": 52,
+            "height": 44.000030517578125,
+            "top": 503.8958435058594,
+            "right": 324,
+            "bottom": 547.8958740234375,
+            "left": 272
+          }
+        }
+      ]
+    },
+    {
+      "selector": ".v141-synthesis-tabs button:nth-child(2)",
+      "x": 180,
+      "y": 142,
+      "hit": true,
+      "target": "<button type=\"button\" class=\"\" onclick=\"v141SwitchSynthesisTab('fragment')\">碎片合成</button>"
+    },
+    {
+      "selector": "#statusHelpModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 553.6666870117188,
+      "hit": true,
+      "target": "<button class=\"close-item-button\" onclick=\"closeStatusHelp()\">\n    關閉\n</button>"
+    },
+    {
+      "heroListInitial": {
+        "list": {
+          "x": 53,
+          "y": 801,
+          "width": 254,
+          "height": 188.4427490234375,
+          "top": 801,
+          "right": 307,
+          "bottom": 989.4427490234375,
+          "left": 53
+        },
+        "pane": {
+          "x": 41,
+          "y": 195,
+          "width": 278,
+          "height": 404,
+          "top": 195,
+          "right": 319,
+          "bottom": 599,
+          "left": 41
+        },
+        "scrollHeight": 2547,
+        "client": 1212
+      }
+    },
+    {
+      "selector": ".hero-card",
+      "x": 92.66667175292969,
+      "y": 450.22137451171875,
+      "hit": true,
+      "target": "<img class=\"\" src=\"assets/heroes/divine-dog-hongbao.webp\" alt=\"神犬紅包立繪\" draggable=\"false\">"
+    },
+    {
+      "selector": ".hero-detail-back",
+      "x": 180,
+      "y": 111,
+      "hit": true,
+      "target": "<button type=\"button\" class=\"main-button hero-detail-back\" onclick=\"returnHeroOverview()\">‹ 返回英雄列表</button>"
+    },
+    {
+      "selector": ".hero-overview-tools [onclick^=\"openSharedFormation\"]",
+      "x": 180,
+      "y": 111,
+      "hit": true,
+      "target": "<button type=\"button\" class=\"main-button\" onclick=\"openSharedFormation('hero')\">佈陣</button>"
+    },
+    {
+      "selector": ".formation-candidate[data-unit=\"hero:divineDogHongbao\"]",
+      "x": 107,
+      "y": 417.68751525878906,
+      "hit": true,
+      "target": "<img src=\"assets/heroes/divine-dog-hongbao.webp\" alt=\"神犬紅包立繪\" draggable=\"false\">"
+    },
+    {
+      "selector": "[onclick=\"returnFromFormation()\"]",
+      "x": 180,
+      "y": 125.66667175292969,
+      "hit": true,
+      "target": "<button type=\"button\" class=\"main-button\" onclick=\"returnFromFormation()\">‹ 返回</button>"
+    },
+    {
+      "formationStatus": {
+        "ready": true,
+        "busy": false,
+        "pending": null,
+        "error": null,
+        "playerIndexes": [
+          0
+        ]
+      }
+    }
+  ],
+  "untested": [
+    "Real cloud/account transactions, crafting, claims, formation placement/save",
+    "Full relic/detail art polish and nonempty material/fragment quantities",
+    "Auto sticky upper-edge background text bleed remains known separate issue",
+    "Physical devices"
+  ],
+  "loadedAssets": [
+    "/build/boot-core.2dbe4a9b1200.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/boot-core.2dbe4a9b1200.css",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.2dbe4a9b1200.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.704efd934a28.js",
+    "/build/app-shell.801bc1a9895d.css",
+    "/build/app-shell.704efd934a28.js",
+    "/build/app-shell.801bc1a9895d.css",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.430798399347.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.bca2dc8fbec6.css",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.430798399347.js",
+    "/build/gameplay-core.bca2dc8fbec6.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "bundleHashes": {
+    "build/boot-core.2dbe4a9b1200.css": "2dbe4a9b12004d17279641e3ef55b26c0bb7c69ce0ef3de79e6857440c15fb3f",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/firebase/firebase-bootstrap.c4f4143606ed.js": "c4f4143606ed3f0b4deefee2a5e2d43674475c6a86c126e656dbf778cab2032b",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/firebase-auth-ui.e5124ef5fef1.js": "e5124ef5fef156f5950471aadd9e83e426f88655642c9607a71f9e989cb8f3f8",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+    "build/app-shell.704efd934a28.js": "704efd934a2859ead56122789ea78485638d770d419700da19bb384f87eee19c",
+    "build/app-shell.801bc1a9895d.css": "801bc1a9895d07b5e5c48c051e3a6f9447da6aefd71f92baf082285136a56128",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.430798399347.js": "430798399347862e47d8d853cf78c5b77a3fe8ee1a3cc35f4c72583619be4232",
+    "build/gameplay-core.bca2dc8fbec6.css": "bca2dc8fbec6f0e6e60766046e81611fa771c72c4e01b9c8a08c7ac1dd44440d",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89"
+  },
+  "sourceBefore": {
+    "index.html": "2424ff6d031c14d53606b608bfa24efb3f15a65d14b0158d1901afa04342f0a5",
+    "asset-manifest.json": "4d634b51db821bb800ea8f55ad317e8f6e9cf18e5fdeeea25e07ce427f7290c6",
+    "css/25-stage-v90-quest-interface-core.css": "9d2744d65184c138da2ec95817cd4e22dd3f0d0347d66dad2c8dfa2c38cb2bd4",
+    "css/38-v141-system-expansion.css": "fb4adc1852d5c8b1f2f001d5e2b6f9b686fddab8d86078c43e89d5158a0d995f",
+    "js/60-team-relic-system.js": "9765a54c1bb06c8f60b8d8de78eab5f7568b26fe2fbb7c2673ad25cc783718e8",
+    "js/36-v141-content-systems.js": "23e8f40bd18ff15ea4e03cbe43622845dcb52a88dc2f16ca6203b64ca39efff6",
+    "css/49-v169-rpg-ui.css": "853af2d7a295d2910ac6b89d52a5b0e5e6dfd92387da62fb23d564d570271bda",
+    "css/53-v173.51-qa.css": "844ac05e860169158439238e0c51ab456eeadb8cdb49c82c1747bb6b29494acf",
+    "js/51-v169-rpg-ui.js": "40efccfedc225ac430cccf9c4b0bc96932f65f36e873c6ea99a7502306a6011c",
+    "js/54-v173.51-battle-qa.js": "4b3193e4ee367ecf051af6af5e9c2926835f3b17ceceb8fdd72d154f237d9864",
+    "build/app-shell.704efd934a28.js": "704efd934a2859ead56122789ea78485638d770d419700da19bb384f87eee19c",
+    "build/app-shell.801bc1a9895d.css": "801bc1a9895d07b5e5c48c051e3a6f9447da6aefd71f92baf082285136a56128",
+    "build/asset-manifest.json": "4d634b51db821bb800ea8f55ad317e8f6e9cf18e5fdeeea25e07ce427f7290c6",
+    "build/boot-core.2dbe4a9b1200.css": "2dbe4a9b12004d17279641e3ef55b26c0bb7c69ce0ef3de79e6857440c15fb3f",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.c04cc2ff12f4.css": "c04cc2ff12f4a9e81adb9ed47e8a1c1d1a0ac1adbd043b7a4e91b1bfede310b7",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.cf640deb110f.js": "cf640deb110f8ed78195747a2e6862d223cc23cc45822f0089168daf0c1135d9",
+    "build/feature-adventure.46e987aa06f0.css": "46e987aa06f0dc4cd4b900a15624ab1e69a87e8bf93088084ef0818d37d84083",
+    "build/feature-boss-relic.5a7d08ddd09f.css": "5a7d08ddd09f347d815592d0376fda0711a8e8806c57794c035b8c11c4dac91d",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.ee5e03209f52.css": "ee5e03209f52e01b3627d98d28f2a15c10eb5a64b8b666ff824e08af72667006",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.430798399347.js": "430798399347862e47d8d853cf78c5b77a3fe8ee1a3cc35f4c72583619be4232",
+    "build/gameplay-core.bca2dc8fbec6.css": "bca2dc8fbec6f0e6e60766046e81611fa771c72c4e01b9c8a08c7ac1dd44440d",
+    "build/firebase/firebase-auth-ui.e5124ef5fef1.js": "e5124ef5fef156f5950471aadd9e83e426f88655642c9607a71f9e989cb8f3f8",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/firebase-bootstrap.c4f4143606ed.js": "c4f4143606ed3f0b4deefee2a5e2d43674475c6a86c126e656dbf778cab2032b",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752"
+  },
+  "sourceAfter": {
+    "index.html": "2424ff6d031c14d53606b608bfa24efb3f15a65d14b0158d1901afa04342f0a5",
+    "asset-manifest.json": "4d634b51db821bb800ea8f55ad317e8f6e9cf18e5fdeeea25e07ce427f7290c6",
+    "css/25-stage-v90-quest-interface-core.css": "9d2744d65184c138da2ec95817cd4e22dd3f0d0347d66dad2c8dfa2c38cb2bd4",
+    "css/38-v141-system-expansion.css": "fb4adc1852d5c8b1f2f001d5e2b6f9b686fddab8d86078c43e89d5158a0d995f",
+    "js/60-team-relic-system.js": "9765a54c1bb06c8f60b8d8de78eab5f7568b26fe2fbb7c2673ad25cc783718e8",
+    "js/36-v141-content-systems.js": "23e8f40bd18ff15ea4e03cbe43622845dcb52a88dc2f16ca6203b64ca39efff6",
+    "css/49-v169-rpg-ui.css": "853af2d7a295d2910ac6b89d52a5b0e5e6dfd92387da62fb23d564d570271bda",
+    "css/53-v173.51-qa.css": "844ac05e860169158439238e0c51ab456eeadb8cdb49c82c1747bb6b29494acf",
+    "js/51-v169-rpg-ui.js": "40efccfedc225ac430cccf9c4b0bc96932f65f36e873c6ea99a7502306a6011c",
+    "js/54-v173.51-battle-qa.js": "4b3193e4ee367ecf051af6af5e9c2926835f3b17ceceb8fdd72d154f237d9864",
+    "build/app-shell.704efd934a28.js": "704efd934a2859ead56122789ea78485638d770d419700da19bb384f87eee19c",
+    "build/app-shell.801bc1a9895d.css": "801bc1a9895d07b5e5c48c051e3a6f9447da6aefd71f92baf082285136a56128",
+    "build/asset-manifest.json": "4d634b51db821bb800ea8f55ad317e8f6e9cf18e5fdeeea25e07ce427f7290c6",
+    "build/boot-core.2dbe4a9b1200.css": "2dbe4a9b12004d17279641e3ef55b26c0bb7c69ce0ef3de79e6857440c15fb3f",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.c04cc2ff12f4.css": "c04cc2ff12f4a9e81adb9ed47e8a1c1d1a0ac1adbd043b7a4e91b1bfede310b7",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.cf640deb110f.js": "cf640deb110f8ed78195747a2e6862d223cc23cc45822f0089168daf0c1135d9",
+    "build/feature-adventure.46e987aa06f0.css": "46e987aa06f0dc4cd4b900a15624ab1e69a87e8bf93088084ef0818d37d84083",
+    "build/feature-boss-relic.5a7d08ddd09f.css": "5a7d08ddd09f347d815592d0376fda0711a8e8806c57794c035b8c11c4dac91d",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.ee5e03209f52.css": "ee5e03209f52e01b3627d98d28f2a15c10eb5a64b8b666ff824e08af72667006",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.430798399347.js": "430798399347862e47d8d853cf78c5b77a3fe8ee1a3cc35f4c72583619be4232",
+    "build/gameplay-core.bca2dc8fbec6.css": "bca2dc8fbec6f0e6e60766046e81611fa771c72c4e01b9c8a08c7ac1dd44440d",
+    "build/firebase/firebase-auth-ui.e5124ef5fef1.js": "e5124ef5fef156f5950471aadd9e83e426f88655642c9607a71f9e989cb8f3f8",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/firebase-bootstrap.c4f4143606ed.js": "c4f4143606ed3f0b4deefee2a5e2d43674475c6a86c126e656dbf778cab2032b",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752"
+  },
+  "unchanged": true,
+  "initialGitStatus": "",
+  "finalGitStatus": "",
+  "dirty": false,
+  "readingSnapshot": "Resumed segment6 after audit; exact head and immutable source/bundle hashes; original before kept intact.",
+  "scope": "Segment6 isolated UI only. Canonical talisman fixture stock and local gold allow quantity preview including four-digit maximum; no crafting, reward claims, placement or save transaction. Hero uses original read transport; official busy gate retained.",
+  "independentReview": "Limited pass for eight selected relic tabs staying visible, locked reward text readability, quantity preview 2/1234 and fragment row layout, correct quest scroll end and preserved ancestor/title/return. Representative screenshots reviewed in all four sizes; no full-game approval."
+}
