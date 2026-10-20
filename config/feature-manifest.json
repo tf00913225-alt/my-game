@@ -65,7 +65,8 @@
         "__BUILD_ABYSS_STYLE__"
       ],
       "dependencies": [
-        "gameplay-core"
+        "gameplay-core",
+        "feature-patrol"
       ]
     },
     "feature-boss-relic": {

@@ -4225,7 +4225,7 @@
 #game-stage #dungeonPage.v146-abyss-active .v141-abyss-map{width:100%;height:100% !important;min-height:0 !important;border:0;border-radius:0;}
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro{min-height:0;border:0;background:linear-gradient(180deg,rgba(8,6,4,.18),rgba(8,6,4,.92)),url(../assets/ui/training-background.jpg) center/cover no-repeat;box-shadow:inset 0 0 70px #000;}
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro p{padding:8px 12px;border-radius:8px;color:#f0e0bd;background:rgba(5,4,3,.72);}
-#game-stage .v146-abyss-return{position:absolute;right:7px;top:5px;z-index:95;width:42px;height:42px;min-height:42px !important;padding:3px !important;border:1px solid #b68a45;border-radius:50%;background:rgba(16,12,8,.9);box-shadow:0 3px 12px rgba(0,0,0,.62);}
+#game-stage .v146-abyss-return{position:absolute;right:7px;top:5px;z-index:95;width:52px;height:52px;min-width:52px;min-height:52px !important;padding:3px !important;border:1px solid #b68a45;border-radius:50%;background:rgba(16,12,8,.9);box-shadow:0 3px 12px rgba(0,0,0,.62);}
 #game-stage .v146-abyss-return img{display:block;width:100%;height:100%;object-fit:contain;}
 #game-stage .v141-abyss-map.v146-moving{cursor:progress;}
 #game-stage .v141-abyss-map.v146-too-far{animation:v146AbyssReject .6s ease;}
@@ -5022,7 +5022,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) p{
     display:none !important;
 }
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button{
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete):not(.v174-abyss-selection) button{
     min-width:136px !important;
     min-height:38px !important;
     padding:7px 15px !important;

@@ -46,9 +46,9 @@
     margin-top:5px;
     padding:8px 16px;
     border:1px solid #9d783f;
-    border-radius:999px;
+    border-radius:4px;
     color:#ead5a9;
-    background:linear-gradient(180deg,#332516,#17100a);
+    background:linear-gradient(#30291f,#1b1812);
     font-size:18px;
     font-weight:900;
 }
