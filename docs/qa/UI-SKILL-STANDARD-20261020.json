@@ -12473,7 +12473,8 @@
         "35首360入口training-zone-item實際36px/EFPtrue，未達44門檻即停止；尚未進map，非巡邏畫面驗收。原CSS00補52px min-height及flex垂直置中，修後待驗。",
         "35B eb5實測及CSSOM證明JS17 inline!important仍壓min-height52；修原Owner：移除純樣式啟動函式，實際font20/pad6 14/line1.15收回CSS00，map mappings保留。after待驗。",
         "35C：501首360列表末項實際被native nav壓住且無可捲動祖先。修原列表內部scroll保留84舊座標導覽區，訓練祖先不再禁pan；map坐標及固定背景保留。修後待驗。",
-        "35D：60ce首360形象選項32.57px，修原CSS32之選項52/font18與面板黑鐵雕框；修後四尺寸待驗。快捷圖內小字仍另列待改善。"
+        "35D：60ce首360形象選項32.57px，修原CSS32之選項52/font18與面板黑鐵雕框；修後四尺寸待驗。快捷圖內小字仍另列待改善。",
+        "35E原quick增可讀中文caption，沿原active唯一狀態；新高度/實畫與四尺寸審核待驗。"
       ],
       "diagnosticEvidence": {
         "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
@@ -26861,6 +26862,18 @@
         "8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄",
         "原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline",
         "本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy"
+      ]
+    },
+    {
+      "segment": "segment35e-quick-label-source",
+      "baseHead": "522d20d1503c6ecf8d5af77ccd303a9e3c8e1d47",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35e-quick-label-source",
+      "status": "已修改/修後未驗",
+      "before": "segment35-static-patrol-accepted/*/patrol-map-static.png",
+      "change": "原quick button增加可讀中文名稱及關閉/開啟caption，唯一沿原.active，保原PNG/id/onclick/aria/JS。",
+      "limits": [
+        "只來源/生成包scope預審，不代四尺寸實畫",
+        "ON/實際切換/巡怪/戰鬥仍未驗，OFF圖內bitmap微字未重畫但另提供可讀文字"
       ]
     }
   ],

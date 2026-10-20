@@ -665,6 +665,7 @@ button:disabled{
     display:none;
     width:64px;
     height:auto;
+    margin:0 auto;
     pointer-events:none;
 
     filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
@@ -673,6 +674,30 @@ button:disabled{
 .map-quick-toggle-btn .icon-off{
     display:block;
 }
+
+.map-quick-toggle-btn .map-quick-caption{
+    display:block;
+    min-width:82px;
+    margin-top:4px;
+    padding:4px 5px;
+    border-top:1px solid #8a6a3a;
+    border-radius:0 0 4px 4px;
+    background:var(--rpg-window-iron,#17130f);
+    color:#f2e3bf;
+    font-size:18px;
+    line-height:1.4;
+    font-weight:700;
+    text-align:center;
+}
+.map-quick-toggle-btn .map-quick-state-off,
+.map-quick-toggle-btn .map-quick-state-on{
+    font-size:16px;
+    color:#d5c39e;
+}
+.map-quick-toggle-btn .map-quick-state-off{display:block;}
+.map-quick-toggle-btn .map-quick-state-on{display:none;}
+.map-quick-toggle-btn.active .map-quick-state-off{display:none;}
+.map-quick-toggle-btn.active .map-quick-state-on{display:block;color:#ffe3a0;}
 
 .map-quick-toggle-btn.active .icon-off{
     display:none;

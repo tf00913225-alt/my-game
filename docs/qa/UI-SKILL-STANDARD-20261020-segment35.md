@@ -32,3 +32,7 @@ Source 4325f3df9ea36cf496723a21edef5cd575eaf8b0，四尺寸32張圖/32項真輸�
 - 8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄
 - 原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline
 - 本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy
+
+## 35E 快捷中文標籤（修後待驗）
+
+Before見522d/segment35-static-patrol-accepted各尺寸patrol-map-static實圖：原78px圖工藝保留，但內嵌主字/OFF微字難讀。原index兩個button添aria-hidden可讀中文名/關閉/開啟span；原CSS00給18/16px明確行高、薄黑鐵底/古銅分隔，唯一原.active切換state顯示，不新增JS或旗標。原id/onclick/aria/四張PNG/source handlers保留，圖尺寸78不改，只水平置中。新增caption會自然增加控制高度，不能聲稱幾何不變；需四尺寸看文字Range/命中/錨點及角色/形象menu安全區。build/check通過，修後未驗；ON/切換/巡怪/戰鬥等仍未驗。

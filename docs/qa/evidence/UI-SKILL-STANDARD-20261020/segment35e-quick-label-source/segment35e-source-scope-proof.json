@@ -1,0 +1,15 @@
+{
+  "base": "522d20d1503c6ecf8d5af77ccd303a9e3c8e1d47",
+  "cssOnlyCaptionAndImageCenterMargin": true,
+  "indexOnlyTwoCaptionsAndGeneratedStyleHref": true,
+  "captionBlock": ".map-quick-toggle-btn .map-quick-caption{\n    display:block;\n    min-width:82px;\n    margin-top:4px;\n    padding:4px 5px;\n    border-top:1px solid #8a6a3a;\n    border-radius:0 0 4px 4px;\n    background:var(--rpg-window-iron,#17130f);\n    color:#f2e3bf;\n    font-size:18px;\n    line-height:1.4;\n    font-weight:700;\n    text-align:center;\n}\n.map-quick-toggle-btn .map-quick-state-off,\n.map-quick-toggle-btn .map-quick-state-on{\n    font-size:16px;\n    color:#d5c39e;\n}\n.map-quick-toggle-btn .map-quick-state-off{display:block;}\n.map-quick-toggle-btn .map-quick-state-on{display:none;}\n.map-quick-toggle-btn.active .map-quick-state-off{display:none;}\n.map-quick-toggle-btn.active .map-quick-state-on{display:block;color:#ffe3a0;}\n\n",
+  "sourceCssBefore": "7fee5b318a4a1ed356c3a396fd2e3f8cbcbaa13a31c6c22944e7bef048033bbb",
+  "sourceCssAfter": "96054a22adec8c5bd822af2fef57913fd50961a85a1ef6005fab544d5af17c09",
+  "indexBefore": "4afbb155453870d346ac5738bee14eb47c91d06e2ff6379877f7db981492cd46",
+  "indexAfter": "9f3fc175a427bb298b4a99ad38cc07eee79ca2f6d9b497aaf79f31f5798b7a6c",
+  "generatedBefore": "build/boot-core.395518a02ff1.css",
+  "generatedAfter": "build/boot-core.6eddb4647dab.css",
+  "wholeGeneratedExpectedExact": true,
+  "generatedSha256": "6eddb4647dabed4e8552963532220c0f701170444ddd16892b2bbf49b7569826",
+  "jsSourcesUnchanged": true
+}
