@@ -6953,7 +6953,7 @@ body > .v169-rpg-dialog-layer{
 :is(#game-ui #homeFeatureModal,#game-stage #trainingZoneModal) .home-feature-close-btn{
     position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
     flex:0 0 auto;white-space:nowrap;
-    box-sizing:border-box;height:var(--skill-header-height);min-height:var(--skill-header-height);margin:0;
+    box-sizing:border-box;height:var(--skill-header-height);min-height:max(var(--skill-header-height),calc(44 * var(--ui-length-unit,1px)));margin:0;
     padding:0 calc(12 * var(--ui-length-unit,1px));border:0;border-radius:0;
     background:transparent;box-shadow:none;color:var(--skill-header-text);font-size:var(--skill-header-button-font-size,calc(16 * var(--ui-length-unit,1px)));line-height:1;
 }
