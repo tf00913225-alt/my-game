@@ -572,10 +572,10 @@
     },
     {
       "id": "home.relic",
-      "label": "秘寶",
+      "label": "秘寶入口",
       "entry": "openHomeFeature('relic')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -591,39 +591,80 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真主城入口4／列表／返回重開",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
       },
       "titleEvidence": {
         "status": "已實際驗證（僅已覆蓋標題畫面）",
@@ -655,6 +696,27 @@
           "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "真主城入口4／列表／返回重開"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
         }
       }
     },
@@ -5950,10 +6012,10 @@
     },
     {
       "id": "relic.overview",
-      "label": "秘寶 overview",
+      "label": "秘寶列表",
       "entry": "openHomeFeature('relic'); 正式 overview 控制",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "未取得",
@@ -5974,39 +6036,101 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-list.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "原列表與品階框保留／可見控制44",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-list.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "原列表與品階框保留／可見控制44"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
       }
     },
     {
@@ -6114,10 +6238,10 @@
     },
     {
       "id": "relic.detail",
-      "label": "秘寶 detail",
+      "label": "秘寶詳情",
       "entry": "openHomeFeature('relic'); 正式 detail 控制",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "未取得",
@@ -6138,39 +6262,80 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-locked-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-locked-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-locked-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-locked-detail-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真卡片入口首畫scroll0、名稱與立繪完整／真末端",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-locked-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-locked-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-locked-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-locked-detail-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
       },
       "titleEvidence": {
         "status": "已實際驗證（僅已覆蓋標題畫面）",
@@ -6203,6 +6368,27 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "真卡片入口首畫scroll0、名稱與立繪完整／真末端"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
       }
     },
     {
@@ -6210,7 +6396,7 @@
       "label": "秘寶詳情：強化區",
       "entry": "秘寶詳情強化區與按鈕；並非獨立頁",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "未取得",
@@ -6231,47 +6417,109 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "隔離Lv10突破說明與Lv20上限／末端／操作鈕呈現",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "隔離Lv10突破說明與Lv20上限／末端／操作鈕呈現"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
       }
     },
     {
       "id": "relic.equip",
-      "label": "秘寶 equip",
+      "label": "秘寶裝備按鈕呈現",
       "entry": "openHomeFeature('relic'); 正式 equip 控制",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "未取得",
@@ -6292,39 +6540,101 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
           "before": null,
-          "after": null,
-          "interaction": null
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-owned-10-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "原裝備鈕44與品階／禁用呈現，未執行裝備",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-owned-10-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "原裝備鈕44與品階／禁用呈現，未執行裝備"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
       }
     },
     {
@@ -7123,6 +7433,15 @@
             }
           ],
           "scope": "固定Head呈現/導航；fixture、原政策viewer入口與checkbox無持久化範圍見第14段"
+        },
+        {
+          "state": "自選列表捲末→home→公告→更新詳情",
+          "status": "有問題",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "device": "360x640",
+          "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-release-title.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json",
+          "finding": "長標題／右返完整，但release正文保留舊body scroll而從中段顯示；不是共用header delta造成，下一段修原release呈現Owner。"
         }
       ],
       "reviews": {
@@ -14347,6 +14666,327 @@
           "scope": "原Owner CSS與一句顯示文案；正式生成產物僅sourceDigest，不改控制流程或政策"
         }
       }
+    },
+    {
+      "id": "relic.acquisition",
+      "label": "秘寶獲取途徑",
+      "entry": "正式秘寶列表／詳情／碎片箱對應可見入口",
+      "owner": "js/60-team-relic-system.js; js/relic-progression-drop-system.js; css/55-team-relic-system.css; css/relic-progression-drop-system.css; css/49-v169-rpg-ui.css",
+      "states": [],
+      "operations": [],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-acquisition-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-acquisition-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-acquisition-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-acquisition-end.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "天罡戰旗正式獲取途徑入口／全文真末與返回",
+          "status": "已實際驗證",
+          "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-relic-acquisition-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-relic-acquisition-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-relic-acquisition-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-relic-acquisition-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
+      "reviews": {
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "status": "部分已實際驗證",
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "天罡戰旗正式獲取途徑入口／全文真末與返回"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
+      }
+    },
+    {
+      "id": "relic.choice",
+      "label": "秘寶碎片自選",
+      "entry": "正式秘寶列表／詳情／碎片箱對應可見入口",
+      "owner": "js/60-team-relic-system.js; js/relic-progression-drop-system.js; css/55-team-relic-system.css; css/relic-progression-drop-system.css; css/49-v169-rpg-ui.css",
+      "states": [],
+      "operations": [],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-choice-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-choice-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-choice-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-choice-top.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "真持有自選箱入口／六字24UI對稱題牌／19選項兩行完整／真末與右返",
+          "status": "已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-choice-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-choice-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-choice-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-choice-top.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
+      "reviews": {
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "status": "部分已實際驗證",
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "真持有自選箱入口／六字24UI對稱題牌／19選項兩行完整／真末與右返"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
+      }
+    },
+    {
+      "id": "relic.loading-error",
+      "label": "秘寶載入／失敗／重試",
+      "entry": "正式秘寶列表／詳情／碎片箱對應可見入口",
+      "owner": "js/60-team-relic-system.js; js/relic-progression-drop-system.js; css/55-team-relic-system.css; css/relic-progression-drop-system.css; css/49-v169-rpg-ui.css",
+      "states": [],
+      "operations": [],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-before-relic-locked-detail-top.png",
+          "beforeStatus": "有實畫",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-relic-failure.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-relic-failure.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-relic-failure.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "before": null,
+          "beforeStatus": "未拍before，不冒充四尺寸before",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-relic-failure.png",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+          "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+        }
+      },
+      "stateEvidence": [
+        {
+          "state": "延遲reject fixture經原controller loading→catch，還原原loader後真tap重試成功",
+          "status": "已實際驗證",
+          "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+          "scope": "僅所列呈現／真入口與導航；fixture無交易，原mark-seen/saveRelics副作用保留",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-relic-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/360x640-delta-report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-relic-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/393x873-delta-report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-relic-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/412x915-delta-report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-relic-failure.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-main-report.json",
+              "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
+            }
+          ]
+        }
+      ],
+      "reviews": {
+        "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+        "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+        "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+      },
+      "status": "部分已實際驗證",
+      "presentationEvidence": {
+        "segment": "segment-16",
+        "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "finalDeltaHead": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted",
+        "verified": [
+          "延遲reject fixture經原controller loading→catch，還原原loader後真tap重試成功"
+        ],
+        "notVerified": [
+          "實體裝置／真帳號／真網路事故",
+          "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+          "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+          "catalog沒有runtimeReady=false，未造未覺醒畫面",
+          "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查"
+        ],
+        "reviews": {
+          "art": "art_review：四尺寸詳情首末/自選首末、f3ee載入失敗重試與右返、release代表圖限定通過；保留內卡/品階/外雕框",
+          "interaction": "interaction_review：f817四尺寸14scene，17records=12tap+5末端紀錄；f3ee四尺寸延遲reject原catch/還原loader真retry與choice末端/返回；精確fixture限制",
+          "scope": "scope_review：原38窄退場零specificity變化，55/progression唯一呈現Owner、49原longtitle、JS唯一首paint前scroll reset，固定slot舊斷言按188+8同步，無數值/交易/Save/Auth變更"
+        }
+      }
     }
   ],
   "segmentReviews": [
@@ -14616,6 +15256,21 @@
         "正常merge吸收即時dev新增依賴/生成衝突，最新Head必要CI目前缺失且PR mergeable=false",
         "秘寶overview/detail/growth/equip與其餘台帳實際狀態",
         "部署/原症狀及硬體未驗"
+      ]
+    },
+    {
+      "segment": "segment-16",
+      "head": "f3ee2487856b71b31aa08b624d59a19e1d4da8ec",
+      "baseEvidenceHead": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+      "result": "秘寶真詳情回頂、長自選題牌/19選項、44targets與原失敗重試四尺寸限定通過；原雕框/品階/內卡保留",
+      "pending": [
+        "實體裝置／真帳號／真網路事故",
+        "裝備／卸下／強化／合成／選箱交易、獎勵／雲端",
+        "DEV statusOf強制卡片unlocked，不能批准正式production locked卡；progression仍讀實際false state",
+        "catalog沒有runtimeReady=false，未造未覺醒畫面",
+        "其餘19件秘寶的個別效果長文／獲取來源／詳細狀態尚未逐件巡查",
+        "Latest Head必要CI未完／尚未合併部署",
+        "逐件秘寶效果內頁、委託／材料合成／背包物品及其餘台帳"
       ]
     }
   ],
