@@ -51,10 +51,10 @@ assert.match(css,/#game-ui #homeFeatureModal\.team-relic-modal \.home-feature-cl
     "relic list return control must be a readable 15px dark-gradient text button");
 assert.match(css,/team-relic-modal\.team-relic-detail-mode \.home-feature-close-btn\{display:none!important;\}/,
     "detail mode must remove the redundant modal return control");
-assert.match(css,/\.team-relic-detail-back\{[^}]*position:absolute;[^}]*top:5px;[^}]*right:8px;[^}]*background:linear-gradient\(180deg,#2c2419,#0f0c09\);[^}]*font-size:0/,
+assert.match(css,/\.team-relic-detail-back\{[^}]*position:absolute;[^}]*top:5px;[^}]*right:8px;[^}]*background:linear-gradient\(180deg,#503a20,#19130b\);[^}]*font-size:15px/,
     "detail back-to-list button must occupy the former header return position");
-assert.match(css,/\.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
-    "detail back button must expose only the requested 15px action label");
+assert.match(source,/class="team-relic-detail-back" onclick="v174OpenRelicPage\(\)">‹ 返回秘寶列表<\/button>/,
+    "detail back button must expose its requested action label directly");
 for(const hex of ["#FF9F38","#FF4FA7","#FF5A36","#42A5FF","#47D6A3","#C89B45"]){
     assert.ok(css.includes(hex),"team relic rarity CSS must preserve formal color "+hex);
 }

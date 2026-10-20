@@ -1007,7 +1007,7 @@
     border:3px solid rgba(138,106,58,.55) !important;
     border-radius:18px !important;
     background:rgba(0,0,0,.25) !important;
-    color:#8f8371 !important;
+    color:#d3c3aa !important;
     font-size:45px !important;
 
     height:auto;
@@ -1031,7 +1031,7 @@
 /* Unavailable and already-claimed chests use the same subdued state. */
 #game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot,
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-slot{
-    opacity:.5 !important;
+    opacity:1 !important;
 }
 #game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-chest,
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-chest{
@@ -3487,9 +3487,9 @@
 }
 :is(#game-stage,#game-ui) .v141-upgrade-flow section b{font-size:calc(12 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .v141-upgrade-flow i{color:#efc76e;font-size:calc(23 * var(--ui-length-unit,1px));font-style:normal;}
-#game-stage .v141-quantity{display:flex;align-items:center;justify-content:center;gap:5px;margin:7px 0;}
-#game-stage .v141-quantity button,:is(#game-stage,#game-ui) .v141-fragment-controls button{min-width:calc(44 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px)) !important;padding:calc(3 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #795b31;border-radius:calc(6 * var(--ui-length-unit,1px));color:#edd9b3;background:#1d160f;font-size:calc(15 * var(--ui-length-unit,1px)) !important;}
-#game-stage .v141-quantity strong{min-width:38px;text-align:center;}
+:is(#game-stage,#game-ui) .v141-quantity{display:grid;grid-template-columns:calc(44 * var(--ui-length-unit,1px)) minmax(calc(44 * var(--ui-length-unit,1px)),1fr) calc(44 * var(--ui-length-unit,1px)) calc(52 * var(--ui-length-unit,1px));align-items:center;gap:calc(5 * var(--ui-length-unit,1px));margin:calc(7 * var(--ui-length-unit,1px)) 0;}
+:is(#game-stage,#game-ui) .v141-quantity button,:is(#game-stage,#game-ui) .v141-fragment-controls button{min-width:calc(44 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px)) !important;padding:calc(3 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #795b31;border-radius:calc(6 * var(--ui-length-unit,1px));color:#edd9b3;background:#1d160f;font-size:calc(15 * var(--ui-length-unit,1px)) !important;}
+:is(#game-stage,#game-ui) .v141-quantity strong,:is(#game-stage,#game-ui) .v141-fragment-controls strong{display:grid;place-items:center;min-width:0;min-height:calc(44 * var(--ui-length-unit,1px));padding:0 calc(4 * var(--ui-length-unit,1px));color:#f0d9aa;background:rgba(0,0,0,.3);font-size:calc(16 * var(--ui-length-unit,1px));font-variant-numeric:tabular-nums;text-align:center;}
 :is(#game-stage,#game-ui) .v141-fragment-list{display:grid;gap:calc(6 * var(--ui-length-unit,1px));height:100%;}
 :is(#game-stage,#game-ui) .v141-fragment-row{display:grid;grid-template-columns:calc(45 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(158 * var(--ui-length-unit,1px));gap:calc(7 * var(--ui-length-unit,1px));align-items:center;padding:calc(7 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #664e2e;border-radius:calc(8 * var(--ui-length-unit,1px));background:linear-gradient(155deg,#21180f,#100d09);}
 :is(#game-stage,#game-ui) .v141-fragment-icon,:is(#game-stage,#game-ui) .v141-fragment-icon svg{width:calc(42 * var(--ui-length-unit,1px));height:calc(42 * var(--ui-length-unit,1px));}
@@ -3498,9 +3498,8 @@
 :is(#game-stage,#game-ui) .v141-fragment-main span{color:#a99b84;font-size:calc(14 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .v141-fragment-progress{height:calc(5 * var(--ui-length-unit,1px));margin-top:calc(3 * var(--ui-length-unit,1px));overflow:hidden;border-radius:calc(99 * var(--ui-length-unit,1px));background:#0b0907;}
 :is(#game-stage,#game-ui) .v141-fragment-progress i{display:block;height:100%;background:linear-gradient(90deg,#a66c2e,#f0c86f);}
-:is(#game-stage,#game-ui) .v141-fragment-controls{display:grid;grid-template-columns:1fr 1fr;gap:calc(4 * var(--ui-length-unit,1px));align-items:center;}
-:is(#game-stage,#game-ui) .v141-fragment-controls > div{display:grid;grid-template-columns:calc(44 * var(--ui-length-unit,1px)) minmax(calc(16 * var(--ui-length-unit,1px)),1fr) calc(44 * var(--ui-length-unit,1px)) calc(48 * var(--ui-length-unit,1px));gap:calc(2 * var(--ui-length-unit,1px));align-items:center;}
-:is(#game-stage,#game-ui) .v141-fragment-controls button{min-width:0 !important;}
+:is(#game-stage,#game-ui) .v141-fragment-controls{display:grid;grid-template-columns:minmax(0,1fr);gap:calc(4 * var(--ui-length-unit,1px));align-items:center;}
+:is(#game-stage,#game-ui) .v141-fragment-controls > div{display:grid;grid-template-columns:calc(44 * var(--ui-length-unit,1px)) minmax(calc(44 * var(--ui-length-unit,1px)),1fr) calc(44 * var(--ui-length-unit,1px)) calc(52 * var(--ui-length-unit,1px));gap:calc(5 * var(--ui-length-unit,1px));align-items:center;}
 :is(#game-stage,#game-ui) .v141-fragment-controls > button{min-height:calc(44 * var(--ui-length-unit,1px)) !important;font-size:calc(15 * var(--ui-length-unit,1px)) !important;line-height:1.2;}
 :is(#game-stage,#game-ui) .v141-fragment-controls > button small{font-size:calc(14 * var(--ui-length-unit,1px));}
 #game-stage .v141-result-item{display:flex;flex-direction:column;align-items:center;gap:8px;color:#f3dcaa;font-size:16px;}
@@ -3544,7 +3543,7 @@
     #game-stage .v141-dungeon-cover-card:first-child{grid-column:auto;}
     :is(#game-stage,#game-ui) .v141-fragment-row{grid-template-columns:39px minmax(0,1fr);}
     :is(#game-stage,#game-ui) .v141-fragment-icon,:is(#game-stage,#game-ui) .v141-fragment-icon svg{width:37px;height:37px;}
-    :is(#game-stage,#game-ui) .v141-fragment-controls{grid-column:1/-1;grid-template-columns:1fr 1fr;}
+    :is(#game-stage,#game-ui) .v141-fragment-controls{grid-column:1/-1;}
     :is(#game-stage,#game-ui) .v141-synthesis-card label{grid-template-columns:calc(105 * var(--ui-length-unit,1px)) minmax(0,1fr);}
 
 
@@ -7340,7 +7339,7 @@ body > .v169-rpg-dialog-layer{
     min-height:calc(44 * var(--ui-length-unit,1px))!important;
 }
 
-#game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot.v17351-previewable{pointer-events:auto!important;cursor:pointer!important;opacity:.62!important}
+#game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot.v17351-previewable{pointer-events:auto!important;cursor:pointer!important}
 
 /* DEV-only ad simulator is intentionally excluded from player-facing typography enforcement. */
 .v17351-ad-simulator{position:absolute!important;inset:0!important;z-index:50000!important;display:none!important;align-items:center!important;justify-content:center!important;padding:calc(20 * var(--ui-length-unit,1px))!important;background:rgba(0,0,0,.86)!important;backdrop-filter:blur(calc(4 * var(--ui-length-unit,1px)))!important}.v17351-ad-simulator.show{display:flex!important}.v17351-ad-panel{width:min(calc(var(--layout-inline-size,420px) * .88),calc(390 * var(--ui-length-unit,1px)))!important;box-sizing:border-box!important;padding:calc(22 * var(--ui-length-unit,1px)) calc(20 * var(--ui-length-unit,1px))!important;border-width:calc(1 * var(--ui-length-unit,1px))!important;border-style:solid!important;border-color:#a67935!important;border-radius:calc(14 * var(--ui-length-unit,1px))!important;background:radial-gradient(circle at 50% 0,rgba(150,103,31,.22),transparent 46%),linear-gradient(160deg,#24180e,#090705)!important;box-shadow:0 calc(22 * var(--ui-length-unit,1px)) calc(70 * var(--ui-length-unit,1px)) rgba(0,0,0,.82)!important;text-align:center!important;color:#e9d8b5!important}.v17351-ad-badge{width:calc(46 * var(--ui-length-unit,1px))!important;height:calc(28 * var(--ui-length-unit,1px))!important;margin:0 auto calc(10 * var(--ui-length-unit,1px))!important;display:grid!important;place-items:center!important;border:calc(1 * var(--ui-length-unit,1px)) solid #9b7139!important;border-radius:calc(999 * var(--ui-length-unit,1px))!important;color:#d7aa55!important;background:#120d08!important;font-size:calc(12 * var(--ui-length-unit,1px))!important;font-weight:900!important}.v17351-ad-panel h2{margin:0 0 calc(7 * var(--ui-length-unit,1px))!important;color:#f0c96e!important;font-size:calc(21 * var(--ui-length-unit,1px))!important}.v17351-ad-panel p{margin:0 auto calc(14 * var(--ui-length-unit,1px))!important;color:#a99b84!important;font-size:calc(12 * var(--ui-length-unit,1px))!important;line-height:1.5!important}.v17351-ad-panel strong{display:block!important;color:#ffe28a!important;font-size:calc(52 * var(--ui-length-unit,1px))!important;line-height:1!important}.v17351-ad-panel span{display:block!important;margin-top:calc(8 * var(--ui-length-unit,1px))!important;color:#c5b18b!important;font-size:calc(13 * var(--ui-length-unit,1px))!important}

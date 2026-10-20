@@ -160,6 +160,10 @@ try{
   for(let i=0;i<tabs.length;i++){
    if(!tabs[i].click||!/Tab|tab|Category|category|filter|Filter/.test(tabs[i].click))continue;
    await c.eval(tabs[i].click);await capture(feature+'-tab-'+i);
+   if(feature==='relic'){
+    const selected=await c.eval(`(()=>{const row=document.querySelector('.team-relic-tabs'),active=row?.querySelector('button.active');if(!row||!active)return null;const r=row.getBoundingClientRect(),a=active.getBoundingClientRect();return {label:active.textContent.trim(),left:a.left,right:a.right,rowLeft:r.left,rowRight:r.right};})()`);
+    assert.ok(selected&&selected.label===tabs[i].label&&selected.left>=selected.rowLeft-1&&selected.right<=selected.rowRight+1,'selected relic category must remain visible: '+JSON.stringify(selected));
+   }
   }
  }
  await c.eval("closeHomeFeature();openHomeFeature('character');switchCharacterTab('skill')");

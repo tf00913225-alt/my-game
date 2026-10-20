@@ -58,10 +58,12 @@ assert.match(relicRuntime,/classList\.add\("team-relic-detail-mode"\)/,
     "detail runtime must explicitly enter relic detail mode before rendering the detail view");
 assert.match(relicRuntime,/classList\.remove\("team-relic-detail-mode"\)/,
     "returning to the list must explicitly leave relic detail mode");
-assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*font-size:0!important/,
-    "the original detail button text must be suppressed with enough specificity to beat shared button CSS");
-assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back::after\{content:"返回秘寶列表";[^}]*font-size:15px/,
-    "the detail return label must have exactly one visible 15px action source");
+assert.match(relicCss,/#game-ui #homeFeatureModal\.team-relic-modal \.team-relic-detail-back\{[^}]*height:38px;[^}]*font-size:15px;/,
+    "the native-stage return control must preserve its readable 15px label and 38px height");
+assert.match(relicRuntime,/class="team-relic-detail-back" onclick="v174OpenRelicPage\(\)">‹ 返回秘寶列表<\/button>/,
+    "the detail return label must come directly from its actionable button");
+assert.doesNotMatch(relicCss,/\.team-relic-detail-back::after\{/,
+    "the return label must not be duplicated by generated text");
 
 assert.match(abyss,/function buildEncounterWaves\([\s\S]*?const first=Array\.from\(\{length:6\}/,
     "normal emperor stages must begin with the formal six-enemy first wave");

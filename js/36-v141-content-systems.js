@@ -399,7 +399,7 @@
         return '<div class="v141-synthesis-card v141-talisman-craft">'+
             renderItemPicker('選擇符咒',list.map(item=>({value:item.id,label:item.name+'（'+countItem(item.id)+'）'})),source.id,'v141SelectTalisman')+
             '<div class="v141-upgrade-flow"><section class="v141-talisman-source" aria-label="合成材料">'+source.icon+'<b>'+escapeHtml(source.name)+' ×'+(qty*3)+'</b></section><i aria-hidden="true">→</i><section class="v141-talisman-target" aria-label="合成目標">'+target.icon+'<b>'+escapeHtml(target.name)+' ×'+qty+'</b></section></div>'+
-            '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">MAX</button></div>'+
+            '<div class="v141-quantity"><button onclick="v141AdjustTalismanQty(-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustTalismanQty(1)">＋</button><button onclick="v141AdjustTalismanQty(\'max\')">最大</button></div>'+
             '<div class="v141-material-lines"><span>持有 '+owned+'</span><span>消耗 '+(qty*3)+'</span><span>金幣 '+(TALISMAN_GOLD[normalizeTierKey(source.tierKey)]*qty).toLocaleString('zh-TW')+'</span></div>'+
             '<button class="v141-synthesis-primary" '+(can?'':'disabled')+' onclick="v141CraftTalismans()">開始合成</button></div>';
     }
@@ -413,7 +413,7 @@
             const qty=Math.max(1,Math.min(Math.max(1,max),synthesisState.fragmentQty[series.setId]||1));
             synthesisState.fragmentQty[series.setId]=qty;
             return '<section class="v141-fragment-row"><div class="v141-fragment-icon">'+fragment.icon+'</div><div class="v141-fragment-main"><b>'+series.label+'碎片</b><span>'+count+' / 100</span><div class="v141-fragment-progress"><i style="width:'+Math.min(100,count)+'%"></i></div></div>'+
-                '<div class="v141-fragment-controls"><div><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',1)">＋</button><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',\'max\')">MAX</button></div>'+
+                '<div class="v141-fragment-controls"><div><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',-1)">－</button><strong>'+qty+'</strong><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',1)">＋</button><button onclick="v141AdjustFragmentQty(\''+series.setId+'\',\'max\')">最大</button></div>'+
                 '<button '+(max>=qty?'':'disabled')+' onclick="v141CraftFragmentTicket(\''+series.setId+'\')">合成抽獎券<br><small>500金幣／張</small></button></div></section>';
         }).join('')+'</div>';
     }
