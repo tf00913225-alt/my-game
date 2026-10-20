@@ -2904,6 +2904,57 @@ assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
 console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, concurrent day/node intents, legal chapter route, permanent stable-seed rights, lost/stale retry, takeover, private rules and corruption rejection; ordinary battle outcomes remain unverified.");
+// Historical issuance uses the original protected writer against actual Firestore;
+// only its server catalog/time dependencies differ. Never manufacture ticket proofs.
+{
+    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+    function historicalFactory(policy){
+        const load=(relative,overrides={})=>{const url=new URL(relative,import.meta.url),local=createRequire(url),module={exports:{}};
+            vm.runInThisContext('(function(module,exports,require){\n'+readFileSync(url,'utf8')+'\n})',{filename:url.pathname})(module,module.exports,id=>Object.hasOwn(overrides,id)?overrides[id]:local(id));return module.exports;};
+        const source=load('../functions/src/hero-chapter-source.js',{'./generated/hero-chapter-qualification.json':policy});
+        return load('../functions/src/hero-acquisition.js',{'./hero-chapter-source':source}).createHeroAcquisition;
+    }
+    async function actor(label,policy,clock){
+        const user=await login('accounts:signUp',{email:`hero-retained-${label}@example.test`,password}),uid=user.localId;
+        const session=await invoke('createGameSession',user.idToken,{uid});await invoke('bootstrapCloudSave',user.idToken,{uid,session});
+        const data={uid,session},root=db.collection('serverUsers').doc(uid),envelope=db.doc(`users/${uid}/saves/current`);
+        const deps={db,FieldValue,HttpsError,runProtected:heroSessions.runProtected,inspectExistingEnvelope,nextRevision,now:()=>clock.value,seed:()=>20261020};
+        const owner=historicalFactory(policy)(deps),current=createHeroAcquisition(deps),request=extra=>({auth:{uid,token:claims(user.idToken)},data:{...data,...extra}});
+        const capture=async()=>{const rows=[];for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);rows.push([envelope.path,(await envelope.get()).data()]);return rows.sort((a,b)=>a[0].localeCompare(b[0]));};
+        return {user,uid,data,root,envelope,owner,current,request,capture};
+    }
+    const clock={value:Date.now()-8*86400000},a=await actor('twenty',retained,clock);
+    let proof=await a.owner.ensureChapterTicket(a.request({expectedRevision:1}));const originalId=proof.chapter.ticketId;
+    proof=await a.owner.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_01',choiceId:null}));
+    proof=await a.current.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_02',choiceId:null}));
+    const oldTicket=(await a.root.collection('heroChapterTickets').doc(originalId).get()).data(),marker=(await a.root.collection('heroChapter').doc('current').get()).data();
+    const prefix=marker.steps,stepRows=await Promise.all(prefix.map(id=>a.root.collection('heroChapterSteps').doc(id).get()));
+    const before=await a.capture();
+    await rejected('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_03',choiceId:null},'FAILED_PRECONDITION');
+    assert.deepEqual(await a.capture(),before,'expired HTTP step performs zero writes');
+    proof=await invoke('ensureHeroChapterTicket',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision});const renewedId=proof.chapter.ticketId;
+    assert.notEqual(renewedId,originalId);const renewed=(await a.root.collection('heroChapterTickets').doc(renewedId).get()).data();
+    assert.deepEqual(renewed.policy,retained);assert.equal(renewed.startingStepCount,2);assert.equal(renewed.startingStepSha256,stepRows.at(-1).get('sha256'));
+    assert.deepEqual((await a.root.collection('heroChapter').doc('current').get()).get('steps'),prefix);
+    assert.deepEqual((await a.root.collection('heroChapterTickets').doc(originalId).get()).data(),oldTicket);
+    for(const row of stepRows)assert.deepEqual((await row.ref.get()).data(),row.data(),'renewal preserves original step evidence');
+    for(const [docPath,value] of before.filter(([docPath])=>/\/(operations|ledgerEntries)\//.test(docPath)))assert.deepEqual((await db.doc(docPath).get()).data(),value,'renewal retains original receipt and ledger bytes');
+    assert.equal(renewed.ownerUid,a.uid);assert.equal(renewed.sessionId,oldTicket.sessionId);assert.equal(renewed.serverRevision,renewed.sourceRevision+1);
+    for(let stage=3;stage<=20;stage++)proof=await invoke('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision,ticketId:renewedId,nodeId:'c1_'+String(stage).padStart(2,'0'),choiceId:null});
+    assert.equal(proof.chapter.phase,'completed');assert.equal(proof.chapter.outcomeVerified,false);assert.equal(proof.authoritativeStateReady,false);
+    assert.equal((await a.root.collection('heroChapterSteps').get()).size,20);assert.equal((await a.root.collection('uniqueClaims').get()).size,1);
+    const grant=proof.entitlements.divineDogHongbao;assert.ok(grant);assert.equal((await a.root.collection('uniqueClaims').doc('hero-v1-divineDogHongbao').get()).get('allocationSeed'),grant.allocationSeed);
+    assert.equal((await a.root.collection('operations').get()).size,22);assert.equal((await a.root.collection('ledgerEntries').get()).size,22);
+    const completed=await a.capture();assert.equal((await invoke('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:1,ticketId:renewedId,nodeId:'c1_20',choiceId:null})).unchanged,true);assert.equal((await invoke('ensureHeroChapterTicket',a.user.idToken,{...a.data,expectedRevision:1})).unchanged,true);assert.deepEqual(await a.capture(),completed);
+    assert.equal(await rulesRequest(`serverUsers/${a.uid}/heroChapterTickets/${originalId}`,a.user.idToken,'PATCH'),403);
+    const badClock={value:Date.now()},bad=await actor('unknown',{...retained,sourceSha256:'f'.repeat(64)},badClock);
+    const badProof=await bad.owner.ensureChapterTicket(bad.request({expectedRevision:1})),sealed=await bad.capture();
+    assert.equal((await invoke('readHeroAcquisition',bad.user.idToken,bad.data)).chapter.nextNodeId,'c1_01');
+    await rejected('completeHeroChapterNode',bad.user.idToken,{...bad.data,expectedRevision:badProof.serverRevision,ticketId:badProof.chapter.ticketId,nodeId:'c1_01',choiceId:null},'FAILED_PRECONDITION');
+    badClock.value+=8*86400000;await assert.rejects(bad.current.ensureChapterTicket(bad.request({expectedRevision:badProof.serverRevision})),error=>error.code==='failed-precondition');
+    assert.deepEqual(await bad.capture(),sealed,'unknown same-graph policy cannot advance or renew or create rights');
+    console.log('PASS retained twenty-node policy actual Firestore/HTTP: original protected historical issuance, current advance, expiry zero-write refusal, immutable prefix renewal, twenty steps and once-only claim; same-graph unknown SHA refuses new writes. Outcomes remain unverified.');
+}
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 // Disposable emulator-only resources. No production grant surface is added.
 const growthUser=await login("accounts:signUp",{email:"hero-growth-emulator@example.test",password});

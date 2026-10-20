@@ -208,6 +208,28 @@ test("retained v1 ticket survives policy replacement, renews its prefix and gran
     }
 });
 
+test("exact retained twenty-node tickets advance and renew across edits while same-graph unknown policies cannot write",async()=>{
+    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+    assert.equal(retained.nodes.length,20);assert.equal(retained.outcomeVerified,false);
+    const h=harness(acquisitionWithPolicy(retained)),issued=await h.ensure();await h.step('c1_01');
+    h.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));await h.step('c1_02');
+    const prefix=structuredClone(h.data.get(BASE+'/heroChapter/current').steps);h.advance(8);
+    const beforeExpiry=structuredClone([...h.data]),beforeWrites=h.writes;
+    await assert.rejects(h.step('c1_03'),e=>e.code==='failed-precondition');assert.equal(h.writes,beforeWrites);assert.deepEqual([...h.data],beforeExpiry);
+    const renewed=await h.ensure(),ticket=h.data.get(BASE+'/heroChapterTickets/'+renewed.chapter.ticketId);
+    assert.notEqual(renewed.chapter.ticketId,issued.chapter.ticketId);assert.deepEqual(JSON.parse(JSON.stringify(ticket.policy)),retained);
+    assert.equal(ticket.startingStepCount,prefix.length);assert.equal(ticket.startingStepSha256,h.data.get(BASE+'/heroChapterSteps/'+prefix.at(-1)).sha256);assert.deepEqual(h.data.get(BASE+'/heroChapter/current').steps,prefix);
+    for(let stage=3;stage<=20;stage++)await h.step('c1_'+String(stage).padStart(2,'0'));
+    const completed=await h.read();assert.equal(completed.chapter.phase,'completed');assert.equal(completed.chapter.outcomeVerified,false);assert.equal(completed.entitlements[DOG].allocationSeed,987654321);
+    const snapshot=structuredClone([...h.data]),writes=h.writes;await h.step('c1_20',null,{expectedRevision:1});h.advance(30);await h.ensure();assert.equal(h.writes,writes);assert.deepEqual([...h.data],snapshot);
+    assert.equal([...h.data.keys()].filter(p=>p===BASE+'/uniqueClaims/hero-v1-'+DOG).length,1);
+    const unknown={...structuredClone(retained),sourceSha256:'f'.repeat(64)},bad=harness(acquisitionWithPolicy(unknown)),badIssued=await bad.ensure();
+    bad.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));const unchanged=structuredClone([...bad.data]),zero=bad.writes;
+    assert.equal((await bad.read()).chapter.nextNodeId,'c1_01','sealed unknown historical evidence remains readable');
+    await assert.rejects(bad.step('c1_01'),e=>e.code==='failed-precondition');bad.advance(8);await assert.rejects(bad.ensure(),e=>e.code==='failed-precondition');
+    assert.equal(bad.writes,zero);assert.deepEqual([...bad.data],unchanged);assert.ok(badIssued.chapter.ticketId);
+});
+
 test("new tickets use current policy while unknown sealed policies cannot advance or renew",async()=>{
     const fresh=harness(acquisitionWithPolicy(replacementChapterPolicy));await fresh.ensure();
     assert.equal((await fresh.read()).chapter.nextNodeId,"story_opening");
