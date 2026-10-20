@@ -29,7 +29,7 @@ test('mechanical catalogue exactly matches the actual full-loaded renderer selec
 });
 function temporary(){
     const dir=fs.mkdtempSync(path.join(os.tmpdir(),'player-skill-catalog-'));
-    const build=fs.readFileSync('scripts/build-production.mjs','utf8'),files=new Set([main,final,'scripts/build-production.mjs',
+    const build=fs.readFileSync('scripts/build-production.mjs','utf8'),files=new Set([main,final,'scripts/build-production.mjs','index.html',
         'functions/src/skill-learning-policy-v1.json','functions/src/skill-loadout-policy-v1.json']);
     for(const list of ['appScripts','gameplayScripts'])for(const match of build.match(new RegExp('const '+list+'=\\[([\\s\\S]*?)\\];'))[1].matchAll(/"([^"]+\.js)"/g))files.add(match[1]);
     for(const file of files){fs.mkdirSync(path.dirname(path.join(dir,file)),{recursive:true});fs.copyFileSync(file,path.join(dir,file));}
@@ -65,6 +65,14 @@ test('only sealed original loadout delegate readers preserve normalized v1 data 
             [main,s=>s+'\nwindow.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);\n'],
             [final,s=>s.replace('finalizeSkillMutation();\n            return true;\n        };\n    }\n\n    if(typeof getSkillEffectPreviewText','return true;\n        };\n    }\n\n    if(typeof getSkillEffectPreviewText')],
             ['js/31-v136-auto-battle-fix.js',s=>s+'\nrememberExplicitAction=function(){};\n'],
+            ['index.html',s=>s.replace('id="autoSettingsActionSelect"','id="autoSkillPlayer2"')],
+            ['index.html',s=>s+'\n<div id="player2AutoSettingsCard"></div>\n'],
+            [main,s=>s+'\ndocument.createElement("div").id="player2AutoSettingsCard";\n'],
+            ['js/51-v169-rpg-ui.js',s=>s+'\ndocument.createElement("select").id="autoSkillPlayer2";\n'],
+            [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!card\)\{/, '$1if(false){')],
+            [main,s=>s.replace(/(function populateAutoSkillOptions2\(\)\{[\s\S]*?)if\(!select\)\{/, '$1if(false){')],
+            ['js/31-v136-auto-battle-fix.js',s=>s.replace('restoreSkillAfterLegacySync(1)','restoreSkillAfterLegacySync(0)')],
+            ['scripts/build-production.mjs',s=>s.replace('    "functions/src/skill-progression-core.js",\n','')],
             [final,s=>s+'\nskillDatabase.flameSlash.learnCost=999;\n'],
             [final,s=>s+'\nconst escapedLoadoutData=skillDatabase.flameSlash;unknownMutation(escapedLoadoutData);\n'],
             [final,s=>s+'\nObject.values(skillDatabase).forEach(skill=>{skill.learnCost=999;});\n']

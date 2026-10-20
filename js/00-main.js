@@ -31798,20 +31798,9 @@ function populateAutoSkillOptions(){
        修正：把"defend"也視為合法值。
     */
 
-    const stillValid =
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig.skill=
-            "normal";
-
-    }
+    autoConfig.skill=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .syncPrimaryAction(autoConfig,character).skill;
 
 
     if(homeSelect){

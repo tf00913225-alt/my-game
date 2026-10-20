@@ -7,7 +7,7 @@
     "js/33-v140-four-element-balance.js": "ec0e90959f8d50862deb808c3cd66554ac426d9bc80de1fe07464e8683162a45",
     "js/43-v149-skill-ui-rules.js": "dc765992753af59a8f1d85f6e1252f492cec949fcbc15699e6dd34d61b73a22b",
     "js/44-v152-dev-fixes.js": "7b9dbd4221c27225b4c177fca61da430f3964d3ae7702199c302234ddb334409",
-    "functions/src/skill-progression-core.js": "6297aeeb096dcbfcee52de75e4617e424f0577de2b4375db388ef1aa921b818d",
+    "functions/src/skill-progression-core.js": "70973ea5b9cbd3083f2723758038af4fab64a8c19fffcb3998fadd84ea5a3df9",
     "js/60-v173.64-skill-progression-rebalance.js": "67a5b19e6669061a4c999c42c1aad9bf20ce284d36d82f17be576da866b13aa5"
   },
   "declarationDigests": {

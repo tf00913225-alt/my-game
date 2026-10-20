@@ -5,6 +5,7 @@ import vm from 'node:vm';
 import crypto from 'node:crypto';
 import {createRequire} from 'node:module';
 import {loadoutParity} from '../.github/scripts/fixtures/skill-loadout-parity.mjs';
+import {loadLegacyRuntime} from '../scripts/monster-balance-shadow-matrix.mjs';
 import {skillLearningRuleSemanticDigest,skillLoadoutRuleSemanticDigest,verifySkillLoadoutPolicy} from '../scripts/lib/skill-learning-policy.mjs';
 const require=createRequire(import.meta.url),core=require('../functions/src/skill-progression-core');
 const baseline=JSON.parse(fs.readFileSync(new URL('./fixtures/skill-loadout-runtime-v1.json',import.meta.url),'utf8'));
@@ -98,4 +99,30 @@ test('loadout decisions preserve frozen inputs and use no clock, randomness, sto
     assert.equal(pure.rememberExplicitAction(config,'defend').v136LastSkill,'flameSlash');
     assert.equal(pure.migrateCurrentIntent(config).skill,'normal');
     assert.deepEqual(carried,['flameSlash']);assert.equal(config.skill,'normal');
+});
+
+test('primary option synchronization and absent secondary legacy DOM preserve original preference branches',()=>{
+    for(const skill of ['normal','defend','flameSlash','old-remembered-skill'])for(const equippedSkills of [[],['flameSlash'],['old-remembered-skill']]){
+        const config={enabled:false,skill,hp:30,sp:20,returnToCityWhenEmpty:false,v136LastSkill:'flameSlash'};
+        const expected={...config};
+        if(skill!=='normal'&&skill!=='defend'&&!equippedSkills.includes(skill))expected.skill='normal';
+        assert.deepEqual(rules.syncPrimaryAction(config,{equippedSkills}),expected);
+        assert.equal(config.skill,skill);
+    }
+    // Legal stale preference is retained by the current secondary absence
+    // branch; it is not proof of learned/equipped qualification or corruption.
+    const stale={skill:'flameSlash',v136ActionIntent:'normal',v136LastSkill:'flameSlash'};
+    assert.deepEqual(rules.restoreSkillAfterLegacySync(stale,{skillLevels:{flameSlash:1},equippedSkills:[]}).config,stale);
+});
+
+test('the single pure core is present before original main initialization calls its option synchronization',()=>{
+    const errors=[],original=console.error;let runtime;
+    console.error=(...args)=>errors.push(args.map(String).join(' '));
+    try{runtime=loadLegacyRuntime();}finally{console.error=original;}
+    const path='functions/src/skill-progression-core.js';
+    assert.equal(runtime.paths.filter(row=>row===path).length,1);
+    assert(runtime.paths.indexOf(path)<runtime.paths.indexOf('js/00-main.js'));
+    assert(runtime.paths.indexOf(path)<runtime.paths.indexOf('js/31-v136-auto-battle-fix.js'));
+    assert(errors.every(row=>!row.includes('getLoadoutRulesForVersion')&&!row.includes('syncPrimaryAction')));
+    assert.equal(typeof runtime.context.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion,'function');
 });

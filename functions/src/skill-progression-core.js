@@ -190,8 +190,13 @@ function restoreSkillAfterLegacySync(config,loadout){
     }
     return {config:next,restored:false};
 }
+function syncPrimaryAction(config,loadout){
+    const next={...config},previous=config.skill;
+    if(previous!=="normal"&&previous!=="defend"&&!loadout.equippedSkills.includes(previous))next.skill="normal";
+    return next;
+}
 return Object.freeze({normalizeCrossElementEquip,equipSkill,removeEquippedSkill,normalizeAction,isUnsupportedAutoCategory,
-    isEquippedAndLearnedAutoSkill,rememberExplicitAction,migrateCurrentIntent,restoreSkillAfterLegacySync});
+    isEquippedAndLearnedAutoSkill,rememberExplicitAction,migrateCurrentIntent,restoreSkillAfterLegacySync,syncPrimaryAction});
 };
 const getLoadoutRulesForVersion=function(version,catalog){
 if(version==="v1")return createLoadoutRulesV1(catalog);

@@ -102,7 +102,7 @@ function retainedLoadoutReader(node){
 // Closed compatibility for this mechanical delegation only. These are AST
 // data-provenance identities, not hashes of the new raw source files.
 const LOADOUT_DELEGATES={
-    'js/00-main.js':{owner:null,selectors:['function:removeEquippedSkill'],sha256:'b2f3858bf497f0593bd4c2230b04b5d6fca107156909c75bc30af18e1fd3a81f'},
+    'js/00-main.js':{owner:null,selectors:['function:removeEquippedSkill','function:populateAutoSkillOptions'],sha256:'69768ee1c1563aa860de7803e386ca60ec32c4feaa4c9b90e13cfc44403645ba'},
     'js/31-v136-auto-battle-fix.js':{owner:'installV136AutoBattleFix',selectors:['const:loadoutRules','function:normalizeAction',
         'function:isUnsupportedAutoCategory','function:rememberExplicitAction','function:migrateCurrentIntent',
         'function:restoreSkillAfterLegacySync','function:saveCurrentActionFromPanel','if:saveAutoSettingsFormToCharacter',
@@ -202,7 +202,7 @@ function mutationShapes(root,asts,apply){
 }
 
 export async function buildPlayerSkillConfigCatalog(root){
-    verifySkillLoadoutPolicy(root);
+    try{verifySkillLoadoutPolicy(root);}catch(error){fail(error.message);}
     const source=Object.fromEntries([MAIN,FINAL].map(file=>[file,fs.readFileSync(path.join(root,file),'utf8')]));
     const main=parse(source[MAIN],{ecmaVersion:'latest'}),final=parse(source[FINAL],{ecmaVersion:'latest'});
     const owner=one(final.body.filter(n=>n.type==='ExpressionStatement'&&n.expression.type==='CallExpression'&&n.expression.callee.type==='FunctionExpression'),'final data Owner').expression.callee.body.body;

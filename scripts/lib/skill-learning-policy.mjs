@@ -102,14 +102,61 @@ export function skillLoadoutRuleSemanticDigest(source){
  rejectRebinding(wrapper);
  return createHash('sha256').update(JSON.stringify(semantic(declarations.flat()))).digest('hex');
 }
+// Fixed current Runtime branch: the unified panel owns selection, while the
+// legacy secondary card/select are absent. Never accept a request DOM flag.
+export function skillLoadoutRuntimeSemanticDigest(root){
+ const main=readFileSync(join(root,'js/00-main.js'),'utf8'),legacy=readFileSync(join(root,'js/31-v136-auto-battle-fix.js'),'utf8');
+ const html=readFileSync(join(root,'index.html'),'utf8');
+ const ids=[...html.matchAll(/\bid\s*=\s*["']([^"']+)["']/g)].map(match=>match[1]);
+ if(['player2AutoSettingsCard','autoSkillPlayer2'].some(id=>ids.includes(id))||
+  ['autoSettingsCharacterSelect','autoSettingsActionSelect'].some(id=>ids.filter(value=>value===id).length!==1))
+  throw Error('Retained loadout formal DOM branch changed.');
+ const ast=parse(main,{ecmaVersion:2022}),wrapper=parse(legacy,{ecmaVersion:2022}).body[0]?.expression?.callee?.body?.body;
+ const legacyReads={player2AutoSettingsCard:0,player2AutoSettingsTitle:0,autoSkillPlayer2:0};
+ function checkLegacyReads(node,parent){
+  if(!node||typeof node!=='object')return;
+  if(node.type==='Literal'&&Object.hasOwn(legacyReads,node.value)){
+   if(parent?.type!=='CallExpression'||parent.callee?.type!=='Identifier'||parent.callee.name!=='$'||
+    parent.arguments.length!==1||parent.arguments[0]!==node)throw Error('Retained loadout secondary DOM source changed.');
+   legacyReads[node.value]++;
+  }
+  for(const row of Object.values(node))if(Array.isArray(row))row.forEach(value=>checkLegacyReads(value,node));else checkLegacyReads(row,node);
+ }
+ checkLegacyReads(ast);
+ if(legacyReads.player2AutoSettingsCard!==1||legacyReads.player2AutoSettingsTitle!==1||legacyReads.autoSkillPlayer2!==2)
+  throw Error('Retained loadout secondary DOM reads changed.');
+ const functions=['populateAutoSkillOptions','populateAutoSkillOptions2','saveAutoSettingsFormToCharacter'];
+ const selected=functions.map(name=>{
+  const rows=ast.body.filter(node=>node.type==='FunctionDeclaration'&&node.id.name===name);
+  if(rows.length!==1)throw Error('Retained loadout Runtime Owner is ambiguous.');return rows[0];
+ });
+ if(!wrapper)throw Error('Retained loadout preference wrapper is missing.');
+ const build=parse(readFileSync(join(root,'scripts/build-production.mjs'),'utf8'),{ecmaVersion:'latest',sourceType:'module'});
+ const files=['appScripts','gameplayScripts'].flatMap(name=>{
+  const node=build.body.flatMap(row=>row.type==='VariableDeclaration'?row.declarations:[]).find(row=>row.id.name===name)?.init;
+  if(node?.type!=='ArrayExpression'||node.elements.some(row=>row.type!=='Literal'||typeof row.value!=='string'))throw Error('Retained loadout formal order is unsupported.');
+  return node.elements.map(row=>row.value);
+ });
+ const core=files.indexOf('functions/src/skill-progression-core.js'),v136=files.indexOf('js/31-v136-auto-battle-fix.js');
+ if(core<0||files.filter(file=>file==='functions/src/skill-progression-core.js').length!==1||
+  files.indexOf('js/00-main.js')<=core||v136<=files.indexOf('js/00-main.js'))throw Error('Retained loadout formal order changed.');
+ for(const file of files){
+  if(!file.endsWith('.js')||file.includes('..'))throw Error('Retained loadout source is unsupported.');
+  const source=readFileSync(join(root,file),'utf8');
+  if(file!=='js/00-main.js'&&/player2AutoSettingsCard|autoSkillPlayer2/.test(source))throw Error('Retained loadout secondary DOM producer changed.');
+ }
+ return createHash('sha256').update(JSON.stringify(semantic({selected,wrapper,files,
+  unifiedIds:['autoSettingsCharacterSelect','autoSettingsActionSelect'],legacySecondaryDom:'absent'}))).digest('hex');
+}
 export function verifySkillLoadoutPolicy(root){
  const policy=JSON.parse(readFileSync(join(root,'functions/src/skill-loadout-policy-v1.json'),'utf8'));
  const source=readFileSync(join(root,'functions/src/skill-progression-core.js'),'utf8');
  const learning=readFileSync(join(root,'functions/src/skill-learning-policy-v1.json'));
- if(Object.keys(policy).sort().join(',')!=='learningPolicySha256,policyVersion,ruleSemanticSha256,ruleVersion,schemaVersion'||
+ if(Object.keys(policy).sort().join(',')!=='learningPolicySha256,policyVersion,ruleSemanticSha256,ruleVersion,runtimeSemanticSha256,schemaVersion'||
   policy.schemaVersion!==1||policy.ruleVersion!=='v1'||policy.policyVersion!=='player-skill-loadout-v1'||
   policy.learningPolicySha256!==createHash('sha256').update(learning).digest('hex')||
-  policy.ruleSemanticSha256!==skillLoadoutRuleSemanticDigest(source))
+  policy.ruleSemanticSha256!==skillLoadoutRuleSemanticDigest(source)||
+  policy.runtimeSemanticSha256!==skillLoadoutRuntimeSemanticDigest(root))
   throw Error('Retained skill loadout v1 changed; preserve v1 and add an explicit new version.');
  verifySkillLearningPolicy(root);
  return policy.ruleSemanticSha256;
