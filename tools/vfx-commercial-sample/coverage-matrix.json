@@ -3,7 +3,7 @@
   "pullRequest": 941,
   "sourceHead": "ade43a48ce618330055f9add290abb175ef9470d",
   "scope": "44 four-element active skills, four intentional passive casts, and 21 formal status visual entries",
-  "qualityClaim": "69-entry inventory with historical technical evidence preserved. All 21 statuses have scoped both-side static PASS at 590b1390; eight pulse statuses have direct-decoded sampled-cycle PASS. Continuous motion and sustained performance remain pending. No blanket art/commercial PASS for 44 active skills.",
+  "qualityClaim": "Historical69-entry inventory and earlier checkpoint evidence. Per-row candidate/pending fields below are historical; current70-item source fingerprints and scoped acceptance live only in currentAcceptanceOwner.",
   "owners": {
     "manifest": "js/39-v143-skill-animation.js",
     "finalSkillData": "js/60-v173.64-skill-progression-rebalance.js",
@@ -3812,5 +3812,6 @@
     "decision": "Rejected and reverted at b145; not current runtime",
     "evidenceHead": "ade43a48ce618330055f9add290abb175ef9470d",
     "scope": "Do not infer this rejected geometry from retained historical reviews."
-  }
+  },
+  "currentAcceptanceOwner": "tools/vfx-commercial-sample/commercial-acceptance-index.json"
 }

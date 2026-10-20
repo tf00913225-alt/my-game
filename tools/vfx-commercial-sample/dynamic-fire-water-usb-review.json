@@ -1,0 +1,158 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "coverage_review",
+  "reviewedAt": "2026-10-20",
+  "evidenceHead": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+  "workspaceHeadAtWrite": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
+  "evidenceDirectory": "artifacts/vfx-freeze-relic-final-usb/sequence-frames",
+  "metadata": "artifacts/vfx-freeze-relic-final-usb/skill-video.json",
+  "method": "tools.view_image 實看原生720x1280、12fps全手機PNG，依label校正起/中/命中相鄰/退場。peakFrame均為已實看有辨識效果的原幀，不以推算時間直接充當峰值。",
+  "scope": "僅9招新增動態跳切、裁切、身份、對位、HUD及過度縮小。先前source/static PASS不重開。",
+  "limitations": [
+    "12fps抽樣不能證明60fps流暢度或幀時間。",
+    "此為指定USB演出條件下逐項視覺PASS，不代表全遊戲商業驗收或正式傷害duration owner重測。",
+    "workspace已前進；本報告只為綁定7cdebfb2的錄影證據背書。"
+  ],
+  "summary": {
+    "pass": 9,
+    "fail": 0,
+    "needsEvidence": 0
+  },
+  "entries": [
+    {
+      "id": "flameSlash",
+      "result": "PASS",
+      "viewedFrames": [
+        11,
+        13,
+        14,
+        15,
+        16,
+        17,
+        20
+      ],
+      "peakFrame": 15,
+      "notes": "細橙斬弧跨過左敵胸腹，15有清楚命中星芒；16散去、17清空。尺寸小但刃線清楚，未縮到不可辨識。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "fireCritical",
+      "result": "PASS",
+      "viewedFrames": [
+        26,
+        30,
+        33,
+        34,
+        39
+      ],
+      "peakFrame": 33,
+      "notes": "紅黑聚氣旋流→垂直火刺→胸腹火環爆擊→34淡殘影→39清空；火環確實包住左敵，HUD保持前景。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "dragonSlash",
+      "result": "PASS",
+      "viewedFrames": [
+        44,
+        54,
+        63,
+        64,
+        70,
+        77
+      ],
+      "peakFrame": 54,
+      "notes": "纏繞蓄勢→有龍首的斬弧→交叉亮擊；63/64命中形一致，70淡火絲、77清空。沒有可見硬裁切或尾端硬切；龍形保留。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "fireRocket",
+      "result": "PASS",
+      "viewedFrames": [
+        83,
+        85,
+        86,
+        87,
+        89,
+        90,
+        95
+      ],
+      "peakFrame": 87,
+      "notes": "83施法者火弓、85/86三火箭向左敵上行，87三點爆擊覆蓋左敵輪廓，89/90餘燼逐減、95清空。軌跡與接觸位置合理，並非打在隊伍空隙。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "blazeSpell",
+      "result": "PASS",
+      "viewedFrames": [
+        99,
+        104,
+        108,
+        109,
+        114
+      ],
+      "peakFrame": 104,
+      "notes": "小法陣→尖頂集中火柱→108胸口火旋→109淡殘影→114清空。頂端完整，沒有先前水平平切；單體範圍受控。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "flameTornado",
+      "result": "PASS",
+      "viewedFrames": [
+        120,
+        129,
+        134,
+        135,
+        145
+      ],
+      "peakFrame": 129,
+      "notes": "細火帶蓄勢→完整火龍卷→134/135稀疏盤旋火帶→145清空。左敵被命中包覆屬短時攻擊，另外兩敵與全體HUD仍可讀，沒有新定位或裁切回歸。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "phoenixCry",
+      "result": "PASS",
+      "viewedFrames": [
+        151,
+        163,
+        172,
+        173,
+        181,
+        190
+      ],
+      "peakFrame": 163,
+      "notes": "羽片聚氣→有清楚頭喙與大翼的鳳凰→172/173鳳形環爆→181透明羽片→190清空。群體大招覆蓋敵方上區且短暫遮中央立繪，但敵名/HP均在前景可讀，沒有延伸到玩家隊伍或新增切邊；不據此重開已過尺寸靜態Gate。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "waterKnife",
+      "result": "PASS",
+      "viewedFrames": [
+        194,
+        198,
+        199,
+        200,
+        201,
+        204
+      ],
+      "peakFrame": 198,
+      "notes": "藍色雙弧水刃→左敵胸口白藍命中→199水滴殘影→200起清空。與同色敵人仍有亮刃對比，HUD不被吞；短退場有實際中間殘影，未判硬切。",
+      "action": "stop-refinement"
+    },
+    {
+      "id": "frostPunch",
+      "result": "PASS",
+      "viewedFrames": [
+        209,
+        212,
+        213,
+        214,
+        215,
+        216,
+        220
+      ],
+      "peakFrame": 212,
+      "notes": "冰晶蓄勢→212具明確拳指輪廓的冰拳→213下擊碎晶→214爆裂→215淡冰屑→216清空。拳與爆裂接觸左敵，身份及命中均清楚。",
+      "action": "stop-refinement"
+    }
+  ]
+}
