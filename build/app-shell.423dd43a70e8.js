@@ -26913,10 +26913,15 @@ function switchCharacterTab(tabName){
         pageEl,
         container
     );
+    // A different tab starts at its heading, never at the previous tab's offset.
+    container.scrollTop=0;
     const characterModal=$("homeFeatureModal");
     if(characterModal){characterModal.dataset.characterTab=tabName;}
     const characterTitle=$("homeFeatureModalTitle");
     if(characterTitle){characterTitle.textContent=tabName==="skill"?"技能":"角色";}
+    if(tabName==="expPool"&&typeof window.v173SyncExpPoolChargeUi==="function"){
+        window.v173SyncExpPoolChargeUi(false);
+    }
 
 
     if(window.v78ApplyCharacterInventoryLayout){

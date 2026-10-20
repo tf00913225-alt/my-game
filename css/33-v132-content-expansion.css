@@ -84,6 +84,28 @@
     line-height:1.6;
 }
 
+/* Long smelting rules are a Medium Modal: header/actions outside one scroller. */
+.v132-reward-modal-inner.v141-affix-modal{
+    height:auto;
+    max-height:var(--ui-medium-modal-height);
+    overflow:hidden;
+}
+.v141-affix-modal .v141-affix-content{
+    flex:1 1 auto;
+    min-height:0;
+    overflow-y:auto;
+    overscroll-behavior-y:contain;
+    touch-action:pan-y;
+    scrollbar-gutter:stable;
+    line-height:1.65;
+}
+.v141-affix-modal > h3,
+.v141-affix-modal > .v132-reward-actions{
+    position:static;
+    flex:0 0 auto;
+}
+.v141-affix-content > div{margin-bottom:calc(10 * var(--ui-length-unit,1px));}
+
 .v132-reward-actions{
     position:sticky;
     bottom:0;

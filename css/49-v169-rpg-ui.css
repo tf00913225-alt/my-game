@@ -609,6 +609,7 @@ body > .v169-rpg-dialog-layer{
 /* Keep existing header actions on one native row; reserve the row for every tab. */
 #game-ui #homeFeatureModal .home-feature-modal-box.wide .home-feature-modal-title > div{
     min-height:114px;
+    flex:0 0 auto;
     display:flex;
     flex-direction:row;
     align-items:center;
@@ -1494,42 +1495,46 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal .character-showcase-avatar{width:calc(56 * var(--ui-length-unit,1px));height:calc(56 * var(--ui-length-unit,1px));margin:0 auto;border:calc(2 * var(--ui-length-unit,1px)) solid #f0b429;border-radius:50%;background-color:#15100a;background-position:center 18%;background-size:cover;background-repeat:no-repeat;display:flex;align-items:center;justify-content:center;font-size:calc(18 * var(--ui-length-unit,1px));transition:opacity .15s;}
 #game-ui #homeFeatureModal .character-showcase-avatar.is-current-character{border-color:var(--character-avatar-edge,#fff0ab);box-shadow:var(--character-avatar-shadow,0 0 0 9px rgba(255,176,42,.55),0 0 48px rgba(255,130,28,.9));}
 
-/* Explicit skill-tab visual state, owned and cleared by switch/closeHomeFeature. */
+/* Character skin state is owned and cleared by switch/closeHomeFeature. */
 #game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-box.wide{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
-#game-ui #homeFeatureModal[data-character-tab="skill"]{
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-modal-box,
+.v132-reward-modal-inner.v141-affix-modal{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)){
     --skill-header-height:calc(38 * var(--ui-length-unit,1px));
     --skill-header-inset:calc(4 * var(--ui-length-unit,1px));
     --skill-header-text:#ffe0a1;
 }
-#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalTitle{
-    flex:0 0 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-modal-title{background:transparent;box-shadow:none;border:0;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) #homeFeatureModalTitle{
+    flex:0 1 70%;min-width:0;box-sizing:border-box;height:var(--skill-header-height);
     display:flex;align-items:center;justify-content:center;
     padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));
     background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;
     font-size:calc(24 * var(--ui-length-unit,1px));line-height:1;color:var(--skill-header-text);letter-spacing:.16em;text-shadow:0 2px 4px #000;
 }
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn{
+#game-ui #homeFeatureModal:has(#autoBattleSettingsPanel) #homeFeatureModalTitle{letter-spacing:.02em;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-close-btn{
     position:relative;isolation:isolate;display:inline-flex;align-items:center;justify-content:center;
+    flex:0 0 auto;white-space:nowrap;
     box-sizing:border-box;height:var(--skill-header-height);min-height:var(--skill-header-height);margin:0;
     padding:0 calc(12 * var(--ui-length-unit,1px));border:0;border-radius:0;
     background:transparent;box-shadow:none;color:var(--skill-header-text);font-size:calc(16 * var(--ui-length-unit,1px));line-height:1;
 }
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn::before{content:'‹';margin-right:calc(5 * var(--ui-length-unit,1px));font-size:1.5em;line-height:1;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn::after{
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-close-btn:not(#statusHelpButton)::before{content:'‹';margin-right:calc(5 * var(--ui-length-unit,1px));font-size:1.5em;line-height:1;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-close-btn::after{
     content:'';position:absolute;z-index:-1;inset:var(--skill-header-inset) 0;pointer-events:none;
     border:calc(1 * var(--ui-length-unit,1px)) solid #a78245;border-radius:calc(3 * var(--ui-length-unit,1px));
     background:linear-gradient(135deg,#a0793c33,transparent 45%),linear-gradient(180deg,#503a20,#2c2012 48%,#19130b);
     box-shadow:inset 0 0 0 calc(2 * var(--ui-length-unit,1px)) #21180e,inset 0 calc(3 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px)) #d7ad5d33,0 calc(1 * var(--ui-length-unit,1px)) calc(3 * var(--ui-length-unit,1px)) #000;
 }
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn:hover::after{border-color:#d2af6d;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-header-actions .home-feature-close-btn:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(2 * var(--ui-length-unit,1px));}
-#game-ui #homeFeatureModal[data-character-tab="skill"] #homeFeatureModalBody{background:transparent;box-shadow:none;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-close-btn:hover::after{border-color:#d2af6d;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .home-feature-close-btn:focus-visible{outline:calc(2 * var(--ui-length-unit,1px)) solid #e6bb69;outline-offset:calc(2 * var(--ui-length-unit,1px));}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) #homeFeatureModalBody{background:transparent;box-shadow:none;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-showcase-avatar{background-size:230%;background-position:center 12%;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
-#game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button.active{background:linear-gradient(#76502a,#37251a);border-color:#d3ab68;color:#fff0cd;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
+#game-ui #homeFeatureModal:is([data-character-tab],:has(#autoBattleSettingsPanel)) .character-tab-row button.active{background:linear-gradient(#76502a,#37251a);border-color:#d3ab68;color:#fff0cd;}
 
+.v132-reward-modal-inner.v141-affix-modal > h3{display:flex;align-items:center;justify-content:center;min-height:calc(38 * var(--ui-length-unit,1px));background:transparent url('../assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp') center/100% auto no-repeat;padding:0 calc(12 * var(--ui-length-unit,1px)) 0 calc(34 * var(--ui-length-unit,1px));}
 /* =====================================================
    Shared Black-Gold Window Skin — visual-only owner
    Geometry, stacking, overflow and interaction remain owned by existing rules.

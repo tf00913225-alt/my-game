@@ -3477,7 +3477,8 @@ button:active{
 */
 
 .status-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:minmax(calc(40 * var(--ui-length-unit,1px)),auto) calc(52 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(52 * var(--ui-length-unit,1px));
     align-items:center;
     justify-content:space-between;
     min-height:52px;
@@ -3485,7 +3486,7 @@ button:active{
     padding:4px 0;
     border-bottom:1px solid rgba(200,154,72,.14);
     font-size:13px;
-    gap:8px;
+    gap:calc(8 * var(--ui-length-unit,1px));
 }
 
 /*
@@ -3707,15 +3708,16 @@ button:active{
 }
 
 .status-btn{
-    width:44px;
-    height:44px;
-    flex:0 0 44px;
+    width:calc(52 * var(--ui-length-unit,1px));
+    height:calc(52 * var(--ui-length-unit,1px));
+    min-width:0;
+    padding:0;
     border:1px solid rgba(200,154,72,.38);
     border-radius:9px;
     background:linear-gradient(180deg,#2b2419,#14110d);
     color:#ead9b4;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.04);
-    font-size:20px;
+    font-size:calc(22 * var(--ui-length-unit,1px));
     font-weight:900;
     -webkit-tap-highlight-color:transparent;
     -webkit-touch-callout:none;

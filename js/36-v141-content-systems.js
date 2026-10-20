@@ -612,7 +612,7 @@
             const cost='金幣 '+meta.reforgeGold.toLocaleString('zh-TW')+(meta.available===false?'・尚未開放':'');
             return '<div><b>'+meta.label+'材料</b>　'+reforgeRangeText(tier,2)+'　／　'+cost+'</div>';
         }).join('');
-        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階數值已定義，目前尚未開放取得來源及交易。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定消耗 50 礦石；鎖 1 條 100 礦石；鎖 2 條 150 礦石。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>每槽獨立等機率抽取六圍，可重複屬性；最高值固定10%，其餘90%均勻抽取其他整數。</p><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
+        window.v132ShowRewardModal('<div class="v132-reward-modal-inner v141-affix-modal"><h3>冶煉規則</h3><div class="v141-affix-content" data-scroll-owner="y"><p>裝備品質不限制材料階級。選用哪一階材料，本次重洗就使用哪一階的數值範圍。</p>'+lines+'<p>桃紅階、四象階數值已定義，目前尚未開放取得來源及交易。</p><p>每次會重洗所有未鎖定的冶煉槽；已鎖定詞條保持原數值。冶煉次數不限。</p><p>消耗：未鎖定消耗 50 礦石；鎖 1 條 100 礦石；鎖 2 條 150 礦石。最多鎖 2 條，且至少保留 1 個槽位重洗。</p><p>每槽獨立等機率抽取六圍，可重複屬性；最高值固定10%，其餘90%均勻抽取其他整數。</p></div><div class="v132-reward-actions"><button onclick="v132CloseRewardModal()">返回</button></div></div>');
     };
 
     window.v141StartReforge=function(){
