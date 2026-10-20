@@ -11932,9 +11932,9 @@
     {
       "id": "gameplay.abyss-detail",
       "label": "abyss-detail內頁",
-      "entry": "玩法頁正式入口→abyss-detail",
-      "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "entry": "玩法中心→深淵→20/40難度選擇與地圖；非獨立詳情彈窗",
+      "owner": "js/59-abyss-two-tier-runtime.js; css/50-v169-abyss-flow.css; css/54-v174-abyss-two-tier.css; js/41-v146-system-polish.js; js/42-v148-combat-dungeon-fixes.js; config/feature-manifest.json",
+      "status": "有問題",
       "states": [
         "鎖定",
         "解鎖",
@@ -11987,6 +11987,22 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "issues": [
+        "34 fixed54c1eb0a/360: selection/leave36px; legacyCSS46 min38!important competes with formal52. Internal map return37.7px covered by formal topreturn36px. Map CSS variable resolves /build/assets path404; cold patrol source src absent through3s. No after acceptance."
+      ],
+      "diagnosticEvidence": {
+        "head": "54c1eb0addb81476e38961547e0f9acb12a59439",
+        "status": "有問題／診斷限定，非驗收通過",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment34-before-observations",
+        "viewport": "360x640",
+        "limits": [
+          "Two initial failures were QA missing reach/wrong descendant selector, not product failures",
+          "Diagnostic-only sub44 known buttons observed via real hit, formal acceptance gate remains44",
+          "Nine raw/meta/abyss/legacy/actors/inventory/loadouts/equipment/saveAPI restorations exact",
+          "No battle/chest/portal/reward/reset/movement; private cache/hardware/locked tiers/all regions unverified",
+          "DOM class correct throughout0/1/3s: no evidence for class-lifecycle migration"
+        ]
       }
     },
     {
@@ -26658,6 +26674,12 @@
         "Six exact restore fields only; baseline after startup/module initialization, not all private caches",
         "Before scope prose five comparisons is a copied metadata typo: actual fixture/phase/input evidence has one armor comparison; original reports retained untouched"
       ]
+    },
+    {
+      "segment": "segment-34-before-observations",
+      "head": "54c1eb0addb81476e38961547e0f9acb12a59439",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment34-before-observations",
+      "result": "具體問題已取證；未修後驗收，不准標完成"
     }
   ],
   "titleAudit": {

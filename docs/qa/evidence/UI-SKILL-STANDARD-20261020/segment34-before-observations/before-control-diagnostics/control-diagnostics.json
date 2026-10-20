@@ -1,0 +1,355 @@
+{
+  "sheetErrors": [],
+  "buttons": [
+    {
+      "selector": ".v174-abyss-card[data-difficulty=\"20\"] button",
+      "present": true,
+      "text": "開始挑戰",
+      "disabled": false,
+      "rect": {
+        "x": 213.42857360839844,
+        "y": 251.78570556640625,
+        "width": 116.57142639160156,
+        "height": 36,
+        "top": 251.78570556640625,
+        "right": 330,
+        "bottom": 287.78570556640625,
+        "left": 213.42857360839844
+      },
+      "computed": {
+        "height": "42px",
+        "minHeight": "38px",
+        "maxHeight": "none",
+        "padding": "7px 15px",
+        "paddingBlock": "7px",
+        "paddingInline": "15px",
+        "font": "900 18px \"Noto Sans TC\", Arial, sans-serif",
+        "fontSize": "18px",
+        "lineHeight": "normal",
+        "boxSizing": "border-box",
+        "display": "block",
+        "flex": "0 1 auto",
+        "transform": "none",
+        "uiLengthUnit": ""
+      },
+      "elementScale": 0.8571428411147174,
+      "stage": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "offsetWidth": 1080,
+        "offsetHeight": 1920,
+        "scale": 0.3333333333333333,
+        "transform": "matrix(0.333333, 0, 0, 0.333333, 0, 0)"
+      },
+      "inlineStyle": "",
+      "matchedCandidates": [
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 2,
+          "selector": "*",
+          "cssText": "box-sizing: border-box;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 3,
+          "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+          "cssText": "scrollbar-width: none !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 17,
+          "selector": "button, select, input",
+          "cssText": "font-family: inherit;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 18,
+          "selector": "button",
+          "cssText": "cursor: pointer;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 194,
+          "selector": "button",
+          "cssText": "position: relative; overflow: hidden;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 1872,
+          "selector": "#game-stage .v141-abyss-intro button",
+          "cssText": "min-width: 150px; border: 1px solid rgb(209, 160, 76); border-radius: 8px; color: rgb(38, 23, 7); background: linear-gradient(rgb(240, 203, 121), rgb(183, 122, 45)); font-weight: 900;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2055,
+          "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+          "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2242,
+          "selector": "#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button",
+          "cssText": "min-width: 136px !important; min-height: 38px !important; padding: 7px 15px !important; box-shadow: rgba(0, 0, 0, 0.72) 0px 3px 14px !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/feature-abyss.8fc5913c1e94.css",
+          "order": 3012,
+          "selector": "#game-stage .v174-abyss-card > button",
+          "cssText": "position: absolute; right: 11px; bottom: 10px; z-index: 4; min-width: 112px; min-height: 52px; padding: 8px 13px; border: 1px solid rgb(199, 155, 80); border-radius: 999px; color: rgb(255, 240, 200); background: linear-gradient(rgba(83, 56, 23, 0.94), rgba(31, 22, 13, 0.98)); box-shadow: rgba(0, 0, 0, 0.45) 0px 4px 10px, rgba(236, 181, 81, 0.08) 0px 0px 10px inset; font-size: 18px; font-weight: 900; letter-spacing: 0.04em;",
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "selector": ".v174-abyss-card[data-difficulty=\"40\"] button",
+      "present": true,
+      "text": "開始挑戰",
+      "disabled": false,
+      "rect": {
+        "x": 213.42857360839844,
+        "y": 442.39288330078125,
+        "width": 116.57142639160156,
+        "height": 36,
+        "top": 442.39288330078125,
+        "right": 330,
+        "bottom": 478.39288330078125,
+        "left": 213.42857360839844
+      },
+      "computed": {
+        "height": "42px",
+        "minHeight": "38px",
+        "maxHeight": "none",
+        "padding": "7px 15px",
+        "paddingBlock": "7px",
+        "paddingInline": "15px",
+        "font": "900 18px \"Noto Sans TC\", Arial, sans-serif",
+        "fontSize": "18px",
+        "lineHeight": "normal",
+        "boxSizing": "border-box",
+        "display": "block",
+        "flex": "0 1 auto",
+        "transform": "none",
+        "uiLengthUnit": ""
+      },
+      "elementScale": 0.8571428411147174,
+      "stage": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "offsetWidth": 1080,
+        "offsetHeight": 1920,
+        "scale": 0.3333333333333333,
+        "transform": "matrix(0.333333, 0, 0, 0.333333, 0, 0)"
+      },
+      "inlineStyle": "",
+      "matchedCandidates": [
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 2,
+          "selector": "*",
+          "cssText": "box-sizing: border-box;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 3,
+          "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+          "cssText": "scrollbar-width: none !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 17,
+          "selector": "button, select, input",
+          "cssText": "font-family: inherit;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 18,
+          "selector": "button",
+          "cssText": "cursor: pointer;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 194,
+          "selector": "button",
+          "cssText": "position: relative; overflow: hidden;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 1872,
+          "selector": "#game-stage .v141-abyss-intro button",
+          "cssText": "min-width: 150px; border: 1px solid rgb(209, 160, 76); border-radius: 8px; color: rgb(38, 23, 7); background: linear-gradient(rgb(240, 203, 121), rgb(183, 122, 45)); font-weight: 900;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2055,
+          "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+          "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2242,
+          "selector": "#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button",
+          "cssText": "min-width: 136px !important; min-height: 38px !important; padding: 7px 15px !important; box-shadow: rgba(0, 0, 0, 0.72) 0px 3px 14px !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/feature-abyss.8fc5913c1e94.css",
+          "order": 3012,
+          "selector": "#game-stage .v174-abyss-card > button",
+          "cssText": "position: absolute; right: 11px; bottom: 10px; z-index: 4; min-width: 112px; min-height: 52px; padding: 8px 13px; border: 1px solid rgb(199, 155, 80); border-radius: 999px; color: rgb(255, 240, 200); background: linear-gradient(rgba(83, 56, 23, 0.94), rgba(31, 22, 13, 0.98)); box-shadow: rgba(0, 0, 0, 0.45) 0px 4px 10px, rgba(236, 181, 81, 0.08) 0px 0px 10px inset; font-size: 18px; font-weight: 900; letter-spacing: 0.04em;",
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "selector": ".v174-abyss-leave",
+      "present": true,
+      "text": "返回玩法",
+      "disabled": false,
+      "rect": {
+        "x": 121.71428680419922,
+        "y": 129.75,
+        "width": 116.57141876220703,
+        "height": 36,
+        "top": 129.75,
+        "right": 238.28570556640625,
+        "bottom": 165.75,
+        "left": 121.71428680419922
+      },
+      "computed": {
+        "height": "42px",
+        "minHeight": "38px",
+        "maxHeight": "none",
+        "padding": "7px 15px",
+        "paddingBlock": "7px",
+        "paddingInline": "15px",
+        "font": "900 18px \"Noto Sans TC\", Arial, sans-serif",
+        "fontSize": "18px",
+        "lineHeight": "normal",
+        "boxSizing": "border-box",
+        "display": "block",
+        "flex": "0 1 auto",
+        "transform": "none",
+        "uiLengthUnit": ""
+      },
+      "elementScale": 0.8571427850162282,
+      "stage": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "offsetWidth": 1080,
+        "offsetHeight": 1920,
+        "scale": 0.3333333333333333,
+        "transform": "matrix(0.333333, 0, 0, 0.333333, 0, 0)"
+      },
+      "inlineStyle": "",
+      "matchedCandidates": [
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 2,
+          "selector": "*",
+          "cssText": "box-sizing: border-box;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 3,
+          "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+          "cssText": "scrollbar-width: none !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 17,
+          "selector": "button, select, input",
+          "cssText": "font-family: inherit;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 18,
+          "selector": "button",
+          "cssText": "cursor: pointer;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/boot-core.1a331d452911.css",
+          "order": 194,
+          "selector": "button",
+          "cssText": "position: relative; overflow: hidden;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 1872,
+          "selector": "#game-stage .v141-abyss-intro button",
+          "cssText": "min-width: 150px; border: 1px solid rgb(209, 160, 76); border-radius: 8px; color: rgb(38, 23, 7); background: linear-gradient(rgb(240, 203, 121), rgb(183, 122, 45)); font-weight: 900;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2055,
+          "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+          "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/gameplay-core.17a9eb874fe3.css",
+          "order": 2242,
+          "selector": "#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button",
+          "cssText": "min-width: 136px !important; min-height: 38px !important; padding: 7px 15px !important; box-shadow: rgba(0, 0, 0, 0.72) 0px 3px 14px !important;",
+          "conditions": []
+        },
+        {
+          "file": "http://127.0.0.1:49174/build/feature-abyss.8fc5913c1e94.css",
+          "order": 3070,
+          "selector": "#game-stage .v174-abyss-selection-head .v174-abyss-leave",
+          "cssText": "align-self: center; min-height: 52px; margin-top: 5px; padding: 8px 16px; border: 1px solid rgb(157, 120, 63); border-radius: 999px; color: rgb(234, 213, 169); background: linear-gradient(rgb(51, 37, 22), rgb(23, 16, 10)); font-size: 18px; font-weight: 900;",
+          "conditions": []
+        }
+      ]
+    },
+    {
+      "selector": ".v174-abyss-back",
+      "present": false,
+      "note": "No formal map entry; back control not fabricated"
+    }
+  ]
+}
