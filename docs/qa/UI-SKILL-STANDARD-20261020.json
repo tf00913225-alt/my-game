@@ -25059,7 +25059,7 @@
       ],
       "note": "真可見返回控制要從實際DOM核定，不把API直接呼叫當真入口；不可為驗返回學習/裝備/用補品/領獎。",
       "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "operations": [
         "正式入口",
         "閱讀",
@@ -25094,7 +25094,22 @@
           "after": null,
           "interaction": null
         }
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "Isolated active guidance three formal system entries/read-end/return, four viewports",
+          "status": "已實際驗證",
+          "head": "3b80199ccc7c2a409853b4392920f3c6947d1c3e",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29-tutorial-display-accepted",
+          "limits": [
+            "Only isolated active-guidance skill/equipment/recovery system entry, destination read/end and return; not completed tutorials",
+            "Skill actual character modal/borrowed node restored; inventory natural empty slots only, not full120/pager/cancel-context",
+            "No learning/equipment/claim/preparation-confirm/potion/combat/settlement/cloud actions; recovery secondary confirmation is readable, not a verified disabled state",
+            "Same-task selected domain unchanged for entry/navigation/return, not zero local saves; original open lastViewedAt/beginChapter effects retained",
+            "Prior black/overlap/pointer/wheel failures retained only as diagnostics; desktop native-wheel replaces inadequate old bounded wheel distance"
+          ]
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-story-cursor",
@@ -25947,6 +25962,19 @@
         "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
         "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
         "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
+      ]
+    },
+    {
+      "segment": "segment-29-tutorial-display",
+      "head": "3b80199ccc7c2a409853b4392920f3c6947d1c3e",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29-tutorial-display-accepted",
+      "result": "三模式正式頁面往返限定驗證；非教學或業務全流程",
+      "pending": [
+        "Only isolated active-guidance skill/equipment/recovery system entry, destination read/end and return; not completed tutorials",
+        "Skill actual character modal/borrowed node restored; inventory natural empty slots only, not full120/pager/cancel-context",
+        "No learning/equipment/claim/preparation-confirm/potion/combat/settlement/cloud actions; recovery secondary confirmation is readable, not a verified disabled state",
+        "Same-task selected domain unchanged for entry/navigation/return, not zero local saves; original open lastViewedAt/beginChapter effects retained",
+        "Prior black/overlap/pointer/wheel failures retained only as diagnostics; desktop native-wheel replaces inadequate old bounded wheel distance"
       ]
     }
   ],
