@@ -15,3 +15,9 @@ eb5首360仍36px，末列不足44；inline/CSSOM診斷證明JS17啟動函式以4
 ## 35C 列表末端遮擋（修後待驗）
 
 固定501首360證明真52後末項落nav下；完整祖先鏈無實際可捲動Owner。失敗/原始祖先證據保留segment35-scroll-before，仍未進巡邏map。CSS00原列表作唯一內部scroll，保留84舊座標單位（原native216/1080×420）導覽區；CSS01訓練祖先不再套map的touch-action:none，原map固定坐標與training固定viewport/背景不改。無wrapper或新JS控制。回歸兩檔/buildcheck過；modal browser未配置exe仍不算通過。真touch/末項/返回與後續map待驗。
+
+## 35D 形象選項（修後待驗）
+
+60ce首360已真末列/回森林/原資訊進入巡邏，但首採集誤讀不存在mapPageTitle失敗，保原圖排除；正式null-safe再跑顯示原地圖無獨立題牌，不能憑空新增。靜態map、人物與quick off目標44.705px/EFP正常，形象原選項32.57px不足44。兩組未通過證據保留segment35-panel-before，不冒稱巡邏已驗收。
+
+原CSS32選項min52/font18/line1.4/可換行，面板適當寬度/內距沿原技能黑鐵雕框，選項保左齊名稱/原active；不改JS26選取或localkey。build/check過，四尺寸/三方修後圖證待完成。快捷圖內微字另待改善，off目標大小不代表語言/切換狀態已驗。
