@@ -11706,7 +11706,7 @@
 
         stoneSlash:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-slash-cast.png?v=173.39","single",{scale:2.2,maxSize:270})},
         petrifyFist:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/petrify-fist-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
-        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/stone-break-sky-cast.png?v=173.39","single",{scale:2.35,maxSize:290})},
+        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/stone-break-sky-soft-edge-v2.webp","single",{scale:2.35,maxSize:290})},
         earthquakeCrush:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/earthquake-crush-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         stoneThrow:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-throw-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         sandWind:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/rolling-stone-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,preserveSourceAspect:true,cellAspect:2.25})},
@@ -12447,10 +12447,10 @@
 
         const anchor=presentationSnapshot&&presentationSnapshot.anchor;
         if(!anchor){ return; }
-        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot.cardRect);
+        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot.cardRect,presentationSnapshot.pairedFrontHudRect);
     }
 
-    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry,measuredCardRect){
+    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry,measuredCardRect,pairedFrontHudRect){
         const profile=STATUS_BODY_PRESENTATION[type];
         if(!profile){ return; }
         const cardRect=measuredCardRect||anchor.rect;
@@ -12471,6 +12471,14 @@
             y=portrait.top-height*.35;
             const hud=geometry?.hudSafeRect;
             if(hud&&hud.bottom<=portrait.top){ y=Math.max(y,hud.bottom+height/2+2); }
+            // The adjacent front-row information band belongs to another unit.
+            // Its rect is read in the shared pre-write snapshot, never here.
+            const front=pairedFrontHudRect;
+            if(front&&front.width>0&&front.height>0&&
+               x+width/2>front.left&&x-width/2<front.right&&
+               y+height/2>front.top-2&&y-height/2<front.bottom+2){
+                y=Math.max(y,front.bottom+height/2+2);
+            }
         }
         node.dataset.slot=anchor.slot;
         node.dataset.presentation=profile.anchor;
@@ -12512,16 +12520,30 @@
         }
     }
 
-    function readStatusPresentation(side,index){
+    function readStatusPresentation(side,index,geometryByUnit){
+        const readGeometry=(targetSide,targetIndex)=>{
+            const key=targetSide+":"+targetIndex;
+            if(geometryByUnit?.has(key)){ return geometryByUnit.get(key); }
+            const result=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(targetSide,targetIndex)||null;
+            geometryByUnit?.set(key,result);
+            return result;
+        };
         const entity=entityFor(side,index);
         const card=cardFor(side,index);
         const baseBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE);
         const rotatingBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.ROTATING);
         const hasBody=!!(card&&(baseBodyTypes.length||rotatingBodyTypes.length));
-        const geometry=hasBody?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(side,index):null;
+        const geometry=hasBody?readGeometry(side,index):null;
         const anchor=hasBody?slotAnchor(side,index,card):null;
         const cardRect=hasBody&&typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor&&anchor.rect;
-        return {entity:entity,card:card,baseBodyTypes:baseBodyTypes,rotatingBodyTypes:rotatingBodyTypes,geometry:geometry,anchor:anchor,cardRect:cardRect};
+        let pairedFrontHudRect=null;
+        const slot=String(anchor&&anchor.slot||"");
+        if(side==="player"&&/^ALLY_B[123]$/.test(slot)&&
+           baseBodyTypes.concat(rotatingBodyTypes).some(type=>STATUS_BODY_PRESENTATION[type]?.anchor==="head")){
+            const frontIndex=window.FourSymbolsBattlefieldSlots?.getCharacterAtAllySlot?.("ALLY_F"+slot.slice(-1));
+            if(Number.isInteger(frontIndex)){pairedFrontHudRect=readGeometry("player",frontIndex)?.hudSafeRect||null;}
+        }
+        return {entity:entity,card:card,baseBodyTypes:baseBodyTypes,rotatingBodyTypes:rotatingBodyTypes,geometry:geometry,anchor:anchor,cardRect:cardRect,pairedFrontHudRect:pairedFrontHudRect};
     }
 
     function syncStatusVisualsForUnit(side,index,advanceRotation,presentationSnapshot){
@@ -12567,9 +12589,10 @@
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
         // Read the entire pass before any status removal/append/style write.
         // A new rotating body must not force layout for the next unit or layer.
-        const presentations=enemyIndexes.map(index=>({side:"monster",index:index,snapshot:readStatusPresentation("monster",index)}));
+        const geometryByUnit=new Map();
+        const presentations=enemyIndexes.map(index=>({side:"monster",index:index,snapshot:readStatusPresentation("monster",index,geometryByUnit)}));
         for(let index=0;index<6;index++){
-            presentations.push({side:"player",index:index,snapshot:readStatusPresentation("player",index)});
+            presentations.push({side:"player",index:index,snapshot:readStatusPresentation("player",index,geometryByUnit)});
         }
         purgeLegacyCardVfx();
         presentations.forEach(entry=>syncStatusVisualsForUnit(entry.side,entry.index,advanceRotation===true,entry.snapshot));

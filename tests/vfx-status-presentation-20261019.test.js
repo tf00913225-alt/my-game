@@ -128,3 +128,41 @@ test('a full rotation reads every unit before DOM writes and refreshes one snaps
   assert.equal([...cards.values()].reduce((n,c)=>n+c.bodies.size,0),12);
   assert.equal([...cards.values()].reduce((n,c)=>n+c.icons.size,0),30);
 });
+
+test('only a head symbol intersecting the cached paired HUD moves, without changing its size or other status profiles',()=>{
+  const c=runtime();
+  for(const scale of [.7,1,1.4]){
+    const art=rect(100*scale,150*scale,100*scale,160*scale),cardRect=rect(0,0,300*scale,400*scale);
+    const geometry={artworkProjection:{rect:art},hudSurface:{scaleX:scale,scaleY:scale},hudSafeRect:rect(0,350*scale,300*scale,40*scale)};
+    const placeCached=(type,hud)=>{const n=node();c.placeStatusBodyVisual(n,'player',3,type,{}, {slot:'ALLY_B1',rect:cardRect},geometry,cardRect,hud);const w=parseFloat(n.style.width)*scale,h=parseFloat(n.style.height)*scale;return {n,box:rect(parseFloat(n.style.left)*scale-w/2,parseFloat(n.style.top)*scale-h/2,w,h)};};
+    const original=placeCached('stun'),front=rect(90*scale,original.box.top+3*scale,130*scale,18*scale);
+    const moved=placeCached('stun',front);
+    assert.ok(moved.box.top>=front.bottom+2-1e-8,'full existing head frame clears the paired HUD');
+    assert.equal(moved.box.width,original.box.width);assert.equal(moved.box.height,original.box.height);
+    assert.equal(moved.n.style['--v143-status-opacity-min'],original.n.style['--v143-status-opacity-min']);
+    assert.deepEqual(placeCached('stun',rect(400*scale,front.top,front.width,front.height)).box,original.box,'a neighboring column must not move this head symbol');
+    assert.deepEqual(placeCached('stun',rect(front.left,original.box.top-100*scale,front.width,10*scale)).box,original.box,'a nonintersecting same-column HUD keeps its accepted placement');
+    for(const type of ['burn','freeze','petrify'])assert.deepEqual(placeCached(type,front).box,placeCached(type).box,'feet/full-body hard control must not receive the head-only clamp');
+  }
+});
+
+test('paired front HUD geometry shares the entire pre-write pass cache even when its unit is visited later',()=>{
+  const c=runtime(),reads=new Map(),snapshots=[];let wrote=false,hudOffset=0;
+  const card={classList:{toggle(){wrote=true;}},getBoundingClientRect(){assert.equal(wrote,false);return rect(0,100,150,200);}};
+  Object.assign(c,{currentBattleMonsters:[],entityFor:(side,index)=>({hp:100,index}),cardFor:()=>card,
+    activeBodyStatusTypesForLayer:(entity,side,index,layer)=>layer===5?(index===0?['stun']:index===4?['burn']:[]):[],
+    slotAnchor:(side,index)=>{assert.equal(wrote,false);return {slot:index===0?'ALLY_B1':'ALLY_F1',rect:rect(0,100,150,200)};},
+    statusRotationByUnit:new Map(),reportHardControlVisualContractViolation(){},hasTimedEffect:()=>false,purgeLegacyCardVfx(){wrote=true;},
+    syncStatusVisual:(side,index,type,show,geometry,snapshot)=>snapshots.push({index,type,snapshot}),
+    window:{FourSymbolsBattlefieldSlots:{getCharacterAtAllySlot:slot=>slot==='ALLY_F1'?4:null},FourSymbolsBattlefieldRenderGeometry:{getUnitGeometry(side,index){assert.equal(wrote,false,'paired HUD read must not follow any DOM write');reads.set(index,(reads.get(index)||0)+1);return {artworkProjection:{rect:rect(0,150,100,160)},hudSafeRect:rect(0,110+hudOffset,150,25)};}}}});
+  vm.runInContext(fn('readStatusPresentation','removeStatusVisualEffects'),c);
+  c.syncStatusVisualEffects(false);
+  const first=snapshots.find(row=>row.index===0&&row.type==='stun').snapshot;
+  assert.equal(first.pairedFrontHudRect.bottom,135);
+  assert.deepEqual([...reads.entries()].sort(),[[0,1],[4,1]],'paired read and later own-unit read share one geometry result');
+  const firstFront=snapshots.find(row=>row.index===4&&row.type==='burn').snapshot;
+  assert.equal(first.pairedFrontHudRect,firstFront.geometry.hudSafeRect,'clamp consumes the same formal HUD snapshot as its actual front recipient');
+  wrote=false;hudOffset=30;snapshots.length=0;c.syncStatusVisualEffects(false);
+  assert.equal(snapshots.find(row=>row.index===0&&row.type==='stun').snapshot.pairedFrontHudRect.bottom,165,'next pass must refresh rather than reuse an earlier layout');
+  assert.deepEqual([...reads.entries()].sort(),[[0,2],[4,2]]);
+});

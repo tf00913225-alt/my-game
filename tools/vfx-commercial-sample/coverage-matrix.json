@@ -1862,7 +1862,7 @@
       "element": "earth",
       "formalTargetType": "single",
       "targetVariants": [],
-      "source": "assets/vfx/earth/stone-break-sky-cast.png?v=173.39",
+      "source": "assets/vfx/earth/stone-break-sky-soft-edge-v2.webp",
       "placement": "single",
       "effectivePlacement": "single",
       "frames": 12,

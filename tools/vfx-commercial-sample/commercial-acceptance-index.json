@@ -1,8 +1,7 @@
 {
   "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
   "pr": "https://github.com/tf00913225-alt/my-game/pull/941",
-  "runtimeHead": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
-  "baseDev": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
+  "baseDev": "10ecbbe0ca73a61cb99509b5e82f8846d8b05809",
   "counts": {
     "active": 44,
     "passive": 4,
@@ -10,44 +9,12 @@
     "relic": 1,
     "total": 70
   },
-  "gate": "REOPENED_LOCAL_FINDINGS_PENDING_USB_REVIEW",
+  "gate": "SCOPED_PRESENTATION_ACCEPTANCE_COMPLETE_STOP_ART_REFINEMENT",
   "scope": "Commercial presentation acceptance within recorded source, target, HUD, timing and cleanup samples. This is a finite engineering/art gate, not a guarantee of every device, every frame or error-free gameplay.",
   "policy": "Passed items stop refinement. Only specific failed presentation portions were corrected. No additional CSS particle system or renderer.",
   "recordedHeads": [
     "1d02be839ebc99b098fe592699fec51c5eca2aa4",
     "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9"
-  ],
-  "mergedHeadCompatibility": [
-    {
-      "file": "js/39-v143-skill-animation.js",
-      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
-      "recordedOwnerSha256": "55eb33420fe33b6c3643a66b916027cc80f79deb82cb80c3720e098168a47cb6",
-      "currentOwnerSha256": "55eb33420fe33b6c3643a66b916027cc80f79deb82cb80c3720e098168a47cb6",
-      "byteIdentical": true
-    },
-    {
-      "file": "css/40-v143-combat-dungeon-polish.css",
-      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
-      "recordedOwnerSha256": "0aad2d46e850bb0f9ffd71d3f49c636522e44a63ee62113fbced0a843174585b",
-      "currentOwnerSha256": "0aad2d46e850bb0f9ffd71d3f49c636522e44a63ee62113fbced0a843174585b",
-      "byteIdentical": true
-    },
-    {
-      "file": "css/fixed-slot-battlefield-rendering-v2.css",
-      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
-      "recordedOwnerSha256": "88e6473486152f55acc99ac9013f869bdae14fbf3bfc65da0a15897269f43be4",
-      "currentOwnerSha256": "88e6473486152f55acc99ac9013f869bdae14fbf3bfc65da0a15897269f43be4",
-      "byteIdentical": true
-    },
-    {
-      "file": "js/60-team-relic-system.js",
-      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
-      "recordedOwnerSha256": "0c5913a63780cfb40c9ab5e7792be5b3b37f3661e4aa6bcdd659a4ec55389539",
-      "currentOwnerSha256": "1c87b398aac1f1b7ad01398b10da54f704fbf936a4104b46e53e68a14511f60d",
-      "byteIdentical": false,
-      "compatibility": "Only relic detail-page tag text changed in dev; cinematic/target/VFX/cleanup code unchanged. Exact whole-file hash intentionally differs.",
-      "presentationCompatible": true
-    }
   ],
   "mergedRuntimeSmoke": "artifacts/vfx-merged-smoke-usb/evidence.json",
   "mergedInventory": "artifacts/vfx-merged-smoke-usb/inventory.json",
@@ -558,14 +525,14 @@
       "id": "stoneBreakSky",
       "kind": "active-skill",
       "name": "石破天驚",
-      "source": "assets/vfx/earth/stone-break-sky-cast.png?v=173.39",
+      "source": "assets/vfx/earth/stone-break-sky-soft-edge-v2.webp",
       "presentation": null,
       "placement": "single",
       "mode": null,
       "frames": 12,
-      "sourceSha256": "91bd7ebcd3a059b85c4f370aeba48307b60c233fca8d76df3c3a34fa7e78e7c2",
-      "decision": "FAIL_LOCAL_SOURCE_DUST_EDGE_PENDING_ALPHA_ONLY_CORRECTION",
-      "review": "tools/vfx-commercial-sample/dynamic-wind-earth-usb-review.json",
+      "sourceSha256": "27dda41d11c88dee51cdb66916f814618bc333d5bb39283bd863d09ebb3c05a0",
+      "decision": "PASS_ALPHA_ONLY_EDGE_USB_STOP_REFINEMENT",
+      "review": "tools/vfx-commercial-sample/stone-break-alpha-usb-review-20261020.json",
       "additionalReview": []
     },
     {
@@ -1103,5 +1070,40 @@
       "review": "tools/vfx-commercial-sample/relic-target-focus-usb-review-20261020.json"
     }
   ],
-  "integrationReviewStatus": "Relic target-only HUD fix passed independent review and USB replay; stop refinement. StoneBreakSky alpha candidate passed source invariants and independent review, pending USB. Rejected temporary-composite status samples require fresh valid capture; other passed items remain frozen."
+  "integrationReviewStatus": "Relic target-only HUD, stoneBreakSky alpha-only edge, full-party rear stun HUD clearance and earthShield visual evidence passed independent and USB review. No remaining demonstrated local visual failure. Latest Head Required CI remains separate.",
+  "integrationReview": "tools/vfx-commercial-sample/portrait-vfx-integration-review-20261020.json",
+  "historicalRuntimeHead": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
+  "historicalMergedHeadCompatibility": [
+    {
+      "file": "js/39-v143-skill-animation.js",
+      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
+      "recordedOwnerSha256": "55eb33420fe33b6c3643a66b916027cc80f79deb82cb80c3720e098168a47cb6",
+      "currentOwnerSha256": "55eb33420fe33b6c3643a66b916027cc80f79deb82cb80c3720e098168a47cb6",
+      "byteIdentical": true
+    },
+    {
+      "file": "css/40-v143-combat-dungeon-polish.css",
+      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
+      "recordedOwnerSha256": "0aad2d46e850bb0f9ffd71d3f49c636522e44a63ee62113fbced0a843174585b",
+      "currentOwnerSha256": "0aad2d46e850bb0f9ffd71d3f49c636522e44a63ee62113fbced0a843174585b",
+      "byteIdentical": true
+    },
+    {
+      "file": "css/fixed-slot-battlefield-rendering-v2.css",
+      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
+      "recordedOwnerSha256": "88e6473486152f55acc99ac9013f869bdae14fbf3bfc65da0a15897269f43be4",
+      "currentOwnerSha256": "88e6473486152f55acc99ac9013f869bdae14fbf3bfc65da0a15897269f43be4",
+      "byteIdentical": true
+    },
+    {
+      "file": "js/60-team-relic-system.js",
+      "comparison": "Exact committed Git blob bytes; working-tree line-ending conversion excluded",
+      "recordedOwnerSha256": "0c5913a63780cfb40c9ab5e7792be5b3b37f3661e4aa6bcdd659a4ec55389539",
+      "currentOwnerSha256": "1c87b398aac1f1b7ad01398b10da54f704fbf936a4104b46e53e68a14511f60d",
+      "byteIdentical": false,
+      "compatibility": "Only relic detail-page tag text changed in dev; cinematic/target/VFX/cleanup code unchanged. Exact whole-file hash intentionally differs.",
+      "presentationCompatible": true
+    }
+  ],
+  "currentSourceEvidence": "Exact source fingerprints and accepted composite trees in integrationReview; final branch Head is recorded in PR941, not inferred from cached tabs."
 }
