@@ -3,10 +3,34 @@ import assert from "node:assert/strict";
 import {createRequire} from "node:module";
 import fs from "node:fs";
 import vm from "node:vm";
+import os from "node:os";
+import path from "node:path";
+import {createHash} from "node:crypto";
+import {syncHeroChapterQualification,HERO_CHAPTER_PATH} from "../scripts/lib/hero-chapter-qualification.mjs";
 const require=createRequire(import.meta.url);
 const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const UID="hero-account-a",BASE=`serverUsers/${UID}`,ENV=`users/${UID}/saves/current`;
 const KING="vajraHeavenlyKing",CLAIM=`${BASE}/uniqueClaims/hero-v1-${KING}`;
+
+test("real Hero qualification sync seals identical canonical LF bytes and strictly rejects changed source",()=>{
+    const root=fs.mkdtempSync(path.join(os.tmpdir(),'hero-chapter-newlines-'));
+    try{
+        const sourcePath='js/adventure/adventure-content-v1-20260915.js',file=path.join(root,sourcePath),target=path.join(root,HERO_CHAPTER_PATH);
+        const canonical=fs.readFileSync(new URL('../'+sourcePath,import.meta.url),'utf8').replace(/\r\n/g,'\n');
+        fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,canonical);
+        syncHeroChapterQualification(root,false);const expected=fs.readFileSync(target);
+        const policy=JSON.parse(expected);assert.equal(policy.sourceSha256,createHash('sha256').update(canonical).digest('hex'));assert.equal(policy.outcomeVerified,false);
+        for(const source of [canonical.replaceAll('\n','\r\n'),canonical.replace('\n','\r\n')]){
+            fs.writeFileSync(file,source);syncHeroChapterQualification(root,true);syncHeroChapterQualification(root,false);
+            assert.deepEqual(fs.readFileSync(target),expected,'real sync produces byte-identical graph, source digest and outcome flags');
+        }
+        fs.writeFileSync(file,canonical+'\n// genuine authored source change\n');
+        assert.throws(()=>syncHeroChapterQualification(root,true),/Hero chapter qualification projection is stale/);
+        assert.deepEqual(fs.readFileSync(target),expected,'strict check never rewrites the accepted projection');
+        syncHeroChapterQualification(root,false);const changed=JSON.parse(fs.readFileSync(target,'utf8'));
+        assert.notEqual(changed.sourceSha256,policy.sourceSha256);assert.deepEqual(changed.nodes,policy.nodes);assert.equal(changed.outcomeVerified,false);
+    }finally{fs.rmSync(root,{recursive:true,force:true});}
+});
 
 function harness(factory=acquisitionWithPolicy(retainedChapterPolicy)){
     const data=new Map([[ENV,{ownerUid:UID,serverRevision:1,authoritativeStateReady:false}]]);
