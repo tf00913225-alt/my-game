@@ -102,6 +102,24 @@ test('healing uses actual HP <40%, HP-ranked formal tri targets, exact heal/SP a
  assert.ok(r.run('monsters.every(m=>m.hp<=m.maxHP)'));cleanup();
 });
 
+test('Tower rage reads final Skill Data at each level and keeps the same formal tri target shape',()=>{
+ for(const level of [1,2,4,5]){
+  setup('fire');r.c.__rageLevel=level;
+  r.run(`monsters[2].v141ForceSkillLevel=__rageLevel;monsters[2].v175ForcedSupportSkillId='rage';monsters[2].sp=200;monsters[2].skillChance=1;monsters[2].v141SupportSkillIds=['rage'];`);
+  attack(2,0);
+  assert.equal(r.json('__declarations.at(-1).skillId'),'rage');
+  const recipients=r.json('monsters.filter(m=>m.v141TeamBuffs?.some(b=>b.type==="rage")).map(m=>({buff:m.v141TeamBuffs.find(b=>b.type==="rage"),mirror:m.activeBuffs.find(b=>b.type==="rage")}))');
+  assert.ok(recipients.length>0&&recipients.length<=3);
+  r.c.__expectedRageChance=database.rage.critChanceBonusByLevel[level-1];r.c.__expectedRageDamage=database.rage.critDamageBonusByLevel[level-1];
+  assert.ok(r.run('monsters.filter(m=>m.v141TeamBuffs?.some(b=>b.type==="rage")).every(m=>getActiveRageCriticalBonuses(m).chance===__expectedRageChance&&getActiveRageCriticalBonuses(m).damage===__expectedRageDamage)'));
+  for(const target of recipients){
+   assert.equal(target.buff.critChanceBonusPercent,database.rage.critChanceBonusByLevel[level-1]);assert.equal(target.buff.critDamageBonusPercent,database.rage.critDamageBonusByLevel[level-1]);
+   assert.equal(target.mirror.critChanceBonusPercent,target.buff.critChanceBonusPercent);assert.equal(target.mirror.critDamageBonusPercent,target.buff.critDamageBonusPercent);
+  }
+  cleanup();
+ }
+});
+
 test('formal same-round wave transition preserves spent team quota',async()=>{
  const w=loadTowerAiRuntime();w.setElement('water');
  w.run(`prepareWildBalanceReferenceParty(100,3);autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;__waves=GameplaySystem.buildTowerWaves(100);v132LaunchDungeonBattle(__waves[0],outcome=>__outcomes.push(outcome.result),{mode:'tower',waves:__waves});`);

@@ -905,9 +905,9 @@
             const buff={type,turnsLeft:turns,amount};
             if(type==="rage"){
                 buff.originalAttack=monster.attack; buff.originalMagicAttack=monster.magicAttack;
-                buff.bonusPercent=25;
-                buff.critChanceBonusPercent=25;
-                buff.critDamageBonusPercent=50;
+                buff.critChanceBonusPercent=Number.isFinite(Number(opts.critChanceBonusPercent))?Number(opts.critChanceBonusPercent):25;
+                buff.bonusPercent=buff.critChanceBonusPercent;
+                buff.critDamageBonusPercent=Number.isFinite(Number(opts.critDamageBonusPercent))?Number(opts.critDamageBonusPercent):50;
             }else if(type==="resistance"){
                 buff.accuracyBonusPercent=Math.max(0,Number(opts.accuracyBonusPercent)||0);
                 monster.resistance=(Number(monster.resistance)||0)+amount;
@@ -1079,7 +1079,10 @@
             target.v141Shield.isBarrier=true;
             addBattleLog(monster.name+"為"+target.name+"施放結界，可抵擋"+blocks+"次直接傷害，最多持續"+duration+"回合。");
         }else if(skillId==="rage"){
-            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0);
+            applyTimedMonsterBuff((supportTargeting.entries||[]).map(entry=>entry.monster),"rage",3,0,tower?{
+                critChanceBonusPercent:levelValue(skill.critChanceBonusByLevel||skill.critBonusByLevel,0),
+                critDamageBonusPercent:levelValue(skill.critDamageBonusByLevel||skill.critBonusByLevel,0)
+            }:undefined);
             addBattleLog(monster.name+"施放怒火，敵方全體爆擊率與爆擊傷害提升3回合。");
         }else if(skillId==="dinghaishenzhen"){
             const resist=levelValue(skill.statusResistBonusByLevel,skill.statusResistBonus||0);
