@@ -354,7 +354,7 @@
             return "消耗最大HP "+levelValue(skill.hpCostPercentByLevel,lv,0)+
                 "%；接下來4次成功施放的直接攻擊技能傷害+"+
                 levelValue(skill.directDamageBonusByLevel,lv,0)+
-                "%；不強化DoT；免費追擊沿用本次加成但不額外消耗次數";
+                "%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數";
         }
         if(skill.id==="healSpell"){
             return "恢復"+levelValue(skill.healHpByLevel,lv,0)+" HP，並恢復目標最大SP的"+
@@ -370,8 +370,8 @@
                 levelValue(skill.freezeDurationByLevel,lv,0)+"回合；完全無法行動，受硬控命中上限與冰封／石化互斥限制";
         }
         if(skill.id==="purifyMind"){
-            return "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；"+
-                "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態";
+            return "立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；"+
+                "不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態";
         }
         if(skill.id==="dodgeSkill"){
             return "最終閃躲+"+levelValue(skill.evasionBonusPercentByLevel,lv,0)+"%，持續3回合";
@@ -393,7 +393,7 @@
                 levelValue(skill.durationByLevel,lv,3)+"回合；同名不可疊加或刷新";
         }
         if(skill.id==="barrier"){
-            return "持續"+levelValue(skill.durationByLevel,lv,3)+"回合；免疫一般直接傷害、DoT與反傷，"+
+            return "持續"+levelValue(skill.durationByLevel,lv,3)+"回合；免疫一般直接傷害、持續傷害與反傷，"+
                 "但不免疫狀態、硬控或淨心訣";
         }
         if(skill.id==="fireEX"){
