@@ -25120,6 +25120,19 @@
             "No purchases/update acknowledgement/learning/equipment/claim/combat; original open save effects retained",
             "Full120/pager and other cancellation routes remain unverified; no general tutorial completion acceptance"
           ]
+        },
+        {
+          "state": "Full120 inventory tutorial normal-flow return and comparison detail end, four viewports",
+          "status": "已實際驗證",
+          "head": "8e614356bc7983e3b30ee1199fd209506633c787",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29c-full120-accepted",
+          "limits": [
+            "360 final is close-only/page5 delta; original a078 five-page evidence retained separately, not re-executed acceptance",
+            "393/412/1280 final each covers true five-page last-slot119 plus detail/body end/formal return",
+            "Three original tutorial handlers have selected-domain same-task observations; pager/detail clicks do not inherit that claim",
+            "No wear/sell/lock/acquisition/equipment/use/claim/combat actions clicked; background original save effects retained",
+            "Empty-current-equipment comparison state only; other equipment transaction states unverified"
+          ]
         }
       ]
     },
@@ -25999,6 +26012,19 @@
         "Original two entrance handlers have selected-domain same-task observations; cancel/shop/announcement taps are not covered by that observer",
         "No purchases/update acknowledgement/learning/equipment/claim/combat; original open save effects retained",
         "Full120/pager and other cancellation routes remain unverified; no general tutorial completion acceptance"
+      ]
+    },
+    {
+      "segment": "segment-29c-full120",
+      "head": "8e614356bc7983e3b30ee1199fd209506633c787",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment29c-full120-accepted",
+      "result": "滿120格/比較標題與末端返回限定通過",
+      "pending": [
+        "360 final is close-only/page5 delta; original a078 five-page evidence retained separately, not re-executed acceptance",
+        "393/412/1280 final each covers true five-page last-slot119 plus detail/body end/formal return",
+        "Three original tutorial handlers have selected-domain same-task observations; pager/detail clicks do not inherit that claim",
+        "No wear/sell/lock/acquisition/equipment/use/claim/combat actions clicked; background original save effects retained",
+        "Empty-current-equipment comparison state only; other equipment transaction states unverified"
       ]
     }
   ],
