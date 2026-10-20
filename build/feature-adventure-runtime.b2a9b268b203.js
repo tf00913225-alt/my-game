@@ -419,6 +419,9 @@
         });
         if(!committed){return false;}
         if(!granted.ok){ showMessage(granted.message||"獎勵領取失敗。");return false; }
+        runtime.selectedNodeId=state.currentNodeId;
+        runtime.activePanel=state.onboarding?.active&&state.onboarding.requiredAction?"tutorial":"map";
+        render();
         return true;
     }
 
@@ -614,7 +617,7 @@
         if(action==="recovery"){
             const preparation=state.onboarding.preparation;
             return !!preparation&&((typeof getPotionCount==="function"&&
-                (getPotionCount("hpPotion10")<preparation.hpCount||getPotionCount("spPotion10")<preparation.spCount))||state.onboarding.recoveryPrepared===true);
+                (getPotionCount("hpPotion10")<preparation.hpCount||getPotionCount("spPotion10")<preparation.spCount)));
         }
         return true;
     }
@@ -693,7 +696,8 @@
     }
     function confirmPreparation(){
         const o=chapterState()?.onboarding;if(!o?.active||o.requiredAction!=="recovery"){return false;}
-        return commitChange(()=>{o.recoveryPrepared=true;});
+        // Acknowledging text cannot stand in for using the original potion owner.
+        return hasTutorialAction("recovery");
     }
     function buildTutorialEncounter(node){
         const profile=CONTENT.tutorialEncounters[node.tutorialEncounterId],state=chapterState(),stats=getPartyStats(0),owner=playerOwner();
@@ -831,9 +835,11 @@
             }
             if(typeof showPage==="function"){ showPage("home"); }
             runtime.visible=true;
-            runtime.activePanel="map";
+            const rewardReady=state.rewardClaims[node.id]==="ready";
+            runtime.selectedNodeId=rewardReady?node.id:state.currentNodeId;
+            runtime.activePanel=rewardReady?"node-reward":"map";
             if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){
-                window.FourSymbolsAdventureUI.show({battleOutcome:outcome&&outcome.result||"lose",focusNodeId:node.id});
+                window.FourSymbolsAdventureUI.show({battleOutcome:outcome&&outcome.result||"lose",focusNodeId:runtime.selectedNodeId});
             }
             render();
             if(outcome?.result==="win"&&state.chapterCompleted&&node.id===chapter.endNodeId){startStory(node.id,"ending");}
@@ -1170,6 +1176,11 @@
             selectedNodeId:runtime.selectedNodeId,
             dialogue:state&&state.dialogue||null,
             tutorial:state&&state.onboarding||null,
+            tutorialProgress:state?.onboarding?.active?{
+                skillReady:hasTutorialAction("skill"),equipmentReady:hasTutorialAction("equipment"),
+                recoveryReady:hasTutorialAction("recovery"),skillUsed:runtime.tutorialSkillUsed,
+                loadout:clone(skillLoadout()),resources:clone(getPartyStats(0))
+            }:null,
             chapter:chapter,
             state:state,
             objective:state&&state.objective||null,

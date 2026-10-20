@@ -351,7 +351,8 @@ function checkTests(){
         "tests/v138-browser-smoke.js",
         "tests/fixtures/wild-balance-reference-party.js",
         "tests/fixtures/adventure-legacy-branch-content.js", // Data consumed by the original branch/mission regression.
-        "tests/fixtures/run-chapter1-story-browser-qa.mjs" // Executed by the existing Adventure browser job.
+        "tests/fixtures/run-chapter1-story-browser-qa.mjs", // Executed by the existing Adventure browser job.
+        "tests/fixtures/run-chapter1-guided-pointer-qa.mjs" // Dedicated guided-onboarding UI fixture and serve-only transport.
     ]);
     const unclassified=allTestJs
         .map(relative)

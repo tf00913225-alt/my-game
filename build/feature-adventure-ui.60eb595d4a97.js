@@ -103,7 +103,7 @@
             (locked?' disabled aria-disabled="true"':' onclick="FourSymbolsAdventure.openNode(\''+attr(node.id)+'\')"')+
             ' aria-label="'+attr(node.title)+'，'+attr(statusLabel(status))+'">'+
                 '<span class="adventure-node-icon">'+esc(nodeGlyph(node.type,status))+'</span>'+badge+position+
-                '<span class="adventure-node-copy"><strong>'+esc(status==="hidden-available"?"未知之處":node.title)+'</strong></span>'+
+                '<span class="adventure-node-copy"><strong>'+esc(status==="hidden-available"?"未知之處":(node.stage?String(node.stage).padStart(2,"0")+" " :"")+node.title)+'</strong><small>'+esc(status==="locked"?"🔒 未解鎖":statusLabel(status))+'</small></span>'+
             '</button>';
     }
 
@@ -113,16 +113,18 @@
         const status=API().getNodeStatus(node.id);
         const labels={battle:"普通戰鬥",event:"江湖事件",chest:"旅途寶箱",rest:"休息驛站",elite:"精英戰",boss:"章節頭目",branch:"路線選擇",objective:"江湖委託",finish:"章節終點"};
         const detail=node.detail||node.subtitle||labels[node.type]||"章節節點";
-        const action=status==="planned"?"尚未開放":status==="locked"?"尚未解鎖":node.type==="finish"?"完成章節":node.type==="rest"?"前往休息":node.type==="chest"?"查看寶箱":node.type==="event"?"開始互動":node.type==="branch"?"選擇路線":node.type==="objective"?"查看委託":"進入";
+        const retry=view.tutorial?.active&&view.tutorial?.nodeId===node.id&&["retry","guidance"].includes(view.tutorial?.phase);
+        const action=status==="planned"?"尚未開放":status==="locked"?"完成上一關解鎖":status==="reward-unclaimed"?"領取「"+node.title+"」獎勵":retry?"重新挑戰第 "+(node.stage||"")+" 關 · "+node.title:view.state.completedNodes[node.id]?"重訪第 "+(node.stage||"")+" 關 · "+node.title:"前往第 "+(node.stage||"")+" 關 · "+node.title;
         const disabled=status==="planned"||status==="locked";
         const onboarding=node.onboarding?'<span class="adventure-sheet-tag">新手引導 · '+esc(node.onboarding)+'</span>':"";
         return '<aside class="adventure-node-sheet is-'+esc(status)+'" aria-live="polite">'+
-            '<div class="adventure-sheet-summary"><span class="adventure-sheet-icon type-'+esc(node.type)+'">'+esc(nodeGlyph(node.type,status))+'</span><div><small>'+esc(labels[node.type]||"章節節點")+'</small><h2>'+esc(node.title)+'</h2><p>'+esc(detail)+'</p>'+onboarding+'</div></div>'+
+            '<div class="adventure-sheet-summary"><span class="adventure-sheet-icon type-'+esc(node.type)+'">'+esc(nodeGlyph(node.type,status))+'</span><div><small>'+esc(statusLabel(status))+" · "+esc(labels[node.type]||"章節節點")+'</small><h2>'+esc(node.title)+'</h2><p>'+esc(detail)+'</p>'+onboarding+'</div></div>'+
             '<div class="adventure-sheet-actions"><button type="button" class="adventure-button primary" '+(disabled?'disabled':'onclick="FourSymbolsAdventure.activateSelectedNode()"')+'>'+action+'</button></div></aside>';
     }
 
     function renderMap(view){
         const chapter=view.chapter,state=view.state;
+        const target=chapter.nodes.find(node=>node.id===state.currentNodeId);
         const mainNodes=chapter.nodes.map(node=>mapNodeButton(node,API().getNodeStatus(node.id),false)).join("");
         const hiddenNodes=(chapter.hiddenNodes||[]).map(node=>mapNodeButton(node,API().getNodeStatus(node.id),true)).join("");
         const branch=chapter.nodes.find(node=>node.type==="branch");
@@ -133,7 +135,8 @@
         const legacy=(CONTENT().legacyNodes||[]).filter(n=>view.state.rewardClaims[n.id]==="ready").map(n=>'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.openLegacyReward(\''+attr(n.id)+'\')">舊旅程待領 · '+esc(n.title)+'</button>').join('');
         return '<section class="adventure-map-screen">'+replay+legacy+
             '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>'+esc(chapter.nodes.filter(node=>state.completedNodes?.[node.id]).length)+' / '+esc(chapter.mainProgressNodeCount||chapter.nodeCapacity||chapter.nodes.length)+' 關</b>'+backtrack+'</div>'+
-            '<div class="adventure-map-canvas">'+
+            '<p class="adventure-map-objective">目前目標：'+esc(target?("第 "+(target.stage||"")+" 關 · "+target.title):"山關重開")+'<span>點選節點，再按下方按鈕前往</span></p>'+
+            '<div class="adventure-map-viewport" data-scroll-owner="y" role="region" aria-label="章節路線，可上下捲動"><div class="adventure-map-canvas" style="--adventure-map-height:'+Math.max(1200,chapter.nodes.length*125)+'px">'+
                 '<div class="adventure-map-depth adventure-map-far" aria-hidden="true"></div>'+
                 '<div class="adventure-map-depth adventure-map-mid" aria-hidden="true"></div>'+
                 '<div class="adventure-boss-landscape" aria-hidden="true"></div>'+
@@ -143,7 +146,7 @@
                 '<div class="adventure-landmark landmark-fort" aria-hidden="true"><i></i><span>山寨</span></div>'+
                 '<div class="adventure-map-fog" aria-hidden="true"></div>'+
                 '<div class="adventure-map-depth adventure-map-near" aria-hidden="true"></div>'+
-            '</div>'+
+            '</div></div>'+
             nodeDetailSheet(view)+
         '</section>';
     }
@@ -213,12 +216,11 @@
         const action=view.tutorial?.requiredAction||"skill";
         const copy={skill:['招式與成長','先在技能頁學習並裝上本門技能，再回來挑戰同一名惡徒。'],
             equipment:['穿上護具','先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。'],
-            recovery:['上路前的準備','紅色是 HP，歸零便無法繼續戰鬥；藍色是 SP，施展技能會消耗它。可從背包使用回春散／凝氣散，也可先確認目前狀態。準備好再出發。']}[action];
+            recovery:['上路前的準備','紅色是 HP，藍色是 SP。接著會帶你從背包選擇補品並使用，實際恢復後再出發。']}[action];
         const owner=typeof player!=="undefined"?player:null;
         const resources=owner?'<p class="adventure-preparation-resources">HP '+esc(Math.floor(owner.hp))+'　SP '+esc(Math.floor(owner.sp))+'</p>':'';
         const actions='<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.openTutorialSystem()">'+(action==="skill"?'前往技能頁':'前往背包')+'</button>'+
             (action==="equipment"&&view.state.rewardClaims.c1_03==="ready"?'<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.claimNodeReward(\'c1_03\')">領取追兵一戰的護具</button>':'')+
-            (action==="recovery"?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.confirmPreparation()">已確認 HP／SP 與補品</button>':'')+
             '<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.continueTutorial()">'+(action==="recovery"?'準備好，繼續上路':'完成準備，原關重試')+'</button>';
         return panelShell(copy[0],"初入江湖",'<p class="adventure-lead">'+copy[1]+'</p>'+resources,actions,"tutorial-panel");
     }
@@ -228,6 +230,128 @@
         if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
         button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
     }
+
+    // One presentation of the existing onboarding state. This never clicks,
+    // learns, equips, consumes, or completes an action on the player's behalf.
+    const guide={target:null,overlay:null,release:null,battle:null,frame:0};
+    function visibleGuideTarget(selector){
+        return Array.from(document.querySelectorAll(selector)).find(el=>{
+            const rect=el.getBoundingClientRect();
+            return rect.width>0&&rect.height>0&&!el.disabled&&getComputedStyle(el).visibility!=="hidden";
+        })||null;
+    }
+    function guideStep(view){
+        if(!view?.tutorial?.active){return null;}
+        const step=(selector,text)=>({target:visibleGuideTarget(selector),text});
+        const dialog=visibleGuideTarget('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button');
+        if(dialog){return {target:dialog,text:"讀完提示後，點這裡繼續。"};}
+        const o=view.tutorial,p=view.tutorialProgress||{};
+        const battle=typeof battleActive!=="undefined"&&battleActive;
+        if(battle){
+            const declaring=typeof battlePhase!=="undefined"&&battlePhase==="declare";
+            if(declaring&&typeof pendingAction!=="undefined"&&pendingAction){
+                return Object.assign(step('#battleMonsterArea [id^="battleMonster"]','點擊敵人，確認這次出招。'),{battle:true});
+            }
+            if(!declaring||(typeof actionReady!=="undefined"&&actionReady)){return {target:null,text:"出招中，看看這一回合的結果。",battle:true};}
+            const node=view.chapter.nodes.find(n=>n.id===o.battleNodeId);
+            if(node?.stage===3&&!p.skillUsed){
+                const skill=visibleGuideTarget('#skillQuickBar.show .skill-quick-button[data-skill-id]:not(:disabled)');
+                return {target:skill||visibleGuideTarget('#mainBattleMenu button[onclick*="toggleSkillQuickBar"]'),text:skill?"點亮起的技能，準備施放。":"點技能，看看剛學會的招式。",battle:true};
+            }
+            return Object.assign(step('#mainBattleMenu button[onclick*="normal"]','先點「普通攻擊」。'),{battle:true});
+        }
+        if(visibleGuideTarget('#adventurePage.active[data-panel="story"]')){
+            return Object.assign(step('#adventurePage [onclick*="advanceDialogue"]','讀完這句，點這裡繼續故事。'),{reading:true});
+        }
+        if(visibleGuideTarget('#itemModal.show')){
+            if(o.requiredAction==="equipment"){
+                return step('#itemEquipButton','點「穿戴」，把護具裝到角色身上。');
+            }
+            return step('#v17342InventoryPotionUse','點「使用」，恢復角色資源。');
+        }
+        if(visibleGuideTarget('#skillPage.active')){
+            if(p.skillReady){return step('#adventureTutorialReturn','技能已裝好，返回故事再挑戰。');}
+            const learned=Object.keys(p.loadout?.skillLevels||{}).find(id=>p.loadout.skillLevels[id]>0&&visibleGuideTarget('.skill-row[data-skill-id="'+CSS.escape(id)+'"] [data-skill-action="equip"]'));
+            if(learned){return step('.skill-row[data-skill-id="'+CSS.escape(learned)+'"] [data-skill-action="equip"]','點「裝備」，把招式放進戰鬥技能欄。');}
+            return step('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)','點「學習」，學會第一個招式。');
+        }
+        if(visibleGuideTarget('#inventoryPage.active')){
+            if(o.requiredAction==="equipment"?p.equipmentReady:p.recoveryReady){
+                return step('#adventureTutorialReturn','操作完成，點這裡返回故事。');
+            }
+            const filter=o.requiredAction==="equipment"?"equipment":"function";
+            const tab=visibleGuideTarget('#inventoryCategoryTabs [data-filter="'+filter+'"]');
+            if(tab?.getAttribute('aria-selected')!=="true"){return {target:tab,text:o.requiredAction==="equipment"?"先點「裝備」分類。":"先點「功能」分類，找到補品。"};}
+            if(o.requiredAction==="equipment"){
+                return step('#inventoryGrid [data-item-uid="'+CSS.escape(view.state.grantedEquipmentUid||'missing')+'"]','點擊剛取得的護具，查看詳情。');
+            }
+            const hp=typeof player!=="undefined"?Number(player.hp):0;
+            const id=hp<Number(p.resources?.maxHP)?"hpPotion10":"spPotion10";
+            return step('#inventoryGrid [data-item-id="'+id+'"]',id==="hpPotion10"?"點回春散，準備恢復 HP。":"點凝氣散，準備恢復 SP。");
+        }
+        if(view.panel==="tutorial"){
+            if(o.requiredAction==="equipment"&&view.state.rewardClaims.c1_03==="ready"){
+                return step('#adventurePage [onclick*="claimNodeReward"]','先領取追兵一戰得到的護具。');
+            }
+            const ready=o.requiredAction==="skill"?p.skillReady:o.requiredAction==="equipment"?p.equipmentReady:p.recoveryReady;
+            return ready?step('#adventurePage [onclick*="continueTutorial"]','準備完成，現在回到原關挑戰。'):
+                step('#adventurePage [onclick*="openTutorialSystem"]',o.requiredAction==="skill"?"先前往技能頁，學會並裝上招式。":"打開背包，跟著亮框操作。");
+        }
+        return step('#adventurePage .adventure-button.primary',view.panel==="node-reward"?"點這裡領取獎勵，再前往下一關。":"點這裡前往目前關卡。");
+    }
+    function clearGuide(){
+        guide.target=null;
+        if(guide.overlay){guide.overlay.hidden=true;}
+        if(guide.release){guide.release();guide.release=null;}
+        guide.battle=null;
+    }
+    function syncGuide(){
+        const view=runtimeView(),step=guideStep(view);
+        if(!step){clearGuide();return;}
+        const host=document.getElementById('game-ui');if(!host){return;}
+        if(!guide.overlay){
+            const overlay=document.createElement('div');overlay.id='adventureInputGuide';
+            overlay.innerHTML='<div class="adventure-guide-shade top"></div><div class="adventure-guide-shade left"></div><div class="adventure-guide-shade right"></div><div class="adventure-guide-shade bottom"></div><div class="adventure-guide-ring"></div><p class="adventure-guide-copy" role="status" aria-live="polite"></p>';
+            host.appendChild(overlay);guide.overlay=overlay;
+        }
+        guide.overlay.hidden=false;
+        guide.overlay.classList.toggle('is-reading',!!step.reading);
+        const target=step.target;
+        if(target&&target!==guide.target){target.scrollIntoView({block:'nearest',inline:'nearest'});}
+        guide.target=target;
+        const inBattle=step.battle&&typeof battleActive!=="undefined"&&battleActive;
+        if(inBattle&&!guide.release){guide.release=window.FourSymbolsBattleFlow?.acquireInputGuideHold('adventure');}
+        if(!inBattle&&guide.release){guide.release();guide.release=null;}
+        const base=host.getBoundingClientRect(),scale=base.width/host.clientWidth;
+        const rect=target?.getBoundingClientRect();
+        const width=host.clientWidth,height=host.clientHeight;
+        const x=rect?Math.max(0,(rect.left-base.left)/scale-5):0;
+        const y=rect?Math.max(0,(rect.top-base.top)/scale-5):0;
+        const right=rect?Math.min(width,(rect.right-base.left)/scale+5):0;
+        const bottom=rect?Math.min(height,(rect.bottom-base.top)/scale+5):0;
+        const boxes={top:[0,0,width,y],left:[0,y,x,bottom-y],right:[right,y,width-right,bottom-y],bottom:[0,bottom,width,height-bottom]};
+        for(const [name,b] of Object.entries(boxes)){guide.overlay.querySelector('.'+name).style.cssText='left:'+b[0]+'px;top:'+b[1]+'px;width:'+b[2]+'px;height:'+b[3]+'px';}
+        const ring=guide.overlay.querySelector('.adventure-guide-ring');
+        ring.hidden=!target;ring.style.cssText='left:'+x+'px;top:'+y+'px;width:'+(right-x)+'px;height:'+(bottom-y)+'px';
+        const copy=guide.overlay.querySelector('.adventure-guide-copy');
+        if(copy.textContent!==step.text){copy.textContent=step.text;}
+        copy.style.top=(y>height*.52?Math.max(25,y-180):Math.min(height-180,bottom+28))+'px';
+    }
+    function installGuide(){
+        const block=event=>{
+            if(!runtimeView()?.tutorial?.active){return;}
+            const step=guideStep(runtimeView()),target=step?.target;
+            if(target&&(target===event.target||target.contains(event.target))){return;}
+            if(event.type==='keydown'&&!["Enter"," ","Tab","Escape"].includes(event.key)){return;}
+            event.preventDefault();event.stopImmediatePropagation();
+        };
+        ['pointerdown','click','keydown'].forEach(type=>document.addEventListener(type,block,true));
+        window.addEventListener('pagehide',clearGuide);
+        let last=0;
+        const frame=time=>{if(!last||time-last>=100){syncGuide();last=time;}guide.frame=requestAnimationFrame(frame);};
+        guide.frame=requestAnimationFrame(frame);
+    }
+    if(typeof requestAnimationFrame==='function'){installGuide();}
 
     function renderEventResult(view){
         const result=view.state.lastEventResult||{};
@@ -387,10 +511,12 @@
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }
         if(ui.body){
-            if(ui.body.querySelector('.adventure-map-canvas')){ ui.mapScrollTop=ui.body.scrollTop; }
+            const previousMap=ui.body.querySelector('.adventure-map-viewport');
+            if(previousMap){ ui.mapScrollTop=previousMap.scrollTop; }
             ui.body.innerHTML=renderPanel(view);
-            if(ui.body.querySelector('.adventure-map-canvas')&&Number.isFinite(ui.mapScrollTop)){
-                ui.body.scrollTop=ui.mapScrollTop;
+            const nextMap=ui.body.querySelector('.adventure-map-viewport');
+            if(nextMap&&Number.isFinite(ui.mapScrollTop)){
+                nextMap.scrollTop=ui.mapScrollTop;
             }
         }
         syncTracker(view);
@@ -407,8 +533,9 @@
         const focusId=opts.focusNodeId||view?.state?.currentNodeId;
         const node=map&&Array.from(map.querySelectorAll('[data-node-id]')).find(entry=>entry.dataset.nodeId===focusId);
         if(node){
-            ui.body.scrollTop=map.offsetTop+node.offsetTop-ui.body.clientHeight/2;
-            ui.mapScrollTop=ui.body.scrollTop;
+            const viewport=map.parentElement;
+            viewport.scrollTop=node.offsetTop-viewport.clientHeight/2;
+            ui.mapScrollTop=viewport.scrollTop;
         }
     }
     function hide(){

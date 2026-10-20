@@ -44,6 +44,7 @@ test("canonical Hero qualification seals the same twenty-node Chapter 1 route",(
 // These tests verify state transitions and never claim real combat coverage.
 function runtime(saved,initialSave=true){
     let callback,saveMode=initialSave,stored,roster,options,launches=0,skillEvent;
+    const potionCounts={hpPotion10:3,spPotion10:3};
     const player={id:"QA",element:"fire",level:1,hp:100,sp:40,adventureProgress:saved||{schemaVersion:3,pendingStoryOpening:true,activeChapterId:"chapter_v1",chapters:{}}};
     const c={window:null,console,Math,Date,Number,String,Boolean,Object,Array,Set,Map,Promise,JSON,
         document:{hidden:false,addEventListener(){},dispatchEvent(){},getElementById(){return null;}},CustomEvent:function(){},
@@ -60,16 +61,106 @@ function runtime(saved,initialSave=true){
         FourSymbolsEquipmentFactory:{starter:id=>({definitionId:id,name:id,v141Uid:"qa-starter-armor"})},
         v132AddItemToInventory(item){c.inventoryItems.push(item);return true;},
         v132RunInventoryTransaction(fn){const before=JSON.parse(JSON.stringify(c.inventoryItems));const ok=fn();if(!ok)c.inventoryItems=before;return ok;},
-        getPotionCount:()=>3,addPotionToInventory:()=>true,
+        getPotionCount:id=>potionCounts[id]||0,addPotionToInventory:()=>true,
         v132LaunchDungeonBattle(enemies,fn,opts){roster=enemies;callback=fn;options=opts;launches++;c.battleActive=true;return true;}};
     c.window=c;vm.createContext(c);
     for(const path of ["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js"])vm.runInContext(fs.readFileSync(path,"utf8"),c);
     return {c,api:c.FourSymbolsAdventure,state:()=>c.player.adventureProgress.chapters.chapter_v1,
         save:value=>{saveMode=value;},stored:()=>structuredClone(stored),roster:()=>roster,options:()=>options,launches:()=>launches,
-        finish:result=>{c.battleActive=false;callback({result});},useSkill:()=>skillEvent({actor:player,actualSpent:1})};
+        finish:result=>{c.battleActive=false;callback({result});},useSkill:()=>skillEvent({actor:player,actualSpent:1}),
+        consumePotion:id=>{assert.ok(potionCounts[id]>0);potionCounts[id]--;}};
 }
 function finishDialogue(h){let guard=30;while(h.state().dialogue&&guard-->0)assert.equal(h.api.advanceDialogue(),true);assert.ok(guard>0);}
 function at(h,id){h.state().currentNodeId=id;h.state().onboarding={active:true,phase:"story",nodeId:"c1_01"};}
+
+function installUi(h){
+    const body={innerHTML:"",querySelector:()=>null};
+    const root={isConnected:true,dataset:{},classList:{contains:()=>false},querySelector:selector=>selector==="#adventureView"?body:null};
+    h.c.document.getElementById=id=>id==="adventurePage"?root:null;
+    vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),h.c);
+    return ()=>body.innerHTML;
+}
+
+test("first victory exposes its reward then a successful claim selects the next fixed-sheet action",()=>{
+    const h=runtime(),html=installUi(h);
+    assert.equal(h.api.startFreshStory(),true);finishDialogue(h);h.finish("win");
+    assert.equal(h.api.getView().panel,"node-reward");
+    assert.equal(h.api.getView().selectedNodeId,"c1_01");
+    assert.equal(h.state().currentNodeId,"c1_02");
+    assert.match(html(),/claimNodeReward\('c1_01'\)/);
+    assert.match(html(),/領取首通獎勵/);
+    assert.equal(h.api.claimNodeReward("c1_01"),true);
+    assert.equal(h.api.getView().panel,"map");assert.equal(h.api.getView().selectedNodeId,"c1_02");
+    assert.equal(h.state().rewardClaims.c1_01,"claimed");
+    assert.equal((html().match(/class="adventure-node type-/g)||[]).length,20);
+    assert.match(html(),/class="adventure-map-viewport" data-scroll-owner="y"/);
+    assert.match(html(),/<\/div><\/div><aside class="adventure-node-sheet/,'fixed action sheet is outside the scroll viewport');
+    assert.match(html(),/onclick="FourSymbolsAdventure.activateSelectedNode\(\)"[^>]*>前往第 2 關 · 山道惡徒/);
+    assert.doesNotMatch(html(),/class="adventure-node[^>]*onclick="FourSymbolsAdventure.beginBattle/);
+    const gold=h.c.gold,exp=h.c.sharedExp;
+    assert.equal(h.api.claimNodeReward("c1_01"),false);assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);
+    assert.equal(h.api.activateSelectedNode(),true);assert.equal(h.api.getView().dialogue.nodeId,"c1_02");
+});
+
+test("refused first reward save keeps the reward action and cannot select the next sheet",()=>{
+    const h=runtime(),html=installUi(h);h.api.startFreshStory();finishDialogue(h);h.finish("win");
+    const gold=h.c.gold,exp=h.c.sharedExp;h.save(false);
+    assert.equal(h.api.claimNodeReward("c1_01"),false);
+    assert.equal(h.state().rewardClaims.c1_01,"ready");assert.equal(h.api.getView().panel,"node-reward");
+    assert.equal(h.api.getView().selectedNodeId,"c1_01");assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);
+    assert.match(html(),/claimNodeReward\('c1_01'\)/);
+});
+
+function guideHarness(){
+    const listeners=new Map(),frames=[],targets=new Map(),children=new Map();let acquired=0,released=0,overlay;
+    const element=()=>{const classes=new Set();return {disabled:false,style:{},classList:{contains:name=>classes.has(name),toggle(name,force){const enabled=force===undefined?!classes.has(name):!!force;if(enabled)classes.add(name);else classes.delete(name);return enabled;}},getBoundingClientRect:()=>({left:20,top:100,right:100,bottom:140,width:80,height:40}),scrollIntoView(){},contains(other){return other?.parent===this;}};};
+    const host={...element(),clientWidth:1080,clientHeight:1920,appendChild(child){overlay=child;}};
+    const view={tutorial:{active:true,battleNodeId:"c1_01"},tutorialProgress:{},chapter:{nodes:[{id:"c1_01",stage:1}]},state:{rewardClaims:{}},panel:"map"};
+    const c={window:null,console,Math,Object,Array,Set,Map,String,Number,Boolean,
+        battleActive:true,battlePhase:"declare",actionReady:false,pendingAction:null,
+        FourSymbolsAdventure:{getView:()=>view},
+        FourSymbolsBattleFlow:{acquireInputGuideHold(){acquired++;return ()=>{released++;};}},
+        CSS:{escape:value=>value},getComputedStyle:()=>({visibility:"visible"}),
+        requestAnimationFrame(fn){frames.push(fn);return frames.length;},addEventListener(){},
+        document:{readyState:"loading",addEventListener(type,fn,capture){if(capture)listeners.set(type,fn);},
+            querySelectorAll:selector=>targets.get(selector)||[],
+            getElementById:id=>id==="game-ui"?host:null,
+            createElement(){return {...element(),querySelector(selector){if(!children.has(selector))children.set(selector,{style:{},textContent:"",hidden:false});return children.get(selector);}};}}};
+    c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),c);
+    let timestamp=0;
+    return {c,view,element,targets,children,overlay:()=>overlay,holds:()=>({acquired,released}),frame(){assert.ok(frames.length);timestamp+=100;frames.shift()(timestamp);},
+        dispatch(type,target,key){const event={type,target,key,prevented:false,stopped:false,preventDefault(){this.prevented=true;},stopImmediatePropagation(){this.stopped=true;}};listeners.get(type)(event);if(!event.stopped)target.action?.();return event;}};
+}
+
+test("guide capture requires the real attack then target and releases locks when onboarding ends",()=>{
+    const h=guideHarness(),attack=h.element(),enemy=h.element(),unrelated=h.element();let attacks=0,selected=0,other=0;
+    attack.action=()=>{attacks++;h.c.pendingAction="normal";h.c.actionReady=true;};enemy.action=()=>{selected++;h.c.pendingAction=null;h.c.battlePhase="resolve";};unrelated.action=()=>{other++;};
+    h.targets.set('#mainBattleMenu button[onclick*="normal"]',[attack]);h.targets.set('#battleMonsterArea [id^="battleMonster"]',[enemy]);
+    h.frame();assert.equal(h.overlay().hidden,false);assert.equal(attacks,0,'guide never executes the highlighted action');
+    assert.equal(h.children.get('.adventure-guide-ring').hidden,false);assert.deepEqual(h.holds(),{acquired:1,released:0});
+    for(const type of ["pointerdown","click"]){assert.equal(h.dispatch(type,unrelated).stopped,true);}
+    assert.equal(h.dispatch("keydown",unrelated,"Escape").prevented,true,'no dismiss/skip confirmation can bypass the guide');assert.equal(other,0);
+    assert.equal(h.dispatch("click",attack).stopped,false);assert.equal(attacks,1);
+    h.frame();assert.equal(h.dispatch("click",attack).stopped,true,'actionReady must still highlight the pending enemy target');
+    assert.equal(h.dispatch("click",enemy).stopped,false);assert.equal(selected,1);
+    h.frame();assert.equal(h.children.get('.adventure-guide-ring').hidden,true);assert.equal(h.dispatch("click",unrelated).stopped,true,'resolution cannot be skipped');
+    h.view.tutorial.active=false;h.frame();assert.equal(h.overlay().hidden,true);assert.deepEqual(h.holds(),{acquired:1,released:1});
+    assert.equal(h.dispatch("click",unrelated).stopped,false);assert.equal(other,1,'normal input is restored after onboarding');
+    h.frame();assert.deepEqual(h.holds(),{acquired:1,released:1},'release executes once');
+});
+
+test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
+    const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
+    h.c.battleActive=false;next.action=()=>{advances++;};
+    h.targets.set('#adventurePage.active[data-panel="story"]',[story]);
+    h.targets.set('#adventurePage [onclick*="advanceDialogue"]',[next]);
+    h.frame();assert.equal(h.overlay().classList.contains('is-reading'),true);
+    assert.equal(advances,0);assert.equal(h.dispatch('click',other).stopped,true);
+    assert.equal(h.dispatch('click',next).stopped,false);assert.equal(advances,1,'the existing story Next advances directly');
+    h.targets.delete('#adventurePage.active[data-panel="story"]');
+    h.targets.set('#adventurePage .adventure-button.primary',[other]);
+    h.frame();assert.equal(h.overlay().classList.contains('is-reading'),false,'leaving story restores the normal guide presentation');
+});
 
 test("tutorial defeat requires learned equipped skill and equipped starter armor before same-node retry",()=>{
     for(const [id,action] of [["c1_02","skill"],["c1_04","equipment"]]){
@@ -98,7 +189,8 @@ test("stage 3 skill-use gate and stage 5 recovery preparation close onboarding",
     assert.equal(h.api.beginBattle("c1_03"),true);h.useSkill();h.finish("win");assert.ok(h.state().completedNodes.c1_03);
     at(h,"c1_05");assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
     assert.equal(h.state().onboarding.requiredAction,"recovery");assert.equal(h.api.continueTutorial(),false);
-    assert.equal(h.api.confirmPreparation(),true);assert.equal(h.api.continueTutorial(),true);h.finish("win");
+    assert.equal(h.api.confirmPreparation(),false,"confirmation cannot replace actual recovery consumption");
+    h.consumePotion("spPotion10");assert.equal(h.api.confirmPreparation(),true);assert.equal(h.api.continueTutorial(),true);h.finish("win");
     assert.equal(h.state().onboarding.active,false);assert.equal(h.state().currentNodeId,"c1_06");
 });
 
@@ -149,7 +241,8 @@ test("preparation from prior equipment retry cannot bypass the stage 5 recovery 
     assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
     assert.equal(h.c.battleActive,false,"stage 5 must show recovery before battle even after a prepared stage 4");
     assert.equal(h.state().onboarding.nodeId,"c1_05");assert.equal(h.state().onboarding.requiredAction,"recovery");
-    assert.equal(h.api.continueTutorial(),false);assert.equal(h.api.confirmPreparation(),true);
+    assert.equal(h.api.continueTutorial(),false);assert.equal(h.api.confirmPreparation(),false);
+    h.consumePotion("hpPotion10");assert.equal(h.api.confirmPreparation(),true);
 });
 test("retained boss ready or claimed receipt blocks the same new boss reward",()=>{
     for(const receipt of ["ready","claimed"]){
