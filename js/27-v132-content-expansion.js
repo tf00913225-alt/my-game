@@ -1880,6 +1880,7 @@
             previousZone:currentZone,
             onComplete:onComplete,
             normalizeFailureResources:opts.normalizeFailureResources!==false,
+            tutorial:opts.mode==="adventure"&&opts.tutorial===true,
             startedAt:Date.now()
         };
 
@@ -2034,7 +2035,7 @@
             restoreDungeonMonsters();
             window.v132ActiveDungeonRun=null;
 
-            applyPostBattleAutoRecovery();
+            if(!run.tutorial){applyPostBattleAutoRecovery();}
             saveGame();
 
             if(run.onComplete){
@@ -2059,7 +2060,7 @@
             */
             battleActive=false;
             clearBattleRoundPrompt();
-            finishBattleStatisticsSession("lose");
+            finishBattleStatisticsSession(run.tutorial?"tutorial":"lose");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;

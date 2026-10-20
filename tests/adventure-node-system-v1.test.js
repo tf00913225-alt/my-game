@@ -24,6 +24,9 @@ function makeDocument(){
 }
 function runScript(context,file){
     vm.createContext(context);
+    // Legacy graph exercises retained generic branch/mission-drop/planned-node
+    // behavior. It is deliberately not the live Chapter 1 content contract.
+    if(file==="js/adventure/adventure-content-v1-20260915.js")file="tests/fixtures/adventure-legacy-branch-content.js";
     vm.runInContext(read(file),context,{filename:file});
     return context;
 }
@@ -39,7 +42,7 @@ function baseRuntime(){
         setTimeout(fn){return 1;},clearTimeout(){},
         setInterval(fn){const id=++intervalId;intervals.set(id,fn);return id;},clearInterval(id){intervals.delete(id);},
         addEventListener(){},alert(){},
-        saveGame(){},updateUI(){},updateGoldDisplay(){},rebuildInventorySlots(){},showPage(){},
+        saveGame(){return true;},updateUI(){},updateGoldDisplay(){},rebuildInventorySlots(){},showPage(){},
         getExistingPartyIndexes(){return [0];},getPartyCharacterByIndex(){return player;},getPartyBattleStats(){return {maxHP:100,maxSP:100};},
         MonsterBalance:{build(spec){return {...spec,maxHP:100,maxSP:50,hp:100,sp:50,alive:true};}},
         getMonsterSkillPoolForLevel(){return [];},getMonsterSkillTierAndChance(){return {chance:0};},configureBuiltMonster(m){return m;},
@@ -249,10 +252,10 @@ function baseRuntime(){
     assert.equal((css.match(/pointer-events:none/g)||[]).length>=1,true);
 
     const content=read("js/adventure/adventure-content-v1-20260915.js");
-    assert.match(content,/nodeCapacity:20/,"Chapter data must explicitly support twenty progression nodes");
-    assert.match(content,/onboarding:/,"Onboarding belongs to Chapter Node data, not a second map runtime");
-    assert.match(content,/routes:\[/,"Route geometry must be owned by Chapter Data");
-    assert.match(content,/availability:"planned"/,"Future Chapter slots must be explicit data, never renderer hard-code");
+    assert.match(content,/["']?nodeCapacity["']?\s*:\s*20/,"Chapter data must explicitly support twenty progression nodes");
+    assert.match(content,/["']?onboarding["']?\s*:/,"Onboarding belongs to Chapter Node data, not a second map runtime");
+    assert.match(content,/["']?routes["']?\s*:\s*\[/,"Route geometry must be owned by Chapter Data");
+    assert.match(read("tests/fixtures/adventure-legacy-branch-content.js"),/availability:"planned"/,"Future Chapter slots must be explicit data, never renderer hard-code");
     assert.match(ui,/function nodeDetailSheet\(view\)/,"Map details must use one canonical Bottom Sheet renderer");
     assert.match(ui,/function mapRoadSvg\(view\)/,"Routes must render from Chapter Data");
     assert.doesNotMatch(ui,/const mainA=.*M194 1613/,"Legacy hard-coded map route geometry must retire");

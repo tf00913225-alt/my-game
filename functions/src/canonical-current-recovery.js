@@ -1102,8 +1102,10 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const receiptById=await recoveryIndex(receipts,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{grantId:row.grantId,operationId:row.operationId,creditedToCharacter:row.creditedToCharacter}:row;});
         const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
         for await(const doc of recoveryRows(patrolTickets)){
-            const proof=segmentedScopes.has(tx)?await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"forest-ticket",doc.id):
+            const scope=segmentedScopes.get(tx),unit=recoveryUnit(tx);
+            const proof=scope?await verifyProofUnit(tx,unit,root,uid,records,expectedRevision,"forest-ticket",doc.id):
                 await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
+            if(scope)scope.completeTicket(unit,proof);
             ticketProofs.set(doc.id,{stateSha256:snapshotDigest(proof.state),status:proof.state.status,terminalOperationId:proof.state.terminalOperationId});
             for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
         }
@@ -1118,7 +1120,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
         for await(const doc of recoveryRows(patrolSettlements)){
             if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
-            await patrolEvidence.verifyRetainedSettlement(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
+            if(!segmentedScopes.get(tx)?.reuseSettlement(doc))
+                await patrolEvidence.verifyRetainedSettlement(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
         for await(const doc of recoveryRows(patrolClosures)){
             const proof=ticketProofs.get(doc.get("ticketId"));
@@ -1577,7 +1580,19 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         const root=db.collection("serverUsers").doc(uid),namespaces=new Map(capture.namespaces.map(row=>[row.path,row.ids]));
         const used=new Set(),absences=new Set(),shapes=recoveryAuditQueryShapes(root),pending=new Set();
         const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
-        const metrics={units:0,maxUnitReads:0,maxUnitTypedBytes:0};
+        const metrics={units:0,executedProofUnits:0,settlementReuseHits:0,enumeratedSettlementRows:0,
+            witnessLookupOperations:0,witnessMetadataNodes:0,maxUnitReads:0,maxUnitTypedBytes:0};
+        chargeRecoveryAuditAssembly(budget,"nodes",3);metrics.witnessMetadataNodes+=3;
+        const qualifiedRows=new WeakMap(),unitSettlements=new WeakMap(),settlementWitnesses=new Map();
+        const witnessLookup=()=>{chargeRecoveryAuditAssembly(budget,"operations",1);metrics.witnessLookupOperations++;};
+        const descriptor=path=>{
+            chargeRecoveryAuditAssembly(budget,"nodes",8);metrics.witnessMetadataNodes+=8;
+            witnessLookup();const row=capture.index.get(path);
+            return Object.freeze({capture,path,seconds:row.updateTime.seconds,nanoseconds:row.updateTime.nanoseconds,
+                typedDataSha256:row.typedDataSha256,typedDataByteLength:row.typedDataByteLength});
+        };
+        const sameDescriptor=(a,b)=>a&&b&&a.capture===b.capture&&a.path===b.path&&a.seconds===b.seconds&&
+            a.nanoseconds===b.nanoseconds&&a.typedDataSha256===b.typedDataSha256&&a.typedDataByteLength===b.typedDataByteLength;
         const snapshot=path=>{
             chargeRecoveryAuditAssembly(budget,"operations",1);
             const slash=path.lastIndexOf("/"),ids=namespaces.get(path.slice(0,slash));
@@ -1588,7 +1603,11 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 if(capture.index.size+absences.size>=4096&&!absences.has(path))fail("resource-exhausted","Segmented dependency limit exceeded.");
                 absences.add(path);used.add(path);return proofSnapshot(path,{exists:false});
             }
-            used.add(path);return proofSnapshot(path,row);
+            used.add(path);const doc=proofSnapshot(path,row);
+            if(path.slice(0,path.lastIndexOf("/"))===root.path+"/patrolSettlements"){
+                const identity=descriptor(path);witnessLookup();qualifiedRows.set(doc,identity);
+            }
+            return doc;
         };
         const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
         const lookup=async reference=>{
@@ -1623,10 +1642,12 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         };
         const tx=Object.freeze({get:tracked});
         const unit=()=>{
-            capture.release();let reads=0,typedBytes=0;const paths=new Set();metrics.units++;
+            chargeRecoveryAuditAssembly(budget,"nodes",2);metrics.witnessMetadataNodes+=2;
+            capture.release();let reads=0,typedBytes=0;const paths=new Set(),settlements=new Map();
+            metrics.units++;metrics.executedProofUnits++;
             // A new readonly identity gives original Owners a unit-local cache.
             // It never calls beginEvidenceAttempt on an existing live attempt.
-            return Object.freeze({get:async reference=>{
+            const kernel=Object.freeze({get:async reference=>{
                 if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
                 const row=await tracked(reference),docs=row.docs??[row];
                 if(row.docs)reads+=Math.max(1,row.size)-1;
@@ -1634,12 +1655,35 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 for(const doc of docs)if(doc.exists&&!paths.has(doc.ref.path)){
                     paths.add(doc.ref.path);typedBytes+=capture.index.get(doc.ref.path).typedDataByteLength;
                     if(typedBytes>PATROL_PROOF_LIMITS.bytes)fail("resource-exhausted","Segmented proof resident data exceeds2MiB.");
+                    if(doc.ref.path.slice(0,doc.ref.path.lastIndexOf("/"))===root.path+"/patrolSettlements")
+                        {witnessLookup();const identity=qualifiedRows.get(doc);witnessLookup();settlements.set(doc.id,identity);}
                 }
                 metrics.maxUnitReads=Math.max(metrics.maxUnitReads,reads);metrics.maxUnitTypedBytes=Math.max(metrics.maxUnitTypedBytes,typedBytes);
                 return row;
-            }});
+            }});witnessLookup();unitSettlements.set(kernel,settlements);return kernel;
         };
-        segmentedScopes.set(tx,{unit});
+        const completeTicket=(kernel,proof)=>{
+            // Read/inflight rows are not proof. Only a successfully completed
+            // original ticket proof can qualify its verified settlement rows.
+            witnessLookup();const reads=unitSettlements.get(kernel);
+            for(const id of proof.verifiedOperationIds){witnessLookup();const row=reads?.get(id);if(row){
+                chargeRecoveryAuditAssembly(budget,"nodes",1);metrics.witnessMetadataNodes++;
+                witnessLookup();settlementWitnesses.set(row.path,row);}}
+            witnessLookup();unitSettlements.delete(kernel);
+        };
+        const reuseSettlement=doc=>{
+            metrics.enumeratedSettlementRows++;
+            // Enumeration still decodes/charges the exact sealed row and runs
+            // the original global classification and coverage checks.
+            witnessLookup();const witness=settlementWitnesses.get(doc.ref.path);
+            witnessLookup();const identity=qualifiedRows.get(doc);
+            if(!sameDescriptor(witness,identity))return false;
+            const actual=inventoryDocumentMetadata(doc,root.path+"/patrolSettlements",budget);
+            if(actual.id!==doc.id||actual.updateTime.seconds!==witness.seconds||actual.updateTime.nanoseconds!==witness.nanoseconds||
+               actual.typedDataSha256!==witness.typedDataSha256||actual.typedDataByteLength!==witness.typedDataByteLength)return false;
+            metrics.settlementReuseHits++;return true;
+        };
+        segmentedScopes.set(tx,{unit,completeTicket,reuseSettlement});
         const rows=(name,filter=null)=>{
             const path=root.path+"/"+name,ids=namespaces.get(path);
             if(!ids)fail("data-loss","Segmented inventory namespace differs.");
@@ -1655,8 +1699,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
             close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
     }
-    async function verifySegmentedRawRecoveryProof(input){
-        const budget=createRecoveryAuditAssemblyBudget();let view;
+    async function verifySegmentedRawRecoveryProof(input,budget=createRecoveryAuditAssemblyBudget()){
+        let view;
         try{
             chargeRecoveryAuditAssembly(budget,"passes",1);
             const capture=inspectCompleteRawCapture(input,budget,true),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
@@ -1740,6 +1784,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function pinCandidatePublication(request,args){
         requirePublicationPreparation();
+        return pinRawCapture(request,args);
+    }
+    async function pinRawCapture(request,args){
         auditIntent("pin publication",args,["auditId","expectedEpoch","operationId"]);
         // A failed/retried callback never mints an identity. Only its committed
         // result is retained in the private map after run resolves.
@@ -1751,6 +1798,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     }
     async function loadPinnedRawCapture(pin){
         requirePublicationPreparation();
+        return loadPinnedRawMaterial(pin);
+    }
+    async function loadPinnedRawMaterial(pin){
         const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
         const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
             sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
@@ -1798,6 +1848,22 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
         recoveryAuditAssemblyUsage(budget);
         return publicationIdentity(publicationMaterials,{pin,input,budget,scanReads,wireBytes});
+    }
+    // Private process-local proof only. No artifact, durable point or authority is issued.
+    async function verifyPinnedSegmentedProof(request,pin,material){
+        const pinned=publicationValue(publicationPins,pin),value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        publicationMaterials.delete(material);
+        recoveryAuditAssemblyUsage(value.budget);
+        const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
+        recoveryAuditAssemblyUsage(value.budget);
+        await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            recoveryAuditAssemblyUsage(value.budget);
+            const current=await publicationContext(tx,session,pinned.args);
+            recoveryAuditAssemblyUsage(value.budget);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Pinned proof capture binding changed.");
+        },pinned.args.operationId);
+        return Object.freeze({...summary,assemblyUsage:recoveryAuditAssemblyUsage(value.budget)});
     }
     async function assemblePinnedCandidate(pin,material){
         requirePublicationPreparation();

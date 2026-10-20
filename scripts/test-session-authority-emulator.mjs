@@ -2865,34 +2865,33 @@ const storyData={uid:storyUid,session:storySession};
 let storyProof=await invoke("ensureHeroChapterTicket",storyUser.idToken,{...storyData,expectedRevision:1});
 const storyTicket=storyProof.chapter.ticketId;
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null},"FAILED_PRECONDITION");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_20",choiceId:null},"FAILED_PRECONDITION");
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null,won:true},"INVALID_ARGUMENT");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_01",choiceId:null,won:true},"INVALID_ARGUMENT");
 await rejected("completeHeroChapterNode",heroOtherDevice.idToken,{uid:heroUid,session:heroOtherSession,
-    expectedRevision:8,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
+    expectedRevision:8,ticketId:storyTicket,nodeId:"c1_01",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
 const firstStep={...storyData,expectedRevision:storyProof.serverRevision,
-    ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null};
+    ticketId:storyTicket,nodeId:"c1_01",choiceId:null};
 const concurrentStep=await Promise.all([
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep),
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep)]);
 assert.deepEqual(concurrentStep.map(r=>r.unchanged).sort(),[false,true]);
 storyProof=concurrentStep.find(r=>!r.unchanged);
-for(const nodeId of ["n02_roadfight","n03_fork","n04a_path","n05_commission","n06_rest",
-    "n07_chest","n08_truth","n09_boss","n10_finish"]){
+for(const nodeId of Array.from({length:19},(_,index)=>`c1_${String(index+2).padStart(2,"0")}`)){
     storyProof=await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
         expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId,
-        choiceId:nodeId==="n03_fork"?"safe":null});
+        choiceId:null});
 }
 assert.equal(storyProof.chapter.phase,"completed");assert.equal(storyProof.chapter.outcomeVerified,false);
 assert.equal(storyProof.authoritativeStateReady,false);
 const storyRoot=db.collection("serverUsers").doc(storyUid);
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
-assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,10);
+assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,20);
 const storyClaim=await storyRoot.collection("uniqueClaims").doc("hero-v1-divineDogHongbao").get();
 const storyGrant=storyProof.entitlements.divineDogHongbao;
 assert.equal(storyClaim.get("allocationSeed"),storyGrant.allocationSeed);
 assert.equal((await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null})).unchanged,true);
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null})).unchanged,true);
 while(Math.floor(Date.now()/1000)<=claims(storyUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
 const storyOther=await login("accounts:signInWithPassword",{email:storyEmail,password});
 const storyOtherSession=await invoke("createGameSession",storyOther.idToken,{uid:storyUid});
@@ -2900,7 +2899,7 @@ await rejected("readHeroAcquisition",storyUser.idToken,storyData,"SESSION_REVOKE
 assert.deepEqual((await invoke("readHeroAcquisition",storyOther.idToken,
     {uid:storyUid,session:storyOtherSession})).entitlements.divineDogHongbao,storyGrant);
 await rejected("completeHeroChapterNode",storyOther.idToken,{uid:storyUid,session:storyOtherSession,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
@@ -3971,7 +3970,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const segmentedNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",segmentedSource=readFileSync(segmentedFilename,"utf8");
     assert.equal(segmentedSource.split(segmentedNeedle).length,2);
     segmentedModule._compile(segmentedSource.replace(segmentedNeedle,
-        "return Object.freeze({verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
+        "return Object.freeze({pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
     assert.equal(Object.hasOwn(recovery,"verifySegmentedRawRecoveryProof"),false);
     const segmentedOwner=segmentedModule.exports.createCanonicalCurrentRecovery(deps),segmented=await segmentedOwner.verifySegmentedRawRecoveryProof(rawMaterial);
     assert.equal(segmented.segmentedProofValid,true);assert.equal(segmented.documentCount,candidate.documentCount);
@@ -3988,6 +3987,58 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
+    // Format roundtrip is one caller-owned syntax budget. The original private
+    // Recovery proof below is a separate consumer verification phase/token;
+    // this does not claim a combined prepare pipeline or201-history capacity.
+    const rawArchiveCodec=require("../functions/src/recovery-audit-artifact.js"),rawArchiveBudget=rawArchiveCodec.createRecoveryAuditAssemblyBudget();
+    const rawArchiveBytes=rawArchiveCodec.encodeRawRecoveryArchive(rawMaterial,rawArchiveBudget);
+    const decodedRawArchive=rawArchiveCodec.decodeRawRecoveryArchive(rawArchiveBytes,rawArchiveBudget);
+    const rawArchiveUsage=rawArchiveCodec.recoveryAuditAssemblyUsage(rawArchiveBudget);
+    assert.ok(rawArchiveBytes.length<=32*1024*1024);assert.equal(rawArchiveUsage.passes,2);assert.equal(rawArchiveUsage.reservedBytes,0);
+    assert.ok(rawArchiveUsage.bytes<=256*1024*1024);assert.ok(rawArchiveUsage.nodes<=16000000);
+    assert.ok(rawArchiveUsage.operations<=16384);assert.ok(rawArchiveUsage.elapsedMs<=30000);
+    for(const name of ["binding","run","inventoryState","rawState"])assert.deepEqual(
+        rawArchiveCodec.encodeProofPayload(decodedRawArchive[name]),rawArchiveCodec.encodeProofPayload(rawMaterial[name]));
+    for(const name of ["inventoryPages","rawReceipts","rawChunks"]){
+        assert.deepEqual(decodedRawArchive[name].map(row=>row.id),rawMaterial[name].map(row=>row.id));
+        for(let i=0;i<rawMaterial[name].length;i++){
+            const {payloadBytes:actual,...decoded}=decodedRawArchive[name][i].row,{payloadBytes:expected,...original}=rawMaterial[name][i].row;
+            assert.deepEqual(rawArchiveCodec.encodeProofPayload(decoded),rawArchiveCodec.encodeProofPayload(original));
+            if(expected)assert.deepEqual(actual,expected);
+        }
+    }
+    const archiveConsumer=await segmentedOwner.verifySegmentedRawRecoveryProof(decodedRawArchive);
+    assert.equal(archiveConsumer.segmentedProofValid,true);assert.equal(archiveConsumer.documentCount,segmented.documentCount);
+    assert.equal(archiveConsumer.absenceCount,segmented.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(archiveConsumer[flag],false);
+    for(const key of ["records","documents","artifactBytes","restorePermit","identity"])assert.equal(Object.hasOwn(archiveConsumer,key),false);
+    assert.ok(Object.isFrozen(archiveConsumer));assert.ok(!Object.values(archiveConsumer).some(value=>Buffer.isBuffer(value)));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS versioned raw archive codec actual SDK: original two-page native Timestamp capture bytes, shared syntax encode/decode token, separate original complete-proof consumer with four flags false, no new SDK attempts/publication/Storage/restore; format bytes="+rawArchiveBytes.length);
+
+    // The same actor now follows the actual private server pin and literal SDK
+    // loader; null IO stays disabled and no candidate/publication is issued.
+    for(const name of ["pinRawCapture","loadPinnedRawMaterial","verifyPinnedSegmentedProof"])
+        assert.equal(Object.hasOwn(recovery,name),false);
+    const pinnedAttemptStart=attempts.length,pinnedArgs={auditId,expectedEpoch:1,operationId:"inventory-private-pinned-proof"};
+    const pinned=await segmentedOwner.pinRawCapture(request(),pinnedArgs);
+    const pinnedMaterial=await segmentedOwner.loadPinnedRawMaterial(pinned);
+    const pinnedResult=await segmentedOwner.verifyPinnedSegmentedProof(request(),pinned,pinnedMaterial);
+    assert.equal(pinnedResult.segmentedProofValid,true);assert.equal(pinnedResult.documentCount,segmented.documentCount);
+    assert.equal(pinnedResult.absenceCount,segmented.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])
+        assert.equal(pinnedResult[flag],false);
+    for(const key of ["records","documents","artifact","artifactBytes","restorePermit","identity"])
+        assert.equal(Object.hasOwn(pinnedResult,key),false);
+    assert.ok(Object.isFrozen(pinnedResult));assert.ok(!Object.values(pinnedResult).some(value=>Buffer.isBuffer(value)));
+    assert.equal(pinnedResult.assemblyUsage.reservedBytes,0);assert.equal(pinnedResult.assemblyUsage.passes,1);
+    assert.ok(pinnedResult.assemblyUsage.bytes<=256*1024*1024);assert.ok(pinnedResult.assemblyUsage.nodes<=16000000);
+    assert.ok(pinnedResult.assemblyUsage.operations<=16384);assert.ok(pinnedResult.assemblyUsage.elapsedMs<=30000);
+    assert.equal(attempts.length,pinnedAttemptStart+2,"literal SDK scans are separate from protected pin/final attempts");
+    for(const attempt of attempts.slice(pinnedAttemptStart))assert.deepEqual(
+        {reads:attempt.reads,queries:attempt.queries,writes:attempt.writes},{reads:13,queries:0,writes:0});
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);
+    console.log("PASS private pinned recovery proof actual SDK: original two-page actor, null IO, protected pin, literal SDK loader and complete original proof on one elapsed budget, final thirteen-point binding recheck; four flags false, no publication or restore.");
     assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
@@ -4330,13 +4381,33 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const needle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",source=readFileSync(filename,"utf8");
     assert.equal(source.split(needle).length,2);
     compiled._compile(source.replace("return buildRecoveryOwner(deps,null,false);","return buildRecoveryOwner(deps,require('test-only-publication-fake-io'),false);")
-        .replace(needle,"return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
+        .replace(needle,"return Object.freeze({verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
     const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
     assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
     async function gate(operation,writes){const start=traces.length,result=await operation();
         assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,13);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
     const pin=await gate(()=>publication.pinCandidatePublication(h.request(),args),0),scanStart=traces.length;
-    const material=await publication.loadPinnedRawCapture(pin),artifact=await publication.assemblePinnedCandidate(pin,material);
+    const material=await publication.loadPinnedRawCapture(pin);
+    // Independent memory-proof acceptance on the existing native20-battle
+    // capture, not a shared publication preparation/readback budget claim.
+    const reuseInput=publication.loadedRawMaterial(material),reuseBytes=JSON.stringify(reuseInput),reuseTrace=JSON.stringify(traces);
+    const {decodeInventoryPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const settlementCount=reuseInput.inventoryPages.reduce((count,page)=>{
+        const payload=decodeInventoryPayload(page.row.payloadBytes);
+        return count+(payload.namespacePath===h.root.path+"/patrolSettlements"?payload.entries.length:0);
+    },0);
+    const nativeReuse=await publication.verifySegmentedRawRecoveryProof(reuseInput),usage=nativeReuse.residentUsage;
+    assert.equal(nativeReuse.segmentedProofValid,true);assert.ok(usage.settlementReuseHits>0);
+    assert.equal(usage.enumeratedSettlementRows,settlementCount);assert.equal(usage.settlementReuseHits,settlementCount);
+    assert.equal(usage.units,usage.executedProofUnits);
+    for(const flag of ["candidateProofValid","trustedCaptureVerified","restoreAuthorized","authoritativeStateReady"])assert.equal(nativeReuse[flag],false);
+    for(const key of ["records","documents","artifact","artifactBytes","identity","restorePermit"])assert.equal(Object.hasOwn(nativeReuse,key),false);
+    assert.equal(JSON.stringify(reuseInput),reuseBytes);assert.equal(JSON.stringify(traces),reuseTrace);
+    assert.ok(nativeReuse.assemblyUsage.bytes<=256*1024*1024);assert.ok(nativeReuse.assemblyUsage.nodes<=16000000);
+    assert.ok(nativeReuse.assemblyUsage.operations<=16384);assert.ok(nativeReuse.assemblyUsage.elapsedMs<=30000);
+    assert.equal(nativeReuse.assemblyUsage.passes,1);assert.equal(nativeReuse.assemblyUsage.reservedBytes,0);
+    console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
+    const artifact=await publication.assemblePinnedCandidate(pin,material);
     assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
     const manifestRef=run.collection("candidatePublications").doc(args.operationId);
     rollbackOnce=true;await assert.rejects(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),/staged rollback/);

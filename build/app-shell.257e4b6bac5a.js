@@ -7630,6 +7630,7 @@ async function createCharacter(){
     }
 
 
+    player.adventureProgress={schemaVersion:3,activeChapterId:"chapter_v1",chapters:{},pendingStoryOpening:true};
     if(saveGame()!==true){
         Object.keys(player).forEach(key=>delete player[key]);
         Object.assign(player,previousPlayer);
@@ -7642,12 +7643,19 @@ async function createCharacter(){
 
     initialCharacterCreationPending=false;
     updateInitialCharacterCreationFeedback();
+    // Only a committed fresh character enters onboarding. Feature loading
+    // remains lazy; failed loading retains the persisted resumable intent.
+    try{await window.FourSymbolsFeatures.ensure("adventure","character-story-opening");}
+    catch(error){console.error("[adventure] story load pending retry",error);}
+    if(accountSave.getActiveUid()!==uid||window.FourSymbolsStartupPolicy.getUid()!==uid||
+       player.id!==id||!window.FourSymbolsStartupPolicy.canCreateCharacter()){return false;}
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";
     if(typeof window.syncCreationTouchMode==="function"){
         window.syncCreationTouchMode();
     }
+    window.FourSymbolsAdventure?.startFreshStory();
     return true;
 
 }
@@ -9016,6 +9024,7 @@ function showPage(page,options={}){
     target.classList.add(
         "active"
     );
+    window.FourSymbolsAdventureUI?.syncTutorialReturn(page);
     if(page!=="battle"){
         window.v143ClearImpactOverlays?.();
         window.FourSymbolsBattlePresentation?.clearHud?.();
@@ -13656,6 +13665,7 @@ function getTowerStatusAccuracyBonus(caster){
         ?Number(caster.vTowerStatusAccuracyPercent)||0:0;
 }
 function getMonsterCriticalChance(monster,targetAntiCrit=0){
+    if(monster?.tutorialEncounter===true){return Math.max(0,Number(monster.criticalChance)||0);}
     const rage=getActiveRageCriticalBonuses(monster);
     const towerBonus=monster&&monster.vGameplayTower===true?Number(monster.vTowerCriticalBonusPercent)||0:0;
     const baseChance=10+rage.chance+towerBonus;
@@ -34183,6 +34193,11 @@ try{
     "use strict";
     let proof=null,error=null,busy=false,generation=0,pipeline=Promise.resolve(),draining=null;
     const pendingNodes=[];
+    // Retained tickets observe new, explicit story actions. A restored local
+    // completion map never creates or fills missing online positions.
+    const retainedStoryPositions={n01_arrival:'c1_01',n02_roadfight:'c1_02',n03_fork:'c1_06',
+        n04a_path:'c1_07',n04b_gate:'c1_07',n05_commission:'c1_08',n06_rest:'c1_09',
+        n07_chest:'c1_10',n08_truth:'c1_11',n09_boss:'c1_20',n10_finish:'c1_20'};
     const copy=value=>value==null?value:JSON.parse(JSON.stringify(value));
     function activeUid(){
         const uid=global.FourSymbolsAccountSave?.getActiveUid?.();
@@ -34281,17 +34296,21 @@ try{
         while(pendingNodes.length){
             const intent=pendingNodes[0];
             if(intent.uid!==uid||intent.chapterId!==proof.chapter.chapterId){pendingNodes.shift();continue;}
-            const prior=proof.chapter.completedIntents.find(row=>row.nodeId===intent.nodeId);
+            const retained=retainedStoryPositions[proof.chapter.nextNodeId];
+            const nodeId=retained&&retained===intent.nodeId?proof.chapter.nextNodeId:intent.nodeId;
+            const choiceId=nodeId==='n03_fork'?'safe':intent.choiceId;
+            const prior=proof.chapter.completedIntents.find(row=>row.nodeId===nodeId);
             if(prior){
-                if(prior.choiceId!==intent.choiceId){throw new Error("章節岔路與線上紀錄不同，無法補發英雄。");}
+                if(prior.choiceId!==choiceId){throw new Error("章節岔路與線上紀錄不同，無法補發英雄。");}
                 pendingNodes.shift();continue;
             }
-            if(proof.chapter.nextNodeId!==intent.nodeId){
-                throw new Error("章節尚缺線上資格紀錄，不能依舊存檔自動補發英雄。請聯絡客服確認。");
+            if(proof.chapter.nextNodeId!==nodeId){
+                pendingNodes.shift();
+                throw new Error("章節尚缺線上紀錄，請從章節地圖的『補看故事紀錄』重看指定段落。");
             }
             const ticketId=proof.chapter.ticketId;
             await mutation(api,uid,token,revision=>api.completeHeroChapterNode({
-                ticketId,nodeId:intent.nodeId,choiceId:intent.choiceId,expectedRevision:revision}));
+                ticketId,nodeId,choiceId,expectedRevision:revision}));
             pendingNodes.shift();
         }
         return copy(proof);
@@ -34319,7 +34338,7 @@ try{
         await drain(api,uid,token);
         if(proof.chapter.phase==="completed"){return copy(proof);}
         const id=proof.chapter.nextNodeId;
-        if(!id||global.FourSymbolsAdventureContent?.chapters[proof.chapter.chapterId]?.endNodeId!==id){
+        if(!id||(global.FourSymbolsAdventureContent?.chapters[proof.chapter.chapterId]?.endNodeId!==id&&id!=="n10_finish")){
             throw new Error("請先完成線上章節資格流程。");
         }
         return mutation(api,uid,token,revision=>api.completeHeroChapterNode({
@@ -34331,6 +34350,7 @@ try{
         getStatus:()=>({ready:!!proof&&proof.ownerUid===activeUid(),busy,error,
             loginCount:proof?.ownerUid===activeUid()?proof.loginCount:null,
             chapter:proof?.ownerUid===activeUid()?copy(proof.chapter):null}),
+        getRequiredStoryNode:()=>proof?.ownerUid===activeUid()?(retainedStoryPositions[proof.chapter.nextNodeId]||proof.chapter.nextNodeId):null,
         sync,refresh:()=>sync().catch(()=>null),beginChapter,observeChapterNode,claimChapterHero
     });
     document.addEventListener("four-symbols:startup-ready",()=>{
@@ -35964,6 +35984,39 @@ window.FourSymbolsItemAcquisitionData={
       "potions": [
         {
           "id": "taichingQiPill",
+          "count": 1
+        }
+      ]
+    },
+    "story_first_growth": {
+      "sharedExp": 15
+    },
+    "story_starter_gear": {
+      "starterEquipment": "leatherArmor"
+    },
+    "story_supplies": {
+      "potions": [
+        {
+          "id": "hpPotion10",
+          "count": 2
+        },
+        {
+          "id": "spPotion10",
+          "count": 2
+        }
+      ]
+    },
+    "story_road_chest": {
+      "gold": 420,
+      "potions": [
+        {
+          "id": "hpPotion30",
+          "count": 1
+        }
+      ],
+      "materials": [
+        {
+          "id": "oreLow",
           "count": 1
         }
       ]
@@ -38838,7 +38891,18 @@ const V_ASSET_VERSION="173.73";
         return !isCurrentNoticeSuppressedToday(manifest);
     }
 
+    function isFreshStoryActive(){
+        // Fresh-character onboarding owns its first playable presentation.
+        // Defer only the ordinary login announcement; forced updates keep
+        // their existing safety gate and are never dismissed by Story.
+        try{
+            const progress=typeof player!=="undefined"&&player?.adventureProgress;
+            return !!(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active));
+        }catch(_){}
+        return false;
+    }
     function isSharedModalAvailableForAnnouncement(){
+        if(isFreshStoryActive()){return false;}
         const parts=getSharedModalParts();
         return !!(
             parts&&
@@ -38958,6 +39022,7 @@ const V_ASSET_VERSION="173.73";
     }
 
     function showMarquee(manifest,kind){
+        if(isFreshStoryActive()&&!String(kind||"").startsWith("forced")){hideMarquee();return;}
         const marquee=ensureMarquee();
         if(!marquee||!manifest){ return; }
         const tag=marquee.querySelector(".release-update-marquee-tag");

@@ -228,6 +228,17 @@ async function test(name,callback){
 }
 
 (async()=>{
+    await test("fresh story defers ordinary login notices while forced updates retain their blocking gate",async()=>{
+        const normal=createHarness({loadedVersion:"173.41",responses:[releaseManifest("V173.41")]});
+        normal.window.player={adventureProgress:{pendingStoryOpening:true,chapters:{}}};
+        await normal.api.checkForUpdate("story-fresh",{force:true});
+        assert.equal(normal.modal.classList.contains("show"),false);
+        const forced=createHarness({loadedVersion:"173.41",responses:[releaseManifest("V173.42",{updateMode:"forced"})]});
+        forced.window.player={adventureProgress:{chapters:{chapter_v1:{onboarding:{active:true}}}}};
+        await forced.api.checkForUpdate("story-forced",{force:true});
+        assert.equal(forced.modal.classList.contains("show"),true);assert.equal(forced.modal.classList.contains("release-update-forced"),true);
+        assert.equal(forced.api.shouldPreventSharedModalClose(),true);assert.equal(forced.window.closeHomeFeature(),false);
+    });
     await test("formal manifest, cache route and build registration use one player source",()=>{
         const manifest=JSON.parse(read(manifestPath));
         const release=JSON.parse(read("release/release.json"));
