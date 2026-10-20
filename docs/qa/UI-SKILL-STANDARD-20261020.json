@@ -7473,6 +7473,40 @@
             "Six restore exact fields; privateHeroCachesExact false remains explicit; no full runtime cache restoration claim",
             "No unlock/star/reset/equip/claim/purchase/combat/transaction; zero transport mutations in isolated QA"
           ]
+        },
+        {
+          "state": "Original503 growth failure true end and exact clamped list return",
+          "status": "已實際驗證",
+          "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32c-failure-end-accepted",
+          "reports": [
+            {
+              "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32c-failure-end-accepted\\360x640\\report.json"
+            },
+            {
+              "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32c-failure-end-accepted\\393x873\\report.json"
+            },
+            {
+              "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32c-failure-end-accepted\\412x915\\report.json"
+            },
+            {
+              "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32c-failure-end-accepted\\1280x800\\report.json"
+            }
+          ],
+          "limits": [
+            "Only first-hero isolated original503 failure true end/list return, not all intermediate failure content",
+            "Six exact restore fields; privateHeroCachesExact=false, fresh isolated profile discarded",
+            "No growth/reward/equipment transactions, live provider availability or physical-device acceptance",
+            "Initial strict same-pixel anchor failure excluded; original saved anchor retained and returned top precisely browser-clamped to new list maximum"
+          ]
         }
       ],
       "reviews": {
@@ -26446,6 +26480,18 @@
         "Post-dev190d dependency smoke: true skill entry and real scroll in isolated local QA,360x640/1280x800 only",
         "Not all48 details, skill learning/equipping, end-of-list, hardware devices or whole UI approval",
         "Not Cloud skill-config authority or SDK/backend acceptance; fresh QA transport only"
+      ]
+    },
+    {
+      "segment": "segment-32c-failure-end",
+      "head": "89ec4b167df6482f7509451b64072150acb0d3ac",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment32c-failure-end-accepted",
+      "result": "四尺寸失敗態末端與原列表返回限定通過；無產品修改",
+      "pending": [
+        "Only first-hero isolated original503 failure true end/list return, not all intermediate failure content",
+        "Six exact restore fields; privateHeroCachesExact=false, fresh isolated profile discarded",
+        "No growth/reward/equipment transactions, live provider availability or physical-device acceptance",
+        "Initial strict same-pixel anchor failure excluded; original saved anchor retained and returned top precisely browser-clamped to new list maximum"
       ]
     }
   ],
