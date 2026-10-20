@@ -102,35 +102,62 @@
         return normalized;
     }
 
+    function validateChapterState(state,chapter){
+        const record=value=>!!value&&typeof value==="object"&&!Array.isArray(value);
+        if(!record(state)||![undefined,1,2].includes(state.storySchemaVersion)||
+           !record(state.completedNodes)||!record(state.rewardClaims)||!record(state.branchSelections)||
+           typeof state.chapterCompleted!=="boolean"||typeof state.chapterRewardClaimed!=="boolean"||
+           Object.values(state.rewardClaims).some(value=>!["ready","claimed","blocked-legacy"].includes(value))||
+           Object.values(state.completedNodes).some(value=>typeof value!=="boolean"&&!record(value))){throw new Error("Adventure claim history requires recovery.");}
+        if((state.objective!=null&&!record(state.objective))||(state.merchant!=null&&(!record(state.merchant)||!record(state.merchant.purchases)))||
+           (state.hidden!=null&&!record(state.hidden))||(state.pendingAdventureBuff!=null&&!record(state.pendingAdventureBuff))){throw new Error("Adventure retained state requires recovery.");}
+        if(state.storySchemaVersion===2){
+            if(!chapter.nodes.some(n=>n.id===state.currentNodeId)||!record(state.storyKeys)||!record(state.onboarding)||typeof state.onboarding.active!=="boolean"||
+               !["story","battle","guidance","system","retry","complete"].includes(state.onboarding.phase)){
+                throw new Error("Adventure story state requires recovery.");
+            }
+            if(state.storyKeys.blackPineToken&&(!record(state.storyKeys.blackPineToken)||state.storyKeys.blackPineToken.sourceNodeId!=="c1_11")){throw new Error("Adventure Story Key requires recovery.");}
+            if(state.dialogue){
+                const cursor=state.dialogue,node=chapter.nodes.find(n=>n.id===cursor.nodeId);
+                const lines=cursor.phase==="ending"?chapter.ending:cursor.phase==="guidance"?node?.guidance:node?.dialogue;
+                if(!node||!["before","guidance","ending"].includes(cursor.phase)||!Number.isInteger(cursor.lineIndex)||!lines||cursor.lineIndex<0||cursor.lineIndex>=lines.length){throw new Error("Adventure dialogue requires recovery.");}
+            }
+        }
+    }
     function ensureState(options){
         const owner=playerOwner();
         if(!owner){ return null; }
         const opts=options||{};
-        let created=false;
-        let root=owner.adventureProgress;
-        if(root&&root.schemaVersion===STATE_VERSION&&root.chapters&&root.chapters[DEFAULT_CHAPTER_ID]?.storySchemaVersion===CONTENT.chapters[DEFAULT_CHAPTER_ID].storySchemaVersion){return root;}
-        if(root&&(![1,2,3].includes(root.schemaVersion)||!root.chapters||typeof root.chapters!=="object")){throw new Error("Adventure save requires recovery.");}
-        if(!root||typeof root!=="object"){
-            root={schemaVersion:STATE_VERSION,activeChapterId:DEFAULT_CHAPTER_ID,chapters:{}};
-            owner.adventureProgress=root;
-            created=true;
+        const original=owner.adventureProgress,exists=original!=null;
+        if(exists&&(!original||typeof original!=="object"||Array.isArray(original)||![1,2,3].includes(original.schemaVersion)||
+           !original.chapters||typeof original.chapters!=="object"||Array.isArray(original.chapters)||!CONTENT.chapters[original.activeChapterId])){throw new Error("Adventure save requires recovery.");}
+        let current=exists&&original.schemaVersion===STATE_VERSION;
+        for(const chapter of Object.values(CONTENT.chapters)){
+            const raw=original?.chapters?.[chapter.id];
+            if(exists&&Object.prototype.hasOwnProperty.call(original.chapters,chapter.id)&&!raw){throw new Error("Adventure chapter source requires recovery.");}
+            if(raw){validateChapterState(raw,chapter);}
+            if(!raw||raw.storySchemaVersion!==(chapter.storySchemaVersion||1)){current=false;}
         }
+        if(current){return original;}
+        // Validate and normalize a detached candidate. Legacy receipt bytes in
+        // memory and in the UID save remain intact if the single save refuses.
+        const root=exists?clone(original):{schemaVersion:STATE_VERSION,activeChapterId:DEFAULT_CHAPTER_ID,chapters:{}};
         root.schemaVersion=STATE_VERSION;
-        if(!root.chapters||typeof root.chapters!=="object"){ root.chapters={};created=true; }
-        if(!CONTENT.chapters[root.activeChapterId]){ root.activeChapterId=DEFAULT_CHAPTER_ID; }
         Object.values(CONTENT.chapters).forEach(chapter=>{
             const raw=root.chapters[chapter.id];
             const normalized=normalizeChapterState(raw,chapter);
-            if(!raw){ created=true; }
             root.chapters[chapter.id]=normalized;
             if(root.pendingStoryOpening===true&&!raw){normalized.onboarding={active:true,phase:"story",nodeId:chapter.startNodeId,source:"new-character"};}
             if(!normalized.hidden.rolled){
                 normalized.hidden.rolled=true;
                 normalized.hidden.merchantAppears=Math.random()<clamp(numeric(chapter.merchantAppearanceChance,.25),0,1);
-                created=true;
             }
         });
-        if(created&&opts.persist!==false){ persist({render:false}); }
+        owner.adventureProgress=root;
+        if((exists||opts.persist!==false)&&!persist({render:false})){
+            if(exists){owner.adventureProgress=original;}else{delete owner.adventureProgress;}
+            throw new Error("Adventure progress could not be committed; original state retained.");
+        }
         return root;
     }
 
@@ -274,7 +301,7 @@
 
     function markRewardReady(state,node){
         if(!node||!node.rewardId||state.rewardClaims[node.id]==="claimed"){ return; }
-        if(state.legacyMigration&&(CONTENT.legacyNodes||[]).some(old=>old.rewardId===node.rewardId&&["ready","claimed"].includes(state.rewardClaims[old.id]))){state.rewardClaims[node.id]="blocked-legacy";return;}
+        if(state.legacyMigration&&(CONTENT.legacyNodes||[]).some(old=>old.rewardId===(node.legacyRewardId||node.rewardId)&&["ready","claimed"].includes(state.rewardClaims[old.id]))){state.rewardClaims[node.id]="blocked-legacy";return;}
         state.rewardClaims[node.id]="ready";
     }
 
@@ -298,12 +325,18 @@
     function grantRewardObject(reward){
         if(!reward){ return {ok:true,summary:[]}; }
         const potions=Array.isArray(reward.potions)?reward.potions:[];
+        if((potions.length||reward.starterEquipment||reward.materials?.length)&&typeof window.v132RunInventoryTransaction!=="function"){return {ok:false,message:"背包交易系統尚未就緒。"};}
         for(const entry of potions){
             if(!canAddPotion(entry.id,Math.max(1,integer(entry.count,1)))){
                 return {ok:false,message:"背包沒有足夠空間領取獎勵。"};
             }
         }
         const summary=[];let starterEquipmentUid=null;
+        for(const entry of reward.materials||[]){
+            const def=window.v132GetOreDefinition?.(entry.id);
+            if(!def||!window.v132AddItemToInventory?.(def,integer(entry.count,1))){return {ok:false,message:"材料獎勵尚未加入背包，請整理空間後再試。"};}
+            summary.push(def.name+" ×"+integer(entry.count,1));
+        }
         if(reward.starterEquipment){
             if(!window.FourSymbolsEquipmentFactory||!window.v132AddItemToInventory){return {ok:false,message:"裝備系統尚未就緒。"};}
             const item=window.FourSymbolsEquipmentFactory.starter(reward.starterEquipment);
@@ -363,7 +396,7 @@
         if(!state.chapterCompleted&&node.type==="branch"&&opts.nextNodeId){ state.currentNodeId=opts.nextNodeId; }
         if(node.id===chapter.endNodeId){state.chapterCompleted=true;state.onboarding.active=false;}
         if(node.stage===5){state.onboarding.active=false;state.onboarding.phase="complete";}
-        else if(state.onboarding.active){state.onboarding.phase="story";state.onboarding.battleNodeId=null;}
+        else if(state.onboarding.active){state.onboarding.phase="story";state.onboarding.battleNodeId=null;state.onboarding.requiredAction=null;state.onboarding.nodeId=node.next||node.id;}
         state.dialogue=null;
         });
         if(!committed){return false;}
@@ -415,7 +448,6 @@
         if(!root){ showMessage("請先建立角色後再出城冒險。");return false; }
         const opts=options||{};
         if(opts.chapterId&&CONTENT.chapters[opts.chapterId]){ root.activeChapterId=opts.chapterId; }
-        window.FourSymbolsHeroAcquisition?.beginChapter(activeChapterId());
         const state=chapterState();
         if(state?.onboarding?.active&&state.onboarding.phase==="battle"&&!(typeof battleActive!=="undefined"&&battleActive)){
             const o=state.onboarding,node=nodeById(chapterDefinition(),o.battleNodeId);
@@ -425,7 +457,8 @@
                 if(o.phase==="guidance"){o.nodeId=node.id;o.requiredAction=node.stage===2?"skill":"equipment";}
             })){return false;}
         }
-        if(state){ state.lastViewedAt=now(); }
+        if(state&&!commitChange(()=>{state.lastViewedAt=now();})){return false;}
+        window.FourSymbolsHeroAcquisition?.beginChapter(activeChapterId());
         runtime.visible=true;
         runtime.activePanel=opts.panel||"map";
         runtime.selectedNodeId=opts.focusNodeId||state&&state.currentNodeId||null;
@@ -435,13 +468,18 @@
             window.FourSymbolsAdventureUI.show(opts);
         }
         startObjectiveWatcher();
-        persist({render:true});
+        render();
         if(opts.story&&!state.dialogue&&runtime.activePanel!=="tutorial"){startStory(state.currentNodeId);}
         return true;
     }
 
     function closeToCity(){
-        if(chapterState()?.onboarding?.active){runtime.activePanel="tutorial";render();return false;}
+        const state=chapterState();
+        if(state?.onboarding?.active){
+            if(state.onboarding.requiredAction){runtime.activePanel="tutorial";render();}
+            else{startStory(state.currentNodeId);}
+            return false;
+        }
         runtime.visible=false;
         runtime.activePanel="map";
         runtime.selectedNodeId=null;
@@ -576,7 +614,7 @@
         if(action==="recovery"){
             const preparation=state.onboarding.preparation;
             return !!preparation&&((typeof getPotionCount==="function"&&
-                (getPotionCount("hpPotion10")<preparation.hpCount||getPotionCount("spPotion10")<preparation.spCount))||state.onboarding.prepared===true);
+                (getPotionCount("hpPotion10")<preparation.hpCount||getPotionCount("spPotion10")<preparation.spCount))||state.onboarding.recoveryPrepared===true);
         }
         return true;
     }
@@ -616,7 +654,7 @@
             runtime.activePanel="map";render();return true;
         }
         if(["battle","elite","boss"].includes(node.type)){
-            if(node.stage===5&&state.onboarding.active&&!state.onboarding.prepared){
+            if(node.stage===5&&state.onboarding.active&&!state.onboarding.recoveryPrepared){
                 if(!commitChange(()=>{state.dialogue=null;state.onboarding.nodeId=node.id;state.onboarding.requiredAction="recovery";state.onboarding.phase="guidance";
                     state.onboarding.preparation={hpCount:typeof getPotionCount==="function"?getPotionCount("hpPotion10"):0,spCount:typeof getPotionCount==="function"?getPotionCount("spPotion10"):0};})){return false;}
                 runtime.activePanel="tutorial";render();return true;
@@ -632,7 +670,7 @@
         runtime.activePanel=node.type;render();return true;
     }
     function openTutorialSystem(){
-        const state=chapterState(),o=state?.onboarding;if(!o?.active){return false;}
+        const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
             if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=playerOwner().element;}
             hideOverlay();showPage("skill");if(typeof renderSkillLoadout==="function"){renderSkillLoadout();}
@@ -644,10 +682,10 @@
     }
     function returnFromTutorial(){return open({panel:"tutorial"});}
     function continueTutorial(){
-        const state=chapterState(),o=state?.onboarding;if(!o?.active){return false;}
+        const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction||o.nodeId!==state.currentNodeId||state.completedNodes[o.nodeId]){return false;}
         if(!hasTutorialAction(o.requiredAction)){showMessage(o.requiredAction==="skill"?"請先實際學習並裝上技能。":o.requiredAction==="equipment"?"請先穿上剛取得的護具。":"請使用補品，或先在此確認 HP／SP 與戰前準備。");return false;}
         if(!commitChange(()=>{
-            o.phase="retry";o.prepared=true;state.dialogue=null;
+            o.phase="retry";if(o.requiredAction==="recovery"){o.recoveryPrepared=true;}state.dialogue=null;
             // Training recovery is explicit and bounded to the onboarding fight.
             getPartyIndexes().forEach(i=>{const c=getPartyCharacter(i),s=getPartyStats(i);if(c&&s){c.hp=s.maxHP;c.sp=s.maxSP;}});
         })){return false;}
@@ -655,12 +693,12 @@
     }
     function confirmPreparation(){
         const o=chapterState()?.onboarding;if(!o?.active||o.requiredAction!=="recovery"){return false;}
-        return commitChange(()=>{o.prepared=true;});
+        return commitChange(()=>{o.recoveryPrepared=true;});
     }
     function buildTutorialEncounter(node){
         const profile=CONTENT.tutorialEncounters[node.tutorialEncounterId],state=chapterState(),stats=getPartyStats(0),owner=playerOwner();
         if(!profile||!stats||!owner){return null;}
-        const unprepared=state.onboarding.active&&profile.lesson&&state.onboarding.nodeId!==node.id;
+        const unprepared=state.onboarding.active&&profile.lesson&&!hasTutorialAction(profile.lesson);
         const config=unprepared?profile.unprepared:profile;
         const hp=Math.ceil(stats.attack*(config.hpRatio||profile.hpRatio));
         const constant=typeof getDamageFormulaConstant==="function"?getDamageFormulaConstant(owner.level):100;

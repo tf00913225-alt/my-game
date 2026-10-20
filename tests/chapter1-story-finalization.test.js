@@ -42,8 +42,8 @@ test("canonical Hero qualification seals the same twenty-node Chapter 1 route",(
 
 // Unit boundary: production Adventure Owner, explicit simulated battle callback.
 // These tests verify state transitions and never claim real combat coverage.
-function runtime(saved){
-    let callback,saveMode=true,stored,roster,options,launches=0,skillEvent;
+function runtime(saved,initialSave=true){
+    let callback,saveMode=initialSave,stored,roster,options,launches=0,skillEvent;
     const player={id:"QA",element:"fire",level:1,hp:100,sp:40,adventureProgress:saved||{schemaVersion:3,pendingStoryOpening:true,activeChapterId:"chapter_v1",chapters:{}}};
     const c={window:null,console,Math,Date,Number,String,Boolean,Object,Array,Set,Map,Promise,JSON,
         document:{hidden:false,addEventListener(){},dispatchEvent(){},getElementById(){return null;}},CustomEvent:function(){},
@@ -133,7 +133,7 @@ test("tutorial guidance and dialogue reload retain exact cursor and required act
 });
 
 test("legacy character migrates its current node and preserves old ready receipts without restarting tutorial",()=>{
-    const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{currentNodeId:"n08_truth",completedNodes:{n01_arrival:true},rewardClaims:{n02_roadfight:"ready"}}}};
+    const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{chapterCompleted:false,chapterRewardClaimed:false,branchSelections:{},currentNodeId:"n08_truth",completedNodes:{n01_arrival:true},rewardClaims:{n02_roadfight:"ready"}}}};
     const h=runtime(saved);assert.equal(h.state().currentNodeId,"c1_11");assert.equal(h.state().onboarding.active,false);
     assert.equal(h.state().rewardClaims.n02_roadfight,"ready");assert.equal(h.state().rewardClaims.c1_02,"blocked-legacy");
     assert.equal(h.api.startFreshStory(),false);assert.equal(h.state().currentNodeId,"c1_11");
@@ -143,9 +143,17 @@ test("refused fresh-story save preserves the original onboarding state and openi
     assert.equal(h.api.startFreshStory(),false);assert.equal(JSON.stringify(h.state()),before);
     assert.equal(h.c.player.adventureProgress.pendingStoryOpening,true);
 });
+test("preparation from prior equipment retry cannot bypass the stage 5 recovery lesson",()=>{
+    const h=runtime();h.state().currentNodeId="c1_05";
+    h.state().onboarding={active:true,phase:"retry",nodeId:"c1_04",requiredAction:"equipment",prepared:true};
+    assert.equal(h.api.startStory("c1_05"),true);finishDialogue(h);
+    assert.equal(h.c.battleActive,false,"stage 5 must show recovery before battle even after a prepared stage 4");
+    assert.equal(h.state().onboarding.nodeId,"c1_05");assert.equal(h.state().onboarding.requiredAction,"recovery");
+    assert.equal(h.api.continueTutorial(),false);assert.equal(h.api.confirmPreparation(),true);
+});
 test("retained boss ready or claimed receipt blocks the same new boss reward",()=>{
     for(const receipt of ["ready","claimed"]){
-        const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{currentNodeId:"n10_finish",completedNodes:{n09_boss:true},rewardClaims:{n09_boss:receipt}}}};
+        const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{chapterCompleted:false,chapterRewardClaimed:false,branchSelections:{},currentNodeId:"n10_finish",completedNodes:{n09_boss:true},rewardClaims:{n09_boss:receipt}}}};
         const h=runtime(saved);assert.equal(h.api.beginBattle("c1_20"),true);h.finish("win");
         assert.equal(h.state().rewardClaims.c1_20,"blocked-legacy");assert.equal(h.api.claimNodeReward("c1_20"),false);
         if(receipt==="ready"){
@@ -154,4 +162,50 @@ test("retained boss ready or claimed receipt blocks the same new boss reward",()
             assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);
         }
     }
+});
+test("legacy chapter endpoint maps to stage 20 without recreating onboarding or erasing receipts",()=>{
+    const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{chapterRewardClaimed:false,branchSelections:{},currentNodeId:"n10_finish",chapterCompleted:true,
+        completedNodes:{n09_boss:true,n10_finish:true},rewardClaims:{n09_boss:"ready"}}}};
+    const h=runtime(saved);assert.equal(h.state().currentNodeId,"c1_20");assert.equal(h.state().chapterCompleted,true);
+    assert.equal(h.state().onboarding.active,false);assert.equal(h.state().rewardClaims.n09_boss,"ready");
+    assert.ok(h.state().storyKeys.blackPineToken);assert.equal(h.api.startFreshStory(),false);
+});
+test("invalid progress shapes and unknown versions refuse recovery without changing the original save",()=>{
+    const baseline={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{chapterCompleted:false,chapterRewardClaimed:false,branchSelections:{},currentNodeId:"n10_finish",completedNodes:{},rewardClaims:{n09_boss:"ready"}}}};
+    for(const corrupt of [s=>{s.schemaVersion=99;},s=>{s.chapters.chapter_v1.currentNodeId="unknown-node";},
+        s=>{s.chapters.chapter_v1.rewardClaims="claimed";},s=>{s.chapters.chapter_v1.rewardClaims=[];},
+        s=>{s.chapters.chapter_v1.rewardClaims.n09_boss="unknown-receipt";},s=>{s.chapters.chapter_v1.completedNodes=[];},
+        s=>{delete s.chapters.chapter_v1.chapterRewardClaimed;},s=>{delete s.chapters.chapter_v1.rewardClaims;}]){
+        const saved=structuredClone(baseline);corrupt(saved);const before=JSON.stringify(saved);
+        assert.throws(()=>runtime(saved),/Adventure|progress|save|recovery|receipt|state/i);assert.equal(JSON.stringify(saved),before);
+    }
+});
+test("refused legacy migration never mutates or opens the original root",()=>{
+    for(const mode of [false,"throw"]){
+        const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{chapterCompleted:false,chapterRewardClaimed:false,branchSelections:{},currentNodeId:"n10_finish",completedNodes:{n09_boss:true},rewardClaims:{n09_boss:"ready"}}}};
+        const before=JSON.stringify(saved);
+        assert.throws(()=>runtime(saved,mode),/Adventure|progress|save|recovery|receipt|state/i);
+        assert.equal(JSON.stringify(saved),before,"failed migration retains original raw root");
+    }
+});
+test("completed tutorial actions cannot replay a prior lesson for another free refill",()=>{
+    const h=runtime();at(h,"c1_02");h.api.beginBattle("c1_02");h.finish("lose");finishDialogue(h);
+    h.c.characterSkillLoadouts.fire={skillLevels:{flameSlash:1},equippedSkills:["flameSlash"]};
+    assert.equal(h.api.continueTutorial(),true);h.finish("win");h.c.player.hp=19;h.c.player.sp=7;
+    const launches=h.launches();assert.equal(h.api.continueTutorial(),false);assert.equal(h.launches(),launches);
+    assert.equal(h.c.player.hp,19);assert.equal(h.c.player.sp,7);
+});
+test("a genuine retained mission objective turns in and claims once after story migration",()=>{
+    const saved={schemaVersion:2,activeChapterId:"chapter_v1",chapters:{chapter_v1:{currentNodeId:"n05_commission",chapterCompleted:false,chapterRewardClaimed:false,
+        branchSelections:{fork_1:"safe"},completedNodes:{n01_arrival:true,n02_roadfight:true,n03_fork:{choiceId:"safe"},n04a_path:true},rewardClaims:{n02_roadfight:"claimed"},
+        objective:{sourceNodeId:"n05_commission",active:true,ready:true,turnedIn:false,current:5,target:5,monsterName:"山狼",zoneKey:"forest"}}}};
+    const h=runtime(saved),gold=h.c.gold,exp=h.c.sharedExp;
+    assert.equal(h.api.turnInObjective("n05_commission"),true);assert.equal(h.state().objective.turnedIn,true);
+    assert.equal(h.api.turnInObjective("n05_commission"),false);assert.equal(h.state().rewardClaims.n05_commission,"ready");
+    assert.equal(h.api.openLegacyReward("n05_commission"),true);assert.equal(h.api.claimNodeReward("n05_commission"),true);
+    const reward=h.c.FourSymbolsAdventureContent.rewards.commission_turnin;
+    assert.equal(h.c.gold-gold,reward.gold||0);assert.equal(h.c.sharedExp-exp,reward.sharedExp||0);
+    const committed=JSON.stringify(h.c.player.adventureProgress),goldAfter=h.c.gold;
+    assert.equal(h.api.claimNodeReward("n05_commission"),false);assert.equal(h.api.turnInObjective("n05_commission"),false);
+    assert.equal(h.c.gold,goldAfter);assert.equal(JSON.stringify(h.c.player.adventureProgress),committed);
 });

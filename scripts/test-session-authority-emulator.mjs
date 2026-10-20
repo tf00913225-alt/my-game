@@ -2865,34 +2865,33 @@ const storyData={uid:storyUid,session:storySession};
 let storyProof=await invoke("ensureHeroChapterTicket",storyUser.idToken,{...storyData,expectedRevision:1});
 const storyTicket=storyProof.chapter.ticketId;
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null},"FAILED_PRECONDITION");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_20",choiceId:null},"FAILED_PRECONDITION");
 await rejected("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null,won:true},"INVALID_ARGUMENT");
+    expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId:"c1_01",choiceId:null,won:true},"INVALID_ARGUMENT");
 await rejected("completeHeroChapterNode",heroOtherDevice.idToken,{uid:heroUid,session:heroOtherSession,
-    expectedRevision:8,ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
+    expectedRevision:8,ticketId:storyTicket,nodeId:"c1_01",choiceId:null},"DATA_LOSS"); // corrupt own rights; no other-UID source is read.
 const firstStep={...storyData,expectedRevision:storyProof.serverRevision,
-    ticketId:storyTicket,nodeId:"n01_arrival",choiceId:null};
+    ticketId:storyTicket,nodeId:"c1_01",choiceId:null};
 const concurrentStep=await Promise.all([
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep),
     invoke("completeHeroChapterNode",storyUser.idToken,firstStep)]);
 assert.deepEqual(concurrentStep.map(r=>r.unchanged).sort(),[false,true]);
 storyProof=concurrentStep.find(r=>!r.unchanged);
-for(const nodeId of ["n02_roadfight","n03_fork","n04a_path","n05_commission","n06_rest",
-    "n07_chest","n08_truth","n09_boss","n10_finish"]){
+for(const nodeId of Array.from({length:19},(_,index)=>`c1_${String(index+2).padStart(2,"0")}`)){
     storyProof=await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
         expectedRevision:storyProof.serverRevision,ticketId:storyTicket,nodeId,
-        choiceId:nodeId==="n03_fork"?"safe":null});
+        choiceId:null});
 }
 assert.equal(storyProof.chapter.phase,"completed");assert.equal(storyProof.chapter.outcomeVerified,false);
 assert.equal(storyProof.authoritativeStateReady,false);
 const storyRoot=db.collection("serverUsers").doc(storyUid);
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
-assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,10);
+assert.equal((await storyRoot.collection("heroChapterSteps").get()).size,20);
 const storyClaim=await storyRoot.collection("uniqueClaims").doc("hero-v1-divineDogHongbao").get();
 const storyGrant=storyProof.entitlements.divineDogHongbao;
 assert.equal(storyClaim.get("allocationSeed"),storyGrant.allocationSeed);
 assert.equal((await invoke("completeHeroChapterNode",storyUser.idToken,{...storyData,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null})).unchanged,true);
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null})).unchanged,true);
 while(Math.floor(Date.now()/1000)<=claims(storyUser.idToken).auth_time){await new Promise(resolve=>setTimeout(resolve,100));}
 const storyOther=await login("accounts:signInWithPassword",{email:storyEmail,password});
 const storyOtherSession=await invoke("createGameSession",storyOther.idToken,{uid:storyUid});
@@ -2900,7 +2899,7 @@ await rejected("readHeroAcquisition",storyUser.idToken,storyData,"SESSION_REVOKE
 assert.deepEqual((await invoke("readHeroAcquisition",storyOther.idToken,
     {uid:storyUid,session:storyOtherSession})).entitlements.divineDogHongbao,storyGrant);
 await rejected("completeHeroChapterNode",storyOther.idToken,{uid:storyUid,session:storyOtherSession,
-    expectedRevision:1,ticketId:storyTicket,nodeId:"n10_finish",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
+    expectedRevision:1,ticketId:storyTicket,nodeId:"c1_20",choiceId:null,save:{chapterCompleted:true}},"INVALID_ARGUMENT");
 assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);

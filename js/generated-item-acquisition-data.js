@@ -1418,6 +1418,21 @@ window.FourSymbolsItemAcquisitionData={
           "count": 2
         }
       ]
+    },
+    "story_road_chest": {
+      "gold": 420,
+      "potions": [
+        {
+          "id": "hpPotion30",
+          "count": 1
+        }
+      ],
+      "materials": [
+        {
+          "id": "oreLow",
+          "count": 1
+        }
+      ]
     }
   },
   "adventureMerchants": [

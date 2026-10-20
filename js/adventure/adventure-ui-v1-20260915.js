@@ -132,7 +132,7 @@
         const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
         const legacy=(CONTENT().legacyNodes||[]).filter(n=>view.state.rewardClaims[n.id]==="ready").map(n=>'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.openLegacyReward(\''+attr(n.id)+'\')">舊旅程待領 · '+esc(n.title)+'</button>').join('');
         return '<section class="adventure-map-screen">'+replay+legacy+
-            '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>'+esc(Object.keys(state.completedNodes||{}).length)+' / '+esc(chapter.mainProgressNodeCount||chapter.nodeCapacity||chapter.nodes.length)+' 關</b>'+backtrack+'</div>'+
+            '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>'+esc(chapter.nodes.filter(node=>state.completedNodes?.[node.id]).length)+' / '+esc(chapter.mainProgressNodeCount||chapter.nodeCapacity||chapter.nodes.length)+' 關</b>'+backtrack+'</div>'+
             '<div class="adventure-map-canvas">'+
                 '<div class="adventure-map-depth adventure-map-far" aria-hidden="true"></div>'+
                 '<div class="adventure-map-depth adventure-map-mid" aria-hidden="true"></div>'+

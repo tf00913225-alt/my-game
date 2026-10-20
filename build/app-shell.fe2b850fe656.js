@@ -36000,6 +36000,21 @@ window.FourSymbolsItemAcquisitionData={
           "count": 2
         }
       ]
+    },
+    "story_road_chest": {
+      "gold": 420,
+      "potions": [
+        {
+          "id": "hpPotion30",
+          "count": 1
+        }
+      ],
+      "materials": [
+        {
+          "id": "oreLow",
+          "count": 1
+        }
+      ]
     }
   },
   "adventureMerchants": [
@@ -38871,14 +38886,18 @@ const V_ASSET_VERSION="173.73";
         return !isCurrentNoticeSuppressedToday(manifest);
     }
 
-    function isSharedModalAvailableForAnnouncement(){
+    function isFreshStoryActive(){
         // Fresh-character onboarding owns its first playable presentation.
         // Defer only the ordinary login announcement; forced updates keep
         // their existing safety gate and are never dismissed by Story.
         try{
             const progress=typeof player!=="undefined"&&player?.adventureProgress;
-            if(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active)){return false;}
+            return !!(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active));
         }catch(_){}
+        return false;
+    }
+    function isSharedModalAvailableForAnnouncement(){
+        if(isFreshStoryActive()){return false;}
         const parts=getSharedModalParts();
         return !!(
             parts&&
@@ -38998,6 +39017,7 @@ const V_ASSET_VERSION="173.73";
     }
 
     function showMarquee(manifest,kind){
+        if(isFreshStoryActive()&&!String(kind||"").startsWith("forced")){hideMarquee();return;}
         const marquee=ensureMarquee();
         if(!marquee||!manifest){ return; }
         const tag=marquee.querySelector(".release-update-marquee-tag");

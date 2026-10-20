@@ -130,7 +130,7 @@ test('formal reference party and damage/action owners satisfy Wild TTK across 40
 
 test('Phase2F migrates Boss; Tower and Adventure coverage is preserved',()=>{
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8'));
- const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);
+ const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,130);
  assert.equal(actual.filter(row=>['personal','world'].includes(row.mode)).length,48);
  const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
  assert.equal(tower.length,72);

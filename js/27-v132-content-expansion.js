@@ -2019,7 +2019,7 @@
             restoreDungeonMonsters();
             window.v132ActiveDungeonRun=null;
 
-            applyPostBattleAutoRecovery();
+            if(!run.tutorial){applyPostBattleAutoRecovery();}
             saveGame();
 
             if(run.onComplete){

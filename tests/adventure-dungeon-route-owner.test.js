@@ -44,11 +44,12 @@ assert.doesNotMatch(read("js/gameplay-boss-tower-system.js"),/vGameplayOpenDaily
 const runtimeSource=read("js/adventure/adventure-runtime-v1-20260915.js");
 const closeSource=runtimeSource.slice(runtimeSource.indexOf("    function closeToCity(){"),runtimeSource.indexOf("    function hideOverlay(){"));
 let returns=0;
-let onboardingActive=false;
-const closeContext={chapterState:()=>({onboarding:{active:onboardingActive}}),render(){},runtime:{visible:true,activePanel:"event",selectedNodeId:"n01_arrival"},showPage(page){assert.equal(page,"home");returns++;}};
+let onboardingActive=false,storyReturns=0;
+const closeContext={chapterState:()=>({currentNodeId:"c1_02",onboarding:{active:onboardingActive}}),startStory(id){assert.equal(id,"c1_02");storyReturns++;},render(){},runtime:{visible:true,activePanel:"event",selectedNodeId:"n01_arrival"},showPage(page){assert.equal(page,"home");returns++;}};
 vm.createContext(closeContext);vm.runInContext(closeSource,closeContext);closeContext.closeToCity();
 assert.equal(returns,1,"city return selects its route exactly once");
 assert.equal(closeContext.runtime.visible,false);
 onboardingActive=true;closeContext.runtime.visible=true;closeContext.closeToCity();
 assert.equal(returns,1,"mandatory onboarding cannot exit to city");assert.equal(closeContext.runtime.visible,true);
+assert.equal(storyReturns,1,"onboarding without a required system action returns to its actual current story");
 console.log("Adventure and Dungeon share one screen authority; distinct entries and repeated transitions passed");

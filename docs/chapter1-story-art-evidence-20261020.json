@@ -1,0 +1,130 @@
+{
+  "workId": "CHAPTER1-STORY-FINALIZATION-20261020",
+  "date": "2026-10-20",
+  "method": "Original PNG to lossless WebP with exact RGBA pixel equality, original dimensions and alpha preserved; final file hashes rechecked after moving into the sole NPC assetPool paths.",
+  "npcReuse": 5,
+  "generatedBackgrounds": 3,
+  "reusedBackground": "assets/ui/home-background.jpg",
+  "generationMode": "built-in image_gen; no CLI fallback or remote image downloads",
+  "promptSet": {
+    "mountain-road.webp": "Ancient Chinese wuxia story background, grounded quiet mountain frontier, eye-level view, muted jade and aged bronze palette, painterly semi-realistic environment, generous clear central composition for overlaid character portraits and dialogue. No people, text, lettering, UI, modern objects or magic. A winding stone and dirt mountain road among pine trees, distant modest roadside pavilion and misty ridges; early morning soft light.",
+    "stone-bridge.webp": "Ancient Chinese wuxia story background, grounded quiet mountain frontier, eye-level view, muted jade and aged bronze palette, painterly semi-realistic environment, generous clear central composition for overlaid character portraits and dialogue. No people, text, lettering, UI, modern objects or magic. A small old stone bridge crossing a narrow mountain stream, pine forest and mountain road continuing beyond, soft daylight and light mist.",
+    "black-pine-stockade.webp": "Ancient Chinese wuxia story background, grounded quiet mountain frontier, eye-level view, muted jade and aged bronze palette, painterly semi-realistic environment, generous clear central composition for overlaid character portraits and dialogue. No people, text, lettering, UI, modern objects or magic. A modest black pine bandit stockade with weathered timber walls and open gate revealing a simple courtyard, rocky mountain setting, warm late daylight."
+  },
+  "assets": [
+    {
+      "path": "assets/monsters/shared/npc-shared-029.webp",
+      "source": {
+        "branch": "assets-library",
+        "path": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000075a482118255e3cc4004c1f7.png",
+        "sha256": "0cc801cc393da168189aebd3e863b874ddc74a7ba308949555c6e477db945bd3"
+      },
+      "size": [
+        1086,
+        1448
+      ],
+      "rgbaSha256": "9a3788d56d289e29bd2e2d25f1772e9788b0e5dcc784761f291e0df9292dcd9d",
+      "webpSha256": "366d07ed98d041d7f94c5faca29433dba5ab0cb3873dbc2b54e079daf52f4488",
+      "losslessPixelEquality": true,
+      "assetId": "NPC_SHARED_029"
+    },
+    {
+      "path": "assets/monsters/shared/npc-shared-021.webp",
+      "source": {
+        "branch": "assets-library",
+        "path": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000511c82119526b036c7b677d9.png",
+        "sha256": "9c199bacf75418b579b663a6e0fb19ea84b8e68df8f43e76499d718ea3cae5cf"
+      },
+      "size": [
+        1086,
+        1448
+      ],
+      "rgbaSha256": "1444750a4fbca4d4fcba448e97da88d881c5a1300e6784bc3f5f8c01dbeb09c2",
+      "webpSha256": "459466d43834bfa583600552e98597a5337dd63ef62a4c94053acd33a89d34da",
+      "losslessPixelEquality": true,
+      "assetId": "NPC_SHARED_021"
+    },
+    {
+      "path": "assets/monsters/shared/npc-shared-044.webp",
+      "source": {
+        "branch": "assets-library",
+        "path": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000d9e48207b7064effd61a2c15.png",
+        "sha256": "ef0fae0f2bfb59b918538ad446da77a3fe0abbaef79abb79a9370968f8c7d4e7"
+      },
+      "size": [
+        1086,
+        1448
+      ],
+      "rgbaSha256": "23dbae63479312f2ac53ae090a0e93669508c8a743b2b15ed6d2626ddd223903",
+      "webpSha256": "892b70f5aff20f9e1dc33c653bcc15eaa0388e124ca8f3597c1ef6fd320c5af3",
+      "losslessPixelEquality": true,
+      "assetId": "NPC_SHARED_044"
+    },
+    {
+      "path": "assets/monsters/shared/npc-shared-034.webp",
+      "source": {
+        "branch": "assets-library",
+        "path": "assets/inbox/英雄or怪物立繪/新npc立繪/file_0000000085a082119a30ce0fe1451f5b.png",
+        "sha256": "87e8adab1569448970f5ec216a5ef13d13394fd4bacad1447d7b00dc779ca78e"
+      },
+      "size": [
+        1086,
+        1448
+      ],
+      "rgbaSha256": "999b1be3b438231c0c3dc3a68dbe78f352bed87690da63f868e47019dbb1f785",
+      "webpSha256": "ce3f37fbf25ce84c0074a8f519d0364b10de916edf8bae94a561c06097ebc144",
+      "losslessPixelEquality": true,
+      "assetId": "NPC_SHARED_034"
+    },
+    {
+      "path": "assets/monsters/shared/npc-shared-040.webp",
+      "source": {
+        "branch": "assets-library",
+        "path": "assets/inbox/英雄or怪物立繪/新npc立繪/file_00000000aaf4821187d562c24e6b356e.png",
+        "sha256": "bb57ca7d3ebfbed629dc367e7194b4542d4a9997b493b44ee2db72107a06724d"
+      },
+      "size": [
+        1086,
+        1448
+      ],
+      "rgbaSha256": "e8ce9006b861298d91ea5eca0843550ba7700d50e838cb7954dd65887758da56",
+      "webpSha256": "9df2ae502a394258a3097705f95b3efce5fd18470337fca2391a4f65d480ad76",
+      "losslessPixelEquality": true,
+      "assetId": "NPC_SHARED_040"
+    },
+    {
+      "path": "assets/story/backgrounds/mountain-road.webp",
+      "source": "exec-2ed4f5eb-48fa-4204-be2a-16cd8a5fdd59.png",
+      "size": [
+        941,
+        1672
+      ],
+      "rgbaSha256": "ad993a17e961c5c64278d6e1dbc974eed83a3b8e2e29236880f3d9134901b65d",
+      "webpSha256": "b1435cd176900904d89cbb65f6089ed4f69d38065d7e709a77c89b827c8f9dff",
+      "losslessPixelEquality": true
+    },
+    {
+      "path": "assets/story/backgrounds/stone-bridge.webp",
+      "source": "exec-e6b03254-0ab2-4d77-823f-6e071f2f176b.png",
+      "size": [
+        941,
+        1672
+      ],
+      "rgbaSha256": "780343822c6d3e932e7f940a948d42c4b2c76b1cbfa15e0bf0eb1b028c59d8d0",
+      "webpSha256": "8d60fa301fb3e29861a69f2ebe639ca7021ac2dd8c4554c99109c46c667d74c1",
+      "losslessPixelEquality": true
+    },
+    {
+      "path": "assets/story/backgrounds/black-pine-stockade.webp",
+      "source": "exec-c5f5e293-4144-469e-b8aa-9104734d361a.png",
+      "size": [
+        941,
+        1672
+      ],
+      "rgbaSha256": "c1ed07ad69f994b68e54d77a5fdc336ecd9494b276b45d4b55ebe9e4850d5ef0",
+      "webpSha256": "88ff864033650a661f24ddb8aac50d53a3eddf353cdeb3871129a551c79c10d7",
+      "losslessPixelEquality": true
+    }
+  ]
+}
+

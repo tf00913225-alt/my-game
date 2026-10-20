@@ -66,12 +66,14 @@ const chapters={
           {
             "speaker": "npc",
             "name": "山道惡徒",
-            "text": "新來的？這條山道的規矩，你可還沒學會。"
+            "text": "新來的？這條山道的規矩，你可還沒學會。",
+            "npcAssetId": "traveler"
           },
           {
             "speaker": "player",
             "name": "玩家",
-            "text": "放旅人過去，有什麼事衝我來。"
+            "text": "放旅人過去，有什麼事衝我來。",
+            "npcAssetId": "traveler"
           }
         ],
         "next": "c1_03",
@@ -322,7 +324,8 @@ const chapters={
         "next": "c1_09",
         "x": 35,
         "y": 63.1,
-        "rewardId": "road_chest"
+        "rewardId": "story_road_chest",
+        "legacyRewardId": "road_chest"
       },
       {
         "id": "c1_09",
@@ -642,7 +645,7 @@ const chapters={
         "title": "寨中頭目",
         "subtitle": "山關主線",
         "stage": 18,
-        "npc": "chief",
+        "npc": "guard",
         "scene": "stockade",
         "dialogue": [
           {
@@ -836,12 +839,14 @@ const chapters={
       {
         "speaker": "npc",
         "name": "守驛人",
-        "text": "山關通了！少俠，驛站的大門隨時為你敞開。"
+        "text": "山關通了！少俠，驛站的大門隨時為你敞開。",
+        "npcAssetId": "guard"
       },
       {
         "speaker": "player",
         "name": "玩家",
-        "text": "江湖的路還長。先回城整備，再啟下一程。"
+        "text": "江湖的路還長。先回城整備，再啟下一程。",
+        "npcAssetId": "guard"
       }
     ]
   }
@@ -1009,7 +1014,7 @@ const encounters={
         "archetype": "balanced",
         "name": "黑松寨精英",
         "level": 2,
-        "element": "fire",
+        "element": "earth",
         "rank": "elite",
         "portraitKey": "NPC_SHARED_029"
       }
@@ -1048,7 +1053,7 @@ const encounters={
         "archetype": "balanced",
         "name": "黑松寨精英",
         "level": 2,
-        "element": "fire",
+        "element": "earth",
         "rank": "elite",
         "portraitKey": "NPC_SHARED_029"
       }
@@ -1204,6 +1209,21 @@ const rewards={
       {
         "id": "spPotion10",
         "count": 2
+      }
+    ]
+  },
+  "story_road_chest": {
+    "gold": 420,
+    "potions": [
+      {
+        "id": "hpPotion30",
+        "count": 1
+      }
+    ],
+    "materials": [
+      {
+        "id": "oreLow",
+        "count": 1
       }
     ]
   }

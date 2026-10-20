@@ -259,14 +259,18 @@
         return !isCurrentNoticeSuppressedToday(manifest);
     }
 
-    function isSharedModalAvailableForAnnouncement(){
+    function isFreshStoryActive(){
         // Fresh-character onboarding owns its first playable presentation.
         // Defer only the ordinary login announcement; forced updates keep
         // their existing safety gate and are never dismissed by Story.
         try{
             const progress=typeof player!=="undefined"&&player?.adventureProgress;
-            if(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active)){return false;}
+            return !!(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active));
         }catch(_){}
+        return false;
+    }
+    function isSharedModalAvailableForAnnouncement(){
+        if(isFreshStoryActive()){return false;}
         const parts=getSharedModalParts();
         return !!(
             parts&&
@@ -386,6 +390,7 @@
     }
 
     function showMarquee(manifest,kind){
+        if(isFreshStoryActive()&&!String(kind||"").startsWith("forced")){hideMarquee();return;}
         const marquee=ensureMarquee();
         if(!marquee||!manifest){ return; }
         const tag=marquee.querySelector(".release-update-marquee-tag");
