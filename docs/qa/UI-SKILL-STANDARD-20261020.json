@@ -459,7 +459,7 @@
       "label": "商店",
       "entry": "openHomeFeature('shop')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -503,7 +503,26 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "mappingRevision": "durable-subset-v2",
+          "state": "商店正式入口/補品裝備末端/預覽/返回",
+          "status": "已實際驗證",
+          "heads": [
+            "639391f4245b0535c7d4aef35cca746bb244bc8a"
+          ],
+          "reports": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+          ],
+          "limits": [
+            "真購買/刷新交易",
+            "所有商店業務失敗/待確認狀態"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -540,6 +559,26 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "existingEvidenceMapping": {
+        "id": "home.shop",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+        ],
+        "heads": [
+          "639391f4245b0535c7d4aef35cca746bb244bc8a"
+        ],
+        "verified": [
+          "商店正式入口/補品裝備末端/預覽/返回"
+        ],
+        "remaining": [
+          "真購買/刷新交易",
+          "所有商店業務失敗/待確認狀態"
+        ],
+        "revision": "durable-subset-v2"
       }
     },
     {
@@ -1641,7 +1680,7 @@
       "label": "主城休息",
       "entry": "openHomeFeature('rest')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "不適用",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -1722,6 +1761,21 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "existingEvidenceMapping": {
+        "id": "home.rest",
+        "reports": [],
+        "status": "不適用",
+        "verified": [],
+        "remaining": [
+          "無可見入口之legacy未作UI操作驗收"
+        ],
+        "note": "homeRestCard隱藏，legacy實作仍存在；不可新增頁面。冒險rest是不同entry。",
+        "sourceEvidence": [
+          "index.html",
+          "js/00-main.js"
+        ],
+        "revision": "durable-subset-v2"
       }
     },
     {
@@ -1817,7 +1871,7 @@
       "label": "主城入口與資源/角色列",
       "entry": "showPage('home')",
       "owner": "index.html; js/00-main.js; css/04-stage-v11-main-city.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "1名角色",
         "3名角色",
@@ -1863,11 +1917,58 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "mappingRevision": "durable-subset-v2",
+          "state": "1/3角色、短/合法16字名稱、資源即時完整顯示、通知有無；唯一home真捲動頂/末、角色/編隊/背包/摘要真入口返回anchor",
+          "status": "已實際驗證",
+          "heads": [
+            "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b"
+          ],
+          "reports": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json"
+          ],
+          "limits": [
+            "DEV28px及footer42px觸控未過",
+            "編隊拖曳/移除/同步成功",
+            "所有主城業務操作",
+            "24B charge浮字仍待delta",
+            "真實裝置/鍵盤"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "existingEvidenceMapping": {
+        "id": "home.main",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/1280x800-report.json"
+        ],
+        "heads": [
+          "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b"
+        ],
+        "verified": [
+          "1/3角色、短/合法16字名稱、資源即時完整顯示、通知有無",
+          "唯一home真捲動頂/末、角色/編隊/背包/摘要真入口返回anchor"
+        ],
+        "remaining": [
+          "DEV28px及footer42px觸控未過",
+          "編隊拖曳/移除/同步成功",
+          "所有主城業務操作",
+          "24B charge浮字仍待delta",
+          "真實裝置/鍵盤"
+        ],
+        "note": "主城入口與列出呈現子集；非全頁所有狀態。摘要跨頁一致性另由24C，不把舊24fixture當該證據。",
+        "revision": "durable-subset-v2"
       }
     },
     {
@@ -2803,7 +2904,32 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "mappingRevision": "durable-subset-v2",
+          "state": "48正式ID詳情真入口/文字綁定/長短內容末端/關閉重開；4代表Lv1隔離已學呈現；3技能四display詞句中文delta",
+          "status": "已實際驗證",
+          "heads": [
+            "be598b486010157f3a707718458ecd2aa255adcf",
+            "067395727302ef1b2c76d7c1357ac095ba0487ea"
+          ],
+          "reports": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-report.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-report.json"
+          ],
+          "limits": [
+            "合法mid/max技能等級狀態",
+            "角色全組合",
+            "學習/升級/裝備/施放/真交易/實機"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -2876,6 +3002,35 @@
           "同步handler同task exact純讀；跨await有原背景資料變化，不稱零save，也不依keys精確判每筆timer來源。",
           "其他角色TAB/未創slot、摘要跨頁一致性、主城28/42觸控缺口、完整編隊等仍依全介面清單未驗，不稱全遊戲完成。"
         ]
+      },
+      "existingEvidenceMapping": {
+        "id": "detail.skill-detail",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/1280x800-report.json"
+        ],
+        "heads": [
+          "be598b486010157f3a707718458ecd2aa255adcf",
+          "067395727302ef1b2c76d7c1357ac095ba0487ea"
+        ],
+        "verified": [
+          "48正式ID詳情真入口/文字綁定/長短內容末端/關閉重開",
+          "4代表Lv1隔離已學呈現",
+          "3技能四display詞句中文delta"
+        ],
+        "remaining": [
+          "合法mid/max技能等級狀態",
+          "角色全組合",
+          "學習/升級/裝備/施放/真交易/實機"
+        ],
+        "note": "取代舊v1僅title+677runtime的不足映射；不再使用scratch或第3裝備詳情冒技能證據。",
+        "revision": "durable-subset-v2"
       }
     },
     {
@@ -11403,6 +11558,17 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "existingEvidenceMapping": {
+        "id": "gameplay.monster-catalog",
+        "reports": [],
+        "verified": [],
+        "remaining": [
+          "正式可見入口未找到",
+          "全部呈現及互動未驗"
+        ],
+        "note": "原ledger推測名稱未找到production入口；保持未檢查，不標已驗、不建立功能。",
+        "revision": "durable-subset-v2"
       }
     },
     {
@@ -12115,7 +12281,7 @@
       "label": "戰鬥 statistics",
       "entry": "隔離QA帳號→正式戰鬥控制 statistics",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "不適用",
       "states": [
         "可操作",
         "禁用",
@@ -12169,7 +12335,22 @@
         "interaction": null,
         "scope": null
       },
-      "formalEntryFinding": "直接Owner及既有battle-ui-status-vfx-followup regression證明統計主頁已退休；不自造入口。現存Boss功能檢視另外待驗。"
+      "formalEntryFinding": "直接Owner及既有battle-ui-status-vfx-followup regression證明統計主頁已退休；不自造入口。現存Boss功能檢視另外待驗。",
+      "existingEvidenceMapping": {
+        "id": "battle.statistics",
+        "reports": [],
+        "status": "不適用",
+        "verified": [],
+        "remaining": [
+          "現存Boss機制抽屜未驗"
+        ],
+        "note": "退休統計主頁及結果明細N/A；記錄Owner仍存在，不能把整個統計子系統當移除。",
+        "sourceEvidence": [
+          "js/battle-statistics-system.js",
+          ".github/scripts/battle-layer-audio-live-qa.mjs"
+        ],
+        "revision": "durable-subset-v2"
+      }
     },
     {
       "id": "battle.boss-mechanism",
@@ -14582,7 +14763,7 @@
       "label": "底部導覽與覆蓋還原",
       "entry": "主城/練功/背包/玩法→詳情→返回",
       "owner": "js/04-stage-v11-native-bottom-nav-runtime.js; css/06-stage-v11-native-bottom-nav.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "選取",
         "通知",
@@ -14627,11 +14808,52 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "mappingRevision": "durable-subset-v2",
+          "state": "主城/野怪區/副本/玩法四來源背包開啟及返回還原",
+          "status": "已實際驗證",
+          "heads": [
+            "15660a34e8d451dd67d26d801373cbd21d7546a2"
+          ],
+          "reports": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-base-controls-156.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-base-controls-156.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-base-controls-156.json",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-base-controls-156.json"
+          ],
+          "limits": [
+            "通知",
+            "連續切頁壓力",
+            "其他modal/目的地與嵌套"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "existingEvidenceMapping": {
+        "id": "shared.navigation",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/360x640-base-controls-156.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/393x873-base-controls-156.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/412x915-base-controls-156.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-base-controls-156.json"
+        ],
+        "heads": [
+          "15660a34e8d451dd67d26d801373cbd21d7546a2"
+        ],
+        "verified": [
+          "主城/野怪區/副本/玩法四來源背包開啟及返回還原"
+        ],
+        "remaining": [
+          "通知",
+          "連續切頁壓力",
+          "其他modal/目的地與嵌套"
+        ],
+        "revision": "durable-subset-v2"
       }
     },
     {
