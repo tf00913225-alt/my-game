@@ -18,3 +18,16 @@ Work ID UI-SKILL-STANDARD-20261020；PR #955；Branch fix/ui-skill-standard-poli
 ## Next／未驗
 
 完成48技能真詳情逐ID綁定/長短文/捲末/返回重開及代表已學Lv1；四尺寸與三方實畫審核仍待完成。角色三選角×三TAB、未創slot、合法1/mid/max狀態與其他未列狀態仍未驗，不稱技能詳情完成。不學習/升級/裝備/施放/消耗，不進Combat/雲端交易。最新必要CI待核，未合dev/部署。
+
+## Base四尺寸限定驗收
+
+Authority be598b486010157f3a707718458ecd2aa255adcf，source與a17候選相同；四尺寸各100張圖、48ID真末端/返回重開、200同步show-close handler全部sameTaskUnchanged、exactBeforeRestore/restored=true，clean/sourceUnchanged。各208個真tap（200個開關詳情、8個元素TAB），其餘紀錄是scroll/定位幾何，不能把整份touches誤稱tap數。
+
+三方實看scope詳見segment25-base/independent-reviews.json：360美術逐48首圖，其他尺寸每5張代表圖，並非人工逐張審400張。四份完整原JSON以gzip無損保留（SHA/bytes記於可讀summary），400張原PNG不改動。新增48個per-ID ledger。
+
+- 語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。
+- 已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。
+- 同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。
+- 原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。
+
+此為布局/閱讀/輸入base限定通過，非全25語言通過。下一步只修4個生效display字串、對3個ID四尺寸delta，不重跑48矩陣。

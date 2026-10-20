@@ -2679,7 +2679,7 @@
       "label": "技能詳情",
       "entry": "showSkillDetail(skillId)",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "已修改",
+      "status": "有問題",
       "states": [
         "短內容",
         "長內容",
@@ -2772,6 +2772,17 @@
           "48formalID",
           "四尺寸",
           "三方實畫審核"
+        ]
+      },
+      "segment25Base": {
+        "head": "be598b486010157f3a707718458ecd2aa255adcf",
+        "status": "48ID四尺寸base已驗，3ID語言未過",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base",
+        "limits": [
+          "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
+          "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+          "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+          "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
         ]
       }
     },
@@ -20453,6 +20464,3321 @@
       ],
       "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24-accepted/360x640-report.json",
       "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b"
+    },
+    {
+      "id": "detail.skill.flameSlash",
+      "label": "火焰斬",
+      "entry": ".skill-row-detail-link showSkillDetail(flameSlash)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flameSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flameSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flameSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flameSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flameSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flameSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flameSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flameSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.fireCritical",
+      "label": "會心一擊",
+      "entry": ".skill-row-detail-link showSkillDetail(fireCritical)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireCritical-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireCritical-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireCritical-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireCritical-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireCritical-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireCritical-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireCritical-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireCritical-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.explosiveFlurry",
+      "label": "火爆亂擊",
+      "entry": ".skill-row-detail-link showSkillDetail(explosiveFlurry)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-explosiveFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-explosiveFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-explosiveFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-explosiveFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-explosiveFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-explosiveFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-explosiveFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-explosiveFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.dragonSlash",
+      "label": "霸龍裂天斬",
+      "entry": ".skill-row-detail-link showSkillDetail(dragonSlash)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dragonSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dragonSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dragonSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dragonSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dragonSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dragonSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dragonSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dragonSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.fireRocket",
+      "label": "火箭",
+      "entry": ".skill-row-detail-link showSkillDetail(fireRocket)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireRocket-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireRocket-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireRocket-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireRocket-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireRocket-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireRocket-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireRocket-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireRocket-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.blazeSpell",
+      "label": "烈火術",
+      "entry": ".skill-row-detail-link showSkillDetail(blazeSpell)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-blazeSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-blazeSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-blazeSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-blazeSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-blazeSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-blazeSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-blazeSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-blazeSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.flameTornado",
+      "label": "烈焰龍捲",
+      "entry": ".skill-row-detail-link showSkillDetail(flameTornado)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flameTornado-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flameTornado-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flameTornado-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flameTornado-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flameTornado-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flameTornado-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flameTornado-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flameTornado-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.phoenixCry",
+      "label": "火鳳天鳴",
+      "entry": ".skill-row-detail-link showSkillDetail(phoenixCry)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-phoenixCry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-phoenixCry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-phoenixCry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-phoenixCry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-phoenixCry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-phoenixCry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-phoenixCry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-phoenixCry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.rage",
+      "label": "怒火",
+      "entry": ".skill-row-detail-link showSkillDetail(rage)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-rage-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-rage-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-rage-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-rage-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-rage-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-rage-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-rage-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-rage-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.fireSoulResonance",
+      "label": "炎魂共鳴",
+      "entry": ".skill-row-detail-link showSkillDetail(fireSoulResonance)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireSoulResonance-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireSoulResonance-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireSoulResonance-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireSoulResonance-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireSoulResonance-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireSoulResonance-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireSoulResonance-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireSoulResonance-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.bloodBurnArt",
+      "label": "焚血訣",
+      "entry": ".skill-row-detail-link showSkillDetail(bloodBurnArt)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "有問題",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-bloodBurnArt-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-bloodBurnArt-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-bloodBurnArt-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-bloodBurnArt-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-bloodBurnArt-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-bloodBurnArt-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-bloodBurnArt-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-bloodBurnArt-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.fireEX",
+      "label": "火元素EX",
+      "entry": ".skill-row-detail-link showSkillDetail(fireEX)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-fireEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-fireEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-fireEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-fireEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.waterKnife",
+      "label": "水刀斬",
+      "entry": ".skill-row-detail-link showSkillDetail(waterKnife)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterKnife-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterKnife-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterKnife-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterKnife-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterKnife-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterKnife-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterKnife-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterKnife-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.frostPunch",
+      "label": "冰霜拳",
+      "entry": ".skill-row-detail-link showSkillDetail(frostPunch)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-frostPunch-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-frostPunch-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-frostPunch-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-frostPunch-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-frostPunch-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-frostPunch-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-frostPunch-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-frostPunch-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.iceSpin",
+      "label": "冰旋一閃",
+      "entry": ".skill-row-detail-link showSkillDetail(iceSpin)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-iceSpin-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-iceSpin-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-iceSpin-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-iceSpin-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-iceSpin-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-iceSpin-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-iceSpin-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-iceSpin-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.frostCrush",
+      "label": "冰封重擊",
+      "entry": ".skill-row-detail-link showSkillDetail(frostCrush)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-frostCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-frostCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-frostCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-frostCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-frostCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-frostCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-frostCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-frostCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.waterBall",
+      "label": "水球術",
+      "entry": ".skill-row-detail-link showSkillDetail(waterBall)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterBall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterBall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterBall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterBall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterBall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterBall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterBall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterBall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.floodBeast",
+      "label": "洪水猛獸",
+      "entry": ".skill-row-detail-link showSkillDetail(floodBeast)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-floodBeast-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-floodBeast-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-floodBeast-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-floodBeast-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-floodBeast-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-floodBeast-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-floodBeast-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-floodBeast-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.iceArrowRain",
+      "label": "冰霜箭雨",
+      "entry": ".skill-row-detail-link showSkillDetail(iceArrowRain)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-iceArrowRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-iceArrowRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-iceArrowRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-iceArrowRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-iceArrowRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-iceArrowRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-iceArrowRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-iceArrowRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.healSpell",
+      "label": "治療術",
+      "entry": ".skill-row-detail-link showSkillDetail(healSpell)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-healSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-healSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-healSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-healSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-healSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-healSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-healSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-healSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.revive",
+      "label": "復活術",
+      "entry": ".skill-row-detail-link showSkillDetail(revive)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-revive-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-revive-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-revive-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-revive-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-revive-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-revive-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-revive-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-revive-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.freeze",
+      "label": "冰封",
+      "entry": ".skill-row-detail-link showSkillDetail(freeze)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-freeze-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-freeze-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-freeze-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-freeze-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-freeze-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-freeze-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-freeze-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-freeze-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.purifyMind",
+      "label": "淨心訣",
+      "entry": ".skill-row-detail-link showSkillDetail(purifyMind)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "有問題",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-purifyMind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-purifyMind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-purifyMind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-purifyMind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-purifyMind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-purifyMind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-purifyMind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-purifyMind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.waterEX",
+      "label": "水元素EX",
+      "entry": ".skill-row-detail-link showSkillDetail(waterEX)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-waterEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-waterEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-waterEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-waterEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stormFist",
+      "label": "暴風拳",
+      "entry": ".skill-row-detail-link showSkillDetail(stormFist)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stormFlurry",
+      "label": "暴風亂擊",
+      "entry": ".skill-row-detail-link showSkillDetail(stormFlurry)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormFlurry-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormFlurry-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.windCrossSlash",
+      "label": "風旋十字斬",
+      "entry": ".skill-row-detail-link showSkillDetail(windCrossSlash)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windCrossSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windCrossSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windCrossSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windCrossSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windCrossSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windCrossSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windCrossSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windCrossSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.dizzyFist",
+      "label": "暈眩猛擊",
+      "entry": ".skill-row-detail-link showSkillDetail(dizzyFist)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dizzyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dizzyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dizzyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dizzyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dizzyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dizzyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dizzyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dizzyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.windSpell",
+      "label": "狂風術",
+      "entry": ".skill-row-detail-link showSkillDetail(windSpell)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windSpell-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windSpell-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stormCircle",
+      "label": "風焰術",
+      "entry": ".skill-row-detail-link showSkillDetail(stormCircle)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormCircle-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormCircle-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormCircle-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormCircle-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormCircle-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormCircle-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormCircle-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormCircle-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.windHowlLightning",
+      "label": "風哮電擊",
+      "entry": ".skill-row-detail-link showSkillDetail(windHowlLightning)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windHowlLightning-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windHowlLightning-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windHowlLightning-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windHowlLightning-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windHowlLightning-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windHowlLightning-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windHowlLightning-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windHowlLightning-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stormRain",
+      "label": "風起雲湧",
+      "entry": ".skill-row-detail-link showSkillDetail(stormRain)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stormRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stormRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stormRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormRain-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stormRain-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.dodgeSkill",
+      "label": "閃躲術",
+      "entry": ".skill-row-detail-link showSkillDetail(dodgeSkill)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dodgeSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dodgeSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dodgeSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dodgeSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dodgeSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dodgeSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dodgeSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dodgeSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stealthSkill",
+      "label": "隱身術",
+      "entry": ".skill-row-detail-link showSkillDetail(stealthSkill)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stealthSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stealthSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stealthSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stealthSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stealthSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stealthSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stealthSkill-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stealthSkill-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.dinghaishenzhen",
+      "label": "氣定神閒",
+      "entry": ".skill-row-detail-link showSkillDetail(dinghaishenzhen)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dinghaishenzhen-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dinghaishenzhen-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dinghaishenzhen-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dinghaishenzhen-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dinghaishenzhen-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dinghaishenzhen-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dinghaishenzhen-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dinghaishenzhen-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.windEX",
+      "label": "風元素EX",
+      "entry": ".skill-row-detail-link showSkillDetail(windEX)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-windEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-windEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-windEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-windEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stoneSlash",
+      "label": "土石斬",
+      "entry": ".skill-row-detail-link showSkillDetail(stoneSlash)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneSlash-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneSlash-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.petrifyFist",
+      "label": "石盾拳",
+      "entry": ".skill-row-detail-link showSkillDetail(petrifyFist)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-petrifyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-petrifyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-petrifyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-petrifyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-petrifyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-petrifyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-petrifyFist-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-petrifyFist-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stoneBreakSky",
+      "label": "石破天驚",
+      "entry": ".skill-row-detail-link showSkillDetail(stoneBreakSky)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneBreakSky-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneBreakSky-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneBreakSky-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneBreakSky-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneBreakSky-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneBreakSky-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneBreakSky-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneBreakSky-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.earthquakeCrush",
+      "label": "地裂重拳",
+      "entry": ".skill-row-detail-link showSkillDetail(earthquakeCrush)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthquakeCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthquakeCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthquakeCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthquakeCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthquakeCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthquakeCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthquakeCrush-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthquakeCrush-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.stoneThrow",
+      "label": "落石術",
+      "entry": ".skill-row-detail-link showSkillDetail(stoneThrow)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneThrow-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-stoneThrow-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneThrow-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-stoneThrow-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneThrow-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-stoneThrow-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneThrow-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-stoneThrow-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.sandWind",
+      "label": "滾石術",
+      "entry": ".skill-row-detail-link showSkillDetail(sandWind)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-sandWind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-sandWind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-sandWind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-sandWind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-sandWind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-sandWind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-sandWind-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-sandWind-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.flyingSandStrike",
+      "label": "飛沙瞬擊",
+      "entry": ".skill-row-detail-link showSkillDetail(flyingSandStrike)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flyingSandStrike-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-flyingSandStrike-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flyingSandStrike-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-flyingSandStrike-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flyingSandStrike-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-flyingSandStrike-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flyingSandStrike-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-flyingSandStrike-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.dustStorm",
+      "label": "地牛猛襲",
+      "entry": ".skill-row-detail-link showSkillDetail(dustStorm)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dustStorm-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-dustStorm-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dustStorm-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-dustStorm-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dustStorm-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-dustStorm-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dustStorm-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-dustStorm-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.rockWall",
+      "label": "岩石壁壘",
+      "entry": ".skill-row-detail-link showSkillDetail(rockWall)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-rockWall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-rockWall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-rockWall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-rockWall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-rockWall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-rockWall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-rockWall-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-rockWall-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.earthShield",
+      "label": "萬象土盾",
+      "entry": ".skill-row-detail-link showSkillDetail(earthShield)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthShield-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthShield-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthShield-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthShield-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthShield-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthShield-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthShield-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthShield-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.barrier",
+      "label": "結界",
+      "entry": ".skill-row-detail-link showSkillDetail(barrier)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "有問題",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-barrier-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-barrier-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-barrier-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-barrier-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-barrier-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-barrier-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "有問題",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-barrier-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-barrier-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
+    },
+    {
+      "id": "detail.skill.earthEX",
+      "label": "土元素EX",
+      "entry": ".skill-row-detail-link showSkillDetail(earthEX)",
+      "owner": "js/00-main.js show/close;js/60-v173.64-skill-progression-rebalance.js display;css/23,49",
+      "status": "部分已實際驗證",
+      "states": [
+        "未學習/等級前置鎖定時詳情可讀",
+        "首開",
+        "全文捲末",
+        "關閉",
+        "重開回頂",
+        "元素正式中文",
+        "已學其他等級仍未驗"
+      ],
+      "operations": [
+        "真入口",
+        "真觸控全文",
+        "真關閉重開"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-earthEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/360x640-report.full.json.gz"
+        },
+        "393x873": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-earthEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/393x873-report.full.json.gz"
+        },
+        "412x915": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-earthEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/412x915-report.full.json.gz"
+        },
+        "1280x800": {
+          "status": "部分已實際驗證",
+          "head": "be598b486010157f3a707718458ecd2aa255adcf",
+          "after": [
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthEX-top.png",
+            "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-earthEX-end.png"
+          ],
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.json",
+          "rawInteraction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/1280x800-report.full.json.gz"
+        }
+      },
+      "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-base/independent-reviews.json",
+      "remaining": [
+        "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+        "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+        "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ]
     }
   ],
   "segmentReviews": [
