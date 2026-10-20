@@ -4903,6 +4903,40 @@
             "Six restore fields only; baseline after startup/module initialization before actor seed, not all private caches/selection/save API restoration",
             "Known tall duplicate header and white-background weapon artwork remain polishing candidates, not new logic regressions"
           ]
+        },
+        {
+          "state": "Single centered two-line comparison heading with original font sizes and symmetric tracks",
+          "status": "已實際驗證",
+          "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33b-centered-compact-header",
+          "reports": [
+            {
+              "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+              "viewport": "360x640",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33b-centered-compact-header\\360x640\\report.json"
+            },
+            {
+              "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+              "viewport": "393x873",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33b-centered-compact-header\\393x873\\report.json"
+            },
+            {
+              "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+              "viewport": "412x915",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33b-centered-compact-header\\412x915\\report.json"
+            },
+            {
+              "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+              "viewport": "1280x800",
+              "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33b-centered-compact-header\\1280x800\\report.json"
+            }
+          ],
+          "limits": [
+            "Shared header delta only, one weapon current-occupied fixture per viewport; five slots retain segment33 evidence",
+            "Six exact restore fields only, after-startup/module-init baseline; physical devices/private caches/transactions unverified",
+            "Ring formal definition and legal filled long affixes remain unverified",
+            "White-background weapon source art retained per existing EQUIPMENT_CATALOG Owner, visual quality limitation not fixed by CSS"
+          ]
         }
       ],
       "reviews": {
@@ -26561,6 +26595,18 @@
         "No wear/sell/lock/source or live transaction/physical-device acceptance",
         "Six restore fields only; baseline after startup/module initialization before actor seed, not all private caches/selection/save API restoration",
         "Known tall duplicate header and white-background weapon artwork remain polishing candidates, not new logic regressions"
+      ]
+    },
+    {
+      "segment": "segment-33b-centered-compact-header",
+      "head": "15935625a2b75b758b1ddadb8bb8a8220174f74d",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment33b-centered-compact-header",
+      "result": "原標題Owner精簡重複標題；四尺寸實圖與操作限定通過",
+      "pending": [
+        "Shared header delta only, one weapon current-occupied fixture per viewport; five slots retain segment33 evidence",
+        "Six exact restore fields only, after-startup/module-init baseline; physical devices/private caches/transactions unverified",
+        "Ring formal definition and legal filled long affixes remain unverified",
+        "White-background weapon source art retained per existing EQUIPMENT_CATALOG Owner, visual quality limitation not fixed by CSS"
       ]
     }
   ],

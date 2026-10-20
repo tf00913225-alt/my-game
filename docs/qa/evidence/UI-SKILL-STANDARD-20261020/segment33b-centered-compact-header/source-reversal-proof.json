@@ -1,0 +1,22 @@
+{
+  "base": "bb6f96e201dd97a3c519a5fc6185ab9e41b9ad73",
+  "scope": "Only duplicate heading removal/shorter unchanged slot semantics; no callbacks/data/values/font sizes/geometry changed; unused small rule retired",
+  "rows": [
+    {
+      "file": "js/55-v173.51-inventory-qa.js",
+      "old": "<small>裝備對照</small><b>裝備比較</b><span>同部位對照・",
+      "next": "<b>裝備對照</b><span>部位・",
+      "reversibleWholeSourceExact": true,
+      "before": "563d1fdee45b625d80192e668c61e5f3f2ed5f43fe5a2cc7c71f20848c7e333b",
+      "after": "61ac2fe4b5e6bb370be6f6c8c464669b1b8aa1e8301badfbad058ec96203ecac"
+    },
+    {
+      "file": "css/53-v173.51-qa.css",
+      "old": "#game-ui #itemModal .v17351-compare-header small{color:#8f7956!important;font:700 calc(16 * var(--ui-length-unit,1px))/1.6 \"Noto Serif TC\",serif!important;letter-spacing:.12em!important}\n",
+      "next": "",
+      "reversibleWholeSourceExact": true,
+      "before": "035eb1593a9b64e9b3f0ce84b285ce161565097b6fff863348a5bb50576fd85f",
+      "after": "10db2d45f0f9803643bab81b351c1e37c75f47d34da50bc45294b8c6da1ab4ba"
+    }
+  ]
+}
