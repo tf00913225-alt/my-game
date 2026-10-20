@@ -3,6 +3,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
+const vm=require("node:vm");
 
 const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
@@ -75,8 +76,27 @@ function block(source,startToken,endToken){
 {
     assert.match(statusCss,/\.v143-status-icon\{[\s\S]*?width:24px;[\s\S]*?height:24px;[\s\S]*?flex:0 0 24px/);
     assert.match(v39,/const STATUS_ROTATION_MS=2000/);
-    assert.match(v39,/const shellStatus=type==="shield"\|\|type==="barrier"\|\|type==="earthShield"\|\|type==="rockWall"/);
-    assert.match(v39,/widthScale=\(regularEnemy\?1\.45:1\.40\)\*\(shellStatus\?1\.08:1\)/);
+    const profiles=block(v39,"    const STATUS_BODY_PRESENTATION=","    const RAW_STATUS_VISUALS=");
+    const placement=block(v39,"    function placeStatusBodyVisual(","    function activeBodyStatusTypesForLayer(");
+    const context={};
+    vm.createContext(context);
+    vm.runInContext(profiles+placement+";this.profiles=STATUS_BODY_PRESENTATION;this.place=placeStatusBodyVisual;",context);
+    for(const type of ["shield","barrier","earthShield","rockWall"]){
+        assert.equal(context.profiles[type].anchor,"feet");
+        const properties={};
+        const node={dataset:{},style:{setProperty:(key,value)=>{ properties[key]=value; }}};
+        // Placement consumes the measured snapshot, never reading layout after a write.
+        const card={getBoundingClientRect(){ throw new Error("late status layout read"); }};
+        context.place(node,"monster",0,type,card,{slot:"enemy-0",rect:{left:0,top:0,width:100,height:120}},
+            {artworkProjection:{rect:{left:10,top:20,width:80,height:100}},hudSurface:{scaleX:1,scaleY:1}},
+            {left:0,top:0,width:100,height:120});
+        const profile=context.profiles[type];
+        assert.equal(parseFloat(node.style.width),Math.min(80*profile.width,94));
+        assert.equal(parseFloat(node.style.height),100*profile.height);
+        assert.equal(parseFloat(node.style.left),50);
+        assert.equal(parseFloat(node.style.top)+parseFloat(node.style.height)/2,120);
+        assert.equal(properties["--v143-status-opacity-max"],String(profile.max));
+    }
     assert.doesNotMatch(statusCss,/\.v143-status-icon\{[^}]*transform:scale\(/);
 }
 

@@ -181,12 +181,37 @@ function currentSprite(runtime){
     runtime.context.v142PlaySkillAnimationFromBadge("monster","風起雲湧","wind",0,null,[2],{
         version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"all",actorIndex:0,targetId:null,targetIds:[2]
     });
+    const current=runtime.context.v143SkillAnimationState.current;
     const sprite=currentSprite(runtime);
-    assert.equal(sprite.dataset.placement,"battlefield");
-    assert.equal(sprite.dataset.areaId,"fixed-ally-zone");
-    assert.equal(sprite.style.left,"200px","all-target VFX stays centered on the complete formation");
+    assert.equal(current.targetType,"all","recipient artwork must not rewrite the formal all-target contract");
+    assert.equal(current.targetId,null);
+    assert.deepEqual(Array.from(current.targetIds),[2]);
+    assert.deepEqual(Array.from(current.targetIndexes),[2]);
+    assert.equal(sprite.dataset.placement,"single");
+    assert.equal(sprite.style.left,"320px","the sole contracted recipient owns its single-person storm");
     assert.equal(sprite.style.top,"350px");
-    assert.equal(sprite.dataset.geometrySlot,undefined);
+    assert.equal(sprite.dataset.geometrySlot,"PLAYER_2");
+}
+
+{
+    const runtime=loadRuntime();
+    runtime.context.v142PlaySkillAnimationFromBadge("monster","風起雲湧","wind",0,null,[0,2],{
+        version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"all",actorIndex:0,targetId:null,targetIds:[0,2]
+    });
+    const current=runtime.context.v143SkillAnimationState.current;
+    assert.equal(current.targetType,"all");
+    assert.equal(current.targetId,null,"an all-target badge keeps its null primary");
+    assert.deepEqual(Array.from(current.targetIds),[0,2],"the badge forwards the complete explicit recipient set");
+    assert.deepEqual(Array.from(current.targetIndexes),[0,2],"art topology must not infer or add the middle recipient");
+    const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
+    const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
+    assert.equal(sprites.length,2,"two formal recipients must each receive their own artwork");
+    assert.deepEqual(sprites.map(node=>node.dataset.geometrySlot).sort(),["PLAYER_0","PLAYER_2"]);
+    assert.deepEqual(sprites.map(node=>node.style.left).sort(),["320px","80px"]);
+    sprites.forEach(node=>{
+        assert.equal(node.dataset.placement,"single");
+        assert.equal(node.style.top,"350px");
+    });
 }
 
 const monsterAction=mainSource.slice(
