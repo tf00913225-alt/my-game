@@ -25939,7 +25939,7 @@ function renderHeroDetailContent(hero,data){
         content=`<div class="hero-profile"><div class="hero-profile-art">${heroPageArtwork(hero)}</div><div class="hero-profile-summary">
             <h3>${escape(hero.definition.name)}</h3><p>${escape(elementDatabase[hero.definition.element]?.name||hero.definition.element)}・${escape(hero.definition.role)}</p>
             <p>等級 ${hero.level===null?"—":"Lv."+hero.level}</p><p>星級 ${hero.account.stars} / ${window.FourSymbolsHeroCore.contract.maxStars}</p><p>專屬碎片 ${hero.account.specificFragments}</p>
-            <small>取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div></div>
+            </div><small class="hero-profile-acquisition">取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div>
             ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；完成取得條件後，需連線確認永久權益。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
             <section class="hero-page-section"><h3>永久取得</h3>
                 <p>${data.acquisition.ready?(hero.definition.acquisition.kind==="cumulativeLoginDay"?`累計登入 ${data.acquisition.loginCount} / 7 天（臺北日期，每日一次）`:data.acquisition.chapter?.phase==="completed"?"第一章線上取得資格已完成。":"需以線上章節票券完成第一章取得資格。"):"需連線確認登入與英雄取得紀錄。"}</p>
@@ -30970,7 +30970,7 @@ function renderHeroEquipment(hero,data){
     const id=hero.definition.heroId,equipment=characterEquipment['heroNpc:'+id];
     const button=(item,slot)=>`<button type="button" class="hero-equipment-item" data-hero="${heroPageHtml(id)}" data-uid="${heroPageHtml(item?.v141Uid||'')}" data-slot="${slot||''}"
         onclick="openHeroEquipmentItem(this.dataset.hero,this.dataset.uid,this.dataset.slot)" ${!data.editingAllowed?'disabled':''}>
-        ${item?FourSymbolsItemSlot.art(item.icon,item):'<span>＋</span>'}<span>${slot?({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+ '：':''}${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span></button>`;
+        ${item?FourSymbolsItemSlot.art(item.icon,item):'<span>＋</span>'}${slot?'<span class="hero-equipment-slot-label">'+({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+'</span>':''}<span>${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span></button>`;
     return `<section class="hero-page-section hero-equipment-section"><h3>裝備</h3><div class="hero-equipment-slots">${Object.entries(equipment).map(([slot,item])=>button(item,slot)).join('')}</div>
         <h3>共用背包裝備</h3><p>穿戴、替換或脫下均使用同一背包；其他角色已穿戴的裝備需先脫下。</p>
         <div class="hero-equipment-bag">${inventoryItems.filter(item=>getInventoryEquipmentSlot(item.type)).map(item=>button(item,null)).join('')||'<p>背包沒有可穿戴裝備。</p>'}</div></section>`;
