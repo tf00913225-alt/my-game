@@ -68,6 +68,12 @@
     background:linear-gradient(180deg,rgba(51,35,18,.96),rgba(19,13,8,.9));
 }
 
+#game-stage .gameplay-panel-header > div{
+    flex:1 1 0;
+    min-width:0;
+    text-align:center;
+}
+
 #game-stage .gameplay-panel-header small{
     display:block;
     margin-bottom:1px;

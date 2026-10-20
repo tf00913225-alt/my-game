@@ -67,42 +67,122 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-baseline.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-scrolled.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-baseline.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-scrolled.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-baseline.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-scrolled.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-baseline.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-scrolled.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
       "baselineEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-69b377c7-7d48-4f46-a4e8-4e192fa3c226.png",
       "notes": "已讀使用者原圖；保留品質。未對任何裝置或操作批准。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "水元素未學習列表及空裝備槽",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-baseline.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "單指捲動技能列表",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/skill-scrolled.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "home.character",
@@ -389,7 +469,7 @@
       "label": "元素匣／自動戰鬥設定",
       "entry": "openHomeFeature('autoBattleSettings')",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "首次開啟",
         "切頁返回",
@@ -405,41 +485,152 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-d6a57f84-f459-41b4-bbd7-fe646b8e435f.png",
       "notes": "普通金框與技能頁不一致；AUTO COMBAT術語待統一。",
-      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
-      "stateEvidence": [],
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "stateEvidence": [
+        {
+          "state": "頂部標題與中文戰鬥策略文字完整",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "角色自訂選單打開及原label再次點擊關閉",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "單指內容捲至回城開關和元素匣剩餘時間、header返回",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
       }
     },
@@ -954,7 +1145,7 @@
       "label": "經驗池分配",
       "entry": "openHomeFeature('character'); switchCharacterTab('expPool')",
       "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "0經驗",
         "不足升級",
@@ -977,41 +1168,152 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-zero-one-character.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-zero-one-character.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-zero-one-character.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-zero-one-character.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b6c10a0e-030b-433d-b87a-e4d59687a90a.png",
       "notes": "共用經驗池主標題被TAB下緣遮裁；資訊與操作層級不足。",
-      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
-      "stateEvidence": [],
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "stateEvidence": [
+        {
+          "state": "0經驗、1名Lv1角色、Lv20前未啟動",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-zero-one-character.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-zero-one-character.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-zero-one-character.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-zero-one-character.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "Lv70雙角色、持續充能、少量經驗不足升級之呈現",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "技能捲動後切入回頂，標題完整",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
       }
     },
@@ -1020,7 +1322,7 @@
       "label": "能力值",
       "entry": "openHomeFeature('character'); switchCharacterTab('status')",
       "owner": "index.html; js/00-main.js; css/00-main.css; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "0點",
         "有點可加",
@@ -1040,41 +1342,216 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-preview.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-preview.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-preview.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-preview.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-bottom-zero.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b3acaf9c-4a1f-4891-a9df-49b98b18e42d.png",
       "notes": "±過窄，文字與操作區比例失衡；頂部只見SP，須查捲動狀態。",
-      "verification": "已實看使用者原圖；原圖裝置尺寸與提交未提供，不能當本輪操作或修後證據。",
-      "stateEvidence": [],
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "stateEvidence": [
+        {
+          "state": "有點可加：攻擊預覽10→11",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-preview.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-preview.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-preview.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-preview.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "暫配可減：攻擊撤回11→10",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "0點：攻擊加點拒絕、確認按鈕禁用",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "六列捲動至敏捷、底部完整",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-bottom-zero.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "切TAB返回頂部HP/SP可見",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
       }
     },
@@ -1145,7 +1622,7 @@
       "label": "角色TAB捲動與切換",
       "entry": "技能捲到底→經驗池→能力值→技能→關閉重開",
       "owner": "index.html; js/00-main.js; js/18-stage-v64-character-touch-action-runtime.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "頂部開啟",
         "中段切頁",
@@ -1163,47 +1640,159 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "技能捲動→經驗池回頂",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/exp-charge-after-scrolled-skill.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "能力值捲末→技能→能力值回頂",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attributes-tab-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "屬性說明關閉及角色頁header返回命中",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "detail.help",
       "label": "能力值說明",
       "entry": "showStatusHelp()",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "有問題",
       "states": [
         "短內容",
         "長內容",
@@ -1220,40 +1809,89 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/attribute-help.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "六屬性說明及關閉可讀、真touch關閉",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/attribute-help.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "可讀/可關閉通過；視覺密度問題待修",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。",
+      "notes": "r3四裝置實畫：六屬性及關閉完整可讀，但仍普通金框、內容下有大片空白，未達技能頁美術/內容密度標準；下一段待修。"
     },
     {
       "id": "detail.skill-detail",
@@ -2550,7 +3188,7 @@
       "label": "鍛造 reforge",
       "entry": "openHomeFeature('forge'); v141SwitchForgeTab('reforge')",
       "owner": "js/36-v141-content-systems.js; css/38-v141-system-expansion.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "無裝備",
         "多裝備",
@@ -2571,40 +3209,88 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-before-rules.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-before-rules.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-before-rules.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-before-rules.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "裝備正式選取、材料/金幣不足呈現，規則關閉後identity保持",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-before-rules.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-before-rules.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-before-rules.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-before-rules.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "forge.socket",
@@ -2672,7 +3358,7 @@
       "label": "冶煉規則",
       "entry": "v141ShowAffixInfo()",
       "owner": "js/36-v141-content-systems.js; css/33-v132-content-expansion.css",
-      "status": "有問題",
+      "status": "已修改",
       "states": [
         "六階材料",
         "長規則",
@@ -2690,42 +3376,154 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-rules-top.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-rules-end.png",
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-rules-top.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-rules-end.png",
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-rules-top.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-rules-end.png",
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "before": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-rules-top.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-rules-end.png",
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-return.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
       "beforeEvidence": "C:/Users/User/AppData/Local/Temp/codex-clipboard-b8cf058f-d363-4b76-bdc2-9466c58b3608.png",
       "notes": "已實看原圖：返回蓋住桃紅材料及下方規則。尚無本輪裝置/修後證據。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "六階材料和長說明頂部完整",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-rules-top.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-rules-top.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-rules-top.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-rules-top.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "單指捲至最終機率段、footer不覆蓋",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-rules-end.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-rules-end.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-rules-end.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-rules-end.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        },
+        {
+          "state": "由正式鍛造規則入口開啟、返回同選定裝備identity",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/reforge-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/reforge-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/reforge-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/reforge-return.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "synthesis.talisman",
@@ -3635,7 +4433,7 @@
       "label": "自動戰鬥 character",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "選單展開",
         "已選取",
@@ -3655,40 +4453,88 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "單角已選取及兩個尚未創建項目、選單打開關閉",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-character-menu.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "auto.strategy",
@@ -3875,7 +4721,7 @@
       "label": "自動戰鬥 return",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "選單展開",
         "已選取",
@@ -3895,47 +4741,95 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "補品耗盡返回主城開關在捲動末段完整可見；未切換開關",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "auto.element-box",
       "label": "自動戰鬥 element-box",
       "entry": "openHomeFeature('autoBattleSettings'); 正式設定控制",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "選單展開",
         "已選取",
@@ -3955,40 +4849,88 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": [
+            "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png"
+          ],
+          "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json",
+          "remaining": "原states未被stateEvidence明確涵蓋者仍未檢查；非真實手機硬體驗收。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "零剩餘時間/觀看廣告控制文字完整可見；未觀看廣告",
+          "status": "已實際驗證",
+          "scope": "呈現/觸控及腳本明確斷言範圍",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/360x640/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/393x873/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/412x915/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "artifacts/ui-skill-standard/segment-1-r3/1280x800/auto-settings-bottom.png",
+              "interaction": "artifacts/ui-skill-standard/segment-1-r3/1280x800/report.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
-        "interaction": null,
+        "interaction": {
+          "reviewer": "interaction_review",
+          "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+          "result": "第一段已覆蓋原症狀通過，整項仍部分未驗",
+          "evidence": "四裝置68張圖實看與4份report/腳本操作斷言核對",
+          "limits": "Chromium視窗/觸控模擬；不批准未操作之業務狀態、真實手機硬體、部署或全介面完成。"
+        },
         "scope": null
-      }
+      },
+      "verification": "第一段r3固定Head部分驗證；詳見stateEvidence，不能等同整項全部狀態驗收。"
     },
     {
       "id": "auto.apply",
@@ -8343,6 +9285,33 @@
         "scope": null
       }
     }
+  ],
+  "segmentReviews": [
+    {
+      "segment": "segment-1-r3",
+      "head": "ddf63ff5270231227e61fdd10f5062d3cb9ec742",
+      "cleanSnapshot": true,
+      "reviewer": "interaction_review",
+      "screenshotsReviewed": 68,
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "result": "已覆蓋原症狀及互動通過；不是全介面品質完成",
+      "resolvedPreviousGaps": [
+        "真0EXP/Lv1單角",
+        "角色選單關閉後auto實際捲至回城/元素匣",
+        "從鍛造開規則並返回同裝備identity"
+      ],
+      "remaining": [
+        "EXP升級預覽/確認/底部操作未驗",
+        "auto策略/補品閾值選單、切換回城開關、套用/廣告未操作",
+        "能力值六項各自長按/大數值/戰鬥鎖定未驗",
+        "屬性說明框美術與內容密度仍有問題",
+        "其它台帳項目仍未檢查"
+      ]
+    }
   ]
 }
-

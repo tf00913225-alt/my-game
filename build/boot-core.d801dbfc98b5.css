@@ -6950,6 +6950,7 @@ body.creation-fixed-active{
 
 #creationSkillDetailModal .creation-skill-detail-heading{
     min-width:0;
+    text-align:center;
 }
 
 #creationSkillDetailModal .creation-skill-detail-name{
