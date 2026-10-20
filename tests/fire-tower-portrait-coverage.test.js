@@ -39,7 +39,7 @@ const context={
     balanceCalls.push({floor,element,rank,role,portraitKey});
     return {name,element,rank};
   },
-  configureBossSkills(){},applyTowerElementProfile(){},applyTowerChallengeProfile(){}
+  configureTowerSkills(){},applyTowerElementProfile(){},applyTowerChallengeProfile(){}
 };
 vm.runInNewContext(['towerPortraitAssetId','bindTowerMonsterIdentity','buildTowerTroop','buildTowerBossMonster'].map(factorySource).join("\n"),context);
 for(const [role,floor,slot,expectedKey] of [
