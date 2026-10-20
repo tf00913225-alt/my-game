@@ -62,6 +62,12 @@ function recoveryAuditAssemblyUsage(token){
     return Object.freeze({bytes:state.bytes,reservedBytes:state.reserved,nodes:state.nodes,operations:state.operations,
         passes:state.passes,elapsedMs:performance.now()-state.startedAt});
 }
+function admitRecoveryAuditAssemblyBytes(token,length){
+    const state=assemblyCharge(token);
+    if(!Number.isSafeInteger(length)||length<0)bad("assembly allocation length");
+    if(state.bytes+state.reserved+length>ASSEMBLY_LIMITS.bytes)
+        assemblyCharge(token,"bytes",length); // Sticky exhaustion before allocation.
+}
 function assemblyParsedNodes(row,token,depth=0){
     if(depth>LIMITS.depth*3+8)bad("parsed node or depth limit");
     assemblyCharge(token,"nodes",1);
@@ -167,20 +173,75 @@ function decodeInventoryPayload(bytes,assemblyBudget,reserved=false){
     return value(parsed);
 }
 const PATROL_PROOF_LIMITS=Object.freeze({bytes:2*1024*1024,chunkBytes:256*1024,chunks:8,reads:400,kernelReads:60,inventoryDocuments:4096,inventoryPages:317});
-function encodeProofPayload(payload,assemblyBudget){
-    const text=JSON.stringify(encodedValue(payload,0,{nodes:0},assemblyBudget));
+// Canonical syntax qualifications only, never source/proof/restore authority.
+// They are scoped to one original assembly token and never serialized.
+const indexedRawRows=new WeakMap();
+function proofPayloadEncoding(payload,assemblyBudget){
+    const tree=encodedValue(payload,0,{nodes:0},assemblyBudget),text=JSON.stringify(tree);
     assemblyCharge(assemblyBudget,"bytes",Buffer.byteLength(text,"utf8"));
     const bytes=Buffer.from(text,"utf8");
     if(!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
-    return bytes;
+    return {bytes,tree};
 }
-function decodeProofPayload(bytes,assemblyBudget,reserved=false){
+function encodeProofPayload(payload,assemblyBudget){return proofPayloadEncoding(payload,assemblyBudget).bytes;}
+function decodeProofPayloadInternal(bytes,assemblyBudget,reserved,indexRaw){
     if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.bytes)bad("Patrol proof payload size");
     assemblyDecodeBytes(assemblyBudget,bytes.length,reserved);
     let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("Patrol proof JSON");}
     if(assemblyBudget)assemblyParsedNodes(parsed,assemblyBudget);
     const result=value(parsed);
-    if(!encodeProofPayload(result,assemblyBudget).equals(bytes))bad("Patrol proof encoding");
+    const encoded=proofPayloadEncoding(result,assemblyBudget);
+    if(!encoded.bytes.equals(bytes))bad("Patrol proof encoding");
+    if(!indexRaw)return result;
+    if(result?.schemaVersion!==3||!Array.isArray(result.documents)||encoded.tree[0]!=="object")bad("raw document span shape");
+    // Walk the same canonical typed tree, not a second JSON parser or a search
+    // for matching text. UTF8 lengths include every preceding typed sibling.
+    let offset=Buffer.byteLength('["object",['),found=false;const spans=[];
+    for(const [position,entry] of encoded.tree[1].entries()){
+        if(position)offset++;
+        const [key,node]=entry;
+        if(key!=="documents"){
+            const text=JSON.stringify(entry);assemblyCharge(assemblyBudget,"bytes",Buffer.byteLength(text));
+            assemblyParsedNodes(entry,assemblyBudget);offset+=Buffer.byteLength(text);continue;
+        }
+        if(found||node[0]!=="array"||node[1].length!==result.documents.length)bad("raw document array span");
+        found=true;offset+=Buffer.byteLength('['+JSON.stringify(key)+',["array",[');
+        for(const [index,row] of node[1].entries()){
+            if(index)offset++;
+            const text=JSON.stringify(row),length=Buffer.byteLength(text);assemblyCharge(assemblyBudget,"bytes",length);
+            assemblyParsedNodes(row,assemblyBudget);
+            const raw=bytes.subarray(offset,offset+length);
+            if(raw.length!==length||!raw.equals(Buffer.from(text)))bad("raw document span differs");
+            spans.push(Object.freeze({start:offset,length,sha256:createHash("sha256").update(raw).digest("hex")}));offset+=length;
+        }
+        if(!bytes.subarray(offset,offset+3).equals(Buffer.from(']]]')))bad("raw document array closure");
+        offset+=3;
+    }
+    if(!found||offset+2!==bytes.length||!bytes.subarray(offset).equals(Buffer.from(']]')))bad("raw document framing");
+    assemblyCharge(assemblyBudget);
+    if(!assemblyBudgets.has(assemblyBudget))bad("raw row requires an assembly budget");
+    const qualified=spans.map((span,index)=>{
+        const qualification=Object.freeze({});
+        indexedRawRows.set(qualification,{budget:assemblyBudget,version:3,path:result.documents[index].path,
+            length:span.length,sha256:span.sha256});
+        return Object.freeze({...span,qualification});
+    });
+    return {payload:result,spans:Object.freeze(qualified)};
+}
+function decodeProofPayload(bytes,assemblyBudget,reserved=false){return decodeProofPayloadInternal(bytes,assemblyBudget,reserved,false);}
+function indexRawProofPayload(bytes,assemblyBudget,reserved=false){return decodeProofPayloadInternal(bytes,assemblyBudget,reserved,true);}
+function decodeIndexedRawProofRow(bytes,qualification,assemblyBudget){
+    assemblyCharge(assemblyBudget); // Sticky failure and real deadline precede hash/parse.
+    const row=indexedRawRows.get(qualification);
+    if(!row||row.budget!==assemblyBudget||row.version!==3||!Buffer.isBuffer(bytes)||bytes.length!==row.length)
+        bad("raw row qualification differs");
+    assemblyDecodeBytes(assemblyBudget,bytes.length,false);
+    if(createHash("sha256").update(bytes).digest("hex")!==row.sha256)bad("raw row bytes differ");
+    let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("raw row JSON");}
+    assemblyParsedNodes(parsed,assemblyBudget);
+    const result=value(parsed);
+    if(result?.path!==row.path)bad("raw row identity differs");
+    assemblyCharge(assemblyBudget);
     return result;
 }
 function inventoryDocumentMetadata(snapshot,namespace,assemblyBudget){
@@ -293,6 +354,25 @@ function prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditContro
     writeCandidateFrames(suffixBytes,0,suffix,token);assemblyCharge(token);
     return fixedCandidateEncoder(prefixBytes,suffixBytes,documents.length,prefix.length+suffix.length,token);
 }
+// Fixed original query surface shared by strict readonly verification modes.
+// No caller-supplied query evaluator or data-loader contract.
+function recoveryAuditQueryShapes(root){
+    const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
+    const queries=[],add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
+    for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
+    for(const name of ["uniqueClaims","grantOperations","ledgerEntries","pendingGrants","rewardEvents","operations",
+        "simulatedAdSources","patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
+        add(root.collection(name).limit(401),name,()=>true,401);
+    for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents","simulatedAdSources",
+        "patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
+        add(root.collection(name).limit(1),name,()=>true,1);
+    for(const [key,expected] of [["modeChanged",true],["schemaVersion",2],["resultOwner","forest-patrol-settlement"]])
+        add(root.collection("modeTimeEvents").where(key,"==",expected).limit(401),"modeTimeEvents",row=>field(row,key)===expected,401);
+    for(const name of ["operations","ledgerEntries"])
+        add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
+    add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
+    return queries;
+}
 function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBudget){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
@@ -387,19 +467,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
     }
     function rows(name){assemblyCharge(assemblyBudget,"operations",1);return Object.freeze(inventories.get(`${root.path}/${name}`).map(id=>document(`${root.path}/${name}/${id}`)));}
     const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
-    const add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
-    for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
-    for(const name of ["uniqueClaims","grantOperations","ledgerEntries","pendingGrants","rewardEvents","operations",
-        "simulatedAdSources","patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
-        add(root.collection(name).limit(401),name,()=>true,401);
-    for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents","simulatedAdSources",
-        "patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
-        add(root.collection(name).limit(1),name,()=>true,1);
-    for(const [key,expected] of [["modeChanged",true],["schemaVersion",2],["resultOwner","forest-patrol-settlement"]])
-        add(root.collection("modeTimeEvents").where(key,"==",expected).limit(401),"modeTimeEvents",row=>field(row,key)===expected,401);
-    for(const name of ["operations","ledgerEntries"])
-        add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
-    add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
+    queries.push(...recoveryAuditQueryShapes(root));
     const lookup=async reference=>{
         assemblyCharge(assemblyBudget,"operations",1);
         if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string")return document(reference.path);
@@ -437,5 +505,6 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
 }
 
 module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
+    chargeRecoveryAuditAssembly:assemblyCharge,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
     encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS};
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS};
