@@ -11594,7 +11594,8 @@
    V174 cleanup: official PNG Sprite Sheets/status loops only.
    Fixed Slot geometry owns battle coverage; its formal artwork projection
    anchors explicitly authored recipient effects within that same formation.
-   No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
+   Casts have no Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
+   Three persistent named buffs use the same status owner's CSS foot aura.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
     "use strict";
@@ -11750,15 +11751,15 @@
 
     const STATUS_BODY_PRESENTATION=Object.freeze({
         burn:{anchor:"feet",width:1.12,height:.66,min:.42,max:.64},
-        rage:{anchor:"body",width:1.08,height:.94,min:.60,max:.80},
+        rage:{anchor:"feet",width:1.12,height:.14,min:.44,max:.60,aura:"red"},
         stun:{anchor:"head",width:.9,height:.22,min:.70,max:.86},
         freeze:{anchor:"feet",width:1.18,height:1.06,min:.68,max:.68},
         petrify:{anchor:"feet",width:1.16,height:1.04,min:.72,max:.72},
-        dodgeSkill:{anchor:"feet",width:1.14,height:.55,min:.38,max:.58},
-        dinghaishenzhen:{anchor:"feet",width:1.12,height:.74,min:.40,max:.58},
+        dodgeSkill:{anchor:"feet",width:1.14,height:.13,min:.40,max:.58,aura:"green"},
+        dinghaishenzhen:{anchor:"feet",width:1.12,height:.12,min:.40,max:.58,aura:"blue"},
         shield:{anchor:"feet",width:1.12,height:.94,min:.52,max:.52},
-        earthShield:{anchor:"feet",width:1.16,height:.96,min:.56,max:.56},
-        rockWall:{anchor:"feet",width:1.18,height:.64,min:.58,max:.58},
+        earthShield:{anchor:"feet",width:1.12,height:1.08,min:.56,max:.56,shell:true},
+        rockWall:{anchor:"feet",width:1.14,height:1.10,min:.58,max:.58,shell:true},
         barrier:{anchor:"feet",width:1.14,height:.92,min:.48,max:.48},
         yuanZuBlessing:{anchor:"feet",width:1.10,height:.66,min:.42,max:.62},
         fireSoulResonance:{anchor:"feet",width:1.10,height:.78,min:.40,max:.60},
@@ -12382,6 +12383,16 @@
         node.style.backgroundImage='url("'+String(spec.src).replace(/"/g,"%22")+'")';
         node.style.backgroundSize="contain";
         node.style.backgroundPosition="center";
+        const profile=STATUS_BODY_PRESENTATION[type];
+        if(profile?.aura){
+            node.dataset.presentationRole="foot-aura";
+            node.dataset.auraColor=profile.aura;
+            node.style.backgroundImage="none";
+            const rise=document.createElement("span");
+            rise.className="v143-status-aura-rise";
+            if(typeof rise.setAttribute==="function"){rise.setAttribute("aria-hidden","true");}
+            node.appendChild(rise);
+        }else if(profile?.shell){node.dataset.presentationRole="outer-shell";}
         return node;
     }
 
@@ -12462,10 +12473,24 @@
         // Character art uses a wide transparent carrier; its height limits the
         // body frame. Normalized monster paint already has a tight source box.
         const bodyWidth=side==="player"?Math.min(portrait.width,portrait.height):portrait.width;
-        const width=Math.min(bodyWidth*profile.width,cardRect.width*.94);
-        const height=portrait.height*profile.height;
+        let width=Math.min(bodyWidth*profile.width,cardRect.width*.94);
+        let height=portrait.height*profile.height;
         const x=portrait.left+portrait.width/2;
         const bottom=portrait.bottom===undefined?portrait.top+portrait.height:portrait.bottom;
+        if(profile.shell){
+            const ownHud=geometry?.hudSafeRect;
+            const upperHud=pairedFrontHudRect&&pairedFrontHudRect.bottom<=bottom?pairedFrontHudRect:
+                ownHud&&ownHud.bottom<=portrait.top?ownHud:null;
+            const safeHeight=upperHud?Math.max(0,bottom-upperHud.bottom-2):portrait.height*profile.height;
+            // These existing sources are square. Actual contain size is this
+            // square budget; never claim a large carrier means a tall shell.
+            const size=Math.min(portrait.height*profile.height,cardRect.width*.94,safeHeight);
+            width=size;height=size;
+            node.dataset.shellPaintSize=String(size);
+            node.dataset.shellSourceAspect="1";
+            node.dataset.shellHeightCoverage=String(size/Math.max(1,portrait.height));
+            node.dataset.shellWidthCoverage=String(size/Math.max(1,bodyWidth));
+        }
         let y=profile.anchor==="feet"?bottom-height/2:portrait.top+portrait.height/2;
         if(profile.anchor==="head"){
             y=portrait.top-height*.35;
@@ -12539,7 +12564,7 @@
         let pairedFrontHudRect=null;
         const slot=String(anchor&&anchor.slot||"");
         if(side==="player"&&/^ALLY_B[123]$/.test(slot)&&
-           baseBodyTypes.concat(rotatingBodyTypes).some(type=>STATUS_BODY_PRESENTATION[type]?.anchor==="head")){
+           baseBodyTypes.concat(rotatingBodyTypes).some(type=>STATUS_BODY_PRESENTATION[type]?.anchor==="head"||STATUS_BODY_PRESENTATION[type]?.shell)){
             const frontIndex=window.FourSymbolsBattlefieldSlots?.getCharacterAtAllySlot?.("ALLY_F"+slot.slice(-1));
             if(Number.isInteger(frontIndex)){pairedFrontHudRect=readGeometry("player",frontIndex)?.hudSafeRect||null;}
         }

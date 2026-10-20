@@ -9,7 +9,7 @@
     "relic": 1,
     "total": 70
   },
-  "gate": "SCOPED_PRESENTATION_ACCEPTANCE_COMPLETE_STOP_ART_REFINEMENT",
+  "gate": "SCOPED_COMMERCIAL_PRESENTATION_PASS_STOP",
   "scope": "Commercial presentation acceptance within recorded source, target, HUD, timing and cleanup samples. This is a finite engineering/art gate, not a guarantee of every device, every frame or error-free gameplay.",
   "policy": "Passed items stop refinement. Only specific failed presentation portions were corrected. No additional CSS particle system or renderer.",
   "recordedHeads": [
@@ -725,17 +725,19 @@
       "kind": "status",
       "name": "怒火",
       "source": "assets/vfx/status/rage-aura-v2.webp",
-      "presentation": null,
+      "presentation": "same-owner CSS foot aura, sparse 2s rise",
       "placement": null,
       "mode": "pulse",
       "frames": null,
       "sourceSha256": "64886f9c879c23ee96b8f6acd9aac036d6dab890bf8d2c65bf8143f810167ba1",
-      "decision": "PASS_SCOPED_STATUS_STOP_REFINEMENT",
+      "decision": "USER_REDESIGN_USB_INDEPENDENT_PASS_STOP",
       "review": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json",
       "additionalReview": [
         "tools/vfx-commercial-sample/mixed-status-usb-review.json",
-        "tools/vfx-commercial-sample/status-profile-review-20261020.json"
-      ]
+        "tools/vfx-commercial-sample/status-profile-review-20261020.json",
+        "tools/vfx-commercial-sample/status-shell-aura-review-20261020.json"
+      ],
+      "sourceUsage": "Existing raster retained for detail icon; body background is none."
     },
     {
       "id": "frostbite",
@@ -827,17 +829,19 @@
       "kind": "status",
       "name": "閃躲術",
       "source": "assets/vfx/status/windwalk.webp",
-      "presentation": null,
+      "presentation": "same-owner CSS foot aura, sparse 2s rise",
       "placement": null,
       "mode": "pulse",
       "frames": null,
       "sourceSha256": "9ddbbe4ae7cd57ab4eaf8e551a22273b8ee7386e9d711d12604820dcb025b54f",
-      "decision": "PASS_SCOPED_STATUS_STOP_REFINEMENT",
+      "decision": "USER_REDESIGN_USB_INDEPENDENT_PASS_STOP",
       "review": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json",
       "additionalReview": [
         "tools/vfx-commercial-sample/mixed-status-usb-review.json",
-        "tools/vfx-commercial-sample/status-profile-review-20261020.json"
-      ]
+        "tools/vfx-commercial-sample/status-profile-review-20261020.json",
+        "tools/vfx-commercial-sample/status-shell-aura-review-20261020.json"
+      ],
+      "sourceUsage": "Existing raster retained for detail icon; body background is none."
     },
     {
       "id": "stealthSkill",
@@ -861,17 +865,19 @@
       "kind": "status",
       "name": "氣定神閒",
       "source": "assets/vfx/status/calm-mind.webp",
-      "presentation": null,
+      "presentation": "same-owner CSS foot aura, sparse 2s rise",
       "placement": null,
       "mode": "pulse",
       "frames": null,
       "sourceSha256": "dd0ca3d46880a28f130f41a1a6a34a6cadbaa82c4df004278d1d7c1677e51311",
-      "decision": "PASS_SCOPED_STATUS_STOP_REFINEMENT",
+      "decision": "USER_REDESIGN_USB_INDEPENDENT_PASS_STOP",
       "review": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json",
       "additionalReview": [
         "tools/vfx-commercial-sample/mixed-status-usb-review.json",
-        "tools/vfx-commercial-sample/status-profile-review-20261020.json"
-      ]
+        "tools/vfx-commercial-sample/status-profile-review-20261020.json",
+        "tools/vfx-commercial-sample/status-shell-aura-review-20261020.json"
+      ],
+      "sourceUsage": "Existing raster retained for detail icon; body background is none."
     },
     {
       "id": "defenseDown",
@@ -929,16 +935,17 @@
       "kind": "status",
       "name": "萬象土盾",
       "source": "assets/vfx/status/earth-shield.webp",
-      "presentation": null,
+      "presentation": "outer-shell behind portrait",
       "placement": null,
       "mode": "static",
       "frames": null,
       "sourceSha256": "a7b3b0be86cd76124573ddfa85c76563f2935792d0de5a7793c016b276ec4899",
-      "decision": "PASS_SCOPED_STATUS_STOP_REFINEMENT",
+      "decision": "USER_REDESIGN_USB_INDEPENDENT_PASS_STOP",
       "review": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json",
       "additionalReview": [
         "tools/vfx-commercial-sample/mixed-status-usb-review.json",
-        "tools/vfx-commercial-sample/status-profile-review-20261020.json"
+        "tools/vfx-commercial-sample/status-profile-review-20261020.json",
+        "tools/vfx-commercial-sample/status-shell-aura-review-20261020.json"
       ]
     },
     {
@@ -946,16 +953,17 @@
       "kind": "status",
       "name": "岩石壁壘",
       "source": "assets/vfx/status/rock-wall.webp",
-      "presentation": null,
+      "presentation": "outer-shell behind portrait",
       "placement": null,
       "mode": "static",
       "frames": null,
       "sourceSha256": "d8585409b4955ae84ff7a50231cf109725ae48eadb41c2dd5d51ec05b00df151",
-      "decision": "PASS_SCOPED_STATUS_STOP_REFINEMENT",
+      "decision": "USER_REDESIGN_USB_INDEPENDENT_PASS_STOP",
       "review": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json",
       "additionalReview": [
         "tools/vfx-commercial-sample/mixed-status-usb-review.json",
-        "tools/vfx-commercial-sample/status-profile-review-20261020.json"
+        "tools/vfx-commercial-sample/status-profile-review-20261020.json",
+        "tools/vfx-commercial-sample/status-shell-aura-review-20261020.json"
       ]
     },
     {
@@ -1070,7 +1078,7 @@
       "review": "tools/vfx-commercial-sample/relic-target-focus-usb-review-20261020.json"
     }
   ],
-  "integrationReviewStatus": "Relic target-only HUD, stoneBreakSky alpha-only edge, full-party rear stun HUD clearance and earthShield visual evidence passed independent and USB review. No remaining demonstrated local visual failure. Latest Head Required CI remains separate.",
+  "integrationReviewStatus": "Five user-reopened body statuses now passed USB3v3/6v6/reduced-motion and independent geometry/timing/engineering reviews; stop refinement. Static icons18/36 positive counts and cleanup0. Latest Head CI remains separate.",
   "integrationReview": "tools/vfx-commercial-sample/portrait-vfx-integration-review-20261020.json",
   "historicalRuntimeHead": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
   "historicalMergedHeadCompatibility": [

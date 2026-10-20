@@ -6,7 +6,7 @@ const vm=require('node:vm');
 const source=fs.readFileSync(path.join(__dirname,'../js/39-v143-skill-animation.js'),'utf8');
 const rect=(left,top,width,height)=>({left,top,width,height,right:left+width,bottom:top+height});
 function fn(name,next){return source.slice(source.indexOf('function '+name+'('),source.indexOf('function '+next+'('));}
-function node(){return {dataset:{},style:{setProperty(k,v){this[k]=v;}},setAttribute(){}};}
+function node(){return {dataset:{},children:[],appendChild(n){this.children.push(n);},style:{setProperty(k,v){this[k]=v;}},setAttribute(){}};}
 function runtime(){
   const c={Math,String,document:{createElement:node},STATUS_VISUAL_LAYERS:{HARD_CONTROL_BASE:4,ROTATING:5},statusVisual:(src,mode,bucket,extra)=>({src,mode,bucket,visualLayer:mode==='icon'?34:5,...extra})};
   vm.createContext(c);
@@ -61,7 +61,10 @@ test('21 status identities retain 14 varied body presentations, five icons and t
     const n=c.createBodyStatusVisual(type,spec);
     assert.equal(n.style.backgroundSize,'contain','whole source ratio remains visible, without cover cropping');
     assert.equal(n.style.backgroundPosition,'center');
-    assert.ok(n.style.backgroundImage.includes(spec.src));
+    if(c.profiles[type].aura){
+      assert.equal(n.style.backgroundImage,'none');assert.equal(n.dataset.presentationRole,'foot-aura');
+      assert.equal(n.children.length,1);assert.equal(n.children[0].className,'v143-status-aura-rise');
+    }else assert.ok(n.style.backgroundImage.includes(spec.src));
   }
 });
 test('sync never creates body nodes for icon-only or invisible states',()=>{
@@ -165,4 +168,74 @@ test('paired front HUD geometry shares the entire pre-write pass cache even when
   wrote=false;hudOffset=30;snapshots.length=0;c.syncStatusVisualEffects(false);
   assert.equal(snapshots.find(row=>row.index===0&&row.type==='stun').snapshot.pairedFrontHudRect.bottom,165,'next pass must refresh rather than reuse an earlier layout');
   assert.deepEqual([...reads.entries()].sort(),[[0,2],[4,2]]);
+});
+
+test('the three named buffs are low foot auras and keep their formal state identities',()=>{
+  const c=runtime();
+  for(const [type,color] of Object.entries({rage:'red',dodgeSkill:'green',dinghaishenzhen:'blue'})){
+    for(const side of ['player','monster']){
+      const result=place(c,type,side);
+      assert.ok(result.box.height<=result.art.height*.16,'aura must stay low, away from the face');
+      assert.ok(Math.abs(result.box.bottom-result.art.bottom)<1e-8);
+      const visual=c.createBodyStatusVisual(type,c.specs[type]);
+      assert.equal(visual.dataset.statusType,type);assert.equal(visual.dataset.auraColor,color);
+      assert.equal(visual.dataset.presentationRole,'foot-aura');assert.equal(visual.children.length,1);
+    }
+  }
+  assert.equal(c.profiles.fireCritical,undefined,'the attack must not become a persistent buff');
+  assert.equal(c.profiles.relicBuff,undefined,'aggregate relic/total stats must not invent a named buff');
+});
+
+test('existing square shell sources expand around narrow portraits but accurately report the HUD-limited contain result',()=>{
+  const c=runtime(),art=rect(100,100,60,100),cardRect=rect(50,0,150,260),geometry={artworkProjection:{rect:art},hudSafeRect:rect(50,70,150,24),hudSurface:{scaleX:1,scaleY:1}};
+  for(const type of ['earthShield','rockWall']){
+    const render=front=>{const n=c.createBodyStatusVisual(type,c.specs[type]);c.placeStatusBodyVisual(n,'monster',0,type,{}, {slot:'ENEMY_F1',rect:cardRect},geometry,cardRect,front);const w=parseFloat(n.style.width),h=parseFloat(n.style.height);return {n,w,h,top:parseFloat(n.style.top)-h/2,bottom:parseFloat(n.style.top)+h/2};};
+    const roomy=render();assert.equal(roomy.n.dataset.presentationRole,'outer-shell');assert.equal(roomy.w,roomy.h);
+    assert.ok(roomy.w>art.width*1.5,'source must no longer collapse to the narrow portrait width');
+    assert.ok(roomy.h>=art.height);assert.equal(roomy.bottom,art.bottom);assert.ok(roomy.top>=geometry.hudSafeRect.bottom+2);
+    assert.equal(roomy.n.style.backgroundSize,'contain');assert.ok(roomy.n.style.backgroundImage.includes(c.specs[type].src));
+    const tight=render(rect(50,90,150,30));assert.equal(tight.w,tight.h);assert.equal(tight.bottom,art.bottom);assert.ok(tight.top>=122);
+    assert.ok(Number(tight.n.dataset.shellHeightCoverage)<1,'a short HUD-limited square must be reported honestly, not called a full-height shell');
+    assert.equal(Number(tight.n.dataset.shellPaintSize),tight.w);
+  }
+});
+
+test('outer shells remain visible behind portrait paint while hard controls keep their foreground plane in three and six-unit layouts',async()=>{
+  const os=require('node:os'),{spawnSync}=require('node:child_process');
+  const {findChrome}=await import('../.github/scripts/runtime-browser-qa-support.mjs');
+  const css=fs.readFileSync(path.join(__dirname,'../css/40-v143-combat-dungeon-polish.css'),'utf8');
+  const fixed=fs.readFileSync(path.join(__dirname,'../css/fixed-slot-battlefield-rendering-v2.css'),'utf8');
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'status-shell-plane-'));
+  try{
+    const fixture=path.join(directory,'fixture.html');
+    fs.writeFileSync(fixture,`<!doctype html><style>${fixed}\n${css}</style><style>
+    /* Geometry is fixed for hit-testing; production CSS still owns all planes,
+       card isolation/transparency and role selectors. */
+    #battlePage{display:block!important} .v-fixed-ally-slot,.v-fixed-battle-slot{position:relative!important;width:120px!important;height:130px!important;display:inline-block!important}
+    .battle-player,.battle-monster{position:relative!important;width:120px!important;height:130px!important}
+    .v174-battle-art{left:35px!important;right:auto!important;top:20px!important;bottom:auto!important;width:50px!important;height:90px!important;background:red!important}
+    .v143-status-visual{left:60px!important;top:65px!important;width:110px!important;height:110px!important;background:gold!important;pointer-events:auto!important;opacity:1!important}
+    </style><div id="game-stage"><div id="app"><div id="game-content"><div id="battlePage" class="v-fixed-slot-render-v2"></div></div></div></div><script>
+    const records=[],page=document.getElementById('battlePage');
+    for(const count of [3,6]){page.replaceChildren();for(const side of ['player','monster'])for(let i=0;i<count;i++){
+      const slot=document.createElement('div');slot.className=side==='player'?'v-fixed-ally-slot':'v-fixed-battle-slot v-fixed-enemy-slot';
+      slot.innerHTML='<div class="'+(side==='player'?'battle-player':'battle-monster')+' v174-cardless-unit"><div class="v174-battle-art"></div><div class="v143-status-visual v143-status-visual--layer-rotating" data-presentation-role="outer-shell"></div></div>';page.appendChild(slot);
+      const card=slot.firstChild,art=card.firstChild,shell=card.lastChild;
+      for(const [key,value] of Object.entries({position:'fixed',left:(20+(i%3)*140)+'px',top:(20+(side==='player'?350:0)+Math.floor(i/3)*150)+'px',width:'120px',height:'130px'}))slot.style.setProperty(key,value,'important');
+      for(const [key,value] of Object.entries({left:'35px',right:'auto',top:'20px',bottom:'auto',width:'50px',height:'90px'}))art.style.setProperty(key,value,'important');
+      // Hit testing observes paint order only; real presentation stays inert.
+      art.style.setProperty('pointer-events','auto','important');shell.style.setProperty('pointer-events','auto','important');
+      const r=shell.getBoundingClientRect(),a=art.getBoundingClientRect(),hit=(x,y)=>document.elementFromPoint(x,y);
+      const center=hit(a.left+a.width/2,a.top+a.height/2)===art,edge=hit(r.left+2,r.top+r.height/2)===shell;
+      const before=[r.left,r.top,r.width,r.height];shell.removeAttribute('data-presentation-role');shell.className='v143-status-visual v143-status-visual--layer-hard-control-base';
+      const hardControl=hit(a.left+a.width/2,a.top+a.height/2)===shell,after=shell.getBoundingClientRect();
+      records.push({count,side,center,edge,hardControl,before,art:[a.left,a.top,a.width,a.height],artZ:getComputedStyle(art).zIndex,after:[after.left,after.top,after.width,after.height],background:getComputedStyle(card).backgroundColor,isolation:getComputedStyle(card).isolation});
+    }}
+    const out=document.createElement('pre');out.id='result';out.textContent=JSON.stringify(records);document.body.appendChild(out);
+    </script>`);
+    const result=spawnSync(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--window-size=1600,1200','--user-data-dir='+path.join(directory,'profile'),'--dump-dom','file:///'+fixture.replace(/\\/g,'/')],{encoding:'utf8',timeout:30000,maxBuffer:3e6});
+    assert.equal(result.status,0,result.stderr);const match=result.stdout.match(/<pre id="result">([^<]+)<\/pre>/);assert.ok(match,'browser must execute stacking checks');
+    const rows=JSON.parse(match[1]);assert.equal(rows.length,18);
+    for(const row of rows){assert.ok(row.center,'portrait must occlude shell front ribbons');assert.ok(row.edge,'shell perimeter must remain visible');assert.ok(row.hardControl,'freeze/petrify foreground must remain intact');assert.deepEqual(row.after,row.before,'plane change must not resize or move source');assert.equal(row.background,'rgba(0, 0, 0, 0)');assert.equal(row.isolation,'isolate');}
+  }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });

@@ -1,0 +1,72 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "scope": [
+    "earthShield",
+    "rockWall",
+    "rage",
+    "dodgeSkill",
+    "dinghaishenzhen"
+  ],
+  "status": "SCOPED_COMMERCIAL_PRESENTATION_PASS_STOP",
+  "device": "Samsung SM-N960F Android10, authorized USB",
+  "baseline": "../portrait-depth/artifacts/status-shell-aura-before/evidence.json",
+  "candidate": "../integration-usb/artifacts/status-shell-aura-side-rise/evidence.json",
+  "candidateBasis": "Temporary integration worktree has dirty source; its c72b4d2 Git HEAD is not the tested source identity. Served bundle fingerprints are in USB evidence; two changed visual Owners were normalized-byte matched to this branch.",
+  "normalizedSourceSha256": {
+    "js/39-v143-skill-animation.js": "9286e01f5147b4a995d67345a9696f4c7d595ba8d5f5737781e4dd82a779f3a2",
+    "css/40-v143-combat-dungeon-polish.css": "ce2e69a0b1f898098c2f064e6c5db2248ffdb96f564d8ad34d6100bef50ad9ab"
+  },
+  "shell": {
+    "decision": "STATIC_PASS_STOP",
+    "reviewer": "geometry_review",
+    "method": "Actual 3v3 and 6v6 physical USB PNG review: portrait occludes authored front ribbons, side/back perimeter remains visible, HP/SP clear.",
+    "implementation": "Existing square raster source, contain, feet anchor, cached HUD-limited fit. Semantic outer-shell plane0 behind portrait plane1; hard-control plane4 and rotating plane5 retained.",
+    "limit": "HUD-limited sources do not necessarily enclose every weapon or hair tip; actual rendered coverage is reported rather than inferred from carrier size."
+  },
+  "aura": {
+    "mapping": {
+      "rage": "red crit buff",
+      "dodgeSkill": "green dodge buff",
+      "dinghaishenzhen": "blue abnormal-status resistance buff"
+    },
+    "implementation": "One existing status node, low foot ring and two sparse CSS fine lines with one small point each; 2s cycle, no emitter timer or extra renderer.",
+    "timingReview": "timing_review PASS STOP: native720 video ~16.00→16.17s frames31→32, left blue-robed player outer x94 green fine line/point rises y834→826 then fades; red/blue share sparse outer path. Full6 remains clear. No more refinement."
+  },
+  "usbFunctional": {
+    "plans": [
+      "3 allies +3 enemies",
+      "6 allies +6 enemies",
+      "6+6 reduced-motion"
+    ],
+    "bodyNodesPerSingleStatus": [
+      6,
+      12,
+      12
+    ],
+    "iconNodesPerSample": [
+      18,
+      36,
+      36
+    ],
+    "iconEvidence": "Three actual icon-only states per formal HUD owner: frostbite/agilityDown/defenseDown. Positive counts required, all opacity1/animationnone/transformnone.",
+    "rotation": "Multiple representative types observed at 2.1s sample intervals under existing body cap",
+    "cleanup": "All three plans restore original entities and remove all body/icon nodes",
+    "reducedMotion": "No rise animation on either pseudo-element",
+    "videoLimit": "90s native recording; screenshot timestamps are authoritative for cases beyond recording interval."
+  },
+  "rejected": [
+    "First shell candidate retained foreground ribbons crossing body: replaced only shell plane.",
+    "Generated 1024x1536 transparent shells rejected before import: clear opening too narrow at HUD-safe height. No generated asset adopted.",
+    "First aura native video too faint: increased two lines' peak opacity and added two tiny points only.",
+    "First test had zero icons: added existing icon-only fixture states and positive per-owner assertions.",
+    "Second aura path remained obscured near feet/icons: moved only two rise paths to outer x10/90 and span height300%, no density or brightness increase."
+  ],
+  "focusedValidation": "Status presentation, status assets, battle UI followup and raster-owner suites PASS; build/build-check/diff-check PASS.",
+  "ci": "Latest committed Head required CI remains separate; no merge/main release claimed.",
+  "previousCandidate": "../integration-usb/artifacts/status-shell-aura-underlay/evidence.json",
+  "engineeringReview": "coverage_review PASS: actual named buff schema, original target/timing/lifecycle/cache, node cap, hard-control and other profiles preserved; no extra timer/renderer.",
+  "latestDevObserved": {
+    "sha": "a001eda41b9c2a49fd5e00c0c30303dbfb97fcc8",
+    "impact": "Only Cloud recovery/functions/session-emulator changes since prior3d0fa; no changed VFX/portrait Owner. Required CI and mergeability remain separate."
+  }
+}
