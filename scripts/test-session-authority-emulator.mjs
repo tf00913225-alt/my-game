@@ -43,6 +43,22 @@ if(process.env.GCLOUD_PROJECT!==project||process.env.FIRESTORE_EMULATOR_HOST!=="
 }
 const testApp=initializeApp({projectId:project},"session-authority-test");
 const db=getFirestore(testApp);
+function assertRecoveryFenceCommitOrder(probe,fence){
+    const valid=value=>value&&Number.isSafeInteger(value.seconds)&&
+        value.seconds>=-62135596800&&value.seconds<=253402300799&&
+        Number.isInteger(value.nanoseconds)&&value.nanoseconds>=0&&value.nanoseconds<1000000000;
+    const describe=value=>value?{seconds:value.seconds,nanoseconds:value.nanoseconds}:null;
+    const diagnostic=JSON.stringify({
+        probe:{createTime:describe(probe.createTime),updateTime:describe(probe.updateTime),
+            readTime:describe(probe.readTime),committedAt:describe(probe.get("committedAt"))},
+        fence:{createTime:describe(fence.createTime),updateTime:describe(fence.updateTime),
+            readTime:describe(fence.readTime),createdAt:describe(fence.get("createdAt"))}
+    });
+    const writerAt=probe.updateTime,fenceAt=fence.updateTime;
+    assert(valid(writerAt)&&valid(fenceAt),"Valid document commit metadata is required: "+diagnostic);
+    assert(writerAt.seconds<fenceAt.seconds||(writerAt.seconds===fenceAt.seconds&&writerAt.nanoseconds<=fenceAt.nanoseconds),
+        "An ordinary writer may commit only before audit begin, never after the active fence: "+diagnostic);
+}
 async function checkRecoveryArchive(uid,revision){
     const root=db.collection("serverUsers").doc(uid);
     const [archive,bundle]=await Promise.all([
@@ -3693,9 +3709,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(committedFence.get("status"),"active");
     if(writerResult.status==="fulfilled"){
         assert.equal(committedProbe.exists,true);
-        const writerAt=committedProbe.get("committedAt"),fenceAt=committedFence.get("createdAt");
-        assert(writerAt.seconds<fenceAt.seconds||(writerAt.seconds===fenceAt.seconds&&writerAt.nanoseconds<=fenceAt.nanoseconds),
-            "An ordinary writer may commit only before audit begin, never after the active fence");
+        assertRecoveryFenceCommitOrder(committedProbe,committedFence);
     }else{
         assert.match(writerResult.reason.message,/RECOVERY_AUDIT_MAINTENANCE/);
         assert.equal(committedProbe.exists,false,"Fence-first serialization commits no ordinary write");
@@ -3705,7 +3719,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await authority.runProtected(raceRequest(),tx=>{tx.set(probe,{afterCancel:true});});
     assert.equal((await probe.get()).get("afterCancel"),true);
     console.log("PASS recovery audit fence: actual absent-read SDK retry blocks later writes; zero/private writers, approval and maintenance scope; reads/original retries survive; real takeover/revoke and expired-approval source-loss cancel; canonical readiness stays false.");
-    console.log("PASS actual ordinary-writer versus begin race on missing fence: server commit timestamps or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
+    console.log("PASS actual ordinary-writer versus begin race on missing fence: document updateTime commit metadata or zero-write maintenance rejection prove serialization; cancel restores normal writes.");
 }
 
 // Real SDK inventory capture remains an internal, metadata-only audit segment.
@@ -3949,6 +3963,31 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>recovery.verifyRawRecoveryAuditCandidate(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS raw capture candidate actual SDK: original two-page bytes and native timestamps, complete chain through sole candidate encoder/original proofs, missing historical chunk refusal; candidate validity only, no trusted capture, restore or playable authority.");
+    // Exercise the private segmented verifier against these same committed
+    // SDK bytes. No new actor, scan, live transaction or public factory API.
+    const segmentedFilename=require.resolve("../functions/src/canonical-current-recovery.js"),segmentedModule=new Module(segmentedFilename);
+    segmentedModule.filename=segmentedFilename;segmentedModule.paths=Module._nodeModulePaths(
+        segmentedFilename.slice(0,Math.max(segmentedFilename.lastIndexOf("/"),segmentedFilename.lastIndexOf("\\"))));
+    const segmentedNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",segmentedSource=readFileSync(segmentedFilename,"utf8");
+    assert.equal(segmentedSource.split(segmentedNeedle).length,2);
+    segmentedModule._compile(segmentedSource.replace(segmentedNeedle,
+        "return Object.freeze({verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
+    assert.equal(Object.hasOwn(recovery,"verifySegmentedRawRecoveryProof"),false);
+    const segmentedOwner=segmentedModule.exports.createCanonicalCurrentRecovery(deps),segmented=await segmentedOwner.verifySegmentedRawRecoveryProof(rawMaterial);
+    assert.equal(segmented.segmentedProofValid,true);assert.equal(segmented.documentCount,candidate.documentCount);
+    assert.equal(segmented.absenceCount,candidate.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(segmented[flag],false);
+    for(const key of ["records","documents","artifactBytes","restorePermit"])assert.equal(Object.hasOwn(segmented,key),false);
+    assert.ok(Object.isFrozen(segmented));assert.ok(!Object.values(segmented).some(value=>Buffer.isBuffer(value)));
+    assert.equal(segmented.assemblyUsage.reservedBytes,0);assert.ok(segmented.assemblyUsage.bytes<=256*1024*1024);
+    assert.ok(segmented.assemblyUsage.nodes<=16000000);assert.ok(segmented.assemblyUsage.operations<=16384);
+    assert.equal(segmented.assemblyUsage.passes,1);assert.ok(segmented.assemblyUsage.elapsedMs<=30000);
+    assert.ok(segmented.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);
+    assert.ok(segmented.residentUsage.maxUnitReads<=60);assert.ok(segmented.residentUsage.maxUnitTypedBytes<=2*1024*1024);
+    assert.equal(segmented.residentUsage.copyChargedBytes,rawMaterial.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0));
+    await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
     assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);

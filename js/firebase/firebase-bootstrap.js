@@ -71,11 +71,14 @@ async function initializeLifecycle(){
     catch(error){ lifecyclePromise=null; throw error; }
 }
 async function resolveIdentity(){ await initializeLifecycle(); return identityPromise(); }
-async function resolveCloudSave(user){
+async function resolveCloudSave(user,options){
     const expectedUid=String(user&&user.uid||"");
     if(!expectedUid){ const error=new Error("Firebase identity is required before save resolution."); error.code="firebase/auth-required"; throw error; }
     const token=generation;
-    const result=await readCurrentCloudSave();
+    if(getSignedInUser()?.uid!==expectedUid){
+        const error=new Error("Firebase account changed before cloud-save resolution."); error.code="firebase/account-changed"; throw error;
+    }
+    const result=await readCurrentCloudSave(options);
     const latest=getSignedInUser();
     if(!latest||latest.uid!==expectedUid||token!==generation){
         const error=new Error("Firebase account changed during cloud-save resolution."); error.code="firebase/account-changed"; throw error;
