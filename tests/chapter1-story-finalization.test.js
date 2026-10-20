@@ -73,6 +73,11 @@ function runtime(saved,initialSave=true){
 }
 function finishDialogue(h){let guard=30;while(h.state().dialogue&&guard-->0)assert.equal(h.api.advanceDialogue(),true);assert.ok(guard>0);}
 function at(h,id){h.state().currentNodeId=id;h.state().onboarding={active:true,phase:"story",nodeId:"c1_01"};}
+function installCanonicalInventoryFilter(c){
+    const source=fs.readFileSync('js/00-main.js','utf8'),start=source.indexOf('function getFilteredInventoryItems('),end=source.indexOf('\nfunction ',start+1);
+    const retired=source.match(/const RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*?\]\);/);
+    assert.ok(start>=0&&end>start&&retired);vm.runInContext(retired[0]+'\n'+source.slice(start,end),c);
+}
 
 function installUi(h){
     const body={innerHTML:"",querySelector:()=>null};
@@ -167,11 +172,15 @@ function guideHarness(){
 }
 
 test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',()=>{
-    const h=guideHarness(),page=h.element(),tab=h.element(),sp=h.element(),hp=h.element();
-    h.c.battleActive=false;h.c.player={hp:30,sp:10};h.c.getPotionCount=id=>id==='spPotion10'?2:0;
-    h.view.tutorial.requiredAction='recovery';h.view.tutorialProgress.resources={maxHP:100,maxSP:40};tab.getAttribute=()=> 'true';
-    h.targets.set('#inventoryPage.active',[page]);h.targets.set('#inventoryCategoryTabs [data-filter="function"]',[tab]);
-    h.targets.set('#inventoryGrid [data-item-id="spPotion10"]',[sp]);h.targets.set('#inventoryGrid [data-item-id="hpPotion10"]',[hp]);
+    const h=guideHarness(),page=h.element(),tab=h.element(),sp=h.element(),hp=h.element(),wrongTab=h.element();
+    h.c.battleActive=false;h.c.player={hp:30,sp:10};h.c.inventoryItems=[{id:'spPotion10',type:'potion',count:2}];h.c.inventoryFilter='function';installCanonicalInventoryFilter(h.c);
+    h.c.getPotionCount=id=>h.c.inventoryItems.filter(i=>i.id===id).reduce((n,i)=>n+i.count,0);
+    assert.equal(h.c.getFilteredInventoryItems().length,0,'the original function category has no potions');
+    h.view.tutorial.requiredAction='recovery';h.view.tutorialProgress.resources={maxHP:100,maxSP:40};tab.getAttribute=()=>h.c.inventoryFilter==='item'?'true':'false';tab.action=()=>{h.c.inventoryFilter='item';};
+    h.targets.set('#inventoryPage.active',[page]);h.targets.set('#inventoryCategoryTabs [data-filter="item"]',[tab]);
+    const query=h.c.document.querySelectorAll;h.c.document.querySelectorAll=selector=>selector==='#inventoryGrid [data-item-id="spPotion10"]'?(h.c.getFilteredInventoryItems().some(i=>i.id==='spPotion10')?[sp]:[]):query(selector);
+    h.frame();assert.equal(h.dispatch('click',wrongTab).stopped,true);assert.equal(h.dispatch('click',sp).stopped,true);assert.equal(h.dispatch('click',tab).stopped,false);
+    assert.equal(h.c.getFilteredInventoryItems()[0].id,'spPotion10','the original item category exposes the stocked potion');
     h.frame();assert.equal(h.dispatch('click',sp).stopped,false);assert.equal(h.dispatch('click',hp).stopped,true);
     assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
 });
@@ -228,15 +237,18 @@ test('the final loaded v141 renderer marks exact item identity and its read-only
         FourSymbolsAccountSave:{accountKey:key=>'test:'+key},FourSymbolsItemSlot:{apply(){},neutralizeArt(){}},
         inventoryItems:Array.from({length:30},(_,i)=>({id:'armor-'+i,v141Uid:'gear-'+i,type:'armor',name:'護具'+i,count:1})),inventoryFilter:'equipment',
         renderInventoryItems(){throw Error('early renderer must be replaced');},rebuildInventorySlots(){},getInventoryRarityKey:()=> 'white',
-        openItemModal:index=>{opened=index;},setTimeout(){},clearTimeout(){},addEventListener(){},
+        openItemModal:index=>{opened=index;},setInventoryFilter:filter=>{c.inventoryFilter=filter;c.renderInventoryItems();},setTimeout(){},clearTimeout(){},addEventListener(){},
         document:{readyState:'loading',addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],getElementById:id=>id==='inventoryGrid'?grid:id==='v141InventoryPageLabel'?label:null,createElement:element}};
-    c.window=c;c.inventorySlots=c.inventoryItems;c.getFilteredInventoryItems=()=>c.inventoryItems;
-    vm.createContext(c);vm.runInContext(fs.readFileSync('js/35-v141-ui-battle.js','utf8'),c);
+    c.window=c;c.inventorySlots=c.inventoryItems;
+    vm.createContext(c);installCanonicalInventoryFilter(c);vm.runInContext(fs.readFileSync('js/35-v141-ui-battle.js','utf8'),c);
     c.renderInventoryItems();assert.equal(children.length,24);assert.equal(children[0].dataset.itemId,'armor-0');assert.equal(children[0].dataset.itemUid,'gear-0');
     assert.deepEqual({...c.v141LocateInventoryItem({uid:'gear-26'})},{page:1,currentPage:0,direction:1});assert.equal(label.textContent,'1 / 5');
     c.v141LocateInventoryItem({uid:'gear-26'});assert.equal(label.textContent,'1 / 5','location does not change the page');
     c.v141ChangeInventoryPage(1);assert.equal(label.textContent,'2 / 5');assert.equal(children[2].dataset.itemUid,'gear-26');
     assert.deepEqual({...c.v141LocateInventoryItem({uid:'gear-26'})},{page:1,currentPage:1,direction:0});children[2].onclick();assert.equal(opened,26);
+    c.inventoryItems=[{id:'hpPotion10',type:'potion',name:'回春散',count:2}];c.inventorySlots=c.inventoryItems;
+    c.setInventoryFilter('function');assert.equal(c.getFilteredInventoryItems().length,0);assert.equal(c.v141LocateInventoryItem({id:'hpPotion10'}),null);
+    assert.ok(children.every(child=>!child.dataset.itemId));c.setInventoryFilter('item');assert.equal(children[0].dataset.itemId,'hpPotion10');assert.equal(label.textContent,'1 / 5');
 });
 
 test("guide capture requires the real attack then target and releases locks when onboarding ends",()=>{

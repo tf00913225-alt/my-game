@@ -158,7 +158,7 @@ try{
             const prepare=async()=>{
                 const before=await observe();if(before.hp>=before.maxHP&&before.sp>=before.maxSP)return;
                 await tap('.adventure-back-button');await dismiss();
-                await tap('#inventoryNav');await tap('#inventoryCategoryTabs [data-filter="function"]');
+                await tap('#inventoryNav');await tap('#inventoryCategoryTabs [data-filter="item"]');
                 for(const resource of ['hp','sp']){
                     for(let used=0;used<24;used++){
                         const status=await observe(),max=resource==='hp'?status.maxHP:status.maxSP;if(status[resource]>=max)break;
@@ -169,7 +169,7 @@ try{
                             const transaction=await observe(),price=await client.eval(`Number(document.getElementById(${JSON.stringify('shopQuantity-'+id)}).dataset.unitPrice)`);
                             await tap(button);await wait(`document.querySelector('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:last-child')?.textContent==='確定購買'`,'normal shop confirmation');await tap('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:last-child');await dismiss();
                             const receipt=await observe();assert.equal(receipt.gold,transaction.gold-price);assert.equal(receipt.potions[id],transaction.potions[id]+1);purchases.push({id,price,beforeGold:transaction.gold,afterGold:receipt.gold});
-                            await tap('[onclick="closeHomeFeature()"]');await tap('#inventoryNav');await tap('#inventoryCategoryTabs [data-filter="function"]');item=id;
+                            await tap('[onclick="closeHomeFeature()"]');await tap('#inventoryNav');await tap('#inventoryCategoryTabs [data-filter="item"]');item=id;
                         }
                         const beforeUse=await observe(),selector='#inventoryGrid [data-item-id="'+item+'"]';await reveal(selector);await tap(selector);await tap('#v17342InventoryPotionUse');await dismiss();
                         const afterUse=await observe();assert.equal(afterUse.potions[item],beforeUse.potions[item]-1);assert.ok(afterUse[resource]>beforeUse[resource]);assert.ok(afterUse[resource]<=max);

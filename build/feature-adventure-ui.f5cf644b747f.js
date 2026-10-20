@@ -320,9 +320,9 @@
             if(o.requiredAction==="equipment"?p.equipmentReady:p.recoveryReady){
                 return step('#adventureTutorialReturn','操作完成，點這裡返回故事。');
             }
-            const filter=o.requiredAction==="equipment"?"equipment":"function";
+            const filter=o.requiredAction==="equipment"?"equipment":"item";
             const tab=visibleGuideTarget('#inventoryCategoryTabs [data-filter="'+filter+'"]');
-            if(tab?.getAttribute('aria-selected')!=="true"){return {target:tab,text:o.requiredAction==="equipment"?"先點「裝備」分類。":"先點「功能」分類，找到補品。"};}
+            if(tab?.getAttribute('aria-selected')!=="true"){return {target:tab,text:o.requiredAction==="equipment"?"先點「裝備」分類。":"先點「物品」分類，找到補品。"};}
             if(o.requiredAction==="equipment"){
                 return inventoryStep({uid:view.state.grantedEquipmentUid},'#inventoryGrid [data-item-uid="'+CSS.escape(view.state.grantedEquipmentUid||'missing')+'"]','點擊剛取得的護具，查看詳情。');
             }
@@ -342,7 +342,7 @@
             }
             const ready=o.requiredAction==="skill"?p.skillReady:o.requiredAction==="equipment"?p.equipmentReady:p.recoveryReady;
             if(o.requiredAction==="recovery"&&p.recoveryNeedsPractice){return step('#adventurePage [onclick*="continueTutorial"]','目前 HP／SP 都是滿的，先進戰練習，再實際用補品恢復。');}
-            return ready?step('#adventurePage [onclick*="continueTutorial"]','準備完成，現在回到原關挑戰。'):
+            return ready?step('#adventurePage [onclick*="continueTutorial"]',o.requiredAction==='recovery'?'準備完成，出發救援旅人。':'準備完成，現在回到原關挑戰。'):
                 step('#adventurePage [onclick*="openTutorialSystem"]',o.requiredAction==="skill"?"先前往技能頁，學會並裝上招式。":o.requiredAction==="equipment"&&!view.state.grantedEquipmentUid?"前往主城商店，練習購買護具。":"打開背包，跟著亮框操作。");
         }
         return step('#adventurePage .adventure-button.primary',view.panel==="node-reward"?"點這裡領取獎勵，再前往下一關。":"點這裡前往目前關卡。");
