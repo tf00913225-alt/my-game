@@ -133,7 +133,9 @@ test('metadata is bounded before retention/parse; media over 32MiB is destroyed 
 
 test('only attempted write transport ambiguity maps UNKNOWN_COMMIT; credentials/provider bodies never escape',async()=>{
     for(const [plan,code] of [[{status:412},'ALREADY_EXISTS'],[{status:408},'UNKNOWN_COMMIT'],[{status:429},'UNKNOWN_COMMIT'],
-        [{status:503},'UNKNOWN_COMMIT'],[{error:true},'UNKNOWN_COMMIT'],[{status:403},'PERMISSION_DENIED'],
+        [{status:503},'UNKNOWN_COMMIT'],[{status:503,headers:{'content-encoding':'gzip'}},'UNKNOWN_COMMIT'],
+        [{status:412,headers:{'content-encoding':'gzip'}},'ALREADY_EXISTS'],
+        [{error:true},'UNKNOWN_COMMIT'],[{status:403},'PERMISSION_DENIED'],
         [{status:400},'PROVIDER_REJECTED'],[{status:302},'PROVIDER_REJECTED']]){
         const h=harness([plan]);await refused(h.io.createOnly({...input,bytes,ifGenerationMatch:'0'}),code);assert.equal(h.calls.length,1);
     }

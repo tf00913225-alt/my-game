@@ -56,10 +56,10 @@ function operation(action){
                     const status=res.statusCode,encoding=res.headers["content-encoding"];
                     const rejectResponse=code=>{end(error(code));res.destroy();};
                     if(status===401||status===403){rejectResponse(status===401?"UNAUTHENTICATED":"PERMISSION_DENIED");return;}
-                    if(encoding!==undefined&&encoding!=="identity"){rejectResponse("DATA_LOSS");return;}
-                    if(status===404&&missing){end(null,null);res.destroy();return;}
                     if(write&&status===412){rejectResponse("ALREADY_EXISTS");return;}
                     if(write&&(status===408||status===429||status>=500)){rejectResponse("UNKNOWN_COMMIT");return;}
+                    if(encoding!==undefined&&encoding!=="identity"){rejectResponse("DATA_LOSS");return;}
+                    if(status===404&&missing){end(null,null);res.destroy();return;}
                     if(!((write&&(status===200||status===201))||(!write&&status===200))){rejectResponse("PROVIDER_REJECTED");return;}
                     const length=res.headers["content-length"];
                     if(length!==undefined&&(typeof length!=="string"||!/^\d+(?![\s\S])/.test(length)||length.length>8||
