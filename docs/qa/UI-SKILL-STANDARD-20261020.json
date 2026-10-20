@@ -9693,7 +9693,7 @@
       "label": "創角 step1",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -9747,6 +9747,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -9754,7 +9783,7 @@
       "label": "創角 element-fire",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -9808,6 +9837,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -9815,7 +9873,7 @@
       "label": "創角 element-water",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -9869,6 +9927,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -9876,7 +9963,7 @@
       "label": "創角 element-wind",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -9930,6 +10017,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -9937,7 +10053,7 @@
       "label": "創角 element-earth",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -9991,6 +10107,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -9998,7 +10143,7 @@
       "label": "創角 gender",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -10052,6 +10197,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -10059,7 +10233,7 @@
       "label": "創角 skill-detail",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -10145,6 +10319,35 @@
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
         }
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -10152,7 +10355,7 @@
       "label": "創角 step2",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -10206,6 +10409,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -10213,7 +10445,7 @@
       "label": "創角 stats",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -10267,6 +10499,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -10335,7 +10596,7 @@
       "label": "創角 cancel",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -10389,6 +10650,35 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-8",
+        "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment8-accepted",
+        "verified": [
+          "黑鐵主框／對稱標題與原配置",
+          "男女／四元素實際點選",
+          "配點加減／說明收合／切步返回",
+          "空名稱錯誤／長名稱／取消返回"
+        ],
+        "notVerified": [
+          "有效建立／真實帳號與雲端提交",
+          "鍵盤／processing與retry瀏覽器狀態",
+          "技能詳情實際入口（本次API開啟、真點關閉）",
+          "技能等級4～10捲動",
+          "實體裝置"
+        ],
+        "reviews": {
+          "art": "實看15張及四報告，限定通過",
+          "interaction": "四尺寸各19圖／38records，限定通過",
+          "scope": "CSS29及生成物／dev吸收diff與實圖，限定通過"
+        }
       }
     },
     {
@@ -11350,6 +11640,17 @@
         "深淵／副本標題帶及完整獎勵資料",
         "其他清單狀態",
         "最新Head CI與部署"
+      ]
+    },
+    {
+      "segment": "segment-8",
+      "head": "8433f93d451e3f9c0072c64c14f8df681e6f8130",
+      "result": "創角原CSS框／對稱標題與已列操作限定通過；非完整創角提交驗收",
+      "pending": [
+        "有效建立與雲端／鍵盤／pending retry",
+        "副本正式四類獎勵預覽縮窄與小字",
+        "其他清單未驗狀態",
+        "最新Head必要CI／部署"
       ]
     }
   ],
