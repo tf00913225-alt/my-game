@@ -669,6 +669,40 @@ async function completeRawMaterial(f,{id=auditId,epoch=1}={}){
         rawState:copy(f.h.data.get(f.root+'/proofState/current')),rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
 }
 const assembledRawBaselines=new Map();
+test('two genuine Forest wins recover but three exceed oneshot proof budget without losing earned sources; raw candidate stays non-authoritative',async t=>{
+    for(const battles of [2,3]){
+        const f=await fixture({battles,three:false,normal:true,currentLoss:false}),revision=f.h.revision;
+        const retained=()=>copy([...f.h.data].filter(([path])=>
+            !path.startsWith(f.h.root+'/recoveryAuditRuns/')&&!path.startsWith(f.h.root+'/recoveryAuditFence/')));
+        const original=retained();
+        assert.equal(f.tickets.length,battles);
+        assert.equal(original.filter(([path,row])=>path.startsWith(f.h.root+'/modeTimeEvents/')&&row.schemaVersion===2).length,battles*2);
+        assert.equal(original.filter(([path])=>path.startsWith(f.h.root+'/ledgerEntries/')).length,battles*2);
+        if(battles===3){
+            const material=await completeRawMaterial(f),writes=f.h.writes;
+            const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+            const candidate=await owner.verifyRawRecoveryAuditCandidate(material);
+            assert.equal(candidate.candidateProofValid,true);
+            for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(candidate[flag],false);
+            assert.equal(f.h.writes,writes);assert.deepEqual(retained(),original);
+        }
+        // Cancellation is an intended maintenance metadata update, not an
+        // earning/source mutation and not evidence of failed preservation.
+        await f.recovery.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'long-bound-cancel-000001'});
+        assert.deepEqual(retained(),original);
+        const before=copy([...f.h.data]),writes=f.h.writes;
+        const restore=()=>f.recovery.restoreCurrent(f.request(),{operationId:approvalId,expectedRevision:revision});
+        if(battles===2){
+            assert.equal((await restore()).restoredRevision,revision+1);
+        }else{
+            await assert.rejects(restore(),{code:'failed-precondition',message:'Recovery claim evidence exceeds the transaction budget.'});
+            assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.deepEqual(retained(),original);
+        }
+        t.diagnostic(JSON.stringify({battles,sourceRevision:revision,originalDocuments:original.length,
+            originalJsonBytes:Buffer.byteLength(JSON.stringify(original)),oneshot:battles===2?'restored':'proof-budget-refused'}));
+    }
+});
+
 async function longRawAssemblyFixture(currentLoss){
     if(!assembledRawBaselines.has(currentLoss))assembledRawBaselines.set(currentLoss,(async()=>{
         const f=await fixture({three:false,adStatus:'abandoned',currentLoss});return {f,material:await completeRawMaterial(f)};
