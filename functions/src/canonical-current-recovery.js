@@ -10,6 +10,7 @@ const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {verifySkillLearningEvidence,skillLearningEvidenceReadBudget}=require("./canonical-skill-learning");
+const {verifySkillLoadoutEvidence,skillLoadoutEvidenceReadBudget}=require("./canonical-skill-loadout");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
@@ -1177,7 +1178,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
                     fail("data-loss","A source operation overlaps economic evidence.");
                 }
-                if(value.kind==="canonical-current-recovery"){
+                if(value.kind==="skill-loadout"){
+                    await verifySkillLoadoutEvidence({tx:recoveryUnit(tx),root,uid,operationId:doc.id,currentRevision:expectedRevision,receipt:value,fail});
+                }else if(value.kind==="canonical-current-recovery"){
                     if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                        !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
                        !Number.isSafeInteger(value.restoredRevision)||
@@ -1442,7 +1445,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
-                (doc.get("kind")==="canonical-current-recovery"?8:
+                (doc.get("kind")==="skill-loadout"?skillLoadoutEvidenceReadBudget():doc.get("kind")==="canonical-current-recovery"?8:
                     doc.get("kind")==="forest-patrol-settlement"?0:
                     doc.get("kind")==="account-mode-time"?
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
