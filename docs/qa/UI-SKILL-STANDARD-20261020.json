@@ -3749,10 +3749,10 @@
     },
     {
       "id": "shop.potion",
-      "label": "商店補品",
+      "label": "商店：補品",
       "entry": "openHomeFeature('shop'); 點擊正式分類TAB",
-      "owner": "index.html; js/00-main.js; js/equipment-progression.js",
-      "status": "未檢查",
+      "owner": "js/40-v144-rules-and-abyss.js; js/51-v169-rpg-ui.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "可購買",
         "金幣不足",
@@ -3801,19 +3801,69 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "呈現與入口／清單末端／返回，fixture及失敗模擬見第13段",
+          "status": "已實際驗證",
+          "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-potion-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-potion-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-potion-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-potion-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-13",
+        "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+        "presentationHead": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
+        "reviews": {
+          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
+          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
+          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
+        },
+        "verified": [
+          "正式入口/TAB/確認取消及金幣變動拒絕（補品）",
+          "隔離sold/unavailable與特定QA storage failure",
+          "真touch/wheel清單/長文末端與返回",
+          "題牌保留／逐卡reforge零重疊／控件至少44screen"
+        ],
+        "notVerified": [
+          "成功購買／成功刷新／存檔交易",
+          "真帳號／實體手機",
+          "其他未列狀態"
+        ]
       }
     },
     {
       "id": "shop.equipment",
-      "label": "商店裝備",
+      "label": "商店：裝備",
       "entry": "openHomeFeature('shop'); 點擊正式分類TAB",
-      "owner": "index.html; js/00-main.js; js/equipment-progression.js",
-      "status": "未檢查",
+      "owner": "js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "可購買",
         "金幣不足",
@@ -3862,19 +3912,69 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "呈現與入口／清單末端／返回，fixture及失敗模擬見第13段",
+          "status": "已實際驗證",
+          "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-equipment-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-equipment-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-equipment-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-equipment-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-13",
+        "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+        "presentationHead": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
+        "reviews": {
+          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
+          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
+          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
+        },
+        "verified": [
+          "正式入口/TAB/確認取消及金幣變動拒絕（補品）",
+          "隔離sold/unavailable與特定QA storage failure",
+          "真touch/wheel清單/長文末端與返回",
+          "題牌保留／逐卡reforge零重疊／控件至少44screen"
+        ],
+        "notVerified": [
+          "成功購買／成功刷新／存檔交易",
+          "真帳號／實體手機",
+          "其他未列狀態"
+        ]
       }
     },
     {
       "id": "shop.refresh",
-      "label": "商店刷新確認",
+      "label": "商店刷新：無前置確認／失敗提示",
       "entry": "商店裝備TAB→刷新",
       "owner": "js/equipment-progression.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "可刷新",
         "不足",
@@ -3924,6 +4024,17 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "verification": "正式SHOP_UNLIMITED_REFRESH_TEST_MODE=true；刷新直接執行，沒有前置確認頁，該子狀態N/A。隔離QA key寫入失敗觸發正式失敗alert已真點；未成功刷新。",
+      "presentationEvidence": {
+        "segment": "segment-13",
+        "head": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
+        "reviews": {
+          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
+          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
+          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
+        }
       }
     },
     {
@@ -12879,6 +12990,144 @@
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
       }
+    },
+    {
+      "id": "shop.preview",
+      "label": "商店：裝備預覽",
+      "entry": "商店裝備真卡片預覽／獲取途徑按鈕",
+      "owner": "js/equipment-progression.js; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "閱讀",
+        "長內容",
+        "返回"
+      ],
+      "operations": [
+        "真入口",
+        "真末端捲動",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "呈現與入口／清單末端／返回，fixture及失敗模擬見第13段",
+          "status": "已實際驗證",
+          "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-equipment-preview.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-equipment-preview.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-equipment-preview.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-equipment-preview.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-13",
+        "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+        "presentationHead": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
+        "reviews": {
+          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
+          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
+          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
+        },
+        "verified": [
+          "正式入口/TAB/確認取消及金幣變動拒絕（補品）",
+          "隔離sold/unavailable與特定QA storage failure",
+          "真touch/wheel清單/長文末端與返回",
+          "題牌保留／逐卡reforge零重疊／控件至少44screen"
+        ],
+        "notVerified": [
+          "成功購買／成功刷新／存檔交易",
+          "真帳號／實體手機",
+          "其他未列狀態"
+        ]
+      }
+    },
+    {
+      "id": "item.acquisition",
+      "label": "物品獲取途徑",
+      "entry": "商店裝備真卡片預覽／獲取途徑按鈕",
+      "owner": "js/item-acquisition-registry.js; css/33-v132-content-expansion.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "閱讀",
+        "長內容",
+        "返回"
+      ],
+      "operations": [
+        "真入口",
+        "真末端捲動",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "呈現與入口／清單末端／返回，fixture及失敗模擬見第13段",
+          "status": "已實際驗證",
+          "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-acquisition-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/360x640-controls-639.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-acquisition-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/393x873-controls-639.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-acquisition-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/412x915-controls-639.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-acquisition-real-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted/1280x800-controls-639.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-13",
+        "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+        "presentationHead": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment13-accepted",
+        "reviews": {
+          "art": "四尺寸裝備及長文/規則末端、代表補品與彈窗實圖限定通過",
+          "interaction": "四尺寸原Owner真touch/wheel末端／hit／返回，44screen下限及逐卡零重疊",
+          "scope": "CSS原Owner修正／覆蓋退役；無JS／價格／交易變更，實圖限定通過"
+        },
+        "verified": [
+          "正式入口/TAB/確認取消及金幣變動拒絕（補品）",
+          "隔離sold/unavailable與特定QA storage failure",
+          "真touch/wheel清單/長文末端與返回",
+          "題牌保留／逐卡reforge零重疊／控件至少44screen"
+        ],
+        "notVerified": [
+          "成功購買／成功刷新／存檔交易",
+          "真帳號／實體手機",
+          "其他未列狀態"
+        ]
+      }
     }
   ],
   "segmentReviews": [
@@ -13115,6 +13364,16 @@
       "result": "原鑲嵌皮膚／標題保留，四尺寸實際相關呈現與操作限定通過；無production修改",
       "pending": [
         "商店裝備卡片文字與購買鈕重疊實證，待修",
+        "其他台帳未驗狀態",
+        "Latest Head Required CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-13",
+      "head": "639391f4245b0535c7d4aef35cca746bb244bc8a",
+      "result": "商店冶煉文字遮擋／44screen操作／原Owner收斂，四尺寸呈現與真末端限定通過",
+      "pending": [
+        "成就頁分頁捲動時標題與返回隨外框捲走，待原Owner處理",
         "其他台帳未驗狀態",
         "Latest Head Required CI／部署"
       ]

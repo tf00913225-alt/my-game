@@ -1,0 +1,97 @@
+{
+  "head": "8062139dbb7620c813ad0690bea12293b562f38e",
+  "dirty": false,
+  "equipment": {
+    "reforge": {
+      "x": 97,
+      "y": 256,
+      "width": 227,
+      "height": 18,
+      "top": 256,
+      "right": 324,
+      "bottom": 274,
+      "left": 97
+    },
+    "ink": {
+      "x": 97,
+      "y": 255.6666717529297,
+      "width": 49.40104675292969,
+      "height": 18.666671752929688,
+      "top": 255.6666717529297,
+      "right": 146.4010467529297,
+      "bottom": 274.3333435058594,
+      "left": 97
+    },
+    "buy": {
+      "x": 36,
+      "y": 272,
+      "width": 288,
+      "height": 42,
+      "top": 272,
+      "right": 324,
+      "bottom": 314,
+      "left": 36
+    },
+    "overlapHeight": 2,
+    "inkOverlap": 2.333343505859375,
+    "grid": "60px 54px 60px 54px 108px",
+    "align": "center"
+  },
+  "controls": [
+    {
+      "tag": "BUTTON",
+      "cls": "home-feature-close-btn",
+      "rect": {
+        "x": 262.75,
+        "y": 41,
+        "width": 68.25,
+        "height": 38,
+        "top": 41,
+        "right": 331,
+        "bottom": 79,
+        "left": 262.75
+      },
+      "hit": true,
+      "height": "114px",
+      "minHeight": "114px",
+      "headerVar": "calc(38 * 3px)"
+    },
+    {
+      "tag": "INPUT",
+      "cls": "shop-potion-quantity",
+      "rect": {
+        "x": 36,
+        "y": 343.796875,
+        "width": 48,
+        "height": 38,
+        "top": 343.796875,
+        "right": 84,
+        "bottom": 381.796875,
+        "left": 36
+      },
+      "hit": true,
+      "height": "114px",
+      "minHeight": "114px",
+      "headerVar": "calc(38 * 3px)"
+    },
+    {
+      "tag": "BUTTON",
+      "cls": "home-feature-buy-btn shop-potion-buy",
+      "rect": {
+        "x": 270,
+        "y": 341.796875,
+        "width": 54,
+        "height": 42,
+        "top": 341.796875,
+        "right": 324,
+        "bottom": 383.796875,
+        "left": 270
+      },
+      "hit": true,
+      "height": "126px",
+      "minHeight": "126px",
+      "headerVar": "calc(38 * 3px)"
+    }
+  ],
+  "scope": "DOM-only isolated account before; no transactions"
+}
