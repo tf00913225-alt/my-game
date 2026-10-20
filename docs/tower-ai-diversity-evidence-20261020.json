@@ -1,6 +1,5 @@
 {
   "workId": "TOWER-AI-DIVERSITY-20261020",
-  "sourceHead": "59296d18ff467f1994c2b3a4f22283c19669fcb7",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "method": "Formal launcher, initiative queue, round boundaries, skill/target/damage/status/heal owners and two-wave settlement; seeded RNG; virtual presentation clock; no human experience acceptance.",
   "independentRuntimePerBattle": true,
@@ -316,7 +315,8 @@
         "casts": 36,
         "matched": true
       }
-    ]
+    ],
+    "method": "Six-round actual enemy action sequences and HP/SP snapshots matched against the base sources, using formal mode builders/configuration and four RNG seeds; not full other-mode battle-completion or browser acceptance."
   },
   "browser": {
     "local": true,
@@ -324,5 +324,275 @@
     "result": "PASS",
     "artifact": "artifacts/browser-qa/tower-challenge.json",
     "humanExperienceAccepted": false
-  }
+  },
+  "runtimeSourceHead": "59296d18ff467f1994c2b3a4f22283c19669fcb7",
+  "simulationHarnessHead": "8acfe8de5ec9a2ac06c5b23f47052fd6a4eb3026",
+  "counting": "One active declaration per formal initiative identity; authored free fire follow-ups counted separately. Repetition is consecutive active skill declarations by the same entity, excluding normal attacks.",
+  "byElementAndFloor": [
+    {
+      "element": "fire",
+      "floor": 10,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 5,
+      "maxRounds": 7,
+      "meanRounds": 6.1875,
+      "counts": {
+        "normal": 189,
+        "flameSlash": 59,
+        "rage": 21,
+        "fireCritical": 54,
+        "fireRocket": 65,
+        "blazeSpell": 74,
+        "explosiveFlurry": 26,
+        "flameTornado": 44
+      }
+    },
+    {
+      "element": "fire",
+      "floor": 50,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 5,
+      "maxRounds": 8,
+      "meanRounds": 6.25,
+      "counts": {
+        "blazeSpell": 47,
+        "fireRocket": 60,
+        "flameSlash": 48,
+        "normal": 161,
+        "rage": 20,
+        "flameTornado": 36,
+        "phoenixCry": 57,
+        "fireCritical": 52,
+        "explosiveFlurry": 19,
+        "dragonSlash": 23
+      }
+    },
+    {
+      "element": "fire",
+      "floor": 100,
+      "cases": 16,
+      "wins": 16,
+      "losses": 0,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 10,
+      "meanRounds": 8.6875,
+      "counts": {
+        "flameTornado": 55,
+        "fireRocket": 67,
+        "normal": 122,
+        "dragonSlash": 29,
+        "flameSlash": 48,
+        "explosiveFlurry": 33,
+        "blazeSpell": 64,
+        "phoenixCry": 62,
+        "fireCritical": 67,
+        "rage": 35
+      }
+    },
+    {
+      "element": "earth",
+      "floor": 10,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 10,
+      "meanRounds": 9.0625,
+      "counts": {
+        "normal": 262,
+        "sandWind": 99,
+        "stoneThrow": 107,
+        "petrifyFist": 107,
+        "stoneSlash": 95,
+        "stoneBreakSky": 41,
+        "flyingSandStrike": 94
+      }
+    },
+    {
+      "element": "earth",
+      "floor": 50,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 11,
+      "meanRounds": 9.1875,
+      "counts": {
+        "sandWind": 82,
+        "normal": 254,
+        "stoneThrow": 97,
+        "stoneSlash": 88,
+        "stoneBreakSky": 29,
+        "flyingSandStrike": 98,
+        "dustStorm": 54,
+        "petrifyFist": 70,
+        "earthquakeCrush": 35
+      }
+    },
+    {
+      "element": "earth",
+      "floor": 100,
+      "cases": 16,
+      "wins": 16,
+      "losses": 0,
+      "unfinished": 0,
+      "minRounds": 9,
+      "maxRounds": 12,
+      "meanRounds": 10.25,
+      "counts": {
+        "flyingSandStrike": 82,
+        "stoneThrow": 101,
+        "stoneBreakSky": 30,
+        "petrifyFist": 71,
+        "earthquakeCrush": 36,
+        "sandWind": 105,
+        "dustStorm": 75,
+        "stoneSlash": 76,
+        "normal": 153
+      }
+    },
+    {
+      "element": "water",
+      "floor": 10,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 7,
+      "maxRounds": 9,
+      "meanRounds": 8.125,
+      "counts": {
+        "normal": 268,
+        "waterKnife": 84,
+        "waterBall": 88,
+        "frostPunch": 85,
+        "iceArrowRain": 71,
+        "iceSpin": 37,
+        "floodBeast": 72,
+        "freeze": 17
+      }
+    },
+    {
+      "element": "water",
+      "floor": 50,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 11,
+      "meanRounds": 9.3125,
+      "counts": {
+        "floodBeast": 96,
+        "waterBall": 92,
+        "waterKnife": 92,
+        "normal": 225,
+        "iceArrowRain": 81,
+        "iceSpin": 44,
+        "frostCrush": 28,
+        "healSpell": 36,
+        "frostPunch": 90,
+        "freeze": 16
+      }
+    },
+    {
+      "element": "water",
+      "floor": 100,
+      "cases": 16,
+      "wins": 16,
+      "losses": 0,
+      "unfinished": 0,
+      "minRounds": 10,
+      "maxRounds": 18,
+      "meanRounds": 12.1875,
+      "counts": {
+        "iceArrowRain": 103,
+        "frostPunch": 94,
+        "iceSpin": 34,
+        "waterKnife": 101,
+        "normal": 204,
+        "waterBall": 114,
+        "healSpell": 71,
+        "floodBeast": 120,
+        "freeze": 22,
+        "frostCrush": 39
+      }
+    },
+    {
+      "element": "wind",
+      "floor": 10,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 10,
+      "maxRounds": 11,
+      "meanRounds": 10.75,
+      "counts": {
+        "windHowlLightning": 87,
+        "normal": 323,
+        "stormCircle": 114,
+        "stormFist": 97,
+        "windSpell": 141,
+        "stormFlurry": 117,
+        "windCrossSlash": 53,
+        "dodgeSkill": 34
+      }
+    },
+    {
+      "element": "wind",
+      "floor": 50,
+      "cases": 16,
+      "wins": 0,
+      "losses": 16,
+      "unfinished": 0,
+      "minRounds": 11,
+      "maxRounds": 14,
+      "meanRounds": 12.25,
+      "counts": {
+        "stormCircle": 109,
+        "normal": 314,
+        "windSpell": 102,
+        "stormFist": 92,
+        "stormRain": 95,
+        "dodgeSkill": 42,
+        "windCrossSlash": 43,
+        "stormFlurry": 115,
+        "windHowlLightning": 93,
+        "dizzyFist": 42
+      }
+    },
+    {
+      "element": "wind",
+      "floor": 100,
+      "cases": 16,
+      "wins": 16,
+      "losses": 0,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 12,
+      "meanRounds": 9.5,
+      "counts": {
+        "normal": 128,
+        "stormRain": 63,
+        "windHowlLightning": 64,
+        "stormCircle": 66,
+        "windSpell": 82,
+        "stormFist": 65,
+        "dizzyFist": 31,
+        "stormFlurry": 65,
+        "windCrossSlash": 26,
+        "dodgeSkill": 34
+      }
+    }
+  ]
 }

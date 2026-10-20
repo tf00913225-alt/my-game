@@ -66,10 +66,12 @@ test('water ten-enemy pressure: each team quota counts declaration even if freez
  assert.equal(r.json('__declarations.filter(d=>d.round===2&&d.skillId==="freeze").length'),1);cleanup();
 });
 
-test('freeze MISS consumes one action and declaration, without retrying or double SP cost',()=>{
- setup();r.run(`monsters[0].skillIds=['freeze','waterKnife'];monsters[0].v141SupportSkillIds=[];monsters[0].skillChance=1;monsters[0].v175ForcedAttackSkillId='freeze';window.__savedHitRoll=rollHitChance;rollHitChance=()=>false;window.__spBefore=monsters[0].sp;`);
- attack(0);assert.equal(r.run('__finished'),1);assert.equal(r.json('__declarations.length'),1);assert.equal(r.json('__declarations[0].skillId'),'freeze');assert.equal(r.run('__spBefore-monsters[0].sp'),32);
- r.run('rollHitChance=__savedHitRoll;');round(2);assert.equal(r.run('FourSymbolsTowerSkillPolicy.allows(monsters[0],"freeze")'),false);cleanup();
+test('pure-control freeze uses resistance only; damaging skill MISS consumes one action and one SP cost',()=>{
+ setup();r.run(`monsters[0].skillIds=['freeze','waterKnife'];monsters[0].v141SupportSkillIds=[];monsters[0].skillChance=1;monsters[0].v175ForcedAttackSkillId='freeze';window.__savedStatusRoll=rollNamedPersistentStatusEffect;rollNamedPersistentStatusEffect=()=>({hit:false,duplicate:false});window.__savedMiss=showMissEffect;window.__misses=[];showMissEffect=(enemy,index,label)=>__misses.push(label);window.__spBefore=monsters[0].sp;`);
+ attack(0);assert.equal(r.run('__finished'),1);assert.equal(r.json('__declarations.length'),1);assert.equal(r.json('__declarations[0].skillId'),'freeze');assert.equal(r.run('__spBefore-monsters[0].sp'),32);assert.ok(r.json('__misses').every(label=>label==='抵抗'));
+ r.run(`monsters[1].skillIds=['waterKnife'];monsters[1].v141SupportSkillIds=[];monsters[1].skillChance=1;window.__savedHitRoll=rollHitChance;rollHitChance=()=>false;window.__spBefore=monsters[1].sp;__misses=[];`);
+ attack(1);assert.equal(r.run('__finished'),2);assert.equal(r.run('__spBefore-monsters[1].sp'),6);assert.ok(r.json('__misses').includes('MISS'));
+ r.run('rollHitChance=__savedHitRoll;showMissEffect=__savedMiss;');round(2);assert.equal(r.run('FourSymbolsTowerSkillPolicy.allows(monsters[0],"freeze")'),false);cleanup();
 });
 
 test('freeze cooldown N+1/N+2, duplicate boundaries and same-round replacement wave cannot reset quotas; new token resets',()=>{
