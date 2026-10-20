@@ -1,0 +1,2990 @@
+[
+  {
+    "name": "relicChoiceBoxPink-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-myriad"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxPink-detail-top",
+    "rows": [
+      {
+        "text": "桃紅階以下秘寶碎片自選箱",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicBreakthroughStone-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-myriad"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red is-selected"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicBreakthroughStone-detail-top",
+    "rows": [
+      {
+        "text": "秘寶突破石",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "秘寶升級的突破材料。請至主城「秘寶」查看各級需求。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.3555908203125,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxOrange-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-myriad"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange is-selected"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxOrange-detail-top",
+    "rows": [
+      {
+        "text": "橙階以下秘寶碎片自選箱",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxPurple-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-myriad"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-red"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-orange is-selected"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-purple"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxPurple-detail-top",
+    "rows": [
+      {
+        "text": "紫階以下秘寶碎片自選箱",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicEssence-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "2 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicEssence-detail-top",
+    "rows": [
+      {
+        "text": "秘寶精華",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "秘寶升級材料。請至主城「秘寶」查看升級需求。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.3555908203125,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxBlue-bag-icon",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 27.514651470302795,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 20.60000283377511,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.300660851883563,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.94347165978473,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 18.311112837357953,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 17.172838953249624,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 17.201651342166876,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 17.209927958826864,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 19.51634724934896,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 19.45342686793187,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 19.45555466871995,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 19.453432309877623,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 20.519542694091797,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 20.60000146793414,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 20.599997991248024,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue is-selected"
+      },
+      {
+        "text": "×3",
+        "font": 20.5961674281529,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "重新整理",
+        "font": 20.599999564034597,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "2 / 5",
+        "font": 20.600000381469727,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 64.08889770507812,
+        "height": 50.355552673339844,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 50.355560302734375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 50.355560302734375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 90.41111755371094,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 90.41110229492188,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 96.13333129882812,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 50.355560302734375,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "relicChoiceBoxBlue-detail-top",
+    "rows": [
+      {
+        "text": "藍階以下秘寶碎片自選箱",
+        "font": 22.888888527636954,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。",
+        "font": 20.59999967487326,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 20.575053422653365,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 20.57386762893508,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 20.59999967487326,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 103.25628662109375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 103.25033569335938,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 315.10369873046875,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

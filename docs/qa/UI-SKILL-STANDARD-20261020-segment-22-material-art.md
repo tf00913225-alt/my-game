@@ -1,4 +1,4 @@
-# 第二十二段B：六個秘寶材料圖示（runtime驗證待完成）
+# 第二十二段B：六個秘寶材料圖示（六圖runtime限定通過）
 
 延續22A；原材料SVG為純色幾何占位，與正式碎片原畫品質不一。正式runtime及origin/assets-library索引未找到對應精華/突破石/四自選箱。既有任務/副本木金箱及元素匣有明確其他身份，未混用。
 
@@ -18,3 +18,11 @@
 - assets/relics/materials/relic-choice-box-pink.32e7de00c345.webp
 - assets/relics/materials/relic-breakthrough-stone.2d2814201552.webp
 - assets/relics/materials/relic-essence.4c8469805189.webp
+
+## e583 四尺寸實際驗證完成
+
+固定Head e58331ecc5427486f2bd18a90ea146eeddf56d98，四尺寸各12圖（六bag小格/六detail）與完整reports；手機各29records、desktop31，逐六ID/UID/sourceIndex及六真reopen，decoder natural1254×1254/visible/contain，真page2。所有相關控制至少44，未碰交易selector。source/bundle hash前後相同、clean、Chrome/server退出。三方獨立實看各尺寸代表，小圖可辨識、無Alpha方底/白邊/裁切、題牌與完整文案/rarity原Owner保留。六row artIssue解除；只有所列呈現與返回通過。
+
+22A其餘21和來源末端沿有效42f3不重跑。母圖審核不代替上述runtime，首精華仍REJECTED。provenance改以preflightArtGate保留歷史待驗狀態，另附本Head runtimeQa，不混成現在仍pending。scope/原圖/完整prompt及無損Alpha/可見像素proof均保留。
+
+限制：僅六個正式material ID的圖示呈現與原入口返回重開；22A其餘21材料與所有來源長表沿42f3既有有效證據，不重跑；未使用/出售/合成/選箱/升級/領獎/驗機率或經濟交易；choice-box bag detail不是relic-strip自選池驗收；未驗真帳號/雲端權威/硬體裝置/軟鍵盤。Latest Head required CI尚未接受，未合併/部署/全UI完成。

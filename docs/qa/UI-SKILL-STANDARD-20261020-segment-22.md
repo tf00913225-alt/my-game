@@ -11,3 +11,5 @@ Work ID UI-SKILL-STANDARD-20261020；PR #955；固定來源 42f3ca5c847a658477fe
 素材問題：四自選箱純色方塊、突破石五角、精華原SVG，與精緻碎片原畫差距已獨立實看；六row status有問題。圖示尚未導入，不能稱第22段完整美術通過。既有正式素材索引無對應，正在用built-in imagegen補六圖，精華第一母圖像補品已退回；選用母圖、轉檔、畫布/Alpha與runtime檢查將另存22B，不能以母圖審核代替實際小尺寸。
 
 證據evidence/UI-SKILL-STANDARD-20261020/segment22-copy-flow。限制：未使用/售出/合成/選箱/升級或驗證掉落/成本/機率；choice box僅正式type material背包詳情，不代表原relic-strip自選池；體質寶石為正式type gem排除；其他系統材料不由這27ID繼承驗收；四箱/突破石/精華6icon仍幾何占位，素材品質尚有問題，不能稱整段美術完成；真帳號/雲端權威/實體裝置/軟鍵盤未驗。Latest Head必要CI未接受，未合併/部署/全部UI完成。Next同段22B六圖導入實驗，再24主城、25技能真詳情及其餘台帳。
+
+22B後續：六素材原問題已由e583四尺寸實畫與三方限定審核解除，詳見segment-22-material-art.md；本段A上述待修描述為當時checkpoint，不代表目前仍未導入。仍未批准未操作的交易/裝置/其他系統材料。

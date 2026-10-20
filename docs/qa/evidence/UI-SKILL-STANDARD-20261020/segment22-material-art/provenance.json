@@ -17,7 +17,18 @@
       "bytes": 1699672,
       "conversion": "Sharp lossless WebP; no resize/crop/rotate/trim",
       "formalPath": "assets/relics/materials/relic-choice-box-blue.8a6cfdd5fb40.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     },
     {
       "id": "purple",
@@ -35,7 +46,18 @@
       "bytes": 1562268,
       "conversion": "Sharp lossless WebP; no resize/crop/rotate/trim",
       "formalPath": "assets/relics/materials/relic-choice-box-purple.0cbbe8fd9b70.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     },
     {
       "id": "orange",
@@ -53,7 +75,18 @@
       "bytes": 1586522,
       "conversion": "Sharp lossless WebP; no resize/crop/rotate/trim",
       "formalPath": "assets/relics/materials/relic-choice-box-orange.6f30554e90e6.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     },
     {
       "id": "pink",
@@ -71,7 +104,18 @@
       "bytes": 1568200,
       "conversion": "Sharp lossless WebP; no resize/crop/rotate/trim",
       "formalPath": "assets/relics/materials/relic-choice-box-pink.32e7de00c345.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     },
     {
       "id": "stone",
@@ -89,7 +133,18 @@
       "bytes": 1493658,
       "conversion": "Sharp lossless WebP; no resize/crop/rotate/trim",
       "formalPath": "assets/relics/materials/relic-breakthrough-stone.2d2814201552.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     },
     {
       "id": "essence-v2",
@@ -108,7 +163,18 @@
       "conversion": "Sharp lossless WebP; original dimensions; no trim/crop/resize/rotate; all alpha and visible RGB exact; invisible alpha0 RGB may normalize",
       "replacesRejectedMother": "essence.png was potion-like; never imported",
       "formalPath": "assets/relics/materials/relic-essence.4c8469805189.webp",
-      "artGate": "Mother reviewed; runtime small-size QA pending"
+      "preflightArtGate": "Mother reviewed; runtime small-size QA pending",
+      "runtimeQa": {
+        "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+        "status": "部分已實際驗證",
+        "reports": [
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json",
+          "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+        ],
+        "scope": "actual six bag/detail/return/reopen only; other states not approved"
+      }
     }
   ]
 }

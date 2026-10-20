@@ -1,0 +1,49 @@
+{
+  "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+  "reviews": {
+    "art": "art_review：四尺寸20代表實圖（360六detail+兩bag，其餘每尺寸四張）涵六圖，精華v2/藍箱與突破石/橙箱輪廓可辨，Alpha邊緣完整，原題牌/rarity/長文無退化；未全48逐張看",
+    "interaction": "interaction_review：四尺寸代表bag/detail實圖+12scene reports，手機29/desktop31records、六ID/sourceIndex/decoder1254contain/六reopen；控制>=44，未點交易",
+    "scope": "scope_review：四尺寸代表實圖，884..e583僅六資產/原圖片Owner映射及資產test/生成hash；可逆原其餘bytes一致，Alpha及可見RGB完全相同、alpha0隱RGB normalization如實記，無數值/存檔/規則/handler漂移"
+  },
+  "limits": [
+    "僅六個正式material ID的圖示呈現與原入口返回重開",
+    "22A其餘21材料與所有來源長表沿42f3既有有效證據，不重跑",
+    "未使用/出售/合成/選箱/升級/領獎/驗機率或經濟交易",
+    "choice-box bag detail不是relic-strip自選池驗收",
+    "未驗真帳號/雲端權威/硬體裝置/軟鍵盤"
+  ],
+  "bindings": [
+    {
+      "device": "360x640",
+      "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+      "scenes": 12,
+      "records": 29,
+      "taps": 27,
+      "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/360x640-report.json"
+    },
+    {
+      "device": "393x873",
+      "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+      "scenes": 12,
+      "records": 29,
+      "taps": 27,
+      "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/393x873-report.json"
+    },
+    {
+      "device": "412x915",
+      "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+      "scenes": 12,
+      "records": 29,
+      "taps": 27,
+      "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/412x915-report.json"
+    },
+    {
+      "device": "1280x800",
+      "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+      "scenes": 12,
+      "records": 31,
+      "taps": 27,
+      "report": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment22-material-art/1280x800-report.json"
+    }
+  ]
+}
