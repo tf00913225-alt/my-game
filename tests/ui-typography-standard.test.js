@@ -58,12 +58,12 @@ assert.match(read('css/00-main.css'), /\.status-number\{[^}]*font-size:15px/, 'a
 // Formal player-facing owners that should contain no sub-13px declarations.
 enforceNoTinyText(owners.elementBox);
 enforceNoTinyText(owners.abyss);
-// INVENTORY is a redundant decorative kicker above the real Chinese heading;
-// exclude only that documented decorative class, never backpack content text.
+// The player-facing title uses the same Chinese label and24UI heading scale.
 const inventoryHtml=read('index.html');
-assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包"[\s\S]*?class="inventory-title-plate-kicker">INVENTORY<\/span>\s*<h2>背包<\/h2>/);
-assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:20px/);
-enforceNoTinyText(owners.inventory, text => text.replace(/#game-stage #inventoryPage \.inventory-title-plate-kicker\{[^}]*\}/, ''));
+assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包">\s*<h2>背包<\/h2>/);
+assert.doesNotMatch(inventoryHtml,/class="inventory-title-plate-kicker"/);
+assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:24px/);
+enforceNoTinyText(owners.inventory);
 enforceNoTinyText(owners.abyssLayout);
 enforceNoTinyText(owners.patrol);
 enforceNoTinyText(owners.inventoryBack);
@@ -107,8 +107,9 @@ assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
 assert.match(gameplay, /\.gameplay-mode-copy h3\{[^}]*font-size:22px/);
 assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:18px/);
 assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
-assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
-assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
+assert.match(read(owners.skillSkin), /\.v17346-shop-card \.v17346-shop-name\{[^}]*font-size:16px !important/);
+assert.match(read(owners.skillSkin), /\.v17346-shop-card \.v17346-shop-buy\{[^}]*font-size:15px !important/);
+assert.doesNotMatch(qa,/\.v17346-shop-card \.v17346-shop-(?:name|buy)\{[^}]*font-size:/);
 assert.match(read('css/25-stage-v90-quest-interface-core.css'), /\.quest-card-desc\{[^}]*font-size:15px/);
 assert.doesNotMatch(qa, /\.v17363-preview-group p\{/);
 assert.doesNotMatch(homePolish, /\.v17363-preview-group p\{/);
