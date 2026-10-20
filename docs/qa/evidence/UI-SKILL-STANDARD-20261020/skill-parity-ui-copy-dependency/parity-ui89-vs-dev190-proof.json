@@ -1,0 +1,19 @@
+{
+  "dev": "a2c2fbb876816a91cab6eaecc54c538c41722ba1919eeff079c229c9db37547e",
+  "ui": "f7a048648dbe25d613a253338d7d7bef7b7ed6a94a7aa9d03e63d902540b046a",
+  "cases": 600,
+  "domainDifferences": 0,
+  "eventDifferences": 0,
+  "domCases": 400,
+  "domNode": "allSkillsList",
+  "changedCases": 400,
+  "literalCounts": [
+    200,
+    200,
+    200,
+    0
+  ],
+  "wholeRowAfterFourAcceptedDisplayLiteralReversalExact": true,
+  "sourceProof": "artifacts/segment25-copy-byte-proof.json",
+  "note": "No baseline updated; recorder VM only, no Chrome/SDK/emulator or production mutation"
+}

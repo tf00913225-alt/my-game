@@ -24,7 +24,7 @@ function original(){
     context.characterSkillLoadouts={fire:context.loadout};context.renderSkillLoadout=()=>{};context.updateUI=()=>{};context.saveGame=()=>{};
     context.window=context;vm.createContext(context);vm.runInContext(Object.values(baseline.sources).join('\n'),context);return context;
 }
-test('loadout extraction preserves600 full-loaded Client domain/save-boundary/DOM cases from original Head',()=>{
+test('loadout extraction preserves600 full-loaded Client domain/save-boundary cases and accepted UI DOM',()=>{
     assert.deepEqual(loadoutParity(),baseline.fullRuntime);
 });
 test('pure equip, first-cross normalization, splice ordering and no-ops match frozen original runtime functions',()=>{
