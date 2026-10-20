@@ -200,9 +200,23 @@ async function runViewport(chrome,url,width,height){
   evidence.foreground=await client.eval(MEASURE);assert.equal(evidence.foreground.sameShell,true);assert.equal(evidence.foreground.visible,true);
   await client.eval("showPage('home')");await settle(client);
   evidence.phase='home';console.log('Home scroll QA');evidence.home=await client.eval(`(()=>{const n=document.getElementById('homePage'),r=n.getBoundingClientRect();return {clientHeight:n.clientHeight,scrollHeight:n.scrollHeight,scrollTop:n.scrollTop,overflow:getComputedStyle(n).overflowY,rect:{left:r.left,top:r.top,width:r.width,height:r.height},documentScroll:document.scrollingElement.scrollTop};})()`);
-  assert.equal(evidence.home.overflow,'hidden');assert.equal(evidence.home.scrollHeight,evidence.home.clientHeight,'city must fit without hidden overflow');await client.eval('homePage.scrollTop=0');
+  assert.equal(evidence.home.overflow,'auto');assert.ok(evidence.home.scrollHeight>evidence.home.clientHeight,'city uses its own scroll owner');await client.eval('homePage.scrollTop=0');
   const hr=evidence.home.rect;await swipe(client,hr.left+hr.width/2,Math.min(height-100,hr.top+hr.height*.7));
-  evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");assert.equal(evidence.homeAfterSwipe.scrollTop,0,'fixed city must not move on swipe');assert.equal(evidence.homeAfterSwipe.documentScroll,0);
+  evidence.homeAfterSwipe=await client.eval("({scrollTop:homePage.scrollTop,documentScroll:document.scrollingElement.scrollTop})");assert.ok(evidence.homeAfterSwipe.scrollTop>0,'real swipe must move the city scroll owner');assert.equal(evidence.homeAfterSwipe.documentScroll,0);
+  const homeEndMeasure=`(()=>{const n=document.getElementById('homePage'),outer=n.closest('.content'),last=[...n.querySelectorAll('.home-card-tertiary')].at(-1),rect=e=>{const r=e.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height}},r=last.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {top:n.scrollTop,client:n.clientHeight,total:n.scrollHeight,rect:rect(n),outerOverflow:getComputedStyle(outer).overflowY,outerTop:outer.scrollTop,documentTop:document.scrollingElement.scrollTop,last:{label:last.getAttribute('aria-label'),rect:rect(last),hit:last===hit||last.contains(hit)},nav:rect(document.getElementById('bottomNav')),sameShell:document.querySelector('.native-bottom-nav-layer')===window.__navQaShell};})()`;
+  evidence.homeEndSamples=[];
+  for(let attempt=0;attempt<30;attempt++){
+   const q=await client.eval(homeEndMeasure);evidence.homeEndSamples.push(q);
+   assert.equal(q.outerOverflow,'hidden');assert.equal(q.outerTop,0);assert.equal(q.documentTop,0);assert.equal(q.sameShell,true);
+   assert.ok(q.rect.bottom<=q.nav.top+1,'city viewport ends above native navigation');
+   for(const key of ['left','top','width','height'])assert.ok(Math.abs(q.nav[key]-evidence.homeEndSamples[0].nav[key])<=1,'home swipe must not move nav '+key);
+   if(q.top+q.client>=q.total-2){evidence.homeEnd=q;break;}
+   await swipe(client,q.rect.left+q.rect.width*.75,Math.min(q.rect.bottom-24,height-100));
+  }
+  assert.ok(evidence.homeEnd,'bounded real swipes must reach city footer');
+  assert.equal(evidence.homeEnd.last.label,'系統');assert.ok(evidence.homeEnd.last.rect.height>=44);
+  assert.ok(evidence.homeEnd.last.rect.top>=evidence.homeEnd.rect.top-1&&evidence.homeEnd.last.rect.bottom<=evidence.homeEnd.rect.bottom+1,'last city control fully reachable');
+  assert.equal(evidence.homeEnd.last.hit,true,'last city control unobstructed');
   // Use the real inventory grid and its real scroll owner. QA-only inventory
   // data supplies enough rows; no production state or CSS is replaced.
   evidence.phase='inventory';console.log('Inventory scroll QA');await client.eval(`inventoryItems.splice(0,inventoryItems.length,...Array.from({length:80},(_,i)=>({id:'qa-scroll-'+i,name:'測試材料'+i,type:'material',rarityKey:'white',count:1})));showPage('inventory');setInventoryFilter('material');renderInventory();`);await settle(client);
