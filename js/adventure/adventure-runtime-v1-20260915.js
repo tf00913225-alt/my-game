@@ -673,14 +673,18 @@
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
             if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=playerOwner().element;}
-            hideOverlay();showPage("skill");if(typeof renderSkillLoadout==="function"){renderSkillLoadout();}
+            hideOverlay();showPage("home");openHomeFeature("character");switchCharacterTab("skill");
         }else{
             hideOverlay();showPage("inventory");
             if(typeof renderInventory==="function"){renderInventory();}
         }
+        window.FourSymbolsAdventureUI?.syncTutorialReturn(o.requiredAction==="skill"?"skill":"inventory");
         return true;
     }
-    function returnFromTutorial(){return open({panel:"tutorial"});}
+    function returnFromTutorial(){
+        if(typeof closeHomeFeature==="function"){closeHomeFeature();}
+        return open({panel:"tutorial"});
+    }
     function continueTutorial(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction||o.nodeId!==state.currentNodeId||state.completedNodes[o.nodeId]){return false;}
         if(!hasTutorialAction(o.requiredAction)){showMessage(o.requiredAction==="skill"?"請先實際學習並裝上技能。":o.requiredAction==="equipment"?"請先穿上剛取得的護具。":"請使用補品，或先在此確認 HP／SP 與戰前準備。");return false;}

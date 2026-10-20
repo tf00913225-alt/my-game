@@ -227,6 +227,12 @@
         let button=document.getElementById("adventureTutorialReturn");
         if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
         button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
+        if(!button.hidden){
+            const destination=page==="inventory"?document.querySelector("#inventoryPage .inventory-classic-shell"):
+                document.querySelector("#homeFeatureModal.show .home-feature-modal-box");
+            if(destination){destination.appendChild(button);}
+            else{button.hidden=true;}
+        }
     }
 
     function renderEventResult(view){

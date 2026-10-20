@@ -29,3 +29,24 @@ test('adventure opens a different inner page at its title and preserves same-pag
     view.tutorial.active=true;view.panel='rest';render();
     assert.equal(back.hidden,false,'leaving the story restores the original page-header control');
 });
+
+test('tutorial return reuses one button in the active system flow and hides it outside the tutorial systems',()=>{
+    const nodes=[];
+    const make=()=>{const n={children:[],parentElement:null,appendChild(child){if(child.parentElement){const a=child.parentElement.children;a.splice(a.indexOf(child),1);}this.children.push(child);child.parentElement=this;}};nodes.push(n);return n;};
+    const host=make(),modal=make(),inventory=make();let returns=0;
+    const tutorial={active:true,requiredAction:'skill'};
+    const document={readyState:'loading',addEventListener(){},createElement:make,
+        getElementById(id){return id==='game-ui'?host:nodes.find(n=>n.id===id)||null;},
+        querySelector(selector){return selector==='#inventoryPage .inventory-classic-shell'?inventory:selector==='#homeFeatureModal.show .home-feature-modal-box'?modal:null;}};
+    const window={FourSymbolsAdventure:{getView:()=>({tutorial}),returnFromTutorial(){returns++;}},FourSymbolsAdventureContent:{}};
+    const context={window,document};vm.createContext(context);
+    vm.runInContext(fs.readFileSync('js/adventure/adventure-ui-v1-20260915.js','utf8'),context);
+    const sync=window.FourSymbolsAdventureUI.syncTutorialReturn;
+    sync('skill');const button=document.getElementById('adventureTutorialReturn');
+    assert.equal(button.parentElement,modal);assert.equal(button.hidden,false);
+    sync('skill');assert.equal(nodes.filter(n=>n.id==='adventureTutorialReturn').length,1);
+    for(const action of ['equipment','recovery']){tutorial.requiredAction=action;sync('inventory');assert.equal(button.parentElement,inventory);assert.equal(button.hidden,false);}
+    button.onclick();assert.equal(returns,1,'the original button delegates to the runtime return Owner');
+    sync('adventure');assert.equal(button.hidden,true);
+    tutorial.active=false;sync('inventory');assert.equal(button.hidden,true);
+});

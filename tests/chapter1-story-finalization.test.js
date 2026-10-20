@@ -81,6 +81,29 @@ test("story return keeps the onboarding guard and permits an existing-character 
     assert.equal(h.launches(),0,"reading and returning do not start a battle");
 });
 
+test("tutorial navigation uses the character skill host and closes borrowed UI before returning without starting gameplay",()=>{
+    for(const [id,action] of [["c1_02","skill"],["c1_04","equipment"],["c1_05","recovery"]]){
+        const h=runtime(),calls=[];at(h,id);
+        h.state().onboarding={active:true,phase:"guidance",nodeId:id,requiredAction:action};
+        h.c.currentSkillCharacter="water";
+        // Interface spies verify the production runtime's routing, not rendered DOM.
+        h.c.showPage=page=>calls.push(["page",page]);
+        h.c.openHomeFeature=feature=>calls.push(["modal",feature]);
+        h.c.switchCharacterTab=tab=>calls.push(["tab",tab]);
+        h.c.closeHomeFeature=()=>calls.push(["close-modal"]);
+        h.c.FourSymbolsAdventureUI={hide(){},show(){calls.push(["tutorial"]);},syncTutorialReturn:page=>calls.push(["return-host",page])};
+        const business=()=>JSON.stringify([h.c.gold,h.c.sharedExp,h.c.inventoryItems,h.c.characterEquipment,h.c.characterSkillLoadouts,h.c.player.hp,h.c.player.sp]);
+        const before=business();assert.equal(h.api.openTutorialSystem(),true);
+        assert.deepEqual(calls,action==="skill"?[["page","home"],["modal","character"],["tab","skill"],["return-host","skill"]]:[["page","inventory"],["return-host","inventory"]]);
+        calls.length=0;assert.equal(h.api.returnFromTutorial(),true);
+        assert.deepEqual(calls,[["close-modal"],["tutorial"]]);
+        assert.equal(h.state().onboarding.requiredAction,action);assert.equal(h.state().currentNodeId,id);
+        assert.equal(h.launches(),0);assert.equal(business(),before);
+        h.state().onboarding.active=false;calls.length=0;
+        assert.equal(h.api.openTutorialSystem(),false);assert.deepEqual(calls,[]);
+    }
+});
+
 test("tutorial defeat requires learned equipped skill and equipped starter armor before same-node retry",()=>{
     for(const [id,action] of [["c1_02","skill"],["c1_04","equipment"]]){
         const h=runtime();at(h,id);assert.equal(h.api.beginBattle(id),true);assert.equal(h.options().tutorial,true);

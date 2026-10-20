@@ -21,7 +21,7 @@
 .adventure-story-speaker{align-self:flex-start;color:#f4d79d;font-size:20px;font-weight:700;letter-spacing:.08em;}
 .adventure-story-dialogue p{margin:0;color:#f5eddd;font-size:18px;line-height:1.7;overflow-wrap:anywhere;}
 .adventure-story-dialogue .adventure-button{flex:0 0 auto;align-self:flex-end;min-width:128px;margin-top:auto;}
-.adventure-tutorial-return{position:absolute;z-index:1200;left:50%;bottom:calc(82 * var(--ui-length-unit,3px));translate:-50% 0;min-height:calc(44 * var(--ui-length-unit,3px));padding:calc(10 * var(--ui-length-unit,3px)) calc(18 * var(--ui-length-unit,3px));font-size:calc(15 * var(--ui-length-unit,3px));border:calc(1 * var(--ui-length-unit,3px)) solid #b39560;border-radius:calc(8 * var(--ui-length-unit,3px));color:#f7e8c8;background:#292216;box-shadow:0 3px 12px #0008;pointer-events:auto;}
+.adventure-tutorial-return{position:static;flex:0 0 auto;align-self:center;max-width:calc(100% - 24 * var(--ui-length-unit,3px));margin:calc(8 * var(--ui-length-unit,3px)) auto;min-height:calc(44 * var(--ui-length-unit,3px));padding:calc(10 * var(--ui-length-unit,3px)) calc(18 * var(--ui-length-unit,3px));font-size:calc(15 * var(--ui-length-unit,3px));border:calc(1 * var(--ui-length-unit,3px)) solid #b39560;border-radius:calc(8 * var(--ui-length-unit,3px));color:#f7e8c8;background:#292216;box-shadow:0 3px 12px #0008;pointer-events:auto;}
 .adventure-tutorial-return[hidden]{display:none;}
 #adventurePage[hidden]{display:none!important;}
 #adventurePage.adventure-page{
