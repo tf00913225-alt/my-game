@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.257e4b6bac5a.js"
+          "build/app-shell.febd46a25a09.js"
         ],
         "styles": [
           "build/app-shell.725d1d00b39e.css"
@@ -133,7 +133,7 @@
         "scripts": [
           "build/feature-adventure-content.67ea9959e593.js",
           "build/feature-adventure-runtime.dd3870f6010a.js",
-          "build/feature-adventure-ui.d01b93b1ff5b.js"
+          "build/feature-adventure-ui.e3d2d8ecf966.js"
         ],
         "styles": [
           "build/feature-adventure.653b97a18985.css"
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.257e4b6bac5a.js",
-        "sha256": "257e4b6bac5a",
-        "bytes": 1191232,
-        "priority": "P1",
-        "type": "script",
-        "decode": false
-      },
-      {
         "path": "build/app-shell.725d1d00b39e.css",
         "sha256": "725d1d00b39e",
         "bytes": 90896,
         "priority": "P1",
         "type": "style",
+        "decode": false
+      },
+      {
+        "path": "build/app-shell.febd46a25a09.js",
+        "sha256": "febd46a25a09",
+        "bytes": 1191297,
+        "priority": "P1",
+        "type": "script",
         "decode": false
       },
       {
@@ -826,8 +826,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "c1083f2e390e",
-    "totalBytes": 24042157,
+    "manifestHash": "f37d08e2fd5c",
+    "totalBytes": 24042222,
     "totalResources": 79
   },
   "assets": {
@@ -835,9 +835,9 @@
       "sha256": "9cdbe69aad4a",
       "bytes": 69972
     },
-    "build/app-shell.257e4b6bac5a.js": {
-      "sha256": "257e4b6bac5a",
-      "bytes": 1191232
+    "build/app-shell.febd46a25a09.js": {
+      "sha256": "febd46a25a09",
+      "bytes": 1191297
     },
     "build/gameplay-core-primary.d1e7d90cba12.js": {
       "sha256": "d1e7d90cba12",
@@ -879,9 +879,9 @@
       "sha256": "dd3870f6010a",
       "bytes": 65677
     },
-    "build/feature-adventure-ui.d01b93b1ff5b.js": {
-      "sha256": "d01b93b1ff5b",
-      "bytes": 35016
+    "build/feature-adventure-ui.e3d2d8ecf966.js": {
+      "sha256": "e3d2d8ecf966",
+      "bytes": 35234
     },
     "build/boot-core.1a331d452911.css": {
       "sha256": "1a331d452911",

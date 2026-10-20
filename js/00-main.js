@@ -26036,6 +26036,7 @@ function closeHomeFeature(){
     ){
         releaseUpdate.onSharedModalClosed();
     }
+    window.FourSymbolsAdventureUI?.syncTutorialReturn?.("home");
 
 
     if(modal){

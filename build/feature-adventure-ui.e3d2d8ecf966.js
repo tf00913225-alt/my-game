@@ -223,8 +223,14 @@
         return panelShell(copy[0],"初入江湖",'<p class="adventure-lead">'+copy[1]+'</p>'+resources,actions,"tutorial-panel");
     }
     function syncTutorialReturn(page){
-        const state=runtimeView()?.tutorial,host=document.getElementById("game-ui");if(!host){return;}
+        const host=document.getElementById("game-ui");if(!host){return;}
         let button=document.getElementById("adventureTutorialReturn");
+        if(!["inventory","skill","status"].includes(page)){
+            if(button){button.hidden=true;}
+            return;
+        }
+        const state=runtimeView()?.tutorial;
+        if(!button&&!(state?.active&&state.requiredAction)){return;}
         if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
         button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
         if(!button.hidden){

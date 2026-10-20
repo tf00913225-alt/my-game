@@ -49,4 +49,7 @@ test('tutorial return reuses one button in the active system flow and hides it o
     button.onclick();assert.equal(returns,1,'the original button delegates to the runtime return Owner');
     sync('adventure');assert.equal(button.hidden,true);
     tutorial.active=false;sync('inventory');assert.equal(button.hidden,true);
+    window.FourSymbolsAdventure.getView=()=>{throw Error('Unrelated modal close must not read adventure state');};
+    assert.doesNotThrow(()=>sync('home'));assert.equal(button.hidden,true);
+    assert.equal(nodes.filter(n=>n.id==='adventureTutorialReturn').length,1);
 });
