@@ -872,6 +872,57 @@ test('actual twenty-battle active and current-loss raw captures assemble through
     }
 });
 
+test('genuine twenty-battle skill learn/upgrade and secondary learn survive full raw current-loss candidate without source replacement',async()=>{
+    const {createCanonicalSkillLearning}=require('../functions/src/canonical-skill-learning');
+    let primaryId,secondaryId,learnIntent,learnResult;
+    const make=async fault=>fixture({three:false,currentLoss:false,beforeAudit:async(h,{deps,request})=>{
+        const writer=createCanonicalSkillLearning(deps),slots=h.data.get(h.root+'/account/current').slots;
+        [primaryId,secondaryId]=slots;
+        assert.equal(h.data.get(h.root+'/characters/'+primaryId).state.level,10);
+        const before=copy(h.data.get(h.root+'/characters/'+secondaryId));
+        learnIntent={operationId:'skill-earned-primary-learn-01',expectedRevision:h.revision,characterId:primaryId,action:'learn',skillId:'flameSlash'};
+        learnResult=await writer.learnOrUpgrade(request(),learnIntent);
+        const upgrade=await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-primary-upgrade1',expectedRevision:h.revision,action:'upgrade'});
+        assert.equal(upgrade.levelAfter,2);
+        const untouched=h.data.get(h.root+'/characters/'+secondaryId);
+        assert.deepEqual(untouched.state,before.state);assert.deepEqual(untouched.skillLoadout,before.skillLoadout);
+        const primary=copy(h.data.get(h.root+'/characters/'+primaryId));
+        await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-secondary-learn1',expectedRevision:h.revision,characterId:secondaryId});
+        assert.deepEqual(h.data.get(h.root+'/characters/'+primaryId).state,primary.state);
+        assert.deepEqual(h.data.get(h.root+'/characters/'+primaryId).skillLoadout,primary.skillLoadout);
+        const complete=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+        assert(complete.characters.every(row=>row.serverRevision===h.revision));
+        assert.equal(complete.characters[0].skillLoadout.skillLevels.flameSlash,2);
+        assert.equal(complete.characters[1].skillLoadout.skillLevels.flameSlash,1);
+        assert.equal(complete.characters[1].state.skillPoints,0);
+        const writes=h.writes;
+        assert.deepEqual(await writer.learnOrUpgrade(request(),learnIntent),{...learnResult,unchanged:true});assert.equal(h.writes,writes);
+        if(fault)fault(h,learnIntent.operationId);
+        for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
+            .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
+    }});
+    const f=await make(),material=await completeRawMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
+    const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+    const result=await owner.verifyRawRecoveryAuditCandidate(material);
+    assert.equal(result.candidateProofValid,true);
+    for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.equal(f.h.data.has(f.h.root+'/characters/'+primaryId),false);
+    assert.equal(f.h.data.has(f.h.root+'/characters/'+secondaryId),false);
+    const input=JSON.stringify(material),segmented=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
+    assert.equal(segmented.segmentedProofValid,true);
+    for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(segmented[flag],false);
+    assert.equal(Object.hasOwn(f.recovery,'verifySegmentedRawRecoveryProof'),false);
+    assert.equal(JSON.stringify(material),input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    for(const fault of [
+        (h,id)=>{h.data.get(h.root+'/ledgerEntries/'+id).amount--;},
+        (h,id)=>{for(const collection of ['operations','ledgerEntries'])h.data.get(h.root+'/'+collection+'/'+id).policySha256='f'.repeat(64);}
+    ]){
+        const corrupt=await make(fault),sealed=await completeRawMaterial(corrupt);
+        await unchanged(corrupt,()=>privateRawInspector(corrupt,'verifySegmentedRawRecoveryProof')(sealed),error=>error.code==='data-loss');
+    }
+});
+
 test('rich twenty-normal-battle multi-character and rested history closes every original byte through a second audit within unchanged assembly limits',async t=>{
     const f=await fixture({battles:20,three:false,normal:true,rested:true,adStatus:'abandoned',currentLoss:false,
         beforeAudit:async(h,{deps,request})=>{
