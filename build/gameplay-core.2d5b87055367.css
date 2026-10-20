@@ -3035,7 +3035,7 @@
     top:max(14px,env(safe-area-inset-top));
     z-index:12000;
     width:min(88vw,430px);
-    padding:10px 12px;
+    padding:14px;
     border:1px solid #bd8735;
     border-radius:9px;
     opacity:0;
@@ -3047,8 +3047,8 @@
 }
 
 .v141-reward-toast.show{animation:v141RewardToast 4.15s ease both;}
-.v141-reward-toast > strong{display:block;color:#f3c76b;font-size:15px;text-align:center;}
-.v141-reward-toast > div{display:flex;flex-wrap:wrap;justify-content:center;gap:4px 12px;margin-top:4px;font-size:13px;}
+.v141-reward-toast > strong{display:flex;align-items:center;justify-content:center;min-height:44px;padding:4px 8px 8px;box-sizing:border-box;color:#f3c76b;font-size:18px;text-align:center;}
+.v141-reward-toast > div{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 12px;margin-top:8px;font-size:16px;line-height:1.5;overflow-wrap:anywhere;}
 .v141-reward-toast b{color:#ffe5a4;}
 @keyframes v141RewardToast{0%{opacity:0;transform:translate(-50%,-24px)}8%,85%{opacity:1;transform:translate(-50%,0)}100%{opacity:0;transform:translate(-50%,-12px)}}
 
@@ -4023,8 +4023,15 @@
     color:#f5ead2;
 }
 #game-stage #battlePage .battle-status-detail-panel h3{
-    margin:0 34px 10px 0;
-    font-size:17px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    min-height:52px;
+    margin:0 48px 12px;
+    padding:4px 8px 8px;
+    box-sizing:border-box;
+    text-align:center;
+    font-size:20px;
     line-height:1.3;
     color:#f3cd78;
 }
@@ -4032,15 +4039,15 @@
     position:absolute;
     top:8px;
     right:8px;
-    width:30px;
-    height:30px;
+    width:52px;
+    height:52px;
     padding:0;
     border:1px solid rgba(215,170,89,.62);
     border-radius:8px;
     background:rgba(22,17,13,.9);
     color:#f5ead2;
     font-size:20px;
-    line-height:28px;
+    line-height:50px;
 }
 #game-stage #battlePage .battle-status-detail-core{
     display:grid;
@@ -4050,13 +4057,13 @@
     border:1px solid rgba(188,145,75,.45);
     border-radius:8px;
     background:rgba(8,9,10,.45);
-    font-size:13px;
+    font-size:16px;
     line-height:1.35;
 }
 #game-stage #battlePage .battle-status-detail-panel section{margin-top:12px;}
 #game-stage #battlePage .battle-status-detail-panel h4{
     margin:0 0 6px;
-    font-size:14px;
+    font-size:17px;
     line-height:1.35;
     color:#e7c982;
 }
@@ -4080,7 +4087,7 @@
 }
 #game-stage #battlePage .battle-status-detail-text{
     min-width:0;
-    font-size:13px;
+    font-size:16px;
     line-height:1.38;
     overflow-wrap:anywhere;
 }
@@ -4088,7 +4095,7 @@
 #game-stage #battlePage .battle-status-detail-empty{
     padding:6px 8px;
     color:#a99d87;
-    font-size:13px;
+    font-size:16px;
 }/* Stealth changes only the combatant artwork. HUD, bars, names and status
    indicators remain fully readable and range skills may still hit the slot. */
 #game-stage #battlePage .battle-player.v143-unit-stealthed > .v174-battle-art,
@@ -6960,7 +6967,12 @@ body > .v169-rpg-dialog-layer{
 #game-stage .modal-box,
 .v169-rpg-dialog,
 .v132-reward-modal-inner,
-.v17351-ad-panel{
+.v141-reward-toast,
+.v17351-ad-panel,
+#game-stage #battlePage .skill-quick-bar,
+#game-stage #battlePage .battle-item-menu,
+#game-stage #battlePage .battle-target-prompt,
+#game-stage #battlePage .battle-status-detail-panel{
     border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     border-radius:calc(10 * var(--ui-length-unit,1px));
@@ -6985,7 +6997,9 @@ body > .v169-rpg-dialog-layer{
 .v132-reward-modal-inner:not(.v141-affix-modal) > h3,
 #game-ui #itemModal .v17351-compare-header,
 .v169-rpg-dialog h2,
-.v17351-ad-panel h2{
+.v141-reward-toast > strong,
+.v17351-ad-panel h2,
+#game-stage #battlePage .battle-status-detail-panel h3{
     border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-text,#EEE7D8);
@@ -7346,7 +7360,7 @@ body > .v169-rpg-dialog-layer{
        decorative 100px raster command stack. Reclaimed space belongs to allies. */
     --battle-center-region-track:21fr;
     --battle-ally-region-track:37fr;
-    --battle-target-prompt-height:60px;
+    --battle-target-prompt-height:88px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
     --battle-title-height:20px;
@@ -7366,7 +7380,9 @@ body > .v169-rpg-dialog-layer{
     --battle-name-row-height:26px;
     --battle-resource-bar-height:6px;
     --battle-enemy-safe-top:12px;
-    --battle-item-menu-top-offset:116px;
+    --battle-skill-menu-top-offset:144px;
+    --battle-item-menu-bottom:78px;
+    --battle-item-menu-height:300px;
     --battle-item-menu-gap:8px;
 }
 
@@ -7481,18 +7497,18 @@ body > .v169-rpg-dialog-layer{
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
     top:auto;
-    bottom:calc(var(--battle-command-visual-height) + 44px);
+    bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + 8px);
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
     top:auto;
-    bottom:calc(var(--battle-command-visual-height) + var(--battle-item-menu-top-offset) + var(--battle-item-menu-gap));
+    bottom:calc(var(--battle-item-menu-bottom) + var(--battle-item-menu-height) + var(--battle-item-menu-gap));
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
     left:14px;
     right:14px;
-    top:-82px;
+    top:calc(-1 * var(--battle-skill-menu-top-offset));
     bottom:0;
     z-index:18065 !important;
     gap:3px;
@@ -7500,9 +7516,10 @@ body > .v169-rpg-dialog-layer{
     overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
-    flex-basis:28px;
-    height:28px;
-    line-height:26px;
+    flex-basis:52px;
+    height:52px;
+    line-height:50px;
+    font-size:16px;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{
     gap:4px;
@@ -7525,23 +7542,23 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-name{
     display:block !important;
     min-height:0 !important;
-    font-size:11px !important;
-    line-height:15px !important;
+    font-size:16px !important;
+    line-height:20px !important;
     overflow-wrap:anywhere !important;
     white-space:normal !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-cost{
     display:block !important;
-    min-height:14px !important;
-    font-size:10px !important;
-    line-height:14px !important;
+    min-height:20px !important;
+    font-size:16px !important;
+    line-height:20px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .v135-sq-scope{
     display:block !important;
     min-height:0 !important;
     color:#f6d58a !important;
-    font-size:9px !important;
-    line-height:12px !important;
+    font-size:16px !important;
+    line-height:20px !important;
     white-space:normal !important;
     overflow-wrap:anywhere !important;
 }

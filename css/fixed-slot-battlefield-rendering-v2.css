@@ -11,7 +11,7 @@
        decorative 100px raster command stack. Reclaimed space belongs to allies. */
     --battle-center-region-track:21fr;
     --battle-ally-region-track:37fr;
-    --battle-target-prompt-height:60px;
+    --battle-target-prompt-height:88px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
     --battle-title-height:20px;
@@ -31,7 +31,9 @@
     --battle-name-row-height:26px;
     --battle-resource-bar-height:6px;
     --battle-enemy-safe-top:12px;
-    --battle-item-menu-top-offset:116px;
+    --battle-skill-menu-top-offset:144px;
+    --battle-item-menu-bottom:78px;
+    --battle-item-menu-height:300px;
     --battle-item-menu-gap:8px;
 }
 
@@ -146,18 +148,18 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
     top:auto;
-    bottom:calc(var(--battle-command-visual-height) + 44px);
+    bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + 8px);
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
     top:auto;
-    bottom:calc(var(--battle-command-visual-height) + var(--battle-item-menu-top-offset) + var(--battle-item-menu-gap));
+    bottom:calc(var(--battle-item-menu-bottom) + var(--battle-item-menu-height) + var(--battle-item-menu-gap));
     opacity:1;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
     left:14px;
     right:14px;
-    top:-82px;
+    top:calc(-1 * var(--battle-skill-menu-top-offset));
     bottom:0;
     z-index:18065 !important;
     gap:3px;
@@ -165,9 +167,10 @@
     overflow:visible !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-close{
-    flex-basis:28px;
-    height:28px;
-    line-height:26px;
+    flex-basis:52px;
+    height:52px;
+    line-height:50px;
+    font-size:16px;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-grid{
     gap:4px;
@@ -190,23 +193,23 @@
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-name{
     display:block !important;
     min-height:0 !important;
-    font-size:11px !important;
-    line-height:15px !important;
+    font-size:16px !important;
+    line-height:20px !important;
     overflow-wrap:anywhere !important;
     white-space:normal !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .sq-cost{
     display:block !important;
-    min-height:14px !important;
-    font-size:10px !important;
-    line-height:14px !important;
+    min-height:20px !important;
+    font-size:16px !important;
+    line-height:20px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar .skill-quick-button .v135-sq-scope{
     display:block !important;
     min-height:0 !important;
     color:#f6d58a !important;
-    font-size:9px !important;
-    line-height:12px !important;
+    font-size:16px !important;
+    line-height:20px !important;
     white-space:normal !important;
     overflow-wrap:anywhere !important;
 }

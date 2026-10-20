@@ -41,8 +41,8 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.doesNotMatch(html,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.ok(html.indexOf('id="battleActionRegion"')<html.indexOf('id="turnTargetRow"'),"turn row should be inside the battle action region");
   assert.match(css,/#battleActionRegion > \.turn-target-row[\s\S]*?opacity:1/);
-  assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
-  assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
+  assert.match(css,/\.turn-target-row\.skill-picker-open\{[^}]*bottom:calc\(var\(--battle-command-visual-height\) \+ var\(--battle-skill-menu-top-offset\) \+ 8px\);[^}]*opacity:1/);
+  assert.match(css,/\.turn-target-row\.battle-item-open\{[^}]*bottom:calc\(var\(--battle-item-menu-bottom\) \+ var\(--battle-item-menu-height\) \+ var\(--battle-item-menu-gap\)\);[^}]*opacity:1/);
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");

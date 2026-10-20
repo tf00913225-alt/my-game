@@ -1586,6 +1586,7 @@ button:disabled{
 }
 
 .battle-target-prompt-copy{
+    min-width:0;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -1595,30 +1596,30 @@ button:disabled{
 
 .battle-target-prompt-action{
     color:#ffe27a;
-    font-size:16px;
+    font-size:18px;
     font-weight:900;
-    line-height:20px;
-    white-space:nowrap;
+    line-height:24px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-target-prompt-hint{
     color:#fff4cf;
-    font-size:14px;
+    font-size:16px;
     font-weight:700;
-    line-height:17px;
-    animation:battleTargetPromptFlash .55s ease-in-out infinite;
+    line-height:20px;
 }
 
 .battle-target-back{
     flex:0 0 auto;
-    min-width:52px;
-    height:36px;
+    min-width:68px;
+    height:52px;
     padding:0 9px;
     border:1px solid #a78348;
     border-radius:6px;
     background:#2b2116;
     color:#ffe7a6;
-    font-size:13px;
+    font-size:16px;
     font-weight:900;
 }
 
@@ -2160,12 +2161,13 @@ button:active{
     position:absolute;
     left:10px;
     right:10px;
-    top:-116px;
-    height:auto;
-    max-height:182px;
-    z-index:35;
+    top:auto;
+    bottom:var(--battle-item-menu-bottom,78px);
+    height:var(--battle-item-menu-height,300px);
+    max-height:var(--battle-item-menu-height,300px);
+    z-index:18065;
     overflow:hidden;
-    padding:5px;
+    padding:8px;
     flex-direction:column;
     gap:5px;
     background:linear-gradient(180deg,rgba(10,8,6,.99),rgba(18,13,9,.99));
@@ -2179,8 +2181,8 @@ button:active{
 }
 
 .battle-item-menu-header{
-    flex:0 0 32px;
-    min-height:32px;
+    flex:0 0 52px;
+    min-height:52px;
     display:flex;
     align-items:stretch;
     gap:5px;
@@ -2201,7 +2203,7 @@ button:active{
     border-radius:6px;
     background:#251a10;
     color:#e9dcc4;
-    font-size:12px;
+    font-size:16px;
     font-weight:900;
     line-height:1;
 }
@@ -2214,7 +2216,7 @@ button:active{
 }
 
 .battle-item-close{
-    flex:0 0 58px;
+    flex:0 0 68px;
     color:#ffe7a6;
     background:#2b2116;
 }
@@ -2223,11 +2225,11 @@ button:active{
     flex:1 1 auto;
     min-height:0;
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-auto-rows:55px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:minmax(116px,auto);
     align-content:start;
     flex:0 1 auto;
-    max-height:calc(182px - 43px);
+    max-height:227px;
     gap:5px;
     overflow-y:auto;
     overflow-x:hidden;
@@ -2238,8 +2240,9 @@ button:active{
 
 .battle-item-card{
     min-width:0;
-    min-height:55px;
-    padding:5px 4px;
+    min-height:116px;
+    box-sizing:border-box;
+    padding:6px;
     border:1px solid rgba(138,106,58,.78);
     border-radius:7px;
     background:#090807;
@@ -2253,7 +2256,9 @@ button:active{
 }
 
 .battle-item-card:disabled{
-    opacity:.42;
+    opacity:1;
+    color:#bcb19e;
+    border-color:#65563c;
     cursor:not-allowed;
 }
 
@@ -2269,6 +2274,7 @@ button:active{
     width:28px;
     height:28px;
     min-height:28px;
+    flex-shrink:0;
     overflow:hidden;
 }
 .battle-item-icon img,
@@ -2295,30 +2301,31 @@ button:active{
     display:block;
     width:100%;
     color:#ffe7a6;
-    font-size:10px;
+    flex-shrink:0;
+    font-size:16px;
     font-weight:900;
-    line-height:12px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    line-height:20px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-item-effect{
     display:block;
     width:100%;
     color:#d8cbb5;
-    font-size:8px;
-    line-height:10px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    flex-shrink:0;
+    font-size:16px;
+    line-height:20px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-item-count{
     display:block;
     color:#fff;
-    font-size:9px;
-    line-height:10px;
+    flex-shrink:0;
+    font-size:16px;
+    line-height:20px;
     font-weight:900;
 }
 
@@ -2335,13 +2342,13 @@ button:active{
     border-radius:8px;
     color:#b9aa91;
     text-align:center;
-    font-size:11px;
-    line-height:15px;
+    font-size:16px;
+    line-height:22px;
 }
 
 .battle-item-empty strong{
     color:#ffe27a;
-    font-size:13px;
+    font-size:18px;
 }
 
 /* 戰鬥背包比技能框更高；打開時把回合資訊同步上移，
@@ -2352,7 +2359,7 @@ button:active{
 
 .skill-sp-warning{
     color:#b3a58c;
-    font-size:11px;
+    font-size:16px;
     font-weight:bold;
 }
 

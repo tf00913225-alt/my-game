@@ -1886,6 +1886,9 @@ function battleItemIconMarkup(item){
     if(!raw){ return ""; }
     if(raw.indexOf("<img")>=0||raw.indexOf("<svg")>=0||raw.indexOf("<span")>=0){ return raw; }
     const escaped=raw.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!/^(?:data:image\/|blob:|https?:\/\/|\/)|\.(?:avif|webp|png|jpe?g|gif|svg)(?:[?#]|$)/i.test(raw)){
+        return '<span aria-hidden="true">'+escaped+'</span>';
+    }
     return '<img src="'+escaped+'" alt="" aria-hidden="true" draggable="false" decoding="async">';
 }
 
