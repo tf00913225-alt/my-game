@@ -1,0 +1,328 @@
+{
+  "workId": "TOWER-AI-DIVERSITY-20261020",
+  "sourceHead": "59296d18ff467f1994c2b3a4f22283c19669fcb7",
+  "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
+  "method": "Formal launcher, initiative queue, round boundaries, skill/target/damage/status/heal owners and two-wave settlement; seeded RNG; virtual presentation clock; no human experience acceptance.",
+  "independentRuntimePerBattle": true,
+  "seeds": [
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "floors": [
+    10,
+    50,
+    100
+  ],
+  "rawSha256": "207dec61de4710608f8311bfb369ee2fddba05a340ac329df5beb246c9613fb2",
+  "safetyWatchdogCount": 0,
+  "rows": [
+    {
+      "element": "fire",
+      "cases": 48,
+      "wins": 16,
+      "losses": 32,
+      "unfinished": 0,
+      "minRounds": 5,
+      "maxRounds": 10,
+      "meanRounds": 7.041666666666667,
+      "declarations": 1637,
+      "counts": {
+        "normal": 472,
+        "flameSlash": 155,
+        "rage": 76,
+        "fireCritical": 173,
+        "fireRocket": 192,
+        "blazeSpell": 185,
+        "explosiveFlurry": 78,
+        "flameTornado": 135,
+        "phoenixCry": 119,
+        "dragonSlash": 52
+      },
+      "percent": {
+        "normal": 28.83,
+        "flameSlash": 9.47,
+        "rage": 4.64,
+        "fireCritical": 10.57,
+        "fireRocket": 11.73,
+        "blazeSpell": 11.3,
+        "explosiveFlurry": 4.76,
+        "flameTornado": 8.25,
+        "phoenixCry": 7.27,
+        "dragonSlash": 3.18
+      },
+      "repeats": 1,
+      "pairs": 775,
+      "repetitionPercent": 0.12903225806451613,
+      "quotaViolations": 0,
+      "cooldownViolations": 0,
+      "followUpCasts": 159
+    },
+    {
+      "element": "earth",
+      "cases": 48,
+      "wins": 16,
+      "losses": 32,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 12,
+      "meanRounds": 9.5,
+      "declarations": 2341,
+      "counts": {
+        "normal": 669,
+        "sandWind": 286,
+        "stoneThrow": 305,
+        "petrifyFist": 248,
+        "stoneSlash": 259,
+        "stoneBreakSky": 100,
+        "flyingSandStrike": 274,
+        "dustStorm": 129,
+        "earthquakeCrush": 71
+      },
+      "percent": {
+        "normal": 28.58,
+        "sandWind": 12.22,
+        "stoneThrow": 13.03,
+        "petrifyFist": 10.59,
+        "stoneSlash": 11.06,
+        "stoneBreakSky": 4.27,
+        "flyingSandStrike": 11.7,
+        "dustStorm": 5.51,
+        "earthquakeCrush": 3.03
+      },
+      "repeats": 7,
+      "pairs": 1230,
+      "repetitionPercent": 0.5691056910569106,
+      "quotaViolations": 0,
+      "cooldownViolations": 0,
+      "followUpCasts": 0
+    },
+    {
+      "element": "water",
+      "cases": 48,
+      "wins": 16,
+      "losses": 32,
+      "unfinished": 0,
+      "minRounds": 7,
+      "maxRounds": 18,
+      "meanRounds": 9.875,
+      "declarations": 2424,
+      "counts": {
+        "normal": 697,
+        "waterKnife": 277,
+        "waterBall": 294,
+        "frostPunch": 269,
+        "iceArrowRain": 255,
+        "iceSpin": 115,
+        "floodBeast": 288,
+        "freeze": 55,
+        "frostCrush": 67,
+        "healSpell": 107
+      },
+      "percent": {
+        "normal": 28.75,
+        "waterKnife": 11.43,
+        "waterBall": 12.13,
+        "frostPunch": 11.1,
+        "iceArrowRain": 10.52,
+        "iceSpin": 4.74,
+        "floodBeast": 11.88,
+        "freeze": 2.27,
+        "frostCrush": 2.76,
+        "healSpell": 4.41
+      },
+      "repeats": 5,
+      "pairs": 1308,
+      "repetitionPercent": 0.382262996941896,
+      "quotaViolations": 0,
+      "cooldownViolations": 0,
+      "followUpCasts": 0
+    },
+    {
+      "element": "wind",
+      "cases": 48,
+      "wins": 16,
+      "losses": 32,
+      "unfinished": 0,
+      "minRounds": 8,
+      "maxRounds": 14,
+      "meanRounds": 10.833333333333334,
+      "declarations": 2637,
+      "counts": {
+        "windHowlLightning": 244,
+        "normal": 765,
+        "stormCircle": 289,
+        "stormFist": 254,
+        "windSpell": 325,
+        "stormFlurry": 297,
+        "windCrossSlash": 122,
+        "dodgeSkill": 110,
+        "stormRain": 158,
+        "dizzyFist": 73
+      },
+      "percent": {
+        "windHowlLightning": 9.25,
+        "normal": 29.01,
+        "stormCircle": 10.96,
+        "stormFist": 9.63,
+        "windSpell": 12.32,
+        "stormFlurry": 11.26,
+        "windCrossSlash": 4.63,
+        "dodgeSkill": 4.17,
+        "stormRain": 5.99,
+        "dizzyFist": 2.77
+      },
+      "repeats": 2,
+      "pairs": 1393,
+      "repetitionPercent": 0.14357501794687724,
+      "quotaViolations": 0,
+      "cooldownViolations": 0,
+      "followUpCasts": 0
+    }
+  ],
+  "isolation": {
+    "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
+    "cases": [
+      {
+        "mode": "wild",
+        "seed": 1,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "wild",
+        "seed": 7,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "wild",
+        "seed": 42,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "wild",
+        "seed": 123,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "daily",
+        "seed": 1,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "daily",
+        "seed": 7,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "daily",
+        "seed": 42,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "daily",
+        "seed": 123,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "personalBoss",
+        "seed": 1,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "personalBoss",
+        "seed": 7,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "personalBoss",
+        "seed": 42,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "personalBoss",
+        "seed": 123,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "worldBoss",
+        "seed": 1,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "worldBoss",
+        "seed": 7,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "worldBoss",
+        "seed": 42,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "worldBoss",
+        "seed": 123,
+        "casts": 6,
+        "matched": true
+      },
+      {
+        "mode": "abyss",
+        "seed": 1,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "abyss",
+        "seed": 7,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "abyss",
+        "seed": 42,
+        "casts": 36,
+        "matched": true
+      },
+      {
+        "mode": "abyss",
+        "seed": 123,
+        "casts": 36,
+        "matched": true
+      }
+    ]
+  },
+  "browser": {
+    "local": true,
+    "scenes": 27,
+    "result": "PASS",
+    "artifact": "artifacts/browser-qa/tower-challenge.json",
+    "humanExperienceAccepted": false
+  }
+}

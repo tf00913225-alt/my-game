@@ -19,7 +19,7 @@ function setup(element='water',floor=100,count=6){
 }
 function attack(index,random=0){r.run(`Math.random=()=>${random};processSingleMonsterAttack(${index},battleToken);`);}
 function round(n){r.run(`notifyBattleRoundBoundary('round_end',battleToken);turn=${n};notifyBattleRoundBoundary('round_start',battleToken);`);}
-function cleanup(){r.run('finishPlayerAction=__savedFinish;battleActive=false;');}
+function cleanup(){r.run('finishPlayerAction=__savedFinish;if(window.__savedStatusRoll){rollNamedPersistentStatusEffect=__savedStatusRoll;delete window.__savedStatusRoll;}battleActive=false;');}
 
 test('four elements, floor/level boundaries: legal final-data IDs, ranks, roles, SP fallback and unchanged wave topology',()=>{
  for(const element of ['fire','earth','water','wind']){
@@ -52,7 +52,7 @@ test('single decision roll, no same skill while another affordable option exists
 
 test('water ten-enemy pressure: each team quota counts declaration even if freeze is resisted/MISS; skips/death consume neither action nor quota',()=>{
  setup('water',100,10);
- r.run(`monsters.forEach(m=>{m.skillIds=['freeze','waterKnife'];m.v141SupportSkillIds=[];m.skillChance=1;});rollNamedPersistentStatusEffect=()=>false;`);
+ r.run(`monsters.forEach(m=>{m.skillIds=['freeze','waterKnife'];m.v141SupportSkillIds=[];m.skillChance=1;});window.__savedStatusRoll=rollNamedPersistentStatusEffect;rollNamedPersistentStatusEffect=()=>({hit:false,duplicate:false});`);
  // Force the legal carried freeze; failure is still a declaration.
  for(let i=0;i<10;i++){r.run(`monsters[${i}].v175ForcedAttackSkillId='freeze';`);attack(i);}
  assert.equal(r.json('__declarations.filter(d=>d.skillId==="freeze").length'),2);
@@ -64,6 +64,12 @@ test('water ten-enemy pressure: each team quota counts declaration even if freez
  assert.equal(r.json('__declarations.filter(d=>d.round===2).length'),0);
  r.run('monsters[4].v175ForcedAttackSkillId="freeze";');attack(4);
  assert.equal(r.json('__declarations.filter(d=>d.round===2&&d.skillId==="freeze").length'),1);cleanup();
+});
+
+test('freeze MISS consumes one action and declaration, without retrying or double SP cost',()=>{
+ setup();r.run(`monsters[0].skillIds=['freeze','waterKnife'];monsters[0].v141SupportSkillIds=[];monsters[0].skillChance=1;monsters[0].v175ForcedAttackSkillId='freeze';window.__savedHitRoll=rollHitChance;rollHitChance=()=>false;window.__spBefore=monsters[0].sp;`);
+ attack(0);assert.equal(r.run('__finished'),1);assert.equal(r.json('__declarations.length'),1);assert.equal(r.json('__declarations[0].skillId'),'freeze');assert.equal(r.run('__spBefore-monsters[0].sp'),32);
+ r.run('rollHitChance=__savedHitRoll;');round(2);assert.equal(r.run('FourSymbolsTowerSkillPolicy.allows(monsters[0],"freeze")'),false);cleanup();
 });
 
 test('freeze cooldown N+1/N+2, duplicate boundaries and same-round replacement wave cannot reset quotas; new token resets',()=>{

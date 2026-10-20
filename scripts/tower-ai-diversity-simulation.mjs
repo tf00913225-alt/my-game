@@ -30,7 +30,7 @@ export function loadTowerAiRuntime(){
     showMonsterSkillNameBadge=function(name,element,index){
       const m=monsters[index];
       const skillId=Object.keys(skillDatabase).find(id=>skillDatabase[id].name===name)||'normal';
-      __declarations.push({round:turn,token:battleToken,index,skillId,sp:m.sp,role:m.vTowerCombatRole});
+      __declarations.push({round:turn,token:battleToken,index,initiative:initiativeIndex,skillId,sp:m.sp,role:m.vTowerCombatRole});
       return diagnosticBadge.apply(this,arguments);
     };
   `);
@@ -46,8 +46,9 @@ export function loadTowerAiRuntime(){
   return {c,run,json,next,timers,setElement};
 }
 export async function simulateTowerAi({elements=['fire','earth','water','wind'],floors=[10,50,100],seeds=Array.from({length:16},(_,i)=>i+1)}={}){
-  const r=loadTowerAiRuntime(),rows=[];
+  const rows=[];
   for(const element of elements)for(const floor of floors)for(const seed of seeds){
+    const r=loadTowerAiRuntime();
     r.c.__case={element,floor,seed};r.timers.clear();r.setElement(element);
     r.run(`
       battleActive=false;autoPatrolEnabled=false;autoBattle=true;autoBattleTimer=0;
@@ -62,7 +63,10 @@ export async function simulateTowerAi({elements=['fire','earth','water','wind'],
     let steps=0;
     while(!r.json('__outcomes.length')&&steps++<25000){if(!r.next())break;await new Promise(resolve=>setImmediate(resolve));if(r.run('turn')>100)break;}
     const row=r.json(`({element:__case.element,floor:__case.floor,seed:__case.seed,rounds:turn,outcomes:__outcomes,declarations:__declarations,wave:FourSymbolsBattleWaves.getState(),active:battleActive})`);
-    row.steps=steps;rows.push(row);
+    row.steps=steps;
+    const seen=new Set();row.followUpCasts=[];
+    row.declarations=row.declarations.filter(d=>{const key=[d.token,d.round,d.initiative,d.index].join(":");if(seen.has(key)){row.followUpCasts.push(d);return false;}seen.add(key);return true;});
+    rows.push(row);
     // Release the formal session before replacing diagnostic actors.
     if(r.run('battleActive'))r.run("v132AbortDungeonBattle('diagnostic-bound');");
   }
