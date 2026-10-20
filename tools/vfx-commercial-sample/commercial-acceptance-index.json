@@ -424,7 +424,9 @@
       "sourceSha256": "73b005cb0199578af99938aa083b10cd6a465f6151b973ce6a57f5c6922df42c",
       "decision": "PASS_SCOPED_PRESENTATION_STOP_REFINEMENT",
       "review": "tools/vfx-commercial-sample/wind-wide-overcorrection-review.json",
-      "additionalReview": []
+      "additionalReview": [
+        "tools/vfx-commercial-sample/six-enemy-range-usb-review.json"
+      ]
     },
     {
       "id": "stormCircle",
