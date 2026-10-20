@@ -4991,8 +4991,8 @@
     },
     {
       "id": "hero.acquisition",
-      "label": "英雄 acquisition",
-      "entry": "主城英雄→正式 acquisition 控制",
+      "label": "英雄詳情：永久取得區",
+      "entry": "英雄詳情內永久取得區塊；並非獨立頁",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
       "status": "未檢查",
       "states": [
@@ -5051,8 +5051,8 @@
     },
     {
       "id": "hero.growth",
-      "label": "英雄 growth",
-      "entry": "主城英雄→正式 growth 控制",
+      "label": "英雄詳情：成長區",
+      "entry": "英雄詳情內 renderHeroGrowthControls；並非獨立頁",
       "owner": "index.html; js/00-main.js; js/hero-acquisition-client.js; js/hero-growth-client.js",
       "status": "未檢查",
       "states": [
@@ -5368,8 +5368,8 @@
     },
     {
       "id": "relic.growth",
-      "label": "秘寶 growth",
-      "entry": "openHomeFeature('relic'); 正式 growth 控制",
+      "label": "秘寶詳情：強化區",
+      "entry": "秘寶詳情強化區與按鈕；並非獨立頁",
       "owner": "js/60-team-relic-system.js; css/55-team-relic-system.css",
       "status": "未檢查",
       "states": [
@@ -6451,7 +6451,7 @@
       "label": "玩法主頁 dungeon",
       "entry": "showPage('dungeon') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -6533,6 +6533,34 @@
           "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
         }
       }
     },
@@ -7571,9 +7599,9 @@
     {
       "id": "dungeon.exp",
       "label": "exp日常副本與獎勵",
-      "entry": "v141ShowDungeonRewardPreview('exp')",
+      "entry": "日常副本 [data-dungeon-cover=\"exp\"] .v141-dungeon-cover-actions button:first-child → 正式 v148ShowDailyDungeonPreview／v17346ShowEquipmentDungeonPreview；原返回",
       "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "剩餘次數",
         "已耗盡",
@@ -7625,14 +7653,42 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
+        }
       }
     },
     {
       "id": "dungeon.material",
       "label": "material日常副本與獎勵",
-      "entry": "v141ShowDungeonRewardPreview('material')",
+      "entry": "日常副本 [data-dungeon-cover=\"material\"] .v141-dungeon-cover-actions button:first-child → 正式 v148ShowDailyDungeonPreview／v17346ShowEquipmentDungeonPreview；原返回",
       "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "剩餘次數",
         "已耗盡",
@@ -7684,14 +7740,42 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
+        }
       }
     },
     {
       "id": "dungeon.equipment",
       "label": "equipment日常副本與獎勵",
-      "entry": "v141ShowDungeonRewardPreview('equipment')",
+      "entry": "日常副本 [data-dungeon-cover=\"equipment\"] .v141-dungeon-cover-actions button:first-child → 正式 v148ShowDailyDungeonPreview／v17346ShowEquipmentDungeonPreview；原返回",
       "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "剩餘次數",
         "已耗盡",
@@ -7743,6 +7827,34 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
+        }
       }
     },
     {
@@ -8078,7 +8190,7 @@
       "label": "abyss-regions內頁",
       "entry": "玩法頁正式入口→abyss-regions",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "解鎖",
@@ -8131,6 +8243,34 @@
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
+        }
       }
     },
     {
@@ -11160,9 +11300,9 @@
     {
       "id": "shared.prompt",
       "label": "共用 prompt",
-      "entry": "由實際功能開啟既有共用對話框",
+      "entry": "現況 production 無 prompt/rpgPrompt 實作或 caller；非待新增功能",
       "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "不適用",
       "states": [
         "短文",
         "長文",
@@ -11216,7 +11356,8 @@
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "scopeEvidence": "scope_review read-only production source search 2026-10-20；battleTargetPrompt 是戰鬥目標提示，不是輸入對話框"
     },
     {
       "id": "shared.toast",
@@ -11454,6 +11595,93 @@
         "interaction": null,
         "scope": null
       }
+    },
+    {
+      "id": "dungeon.gold",
+      "label": "gold日常副本與獎勵",
+      "entry": "日常副本 [data-dungeon-cover=\"gold\"] .v141-dungeon-cover-actions button:first-child → 正式 v148ShowDailyDungeonPreview／v17346ShowEquipmentDungeonPreview；原返回",
+      "owner": "js/36-v141-content-systems.js; js/equipment-progression.js",
+      "status": "部分已實際驗證",
+      "states": [
+        "剩餘次數",
+        "已耗盡",
+        "難度鎖定",
+        "可進入",
+        "全部獎勵",
+        "確認",
+        "返回"
+      ],
+      "operations": [
+        "開啟",
+        "閱讀完整內容",
+        "操作可見控制",
+        "捲動至末項（若有）",
+        "返回及重新開啟"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      },
+      "stateEvidence": [],
+      "reviews": {
+        "art": null,
+        "interaction": null,
+        "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-9",
+        "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment9-accepted",
+        "verified": [
+          "四類正式預覽入口／正文可讀／完整內容與返回／重開",
+          "副本與深淵對稱標題／保留封面",
+          "原預覽無需捲動時如實記錄",
+          "正式DOM長文壓力fixture另證真touch／wheel末端"
+        ],
+        "notVerified": [
+          "開戰／結算／廣告／真獎勵領取",
+          "真實資料交易／存檔／帳號",
+          "實體裝置",
+          "未列出的其他狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸16張代表實圖限定通過",
+          "scope": "真入口before／after＋原Owner及JS文案精確diff，限定通過",
+          "interaction": "正式四類操作與另列long-formal長文，見報告限定"
+        }
+      }
     }
   ],
   "segmentReviews": [
@@ -11651,6 +11879,16 @@
         "副本正式四類獎勵預覽縮窄與小字",
         "其他清單未驗狀態",
         "最新Head必要CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-9",
+      "head": "3d211ee66151b33d6ae5b4940f92c9de210b2a15",
+      "result": "副本正式四類預覽／深淵與副本標題限定通過；不代表獎勵交易驗收",
+      "pending": [
+        "練功地區獨立標題／小返回",
+        "清單其餘未驗入口與狀態",
+        "最新Head CI／Linux Chrome根因阻塞／部署"
       ]
     }
   ],

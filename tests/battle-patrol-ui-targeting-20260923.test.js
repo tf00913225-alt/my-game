@@ -27,7 +27,8 @@ test("battle log is retired and turn countdown remains fully visible",()=>{
   assert.doesNotMatch(css,/battle-info-toggle\.is-dragging|cursor:ew-resize/);
   assert.doesNotMatch(css,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?z-index:18070 !important/);
-  assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
+  assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ var\(--battle-skill-menu-top-offset\) \+ 8px\);[\s\S]*?opacity:1/);
+  assert.match(css,/--battle-skill-menu-top-offset:188px;/);
   assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?opacity:1/);
 });
