@@ -102,6 +102,28 @@ test('healing uses actual HP <40%, HP-ranked formal tri targets, exact heal/SP a
  assert.ok(r.run('monsters.every(m=>m.hp<=m.maxHP)'));cleanup();
 });
 
+test('formal same-round wave transition preserves spent team quota',async()=>{
+ const w=loadTowerAiRuntime();w.setElement('water');
+ w.run(`prepareWildBalanceReferenceParty(100,3);autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;__waves=GameplaySystem.buildTowerWaves(100);v132LaunchDungeonBattle(__waves[0],outcome=>__outcomes.push(outcome.result),{mode:'tower',waves:__waves});`);
+ for(let n=0;n<30&&!w.run('declaredCharacterIndexes.has(0)');n++){assert.ok(w.next());await new Promise(resolve=>setImmediate(resolve));}
+ w.run(`window.__formalFinish=finishPlayerAction;finishPlayerAction=()=>{};Math.random=()=>0;for(const i of [0,1]){monsters[i].skillIds=['freeze'];monsters[i].v141SupportSkillIds=[];monsters[i].skillChance=1;processSingleMonsterAttack(i,battleToken);}finishPlayerAction=__formalFinish;`);
+ assert.equal(w.json('__declarations.filter(d=>d.skillId==="freeze").length'),2);
+ w.run(`battlePhase='resolve';initiativeQueue=buildInitiativeQueue();initiativeIndex=0;currentBattleMonsters.forEach(i=>{monsters[i].hp=0;monsters[i].alive=false;});finishPlayerAction();`);
+ for(let n=0;n<100&&w.run('FourSymbolsBattleWaves.getState().index')===0;n++){assert.ok(w.next());await new Promise(resolve=>setImmediate(resolve));}
+ assert.equal(w.run('FourSymbolsBattleWaves.getState().index'),1);assert.equal(w.run('turn'),1);
+ assert.equal(w.run('FourSymbolsTowerSkillPolicy.allows(monsters[currentBattleMonsters[0]],"freeze")'),false);
+ w.run(`finishPlayerAction=()=>{};const i=currentBattleMonsters[0];monsters[i].skillIds=['freeze','waterKnife'];monsters[i].v141SupportSkillIds=[];monsters[i].skillChance=1;monsters[i].v175ForcedAttackSkillId='freeze';processSingleMonsterAttack(i,battleToken);`);
+ assert.equal(w.json('__declarations.at(-1).skillId'),'waterKnife');
+ w.run('finishPlayerAction=__formalFinish;v132AbortDungeonBattle("test-complete");');
+});
+
+test('healing excludes dead units, gives zero overheal, and leaves every out-of-shape HP unchanged',()=>{
+ setup();r.run(`monsters.forEach(m=>{m.hp=m.maxHP;m.sp=0;});monsters[0].hp=100;monsters[2].alive=false;monsters[2].hp=0;monsters[5].sp=200;monsters[5].skillIds=['waterKnife'];monsters[5].v141SupportSkillIds=['healSpell'];monsters[5].skillChance=1;monsters[5].v175ForcedSupportSkillId='healSpell';window.__healingTargets=v141GetMonsterAllyTriTargeting(5,undefined,.4).entries.map(e=>e.index);window.__hpBefore=monsters.map(m=>m.hp);`);
+ assert.ok(!r.json('__healingTargets').includes(2));attack(5,.9);assert.equal(r.json('__declarations.at(-1).skillId'),'healSpell');
+ for(let i=0;i<6;i++){if(i===0)assert.ok(r.run('monsters[0].hp>__hpBefore[0]'));else assert.equal(r.run('monsters['+i+'].hp'),r.run('__hpBefore['+i+']'));}
+ cleanup();
+});
+
 test('seeded complete queue battles across four elements and low/mid/high floors finish exactly once',async()=>{
  const report=await simulateTowerAi({seeds:[1,7]});
  for(const row of report.rows){

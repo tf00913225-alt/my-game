@@ -7,7 +7,8 @@ import {fileURLToPath} from 'node:url';
 // Does not model human decisions, device rendering or player experience acceptance.
 export function loadTowerAiRuntime(){
   const {context:c}=loadLegacyRuntime();
-  const timers=new Map();let id=100,clock=0;
+  const timers=new Map(),runtimeErrors=[];let id=100,clock=0;
+  c.console={...console,error:(...args)=>{runtimeErrors.push(args.map(String).join(" "));console.error(...args);}};
   c.Date=class extends Date {static now(){return (c.__diagnosticNow||Date.UTC(2026,9,20))+clock;}};
   c.setTimeout=(fn,ms)=>{timers.set(++id,{fn,at:clock+Math.max(0,Number(ms)||0)});return id;};
   c.clearTimeout=key=>timers.delete(key);
@@ -43,7 +44,7 @@ export function loadTowerAiRuntime(){
     for(let i=0;i<4;i++){const now=Date.UTC(2026,9,20)+i*7*86400000;const week=c.GameplaySystem.getWeekInfo(now);if(week.element===element){c.__diagnosticNow=now;run("GameplaySystem.debugReloadState({},Date.now())");return;}}
     throw new Error("element week missing");
   }
-  return {c,run,json,next,timers,setElement};
+  return {c,run,json,next,timers,setElement,runtimeErrors};
 }
 export async function simulateTowerAi({elements=['fire','earth','water','wind'],floors=[10,50,100],seeds=Array.from({length:16},(_,i)=>i+1)}={}){
   const rows=[];
@@ -64,8 +65,22 @@ export async function simulateTowerAi({elements=['fire','earth','water','wind'],
     while(!r.json('__outcomes.length')&&steps++<25000){if(!r.next())break;await new Promise(resolve=>setImmediate(resolve));if(r.run('turn')>100)break;}
     const row=r.json(`({element:__case.element,floor:__case.floor,seed:__case.seed,rounds:turn,outcomes:__outcomes,declarations:__declarations,wave:FourSymbolsBattleWaves.getState(),active:battleActive})`);
     row.steps=steps;
-    const seen=new Set();row.followUpCasts=[];
-    row.declarations=row.declarations.filter(d=>{const key=[d.token,d.round,d.initiative,d.index].join(":");if(seen.has(key)){row.followUpCasts.push(d);return false;}seen.add(key);return true;});
+    const seen=new Map(),database=r.run('skillDatabase');row.followUpCasts=[];
+    row.declarations=row.declarations.filter(d=>{
+      const key=[d.token,d.round,d.initiative,d.index].join(':');
+      const prior=seen.get(key);
+      if(prior){
+        const skill=database[d.skillId];
+        prior.repeats++;
+        if(!skill?.followUpOnCriticalOrDefeat||d.skillId!==prior.first.skillId||d.sp!==prior.first.sp||prior.repeats>Number(skill.followUpMaxCasts)){
+          throw new Error('Unexpected repeated dispatch '+JSON.stringify({key,prior,declaration:d}));
+        }
+        row.followUpCasts.push(d);return false;
+      }
+      seen.set(key,{first:d,repeats:0});return true;
+    });
+    row.runtimeErrors=r.runtimeErrors;
+    if(row.runtimeErrors.length)throw new Error('Battle Runtime error '+JSON.stringify(row.runtimeErrors));
     rows.push(row);
     // Release the formal session before replacing diagnostic actors.
     if(r.run('battleActive'))r.run("v132AbortDungeonBattle('diagnostic-bound');");

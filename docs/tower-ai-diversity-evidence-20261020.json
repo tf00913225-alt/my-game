@@ -26,7 +26,7 @@
     50,
     100
   ],
-  "rawSha256": "207dec61de4710608f8311bfb369ee2fddba05a340ac329df5beb246c9613fb2",
+  "rawSha256": "a7a4f1eaaeee4bd3f9b21fd8efc49eba346b139081f1b5c5528f0f90258d5cab",
   "safetyWatchdogCount": 0,
   "rows": [
     {
@@ -316,17 +316,36 @@
         "matched": true
       }
     ],
-    "method": "Six-round actual enemy action sequences and HP/SP snapshots matched against the base sources, using formal mode builders/configuration and four RNG seeds; not full other-mode battle-completion or browser acceptance."
+    "method": "Six-round actual enemy action sequences and HP/SP snapshots matched against the base sources, using formal mode builders/configuration and four RNG seeds; not full other-mode battle-completion or browser acceptance.",
+    "reproduce": "node scripts/tower-ai-isolation-regression.mjs ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3"
   },
   "browser": {
     "local": true,
     "scenes": 27,
     "result": "PASS",
     "artifact": "artifacts/browser-qa/tower-challenge.json",
-    "humanExperienceAccepted": false
+    "humanExperienceAccepted": false,
+    "fullBattle": {
+      "passed": true,
+      "artifact": "artifacts/browser-qa/tower-challenge-fullbattle-reference.json",
+      "artifactSha256": "c7b359ba67a3bade516802ecdff7ab4871d6cf012d67d8d934dd7f6f5c22e035",
+      "rounds": 10,
+      "enemyCasts": 48,
+      "waveIndex": 1,
+      "terminal": "BATTLE_COMPLETE",
+      "party": "formal unequipped Lv100 reference party of3",
+      "virtualTime": true,
+      "humanExperienceAccepted": false
+    },
+    "additionalPressureObservation": {
+      "passed": false,
+      "artifact": "artifacts/browser-qa/tower-challenge-fullbattle.json",
+      "fixture": "one player with artificially high HP/intelligence",
+      "limitSeconds": 240,
+      "reason": "did not reach terminal before observation bound; live inspection saw round11 resolve advancing in wave1, no presentation lock; not used as completion evidence or justification for changing game limits"
+    }
   },
   "runtimeSourceHead": "59296d18ff467f1994c2b3a4f22283c19669fcb7",
-  "simulationHarnessHead": "8acfe8de5ec9a2ac06c5b23f47052fd6a4eb3026",
   "counting": "One active declaration per formal initiative identity; authored free fire follow-ups counted separately. Repetition is consecutive active skill declarations by the same entity, excluding normal attacks.",
   "byElementAndFloor": [
     {
@@ -594,5 +613,10 @@
         "dodgeSkill": 34
       }
     }
-  ]
+  ],
+  "simulationHarnessSha256": "0b990416a21888d7d0b5579bcfe8e703af8f5d48c0bd20d9205a35a07fb3346b",
+  "rawPath": "artifacts/tower-ai-diversity/simulation-final.json",
+  "runtimeErrors": 0,
+  "followUpValidation": "All duplicates must use a formal followUpOnCriticalOrDefeat skill, identical skill/SP, and stay within followUpMaxCasts; otherwise simulation throws. All192 cases passed this check.",
+  "permanentRegression": "9 new tests include formal same-round wave transition with exhausted quota, dead/full/out-of-shape healing recipients, resistance and damaging-skill MISS. Existing tower/formation/2-wave suites and V141/V144/V148/V149/V169 suites also passed."
 }
