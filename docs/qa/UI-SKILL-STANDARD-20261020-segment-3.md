@@ -1,4 +1,4 @@
-# UI-SKILL-STANDARD-20261020 — 第三施工段（驗收中）
+# UI-SKILL-STANDARD-20261020 — 第三施工段（限定範圍驗收通過）
 
 - 實圖證實詳情、預覽、比較及一般對話框仍是普通細框。只在既有 css49 共用視覺 Owner 使用技能原 panel 九宮格與黑鐵中心，取代原普通漸層；對稱標題採原素材雕框，保留文字置中和原頁資訊排版，不強套龍牌。
 - 共用背景/邊框來源仍只有 css49；圖檔無新增。原顏色狀態、固定操作列、內容捲動及尺寸 Owner 保留。
@@ -14,3 +14,5 @@
 獨立真touch審核另抓到票券詳情返回後點擊穿透：原預覽正常rehost回 `#game-ui`，卻繼承該非互動host的 `pointer-events:none`。只在原 css33 `.v132-reward-modal.show` 明定可互動，保留後續 `.v132-detail-paused` 的 none 與關閉display:none。原reading QA改用真touch與elementFromPoint斷言，保留首項→詳情→返回→末項→返回→關閉的回歸；不再用程式 `.click()` 充當驗收。
 
 原reading fixture把同一armor同時放背包及已裝備，會正確觸發正式UID防護，故舊equipment-detail只代表錯誤狀態可讀。現改由原factory建立不同UID的背包/已裝備物品，不改任何UID防護或交易程式。票券標題最後在原variant調整上4/下12留白，保留整體框高，待新checkpoint四尺寸實圖再審。
+
+最終 efb2cff919349d6250634f5faca8b12db4b363f9：三方獨立限定通過。`detail-final-efb2cff9` 四尺寸各15實圖；`detail-touch-efb2cff9` 四尺寸各32操作、9正式實圖（合計128操作、36圖），report來源前後雜湊一致。票券十項逐一開啟與返回、關閉再開、長裝備名、短補品名、比較末端、鎖定/解鎖本地fixture均實際觸控。裝備取得/穿戴/出售僅命中檢查，未執行交易。360目錄內較早的failure-report/touch-blocked探索檔不屬最終證據。未涵蓋真實手機硬體、真交易、Auth/啟動、戰鬥、找不到正式入口的prompt，不延伸為全遊戲通過。

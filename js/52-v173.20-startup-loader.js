@@ -177,7 +177,7 @@
         creation.setAttribute("aria-hidden","false");
     }
     async function enterReady(save,offline=false,token=transitionToken){
-        showLoader(); status("載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
+        showLoader(); status("載入角色資料",offline?"使用此帳號已驗證的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
         activateGameplaySaveOwner();
@@ -208,7 +208,7 @@
         await prepareCreationRender();
         if(token!==transitionToken){ return; }
         transition(STATES.NEED_CHARACTER,{uid:resolvedUid});
-        firebase.closeAuth(); status("帳號資料已確認","此 UID 尚無角色，可以建立角色");
+        firebase.closeAuth(); status("帳號資料已確認","此帳號尚無角色，可以建立角色");
         showCharacterCreationSurface();
         if(game){ game.style.display="none"; }
         mark("four-symbols:critical-ready");
@@ -231,7 +231,7 @@
         activeUser=user; resolvedUid=user.uid; saveResolved=false; cloudResult=null; lastError=null;
         startAppShell();
         transition(STATES.SAVE_LOADING,{uid:user.uid}); showLoader();
-        status("讀取帳號角色","正在解析 UID 雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此 UID 的角色資料…");
+        status("讀取帳號角色","正在比對雲端與本機存檔"); accountUi("SAVE_LOADING","正在讀取此帳號的角色資料…");
         const repo=global.FourSymbolsAccountSave;
         repo.activate(user.uid);
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.activate(user.uid); }
@@ -276,7 +276,7 @@
                     // It cannot authorize unverified gameplay changes as cloud state.
                     return migration(localBase===cloudFingerprint
                         ? "此裝置保留了雲端角色之後的本機變更。尚未由後端確認，禁止直接當作正式進度或覆寫；原本機資料會保留。"
-                        : "雲端角色與此 UID 的本機角色沒有共同的已驗證基底。系統禁止靜默選邊或覆寫；原本機資料會保留。",true);
+                        : "雲端角色與此帳號的本機角色無法確認來源一致。為保護資料，目前無法繼續讀取或覆寫；原本機資料會保留。",true);
                 }
             }catch(error){ return fail(error,"無法驗證雲端與本機存檔的來源關係；未覆寫任何資料。",token); }
         }
@@ -291,20 +291,20 @@
             saveResolved=true; mark("four-symbols:save-resolved"); return enterReady(local.save,false,token).catch(error=>fail(error,"角色載入失敗。",token));
         }
         if(legacy.status==="available"){
-            return migration("偵測到此裝置存在舊版角色資料。請確認是否備份並作為目前 UID 的本機角色；原始 legacy key 會保留。",false);
+            return migration("偵測到此裝置的舊版角色資料。請確認是否先備份，再作為目前帳號在此裝置的角色；原始資料會保留。",false);
         }
         if(!safeCloudEmpty(cloud,user.uid)){
             return migration("雲端狀態仍在遷移或無法證明為空；禁止把它當成新帳號。",true);
         }
-        saveResolved=true; mark("four-symbols:save-resolved"); status("帳號資料已確認","此 UID 沒有角色");
+        saveResolved=true; mark("four-symbols:save-resolved"); status("帳號資料已確認","此帳號尚未建立角色");
         return enterCreation(token).catch(error=>fail(error,"創角介面載入失敗。",token));
     }
     function requireAuth(){
         showCity("auth-required");
         activeUser=null; resolvedUid=null; saveResolved=false; cloudResult=null;
         if(global.FourSymbolsGameSave){ global.FourSymbolsGameSave.deactivate(); }else{ global.FourSymbolsAccountSave.deactivate(); }
-        transition(STATES.AUTH_REQUIRED); status("帳號服務已就緒","請登入、註冊或以 Firebase 訪客 UID 開始");
-        accountUi("AUTH_REQUIRED","請先登入、註冊或使用訪客開始遊戲。沒有 UID 時不能建立角色。");
+        transition(STATES.AUTH_REQUIRED); status("帳號服務已就緒","請登入、建立帳號或使用訪客開始遊戲");
+        accountUi("AUTH_REQUIRED","建立角色前，請先登入、建立帳號或使用訪客開始遊戲。");
         void hideLoader();
         mark("four-symbols:critical-ready"); mark("four-symbols:auth-ui-interactive");
     }
@@ -328,7 +328,7 @@
         if(creation){ creation.style.display="none"; creation.setAttribute("aria-hidden","true"); }
         if(game){ game.style.display="none"; }
         showLoader();
-        status("切換帳號","正在清除上一個 UID 的執行狀態並重新載入");
+        status("切換帳號","正在切換登入身份並重新載入");
         emit("four-symbols:account-transition",{reason:String(reason||"account-change")});
         global.location.reload();
     }
@@ -446,11 +446,11 @@
             transition(STATES.AUTH_RESOLVING);
             status("初始化帳號服務","恢復 Firebase Authentication session");
             const user=await (firebasePromise||startFirebaseLifecycle());
-            status("身份確認完成",user?"已取得 UID":"需要玩家選擇登入方式");
+            status("身份確認完成",user?"已確認登入帳號":"需要玩家選擇登入方式");
             onAuth({user,error:null});
         }catch(error){
             if(error&&error.code==="privacy-declined"){ return; }
-            fail(error,"Firebase Authentication 無法初始化；禁止 fail-open 創角。");
+            fail(error,"帳號驗證啟動失敗，請稍後重試。");
         }
     }
     if(retryButton){ retryButton.addEventListener("click",()=>{ retryButton.disabled=true; void boot(true); }); }
@@ -460,7 +460,7 @@
         canCreateCharacter:()=>contract.canCreateCharacter({state,userUid:activeUser&&activeUser.uid,resolvedUid,saveResolved,activeSaveUid:global.FourSymbolsAccountSave.getActiveUid()}),
         openAccountManager:()=>{
             if(!firebase||!activeUser){ return false; }
-            accountUi(state,"目前角色資料綁定此 Firebase UID。");
+            accountUi(state,"目前角色資料已綁定此帳號。");
             return true;
         },
         notifyCharacterCreated:()=>{

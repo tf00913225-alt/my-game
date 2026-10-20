@@ -146,9 +146,10 @@ body > #startupLoader.is-leaving{
     box-sizing:border-box;
     padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
     border:1px solid rgba(229,190,103,.72);
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 10px / 0 stretch;
     border-radius:clamp(10px,3vw,14px);
     transform:translateX(-50%);
-    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
+    background:#151515;
     box-shadow:
         0 12px 36px rgba(0,0,0,.72),
         inset 0 0 26px rgba(225,174,72,.07),
@@ -171,7 +172,7 @@ body > #startupLoader.is-leaving{
 
 #startupLoader .startup-status-row{
     display:flex;
-    align-items:flex-end;
+    align-items:center;
     justify-content:space-between;
     gap:clamp(10px,3vw,22px);
 }
@@ -179,31 +180,32 @@ body > #startupLoader.is-leaving{
 #startupLoader .startup-status-copy{
     min-width:0;
     flex:1 1 auto;
+    text-align:center;
 }
 
 #startupLoader .startup-status-title{
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:#fff4d2;
     font-size:clamp(18px,5.2vw,29px);
     font-weight:900;
     line-height:1.28;
     letter-spacing:.04em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
     text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
 }
 
 #startupLoader .startup-status-detail{
     margin-top:6px;
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:rgba(224,213,187,.8);
     font-family:"Noto Sans TC",sans-serif;
-    font-size:clamp(11px,3.25vw,17px);
+    font-size:clamp(13px,3.25vw,17px);
     font-weight:500;
     line-height:1.35;
     letter-spacing:.02em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
 }
 
 #startupLoader .startup-percent{

@@ -30,10 +30,10 @@
         overlay.setAttribute("aria-hidden","true");
         overlay.innerHTML=[
             '<div class="support-contact-dialog" role="dialog" aria-modal="true" aria-labelledby="supportContactTitle">',
-                '<div class="support-contact-eyebrow">FOUR SYMBOLS SUPPORT</div>',
+                '<div class="support-contact-eyebrow">玩家支援</div>',
                 '<h2 id="supportContactTitle">聯絡客服</h2>',
                 '<p>客服信箱</p>',
-                '<a class="support-contact-email" href="mailto:'+EMAIL+'">'+EMAIL+'</a>',
+                '<a class="support-contact-email" href="mailto:'+EMAIL+'">'+EMAIL.replace('@','@<wbr>')+'</a>',
                 '<button id="supportContactCloseButton" type="button">關閉</button>',
             '</div>'
         ].join("");

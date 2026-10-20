@@ -7276,9 +7276,10 @@ body > #startupLoader.is-leaving{
     box-sizing:border-box;
     padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
     border:1px solid rgba(229,190,103,.72);
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 10px / 0 stretch;
     border-radius:clamp(10px,3vw,14px);
     transform:translateX(-50%);
-    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
+    background:#151515;
     box-shadow:
         0 12px 36px rgba(0,0,0,.72),
         inset 0 0 26px rgba(225,174,72,.07),
@@ -7301,7 +7302,7 @@ body > #startupLoader.is-leaving{
 
 #startupLoader .startup-status-row{
     display:flex;
-    align-items:flex-end;
+    align-items:center;
     justify-content:space-between;
     gap:clamp(10px,3vw,22px);
 }
@@ -7309,31 +7310,32 @@ body > #startupLoader.is-leaving{
 #startupLoader .startup-status-copy{
     min-width:0;
     flex:1 1 auto;
+    text-align:center;
 }
 
 #startupLoader .startup-status-title{
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:#fff4d2;
     font-size:clamp(18px,5.2vw,29px);
     font-weight:900;
     line-height:1.28;
     letter-spacing:.04em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
     text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
 }
 
 #startupLoader .startup-status-detail{
     margin-top:6px;
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:rgba(224,213,187,.8);
     font-family:"Noto Sans TC",sans-serif;
-    font-size:clamp(11px,3.25vw,17px);
+    font-size:clamp(13px,3.25vw,17px);
     font-weight:500;
     line-height:1.35;
     letter-spacing:.02em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
 }
 
 #startupLoader .startup-percent{
@@ -7497,10 +7499,13 @@ body > #startupLoader.is-leaving{
     -webkit-overflow-scrolling:touch;
     padding:16px 18px 15px;
     border:1px solid #b88a3b;
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 10px / 0 stretch;
     border-radius:14px;
-    background:linear-gradient(180deg,#241d13 0%,#0d0c0d 25%,#08080a 100%);
+    background:#151515;
     box-shadow:0 16px 42px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,224,154,.10);
     scrollbar-gutter:stable;
+    scrollbar-width:thin;
+    scrollbar-color:#8a6a3a #151515;
     touch-action:pan-y;
 }
 
@@ -7513,10 +7518,12 @@ body > #startupLoader.is-leaving{
 }
 
 .firebase-auth-eyebrow{
+    flex:1 1 auto;
     min-width:0;
+    text-align:center;
     color:#c9a762;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:clamp(10px,2.7vw,12px);
+    font-size:13px;
     font-weight:800;
     letter-spacing:.1em;
 }
@@ -7530,7 +7537,7 @@ body > #startupLoader.is-leaving{
     border-radius:9px;
     background:linear-gradient(180deg,#332817,#17130d);
     color:#f4e7c4;
-    font:800 clamp(12px,3.1vw,14px)/1.2 "Noto Sans TC",sans-serif;
+    font:800 16px/1.2 "Noto Sans TC",sans-serif;
     touch-action:manipulation;
 }
 
@@ -7539,10 +7546,19 @@ body > #startupLoader.is-leaving{
 }
 
 .firebase-auth-title{
-    margin:2px 0 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    min-height:48px;
+    padding:6px 12px 10px;
+    margin:8px 0 0;
+    text-align:center;
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 6px / 0 stretch;
+    background:#151515;
     font-family:"Noto Serif TC",serif;
-    font-size:clamp(21px,5.4vw,27px);
-    line-height:1.16;
+    font-size:clamp(24px,5.4vw,28px);
+    line-height:1.25;
     letter-spacing:.05em;
     color:#fff3cf;
 }
@@ -7550,8 +7566,8 @@ body > #startupLoader.is-leaving{
 .firebase-auth-subtitle{
     margin:6px 0 10px;
     color:#c7bdab;
-    font-size:clamp(12px,3.1vw,13px);
-    line-height:1.38;
+    font-size:14px;
+    line-height:1.5;
 }
 
 .firebase-auth-status{
@@ -7563,8 +7579,8 @@ body > #startupLoader.is-leaving{
     border-radius:9px;
     background:#09090b;
     color:#dfd4c0;
-    font-size:clamp(12px,3.05vw,13px);
-    line-height:1.4;
+    font-size:14px;
+    line-height:1.5;
 }
 
 .firebase-auth-status.is-error{
@@ -7593,21 +7609,16 @@ body > #startupLoader.is-leaving{
     border-radius:9px;
     background:linear-gradient(180deg,#342816,#17130d);
     color:#fff1c7;
-    font:800 clamp(12px,3.1vw,14px)/1.28 "Noto Sans TC",sans-serif;
+    font:800 16px/1.28 "Noto Sans TC",sans-serif;
     letter-spacing:.015em;
     box-shadow:inset 0 0 0 1px rgba(255,234,180,.10);
     touch-action:manipulation;
 }
 
-.firebase-auth-button:disabled,
-.firebase-auth-back-button:disabled{
-    opacity:.42;
-}
-
 .firebase-auth-button.secondary{
-    border-color:rgba(187,187,187,.36);
-    background:linear-gradient(180deg,#252527,#121214);
-    color:#dedede;
+    border-color:#806239;
+    background:linear-gradient(180deg,#2e2518,#15130f);
+    color:#e0cfaf;
 }
 
 .firebase-auth-button.danger{
@@ -7622,13 +7633,22 @@ body > #startupLoader.is-leaving{
     background:linear-gradient(180deg,#2d261a,#16120d);
 }
 
+.firebase-auth-button:disabled,
+.firebase-auth-back-button:disabled{
+    opacity:1;
+    border-color:#5d5342;
+    color:#b8ad98;
+    background:#191814;
+    cursor:not-allowed;
+}
+
 .firebase-auth-divider{
     display:flex;
     align-items:center;
     gap:9px;
     margin:5px 0 7px;
     color:#8f8576;
-    font-size:clamp(11px,2.9vw,12px);
+    font-size:13px;
 }
 
 .firebase-auth-divider::before,
@@ -7647,7 +7667,7 @@ body > #startupLoader.is-leaving{
 
 .firebase-auth-field label{
     color:#d9c8a6;
-    font-size:clamp(12px,3.05vw,13px);
+    font-size:14px;
     font-weight:700;
 }
 
@@ -7661,7 +7681,7 @@ body > #startupLoader.is-leaving{
     outline:none;
     background:#0c0c0f;
     color:#f8f4ea;
-    font:500 15px/1.25 "Noto Sans TC",sans-serif;
+    font:500 16px/1.25 "Noto Sans TC",sans-serif;
 }
 
 .firebase-auth-field input:focus{
@@ -7672,8 +7692,8 @@ body > #startupLoader.is-leaving{
 .firebase-auth-email-help{
     margin:0 0 5px;
     color:#b8ad9b;
-    font-size:clamp(11px,2.9vw,12px);
-    line-height:1.36;
+    font-size:13px;
+    line-height:1.5;
 }
 
 .firebase-auth-email-actions{
@@ -7705,7 +7725,7 @@ body > #startupLoader.is-leaving{
 .firebase-auth-account-meta{
     margin-top:6px;
     color:#c7bdad;
-    font-size:clamp(12px,3.05vw,13px);
+    font-size:14px;
     line-height:1.42;
 }
 
@@ -7717,21 +7737,21 @@ body > #startupLoader.is-leaving{
     border-radius:8px;
     background:#08080a;
     color:#b9d6ff;
-    font:600 clamp(11px,2.85vw,12px)/1.42 monospace;
+    font:600 13px/1.42 monospace;
 }
 
 .firebase-auth-cloud-state{
     margin-top:8px;
     color:#d4c9b4;
-    font-size:clamp(12px,3.05vw,13px);
+    font-size:14px;
     line-height:1.42;
 }
 
 .firebase-auth-note{
     margin:6px 0 0;
     color:#9e9587;
-    font-size:clamp(11px,2.9vw,12px);
-    line-height:1.36;
+    font-size:13px;
+    line-height:1.5;
 }
 
 .firebase-auth-footer{
@@ -7814,8 +7834,9 @@ body > #startupLoader.is-leaving{
     box-sizing:border-box;
     padding:26px 22px 22px;
     border:2px solid #b88a3b;
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 10px / 0 stretch;
     border-radius:18px;
-    background:linear-gradient(180deg,#2d2417,#0d0b09);
+    background:#151515;
     box-shadow:0 18px 58px rgba(0,0,0,.78),inset 0 0 0 1px rgba(255,231,171,.12);
     color:#f3ead7;
     text-align:center;
@@ -7823,14 +7844,22 @@ body > #startupLoader.is-leaving{
 
 .support-contact-eyebrow{
     color:#b99a61;
-    font:800 12px/1.4 "Cinzel","Noto Serif TC",serif;
+    font:800 13px/1.4 "Cinzel","Noto Serif TC",serif;
     letter-spacing:.12em;
 }
 
 .support-contact-dialog h2{
     margin:7px 0 18px;
+    padding:6px 12px 10px;
+    min-height:48px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    box-sizing:border-box;
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 6px / 0 stretch;
+    background:#151515;
     color:#ffe4a4;
-    font:900 clamp(26px,7vw,34px)/1.25 "Noto Serif TC",serif;
+    font:900 clamp(24px,5.4vw,28px)/1.25 "Noto Serif TC",serif;
 }
 
 .support-contact-dialog p{
@@ -7842,7 +7871,8 @@ body > #startupLoader.is-leaving{
 .support-contact-email{
     display:block;
     padding:13px 10px;
-    overflow-wrap:anywhere;
+    overflow-wrap:normal;
+    word-break:normal;
     border:1px solid rgba(202,165,92,.42);
     border-radius:10px;
     background:rgba(0,0,0,.3);
