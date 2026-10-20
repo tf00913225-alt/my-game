@@ -1,14 +1,15 @@
 {
   "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
   "pr": 958,
-  "status": "focused-geometry-pass-usb-interaction-pending",
+  "status": "focused-geometry-and-usb-interaction-pass-stop",
   "baseline": "ce1e603c",
-  "head": "f77dd6401922a79f4d3d0df87995c0d832227158",
-  "sourceState": "uncommitted candidate; root performs official build",
+  "head": "07b46138ecf3db2b172bcd65e1622b2b7ac9ddb4",
+  "sourceState": "Product checkpoint07b46138 matches the tested composite over f77dd640; official build/build-check PASS. Acceptance-only follow-up does not change product bytes.",
   "sources": {
     "css/fixed-slot-battlefield-rendering-v2.css": "c77cc536aeb69a542d2ca881e0e1538504d2f3a17a4b74fb82830a7cea85ff7a",
     "js/54-v173.51-battle-qa.js": "753953401a6f14e72451e2761bd824e6b1174d501b1997b65e655e454417d8b5",
-    "js/battlefield-render-geometry-adapter.js": "c11b030af9630967e276d4ba8279d5414f876fcbb02f1fb5f223137aed52a3e1"
+    "js/battlefield-render-geometry-adapter.js": "c11b030af9630967e276d4ba8279d5414f876fcbb02f1fb5f223137aed52a3e1",
+    "js/01-stage-v8-touch-lock.js": "1bc6a4885143cec0e5300bb5c85150f04583d68dde0b868571fec7781317807e"
   },
   "evidence": "artifacts/status-badge-probe/single-line-candidate.json",
   "commands": [
@@ -157,5 +158,258 @@
     "Party alpha height decreases 3.855% front and 4.051% rear; do not claim all portraits unchanged",
     "Programmatic horizontal reach proves layout reachability, not physical touch gesture delivery",
     "No CI rerun, commit or push performed by geometry agent"
-  ]
+  ],
+  "checkpointHead": "07b46138ecf3db2b172bcd65e1622b2b7ac9ddb4",
+  "usb": {
+    "state": "PASS_STOP",
+    "device": "2858d1d9c23f7ece",
+    "checkpointHead": "07b46138ecf3db2b172bcd65e1622b2b7ac9ddb4",
+    "sourceIdentityNote": "Fresh origins loaded the built dirty composite before checkpoint; root confirmed checkpoint changed no product bytes. Original geometry head/sourceState retained as historical measurement identity.",
+    "sourceHashesAtReview": {
+      "css/fixed-slot-battlefield-rendering-v2.css": "c77cc536aeb69a542d2ca881e0e1538504d2f3a17a4b74fb82830a7cea85ff7a",
+      "js/54-v173.51-battle-qa.js": "753953401a6f14e72451e2761bd824e6b1174d501b1997b65e655e454417d8b5",
+      "js/battlefield-render-geometry-adapter.js": "c11b030af9630967e276d4ba8279d5414f876fcbb02f1fb5f223137aed52a3e1",
+      "js/01-stage-v8-touch-lock.js": "1bc6a4885143cec0e5300bb5c85150f04583d68dde0b868571fec7781317807e"
+    },
+    "loadedFingerprint": {
+      "href": "http://127.0.0.1:56916/index.html",
+      "bundles": [
+        {
+          "url": "http://127.0.0.1:56916/build/boot-core.3c6f6f5d87d2.css",
+          "bytes": 204305,
+          "sha256": "3c6f6f5d87d207d142a855f45502967810aff708c41f8ad1f7d7744f3c17ee9d",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/boot-core.d767bdf758f2.js",
+          "bytes": 69999,
+          "sha256": "d767bdf758f25f51ae1018c059dc5127a6f4d63268722ebcea391e25baf17cee",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-bootstrap.475fdb2f9168.js",
+          "bytes": 6710,
+          "sha256": "475fdb2f916869d898dab3e5b15b9ceffefacfc1d9bfbc353d162f0a78508c74",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-auth.9f8c09942b79.js",
+          "bytes": 6276,
+          "sha256": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+          "bytes": 12860,
+          "sha256": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-auth-ui.2698bfba1bdc.js",
+          "bytes": 49123,
+          "sha256": "2698bfba1bdc93c9ad3c286e8f5fff5f3b0652791b6c416982fa949e582bf9b6",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-session.877a7842d6bd.js",
+          "bytes": 2882,
+          "sha256": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/firebase-config.4314d6321ba1.js",
+          "bytes": 1681,
+          "sha256": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/firebase/session-client.235aa8b1f47e.js",
+          "bytes": 6112,
+          "sha256": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/app-shell.801bc1a9895d.css",
+          "bytes": 90552,
+          "sha256": "801bc1a9895d07b5e5c48c051e3a6f9447da6aefd71f92baf082285136a56128",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/app-shell.8f876871c96f.js",
+          "bytes": 1193497,
+          "sha256": "8f876871c96fa45a2d9db26f2de17650787e52eb81ccdf71bd6b6436a7e17016",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/feature-patrol.1cef20d37f82.css",
+          "bytes": 2471,
+          "sha256": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/feature-patrol.ab5bd3ce5582.js",
+          "bytes": 9720,
+          "sha256": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/gameplay-core-primary.f565a0cbe6c0.js",
+          "bytes": 677507,
+          "sha256": "f565a0cbe6c0b6a7d8ee086be4b34ca6b018e2112d960f37c649618f13128ed1",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/gameplay-core-secondary.79934cd47cf9.js",
+          "bytes": 742341,
+          "sha256": "79934cd47cf913c75365c59f4acf7c90d9f2ef306b4a61f5de40ec8c00f1a761",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "bytes": 438977,
+          "sha256": "d4f91da44aa9fea810a49ffa84b5824aad61de1f890c947f2d65e1d3f0623d31",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/feature-adventure-entry.f68f5350eccc.css",
+          "bytes": 1306,
+          "sha256": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/feature-adventure-entry.0f3635335ca7.js",
+          "bytes": 5079,
+          "sha256": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+          "basis": "loaded resource URL plus fresh served bytes"
+        },
+        {
+          "url": "http://127.0.0.1:56916/build/feature-adventure-items.cf197e72837f.js",
+          "bytes": 6423,
+          "sha256": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+          "basis": "loaded resource URL plus fresh served bytes"
+        }
+      ],
+      "css": [
+        {
+          "href": "http://127.0.0.1:56916/build/boot-core.3c6f6f5d87d2.css",
+          "css": ".battle-player.active-turn:not(.v174-cardless-unit) { position: relative; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/boot-core.3c6f6f5d87d2.css",
+          "css": ".battle-player.active-turn:not(.v174-cardless-unit)::after { content: \"\"; position: absolute; inset: -4px; border: 4px solid rgb(255, 210, 31); border-radius: 11px; pointer-events: none; z-index: 60; animation: 0.28s linear 0s infinite normal none running activeTurnFrameFlash; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/boot-core.3c6f6f5d87d2.css",
+          "css": ".battle-player.active-turn:not(.v174-cardless-unit).attacker-lunge-up { animation: 0.45s ease 0s 1 normal none running lungeUp; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/boot-core.3c6f6f5d87d2.css",
+          "css": ".battle-player.active-turn:not(.v174-cardless-unit).dodge-back { animation: 0.45s ease 0s 1 normal none running dodgeBack; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage > #app > #game-content #battlePage .battle-player.active-turn:not(.v174-cardless-unit)::after { border-color: var(--v138-element-color) !important; animation: 0.34s linear 0s infinite normal none running v138ElementTurnFrameFlash !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage > #app > #game-content #battlePage .battle-player[data-element=\"earth\"].active-turn:not(.v174-cardless-unit)::after { background: rgba(255, 190, 63, 0.055); border-color: rgb(255, 216, 120) !important; animation: 0.34s linear 0s infinite normal none running v141EarthTurnFlash !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit > .v174-battle-art::after { content: \"\"; position: absolute; left: 50%; bottom: -2px; width: 66%; height: 10px; border-radius: 50%; background: radial-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.22) 45%, transparent 72%); transform: translateX(-50%); opacity: 0.72; pointer-events: none; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before { opacity: 0.65; content: \"\" !important; position: absolute !important; inset: auto auto -2px 50% !important; width: 66% !important; height: 10px !important; transform: translateX(-50%) !important; box-sizing: border-box !important; border: 1px solid rgba(241, 210, 137, 0.72) !important; border-radius: 50% !important; background: radial-gradient(rgba(241, 210, 137, 0.12), rgba(241, 210, 137, 0.25) 65%, transparent 74%) !important; box-shadow: rgba(241, 210, 137, 0.3) 0px 0px 5px 1px !important; pointer-events: none !important; z-index: -1 !important; animation: 2s ease-in-out 0s infinite normal none running v174ManualTurnFootBreath !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow { display: none; position: absolute; left: 50%; top: -5px; width: 0px; height: 0px; border-left: 4px solid transparent; border-right: 4px solid transparent; border-top: 4px solid rgb(236, 209, 144); transform: translateX(-50%); pointer-events: none; z-index: 2; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow { display: block; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after { content: none !important; display: none !important; animation: auto ease 0s 1 normal none running none !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn { outline: 0px !important; box-shadow: none !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "@keyframes v174ManualTurnFootBreath { \n  0%, 100% { opacity: 0.55; }\n  50% { opacity: 0.75; }\n}"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::after, #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable:not(.active-turn)::after { content: none !important; display: none !important; animation: auto ease 0s 1 normal none running none !important; }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art, #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art { filter: drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7))); }"
+        },
+        {
+          "href": "http://127.0.0.1:56916/build/gameplay-core.d4f91da44aa9.css",
+          "css": "@media (prefers-reduced-motion: reduce) {\n  #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before { opacity: 0.65; animation: auto ease 0s 1 normal none running none !important; }\n  #game-stage #battlePage .v174-action-motion, #game-stage #battlePage .v174-portrait-paint, #game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before { animation: auto ease 0s 1 normal none running none !important; }\n  #game-stage #battlePage .v174-battle-art[data-motion=\"dying\"] > .v174-action-motion { opacity: 0.35; }\n  #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.target::before, #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.ally-targetable::before { animation: auto ease 0s 1 normal none running none !important; }\n}"
+        }
+      ]
+    },
+    "ordinary": {
+      "state": "PASS",
+      "evidence": "artifacts/status-badge-scroll-usb/evidence.json",
+      "scope": "Real isolated ordinary 6v6 gameplay scene, five formal icon-only statuses through original renderer. All icons 24x24 logical px, static opacity1. Tap opens detail, target selection takes precedence, detached tap forwards original card, disposal removes HUD layer.",
+      "rowCompleted": true,
+      "visual": "Root reviewed six-v-six.png PASS: icons at feet, single-line identity and HP separate."
+    },
+    "boss": {
+      "state": "PASS",
+      "scope": "Independent fresh-origin controlled Boss layout fixture from existing fixed-slot browser QA. Formal slots/geometry/status renderer/gesture Owner with fixture Boss authority; not a true Core Boss summon claim.",
+      "evidence": "artifacts/status-badge-scroll-boss-fixture-usb/evidence.json",
+      "verifiedBeforeFinalBoundedAssertion": [
+        "five formal static 24px icons for all units",
+        "native swipe reaches last icon without opening modal",
+        "reverse swipe restores first icon without modal",
+        "tap opens original status detail",
+        "target selection wins over detail",
+        "detached tap forwards original card and cleanup"
+      ],
+      "visual": "Reviewer view_image and root viewed Boss left/right PNG: full last icon reachable, portrait and HP preserved. Stop refining.",
+      "historicalFinalAssertion": "The final short-normal detached drag returned scroll0/modalfalse; isolated below with an unchanged longer formal cast."
+    },
+    "detachedNativeDrag": {
+      "state": "PASS",
+      "evidence": "artifacts/status-badge-scroll-detached-long-usb/evidence.json",
+      "cast": "stormRain existing duration2600, no clock override, no pause, no fake stage",
+      "response": {
+        "scrollLeft": 43.0476188659668,
+        "afterDetached": true,
+        "modal": false,
+        "beforeDetached": true
+      },
+      "cleanup": "No detached HUD layer after dispose; fixture restores original Boss authority."
+    },
+    "historicalFixtureFailures": [
+      "Original personal-20 scene has only one Boss; assumed count5 was scratch error, not product regression.",
+      "personal-70 entry was disabled in existing level50 fixture; attempt abandoned without changing eligibility or levels.",
+      "Short normal520ms drag sampled scroll0; not used as product failure or passing detached-scroll evidence. Longer existing cast resolves the bounded window."
+    ],
+    "validation": [
+      "Original gesture lifecycle, touch-scroll convergence, ui-global lock focused suites PASS",
+      "Root reported integrated16 focused tests plus official build/build-check PASS"
+    ],
+    "notClaimed": [
+      "True Boss Core summon gameplay validation",
+      "New modal/normal-air-shot matrix",
+      "60fps/endurance validation"
+    ]
+  },
+  "independent": {
+    "state": "PASS_STOP",
+    "reviewer": "coverage_review",
+    "scope": "Owner convergence and focused native touch badge interactions only; no source-art refinements.",
+    "geometryMeasurementsPreserved": true,
+    "noBlockingProductFinding": true
+  }
 }
