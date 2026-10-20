@@ -707,6 +707,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         let privateChunkBytes=0;
         if(segmented){
             for(const entry of rawChunks){
+                inventoryExact(entry,["id","row"],"raw chunk entry");
                 const bytes=entry?.row?.payloadBytes;
                 if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.chunkBytes)
                     fail("data-loss","Segmented raw chunk bounds differ.");

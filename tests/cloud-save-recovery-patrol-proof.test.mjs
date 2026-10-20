@@ -644,15 +644,15 @@ function candidateQueryDb(db){
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
 }
 
-function privateRawInspector(f,which='inspectCompleteRawCapture',artifactHelper){
+function privateRawInspector(f,which='inspectCompleteRawCapture',artifactHelper,bufferApi){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
-    const native=compiled.require.bind(compiled);if(artifactHelper)compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);
+    const native=compiled.require.bind(compiled);if(artifactHelper||bufferApi)compiled.require=name=>name==='./recovery-audit-artifact'&&artifactHelper?artifactHelper:name==='node:buffer'&&bufferApi?{Buffer:bufferApi}:native(name);
     const original=readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(original.split(needle).length,2);
     // Test-only lexical access to the private pure kernel. Production exports,
     // factory methods and SDK entry points remain unchanged.
-    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
+    compiled._compile((bufferApi?"const Buffer=require('node:buffer').Buffer;\n":'')+original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
     assert.equal(Object.hasOwn(f.recovery,'inspectCompleteRawCapture'),false);
     return compiled.exports.createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)})[which];
 }
@@ -1226,18 +1226,50 @@ test('segmented private proof rejects semantic orphans, lost economic pairs and 
     }
 });
 
-test('segmented row reads recheck original chunk seals and charge one sticky whole-lifecycle budget',async()=>{
+test('segmented private chunk copies isolate external mutation and charge one sticky whole-lifecycle budget',async()=>{
     const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
     let builds=0,token;const tokens=new Set(),wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
         chargeRecoveryAuditAssembly:(budget,...args)=>{tokens.add(budget);return helper.chargeRecoveryAuditAssembly(budget,...args);}};
-    await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
+    const expected=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
+    const privateBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
+    assert.equal(expected.residentUsage.privateChunkBytes,privateBytes);assert.equal(expected.residentUsage.copyChargedBytes,privateBytes);
+    assert.equal(expected.residentUsage.initialHashCheckedBytes,2*privateBytes);assert(expected.residentUsage.rowSpanHashBytes>0);
     const material=copy(base);let scheduled=false;
     const mutation={...helper,indexRawProofPayload:(...args)=>{const result=helper.indexRawProofPayload(...args);
         if(!scheduled){scheduled=true;queueMicrotask(()=>{material.rawChunks[0].row.payloadBytes[100]^=1;});}return result;}};
-    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',mutation)(material),/chunk differs|payload changed/);
+    const original=copy([...f.h.data]),writes=f.h.writes;
+    const actual=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',mutation)(material);
+    const stable=result=>({...result,assemblyUsage:{...result.assemblyUsage,elapsedMs:0}});
+    assert.deepEqual(stable(actual),stable(expected),'copy-after caller mutation cannot replace this sealed snapshot');
+    assert.notDeepEqual(material.rawChunks[0].row.payloadBytes,base.rawChunks[0].row.payloadBytes);
+    assert.deepEqual([...f.h.data],original);assert.equal(f.h.writes,writes);
+    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material),/chunk differs/);
     const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
-    const original=readFileSync(filename,'utf8');assert(original.includes('nodes:16000000'));
-    compiled._compile(original.replace('nodes:16000000','nodes:200000'),filename);
+    const source=readFileSync(filename,'utf8');assert(source.includes('nodes:16000000'));
+    compiled._compile(source.replace('nodes:16000000','nodes:200000'),filename);
     await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports)(copy(base)),/nodes budget exceeded/);
+});
+
+
+test('segmented chunk shape and aggregate copy admission reject before private allocation',async()=>{
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
+    let copies=0;const buffers=new Proxy(Buffer,{get:(target,key)=>key==='from'?((...args)=>{copies++;return Buffer.from(...args);}):Reflect.get(target,key)});
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    for(const mutate of [m=>{m.rawChunks[0].unknown='original-shape-must-reject';},
+        m=>{m.rawChunks[0].row.payloadBytes=Buffer.alloc(PATROL_PROOF_LIMITS.chunkBytes+1);},
+        m=>{m.rawChunks[0].row.payloadBytes=null;},m=>{m.rawChunks[0].extra={nested:true};}]){
+        const material=copy(base);mutate(material);copies=0;
+        await assert.rejects(()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',helper,buffers)(material));
+        assert.equal(copies,0,'strict shape and per-chunk bounds precede every copy');
+    }
+    const reserved=[...base.inventoryPages,...base.rawChunks].reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0),
+        copyBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const source=readFileSync(filename,'utf8');assert(source.includes('bytes:256*1024*1024'));
+    compiled._compile(source.replace('bytes:256*1024*1024','bytes:'+(reserved+copyBytes-1)),filename);copies=0;
+    await assert.rejects(()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports,buffers)(copy(base)),/bytes budget exceeded/);
+    assert.equal(copies,0,'aggregate admission includes reserved input plus fresh copies before any allocation');
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
 });
