@@ -933,6 +933,11 @@ button:disabled{
 .training-zone-list{
     position:relative;
     z-index:2;
+    /* Native nav 216/1080 projects to 84 units on this 420-unit plane. */
+    height:calc(100% - 84px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
 
     display:flex;
     flex-direction:column;

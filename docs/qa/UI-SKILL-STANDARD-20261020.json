@@ -12471,7 +12471,8 @@
       },
       "issues": [
         "35首360入口training-zone-item實際36px/EFPtrue，未達44門檻即停止；尚未進map，非巡邏畫面驗收。原CSS00補52px min-height及flex垂直置中，修後待驗。",
-        "35B eb5實測及CSSOM證明JS17 inline!important仍壓min-height52；修原Owner：移除純樣式啟動函式，實際font20/pad6 14/line1.15收回CSS00，map mappings保留。after待驗。"
+        "35B eb5實測及CSSOM證明JS17 inline!important仍壓min-height52；修原Owner：移除純樣式啟動函式，實際font20/pad6 14/line1.15收回CSS00，map mappings保留。after待驗。",
+        "35C：501首360列表末項實際被native nav壓住且無可捲動祖先。修原列表內部scroll保留84舊座標導覽區，訓練祖先不再禁pan；map坐標及固定背景保留。修後待驗。"
       ],
       "diagnosticEvidence": {
         "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
@@ -26774,6 +26775,17 @@
       "limits": [
         "未進巡邏map",
         "8 restore true；不驗私有cache或瞬態完全還原"
+      ]
+    },
+    {
+      "segment": "segment35-scroll-before",
+      "head": "501bdc2d3e597d88301f297e6accb890cb4e43b5",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-scroll-before",
+      "status": "有問題/未驗收",
+      "problem": "真正52px後第10地區列落導覽下，完整祖先鏈無實際可捲動Owner；並非只查兩層的QA誤判。",
+      "limits": [
+        "未進巡邏map",
+        "8 restore true；private cache/瞬態未驗"
       ]
     }
   ],

@@ -11,3 +11,7 @@ CSS00原training-zone-item唯一Owner新增border-box/flex垂直置中/min-heigh
 eb5首360仍36px，末列不足44；inline/CSSOM診斷證明JS17啟動函式以42px!important壓過CSS00。這是樣式覆蓋，並非已證末端捲動故障。兩組完整失敗/診斷保留segment35-inline-owner-before。
 
 刪JS17完整純樣式函式及DOMContentLoaded呼叫，保原metadata/地圖映射；原實際font20/pad6 14/line1.15回CSS00唯一Owner，52px與flex垂直中心保留。既有回歸保全部斷言並補防inline Owner復發。Targeted兩檔通過，但內建modal browser因無配置exe而跳過，未算實畫通過；build/check通過。固定新Head後真44/末列/返回/巡邏map仍待驗，未宣稱完成。
+
+## 35C 列表末端遮擋（修後待驗）
+
+固定501首360證明真52後末項落nav下；完整祖先鏈無實際可捲動Owner。失敗/原始祖先證據保留segment35-scroll-before，仍未進巡邏map。CSS00原列表作唯一內部scroll，保留84舊座標單位（原native216/1080×420）導覽區；CSS01訓練祖先不再套map的touch-action:none，原map固定坐標與training固定viewport/背景不改。無wrapper或新JS控制。回歸兩檔/buildcheck過；modal browser未配置exe仍不算通過。真touch/末項/返回與後續map待驗。

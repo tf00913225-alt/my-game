@@ -7,7 +7,7 @@
       "build/boot-core.b447fc7be00c.js"
     ],
     "styles": [
-      "build/boot-core.9ef122c72d49.css"
+      "build/boot-core.395518a02ff1.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -23,7 +23,7 @@
           "build/app-shell.254c23dc6ec9.js"
         ],
         "styles": [
-          "build/app-shell.725d1d00b39e.css"
+          "build/app-shell.984f2e5f2fe4.css"
         ],
         "dependencies": [
           "feature-adventure-entry"
@@ -211,9 +211,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.9ef122c72d49.css",
-        "sha256": "9ef122c72d49",
-        "bytes": 205884,
+        "path": "build/boot-core.395518a02ff1.css",
+        "sha256": "395518a02ff1",
+        "bytes": 206067,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -571,9 +571,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.725d1d00b39e.css",
-        "sha256": "725d1d00b39e",
-        "bytes": 90896,
+        "path": "build/app-shell.984f2e5f2fe4.css",
+        "sha256": "984f2e5f2fe4",
+        "bytes": 90847,
         "priority": "P1",
         "type": "style",
         "decode": false
@@ -827,8 +827,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "31620f118e3f",
-    "totalBytes": 24059857,
+    "manifestHash": "f7cd8cb78fa5",
+    "totalBytes": 24059991,
     "totalResources": 79
   },
   "assets": {
@@ -884,13 +884,13 @@
       "sha256": "e3d2d8ecf966",
       "bytes": 35234
     },
-    "build/boot-core.9ef122c72d49.css": {
-      "sha256": "9ef122c72d49",
-      "bytes": 205884
+    "build/boot-core.395518a02ff1.css": {
+      "sha256": "395518a02ff1",
+      "bytes": 206067
     },
-    "build/app-shell.725d1d00b39e.css": {
-      "sha256": "725d1d00b39e",
-      "bytes": 90896
+    "build/app-shell.984f2e5f2fe4.css": {
+      "sha256": "984f2e5f2fe4",
+      "bytes": 90847
     },
     "build/gameplay-core.af5892190f1c.css": {
       "sha256": "af5892190f1c",

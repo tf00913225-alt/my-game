@@ -20,6 +20,11 @@ assert.match(trainingListCss,/min-height:52px;/,"training zone entries must reta
 assert.match(trainingListCss,/font-size:20px;/);
 assert.match(trainingListCss,/line-height:1\.15;/);
 assert.match(trainingListCss,/padding:6px 14px;/);
+const trainingScrollCss=fs.readFileSync("css/00-main.css","utf8").match(/\.training-zone-list\{([^}]+)\}/)[1];
+assert.match(trainingScrollCss,/height:calc\(100% - 84px\);/);
+assert.match(trainingScrollCss,/overflow-y:auto;/);
+assert.match(trainingScrollCss,/touch-action:pan-y;/);
+assert.doesNotMatch(fs.readFileSync("css/01-stage-v8-map-page-fix.css","utf8"),/#trainingPage\{[^}]*touch-action:none/,"the training ancestor must not suppress its list's vertical pan");
 
 function findChrome(){
     const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
