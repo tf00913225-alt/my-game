@@ -95,6 +95,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     // The original factory remains disabled. Only the maintenance constructor
     // binds the sole production Storage Owner; no request/dependency can select IO.
     const publicationPins=new WeakMap(),publicationMaterials=new WeakMap(),publicationArtifacts=new WeakMap(),publicationPreparations=new WeakMap();
+    const privateReadbackOwnership=new WeakMap(); // Memory ownership only, never proof or restore authority.
     const publicationReadProofs=new WeakMap();
     function requirePublicationPreparation(){
         if(immutableCandidateIO===null)fail("failed-precondition","Immutable candidate publication is unavailable.");
@@ -684,7 +685,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     // Structural review of already-materialized schema3 bytes only. No SDK
     // reads, semantic Owner dispatch, candidate approval or restore capability.
     // Decode one bounded capsule at a time; do not concatenate the full capture.
-    function inspectCompleteRawCapture(input,assemblyBudget,segmented=false){
+    function inspectCompleteRawCapture(input,assemblyBudget,segmented=false,ownership){
+        if(ownership&&(!segmented||ownership.input!==input||ownership.budget!==assemblyBudget))
+            fail("data-loss","Private raw readback ownership differs.");
         inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
         const {binding}=input;
         inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
@@ -714,10 +717,10 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     fail("data-loss","Segmented raw chunk bounds differ.");
                 privateChunkBytes+=bytes.length;
             }
-            admitRecoveryAuditAssemblyBytes(assemblyBudget,privateChunkBytes);
+            admitRecoveryAuditAssemblyBytes(assemblyBudget,ownership?0:privateChunkBytes);
             rawChunks=rawChunks.map(entry=>{
-                chargeRecoveryAuditAssembly(assemblyBudget,"bytes",entry.row.payloadBytes.length);
-                return {id:entry.id,row:{...entry.row,payloadBytes:Buffer.from(entry.row.payloadBytes)}};
+                if(!ownership)chargeRecoveryAuditAssembly(assemblyBudget,"bytes",entry.row.payloadBytes.length);
+                return {id:entry.id,row:{...entry.row,payloadBytes:ownership?entry.row.payloadBytes:Buffer.from(entry.row.payloadBytes)}};
             });
         }
         const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces,assemblyBudget);
@@ -775,7 +778,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         // One private sealed-capture reader. Keep only metadata locations after
         // validating the entire original chain; never expose this capability.
         const chunkRows=new Map(rawChunks.map(entry=>[entry.id,entry.row]));
-        const metrics={capsuleDecodes:ordered.length,rowDecodes:0,privateChunkBytes,copyChargedBytes:privateChunkBytes,
+        const metrics={capsuleDecodes:ordered.length,rowDecodes:0,privateChunkBytes,copyChargedBytes:ownership?0:privateChunkBytes,
             initialHashCheckedBytes:2*privateChunkBytes,rowSpanHashBytes:0,
             maxResidentCapsuleBytes:Math.max(...ordered.map(row=>row.payloadByteLength))};
         const release=()=>{}; // No decoded row/capsule is retained by this locator.
@@ -1699,11 +1702,24 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
             close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
     }
+    function registerPrivateReadbackOwnership(input,budget){
+        // This call is followed synchronously by the verifier's get/delete.
+        // Prepay exactly those three Map operations and the one private record.
+        chargeRecoveryAuditAssembly(budget,"nodes",1);
+        chargeRecoveryAuditAssembly(budget,"operations",3);
+        privateReadbackOwnership.set(input,Object.freeze({input,budget}));
+    }
     async function verifySegmentedRawRecoveryProof(input,budget=createRecoveryAuditAssemblyBudget()){
+        // Consume before any budget check/await can throw. A retry must either
+        // decode anew or use the ordinary copying path; no finally re-delete.
+        const ownership=privateReadbackOwnership.get(input);
+        if(ownership)privateReadbackOwnership.delete(input);
         let view;
         try{
+            if(ownership&&ownership.budget!==budget)fail("data-loss","Private raw readback ownership differs.");
+            if(!ownership)chargeRecoveryAuditAssembly(budget,"operations",1);
             chargeRecoveryAuditAssembly(budget,"passes",1);
-            const capture=inspectCompleteRawCapture(input,budget,true),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
+            const capture=inspectCompleteRawCapture(input,budget,true,ownership),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
             view=segmentedRawView(capture,budget,uid);const {tx,root}=view;
             const selected=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId));
             if(!selected.exists||!encodeProofPayload(selected.data(),budget).equals(encodeProofPayload(input.run,budget)))
@@ -2022,6 +2038,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                input.rawState.stateSha256!==tuple.rawStateSha256||
                input.rawState.lastReceiptSha256!==tuple.rawLastReceiptSha256)
                 fail("data-loss","Raw archive original publication binding differs.");
+            registerPrivateReadbackOwnership(input,readBudget);
             const result=await verifySegmentedRawRecoveryProof(input,readBudget);
             if(result.segmentedProofValid!==true||Object.keys(inventoryFlags).some(key=>result[key]!==false)||
                result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision)

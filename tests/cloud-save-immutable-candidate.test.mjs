@@ -18,12 +18,12 @@ function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'},artif
     let source=readFileSync(filename,'utf8');
     const needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(source.split(needle).length,2);
-    source=source.replace(needle,'return Object.freeze({assemblePinnedRawArchive,publicationMaterialTestValue:identity=>publicationValue(publicationMaterials,identity),publicationArtifactTestValue:identity=>publicationValue(publicationArtifacts,identity),publicationPreparationTestValue:identity=>publicationValue(publicationPreparations,identity),pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
+    source=source.replace(needle,'return Object.freeze({registerPrivateReadbackOwnership,verifySegmentedRawRecoveryProof,readbackOwnershipTestValue:input=>privateReadbackOwnership.has(input),assemblePinnedRawArchive,publicationMaterialTestValue:identity=>publicationValue(publicationMaterials,identity),publicationArtifactTestValue:identity=>publicationValue(publicationArtifacts,identity),publicationPreparationTestValue:identity=>publicationValue(publicationPreparations,identity),pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
     if(enabled){
         source=source.replace('return buildRecoveryOwner(deps,null,false);','return buildRecoveryOwner(deps,require("test-only-immutable-candidate-io"),false);');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
-    source=source.replace('return Object.freeze({assemblePinnedRawArchive,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,assemblePinnedRawArchive,');
+    source=source.replace('return Object.freeze({registerPrivateReadbackOwnership,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,registerPrivateReadbackOwnership,');
     if(artifactHelper){const native=compiled.require.bind(compiled);compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);}
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
@@ -543,6 +543,71 @@ test('raw publication snapshots through the fixed transport contract and mismatc
     assert.equal(probe.parses(),parses,'manifest mismatch is refused before parsing or complete proof');
     assert.deepEqual([...bad.h.data],before);assert.equal(bad.h.writes,writes);
     assert.equal(bad.h.data.get(bad.root+'/candidatePublications/'+operationId).status,'prepared');
+});
+
+test('private readback ownership saves only the second chunk copy and is exact-input/token single-use',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await rawPreparedFixture(),wire=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    const a=helper.createRecoveryAuditAssemblyBudget(),b=helper.createRecoveryAuditAssemblyBudget();
+    const original=helper.decodeRawRecoveryArchive(wire,a),owned=helper.decodeRawRecoveryArchive(wire,b);
+    const ordinary=await f.private.verifySegmentedRawRecoveryProof(original,a);
+    f.private.registerPrivateReadbackOwnership(owned,b);
+    assert.equal(f.private.readbackOwnershipTestValue(owned),true);
+    const borrowed=await f.private.verifySegmentedRawRecoveryProof(owned,b);
+    assert.equal(f.private.readbackOwnershipTestValue(owned),false);
+    const p=ordinary.residentUsage.privateChunkBytes;
+    assert(p>0);assert.equal(ordinary.residentUsage.copyChargedBytes,p);assert.equal(borrowed.residentUsage.copyChargedBytes,0);
+    for(const [key,value] of Object.entries(ordinary.residentUsage))if(key!=='copyChargedBytes')assert.equal(borrowed.residentUsage[key],value,key);
+    assert.equal(borrowed.assemblyUsage.bytes,ordinary.assemblyUsage.bytes-p);
+    assert.equal(borrowed.assemblyUsage.nodes,ordinary.assemblyUsage.nodes+1);
+    assert.equal(borrowed.assemblyUsage.operations,ordinary.assemblyUsage.operations+2,'brand set/get/delete3 versus ordinary lookup1');
+    assert.equal(borrowed.assemblyUsage.reservedBytes,0);assert.equal(ordinary.assemblyUsage.reservedBytes,0);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(owned,b),/already reserved/,'the original one-reservation-per-token gate remains');
+    assert.equal((await f.private.verifySegmentedRawRecoveryProof(owned,helper.createRecoveryAuditAssemblyBudget())).residentUsage.copyChargedBytes,p,'consumed input uses the original copy path on a fresh verification');
+    const c=helper.createRecoveryAuditAssemblyBudget(),wrong=helper.createRecoveryAuditAssemblyBudget(),input=helper.decodeRawRecoveryArchive(wire,c);
+    f.private.registerPrivateReadbackOwnership(input,c);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(input,wrong),/ownership differs/);
+    assert.equal(f.private.readbackOwnershipTestValue(input),false);
+    assert.equal((await f.private.verifySegmentedRawRecoveryProof(input,c)).residentUsage.copyChargedBytes,p);
+    const d=helper.createRecoveryAuditAssemblyBudget(),bad=helper.decodeRawRecoveryArchive(wire,d);bad.binding={...bad.binding,epoch:bad.binding.epoch+1};
+    f.private.registerPrivateReadbackOwnership(bad,d);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(bad,d));
+    assert.equal(f.private.readbackOwnershipTestValue(bad),false,'early source failure consumes memory ownership');
+    for(const mutate of [x=>{x.rawChunks[0].extra=true;},x=>{x.rawChunks[0].row.payloadBytes=Buffer.alloc(0);},
+        x=>{x.rawChunks[0].row.payloadBytes=Buffer.alloc(256*1024+1);},x=>{x.rawChunks[0].row.payloadBytes='not-bytes';}]){
+        const budget=helper.createRecoveryAuditAssemblyBudget(),invalid=helper.decodeRawRecoveryArchive(wire,budget);mutate(invalid);
+        f.private.registerPrivateReadbackOwnership(invalid,budget);
+        await assert.rejects(f.private.verifySegmentedRawRecoveryProof(invalid,budget));
+        assert.equal(f.private.readbackOwnershipTestValue(invalid),false,'borrowing never skips entry or Buffer bounds');
+    }
+    const sticky=helper.createRecoveryAuditAssemblyBudget(),expired=helper.decodeRawRecoveryArchive(wire,sticky);
+    f.private.registerPrivateReadbackOwnership(expired,sticky);
+    assert.throws(()=>helper.chargeRecoveryAuditAssembly(sticky,'bytes',256*1024*1024),/bytes budget/);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(expired,sticky),/bytes budget/);
+    assert.equal(f.private.readbackOwnershipTestValue(expired),false,'a preexisting sticky failure still consumes before throwing');
+    assert.equal(borrowed.segmentedProofValid,true);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(borrowed[key],false);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+});
+test('unbranded source copy isolation and private decoded readback isolation survive late external mutation',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await rawPreparedFixture(),wire=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const token=helper.createRecoveryAuditAssemblyBudget(),input=helper.decodeRawRecoveryArchive(wire,token);
+    const before=copy([...f.h.data]),writes=f.h.writes,pending=f.private.verifySegmentedRawRecoveryProof(input,token);
+    queueMicrotask(()=>input.rawChunks[0].row.payloadBytes.fill(0));
+    const result=await pending;assert(result.residentUsage.copyChargedBytes>0);assert(input.rawChunks[0].row.payloadBytes.every(byte=>byte===0));
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    let external,scheduled=false;
+    const probe=rawDecoderProbe(()=>{if(external&&!scheduled){scheduled=true;queueMicrotask(()=>external.fill(0));}}),g=await rawPreparedFixture(probe.helper);
+    const read=g.io.readExact;g.io.readExact=async args=>{const response=await read(args);external=response.bytes;return response;};
+    const proof=await g.private.publishPreparedCandidate(g.request(),g.prepared);
+    assert(scheduled);assert(external.every(byte=>byte===0));
+    assert.equal((await g.private.ackCandidatePublication(g.request(),g.prepared,proof)).status,'acknowledged');
+    let rejectedInput;
+    const invalid={...helper,decodeRawRecoveryArchive:(...args)=>{rejectedInput=helper.decodeRawRecoveryArchive(...args);rejectedInput.binding={...rejectedInput.binding,sourceRevision:rejectedInput.binding.sourceRevision+1};return rejectedInput;}};
+    const badFixture=await rawPreparedFixture(invalid),badBefore=copy([...badFixture.h.data]),badWrites=badFixture.h.writes;
+    await assert.rejects(badFixture.private.publishPreparedCandidate(badFixture.request(),badFixture.prepared),/binding differs/);
+    assert.equal(badFixture.private.readbackOwnershipTestValue(rejectedInput),false,'tuple rejection cannot register memory ownership');
+    assert.deepEqual([...badFixture.h.data],badBefore);assert.equal(badFixture.h.writes,badWrites);
 });
 
 test('raw metadata lookup deadline expires before any create or exact-read side effect',async()=>{
