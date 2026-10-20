@@ -11,7 +11,7 @@ const prepare=fs.readFileSync(path.join(ROOT,'.github/scripts/run-skill-progress
 const viewport=JSON.parse(process.env.UI_READING_VIEWPORT||'[393,873]');
 const out=path.join(ROOT,'artifacts/ui-skill-standard/segment-1-r3',viewport.join('x'));
 fs.mkdirSync(out,{recursive:true});
-const server=await startServer(),port=9810+Math.floor(Math.random()*30);
+const server=await startServer(),port=9800+viewport[0];
 const chrome=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu',`--remote-debugging-port=${port}`,`--user-data-dir=${fs.mkdtempSync(path.join(os.tmpdir(),'ui-standard-'))}`,'about:blank'],{stdio:'ignore',windowsHide:true});
 let c;
 const report={head:execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim(),dirty:!!execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim(),viewport,scenes:[],actions:[],errors:[]};
