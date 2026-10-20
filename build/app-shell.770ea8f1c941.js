@@ -39086,6 +39086,7 @@ const V_ASSET_VERSION="173.73";
         parts.modal.classList.toggle("release-update-forced",forced);
         parts.title.textContent=manifest.title;
         parts.body.innerHTML=renderReleaseContent(manifest,kind);
+        parts.body.scrollTop=0;
         parts.modal.classList.add("show");
         global.FourSymbolsBottomNav?.syncContext();
         state.modalOpen=true;

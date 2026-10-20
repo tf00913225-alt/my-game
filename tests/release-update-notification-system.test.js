@@ -253,6 +253,25 @@ async function test(name,callback){
         assert.doesNotMatch(css,/!important/);
     });
 
+    await test("cross-feature detail starts at its summary before showing, while blocked forced entry preserves the prior body",async()=>{
+        const harness=createHarness({responses:[releaseManifest("V173.41")]});
+        await harness.api.checkForUpdate("scroll-regression",{force:true});
+        harness.window.closeHomeFeature();
+        const stored=[...harness.storage.entries()];
+        harness.body.scrollTop=1600;
+        let scrollWhenShown=null;
+        const add=harness.modal.classList.add.bind(harness.modal.classList);
+        harness.modal.classList.add=(...names)=>{if(names.includes("show")){scrollWhenShown=harness.body.scrollTop;}add(...names);};
+        assert.equal(harness.api.openReleaseDetail("acknowledge"),true);
+        assert.equal(scrollWhenShown,0,"a recycled shared body must reveal the summary on the first visible frame");
+        assert.deepEqual([...harness.storage.entries()],stored,"opening must not acknowledge or change preferences");
+        harness.window.closeHomeFeature();
+        harness.window.battleActive=true;
+        harness.body.scrollTop=900;
+        assert.equal(harness.api.openReleaseDetail("forced"),false);
+        assert.equal(harness.body.scrollTop,900,"a blocked forced update must not alter the active body's scroll");
+    });
+
     await test("Case A: current release auto-opens once per login even when it was already read before",async()=>{
         const current=releaseManifest("V173.41");
         const harness=createHarness({responses:[current],seen:current});
