@@ -948,7 +948,8 @@ button:disabled{
     display:flex;
     align-items:center;
     min-height:52px;
-    font-size:17px;
+    font-size:20px;
+    line-height:1.15;
     font-weight:bold;
 
     color:#e8ddc7;
@@ -971,7 +972,7 @@ button:disabled{
 
     background:rgba(120,110,95,.35);
 
-    padding:4px 10px;
+    padding:6px 14px;
     border-radius:6px;
 
     cursor:pointer;

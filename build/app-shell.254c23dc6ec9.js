@@ -37374,31 +37374,6 @@ const V17344_ZONE_ART={
 try{ if(typeof zoneBackgroundImages!=="undefined"){ Object.assign(zoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }
 try{ if(typeof mapZoneBackgroundImages!=="undefined"){ Object.assign(mapZoneBackgroundImages,V17344_ZONE_ART); } }catch(_){ }
 
-function enforceTrainingRender(){
-    const page=document.getElementById("trainingPage");
-    if(page){
-        page.querySelectorAll(".training-zone-item").forEach(function(el){
-            el.style.setProperty("font-size","20px","important");
-            el.style.setProperty("padding","6px 14px","important");
-            el.style.setProperty("min-height","42px","important");
-            el.style.setProperty("line-height","1.15","important");
-            el.style.setProperty("box-sizing","border-box","important");
-        });
-    }
-
-    /*
-       The training zone information modal used to receive width/max-height/
-       overflow inline styles here. Those declarations fought the shared UI
-       sizing authority and made the whole frame the scroll owner. Geometry is
-       now owned by css/20-stage-v60-training-only-safety.css; this runtime guard
-       intentionally touches only the training-zone list items above.
-    */
-}
-if(document.readyState==="loading"){
-    document.addEventListener("DOMContentLoaded",enforceTrainingRender,{once:true});
-}else{
-    enforceTrainingRender();
-}
 })();
 
 

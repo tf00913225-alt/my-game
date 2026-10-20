@@ -14,6 +14,12 @@ assert.match(css,/#trainingZoneModal #trainingZoneModalBody\{[\s\S]*?flex:1 1 au
 assert.match(css,/#trainingZoneModal \.home-feature-buy-btn\{[^}]*min-height:52px !important;/,"420-unit training controls must retain a 44px touch target at 360px viewport");
 assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.doesNotMatch(runtime,/box\.style\.setProperty\("width"|box\.style\.setProperty\("max-height"|box\.style\.setProperty\("overflow-y"/);
+assert.doesNotMatch(runtime,/enforceTrainingRender|\.style\.setProperty\(/,"training list geometry must remain with its CSS Owner, without startup inline overrides");
+const trainingListCss=fs.readFileSync("css/00-main.css","utf8").match(/\.training-zone-item\{([^}]+)\}/)[1];
+assert.match(trainingListCss,/min-height:52px;/,"training zone entries must retain a 44px projected touch target at 360px");
+assert.match(trainingListCss,/font-size:20px;/);
+assert.match(trainingListCss,/line-height:1\.15;/);
+assert.match(trainingListCss,/padding:6px 14px;/);
 
 function findChrome(){
     const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;

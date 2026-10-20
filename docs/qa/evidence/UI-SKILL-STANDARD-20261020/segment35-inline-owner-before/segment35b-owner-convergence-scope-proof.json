@@ -1,0 +1,33 @@
+{
+  "base": "eb5a180b",
+  "scope": "Exact style-only retirement; original maps/metadata retained and actual prior typography moved to canonical CSS",
+  "rows": [
+    {
+      "file": "js/17-stage-v60-training-render-guard.js",
+      "expectedSha": "f37ef7bb3e0d12b5ddb69060f651013eab9a204d097ce8081f5fae75f646496e",
+      "actualSha": "f37ef7bb3e0d12b5ddb69060f651013eab9a204d097ce8081f5fae75f646496e",
+      "exact": true,
+      "mapsAndMetadataPrefixExact": true
+    },
+    {
+      "file": "css/00-main.css",
+      "expectedSha": "5ce96ebab1a9b3f233a79a21165daeb464c39b5cc0a333498fb7998176a7697b",
+      "actualSha": "5ce96ebab1a9b3f233a79a21165daeb464c39b5cc0a333498fb7998176a7697b",
+      "exact": true
+    },
+    {
+      "file": "build/app-shell.254c23dc6ec9.js",
+      "beforePath": "build/app-shell.5e2c273826d7.js",
+      "expectedSha": "254c23dc6ec976f6a11703878e672eace83f5ad182a1c811c72dc11718ec55bc",
+      "actualSha": "254c23dc6ec976f6a11703878e672eace83f5ad182a1c811c72dc11718ec55bc",
+      "exact": true
+    },
+    {
+      "file": "build/boot-core.9ef122c72d49.css",
+      "beforePath": "build/boot-core.aa47a62134df.css",
+      "expectedSha": "9ef122c72d49078e8cd450ec258c4c666a9f7a195dadf60e8e2ca15e2f49f760",
+      "actualSha": "9ef122c72d49078e8cd450ec258c4c666a9f7a195dadf60e8e2ca15e2f49f760",
+      "exact": true
+    }
+  ]
+}

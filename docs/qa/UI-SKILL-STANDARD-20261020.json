@@ -12470,7 +12470,8 @@
         "scope": null
       },
       "issues": [
-        "35首360入口training-zone-item實際36px/EFPtrue，未達44門檻即停止；尚未進map，非巡邏畫面驗收。原CSS00補52px min-height及flex垂直置中，修後待驗。"
+        "35首360入口training-zone-item實際36px/EFPtrue，未達44門檻即停止；尚未進map，非巡邏畫面驗收。原CSS00補52px min-height及flex垂直置中，修後待驗。",
+        "35B eb5實測及CSSOM證明JS17 inline!important仍壓min-height52；修原Owner：移除純樣式啟動函式，實際font20/pad6 14/line1.15收回CSS00，map mappings保留。after待驗。"
       ],
       "diagnosticEvidence": {
         "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
@@ -26763,6 +26764,17 @@
       "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
       "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-entry-before",
       "status": "36px入口問題，修後實畫待驗"
+    },
+    {
+      "segment": "segment35-inline-owner-before",
+      "head": "eb5a180bc89a7b92e167ce68b4729a013efe3f42",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35-inline-owner-before",
+      "status": "有問題/診斷，非通過",
+      "problem": "JS17原啟動inline min-height42px!important覆蓋CSS00 52，首末仍36px；未能據此斷言捲動故障。",
+      "limits": [
+        "未進巡邏map",
+        "8 restore true；不驗私有cache或瞬態完全還原"
+      ]
     }
   ],
   "titleAudit": {
