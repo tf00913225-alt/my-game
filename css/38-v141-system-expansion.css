@@ -43,7 +43,7 @@
 }
 
 #game-ui #homeFeatureModalBody .home-feature-buy-btn,
-#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn)){
+#game-ui #homeFeatureModalBody button:where(:not(.team-relic-modal button,.quest-claim-all-btn,.v17363-material-synthesis button)){
     min-height:114px;
     font-size:45px;
 }
@@ -622,7 +622,7 @@
 #game-stage .v17363-material-flow section b{max-width:100%;color:#f1d698;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.25;overflow-wrap:anywhere;}
 #game-stage .v17363-material-flow section span{font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.25;}
 #game-stage .v17363-material-flow>i{color:#d3a34f;font-size:calc(18 * var(--ui-length-unit,1px));font-style:normal;}
-#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:calc(44 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #b88740;border-radius:calc(8 * var(--ui-length-unit,1px));color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-weight:900;}
+#game-stage .v17363-material-card .v17363-craft-button{width:100%;min-height:calc(44 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #b88740;border-radius:calc(8 * var(--ui-length-unit,1px));color:#1c1207;background:linear-gradient(180deg,#efd17f,#bd7d2c);font-size:calc(15 * var(--ui-length-unit,1px));font-weight:900;}
 :is(#game-stage,#game-ui) .v141-picker-field{margin-bottom:calc(7 * var(--ui-length-unit,1px));color:#d8c6a5;font-size:calc(14 * var(--ui-length-unit,1px));}
 
 /* Crafting outer spacing is owned by css/49-v169-rpg-ui.css. */
