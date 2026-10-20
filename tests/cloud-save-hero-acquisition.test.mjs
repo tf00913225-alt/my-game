@@ -8,7 +8,7 @@ const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const UID="hero-account-a",BASE=`serverUsers/${UID}`,ENV=`users/${UID}/saves/current`;
 const KING="vajraHeavenlyKing",CLAIM=`${BASE}/uniqueClaims/hero-v1-${KING}`;
 
-function harness(){
+function harness(factory=createHeroAcquisition){
     const data=new Map([[ENV,{ownerUid:UID,serverRevision:1,authoritativeStateReady:false}]]);
     let instant=Date.parse("2026-10-12T03:00:00Z"),active=true,failWrites=false,writes=0;
     const ref=path=>({path,collection:name=>collection(`${path}/${name}`)});
@@ -18,7 +18,7 @@ function harness(){
         limit:count=>collection(path,filter,count,sort)});
     class HttpsError extends Error{constructor(code,message){super(message);this.code=code;}}
     const snapshot=(path,value)=>({id:path.split("/").at(-1),exists:value!==undefined,data:()=>value});
-    const writer=createHeroAcquisition({db:{collection},HttpsError,
+    const dependencies={db:{collection},HttpsError,
         FieldValue:{serverTimestamp:()=>({seconds:1})},now:()=>instant,seed:()=>987654321,
         inspectExistingEnvelope:value=>({kind:"current",data:value,serverRevision:value.serverRevision}),
         nextRevision:envelope=>envelope.serverRevision+1,
@@ -49,9 +49,10 @@ function harness(){
             }};
             const result=await operation(transaction,{uid:UID,sessionId:"A".repeat(32)});
             data.clear();for(const entry of staged)data.set(...entry);writes+=count;return result;
-        }});
+        }};
+    let writer=factory(dependencies);
     const request=extra=>({data:{uid:UID,session:"active",...extra}});
-    return {data,writer,request,read:()=>writer.read(request()),
+    return {data,get writer(){return writer;},replaceFactory:next=>{writer=next(dependencies);},request,read:()=>writer.read(request()),
         observe:revision=>writer.observeLogin(request({expectedRevision:revision??data.get(ENV).serverRevision})),
         ensure:()=>writer.ensureChapterTicket(request({expectedRevision:data.get(ENV).serverRevision})),
         step:async(nodeId,choiceId=null,args={})=>{
@@ -140,6 +141,70 @@ test("invalid calendar/source-session evidence and orphan audit records block so
 });
 
 const DOG="divineDogHongbao";
+const retainedChapterPolicy=JSON.parse(fs.readFileSync(new URL("../functions/src/generated/hero-chapter-qualification-v1.json",import.meta.url),"utf8"));
+const replacementChapterPolicy={...structuredClone(retainedChapterPolicy),startNodeId:"story_opening",endNodeId:"story_finish",
+    nodes:[{id:"story_opening",type:"event",next:"story_finish"},{id:"story_finish",type:"finish",next:null}]};
+function acquisitionWithPolicy(current){
+    function load(relative,overrides){
+        const url=new URL(relative,import.meta.url),localRequire=createRequire(url),module={exports:{}};
+        const context={module,exports:module.exports,require:id=>Object.hasOwn(overrides,id)?overrides[id]:localRequire(id)};
+        vm.runInNewContext(fs.readFileSync(url,"utf8"),context,{filename:url.pathname});
+        return module.exports;
+    }
+    const chapterSource=load("../functions/src/hero-chapter-source.js",{
+        "./generated/hero-chapter-qualification.json":current,
+        "./generated/hero-chapter-qualification-v1.json":retainedChapterPolicy});
+    return load("../functions/src/hero-acquisition.js",{"./hero-chapter-source":chapterSource}).createHeroAcquisition;
+}
+
+test("retained v1 ticket survives policy replacement, renews its prefix and grants exactly once",async()=>{
+    for(const branch of ["safe","bold"]){
+        const h=harness(acquisitionWithPolicy(retainedChapterPolicy));
+        const issued=await h.ensure();await h.step("n01_arrival");
+        h.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));
+        assert.equal((await h.read()).chapter.nextNodeId,"n02_roadfight");
+        await h.step("n02_roadfight");await h.step("n03_fork",branch);
+        const prefix=structuredClone(h.data.get(BASE+"/heroChapter/current").steps);
+        h.advance(8);const expired=structuredClone([...h.data]),writes=h.writes;
+        await assert.rejects(h.step(branch==="safe"?"n04a_path":"n04b_gate"),e=>e.code==="failed-precondition");
+        assert.equal(h.writes,writes);assert.deepEqual([...h.data],expired);
+        const renewed=await h.ensure();assert.notEqual(renewed.chapter.ticketId,issued.chapter.ticketId);
+        const ticket=h.data.get(BASE+"/heroChapterTickets/"+renewed.chapter.ticketId);
+        assert.equal(ticket.startingStepCount,prefix.length);
+        assert.equal(ticket.startingStepSha256,h.data.get(BASE+"/heroChapterSteps/"+prefix.at(-1)).sha256);
+        assert.deepEqual(JSON.parse(JSON.stringify(ticket.policy)),retainedChapterPolicy);
+        assert.deepEqual(h.data.get(BASE+"/heroChapter/current").steps,prefix);
+        for(const id of [branch==="safe"?"n04a_path":"n04b_gate","n05_commission","n06_rest","n07_chest","n08_truth","n09_boss","n10_finish"])await h.step(id);
+        const proof=await h.read(),before=structuredClone([...h.data]),commits=h.writes;
+        assert.equal(proof.chapter.phase,"completed");assert.equal(proof.entitlements[DOG].allocationSeed,987654321);
+        await h.step("n10_finish",null,{expectedRevision:1});h.advance(30);await h.ensure();
+        assert.equal(h.writes,commits);assert.deepEqual([...h.data],before);
+        assert.equal([...h.data.keys()].filter(p=>p===BASE+"/uniqueClaims/hero-v1-"+DOG).length,1);
+    }
+});
+
+test("new tickets use current policy while unknown sealed policies cannot advance or renew",async()=>{
+    const fresh=harness(acquisitionWithPolicy(replacementChapterPolicy));await fresh.ensure();
+    assert.equal((await fresh.read()).chapter.nextNodeId,"story_opening");
+    await fresh.step("story_opening");await fresh.step("story_finish");
+    assert.equal((await fresh.read()).entitlements[DOG].allocationSeed,987654321);
+    const h=harness(acquisitionWithPolicy(retainedChapterPolicy));const issued=await h.ensure();
+    const ticket=h.data.get(BASE+"/heroChapterTickets/"+issued.chapter.ticketId);
+    const {snapshotDigest:digest}=require("../functions/src/canonical-snapshot");
+    ticket.policy={...structuredClone(ticket.policy),startNodeId:"forged",endNodeId:"forged",
+        nodes:[{id:"forged",type:"finish",next:null}]};ticket.policySha256=digest(ticket.policy);
+    const {createdAt,sha256,...proof}=ticket;ticket.sha256=digest(proof);
+    for(const collection of ["operations","ledgerEntries"])h.data.get(BASE+"/"+collection+"/"+ticket.operationId).sourceSha256=ticket.sha256;
+    Object.assign(h.data.get(BASE+"/heroChapter/current"),{policySha256:ticket.policySha256,nextNodeId:"forged"});
+    h.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));
+    const before=structuredClone([...h.data]),writes=h.writes;
+    assert.equal((await h.read()).chapter.nextNodeId,"forged","sealed historical evidence remains readable");
+    await assert.rejects(h.writer.completeChapterNode(h.request({expectedRevision:h.data.get(ENV).serverRevision,
+        ticketId:issued.chapter.ticketId,nodeId:"forged",choiceId:null})),e=>e.code==="failed-precondition");
+    h.advance(8);await assert.rejects(h.ensure(),e=>e.code==="failed-precondition");
+    assert.equal(h.writes,writes);assert.deepEqual([...h.data],before);
+});
+
 async function chapter(h,branch="safe"){
     await h.ensure();
     for(const node of ["n01_arrival","n02_roadfight","n03_fork",
