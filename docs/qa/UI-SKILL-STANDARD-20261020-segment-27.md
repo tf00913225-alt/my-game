@@ -25,3 +25,9 @@ Before d6e52c235760791cae581dc0b86f037b11f5e7ba／360×640六張；After3d14c8b2
 ## 題牌字型補充覆核：暫退回待驗
 
 37501567保存後，art_review補核題牌字形並撤回先前整段美術批准：Boss原header仍為方直黑體，與技能／角色題牌宋明體不同。其餘幾何／閱讀／四尺寸操作與scope證據保留，不宣稱字型已通過。原header局部沿既有Noto Serif TC／serif與900字重，不新增字型、不全域換字；待四尺寸題牌差異實圖與獨立審核後補接受。此補充優先於上方較早的美術結論。
+
+## 題牌字型差異驗證：限定接受
+
+Source60293edc1f0d44438f704bcf4d9074c3b32583d5，四尺寸各首開／關閉重開兩張，共8張，不重跑原長列表矩陣。正式證據segment27-font-delta-accepted，原loaded來源hash／完整report及無損helper保存。
+
+四報告complete／source不變、字型Noto Serif TC／serif、字重900、fontReady=true，題字墨跡完整在牌框內、重開0、原戰鬥狀態不變。art_review逐張實看八圖，確認宋明體收筆與技能／角色題牌一致且不碰關閉鍵，解除字型退回；interaction_review實看四尺寸首開／重開與報告，控制／墨跡及安全欄位保持；scope_review實看四尺寸代表及source單一font修改，無JS業務漂移。三方限定通過，結合3d14既有幾何／閱讀／末端／guard證據，第27段observer呈現範圍接受。舊批准撤回歷史仍保留，真戰鬥／VFX／動態物件／結算及實機限制不變。

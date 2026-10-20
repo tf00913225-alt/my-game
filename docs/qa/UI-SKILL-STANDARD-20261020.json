@@ -12847,6 +12847,16 @@
             "No actual active-battle priority/layer acceptance or actual Boss encounter",
             "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
           ]
+        },
+        {
+          "state": "Boss標題原Owner serif900，四尺寸真開啟/重開題牌文字可見",
+          "status": "已實際驗證",
+          "head": "60293edc1f0d44438f704bcf4d9074c3b32583d5",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-font-delta-accepted",
+          "limits": [
+            "Font-only delta; prior non-serif art approval withdrawn as documented, preserved as historical evidence",
+            "Observer fixture only; actual active battle layer/encounter and all business operations unverified"
+          ]
         }
       ],
       "reviews": {
@@ -12864,6 +12874,14 @@
               "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
               "No actual active-battle priority/layer acceptance or actual Boss encounter",
               "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+            ]
+          },
+          {
+            "segment": "segment-27-font-delta",
+            "head": "60293edc1f0d44438f704bcf4d9074c3b32583d5",
+            "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-font-delta-accepted",
+            "notVerified": [
+              "actual combat/encounter/settlement/real device"
             ]
           }
         ]
@@ -25497,6 +25515,15 @@
         "Observer-only empty/inactive/cleared guards and six formal mechanism presentation cards; true alert/open/end/close/reopen",
         "No actual active-battle priority/layer acceptance or actual Boss encounter",
         "No damage/targeting/turn/settlement/reward/save/escape/transactions/real device acceptance"
+      ]
+    },
+    {
+      "segment": "segment-27-font-delta",
+      "head": "60293edc1f0d44438f704bcf4d9074c3b32583d5",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment27-font-delta-accepted",
+      "result": "標題字型有限通過；保留先前字型批准撤回之歷史",
+      "pending": [
+        "Actual battle states remain unverified"
       ]
     }
   ],
