@@ -27247,9 +27247,7 @@ function renderCharacterShowcaseContent(){
                 html+=
 
                     '<div style="width:calc(66 * var(--ui-length-unit,1px));text-align:center;'+
-                    'cursor:pointer;opacity:'+
-                    (eligible?"1":".55")+
-                    ';" onclick="'+
+                    'cursor:pointer;" onclick="'+
                     (
                         eligible
                         ?
@@ -27267,11 +27265,11 @@ function renderCharacterShowcaseContent(){
                     "</div>"+
 
                     '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
-                    'color:#8a8a8a;">'+
+                    'color:#c5bba8;">'+
                     "未解鎖"+
                     "</div>"+
 
-                    '<div style="font-size:calc(13 * var(--ui-length-unit,1px));color:#7a6f5c;">'+
+                    '<div style="font-size:calc(13 * var(--ui-length-unit,1px));color:#b9ad98;">'+
                     (
                         eligible
                         ?

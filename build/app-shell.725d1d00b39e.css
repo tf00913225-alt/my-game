@@ -2302,10 +2302,6 @@ html, body{
 #creationPage .creation-input{
     height:100px;
 }
-#creationPage .creation-next,
-#creationPage .creation-back{
-    height:124px;
-}
 
 /* V174.1 mobile regression follow-up — scoped to the five reported regressions. */
 

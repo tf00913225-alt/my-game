@@ -1810,8 +1810,11 @@
 
 .v131-exp-actions button:disabled,
 .v131-exp-preview-btn:disabled{
-    opacity:.35 !important;
-    filter:grayscale(.65);
+    opacity:1 !important;
+    color:#b9ad98;
+    border-color:#5d5342;
+    background:#211e18;
+    filter:none;
     pointer-events:none;
 }
 

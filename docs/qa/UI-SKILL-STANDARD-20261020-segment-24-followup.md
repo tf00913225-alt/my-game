@@ -1,0 +1,19 @@
+# 第24段補驗：進行中
+
+本紀錄補充第24段，不取代已接受的有限範圍；尚未完成全介面驗收或部署。
+
+## 24B 角色分頁
+
+c5ea05020f8d2126e3e86ad4fbd2efdcfd75266a 的360×640實際操作已走過三角色×能力值／技能／經驗池的首尾畫面及新增第二角色入口；返回角色頁按鈕實測41.333px，因此整段未通過。CSS56的124px後載覆蓋原CSS29的132px，是此次高度不足的來源，移除該競爭宣告、保留原畫布與操作列。
+
+獨立美術審核實看發現經驗池禁用按鈕及角色鎖定條件過暗。修原CSS31禁用色與原showcase展示字色／透明度，保留disabled與既有業務handlers。
+
+該次經驗池的兩張舊QA卡為測試準備殘留：替換本機三角色後未呼叫原renderExpDistributeList。不得把此圖當作三角色經驗池資料綁定或第三列可達證據，也不據此修改資料邏輯。補驗須先經原renderer更新，再逐列核對正式角色名稱與等級並實際讀至末列。截圖中追趕徽牌裁切仍須在正確資料準備後確認。
+
+## 24C 秘寶摘要一致性
+
+以正式skill feature ensure之前的隔離本機canonical fixture，讓原秘寶Owner首次初始化讀取資料。preinit2失敗是返回selector選中隱藏statusHelpButton，非秘寶hydrate故障。修QA排除該按鈕後，c5ea0502 preinit3的360×640空／已載入兩情境已完整執行，原始存檔與metadata還原、來源hash不變。其他三尺寸及獨立實圖審核尚待完成，不列整段通過。
+
+原始暫存證據：artifacts/ui-skill-standard/segment24b-character-tabs-c5ea0502/prepared/360x640，以及segment24c-summary-preinit2-c5ea0502與segment24c-summary-preinit3-c5ea0502。通過證據須在四尺寸及獨立審核後轉存正式evidence；失敗候選不可代替通過。
+
+Next：正確三角色EXP fixture後補驗24B四尺寸／創角取消；24C其餘三尺寸及三方實圖審核。其餘全介面待驗項目仍以逐項清單與PR即時狀態為準。
