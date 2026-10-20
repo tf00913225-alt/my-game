@@ -10,6 +10,7 @@
 import {
     doc,
     getDoc,
+    getDocFromServer,
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.js";
@@ -78,21 +79,24 @@ export async function screenLegacyMigrationCandidate(candidateRevision,expectedR
     return callTrustedFunction("screenLegacyMigrationCandidate",{candidateRevision,expectedRevision});
 }
 
-export async function readCurrentCloudSave(){
+export async function readCurrentCloudSave({serverOnly=false}={}){
     const db = await ensureFirestore();
     const uid = requireSignedInUid();
     const reference = doc(db, "users", uid, CURRENT_SAVE_SUBCOLLECTION, CURRENT_SAVE_DOCUMENT);
-    const snapshot = await getDoc(reference);
+    const snapshot = await (serverOnly?getDocFromServer(reference):getDoc(reference));
+    if(serverOnly&&(snapshot.metadata?.fromCache!==false||snapshot.metadata?.hasPendingWrites!==false)){
+        throw Object.assign(new Error("Cloud save has not been confirmed by the server."),{code:"cloud-server-unconfirmed"});
+    }
 
     if(!snapshot.exists()){
-        return Object.freeze({ exists: false, uid, path: reference.path, data: null });
+        return Object.freeze({ exists: false, uid, path: reference.path, data: null,...(serverOnly?{serverConfirmed:true}:{}) });
     }
 
     return Object.freeze({
         exists: true,
         uid,
         path: reference.path,
-        data: snapshot.data()
+        data: snapshot.data(),...(serverOnly?{serverConfirmed:true}:{})
     });
 }
 

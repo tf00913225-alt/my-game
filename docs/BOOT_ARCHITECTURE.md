@@ -110,6 +110,8 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 
 正式 cloud write 仍只允許 trusted backend。瀏覽器不得直接 create/update/delete Firestore authoritative progression。
 
+`OFFLINE_READY` 或曾收到同 UID offline 事件的 `READY` 在回線時，只由 Startup Owner 單 flight、每次網路週期一次向伺服器重讀雲端（15 秒背景 deadline，不阻塞 Boot）。Firestore 必須明確非 cache、無 pending writes；UID、Auth generation、Session、啟動 token 與本機資料在 await 前後仍一致才可顯示確認讀取訊息。此流程不 hydrate、不寫本機 payload／metadata／sidecars、不建立 Session、不上傳或選擇衝突勝方，也不改啟動狀態；未確認或衝突沿既有帳號 UI 顯示並保留 Back。`OFFLINE_READY` 的重試沿同唯讀流程，帳號管理保留最近同 UID 結果。確認讀取不等於完整 Cloud Save 或後端進度授權。
+
 ## Critical Boot manifest
 
 `asset-manifest.json` 是部署時的實際清單。未登入的 Critical Boot 只包含：
