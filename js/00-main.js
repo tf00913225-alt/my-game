@@ -31468,10 +31468,6 @@ function showSkillDetail(skillId){
 
     const detailStats=$("skillDetailStats");
 
-    if(detailStats){
-        detailStats.scrollTop=0;
-    }
-
     [
         document.documentElement,
         document.body,
@@ -31486,6 +31482,10 @@ function showSkillDetail(skillId){
     $("skillDetailModal")
         .classList
         .add("show");
+
+    if(detailStats){
+        detailStats.scrollTop=0;
+    }
 
 }
 

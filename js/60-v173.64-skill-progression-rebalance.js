@@ -792,7 +792,7 @@
             ["最低學習等級","Lv"+skill.learnLevel],
             ["目前技能等級",current>0?"Lv"+current:"尚未學習"],
             ["下一級角色需求",next?"角色 Lv"+getRequiredCharacterLevelForSkillLevel(skill,next):"—"],
-            ["技能元素",skill.element||"—"],
+            ["技能元素",typeof SKILL_ELEMENT_TAB_META!=="undefined"&&SKILL_ELEMENT_TAB_META[skill.element]?SKILL_ELEMENT_TAB_META[skill.element].label:"—"],
             ["學習成本",initialLearnCost(context,skill)+" 技能點"+(isCrossElementSkill(context.character,skill)?"（跨修）":"")],
             ["升級成本",upgradeText],
             ["前置技能",isCrossElementSkill(context.character,skill)?"跨修免前置":prerequisiteLabel(skill)]

@@ -13,6 +13,29 @@ assert.match(detailCss,/#game-ui #skillDetailModal #skillDetailStats\{[\s\S]*?fl
 assert.match(detailCss,/#game-ui #skillDetailModal \.close-item-button\{[\s\S]*?margin-top:0 !important;/);
 assert.match(touchSource,/data-scroll-owner="x\|y\|both"/);
 
+// Hidden scroll boxes can retain the old offset: exercise the real opener,
+// including close/reopen and a different skill, rather than a copy of its code.
+function verifySkillDetailReopen(source){
+    const vm=require("node:vm");
+    const opener=source.match(/function showSkillDetail\(skillId\)\{[\s\S]*?\n\}/);
+    assert.ok(opener,"real skill detail opener missing");
+    const visible=new Set();
+    const modal={classList:{add:key=>visible.add(key),remove:key=>visible.delete(key)}};
+    let offset=720;
+    const stats={innerHTML:"",get scrollTop(){return offset;},set scrollTop(value){if(visible.has("show"))offset=value;}};
+    const plain=()=>({style:{},classList:{add(){},remove(){}}});
+    const nodes={skillDetailModal:modal,skillDetailStats:stats,skillDetailIcon:plain(),skillDetailName:plain(),"game-viewport":plain(),"game-stage":plain()};
+    const loadouts={fire:{skillLevels:{second:1}}};
+    const before=JSON.stringify(loadouts);
+    const context={skillDatabase:{first:{name:"第一技能",category:"physical",description:"長說明",spCost:10,maxLevel:10},second:{name:"第二技能",category:"passive",description:"短說明",maxLevel:1}},characterSkillLoadouts:loadouts,currentSkillCharacter:"fire",skillIconImages:{},$:id=>nodes[id],document:{documentElement:plain(),body:plain()},getSkillCategoryLabel:()=>"物理",getSkillCharacterObject:()=>({}),getSkillLearnCostForUi:()=>2,buildSkillLevelBreakdownHTML:skill=>skill.name};
+    vm.createContext(context);vm.runInContext(opener[0],context);
+    context.showSkillDetail("first");assert.equal(offset,0,"show must precede initial scroll reset");
+    offset=720;visible.delete("show");context.showSkillDetail("first");assert.equal(offset,0,"reopen must reset the retained hidden offset");
+    offset=480;visible.delete("show");context.showSkillDetail("second");assert.equal(offset,0,"another skill must also start at the top");assert.match(stats.innerHTML,/第二技能/);
+    offset=240;visible.delete("show");context.showSkillDetail("missing");assert.equal(offset,240);assert.equal(visible.has("show"),false);assert.equal(JSON.stringify(loadouts),before);
+}
+verifySkillDetailReopen(fs.readFileSync("js/00-main.js","utf8"));
+
 function findChrome(){
     const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
     if(configured&&fs.existsSync(configured))return configured;
