@@ -72,7 +72,9 @@
     z-index:3;
     flex:0 0 auto;
     margin:0;
-    padding:0 0 calc(10 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
+    box-sizing:border-box;
+    text-align:center;
     font-size:calc(22 * var(--ui-length-unit,1px));
     color:#ffe08a;
     background:linear-gradient(180deg,#20180f 78%,rgba(32,24,15,.92));
@@ -291,7 +293,7 @@
 
 /* Equipment acquisition/list previews: css/33 owns frame and sole list scroll. */
 .v132-reward-modal-inner.v17346-preview-modal{width:min(calc(360 * var(--ui-length-unit,1px)),calc(100% - calc(24 * var(--ui-length-unit,1px))))!important;height:min(calc(540 * var(--ui-length-unit,1px)),calc(var(--layout-block-size,746.6667px) - calc(24 * var(--ui-length-unit,1px))))!important;max-height:calc(var(--layout-block-size,746.6667px) - calc(24 * var(--ui-length-unit,1px)))!important;display:flex!important;flex-direction:column!important;overflow:hidden!important;padding:calc(16 * var(--ui-length-unit,1px))!important;box-sizing:border-box!important}
-.v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;margin:0 0 calc(12 * var(--ui-length-unit,1px))!important;padding:0!important;background:transparent!important}
+.v132-reward-modal-inner.v17346-preview-modal>h3{position:static!important;flex:0 0 auto!important;min-height:calc(44 * var(--ui-length-unit,1px));margin:0 0 calc(12 * var(--ui-length-unit,1px))!important;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px))!important;background:transparent!important}
 .v132-reward-modal-inner.v17346-preview-modal .v132-preview-list-scroll{flex:1 1 auto!important;min-height:0!important;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain;touch-action:pan-y;scrollbar-gutter:stable}
 .v132-reward-modal-inner.v17346-preview-modal .v132-reward-actions{position:static!important;flex:0 0 auto!important;margin-top:calc(12 * var(--ui-length-unit,1px))!important;padding-top:0!important;background:transparent!important}
 
@@ -334,9 +336,16 @@
 }
 
 .v132-ticket-preview-modal .v132-preview-item{
+    display:grid;
+    grid-template-columns:calc(32 * var(--ui-length-unit,1px)) minmax(0,1fr);
+    column-gap:calc(6 * var(--ui-length-unit,1px));
+    row-gap:0;
     min-height:calc(50 * var(--ui-length-unit,1px));
-    padding:calc(6 * var(--ui-length-unit,1px));
+    padding:calc(4 * var(--ui-length-unit,1px));
 }
+.v132-ticket-preview-modal .v132-preview-icon{grid-column:1;grid-row:1;}
+.v132-ticket-preview-modal .v132-preview-item > b{grid-column:2;grid-row:1;text-align:right;}
+.v132-ticket-preview-modal .v132-preview-item-name{grid-column:1/-1;grid-row:2;text-align:center;}
 
 .v132-ticket-preview-modal .v132-reward-actions{
     position:static;

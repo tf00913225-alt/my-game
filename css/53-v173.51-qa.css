@@ -22,7 +22,7 @@
 #game-ui #itemModal .v17351-compare-stat{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:calc(7 * var(--ui-length-unit,1px))!important;padding:calc(5 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px))!important;border-bottom:calc(1 * var(--ui-length-unit,1px)) solid rgba(111,82,45,.25)!important}
 #game-ui #itemModal .v17351-compare-stat span{min-width:0;flex:1 1 auto;overflow-wrap:anywhere;color:#ab9b80!important}#game-ui #itemModal .v17351-compare-stat b{flex:0 0 auto;overflow-wrap:anywhere;color:#e9c06a!important}
 #game-ui #itemModal .v17351-compare-empty{display:grid!important;place-items:center!important;min-height:calc(48 * var(--ui-length-unit,1px))!important;padding:calc(7 * var(--ui-length-unit,1px))!important;color:#958873!important;text-align:center!important}
-#game-ui #itemModal .v17351-lock-button{border-color:#9c773b!important;background:linear-gradient(180deg,#2d2114,#15100b)!important;color:#efd08a!important;font-weight:900!important}
+#game-ui #itemModal .v17351-lock-button{grid-column:1/-1;border-color:#9c773b!important;background:linear-gradient(180deg,#2d2114,#15100b)!important;color:#efd08a!important;font-weight:900!important}
 #game-ui #itemModal .v17351-lock-button.locked{border-color:#bc8737!important;background:linear-gradient(180deg,#5b3b12,#2a1b0a)!important;color:#ffe292!important;box-shadow:inset 0 0 calc(10 * var(--ui-length-unit,1px)) rgba(236,180,68,.12)!important}
     #game-ui #itemModal .v17351-compare-grid{grid-template-columns:minmax(0,1fr)!important}
     #game-ui #itemModal .v17351-compare-pane>strong{min-height:0!important}

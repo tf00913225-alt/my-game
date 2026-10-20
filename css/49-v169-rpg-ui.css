@@ -317,6 +317,9 @@ body > .v169-rpg-dialog-layer{
    to force content into the frame. */
 #game-ui #itemModal #itemModalName{
     margin:calc(5 * var(--ui-length-unit,1px)) 0 calc(9 * var(--ui-length-unit,1px));
+    min-height:calc(44 * var(--ui-length-unit,1px));
+    padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));
+    box-sizing:border-box;
     font-size:calc(20 * var(--ui-length-unit,1px));
     line-height:1.35;
     overflow-wrap:anywhere;
