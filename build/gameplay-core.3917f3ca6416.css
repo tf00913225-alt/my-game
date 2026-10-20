@@ -13,20 +13,20 @@
 #battlePage .battle-mechanism-alert{
     top:98px;
     right:0;
-    width:36px;
-    height:48px;
+    width:52px;
+    height:56px;
     border-right:0;
     border-radius:8px 0 0 8px;
     color:#ff3b30;
     font-size:32px;
     font-weight:1000;
-    line-height:42px;
+    line-height:50px;
     text-shadow:0 0 8px rgba(255,59,48,.65);
     animation:battleMechanismAlertPulse .48s steps(2,end) infinite;
 }
 @keyframes battleMechanismAlertPulse{
-    0%,100%{opacity:1;transform:scale(1);}
-    50%{opacity:.28;transform:scale(.9);}
+    0%,100%{opacity:1;}
+    50%{opacity:.7;}
 }
 #battlePage .battle-insight-drawer{
     position:absolute;
@@ -43,7 +43,7 @@
     transition:transform .18s ease-out;
     pointer-events:none;
 }
-#battlePage .battle-boss-mechanism-drawer{right:0;transform:translateX(102%);border-right:0;}
+#battlePage .battle-boss-mechanism-drawer{right:0;transform:translateX(102%);}
 #battlePage .battle-insight-drawer.open{transform:translateX(0);pointer-events:auto;}
 #battlePage.v-fixed-slot-render-v2 .battle-center-region{
     position:relative;
@@ -51,17 +51,18 @@
 }
 #battlePage .battle-insight-drawer > header{
     flex:0 0 auto;
-    display:flex;
+    display:grid;
+    grid-template-columns:52px minmax(0,1fr) 52px;
     align-items:center;
-    justify-content:space-between;
-    min-height:48px;
-    padding:8px 10px;
+    min-height:64px;
+    gap:6px;
+    padding:10px 12px;
     border-bottom:1px solid rgba(189,138,54,.62);
     color:#f4d586;
 }
-#battlePage .battle-insight-drawer > header b{font-size:18px;}
+#battlePage .battle-insight-drawer > header b{grid-column:2;min-width:0;padding:6px;text-align:center;font-size:20px;line-height:1.4;overflow-wrap:anywhere;}
 #battlePage .battle-insight-drawer > header button{
-    width:38px;height:36px;border:1px solid rgba(199,150,67,.68);border-radius:7px;
+    grid-column:3;width:52px;height:52px;padding:0;border:1px solid rgba(199,150,67,.68);border-radius:7px;
     background:rgba(38,27,14,.9);color:#f6dda1;font-size:23px;line-height:30px;
 }
 #battlePage .battle-insight-drawer-body{
@@ -69,30 +70,30 @@
     min-height:0;
     overflow-y:auto;
     overflow-x:hidden;
-    padding:9px;
+    padding:12px;
     overscroll-behavior:contain;
     -webkit-overflow-scrolling:touch;
 }
 .battle-mechanism-card{
-    margin:0 0 9px;
-    padding:9px;
+    margin:0 0 12px;
+    padding:12px;
     border:1px solid rgba(158,116,51,.56);
     border-radius:9px;
     background:linear-gradient(145deg,rgba(39,27,15,.93),rgba(10,9,7,.94));
 }
-.battle-mechanism-card > div span{color:#b9a47a;font-size:13px;}
+.battle-mechanism-card > div span{color:#b9ad98;font-size:16px;}
 .battle-insight-empty{padding:20px 8px;color:#c5b38e;font-size:14px;line-height:1.6;text-align:center;}
 .battle-mechanism-title{display:flex;align-items:center;gap:8px;margin-bottom:7px;}
 .battle-mechanism-title img,.battle-mechanism-title > span{
     width:42px;height:42px;border:1px solid rgba(202,73,59,.7);border-radius:7px;object-fit:contain;
 }
 .battle-mechanism-title > span{display:grid;place-items:center;color:#ff5144;font-size:28px;font-weight:1000;}
-.battle-mechanism-title b{color:#f6d99a;font-size:16px;}
-.battle-mechanism-card p{margin:6px 0 10px;color:#eadcc0;font-size:14px;line-height:1.55;}
+.battle-mechanism-title b{min-width:0;overflow-wrap:anywhere;color:#f6d99a;font-size:20px;line-height:1.4;}
+.battle-mechanism-card p{margin:6px 0 10px;color:#eadcc0;font-size:18px;line-height:1.6;overflow-wrap:anywhere;}
 .battle-mechanism-card > div:not(.battle-mechanism-title){
     display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px;margin-top:5px;
 }
-.battle-mechanism-card > div:not(.battle-mechanism-title) b{color:#f0d493;font-size:14px;line-height:1.45;}
+.battle-mechanism-card > div:not(.battle-mechanism-title) b{min-width:0;overflow-wrap:anywhere;color:#f0d493;font-size:18px;line-height:1.5;}
 
 #battlePage .battle-round-prompt{
     position:absolute;
@@ -7007,7 +7008,8 @@ body > .v169-rpg-dialog-layer{
 #game-stage #battlePage .skill-quick-bar,
 #game-stage #battlePage .battle-item-menu,
 #game-stage #battlePage .battle-target-prompt,
-#game-stage #battlePage .battle-status-detail-panel{
+#game-stage #battlePage .battle-status-detail-panel,
+#game-stage #battlePage .battle-boss-mechanism-drawer{
     border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     border-radius:calc(10 * var(--ui-length-unit,1px));
@@ -7036,7 +7038,8 @@ body > .v169-rpg-dialog-layer{
 .v169-rpg-dialog h2,
 .v141-reward-toast > strong,
 .v17351-ad-panel h2,
-#game-stage #battlePage .battle-status-detail-panel h3{
+#game-stage #battlePage .battle-status-detail-panel h3,
+#game-stage #battlePage .battle-boss-mechanism-drawer > header b{
     border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-text,#EEE7D8);
