@@ -60,7 +60,7 @@ function browser(state,tape,definition){
   declarations.push(...['getMainCharacterStats','projectRelicBattleStats','getRelicFinalEvasionPercent','getCharacterSkillKey','getLearnedElementEX','getWindEXFinalEvasionBonusPercent'].map(extract));
   vm.runInContext(declarations.join('\n'),context);
   for(const file of ['js/33-v140-four-element-balance.js','js/43-v149-skill-ui-rules.js',
-    'js/44-v152-dev-fixes.js','js/60-v173.64-skill-progression-rebalance.js']){
+    'js/44-v152-dev-fixes.js',"functions/src/skill-progression-core.js",'js/60-v173.64-skill-progression-rebalance.js']){
     vm.runInContext(fs.readFileSync(file,'utf8'),context,{filename:file});
   }
   const enemy={...definition.stats,level:definition.spec.level,element:definition.spec.element};

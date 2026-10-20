@@ -79,7 +79,7 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/49-v169-element-box-settings.js",
     "js/50-v169-water-skill-rules.js",
     "js/51-v169-rpg-ui.js",
-    "js/60-v173.64-skill-progression-rebalance.js",
+    "functions/src/skill-progression-core.js","js/60-v173.64-skill-progression-rebalance.js",
     "js/59-abyss-two-tier-runtime.js",
 ];
 
