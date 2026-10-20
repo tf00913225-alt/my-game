@@ -1,0 +1,228 @@
+{
+  "workId": "BATTLE-BASIC-AIR-SHOT-20261021",
+  "reviewDate": "2026-10-21",
+  "decision": "PASS_FOCUSED_SCOPE_STOP_VISUAL_REFINEMENT",
+  "scope": "Normal-only air projectile; existing normal impact,520ms clock and hit.57 unchanged. No balance or save changes.",
+  "sourceSnapshot": {
+    "gitHead": "55556ec2c663f83e3f88942ecff0ca8418d44779",
+    "js39Sha256": "c639b4eacac6fa3082a5f1966fc32d12affb2b150d4a8581aa0547d0f62b920c",
+    "assetSha256": "6d23bf9346e995c366035ce904bfa84b9979757a0b02db31398331fd7247823f"
+  },
+  "engineering": {
+    "decision": "PASS",
+    "method": "Independent read-only runtime diff and new behavior-test review; did not repeat full tests.",
+    "checks": [
+      "Official actor and actual target slot anchors; projectile size52–64px.",
+      "Air:index and impact index keys remain separate; confirmed hit and MISS do not share impact confirmation.",
+      "Same existing impact visual clock; late attachment catches up rather than making a new hit clock.",
+      "Existing cleanup cancels WAAPI tracks; stale deferred starts guard current/done.",
+      "No new renderer, recurring emitter, gameplay formula or target authority."
+    ]
+  },
+  "loadedSnapshot": {
+    "headAtUsb": "55556ec2c663f83e3f88942ecff0ca8418d44779",
+    "freshOrigin": "http://127.0.0.1:49304/index.html",
+    "bundles": [
+      {
+        "url": "http://127.0.0.1:49304/build/app-shell.801bc1a9895d.css",
+        "bytes": 90552,
+        "sha256": "801bc1a9895d07b5e5c48c051e3a6f9447da6aefd71f92baf082285136a56128",
+        "basis": "loaded resource URL plus fresh served bytes"
+      },
+      {
+        "url": "http://127.0.0.1:49304/build/app-shell.fe2b850fe656.js",
+        "bytes": 1191008,
+        "sha256": "fe2b850fe656441991ab65953a54190cd39dd8105894deec2bbec1ac2d52db6f",
+        "basis": "loaded resource URL plus fresh served bytes"
+      },
+      {
+        "url": "http://127.0.0.1:49304/build/gameplay-core-primary.b889e88b3c10.js",
+        "bytes": 680653,
+        "sha256": "b889e88b3c10e39dad646994eef6ac19be25ff1fb6d8a4ecfcc5ae8dd713510f",
+        "basis": "loaded resource URL plus fresh served bytes"
+      },
+      {
+        "url": "http://127.0.0.1:49304/build/gameplay-core-secondary.ed4ee8e649c6.js",
+        "bytes": 740319,
+        "sha256": "ed4ee8e649c6e0253b196a2b225888c3f1df35d55ac270faac936c66d28b409f",
+        "basis": "loaded resource URL plus fresh served bytes"
+      },
+      {
+        "url": "http://127.0.0.1:49304/build/gameplay-core.fc4d2574e94d.css",
+        "bytes": 433611,
+        "sha256": "fc4d2574e94d9545ca4ba85a95c2b9c9ac31365918df07a49b5da5e753e6969c",
+        "basis": "loaded resource URL plus fresh served bytes"
+      }
+    ],
+    "identityBasis": "Resource URLs loaded by the physical Chrome tab plus SHA256 of fresh served bytes; no claim to hash in-memory execution."
+  },
+  "presentationTechnical": {
+    "decision": "PASS",
+    "evidence": "artifacts/normal-air-shot-usb-v2/evidence.json",
+    "fixture": "Formal director and floating-feedback owners, real six allies/six enemies; synthetic presentation calls do not prove Core propagation.",
+    "caseCount": 12,
+    "cases": [
+      {
+        "side": "player",
+        "actorIndex": 0,
+        "targetIndex": 0,
+        "confirmed": true,
+        "impactVisibleSamples": 4,
+        "cleanup": true
+      },
+      {
+        "side": "player",
+        "actorIndex": 0,
+        "targetIndex": 0,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      },
+      {
+        "side": "player",
+        "actorIndex": 2,
+        "targetIndex": 2,
+        "confirmed": true,
+        "impactVisibleSamples": 5,
+        "cleanup": true
+      },
+      {
+        "side": "player",
+        "actorIndex": 2,
+        "targetIndex": 2,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      },
+      {
+        "side": "player",
+        "actorIndex": 5,
+        "targetIndex": 5,
+        "confirmed": true,
+        "impactVisibleSamples": 4,
+        "cleanup": true
+      },
+      {
+        "side": "player",
+        "actorIndex": 5,
+        "targetIndex": 5,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 0,
+        "targetIndex": 0,
+        "confirmed": true,
+        "impactVisibleSamples": 5,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 0,
+        "targetIndex": 0,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 2,
+        "targetIndex": 2,
+        "confirmed": true,
+        "impactVisibleSamples": 4,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 2,
+        "targetIndex": 2,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 5,
+        "targetIndex": 5,
+        "confirmed": true,
+        "impactVisibleSamples": 4,
+        "cleanup": true
+      },
+      {
+        "side": "monster",
+        "actorIndex": 5,
+        "targetIndex": 5,
+        "confirmed": false,
+        "impactVisibleSamples": 0,
+        "cleanup": true
+      }
+    ],
+    "readingHidden": true,
+    "disposeAndStaleStartCleanup": true,
+    "runtimeExceptions": []
+  },
+  "visual": {
+    "decision": "PASS_REPRESENTATIVE_NATIVE_FRAMES",
+    "method": "Physically recorded, uninterrupted original720x1280 movie. Chrome native H264 decoded selected samples at12fps-quantized media times; no cast/WAAPI pausing, image crop, resize or repaint.",
+    "findings": [
+      "Compact pale compressed-air head and short trail remain recognizable at actual phone size; no enlargement needed.",
+      "Upward and downward trajectories follow the corresponding real actor/target sides.",
+      "Confirmed impact stays on target; MISS has no confirmed impact.",
+      "HUD remains in front of flight where paths cross information bands; no observed name/resource or Element Box text obstruction."
+    ],
+    "flightFrames": [
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0002.png",
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0005.png",
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0007.png",
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0009.png",
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0012.png"
+    ],
+    "rootViewedAndAcceptedFrames": [
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0005.png",
+      "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\sequence-frames\\frame-0009.png"
+    ],
+    "impactComparisonDirectory": "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\impact-samples",
+    "samplingLimit": "12 selected native frames, not every frame of the movie. Selected frames1/11 are not used as visible-flight proof. No60fps, frame-perfect smoothness or endurance claim."
+  },
+  "video": {
+    "path": "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\normal-air-shot.mp4",
+    "sha256": "a87a6c71e511028981af41455f5aa91f2624abc79d41bcdd97cfcb36e05c82dd",
+    "durationSeconds": 10.009589,
+    "size": [
+      720,
+      1280
+    ],
+    "continuousCaseElapsedSeconds": 8.843199999988078,
+    "startAcknowledgementDelaySeconds": 0.03390000000596047,
+    "coverage": "Replacement10-second clip includes all12case starts and the8.843-second uninterrupted presentation sequence. Start screenshot was omitted to avoid the old2.703-second delay.",
+    "decodeMetadata": "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb-v2\\native-decode.json",
+    "oldClipLimit": {
+      "path": "C:\\Projects\\my-game\\.vfx-work\\basic-air-shot\\artifacts\\normal-air-shot-usb\\normal-air-shot.mp4",
+      "sha256": "7eefe1f3875dfaecf4485f8fc274ba4db9bcb73882dea0234d298ef46c90d806",
+      "description": "Earlier10-second clip began2.703 seconds before case sequence; last enemy5 hit/MISS fall outside that movie. Its technical samples remain separate; do not claim full12 visual coverage from the old clip."
+    }
+  },
+  "coldStartDiagnostic": {
+    "path": "artifacts/normal-air-shot-usb/cold-start-diagnostic.json",
+    "initialResult": "Fixed585ms helper cutoff missed the cold impact window; not sufficient to classify runtime impact failure.",
+    "correction": "Use formal gate.done with1500ms bound. Warmup before the continuous clip is explicit, not cold-start evidence.",
+    "limit": "Cold-start latency/performance is not passed by the warmed movie."
+  },
+  "coreActualEntry": {
+    "decision": "PASS_ONE_NONZERO_PLAYER_CORE",
+    "evidence": "artifacts/normal-air-core-usb/evidence.json",
+    "entry": "secondaryCharacterNormalAttack(2,2)",
+    "actorIndex": 2,
+    "actualTargetIndex": 2,
+    "observedProjectileSamples": 10,
+    "allObservedIndicesMatch": true,
+    "hpBefore": 1000000,
+    "hpAfter": 999812,
+    "gateReason": "v142-v143-visual-complete",
+    "cleanup": true,
+    "enemyAndHeroCoreUsb": "NOT_EXECUTED; formal propagation was independently code-reviewed by timing_review; do not relabel synthetic presentation cases as Core gameplay calls."
+  },
+  "remaining": "No visual refinement required in this focused scope. Latest Head CI/merge and wider integration remain parent-owned."
+}

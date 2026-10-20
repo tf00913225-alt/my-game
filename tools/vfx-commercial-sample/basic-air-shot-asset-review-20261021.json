@@ -20,5 +20,5 @@
   "conversion": "Lossless WebP exact=true, unchanged dimensions/orientation/canvas, all decoded RGBA bytes equal to mother PNG",
   "sha256": "6d23bf9346e995c366035ce904bfa84b9979757a0b02db31398331fd7247823f",
   "bytes": 187650,
-  "status": "ASSET VALIDATED; runtime visual acceptance pending"
+  "status": "ASSET AND FOCUSED USB VISUAL ACCEPTANCE PASS; see basic-air-shot-usb-review-20261021.json; stop visual refinement"
 }
