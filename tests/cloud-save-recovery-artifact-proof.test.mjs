@@ -553,6 +553,99 @@ function syntaxFrames(frames,seal=true){
     frames.slice(0,-1).forEach(append);
     if(seal)frames.at(-1).framesSha256=createHash('sha256').update(Buffer.concat(parts)).digest('hex');append(frames.at(-1));return Buffer.concat(parts);
 }
+// Frozen pre-elision leaf reference; no runtime or Git-history dependency.
+function previousRawBase64(text,maximum,charge=()=>{}){
+    const bad=message=>{throw Error('Invalid recovery audit artifact: '+message);};
+    if(typeof text!=="string"||!text.length||text.length%4||! /^[A-Za-z0-9+/]*={0,2}$/.test(text))bad("raw archive base64");
+    const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    if((text.endsWith("==")&&(alphabet.indexOf(text.at(-3))&15))||
+       (!text.endsWith("==")&&text.endsWith("=")&&(alphabet.indexOf(text.at(-2))&3)))bad("raw archive base64");
+    const length=text.length/4*3-(text.endsWith("==")?2:text.endsWith("=")?1:0);
+    if(length<1||length>maximum)bad("raw archive payload size");
+    charge(length);
+    const bytes=Buffer.from(text,"base64");
+    charge(text.length);
+    if(bytes.length!==length||bytes.toString("base64")!==text)bad("raw archive base64");
+    return bytes;
+}
+test('raw base64 removes only canonical reencoding allocation and preserves the original joint guards',()=>{
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    compiled._compile(readFileSync(filename,'utf8')+'\nmodule.exports.testRawBase64=rawArchiveBase64;',filename);
+    const helper=compiled.exports,maximum=256*1024;
+    const valid=[Buffer.from(Array.from({length:256},(_,i)=>i)),Buffer.alloc(maximum,255)];
+    for(let byte=0;byte<256;byte++)for(const length of [1,2,3])valid.push(Buffer.alloc(length,byte));
+    for(let length=1;length<=8;length++)valid.push(Buffer.alloc(length,7));
+    for(const input of valid){
+        const text=input.toString('base64'),token=helper.createRecoveryAuditAssemblyBudget();let formerBytes=0;
+        const expected=previousRawBase64(text,maximum,amount=>{formerBytes+=amount;});
+        let reencodes=0;const native=Buffer.prototype.toString;
+        Buffer.prototype.toString=function(...args){if(args[0]==='base64')reencodes++;return native.apply(this,args);};
+        let actual;try{actual=helper.testRawBase64(text,maximum,token);}finally{Buffer.prototype.toString=native;}
+        assert.deepEqual(actual,expected);assert.equal(reencodes,0);
+        assert.equal(helper.recoveryAuditAssemblyUsage(token).bytes,input.length,'only the real decoded allocation remains');
+        assert.equal(formerBytes-helper.recoveryAuditAssemblyUsage(token).bytes,text.length,'exact former reencoding allocation removed');
+    }
+    const invalid=[undefined,null,true,{},'', 'A','AA','AAA','AAAAA','AA=','A===','====','AA===','A=AA','AB==','AAB=',
+        '-w==','_w==','A A=','AA\t=','AA\n=', 'AA\r='];
+    for(const suffix of ['\n','\r','\r\n','\u2028','\u2029'])for(const base of ['AA==','AAA=','AAAA','AAA','AA='])invalid.push(base+suffix);
+    invalid.push(Buffer.alloc(maximum+1).toString('base64'));
+    for(const text of invalid){
+        const errors=[];
+        for(const decode of [()=>previousRawBase64(text,maximum),()=>helper.testRawBase64(text,maximum,helper.createRecoveryAuditAssemblyBudget())]){
+            try{decode();assert.fail('invalid base64 was accepted');}catch(error){errors.push(error.message);}
+        }
+        assert.deepEqual(errors,[errors[0],errors[0]]);assert.match(errors[0],/^Invalid recovery audit artifact:/);
+    }
+    const material=rawSyntaxMaterial(),wire=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget());
+    assert.deepEqual(helper.encodeRawRecoveryArchive(helper.decodeRawRecoveryArchive(wire,helper.createRecoveryAuditAssemblyBudget()),helper.createRecoveryAuditAssemblyBudget()),wire);
+});
+
+test('raw canonical UTF8 validation preserves original frame values and error order without a second encoded Buffer',()=>{
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),source=readFileSync(filename,'utf8');
+    function probe(legacy=false,clock){
+        const compiled=new Module(filename);compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+        const native=compiled.require.bind(compiled);
+        compiled.require=name=>name==='node:perf_hooks'&&clock?{performance:{now:()=>clock.now}}:
+            name==='node:buffer'&&clock?{isUtf8:input=>{clock.now=30001;return native(name).isUtf8(input);}}:native(name);
+        const current='assemblyCharge(assemblyBudget);\n            const validUtf8=isUtf8(raw);\n            assemblyCharge(assemblyBudget);\n            if(!validUtf8)bad("noncanonical JSON");';
+        assert.equal(source.split(current).length,2);
+        const body=legacy?source.replace(current,'assemblyCharge(assemblyBudget,"bytes",length);\n            if(!Buffer.from(canonical).equals(raw))bad("noncanonical JSON");'):source;
+        compiled._compile(body+'\nmodule.exports.testFrames=(bytes,token,raw=true)=>readRecoveryFrames(bytes,token,raw);',filename);return compiled.exports;
+    }
+    const previous=probe(true),current=probe(),frame=value=>({type:'control',name:'run',data:['object',[['text',['string',value]]]]});
+    const wire=raw=>{const length=Buffer.alloc(4);length.writeUInt32BE(raw.length);return Buffer.concat([Buffer.from('CSRA1\n'),length,raw]);};
+    for(const text of ['', '文😀', '\ufffd', '\u0000\t"\\', '\ud800']){
+        const canonical=JSON.stringify(frame(text)),bytes=wire(Buffer.from(canonical));
+        const a=previous.createRecoveryAuditAssemblyBudget(),b=current.createRecoveryAuditAssemblyBudget();
+        let oldAllocations=0,newAllocations=0;const from=Buffer.from;
+        Buffer.from=(value,...args)=>{if(typeof value==='string')oldAllocations++;return from(value,...args);};
+        let expected;try{expected=previous.testFrames(bytes,a);}finally{Buffer.from=from;}
+        Buffer.from=(value,...args)=>{if(typeof value==='string')newAllocations++;return from(value,...args);};
+        let actual;try{actual=current.testFrames(bytes,b);}finally{Buffer.from=from;}
+        assert.deepEqual(actual,expected);assert.equal(oldAllocations,1);assert.equal(newAllocations,0);
+        assert.equal(previous.recoveryAuditAssemblyUsage(a).bytes-current.recoveryAuditAssemblyUsage(b).bytes,Buffer.byteLength(canonical));
+        for(const key of ['nodes','operations','passes'])assert.equal(previous.recoveryAuditAssemblyUsage(a)[key],current.recoveryAuditAssemblyUsage(b)[key]);
+        const legacyA=previous.createRecoveryAuditAssemblyBudget(),legacyB=current.createRecoveryAuditAssemblyBudget();
+        const legacyBytes=wire(Buffer.from(JSON.stringify({type:'document',path:'serverUsers/test/account/current',data:['string',text]})));
+        assert.deepEqual(current.testFrames(legacyBytes,legacyB,false),previous.testFrames(legacyBytes,legacyA,false));
+        assert.equal(previous.recoveryAuditAssemblyUsage(legacyA).bytes,current.recoveryAuditAssemblyUsage(legacyB).bytes,'v1/v2 frame branch accounting is unchanged');
+    }
+    const template=JSON.stringify(frame('MARKER')),at=template.indexOf('MARKER'),prefix=Buffer.from(template.slice(0,at)),suffix=Buffer.from(template.slice(at+6));
+    const malformed=[Buffer.from(' '+template),Buffer.from(template.replace('"type":"control"','"type":"control","type":"control"')),
+        Buffer.from(template.replace('MARKER','\\u4e2d')),Buffer.from(template.replace('MARKER','"'))];
+    for(const raw of [[255],[192,175],[237,160,128],[240,144,128],[226,130],[226,40,161]])malformed.push(Buffer.concat([prefix,Buffer.from(raw),suffix]));
+    for(const raw of malformed){
+        const errors=[];
+        for(const helper of [previous,current])try{helper.testFrames(wire(raw),helper.createRecoveryAuditAssemblyBudget());assert.fail('invalid frame accepted');}
+        catch(error){errors.push(error.message);}
+        assert.deepEqual(errors,[errors[0],errors[0]]);assert.match(errors[0],/^Invalid recovery audit artifact:/);
+    }
+    const clock={now:0},timed=probe(false,clock),token=timed.createRecoveryAuditAssemblyBudget();
+    assert.throws(()=>timed.testFrames(wire(Buffer.from(JSON.stringify(frame('deadline')))),token),/deadline exceeded/);
+    assert.throws(()=>timed.recoveryAuditAssemblyUsage(token),/deadline exceeded/);
+});
+
 test('raw archive fixed version frames reject extra, missing, duplicate, reordered, noncanonical and damaged syntax without authority',()=>{
     const helper=require('../functions/src/recovery-audit-artifact'),material=rawSyntaxMaterial(),bytes=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget());
     const mutations=[
