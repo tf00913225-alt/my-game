@@ -1,0 +1,24 @@
+{
+  "workId": "BATTLE-BASIC-AIR-SHOT-20261021",
+  "asset": "assets/vfx/normal/normal-air-shot-v1.webp",
+  "purpose": "Single neutral basic-attack air pulse flight texture. Existing normal impact and gameplay hit clock remain authoritative.",
+  "method": "Built-in imagegen",
+  "prompt": "Use case: stylized-concept. Asset type: a SINGLE isolated raster projectile texture for a commercial mobile RPG normal/basic attack. Create one compact ordinary AIR CANNON pulse pointing horizontally to the RIGHT: a small soft white and pale neutral-gray compressed-air head with one subtle curved translucent pressure arc and a very short tapered wispy trail behind to the LEFT. Restrained, simple, crisp at small gameplay size; soft alpha edges, no opaque core blob, no elemental color, no fire, no ice, no electricity, no magic glyph, no shockwave explosion. The flight will be animated by code; this image is only ONE projectile, NOT a sprite sheet, no multiple poses or copies. Square canvas, centered object, keep the complete object well inside the canvas with generous true transparent padding on all four sides. Transparent background with actual alpha, no painted checkerboard, no black or white backdrop. No characters, UI, borders, text or watermark.",
+  "source": "C:/Users/User/.codex/generated_images/01a15425-277b-7140-b0e5-d3891f17519d/exec-2916e3d0-fa56-4810-b018-0d143d50b865.png",
+  "size": [
+    1254,
+    1254
+  ],
+  "columns": 1,
+  "rows": 1,
+  "frames": 1,
+  "transparent": true,
+  "alphaExtrema": [
+    0,
+    255
+  ],
+  "conversion": "Lossless WebP exact=true, unchanged dimensions/orientation/canvas, all decoded RGBA bytes equal to mother PNG",
+  "sha256": "6d23bf9346e995c366035ce904bfa84b9979757a0b02db31398331fd7247823f",
+  "bytes": 187650,
+  "status": "ASSET VALIDATED; runtime visual acceptance pending"
+}
