@@ -132,20 +132,21 @@
 }
 @keyframes v143RasterCastOpacity{
     0%,100%{opacity:0}
-    2%,97%{opacity:1}
+    2%,66.666667%{opacity:1}
+    83.333333%{opacity:.4}
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
+    filter:drop-shadow(0 0 4px rgba(255,87,25,.55));
 }
 .v143-skill-stage[data-element="water"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(76,205,255,.9));
+    filter:drop-shadow(0 0 4px rgba(76,205,255,.5));
 }
 .v143-skill-stage[data-element="wind"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 12px rgba(83,241,184,.92));
+    filter:drop-shadow(0 0 4px rgba(83,241,184,.5));
 }
 .v143-skill-stage[data-element="earth"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(214,166,77,.9));
+    filter:drop-shadow(0 0 4px rgba(214,166,77,.5));
 }
 .v143-skill-stage[data-element="light"] .v143-vfx-sprite{
     filter:drop-shadow(0 0 12px rgba(255,230,116,.94));
@@ -168,7 +169,8 @@
 
 @keyframes v143RasterCastEnvelope{
     0%{opacity:0;transform:translate(-50%,-50%) scale(.98)}
-    2%,97%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    2%,66.666667%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    83.333333%{opacity:.4;transform:translate(-50%,-50%) scale(1)}
     100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
 }
 
@@ -217,7 +219,7 @@
     background-position:0 0;
     background-repeat:no-repeat;
     image-rendering:auto;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
@@ -229,7 +231,7 @@
 
 #game-stage #battlePage .v143-status-visual--static{
     animation:none;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
 }
 
 #game-stage #battlePage .v143-status-visual--layer-hard-control-base{
@@ -239,7 +241,7 @@
     z-index:var(--v143-status-layer-rotating);
 }
 
-#game-stage #battlePage .v143-status-icon{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon{
     display:inline-block;
     width:24px;
     height:24px;
@@ -257,46 +259,50 @@
     pointer-events:none;
     transform:none;
 }
-#game-stage #battlePage .v143-status-icon--layer-hud{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--layer-hud{
     position:relative;
-    z-index:var(--v143-status-layer-hud);
+    z-index:var(--v143-status-layer-hud,34);
 }
 
-#game-stage #battlePage .v143-status-icon--pulse{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--pulse{
     animation:none !important;
     opacity:1 !important;
     transform:none !important;
 }
 
+:is(#game-stage #battlePage,.v174-battle-hud-layer) :is(.v143-status-icon-agilityDown,.v143-status-icon-defenseDown){
+    filter:drop-shadow(0 0 1px rgba(229,246,255,.95));
+}
+
 #game-stage #battlePage .v143-status-visual-burn{
-    filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
+    filter:drop-shadow(0 0 2px rgba(255,79,23,.5));
 }
 #game-stage #battlePage .v143-status-visual-rage{
-    filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
+    filter:drop-shadow(0 0 2px rgba(255,35,20,.5));
 }
 #game-stage #battlePage .v143-status-visual-freeze{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
+    opacity:var(--v143-status-opacity-max,.68);
+    filter:drop-shadow(0 0 2px rgba(178,238,255,.5));
 }
 #game-stage #battlePage .v143-status-visual-dodgeSkill,
 #game-stage #battlePage .v143-status-visual-stealthSkill,
 #game-stage #battlePage .v143-status-visual-dinghaishenzhen{
-    filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
+    filter:drop-shadow(0 0 2px rgba(127,255,205,.5));
 }
 #game-stage #battlePage .v143-status-visual-shield,
 #game-stage #battlePage .v143-status-visual-earthShield,
 #game-stage #battlePage .v143-status-visual-rockWall,
 #game-stage #battlePage .v143-status-visual-barrier{
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-petrify{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    opacity:var(--v143-status-opacity-max,.72);
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-yuanZuBlessing{
-    filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
+    filter:drop-shadow(0 0 2px rgba(255,232,135,.5));
 }
 
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v143-status-visual{
@@ -311,8 +317,8 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:0}
-    50%{opacity:1}
+    0%,100%{opacity:var(--v143-status-opacity-min,.42)}
+    50%{opacity:var(--v143-status-opacity-max,.64)}
 }
 
 @keyframes v143StatusIconBreath{

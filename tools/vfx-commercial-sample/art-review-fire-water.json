@@ -1,0 +1,2094 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "timing_review",
+  "reviewDate": "2026-10-19",
+  "scope": "11 fire and 11 water formal active-skill source sheets",
+  "method": "All 22 source sheets viewed individually with view_image. Qualitative silhouette, cell-boundary, background mass and frame-sequence inspection only; no player/runtime/commercial acceptance is claimed.",
+  "limitations": [
+    "Static sheet inspection cannot prove temporal smoothness; animation must be reviewed on device.",
+    "Apparent colored rectangular fields are visual findings; exact per-pixel alpha should be checked before remediation.",
+    "No runtime QA result is inferred from source review."
+  ],
+  "counts": {
+    "reviewed": 22,
+    "sourceReviewedWithoutArtBlocker": 9,
+    "needsArtFollowup": 13
+  },
+  "rows": [
+    {
+      "id": "flameSlash",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Frames 5–6 flatten into a horizontal cut, then 7–8 abruptly become a tall crescent; the leading slash visually approaches cell bounds.",
+        "Frame 8 has a strong white crescent but its broad orange body masks the cut silhouette; narrow the surrounding flame without removing the crescent.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/flame-slash-cast.png",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.612,
+          "64": 0.535,
+          "128": 0.4735
+        }
+      }
+    },
+    {
+      "id": "fireCritical",
+      "element": "fire",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Sword build-up and grounded strike are readable and the contact remains centered; frame 8 has an identifiable bright ground explosion.",
+        "RGBA outer-cell boundary has no alpha>=64 pixels. The viewer top beam edge is not evidence of source clipping. Dynamic contact/occlusion review remains required."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/fire-critical-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6816,
+          "64": 0.6089,
+          "128": 0.5569
+        }
+      }
+    },
+    {
+      "id": "explosiveFlurry",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Three blade motif is readable in frames 1–3, but frames 4–6 replace it with broad crossing ribbons before returning to three separate strikes.",
+        "Frame 8 fills nearly the whole cell with three flame columns; preserve three contact points and reduce intervening opaque-looking haze.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/explosive-flurry-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5827,
+          "64": 0.5241,
+          "128": 0.4945
+        }
+      }
+    },
+    {
+      "id": "dragonSlash",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "RGBA sampling disproves an opaque orange rectangle: sampled colored backing pixel is RGBA (190,59,27,0), and cell boundaries have no alpha>=64 pixels. Black row gutters shown by viewer are transparent.",
+        "Needs art followup for discontinuous motif: detailed dragon in frames 2–6 becomes a nearly dragon-free vertical pillar at frame 7, then a circular dragon burst at hit 8. Confirm in motion before remaking; no alpha cleanup is justified by viewer background."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/dragon-slash-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "firstCellRgbaSamples": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            190,
+            59,
+            27,
+            0
+          ],
+          [
+            252,
+            252,
+            216,
+            250
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ]
+        ],
+        "hit8Coverage": {
+          "16": 0.5981,
+          "64": 0.5449,
+          "128": 0.5127
+        }
+      }
+    },
+    {
+      "id": "fireRocket",
+      "element": "fire",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Bow, three arrow flight and three explosions provide a readable sequence. Hit 8 alpha>=128 coverage is 38.85%, with no alpha>=64 outer boundary contact.",
+        "Smoke/arrow continuity and rotation require runtime viewing; static source has no established blocking art defect."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/fire-rocket-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5185,
+          "64": 0.437,
+          "128": 0.3885
+        }
+      }
+    },
+    {
+      "id": "blazeSpell",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Distinct magic circle build-up is followed by a coherent vertical pillar, but frames 5–7 clip its shaft at the top edge.",
+        "Hit frame 8 changes from pillar to a broad vortex; keep the contact center visually stable and reduce full-cell orange fill in the long tail."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/blaze-spell-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0007,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0111,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0215,
+            "64": 0.0052,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0078,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0085,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6521,
+          "64": 0.542,
+          "128": 0.4778
+        }
+      }
+    },
+    {
+      "id": "flameTornado",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Recognizable dragon forms in 3–6 then jumps to a vertical beam in 7 and a right-facing dragon head in hit frame 8.",
+        "Frame 8 mouth flare is visually close to the right edge; frames 10–12 retain heavy gray smoke. Needs bounded silhouette and a less abrupt beam/head transition.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/flame-tornado-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6741,
+          "64": 0.6134,
+          "128": 0.5698
+        }
+      }
+    },
+    {
+      "id": "phoenixCry",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Phoenix identity is readable in 3–6 but frames 5–6 wing tips approach or cross cell bounds.",
+        "Frame 8 is a large radial blast with only a tiny central bird; preserve bird silhouette and reduce the surrounding fire/feather slab so the signature remains visible.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/phoenix-cry-cast.png?v=165",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6302,
+          "64": 0.5729,
+          "128": 0.534
+        }
+      }
+    },
+    {
+      "id": "rage",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Viewer rectangular background alone is not proof of opaque contamination; sampled top/left pixels are alpha0.",
+        "Measured some outer cell boundaries are 100% alpha>=128 and hit8 coverage is 68.84%; inspect formal equal-grid crop against intended frame gutters. Demon face changes into buff arrows at frames7–8; retain arrow identity while verifying crop registration."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/status/rage.webp",
+      "alphaEvidence": {
+        "size": [
+          1024,
+          1536
+        ],
+        "alphaExtrema": [
+          0,
+          254
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.1406,
+            "64": 0.1387,
+            "128": 0.1354
+          },
+          {
+            "16": 0.5345,
+            "64": 0.5319,
+            "128": 0.5299
+          },
+          {
+            "16": 0.5918,
+            "64": 0.5911,
+            "128": 0.5892
+          },
+          {
+            "16": 0.1797,
+            "64": 0.1777,
+            "128": 0.1751
+          },
+          {
+            "16": 0.5072,
+            "64": 0.5039,
+            "128": 0.5033
+          },
+          {
+            "16": 0.9948,
+            "64": 0.9948,
+            "128": 0.9948
+          },
+          {
+            "16": 1.0,
+            "64": 1.0,
+            "128": 1.0
+          },
+          {
+            "16": 0.5306,
+            "64": 0.5286,
+            "128": 0.5273
+          },
+          {
+            "16": 0.237,
+            "64": 0.2324,
+            "128": 0.2272
+          },
+          {
+            "16": 0.5462,
+            "64": 0.543,
+            "128": 0.5391
+          },
+          {
+            "16": 0.5996,
+            "64": 0.5983,
+            "128": 0.5964
+          },
+          {
+            "16": 0.3249,
+            "64": 0.3236,
+            "128": 0.3216
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "firstCellRgbaSamples": [
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            0,
+            0,
+            0,
+            0
+          ],
+          [
+            254,
+            183,
+            24,
+            252
+          ]
+        ],
+        "hit8Coverage": {
+          "16": 0.7018,
+          "64": 0.6942,
+          "128": 0.6884
+        }
+      }
+    },
+    {
+      "id": "fireSoulResonance",
+      "element": "fire",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Frame 1 small star expands immediately to a broad ring/cloud at frame 2; middle frames alternate ellipse and front-facing spiral.",
+        "Hit 8 has a clear star but surrounding orange disk reaches cell boundaries; needs a more distinct resonance motif and transparent negative space around the rings."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/status/fire-soul-resonance.webp",
+      "alphaEvidence": {
+        "size": [
+          1254,
+          1254
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.2839,
+            "64": 0.2134,
+            "128": 0.1915
+          },
+          {
+            "16": 0.4863,
+            "64": 0.3892,
+            "128": 0.3509
+          },
+          {
+            "16": 0.3735,
+            "64": 0.3222,
+            "128": 0.2661
+          },
+          {
+            "16": 0.2893,
+            "64": 0.236,
+            "128": 0.1963
+          },
+          {
+            "16": 0.3933,
+            "64": 0.3269,
+            "128": 0.2934
+          },
+          {
+            "16": 0.513,
+            "64": 0.433,
+            "128": 0.3755
+          },
+          {
+            "16": 0.4159,
+            "64": 0.3564,
+            "128": 0.3092
+          },
+          {
+            "16": 0.4542,
+            "64": 0.3824,
+            "128": 0.3564
+          },
+          {
+            "16": 0.3694,
+            "64": 0.3372,
+            "128": 0.3064
+          },
+          {
+            "16": 0.4945,
+            "64": 0.4282,
+            "128": 0.3878
+          },
+          {
+            "16": 0.5109,
+            "64": 0.4391,
+            "128": 0.3755
+          },
+          {
+            "16": 0.4042,
+            "64": 0.357,
+            "128": 0.3174
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.7547,
+          "64": 0.6602,
+          "128": 0.6023
+        }
+      }
+    },
+    {
+      "id": "bloodBurnArt",
+      "element": "fire",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Red rising tendrils provide a distinct identity and late dissolution is readable; hit 8 alpha>=128 coverage is 32.68%.",
+        "Small boundary contact exists (maximum 2.9% at alpha>=128), but this alone does not establish essential silhouette clipping. Review dynamic ring/tendril transition on device."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/fire/blood-burn-art-cast.webp",
+      "alphaEvidence": {
+        "size": [
+          1448,
+          1086
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0159,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0552,
+            "64": 0.0228,
+            "128": 0.02
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0166,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0822,
+            "64": 0.0387,
+            "128": 0.029
+          },
+          {
+            "16": 0.038,
+            "64": 0.02,
+            "128": 0.0145
+          },
+          {
+            "16": 0.0035,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5931,
+          "64": 0.4245,
+          "128": 0.3268
+        }
+      }
+    },
+    {
+      "id": "waterKnife",
+      "element": "water",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Crescent blade reads in frames 4–5; frame 6 abruptly flattens it horizontally before 7–8 radial bursts.",
+        "Frame 8 has a clear star but large blue backing haze fills the cell, and late-frame waves approach the left/bottom edges; isolate the blade from the haze.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/water-blade-slash-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5487,
+          "64": 0.4409,
+          "128": 0.3656
+        }
+      }
+    },
+    {
+      "id": "frostPunch",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Fist remains legible through frame 7 and frame 8 is a concentrated ice burst. No effective-alpha cell boundary clipping was measured.",
+        "Dense burst needs runtime occlusion review; source alone does not prove a blocker."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/frost-fist-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.7018,
+          "64": 0.6231,
+          "128": 0.5673
+        }
+      }
+    },
+    {
+      "id": "iceSpin",
+      "element": "water",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Three swords and a circular sweep establish the skill; frame 5 left sword and frame 6 vertical blades visually approach cell edges.",
+        "Frame 8 substitutes three upward ice columns, then frame 10 returns to a bright crossed slash; secondary bright reappearance weakens single hit hierarchy.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/frost-spinning-slash-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5597,
+          "64": 0.4701,
+          "128": 0.3987
+        }
+      }
+    },
+    {
+      "id": "frostCrush",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Descending ice spear leads into a planted crystal impact; source identity remains readable.",
+        "No alpha>=64 outer-cell contact: apparent beam truncation in viewer is not established clipping. Dynamic motion/hit testing remains required."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/freeze-heavy-strike-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6173,
+          "64": 0.5464,
+          "128": 0.4865
+        }
+      }
+    },
+    {
+      "id": "waterBall",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Three orbs remain distinct through frame 7 and hit 8 maintains three separated splash contacts.",
+        "Hit 8 alpha>=128 coverage is 29.08% and outer cell boundary is transparent at alpha>=64; viewer blue backing is not an opaque-field defect."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/water-orb-vfx.png?v=173.19",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.4105,
+          "64": 0.3377,
+          "128": 0.2908
+        }
+      }
+    },
+    {
+      "id": "floodBeast",
+      "element": "water",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Beast head is detailed and readable, but frames 4–5 push the muzzle to/right through the cell boundary.",
+        "Frame 7 loses the beast into an upward splash; hit 8 returns to an inward vortex rather than a stable contact silhouette. Blue field fills the rectangular cell in many frames; needs alpha/edge and transition cleanup.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/tidal-beast-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          252
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0007,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0065,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6905,
+          "64": 0.6139,
+          "128": 0.5691
+        }
+      }
+    },
+    {
+      "id": "iceArrowRain",
+      "element": "water",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Arrow direction is consistent in 2–6 and plural ground contacts are readable.",
+        "Hit 8 is a dense splash slab; 9–11 retain a large cracked-ice platform and blue fog. Reduce cloudy backing and hold visible arrow/contact shapes through the impact.",
+        "RGBA boundary measurement found no alpha>=64 pixels on the actual equal-grid cell boundary; apparent viewer edge contact is not confirmed source clipping. Followup is composition/sequence review, not automatic alpha cleanup."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.6233,
+          "64": 0.5511,
+          "128": 0.4679
+        }
+      }
+    },
+    {
+      "id": "freeze",
+      "element": "water",
+      "artReviewState": "needs-art-followup",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Ice prison shape becomes distinct in 7–10 and communicates immobilization.",
+        "Frame 5 sends four large crystal tips to all corners; hit 8 floods prison center with white flare while the rest remains a blue slab. Preserve prison silhouette and bound spikes."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/status/freeze.webp",
+      "alphaEvidence": {
+        "size": [
+          1187,
+          1326
+        ],
+        "alphaExtrema": [
+          0,
+          255
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.3035,
+            "64": 0.2995,
+            "128": 0.2988
+          },
+          {
+            "16": 0.6402,
+            "64": 0.6382,
+            "128": 0.6375
+          },
+          {
+            "16": 0.6653,
+            "64": 0.6626,
+            "128": 0.6606
+          },
+          {
+            "16": 0.3272,
+            "64": 0.3211,
+            "128": 0.3137
+          },
+          {
+            "16": 0.4431,
+            "64": 0.437,
+            "128": 0.4336
+          },
+          {
+            "16": 0.8625,
+            "64": 0.8584,
+            "128": 0.8577
+          },
+          {
+            "16": 0.9756,
+            "64": 0.9715,
+            "128": 0.9688
+          },
+          {
+            "16": 0.5915,
+            "64": 0.5833,
+            "128": 0.5725
+          },
+          {
+            "16": 0.4153,
+            "64": 0.4119,
+            "128": 0.4099
+          },
+          {
+            "16": 0.7392,
+            "64": 0.7385,
+            "128": 0.7364
+          },
+          {
+            "16": 0.7331,
+            "64": 0.7297,
+            "128": 0.7276
+          },
+          {
+            "16": 0.4383,
+            "64": 0.435,
+            "128": 0.4336
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.7888,
+          "64": 0.7713,
+          "128": 0.758
+        }
+      }
+    },
+    {
+      "id": "healSpell",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Lotus, water rings and green accent distinguish healing. Frame 7 carries the lotus climax and frame 8 carries its resource beam; this can be a valid release phase.",
+        "No effective-alpha outer-cell contact; brightness timing is a runtime review item, not a proven source failure."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/water-heal-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5711,
+          "64": 0.4817,
+          "128": 0.4091
+        }
+      }
+    },
+    {
+      "id": "revive",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Lotus, golden accent and rising column communicate revival; frame 7 climax followed by frame 8 release is visually coherent in sheet order.",
+        "No alpha>=64 cell boundary contact; registered hit synchronization must be reviewed dynamically."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/water-revive-vfx.png?v=166",
+      "alphaEvidence": {
+        "size": [
+          1536,
+          1152
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5686,
+          "64": 0.4638,
+          "128": 0.3856
+        }
+      }
+    },
+    {
+      "id": "purifyMind",
+      "element": "water",
+      "artReviewState": "source-reviewed",
+      "reviewMethod": "view_image: complete formal 4x3 source sheet, row-major frame inspection",
+      "registeredHitFrame": 8,
+      "notes": [
+        "Rising spiral and washed-out debris provide a plausible cleansing cue, followed by dissolution. Hit 8 alpha>=128 coverage is 30.04%.",
+        "Tiny boundary contact (0.62% maximum alpha>=128) does not establish meaningful clipping; debris meaning should be checked in context."
+      ],
+      "runtimeQaState": "not-reviewed",
+      "source": "assets/vfx/water/purify-mind-cast.webp",
+      "alphaEvidence": {
+        "size": [
+          1448,
+          1086
+        ],
+        "alphaExtrema": [
+          0,
+          253
+        ],
+        "cellBoundaryFractions": [
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0318,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0373,
+            "64": 0.0131,
+            "128": 0.0
+          },
+          {
+            "16": 0.1699,
+            "64": 0.0159,
+            "128": 0.0062
+          },
+          {
+            "16": 0.0131,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0656,
+            "64": 0.0,
+            "128": 0.0
+          },
+          {
+            "16": 0.0,
+            "64": 0.0,
+            "128": 0.0
+          }
+        ],
+        "interpretation": "Boundary fractions measure RGBA alpha, excluding low-alpha viewer color; nonzero alone does not prove important silhouette clipping.",
+        "hit8Coverage": {
+          "16": 0.5328,
+          "64": 0.3877,
+          "128": 0.3004
+        }
+      }
+    }
+  ],
+  "correction": "Initial viewer-only concerns about opaque rectangles and hard clipping were corrected using RGBA measurements. Alpha measurements govern edge claims; art followup is not an instruction to redraw all sources."
+}

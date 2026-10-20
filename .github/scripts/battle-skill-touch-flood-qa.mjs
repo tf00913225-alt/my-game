@@ -156,7 +156,7 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
                     const projected=await client.eval(`(()=>{FourSymbolsBattlefieldSlots.moveAllyCharacter(0,${JSON.stringify(slots[column])});FourSymbolsBattlefieldRenderGeometry.reconcile();updateUI();return document.getElementById('battlePlayerCard0').dataset.slot;})()`);
                     assert.equal(projected,slots[column],'moved target must be rendered in its canonical slot');
                 }
-                for(const [phase,time] of [['cast',.08],['flight',.3],['impact',.65],['dissipate',.92]]){
+                for(const [phase,time] of [['cast',.08],['flight',.3],['turn',.45],['impact',.65],['dissipate',.92]]){
                     console.log('Battle touch/flood QA: '+side+' target '+column+' '+phase);
                     const snapshot=await client.eval(`(()=>{
                         v142SkillAnimationDirector.dispose();
@@ -173,7 +173,16 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
                     })()`);
                     assert.ok(snapshot);assert.equal(snapshot.motion,'phased');assert.equal(snapshot.travel,null);
                     assert.equal(snapshot.hit,.5833333333);
-                    assert.ok(Math.abs(snapshot.angle)<.01,phase+' must preserve the original upright artwork');
+                    if(phase==='flight'||phase==='turn'){
+                        // Authored flight faces right (0deg); frame-six turn faces down (90deg).
+                        // Compare headings modulo 360 because DOMMatrix returns a signed angle.
+                        const sourceHeading=phase==='turn'?90:0;
+                        const travelHeading=Math.atan2(snapshot.dy,snapshot.dx)*180/Math.PI;
+                        const headingError=((snapshot.angle+sourceHeading-travelHeading+540)%360+360)%360-180;
+                        assert.ok(Math.abs(headingError)<.01,phase+' authored heading plus rotation must face the actual target vector');
+                    }else{
+                        assert.ok(Math.abs(snapshot.angle)<.01,phase+' must preserve the original upright artwork');
+                    }
                     if(phase==='cast'||phase==='impact'||phase==='dissipate'){
                         const atTarget=phase!=='cast';
                         assert.ok(Math.abs(snapshot.center.x-snapshot.actor.x-(atTarget?snapshot.dx:0))<1);

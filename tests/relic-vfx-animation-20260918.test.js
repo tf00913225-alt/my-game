@@ -3,6 +3,7 @@
 const fs=require("node:fs");
 const path=require("node:path");
 const assert=require("node:assert/strict");
+const crypto=require("node:crypto");
 
 const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const relic=fs.readFileSync("js/60-team-relic-system.js","utf8");
@@ -35,12 +36,21 @@ const runtimeFiles=fs.readdirSync(root).filter(name=>name.endsWith(".webp")).sor
 assert.equal(runtimeFiles.length,20,"runtime must contain exactly 20 relic WebP VFX sheets");
 assert.deepEqual(runtimeFiles,expected.map(row=>row[1]).sort(),"runtime relic VFX set must match the 20 catalog relics");
 
+const dragon=fs.readFileSync(path.join(root,"relic_nine_dragon_fire.webp"));
+assert.deepEqual(dragon,fs.readFileSync("tools/vfx-commercial-sample/assets/full/nine-dragon-safe-v4.webp"),"Nine Dragon keeps the reviewed source bytes without a custom impact-frame override");
+assert.equal(crypto.createHash("sha256").update(dragon).digest("hex"),"6a58936606a09df7165221988ce0785f337996c992bce417b364dcf12d9e6659");
+let dragonImage;
+for(let offset=12;offset+8<=dragon.length;){const size=dragon.readUInt32LE(offset+4),start=offset+8;assert.ok(start+size<=dragon.length);if(dragon.toString("ascii",offset,offset+4)==="VP8L"){assert.equal(dragon[start],0x2f);const bits=dragon.readUInt32LE(start+1);dragonImage=[1+(bits&16383),1+((bits>>>14)&16383),(bits>>>28)&1];break;}offset=start+size+(size%2);}
+assert.deepEqual(dragonImage,[1448,1086,1],"lossless alpha-bearing 4x3 square-cell sheet");
+assert.equal(crypto.createHash("sha256").update(fs.readFileSync("tools/vfx-commercial-sample/assets/nine-dragon-fire-original.webp")).digest("hex"),"97da52852284c391881e98cb93ed47c56b085b629e21f88e18936bdc790f1254","historical baseline remains exact");
+
 for(const [id,file,duration,hitFrame,target] of expected){
     const bytes=fs.readFileSync(path.join(root,file));
+    const runtimeFile=file+(id==="relic_nine_dragon_fire"?"?v=6a58936606a0":"");
     assert.equal(bytes.subarray(0,4).toString("ascii"),"RIFF",file+" must be a WebP RIFF container");
     assert.equal(bytes.subarray(8,12).toString("ascii"),"WEBP",file+" must be WebP");
     assert.ok(
-        vfx.includes(id+':relicSheet("assets/vfx/relic/'+file+'",'+hitFrame+')'),
+        vfx.includes(id+':relicSheet("assets/vfx/relic/'+runtimeFile+'",'+hitFrame+')'),
         id+" must map to its reviewed 4x3 VFX sheet and hit frame"
     );
     assert.ok(

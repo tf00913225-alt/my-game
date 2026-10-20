@@ -1,0 +1,101 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "assetId": "earthShield",
+  "status": "needs-art",
+  "runtimeQaState": "not-reviewed",
+  "tool": "built-in image_gen",
+  "attemptCount": 2,
+  "originalSource": "assets/vfx/earth/earth-shield-cast.png",
+  "output": "tools/vfx-commercial-sample/assets/full/earth-shield-v2.webp",
+  "selectedGeneratedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-2fbc008a-b5fb-47aa-a8dc-c1bab2a7e28a.png",
+  "attempts": [
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-a53fcca8-d70f-4f3c-86dd-88211f703947.png",
+      "prompt": "Use case: precise-object-edit. Edit target: the attached earth-shield cast sprite sheet. Replace its incorrect multiple shields with exactly ONE earth-element self-protection shield per cell. Preserve its polished golden-brown cracked stone and warm amber magic visual language, but make a coherent commercially polished animation. Asset: a true-alpha transparent sprite atlas, exactly 4 columns by 3 rows, 12 equally sized square cells, read left-to-right then top-to-bottom. Whole canvas aspect 4:3 (for example 2048x1536). NO visible grid lines, labels, text, checkerboard, floor/background or opaque mist. Each cell isolated with at least 12% completely transparent safe margin on all four sides. The ONE shield stays at the same center, front-facing slight 3D oval protective shell for one person; hollow transparent center through which the character remains visible, curved cracked-rock rim and delicate amber energy contour. NO three pillars, no duplicate shields, no second orb. Sequence: frame1 tiny amber fragments gathering; frame2 fragments arc upward; frame3 incomplete lower stone rim; frame4 rim builds; frame5 mostly formed single oval shield; frame6 shield closes; frame7 crisp fully established shield, brightest brief activation rim; frame8 stable shield with reduced glow; frame9 thin rim starts releasing fragments; frame10 fewer stone fragments and fading rim; frame11 sparse fading motes; frame12 nearly empty tiny residual sparks. One coherent shield identity and stable center, continuous neighboring frames, no reappearance after dissipation. Keep interior mostly transparent and negative space ample; no solid glowing ball, thick smoke or radial explosion. Entire silhouette inside each cell, tips and glows never touch cell boundaries. High-detail original-resolution game VFX, real transparent alpha background.",
+      "review": "Single shield restored, but initial and final frames remain large filled-looking shells; rejected as animation progression."
+    },
+    {
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-2fbc008a-b5fb-47aa-a8dc-c1bab2a7e28a.png",
+      "prompt": "Use case: precise-object-edit. Edit target: this 4-column x 3-row single earth shield sprite sheet. Keep the gold cracked-stone oval shield identity and true transparent alpha. Correct its animation progression and padding. Exactly twelve equal cells in 4x3; same centered shield axis in every cell; NO grid lines/text/background/checkerboard. CRITICAL: frame 1 (top left) only 4 tiny floating amber fragments, no shield or cloud; frame2 small lower arc; frame3 open half oval rim; frame4 two-thirds oval rim. Frame5 mostly complete hollow oval; frame6 complete hollow shield; frame7 brightest complete single shield; frame8 same shield dimmer. Frame9 half rim dissolving; frame10 four thin detached arc fragments; frame11 only 5 tiny motes; frame12 (bottom right) only 2 tiny dim motes, NO large shape or cloud. Frames9-12 must continuously DECREASE coverage, never keep a full shield. A SINGLE shield per cell, transparent open interior, sharp controlled rim, no solid mist filling the center. All source edges, faint glow and fragments stay at least 12% cell width away from every cell boundary. The complete shield should occupy at most 68% of each cell width and height. Every cell has a fully transparent gutter, never touching or blending neighboring cells. Whole sheet ratio4:3, square equal cells, isolated RGBA game VFX, no resampling or painted fake transparency.",
+      "review": "One shield with clear gather/establish/dissolve progression. Strong-alpha source crosses cell boundary in frames 3 and 7; padding requirement fails. Retained only as needs-art candidate."
+    }
+  ],
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "cellWidth": 362,
+    "cellHeight": 362,
+    "order": "row-major",
+    "authoredHitFraction": 0.5,
+    "activationFrame": 7
+  },
+  "conversion": {
+    "format": "WebP",
+    "lossless": true,
+    "exact": true,
+    "method": 6,
+    "sourceDimensions": [
+      1448,
+      1086
+    ],
+    "outputDimensions": [
+      1448,
+      1086
+    ],
+    "rgbaPixelEquality": true,
+    "resized": false,
+    "cropped": false,
+    "rearranged": false,
+    "sourcePngSha256": "cb61451225cc0e7b862cf966cbf2bb0a542433821c9acf15990d00da8e2c3f0d",
+    "webpSha256": "4053da4eff540a1fd1e75012c0a2f9e2b4fdfdd92b28c81dc7bea4ee2282affa",
+    "webpBytes": 1243782
+  },
+  "alphaValidation": {
+    "method": "Full 362x362 alpha scan per cell; border counted once per pixel, strong threshold64. Low-alpha RGB preview color is not treated as opaque content.",
+    "transparentBackground": true,
+    "strongBorderContactFrames": [
+      3,
+      7
+    ],
+    "strongBorderPixelCount": 33,
+    "requiredCellPaddingFraction": 0.12,
+    "paddingPass": false,
+    "visiblePixelsAlpha64": [
+      4021,
+      15385,
+      29959,
+      36407,
+      44921,
+      48713,
+      58143,
+      45285,
+      25309,
+      14314,
+      2986,
+      1206
+    ],
+    "fullyTransparentPixels": [
+      103910,
+      84790,
+      62601,
+      47732,
+      37501,
+      29535,
+      18677,
+      35342,
+      59753,
+      48163,
+      92217,
+      113449
+    ]
+  },
+  "visualReview": {
+    "singleShieldIdentity": "pass",
+    "gatherPeakDissolve": "improved; coverage peaks at frame7 then decreases monotonically",
+    "transparentInterior": "candidate; requires independent alpha-aware review at actual combat size",
+    "safePadding": "fail; frame3 bottom and frame7 top strong-alpha contact",
+    "commercialReadiness": "not-passed"
+  },
+  "next": "Independent review; do not integrate until boundary contamination/padding is repaired by a later explicitly authorized art pass. No runtime or manifest was changed."
+}

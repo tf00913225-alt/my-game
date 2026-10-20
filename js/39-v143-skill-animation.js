@@ -1,7 +1,8 @@
 /* =====================================================
    V143 — single-owner raster battle VFX runtime
    V174 cleanup: official PNG Sprite Sheets/status loops only.
-   Fixed Slot geometry is the only battle position/coverage source.
+   Fixed Slot geometry owns battle coverage; its formal artwork projection
+   anchors explicitly authored recipient effects within that same formation.
    No Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
@@ -20,7 +21,7 @@
     const SPRITE_SCALE_MULTIPLIER=1;
     /* Size the raster box before centering/travel. CSS independent scale also
        scales translate(-50%) and the travel vector, moving the visible hit. */
-    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1});
+    const PLACEMENT_SIZE_SCALE=Object.freeze({single:.70,targetTrajectory:.72,trajectory:1,group:1,battlefield:1});
     const spriteFrameAspectCache=new Map();
     const spriteFrameAspectLoading=new Set();
 
@@ -66,46 +67,46 @@
     const RAW_MANIFEST={
         normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
 
-        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast.png","single",{scale:1.85,maxSize:220})},
+        flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast-v2.webp","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
         fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
-        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-cast.png?v=165","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast.png?v=165","single",{scale:2.35,maxSize:300})},
+        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         fireRocket:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-rocket-cast.png?v=165","trajectory",{travelToTargets:true,scale:.72,minSize:180,maxSize:280})},
-        blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast.png?v=165","single",{scale:2.15,maxSize:260})},
-        flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast.png?v=165","single",{scale:2.35,maxSize:300})},
+        blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast-v2.webp","single",{scale:2.15,maxSize:260})},
+        flameTornado:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-tornado-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         phoenixCry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/phoenix-cry-cast.png?v=165","battlefield",{scale:1.12,minSize:280})},
-        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-cast.png?v=165","single",{scale:1.08,minSize:96,maxSize:148})},
-        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast.webp","single",{scale:1.7,maxSize:225})},
+        rage:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/rage-recipient-v1.webp","single",{scale:1.08,minSize:96,maxSize:148,presentation:"per-recipient"})},
+        fireSoulResonance:{hit:DEFAULT_HIT,deferredActorStatusTypes:["fireSoulResonance"],sprite:castSheet("assets/vfx/fire/fire-soul-resonance-cast-v2.webp","single",{scale:1.7,maxSize:225})},
         bloodBurnArt:{hit:DEFAULT_HIT,deferredActorStatusTypes:["bloodBurn"],sprite:castSheet("assets/vfx/fire/blood-burn-art-cast.webp","single",{scale:1.7,maxSize:225})},
         fireEX:{hit:.74,noVisual:true,passive:true},
 
         waterKnife:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-blade-slash-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
         frostPunch:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/frost-fist-vfx.png?v=166","single",{scale:2.15,maxSize:260})},
-        iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-spinning-slash-vfx.png?v=166","single",{scale:1.95,maxSize:235})},
+        iceSpin:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/ice-spin-wide-v2.webp","single",{scale:1.95,maxSize:235,cellAspect:2.2448275862068967})},
         frostCrush:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/freeze-heavy-strike-vfx.png?v=166","single",{scale:2.35,maxSize:290})},
-        waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-vfx.png?v=173.19","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true})},
-        // Keep every authored frame at its original source angle while the
-        // complete sheet moves between actor and target. Hit timing is unchanged.
-        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-vfx.png?v=166","targetTrajectory",{travelToTargets:true,preserveSourceOrientation:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
+        waterBall:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-orb-recipient-v1.webp","group",{scale:1.22,minSize:150,maxSize:500,alignToSlots:true,presentation:"per-recipient"})},
+        // Match each authored head angle to the travel direction; the splash
+        // returns upright only after the complete source reaches its endpoint.
+        floodBeast:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/tidal-beast-safe-v3.webp","targetTrajectory",{travelToTargets:true,scale:1.85,minSize:175,maxSize:250,motionPhases:{flightStart:2,turnFrame:5,impactStart:6,flightSourceAngle:0,turnSourceAngle:90}})},
         iceArrowRain:{hit:DEFAULT_HIT,deferredStatusTypes:["frostbite"],sprite:castSheet("assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19","battlefield",{fixedFormation:true,coverageScale:1.22,minWidth:140,minHeight:140})},
-        freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270})},
-        healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-heal-vfx.png?v=166","single",{scale:2.05,maxSize:250})},
+        freeze:{hit:DEFAULT_HIT,deferredStatusTypes:["freeze"],sprite:castSheet("assets/vfx/water/freeze-cast-vfx.png?v=166","single",{scale:2.2,maxSize:270,presentation:"per-recipient"})},
+        healSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/heal-recipient-v1.webp","single",{scale:2.05,maxSize:250,presentation:"per-recipient"})},
         revive:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/water-revive-vfx.png?v=166","single",{scale:2.3,maxSize:285})},
         purifyMind:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/water/purify-mind-cast.webp","single",{scale:2.05,maxSize:250})},
         waterEX:{hit:.74,noVisual:true,passive:true},
 
         stormFist:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/storm-fist-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
-        stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-wide-v3.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         windCrossSlash:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-cross-slash-cast.png?v=173.24","single",{scale:2.25,maxSize:280})},
         dizzyFist:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/dizzy-fist-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
         windHowlLightning:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-howl-lightning-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280})},
-        dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-skill-cast.png?v=173.24","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-recipient-v1.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
+        dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-recipient-v1.webp","group",{scale:1.08,minSize:190,alignToSlots:true,presentation:"per-recipient"})},
         stealthSkill:{hit:.5,deferredStatusTypes:["stealthSkill"],sprite:castSheet("assets/vfx/wind/stealth-skill-cast.png?v=173.24","single",{scale:2.15,maxSize:260})},
-        dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/dinghaishenzhen-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280})},
+        dinghaishenzhen:{hit:.5,deferredStatusTypes:["dinghaishenzhen"],sprite:castSheet("assets/vfx/wind/calm-mind-cast-person-v2.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
         windEX:{hit:.74,noVisual:true,passive:true},
         /* Monster-only legacy derivative: use an existing formal Wind sheet,
            never a generated text/particle fallback. */
@@ -113,15 +114,15 @@
         windArrow:{hit:.5,sprite:castSheet("assets/vfx/wind/wind-spell-cast.png?v=173.24","targetTrajectory",{travelToTargets:true,scale:1.8,minSize:150,maxSize:230,reusedFrom:"windSpell"})},
 
         stoneSlash:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-slash-cast.png?v=173.39","single",{scale:2.2,maxSize:270})},
-        petrifyFist:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/petrify-fist-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/stone-break-sky-cast.png?v=173.39","single",{scale:2.35,maxSize:290})},
-        earthquakeCrush:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/earthquake-crush-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        stoneThrow:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-throw-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        sandWind:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/sand-wind-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true,preserveSourceAspect:true})},
+        petrifyFist:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/petrify-fist-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        stoneBreakSky:{hit:.5,deferredActorStatusTypes:["shield"],sprite:castSheet("assets/vfx/earth/stone-break-sky-soft-edge-v2.webp","single",{scale:2.35,maxSize:290})},
+        earthquakeCrush:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/earthquake-crush-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        stoneThrow:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-throw-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        sandWind:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/rolling-stone-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,preserveSourceAspect:true,cellAspect:2.25})},
         flyingSandStrike:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/flying-sand-strike-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})},
         dustStorm:{hit:.5,deferredStatusTypes:["petrify"],sprite:castSheet("assets/vfx/earth/dust-storm-cast.png?v=173.39","single",{scale:2.4,maxSize:300})},
-        earthShield:{hit:.5,deferredStatusTypes:["earthShield"],sprite:castSheet("assets/vfx/earth/earth-shield-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
-        rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-cast.png?v=173.39","group",{scale:1.08,minSize:190,alignToSlots:true})},
+        earthShield:{hit:.5,deferredStatusTypes:["earthShield"],sprite:castSheet("assets/vfx/earth/earth-shield-cast-v2.webp","single",{scale:1.7,maxSize:225})},
+        rockWall:{hit:.5,deferredStatusTypes:["rockWall"],sprite:castSheet("assets/vfx/earth/rock-wall-recipient-v1.webp","group",{scale:1.08,minSize:190,alignToSlots:true,presentation:"per-recipient"})},
         barrier:{hit:.5,deferredStatusTypes:["barrier"],sprite:castSheet("assets/vfx/earth/barrier-cast.png?v=173.39","single",{scale:2.25,maxSize:280})},
         earthEX:{hit:.74,noVisual:true,passive:true},
 
@@ -132,7 +133,7 @@
         relic_xuanwu_seal:relicSheet("assets/vfx/relic/relic_xuanwu_seal.webp",8),
         relic_soul_bell:relicSheet("assets/vfx/relic/relic_soul_bell.webp",8),
         relic_tiangang_banner:relicSheet("assets/vfx/relic/relic_tiangang_banner.webp",9),
-        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp",8),
+        relic_nine_dragon_fire:relicSheet("assets/vfx/relic/relic_nine_dragon_fire.webp?v=6a58936606a0",8),
         relic_cold_spring_jade:relicSheet("assets/vfx/relic/relic_cold_spring_jade.webp",7),
         relic_qinglan_feather:relicSheet("assets/vfx/relic/relic_qinglan_feather.webp",6),
         relic_rock_mountain_seal:relicSheet("assets/vfx/relic/relic_rock_mountain_seal.webp",7),
@@ -156,14 +157,31 @@
         yuanZuBlessing:{hit:.5,deferredStatusTypes:["yuanZuBlessing"],sprite:castSheet("assets/vfx/light/yuan-zu-blessing-cast.png?v=173.39","battlefield",{scale:1.08,minSize:280})}
     };
 
+    const STATUS_BODY_PRESENTATION=Object.freeze({
+        burn:{anchor:"feet",width:1.12,height:.66,min:.42,max:.64},
+        rage:{anchor:"body",width:1.08,height:.94,min:.60,max:.80},
+        stun:{anchor:"head",width:.9,height:.22,min:.70,max:.86},
+        freeze:{anchor:"feet",width:1.18,height:1.06,min:.68,max:.68},
+        petrify:{anchor:"feet",width:1.16,height:1.04,min:.72,max:.72},
+        dodgeSkill:{anchor:"feet",width:1.14,height:.55,min:.38,max:.58},
+        dinghaishenzhen:{anchor:"feet",width:1.12,height:.74,min:.40,max:.58},
+        shield:{anchor:"feet",width:1.12,height:.94,min:.52,max:.52},
+        earthShield:{anchor:"feet",width:1.16,height:.96,min:.56,max:.56},
+        rockWall:{anchor:"feet",width:1.18,height:.64,min:.58,max:.58},
+        barrier:{anchor:"feet",width:1.14,height:.92,min:.48,max:.48},
+        yuanZuBlessing:{anchor:"feet",width:1.10,height:.66,min:.42,max:.62},
+        fireSoulResonance:{anchor:"feet",width:1.10,height:.78,min:.40,max:.60},
+        bloodBurn:{anchor:"feet",width:1.10,height:.70,min:.42,max:.64}
+    });
+
     const RAW_STATUS_VISUALS={
         burn:statusVisual("assets/vfx/status/burn.webp","pulse","statusEffects",{label:"燃燒",statusName:"燃燒",iconSrc:"assets/vfx/status/burn.webp"}),
-        rage:statusVisual("assets/vfx/status/rage.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
+        rage:statusVisual("assets/vfx/status/rage-aura-v2.webp","pulse","activeBuffs",{label:"怒火",statusName:"怒火",iconSrc:"assets/vfx/status/rage-icon.webp"}),
         frostbite:statusVisual("","icon","statusEffects",{label:"凍傷",statusName:"凍傷",iconSrc:"assets/vfx/status/frostbite-icon.webp"}),
         freeze:statusVisual("assets/vfx/status/freeze.webp","static","statusEffects",{label:"冰封",statusName:"冰封",iconSrc:"assets/vfx/status/freeze.webp",visualLayer:STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE}),
         agilityDown:statusVisual("","icon","statusEffects",{label:"重力",statusName:"重力",iconSrc:"assets/vfx/status/gravity-icon.webp"}),
         damageDown:statusVisual("","icon","statusEffects",{label:"殤風",statusName:"殤風",iconSrc:"assets/vfx/status/damage-down-icon.webp"}),
-        stun:statusVisual("assets/vfx/status/stun.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
+        stun:statusVisual("assets/vfx/status/stun-stars-v2.webp","pulse","statusEffects",{label:"暈眩",statusName:"暈眩",iconSrc:"assets/vfx/status/stun-icon.webp"}),
         dodgeSkill:statusVisual("assets/vfx/status/windwalk.webp","pulse","activeBuffs",{label:"風行",statusName:"風行",iconSrc:"assets/vfx/status/windwalk.webp"}),
         stealthSkill:statusVisual("","none","activeBuffs",{label:"隱身",statusName:"隱身",noBodyVisual:true,noHudIcon:true}),
         dinghaishenzhen:statusVisual("assets/vfx/status/calm-mind.webp","pulse","activeBuffs",{label:"氣定神閒",statusName:"氣定神閒",iconSrc:"assets/vfx/status/calm-mind.webp"}),
@@ -644,6 +662,9 @@
     function placementFor(config,sprite,targetTypeOverride){
         const authored=String(sprite&&sprite.placement||"single");
         const targetType=String(targetTypeOverride||config&&config.targetType||"single");
+        // Explicit recipient artwork reuses the existing single-node emitter.
+        // The formal target type/recipient set and hit authority stay unchanged.
+        if(sprite&&sprite.presentation==="per-recipient"){ return "single"; }
         if(/^(all|enemyAll|allyAll)$/i.test(targetType)){ return "battlefield"; }
         if(/^(tri|allyTri|row|column|horizontal-3)$/i.test(targetType)){
             return authored==="trajectory"?"trajectory":"group";
@@ -797,7 +818,7 @@
     const statusRotationByUnit=new Map();
     const hardControlContractViolationByUnit=new Map();
 
-    function syncStatusVisual(side,index,type,showBody){
+    function syncStatusVisual(side,index,type,showBody,presentationGeometry,presentationSnapshot){
         const spec=STATUS_VISUALS[type];
         const card=cardFor(side,index);
         const entity=entityFor(side,index);
@@ -833,22 +854,49 @@
             card.appendChild(node);
         }
 
-        const anchor=slotAnchor(side,index,card);
+        const anchor=presentationSnapshot&&presentationSnapshot.anchor;
         if(!anchor){ return; }
-        const cardRect=typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor.rect;
-        const regularEnemy=side==="monster"&&!isBossIndexForVfx(index);
-        const shellStatus=type==="shield"||type==="barrier"||type==="earthShield"||type==="rockWall";
-        const widthScale=(regularEnemy?1.45:1.40)*(shellStatus?1.08:1);
-        const heightScale=(regularEnemy?1.36:1.34)*(shellStatus?1.08:1);
-        const width=regularEnemy
-            ?Math.max(72,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale))
-            :Math.max(62,Math.min(anchor.rect.width*widthScale,cardRect.width*widthScale));
-        const height=regularEnemy
-            ?Math.max(68,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale))
-            :Math.max(64,Math.min(anchor.rect.height*heightScale,cardRect.height*heightScale));
+        placeStatusBodyVisual(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot.cardRect,presentationSnapshot.pairedFrontHudRect);
+    }
+
+    function placeStatusBodyVisual(node,side,index,type,card,anchor,geometry,measuredCardRect,pairedFrontHudRect){
+        const profile=STATUS_BODY_PRESENTATION[type];
+        if(!profile){ return; }
+        const cardRect=measuredCardRect||anchor.rect;
+        const paint=geometry?.artworkProjection?.rect;
+        const projected=geometry?.portraitRect;
+        const portrait=paint&&paint.width>0&&paint.height>0?paint:
+            projected&&projected.width>0&&projected.height>0?projected:anchor.rect;
+        const scaleX=geometry?.hudSurface?.scaleX||1,scaleY=geometry?.hudSurface?.scaleY||1;
+        // Character art uses a wide transparent carrier; its height limits the
+        // body frame. Normalized monster paint already has a tight source box.
+        const bodyWidth=side==="player"?Math.min(portrait.width,portrait.height):portrait.width;
+        const width=Math.min(bodyWidth*profile.width,cardRect.width*.94);
+        const height=portrait.height*profile.height;
+        const x=portrait.left+portrait.width/2;
+        const bottom=portrait.bottom===undefined?portrait.top+portrait.height:portrait.bottom;
+        let y=profile.anchor==="feet"?bottom-height/2:portrait.top+portrait.height/2;
+        if(profile.anchor==="head"){
+            y=portrait.top-height*.35;
+            const hud=geometry?.hudSafeRect;
+            if(hud&&hud.bottom<=portrait.top){ y=Math.max(y,hud.bottom+height/2+2); }
+            // The adjacent front-row information band belongs to another unit.
+            // Its rect is read in the shared pre-write snapshot, never here.
+            const front=pairedFrontHudRect;
+            if(front&&front.width>0&&front.height>0&&
+               x+width/2>front.left&&x-width/2<front.right&&
+               y+height/2>front.top-2&&y-height/2<front.bottom+2){
+                y=Math.max(y,front.bottom+height/2+2);
+            }
+        }
         node.dataset.slot=anchor.slot;
-        node.style.width=Math.round(width)+"px";
-        node.style.height=Math.round(height)+"px";
+        node.dataset.presentation=profile.anchor;
+        node.style.left=((x-cardRect.left)/scaleX)+"px";
+        node.style.top=((y-cardRect.top)/scaleY)+"px";
+        node.style.width=(width/scaleX)+"px";
+        node.style.height=(height/scaleY)+"px";
+        node.style.setProperty("--v143-status-opacity-min",String(profile.min));
+        node.style.setProperty("--v143-status-opacity-max",String(profile.max));
     }
 
     function activeBodyStatusTypesForLayer(entity,side,index,visualLayer){
@@ -881,9 +929,35 @@
         }
     }
 
-    function syncStatusVisualsForUnit(side,index,advanceRotation){
+    function readStatusPresentation(side,index,geometryByUnit){
+        const readGeometry=(targetSide,targetIndex)=>{
+            const key=targetSide+":"+targetIndex;
+            if(geometryByUnit?.has(key)){ return geometryByUnit.get(key); }
+            const result=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(targetSide,targetIndex)||null;
+            geometryByUnit?.set(key,result);
+            return result;
+        };
         const entity=entityFor(side,index);
         const card=cardFor(side,index);
+        const baseBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE);
+        const rotatingBodyTypes=activeBodyStatusTypesForLayer(entity,side,index,STATUS_VISUAL_LAYERS.ROTATING);
+        const hasBody=!!(card&&(baseBodyTypes.length||rotatingBodyTypes.length));
+        const geometry=hasBody?readGeometry(side,index):null;
+        const anchor=hasBody?slotAnchor(side,index,card):null;
+        const cardRect=hasBody&&typeof card.getBoundingClientRect==="function"?card.getBoundingClientRect():anchor&&anchor.rect;
+        let pairedFrontHudRect=null;
+        const slot=String(anchor&&anchor.slot||"");
+        if(side==="player"&&/^ALLY_B[123]$/.test(slot)&&
+           baseBodyTypes.concat(rotatingBodyTypes).some(type=>STATUS_BODY_PRESENTATION[type]?.anchor==="head")){
+            const frontIndex=window.FourSymbolsBattlefieldSlots?.getCharacterAtAllySlot?.("ALLY_F"+slot.slice(-1));
+            if(Number.isInteger(frontIndex)){pairedFrontHudRect=readGeometry("player",frontIndex)?.hudSafeRect||null;}
+        }
+        return {entity:entity,card:card,baseBodyTypes:baseBodyTypes,rotatingBodyTypes:rotatingBodyTypes,geometry:geometry,anchor:anchor,cardRect:cardRect,pairedFrontHudRect:pairedFrontHudRect};
+    }
+
+    function syncStatusVisualsForUnit(side,index,advanceRotation,presentationSnapshot){
+        const snapshot=presentationSnapshot||readStatusPresentation(side,index);
+        const {entity,card,baseBodyTypes,rotatingBodyTypes}=snapshot;
         const stealthActive=!!(
             entity&&Number(entity.hp)>0&&
             (side!=="monster"||entity.alive!==false)&&
@@ -892,12 +966,6 @@
         if(card&&card.classList&&typeof card.classList.toggle==="function"){
             card.classList.toggle("v143-unit-stealthed",stealthActive);
         }
-        const baseBodyTypes=activeBodyStatusTypesForLayer(
-            entity,side,index,STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
-        );
-        const rotatingBodyTypes=activeBodyStatusTypesForLayer(
-            entity,side,index,STATUS_VISUAL_LAYERS.ROTATING
-        );
         reportHardControlVisualContractViolation(side,index,baseBodyTypes);
 
         const rotationKey=side+":"+index;
@@ -915,21 +983,28 @@
         const activeRotatingBodyType=rotation&&rotatingBodyTypes.length
             ?rotatingBodyTypes[rotation.index%rotatingBodyTypes.length]
             :null;
+        const presentationGeometry=snapshot.geometry;
 
         Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
             const spec=RAW_STATUS_VISUALS[type];
             const showBody=spec&&spec.visualLayer===STATUS_VISUAL_LAYERS.HARD_CONTROL_BASE
                 ?baseBodyTypes.includes(type)
                 :type===activeRotatingBodyType;
-            syncStatusVisual(side,index,type,showBody);
+            syncStatusVisual(side,index,type,showBody,presentationGeometry,snapshot);
         });
     }
 
     function syncStatusVisualEffects(advanceRotation){
-        purgeLegacyCardVfx();
         const enemyIndexes=typeof currentBattleMonsters!=="undefined"?currentBattleMonsters.filter(Number.isInteger):[];
-        enemyIndexes.forEach(index=>syncStatusVisualsForUnit("monster",index,advanceRotation===true));
-        for(let index=0;index<6;index++){ syncStatusVisualsForUnit("player",index,advanceRotation===true); }
+        // Read the entire pass before any status removal/append/style write.
+        // A new rotating body must not force layout for the next unit or layer.
+        const geometryByUnit=new Map();
+        const presentations=enemyIndexes.map(index=>({side:"monster",index:index,snapshot:readStatusPresentation("monster",index,geometryByUnit)}));
+        for(let index=0;index<6;index++){
+            presentations.push({side:"player",index:index,snapshot:readStatusPresentation("player",index,geometryByUnit)});
+        }
+        purgeLegacyCardVfx();
+        presentations.forEach(entry=>syncStatusVisualsForUnit(entry.side,entry.index,advanceRotation===true,entry.snapshot));
     }
 
     function removeStatusVisualEffects(){
@@ -1236,6 +1311,29 @@
         image.src=key;
     }
 
+    function fitRangeArt(node,current,bounds,center){
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const side=geometryOwner()?.getSideRect?.(current.targetSide);
+        if(!overlay||!side){ return; }
+        const left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
+        const top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
+        const width=parseFloat(node.style.width),height=parseFloat(node.style.height);
+        const availableWidth=2*Math.min(center.x-left,right-center.x);
+        const availableHeight=2*Math.min(center.y-top,bottom-center.y);
+        if(!(width>0&&height>0&&availableWidth>0&&availableHeight>0)){
+            node.dataset.artFit="unavailable";
+            node.style.visibility="hidden";
+            return;
+        }
+        const fit=Math.min(1,availableWidth/width,availableHeight/height);
+        node.style.width=(width*fit)+"px";
+        node.style.height=(height*fit)+"px";
+        node.dataset.artFit="safe";
+        node.dataset.artFitScale=String(fit);
+        node.dataset.semanticWidth=String(bounds.width);
+        node.dataset.semanticHeight=String(bounds.height);
+    }
+
     function emittedSpriteTargets(current){
         return current.targetIndexes.filter(index=>
             current.emitted.has(index)&&current.validTargets.has(index)&&
@@ -1285,13 +1383,19 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const size=authoredSquareSize(sprite,target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
+            const portrait=sprite.presentation==="per-recipient"
+                ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect:null;
+            const hasPortrait=portrait&&Number(portrait.width)>0&&Number(portrait.height)>0;
+            const center=hasPortrait?{x:portrait.left+portrait.width/2,y:portrait.top+portrait.height/2}:target;
+            const body=hasPortrait?Math.min(portrait.width,portrait.height):0;
+            const size=authoredSquareSize(sprite,hasPortrait?{width:body,height:body}:target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.geometrySlot=target.slot;
-            node.style.left=target.x+"px";
-            node.style.top=target.y+"px";
+            node.style.left=center.x+"px";
+            node.style.top=center.y+"px";
             applySpriteBox(node,size,size,sprite);
+            fitRangeArt(node,current,target.rect,center);
             return;
         }
 
@@ -1338,6 +1442,7 @@
                extend into the independent operation track. The whole source
                frame remains visible; no card or Zone is a paint clip owner. */
             applySpriteBox(node,width,height,sprite,"cover");
+            fitRangeArt(node,current,bounds,{x:bounds.centerX,y:bounds.centerY});
             return;
         }
 
@@ -1347,14 +1452,15 @@
         const height=Math.max(1,Math.round(bounds.height));
         node.dataset.targetIndexes=indexes.join(",");
         applySpriteBox(node,width,height,sprite,"cover");
-        /* A group/row/tri Sprite keeps the fixed-shape bounds for sizing, but
-           its visual center belongs to the explicitly selected primary card.
-           Only full-battlefield effects remain centered on the whole side. */
-        const destination=bounds.centerOnBounds&&placement!=="trajectory"
+        /* Authored multi-target art spans the canonical shape, including when
+           the selected primary is its edge slot. Hit callbacks retain the
+           primary/individual target anchors; projectiles still fly to primary. */
+        const destination=(placement==="group"||bounds.centerOnBounds)&&placement!=="trajectory"
             ?{x:bounds.centerX,y:bounds.centerY}
             :primaryAnchor
             ?{x:primaryAnchor.x,y:primaryAnchor.y}
             :{x:bounds.centerX,y:bounds.centerY};
+        fitRangeArt(node,current,bounds,destination);
         if(primaryAnchor){ node.dataset.geometrySlot=primaryAnchor.slot; }
         const actor=placement==="trajectory"?slotAnchor(current.side,current.actorIndex,current.actorCard):null;
         if(placement==="trajectory"&&sprite.travelToTargets&&actor){
@@ -1379,7 +1485,6 @@
         let node=current.spriteNodes.get(key);
         if(!node){
             const initialSprite=!current.firstVisibleFrameAt;
-            if(initialSprite&&!sprite.impactOnly){ beginVisualTimeline(current); }
             node=appendSpriteNode(current);
             node.dataset.columns=String(sprite.columns);
             node.dataset.rows=String(sprite.rows);
@@ -1412,7 +1517,7 @@
            Outcome confirmation still marks the node and controls hit feedback, but
            MISS/status/custom Boss paths must not make the cast animation disappear. */
         if(node.style.left&&node.style.top){
-            node.style.visibility=sprite.impactOnly?"hidden":"visible";
+            node.style.visibility=sprite.impactOnly||node.dataset.artFit==="unavailable"?"hidden":"visible";
             node.dataset.emittedVisual="true";
         }
         if(!node.classList.contains("v143-vfx-sprite-active")){ node.classList.add("v143-vfx-sprite-active"); }
@@ -1422,8 +1527,9 @@
     }
 
     function queueTargetHit(current,index,callback,phase,side){
-        if(!current||!current.model||!current.model.sprite||!current.model.sprite.impactOnly){ return false; }
+        if(!current||!current.model||!current.model.sprite){ return false; }
         if(side&&current.targetSide!==side){ return false; }
+        if(!current.model.sprite.impactOnly&&!current.emitted?.has(index)){ return false; }
         if(current.done){ return true; }
         if(current.hitReached){ callback(); return true; }
         if(!current.hitCallbacks){ current.hitCallbacks=new Map(); }
@@ -1431,6 +1537,49 @@
         callbacks.push({callback:callback,phase:phase||"feedback"});
         current.hitCallbacks.set(index,callbacks);
         return true;
+    }
+
+    function requestCastTimeline(current){
+        if(current.castTimelineRequested){ return; }
+        current.castTimelineRequested=true;
+        if(current.gate){ current.gate.visualTimelinePending=true; }
+        const start=function(frameTime){
+            if(state.current!==current||current.done){ return; }
+            // Force CSS animation creation after the complete settlement/DOM
+            // task, then align every raster and travel track to one paint clock.
+            const tracks=[];
+            current.spriteNodes.forEach(node=>{
+                try{
+                    const animations=typeof node.getAnimations==="function"?node.getAnimations():[];
+                    animations.forEach(animation=>{ if(String(animation.animationName||"").startsWith("v143Raster")){ tracks.push(animation); } });
+                    if(node.v143MotionAnimation){ tracks.push(node.v143MotionAnimation); }
+                }catch(_){ state.metrics.clockAlignmentFailures=(state.metrics.clockAlignmentFailures||0)+1; }
+            });
+            // performance.now and the default DocumentTimeline share a time
+            // origin. Read after style creation, not the stale RAF frame stamp.
+            const clockTime=Number.isFinite(frameTime)&&typeof performance!=="undefined"&&typeof performance.now==="function"
+                ?performance.now():frameTime;
+            tracks.forEach(animation=>{
+                try{ if(Number.isFinite(clockTime)){ animation.startTime=clockTime; } }
+                catch(_){ state.metrics.clockAlignmentFailures=(state.metrics.clockAlignmentFailures||0)+1; }
+            });
+            current.animationStartTimeline=Number.isFinite(clockTime)?clockTime:null;
+            beginVisualTimeline(current);
+            current.targetIndexes.forEach(index=>setTimer(
+                ()=>{
+                    // A timer may run in the same render cycle as its RAF.
+                    // A bounded two-frame fence crosses that cycle before hit;
+                    // it never samples or renders an ongoing animation loop.
+                    const presentHit=()=>settleTargetVisual(current,index);
+                    if(typeof requestAnimationFrame==="function"){
+                        requestAnimationFrame(()=>requestAnimationFrame(presentHit));
+                    }
+                    else{ presentHit(); }
+                },Math.max(0,targetHitTime(current,index)-Date.now())
+            ));
+        };
+        if(typeof requestAnimationFrame==="function"){ requestAnimationFrame(start); }
+        else{ start(); }
     }
 
     function requestImpactTimeline(current){
@@ -1508,6 +1657,7 @@
 
     function emitSprite(current,index,allowDefeated){
         if(!state.stage||current.emitted.has(index)||!current.validTargets.has(index)){ return; }
+        if(current.recipientTargets&&!current.recipientTargets.has(index)){ return; }
         if(!allowDefeated&&!canReceive(current.config,current.targetSide,index)){ return; }
         const targetCard=cardFor(current.targetSide,index);
         const target=slotAnchor(current.targetSide,index,targetCard);
@@ -1517,7 +1667,7 @@
         if(current.targetIndexes.indexOf(index)<0){ current.targetIndexes.push(index); }
         if(targetCard&&targetCard.classList){ targetCard.classList.add("v143-effects-pending"); }
         if(current.model.sprite){ addSprite(current,index,target); }
-        if(!current.model.sprite||!current.model.sprite.impactOnly||current.firstVisibleFrameAt){
+        if(!current.model.sprite||current.firstVisibleFrameAt){
             setTimer(()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now()));
         }
     }
@@ -1525,6 +1675,7 @@
     function registerTarget(targetSide,index,allowDefeated){
         const current=state.current;
         if(!current||current.done||current.targetSide!==targetSide){ return null; }
+        if(current.recipientTargets&&!current.recipientTargets.has(index)){ return null; }
         const single=String(current.targetType||current.config.targetType||"")==="single";
         if(single&&current.targetIndexes.length&&current.targetIndexes.indexOf(index)<0){ return null; }
         if(!current.validTargets.has(index)){ current.validTargets.add(index); }
@@ -1544,6 +1695,8 @@
             }
         }
         current.done=true;
+        current.pendingUpdateKeys?.forEach(key=>state.pendingUpdates?.delete(key));
+        if(current.hitCallbacks){ current.hitCallbacks.clear(); }
         window.FourSymbolsBattlePresentation?.endCast?.(current.actorCard,current.characterMotion);
         current.spriteNodes.forEach(node=>{ if(node.v143MotionAnimation){ node.v143MotionAnimation.cancel(); } });
         current.targetIndexes.forEach(index=>{
@@ -1620,6 +1773,9 @@
             duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
+        if(model.sprite&&model.sprite.presentation==="per-recipient"){
+            current.recipientTargets=new Set(current.targetIndexes);
+        }
 
         const stage=document.createElement("div");
         stage.id="v143-skill-stage";
@@ -1648,6 +1804,7 @@
             if(!model.passive){ state.metrics.missingVisuals++; }
         }else{
             current.targetIndexes.slice().forEach(index=>emitSprite(current,index));
+            if(!model.sprite.impactOnly&&current.spriteNodes.size){ requestCastTimeline(current); }
         }
 
         if(model.noVisual||!model.sprite){
@@ -1788,7 +1945,8 @@
             if(wait>8||current&&!current.done&&!current.hitReached){ setTimer(present,wait); }else{ present(); }
         }
         if(wait>8){ state.metrics.delayedNumbers++; }
-        const scheduleImpact=current&&current.model&&current.model.sprite&&current.model.sprite.impactOnly
+        const scheduleImpact=current&&!current.done&&current.targetSide===side&&current.model&&current.model.sprite&&
+            (current.model.sprite.impactOnly||current.emitted?.has(unitIndex))
             ?callback=>queueTargetHit(current,unitIndex,callback,"feedback",side):null;
         return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact});
     };
@@ -1850,9 +2008,13 @@
                 state.pendingUpdates.set(key,true);
                 const project=()=>{
                     state.pendingUpdates.delete(key);
+                    current?.pendingUpdateKeys?.delete(key);
                     callback();
                 };
-                if(!queueTargetHit(current,index,project,"projection",side)){ setTimer(project,wait); }
+                if(queueTargetHit(current,index,project,"projection",side)){
+                    if(!current.pendingUpdateKeys){ current.pendingUpdateKeys=new Set(); }
+                    current.pendingUpdateKeys.add(key);
+                }else{ setTimer(project,wait); }
             }
             return;
         }

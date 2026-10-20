@@ -1,0 +1,728 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "source": "assets/vfx/fire/flame-slash-cast.png",
+  "mode": "builtin-imagegen-edit",
+  "attemptCount": 2,
+  "selectedAttempt": 2,
+  "attempts": [
+    {
+      "prompt": "Use case: precise-object-edit. Input image is the old FLAME SLASH sprite sheet; replace the artwork entirely while retaining orange-gold fire slash identity. Mobile fantasy RPG raster VFX. Exact output 4 columns x 3 rows, TWELVE equal square animation cells, row-major order, canvas 4:3. Genuinely transparent RGBA background. Each frame centered identically; whole visible effect including glow contained in central60% of cell width and height, target20% clear padding all sides. ONE thin sharp diagonal crescent slash, consistently rising lower-left to upper-right across all frames; clearly defined hot gold-white cutting edge with narrow red-orange flame filament trailing it. Very large EMPTY transparent central character space, no fire mass, no pillar, no fog, no explosion disk, no rocks, no circles, no additional slashes, no person. Frames1-2 tiny orange filament anticipating the same diagonal path, 3-6 progressively lengthening curved blade, 7 bright poised thin arc, FRAME8 is ONLY contact climax: same thin crescent and a SMALL intense four-point impact star at its middle. Frame9 short fading arc breaking into embers, frame10 only a few sparse curved ember fragments, frame11 tiny scattered sparks, frame12 just two very faint embers. Do not grow later frames into a large cloud. Crisp detailed luminous filaments, clear negative space, coherent angle and registration. No text, numbers, labels, grids, borders or visible cells. No uniform resizing/copy of old sheet: freshly paint a slender elegant commercial-quality fire strike.",
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-e7f2a938-6f6f-4e87-a1bb-9a4724b0c1c6.png"
+    },
+    {
+      "prompt": "Use case: precise-object-edit. Input image is the old FLAME SLASH sprite sheet; replace the artwork entirely while retaining orange-gold fire slash identity. Mobile fantasy RPG raster VFX. Exact output 4 columns x 3 rows, TWELVE equal square animation cells, row-major order, canvas 4:3. Genuinely transparent RGBA background. Each frame centered identically; whole visible effect including glow contained in central60% of cell width and height, target20% clear padding all sides. ONE thin sharp diagonal crescent slash, consistently rising lower-left to upper-right across all frames; clearly defined hot gold-white cutting edge with narrow red-orange flame filament trailing it. Very large EMPTY transparent central character space, no fire mass, no pillar, no fog, no explosion disk, no rocks, no circles, no additional slashes, no person. Frames1-2 tiny orange filament anticipating the same diagonal path, 3-6 progressively lengthening curved blade, 7 bright poised thin arc, FRAME8 is ONLY contact climax: same thin crescent and a SMALL intense four-point impact star at its middle. Frame9 short fading arc breaking into embers, frame10 only a few sparse curved ember fragments, frame11 tiny scattered sparks, frame12 just two very faint embers. Do not grow later frames into a large cloud. Crisp detailed luminous filaments, clear negative space, coherent angle and registration. No text, numbers, labels, grids, borders or visible cells. No uniform resizing/copy of old sheet: freshly paint a slender elegant commercial-quality fire strike.\nTargeted revision: Retain the slender diagonal flame-crescent sequence and unique small frame8 impact star, but make ALL EFFECTS in cells4–10 smaller within each equal cell. Entire effect plus glow MUST be inside cell coordinates20%–80% horizontally and vertically. No flame tips outside safe area. Frame8 star should be only one tenth of cell width. Do not return to broad smoke masses or grow the tail. Leave much wider transparent margins around the whole arc. Frame9-10 decay quickly, no long bright blade after contact. Keep cell registration identical.",
+      "mother": "C:/Users/User/.codex/generated_images/01a15479-dacf-7941-bc65-e785a5c615f3/exec-32d149aa-d830-4d57-ba17-e21711fd08e4.png"
+    }
+  ],
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "hitFrame": 8,
+    "hitFraction": 0.5833333333333334,
+    "divisible": true,
+    "cell": [
+      362,
+      362
+    ]
+  },
+  "status": "CANDIDATE_PENDING_INDEPENDENT_AND_DEVICE_REVIEW",
+  "conversion": {
+    "lossless": true,
+    "exact": true,
+    "rgbaPixelEquality": true,
+    "alphaEquality": true,
+    "motherSize": [
+      1448,
+      1086
+    ],
+    "outputSize": [
+      1448,
+      1086
+    ],
+    "resized": false,
+    "cropped": false,
+    "rearranged": false
+  },
+  "motherSha256": "2b387e460d378fa6fa716fbb93b0c6daa105c13a0e6f549870ab1b78b246ef87",
+  "outputSha256": "c20fd88c563d13796b155d0fb5da920b4ca96a141e3f1347ae3ba64efd6d11f8",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            138,
+            227,
+            224,
+            286
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.016285,
+          "paddingFraction": [
+            0.3812,
+            0.6271,
+            0.3812,
+            0.2099
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            142,
+            230,
+            220,
+            280
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.007677,
+          "paddingFraction": [
+            0.3923,
+            0.6354,
+            0.3923,
+            0.2265
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            143,
+            234,
+            218,
+            279
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.004869,
+          "paddingFraction": [
+            0.395,
+            0.6464,
+            0.3978,
+            0.2293
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            127,
+            192,
+            239,
+            290
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.028517,
+          "paddingFraction": [
+            0.3508,
+            0.5304,
+            0.3398,
+            0.1989
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            132,
+            206,
+            231,
+            286
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.01382,
+          "paddingFraction": [
+            0.3646,
+            0.5691,
+            0.3619,
+            0.2099
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            133,
+            213,
+            223,
+            283
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.006525,
+          "paddingFraction": [
+            0.3674,
+            0.5884,
+            0.384,
+            0.2182
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            106,
+            151,
+            261,
+            294
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.054196,
+          "paddingFraction": [
+            0.2928,
+            0.4171,
+            0.279,
+            0.1878
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            112,
+            157,
+            258,
+            291
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.032294,
+          "paddingFraction": [
+            0.3094,
+            0.4337,
+            0.2873,
+            0.1961
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            122,
+            164,
+            256,
+            283
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.021344,
+          "paddingFraction": [
+            0.337,
+            0.453,
+            0.2928,
+            0.2182
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            99,
+            135,
+            277,
+            302
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.075517,
+          "paddingFraction": [
+            0.2735,
+            0.3729,
+            0.2348,
+            0.1657
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            104,
+            145,
+            272,
+            297
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.049792,
+          "paddingFraction": [
+            0.2873,
+            0.4006,
+            0.2486,
+            0.1796
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            115,
+            151,
+            270,
+            295
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.034927,
+          "paddingFraction": [
+            0.3177,
+            0.4171,
+            0.2541,
+            0.1851
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            106,
+            107,
+            284,
+            264
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.066695,
+          "paddingFraction": [
+            0.2928,
+            0.2956,
+            0.2155,
+            0.2707
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            111,
+            115,
+            276,
+            259
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.04426,
+          "paddingFraction": [
+            0.3066,
+            0.3177,
+            0.2376,
+            0.2845
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            114,
+            119,
+            273,
+            257
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.031936,
+          "paddingFraction": [
+            0.3149,
+            0.3287,
+            0.2459,
+            0.2901
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            102,
+            92,
+            286,
+            260
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.080629,
+          "paddingFraction": [
+            0.2818,
+            0.2541,
+            0.2099,
+            0.2818
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            107,
+            99,
+            282,
+            257
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.056279,
+          "paddingFraction": [
+            0.2956,
+            0.2735,
+            0.221,
+            0.2901
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            117,
+            104,
+            281,
+            254
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.038995,
+          "paddingFraction": [
+            0.3232,
+            0.2873,
+            0.2238,
+            0.2983
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            106,
+            90,
+            292,
+            264
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.083987,
+          "paddingFraction": [
+            0.2928,
+            0.2486,
+            0.1934,
+            0.2707
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            110,
+            97,
+            289,
+            259
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.058408,
+          "paddingFraction": [
+            0.3039,
+            0.268,
+            0.2017,
+            0.2845
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            115,
+            104,
+            288,
+            258
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.041772,
+          "paddingFraction": [
+            0.3177,
+            0.2873,
+            0.2044,
+            0.2873
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            99,
+            92,
+            285,
+            259
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.07251,
+          "paddingFraction": [
+            0.2735,
+            0.2541,
+            0.2127,
+            0.2845
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            103,
+            104,
+            279,
+            251
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.049533,
+          "paddingFraction": [
+            0.2845,
+            0.2873,
+            0.2293,
+            0.3066
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            107,
+            111,
+            278,
+            251
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.036438,
+          "paddingFraction": [
+            0.2956,
+            0.3066,
+            0.232,
+            0.3066
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            114,
+            75,
+            287,
+            235
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.059369,
+          "paddingFraction": [
+            0.3149,
+            0.2072,
+            0.2072,
+            0.3508
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            123,
+            79,
+            282,
+            233
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.031592,
+          "paddingFraction": [
+            0.3398,
+            0.2182,
+            0.221,
+            0.3564
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            140,
+            81,
+            270,
+            229
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.015361,
+          "paddingFraction": [
+            0.3867,
+            0.2238,
+            0.2541,
+            0.3674
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            128,
+            92,
+            267,
+            232
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.028296,
+          "paddingFraction": [
+            0.3536,
+            0.2541,
+            0.2624,
+            0.3591
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            133,
+            96,
+            264,
+            229
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.010172,
+          "paddingFraction": [
+            0.3674,
+            0.2652,
+            0.2707,
+            0.3674
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            135,
+            97,
+            262,
+            227
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.004663,
+          "paddingFraction": [
+            0.3729,
+            0.268,
+            0.2762,
+            0.3729
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            129,
+            130,
+            255,
+            231
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.005136,
+          "paddingFraction": [
+            0.3564,
+            0.3591,
+            0.2956,
+            0.3619
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            132,
+            134,
+            252,
+            227
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.001419,
+          "paddingFraction": [
+            0.3646,
+            0.3702,
+            0.3039,
+            0.3729
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            134,
+            136,
+            250,
+            225
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.000336,
+          "paddingFraction": [
+            0.3702,
+            0.3757,
+            0.3094,
+            0.3785
+          ]
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "alpha": [
+        {
+          "threshold": 16,
+          "bbox": [
+            162,
+            156,
+            231,
+            217
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.002839,
+          "paddingFraction": [
+            0.4475,
+            0.4309,
+            0.3619,
+            0.4006
+          ]
+        },
+        {
+          "threshold": 64,
+          "bbox": [
+            166,
+            159,
+            227,
+            214
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.001023,
+          "paddingFraction": [
+            0.4586,
+            0.4392,
+            0.3729,
+            0.4088
+          ]
+        },
+        {
+          "threshold": 128,
+          "bbox": [
+            167,
+            161,
+            225,
+            212
+          ],
+          "edgeFraction": 0.0,
+          "coverage": 0.000389,
+          "paddingFraction": [
+            0.4613,
+            0.4448,
+            0.3785,
+            0.4144
+          ]
+        }
+      ]
+    }
+  ],
+  "selfReview": [
+    "Fresh generated thin diagonal crescent retains single slash identity with unique small star in frame8; no fire pillar, rock or cloud disk.",
+    "Frames9-10 retain dimming arc before sparse embers11-12; assess decay at authored duration.",
+    "Actual effective-alpha padding and boundary rates recorded. No runtime changes."
+  ]
+}

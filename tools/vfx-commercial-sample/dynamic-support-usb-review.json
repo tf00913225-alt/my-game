@@ -1,0 +1,293 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "timing_review independent commercial gate",
+  "reviewedVideoHead": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+  "workspaceHeadAtSave": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
+  "source": "artifacts/vfx-freeze-relic-final-usb/skill-cycle.mp4",
+  "metadata": "artifacts/vfx-freeze-relic-final-usb/skill-video.json",
+  "method": "Actual view_image inspection of 51 native full-screen 720x1280 PNG frames, FFmpeg 12 fps. Located using metadata +800 ms and checked visible skill labels. Start, middle, contact-adjacent and tail samples.",
+  "scope": "Dynamic presentation of eight already statically accepted skills; no runtime/test changes or phone operations.",
+  "excluded": [
+    {
+      "id": "freeze",
+      "reason": "Not present in this 27-skill film; separate six-enemy evidence already passed. Absence is not a failure."
+    },
+    {
+      "id": "barrier/dodge",
+      "reason": "Previously independently passed; not reopened."
+    }
+  ],
+  "results": [
+    {
+      "id": "frostCrush",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0226.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0230.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0232.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0233.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0234.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0235.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0238.png"
+      ],
+      "technical": [
+        {
+          "id": "frostCrush",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "frostCrush",
+          "at": 17867.40000000596,
+          "hit": 18632,
+          "duration": 1150,
+          "remaining": 0
+        }
+      ],
+      "observation": "尖冰下砸、接觸冰爆與碎片散去次序清楚；主體打在左敵，HUD置前，尾段逐步透明，未見硬裁或失去冰碎身份。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0232.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "iceArrowRain",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0246.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0251.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0256.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0257.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0258.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0263.png"
+      ],
+      "technical": [
+        {
+          "id": "iceArrowRain",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "iceArrowRain",
+          "at": 19479.69999998808,
+          "hit": 20513.19999998808,
+          "duration": 1600,
+          "remaining": 0
+        }
+      ],
+      "observation": "長冰箭由上落向敵列並接地冰紋，峰值覆蓋有終結技力度；姓名血條仍清楚，兩側敵身可辨；冰紋與箭尾淡去，未見畫面邊界切斷。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0251.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "revive",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0273.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0280.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0285.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0286.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0287.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0293.png"
+      ],
+      "technical": [
+        {
+          "id": "revive",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "revive",
+          "at": 21790.40000000596,
+          "hit": 22942.30000001192,
+          "duration": 1800,
+          "remaining": 0
+        }
+      ],
+      "observation": "中央倒地角色位置先水滴聚集、再蓮花亮核、後上散水滴與光圈淡去，未跳到其他目標或留下圖層。倒地角色與HUD淡化持續是fixture呈現，不能由本片宣稱正式復活結算或角色已復活。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0280.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "fireSoulResonance",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0304.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0309.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0313.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0314.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0315.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0318.png"
+      ],
+      "technical": [
+        {
+          "id": "fireSoulResonance",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "fireSoulResonance",
+          "at": 24337.5,
+          "hit": 25255,
+          "duration": 1400,
+          "remaining": 0
+        }
+      ],
+      "observation": "橙紅火環包住施術者身體，輪廓與角色本有火焰仍可分辨；聚環到散火幅度可見，沒有縮到只剩不可辨亮點，角色與HUD保持可讀。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0309.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "bloodBurnArt",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0326.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0331.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0335.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0336.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0337.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0341.png"
+      ],
+      "technical": [
+        {
+          "id": "bloodBurnArt",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "bloodBurnArt",
+          "at": 26206.09999999404,
+          "hit": 27129.59999999404,
+          "duration": 1400,
+          "remaining": 0
+        }
+      ],
+      "observation": "暗紅底旋聚成亮紅火柱再退為薄紅餘焰；血燃比火魂更濃重的紅黑身份保留，局部峰值遮身短暫且HUD仍在前，尾段清除。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0335.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "purifyMind",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0349.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0353.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0358.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0359.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0360.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0363.png"
+      ],
+      "technical": [
+        {
+          "id": "purifyMind",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "purifyMind",
+          "at": 28084.40000000596,
+          "hit": 28991.80000001192,
+          "duration": 1400,
+          "remaining": 0
+        }
+      ],
+      "observation": "水珠起手、淺藍環繞淨化柱與退散水圈可辨；效果圍繞自身而非空地，亮柱短暫遮身後恢復，姓名血條可讀，尾部不殘留。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0353.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "dizzyFist",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0400.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0406.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0409.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0410.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0411.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0415.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0419.png"
+      ],
+      "technical": [
+        {
+          "id": "dizzyFist",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "dizzyFist",
+          "at": 32309.30000001192,
+          "hit": 33303.09999999404,
+          "duration": 1800,
+          "remaining": 0
+        }
+      ],
+      "observation": "綠青旋風聚向左敵、垂直撞擊白核、環繞餘風再淡去；接觸確在目標身體範圍，旋轉衝擊身份與命中力度可見，未見空擊或HUD遮蔽。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0409.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    },
+    {
+      "id": "dustStorm",
+      "gate": "PASS",
+      "gateScope": "sampled dynamic presentation",
+      "frames": [
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0452.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0459.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0463.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0464.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0467.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0469.png",
+        "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0473.png"
+      ],
+      "technical": [
+        {
+          "id": "dustStorm",
+          "event": "hit-hud",
+          "battleActive": true,
+          "hud": 6
+        },
+        {
+          "id": "dustStorm",
+          "at": 36645,
+          "hit": 37753.30000001192,
+          "duration": 2000,
+          "remaining": 0
+        }
+      ],
+      "observation": "棕金岩屑旋聚、重石壓向左敵與地面碎岩爆發後逐步淡去；土石身份鮮明，主體沒有邊界硬裁，兩個鄰敵與HUD可讀，收尾不跳到其他位置。",
+      "action": "Accept and stop art refinement for this demonstrated presentation.",
+      "peakFrame": "artifacts/vfx-freeze-relic-final-usb/sequence-frames/frame-0463.png",
+      "peakVerified": "Viewed native frame; visible matching skill label and identifiable active effect, not selected solely by metadata time."
+    }
+  ],
+  "summary": {
+    "pass": 8,
+    "fail": 0,
+    "concreteBlockers": [],
+    "decision": "No demonstrated crop, target mismatch, identity loss, excessive shrink or persistent overlay requiring another revision in these samples."
+  },
+  "limits": [
+    "12 fps extracted samples do not establish uninterrupted 60 fps smoothness or exclude every intermediate-frame jump.",
+    "No endurance/performance certification from screenrecord; technical performance evidence is separate.",
+    "Visual contact review is not damage, eligibility, buff application or revive settlement authority.",
+    "PASS is bounded to the recorded target arrangement and reviewed video head; no blanket approval of all skills."
+  ]
+}

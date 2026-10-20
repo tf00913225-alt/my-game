@@ -16,12 +16,12 @@ test("Water Ball owns a 12-frame, 4x3 group raster sprite with the frame-eight h
     assert.match(animation,/function castSheet\(src,placement,options\)[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
     assert.match(
         animation,
-        /waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/
+        /waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-recipient-v1\.webp","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/
     );
     assert.match(animation,/const DEFAULT_HIT=\.5833333333;/);
 });
 
-test("the single group VFX uses fixed geometry and the explicit primary target",()=>{
+test("the group artwork uses canonical geometry while trajectories retain the primary target",()=>{
     const placement=animation.slice(animation.indexOf("function placeSprite(current,node,index,target){"));
     assert.match(
         placement,
@@ -29,7 +29,7 @@ test("the single group VFX uses fixed geometry and the explicit primary target",
     );
     assert.match(
         placement,
-        /const destination=bounds\.centerOnBounds&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}[\s\S]*?:\{x:bounds\.centerX,y:bounds\.centerY\}/
+        /const destination=\(placement==="group"\|\|bounds\.centerOnBounds\)&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}[\s\S]*?:\{x:bounds\.centerX,y:bounds\.centerY\}/
     );
     assert.doesNotMatch(placement,/waterBall.*targetTrajectory/);
 });

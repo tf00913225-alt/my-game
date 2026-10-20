@@ -1,0 +1,60 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Two corrected source candidates only; no runtime/phone changes. Candidate images viewed, adjacent generation/conversion metadata read, decoded boundaries and mother equality independently measured.",
+  "qualityClaim": "Focused USB candidate permission only; no commercial or full playback acceptance.",
+  "measurement": {
+    "method": "Pillow/NumPy full decoded RGBA equality against conversion.source PNG; four edges of all12 cells sampled using round(row*height/3), round(column*width/4). No alpha>=8 edge pixels for either candidate, therefore no alpha>=64 edge pixels.",
+    "alpha8EdgeCountsAll24Frames": 0,
+    "fullMotherRgbaEqualityBoth": true,
+    "arbitraryPromptMarginNotAGate": true
+  },
+  "reviews": [
+    {
+      "id": "stormFlurry",
+      "candidate": "tools/vfx-commercial-sample/assets/full/storm-flurry-wide-v3.webp",
+      "dimensions": [
+        2172,
+        724
+      ],
+      "nativeCellAspect": 2.25,
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED_WITH_TAIL_CHECK",
+      "maxMeasuredEdgeAlpha": 1,
+      "priorRejectionResolved": "The real alpha>=8 cross-row art observed in v2 is absent in v3. Paired clenched wind fists remain recognizable, so containment has not erased fist-barrage identity.",
+      "identity": "Green paired knuckles and diagonal wind streaks clearly distinguish this skill from circular wind rings. Frame7 contact stars and8 recoil are visible.",
+      "sequence": "First frame already contains substantial wind ribbons; fist phase3-8 gives clear change. Tail9-12 loses fists but remains broad wind shapes. Alpha mass peaks31071 at7, frame12 still16471 (~53.0% of peak), with slight9-to10 mass rebound21453 to21923. Source is not a near-empty authored endpoint.",
+      "phoneChecks": [
+        "Mandatory: verify existing bounded runtime fade makes residual broad wind trail release smoothly with no hard pop or stale wall.",
+        "Verify compact paired fists remain readable at actual group fit and hit7 feels distinct.",
+        "Keep geometry/scale/target authority unchanged; no further static redraw unless concrete phone defect appears."
+      ]
+    },
+    {
+      "id": "iceSpin",
+      "candidate": "tools/vfx-commercial-sample/assets/full/iceSpin-wide-v2.webp",
+      "dimensions": [
+        2170,
+        725
+      ],
+      "nativeCellAspect": 2.2448275862068967,
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "maxMeasuredEdgeAlpha": 2,
+      "priorRejectionResolved": "Long pointed faceted ice blades and angular shards are plainly restored. Candidate now reads as crystalline spinning slash, unlike v1 rounded water curls.",
+      "identity": "Three sites each show crystal rise, blade rotation/crossing and icy contact. Frame8 sharp crystal eruption and frame9 smaller breakup retain ice-cut identity.",
+      "hazeFinding": "Bright white/cyan haze is visible in black preview, but every measured cell edge has alpha below8 (max2), so it is not demonstrated cross-cell clipping or an opaque atlas grid. Do not reject based on preview brightness alone; actual character obstruction still needs phone peak frames.",
+      "sequence": "Frame8 alpha mass36826 peak;9=25068,10=9823,11=6116,12=4330. Clear release into angular shards/trails, ending ~11.8% peak mass.",
+      "phoneChecks": [
+        "Use actual aspect (2170/4)/(725/3)=2.2448275862068967, not hard-coded2.25 or a stretched/cropped source.",
+        "Verify white-blue haze at peak does not hide targeted actor/HUD.",
+        "Inspect spin-to-impact continuity5-9 and release baseline at actual fit."
+      ]
+    }
+  ],
+  "counts": {
+    "reviewed": 2,
+    "sourceRejected": 0,
+    "usbEligible": 2
+  },
+  "next": "Both corrected sources may proceed to focused USB gate. No runtime edits here; avoid reopening already accepted unrelated source polish.",
+  "runtimeOrPhoneChangesMade": false
+}

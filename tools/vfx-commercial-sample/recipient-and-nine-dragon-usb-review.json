@@ -1,0 +1,125 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "reviewer": "independent coverage_review",
+  "scope": "Six recipient CAST physical presentation gates plus Nine Dragon Fire original HUD failure and focused fix retest. No runtime/tests/phone changes.",
+  "recipientEvidence": {
+    "head": "1d02be839ebc99b098fe592699fec51c5eca2aa4",
+    "metadata": "artifacts/vfx-final-recipient-usb/skill-video.json",
+    "frames": "artifacts/vfx-final-recipient-usb/sequence-frames",
+    "method": "view_image inspection of original uncropped native720x1280 decoded12fps phone frames; sampled activation/contact and release for every item. Does not claim all frames watched or 60fps performance."
+  },
+  "recipientReviews": [
+    {
+      "id": "waterBall",
+      "framesViewed": [
+        15,
+        17,
+        18,
+        19,
+        20,
+        25
+      ],
+      "peakFrame": 17,
+      "conclusion": "Three clearly recognizable blue swirling water orbs sit on each enemy lower torso; former inner empty-gap impact resolved. Faces and HUD clear, fades then clears25.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    },
+    {
+      "id": "healSpell",
+      "framesViewed": [
+        35,
+        38,
+        40,
+        45
+      ],
+      "peakFrame": 38,
+      "conclusion": "Blue-white healing lotus/water activation centered on each allied lower body; title/level/HP unobstructed. Healing identity remains readable at smaller size, clear45.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    },
+    {
+      "id": "rage",
+      "framesViewed": [
+        55,
+        60,
+        62,
+        65
+      ],
+      "peakFrame": 60,
+      "conclusion": "Gold upward arrows and orange fire spiral correctly attach to each ally. Distinct even on red player; clear face and HUD. Former name-strip base overlap resolved; faint release65.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    },
+    {
+      "id": "dodgeSkill",
+      "framesViewed": [
+        80,
+        85,
+        90
+      ],
+      "peakFrame": 85,
+      "conclusion": "Green wind/leaf U and activation glint surround each ally waist/legs rather than name strip. Sufficient evasion identity, not erased to generic dots. Clear90.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    },
+    {
+      "id": "rockWall",
+      "framesViewed": [
+        100,
+        108,
+        115
+      ],
+      "peakFrame": 108,
+      "conclusion": "Paired angular stone guards visibly flank each allied body, with central space preserved. Former inside-gap guards resolved. HUD clear;115 shows small retiring remnants above HUD.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    },
+    {
+      "id": "stormRain",
+      "framesViewed": [
+        130,
+        140,
+        150
+      ],
+      "peakFrame": 140,
+      "conclusion": "Small green funnel and circling wind visibly act on each intended enemy torso. Despite reduced size, funnel identity remains recognizable and no empty-space placement/whole-row blanket occurs. Clear release150.",
+      "gate": "PASS_SCOPED_VISUAL_STOP_REFINEMENT"
+    }
+  ],
+  "nineDragonHistory": [
+    {
+      "head": "1d02be839ebc99b098fe592699fec51c5eca2aa4",
+      "metadata": "artifacts/vfx-final-recipient-usb/relic-video.json",
+      "frames": "artifacts/vfx-final-recipient-usb/relic-frames",
+      "framesViewed": [
+        20,
+        35,
+        45,
+        55,
+        70,
+        90
+      ],
+      "gate": "FAIL_LOCAL_HUD_LAYER",
+      "identityGate": "PASS_STOP_SOURCE_REFINEMENT",
+      "sizeGate": "PASS_STOP_SIZE_REFINEMENT",
+      "releaseGate": "PASS",
+      "conclusion": "Frames45/55 show clearly readable multiple dragon heads, interwoven fiery bodies and compact ring with no full-screen baseline blast. Central enemy HUD is hidden behind rising dragon/coil; actual failure is cinematic layer ordering, not source/size.70 release and90 cleared. Do not fix by removing dragons or arbitrary shrinking.",
+      "baselineViewed": "artifacts/vfx-usb-runtime/before-relic_nine_dragon_fire.png"
+    },
+    {
+      "head": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+      "metadata": "artifacts/vfx-freeze-relic-final-usb/relic-video.json",
+      "frames": "artifacts/vfx-freeze-relic-final-usb/relic-frames",
+      "framesViewed": [
+        45,
+        50,
+        55
+      ],
+      "gate": "PASS_LOCAL_HUD_RETEST_STOP_REFINEMENT",
+      "conclusion": "At same rising/peak dragon phases, all three enemy names, levels and HP bars visibly render above fire coils. Allied names/levels/HP/MP also remain readable. Original central-HUD concealment resolved while retaining previously accepted dragon source/size. This retest only reopens prior HUD failure."
+    }
+  ],
+  "finalCounts": {
+    "recipientPass": 6,
+    "recipientFail": 0,
+    "nineDragonHudFailureResolved": true
+  },
+  "qualityClaim": "Scoped physical visual acceptance for listed symptoms only. Technical HUD counts/cleanup are supporting inputs and do not substitute this visual inspection. Not whole-game commercial completion, eligibility/damage validation or sustained performance acceptance.",
+  "policy": "Stop discretionary refinement of passed items. Preserve prior seven PASS casts and all approved persistent states. No exact-nine-head counting gate; actual multiple-dragon/coil/fire-ring readability remains required."
+}

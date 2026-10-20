@@ -34,12 +34,18 @@ assert.match(bossRuntime,/const ELEMENT_ORDER=Object\.freeze\(\["fire","earth","
 assert.match(bossRuntime,/return value<=30\?\.65:value<=60\?\.70:value<=90\?\.75:\.80/);
 assert.doesNotMatch(bossRuntime,/monster\.skillChance=Math\.min\(\.82,numeric\(monster\.skillChance,\.48\)\+\.08\)/);
 assert.match(bossRuntime,/if\(element==="fire"\)\{[\s\S]*?monster\.vTowerCriticalBonusPercent=15;[\s\S]*?monster\.vTowerDirectDamageMultiplier=1\.15;/);
-assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.vTowerHealingMultiplier=1\.15;[\s\S]*?monster\.vTowerStatusAccuracyPercent=15;[\s\S]*?monster\.v141SupportSkillIds=compatibleSkillIds\(element,ELEMENTS\.water\.supports\);[\s\S]*?monster\.v141AbyssAi="support";/);
+assert.match(bossRuntime,/if\(element==="water"\)\{[\s\S]*?monster\.vTowerHealingMultiplier=1\.15;[\s\S]*?monster\.vTowerStatusAccuracyPercent=15;/);
+// The Tower loadout owner grants support by combat role; element bonuses must
+// not overwrite every water unit with the same heal/control loadout.
+const towerLoadout=bossRuntime.slice(bossRuntime.indexOf("function configureTowerSkills("),bossRuntime.indexOf("let towerDecisionState="));
+assert.match(towerLoadout,/monster\.v141SupportSkillIds=profile\.support&&\(role==="support"\|\|boss\)/);
+assert.match(towerLoadout,/if\(element==="water"&&\(role==="support"\|\|boss\)\)attacks\.push\("freeze"\)/);
 assert.match(bossRuntime,/if\(element==="wind"\)\{[\s\S]*?monster\.evasion=[\s\S]*?\+15;/);
 // Phase 2C moves Earth/Wind stats into the pre-battle owner. Preserve the
 // elemental bonuses while rejecting the retired gameplay post-writes.
 const towerElementRuntime=bossRuntime.slice(bossRuntime.indexOf("function applyTowerElementProfile("),bossRuntime.indexOf("function bindTowerMonsterIdentity("));
 assert.doesNotMatch(towerElementRuntime,/monster\.(?:agility|defense|maxHP|hp)\s*=/);
+assert.doesNotMatch(towerElementRuntime,/monster\.(?:skillIds|v141SupportSkillIds|v141AbyssAi)\s*=/);
 for(const level of [1,30,50,100]){
     const spec={monsterKey:"tower.ui-regression",name:"塔衛",level,rank:"regular",archetype:"balanced",mode:"tower",context:`tower/floor/${level}`};
     const wind=MonsterBalance.preview({...spec,element:"wind"});

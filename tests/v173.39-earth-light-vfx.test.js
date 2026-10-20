@@ -23,7 +23,7 @@ const CASTS={
     sandWind:{file:"assets/vfx/earth/sand-wind-cast.png",duration:1500,placement:"group",status:"defenseDown"},
     flyingSandStrike:{file:"assets/vfx/earth/flying-sand-strike-cast.png",duration:2000,placement:"battlefield",status:"defenseDown"},
     dustStorm:{file:"assets/vfx/earth/dust-storm-cast.png",duration:2000,placement:"single",status:"petrify"},
-    earthShield:{file:"assets/vfx/earth/earth-shield-cast.png",duration:1800,placement:"group",status:"earthShield"},
+    earthShield:{file:"assets/vfx/earth/earth-shield-cast-v2.webp",duration:1800,placement:"single",status:"earthShield"},
     rockWall:{file:"assets/vfx/earth/rock-wall-cast.png",duration:1700,placement:"group",status:"rockWall"},
     barrier:{file:"assets/vfx/earth/barrier-cast.png",duration:1900,placement:"single",status:"barrier"},
     yuanZuBlessing:{file:"assets/vfx/light/yuan-zu-blessing-cast.png",duration:2000,placement:"battlefield",status:"yuanZuBlessing"}
@@ -119,7 +119,8 @@ function statusRuntime(){
 test("earth and Yuan Zu cast sheets keep the supplied production dimensions and natural 4x3 grid",()=>{
     Object.entries(CASTS).forEach(([id,spec])=>{
         const expected=id==="sandWind"?[1536,1024]:[1448,1086];
-        assert.deepEqual(pngSize(spec.file),expected,spec.file);
+        if(spec.file.endsWith(".webp")){const info=losslessWebpInfo(spec.file);assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);assert.equal(info.width/4,info.height/3);}
+        else{assert.deepEqual(pngSize(spec.file),expected,spec.file);}
     });
 });
 
@@ -141,7 +142,8 @@ test("all casts use DOM Sprite Sheets, frame seven impact and the requested plac
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        assert.equal(model.sprite.src,spec.file+"?v=173.39",id);
+        const wideFile={rockWall:"rock-wall-recipient-v1.webp",petrifyFist:"petrify-fist-wide-v2.webp",earthquakeCrush:"earthquake-crush-wide-v2.webp",stoneThrow:"stone-throw-wide-v2.webp",sandWind:"rolling-stone-wide-v2.webp"}[id];
+        assert.equal(model.sprite.src,wideFile?"assets/vfx/earth/"+wideFile:spec.file+(spec.file.endsWith(".webp")?"":"?v=173.39"),id);
         assert.deepEqual(Array.from([
             model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame
         ]),[4,3,12,7],id);
@@ -158,15 +160,20 @@ test("all casts use DOM Sprite Sheets, frame seven impact and the requested plac
 test("earth trio sheets opt into fixed slot alignment and full-field earth stays formation-locked",()=>{
     const runtime=statusRuntime();
     const manifest=runtime.context.v143SkillAnimationManifest;
-    ["petrifyFist","earthquakeCrush","stoneThrow","sandWind","earthShield","rockWall"].forEach(id=>{
+    ["petrifyFist","earthquakeCrush","stoneThrow","sandWind","rockWall"].forEach(id=>{
         assert.equal(manifest[id].sprite.placement,"group",id);
         assert.equal(manifest[id].sprite.alignToSlots,true,id);
     });
+    assert.equal(manifest.earthShield.sprite.placement,"single","self shield has one caster anchor");
+    assert.equal(manifest.earthShield.sprite.scale,1.7);
+    assert.equal(manifest.earthShield.sprite.maxSize,225);
+    assert.equal(manifest.earthShield.sprite.alignToSlots,undefined);
+    assert.deepEqual(fs.readFileSync("assets/vfx/earth/earth-shield-cast-v2.webp"),fs.readFileSync("tools/vfx-commercial-sample/assets/full/earth-shield-v3.webp"),"runtime shield preserves the reviewed candidate bytes");
     assert.equal(manifest.flyingSandStrike.sprite.placement,"battlefield");
     assert.equal(manifest.flyingSandStrike.sprite.targetBounds,undefined);
     assert.match(animation,/owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
     assert.match(animation,/const bounds=geometryBounds\(current,indexes,placement\)/);
-    assert.match(animation,/const destination=bounds\.centerOnBounds&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}/);
+    assert.match(animation,/const destination=\(placement===\"group\"\|\|bounds\.centerOnBounds\)&&placement!=="trajectory"[\s\S]*?\?\{x:bounds\.centerX,y:bounds\.centerY\}[\s\S]*?:primaryAnchor[\s\S]*?\?\{x:primaryAnchor\.x,y:primaryAnchor\.y\}/);
 });
 
 test("earth and light persistent states use low-motion modes without a frame clock",()=>{
@@ -270,4 +277,28 @@ test("V173.39 cache version loads the new owner code without stale V173.38 brows
     assert.match(index,/build\/boot-core\.[0-9a-f]{12}\.js/);
 });
 
+
+test("wide baseline bytes remain exact and active wide sources retain their native ratio",()=>{
+    const manifest=statusRuntime().context.v143SkillAnimationManifest;
+    const entries=[["rockWall", "earth/rock-wall-wide-v2.webp", "45989080b9506d5804d07daf79c308b41f16810c90ed50c713b58318e98cf683"], ["petrifyFist", "earth/petrify-fist-wide-v2.webp", "1d76cf65922b6329189ce7540a5161442943a5f3f2380261524abcdf89799045"], ["earthquakeCrush", "earth/earthquake-crush-wide-v2.webp", "2f8325f12475965ae3b96f008231ceca6394c9f9827fa51b856d21d25b47bd4a"], ["stoneThrow", "earth/stone-throw-wide-v2.webp", "3aab7fc59305527a2d1603ae94882dfc6aefabca8798489c4b155ea095a755bc"], ["sandWind", "earth/rolling-stone-wide-v2.webp", "b9fca4658b97fd690db1a877040a7ae66bc92a0fe51e232fb2d2f949a63ae1a3"]];
+    entries.forEach(([id,file,hash])=>{
+        const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
+        assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
+        assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
+        if(!["rockWall"].includes(id)){
+        assert.equal(manifest[id].sprite.src,candidate,id);
+        assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
+        assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
+        }else{ assert.equal(manifest[id].sprite.presentation,"per-recipient",id); assert.notEqual(manifest[id].sprite.src,candidate,id+" rejected placement source is retired"); }
+    });
+});
+
 console.log("\n"+passed+" V173.39 earth/light Sprite VFX tests passed.");
+
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

@@ -1,0 +1,126 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Six source candidates only; no runtime or phone changes. Viewed all six candidates plus earth originals; compared flurry originals already visually reviewed in prior batch. Read adjacent generation/conversion metadata and independently measured decoded pixels.",
+  "qualityClaim": "USB candidate eligibility only, not phone/commercial acceptance.",
+  "technical": {
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cellAspect": 2.25,
+    "fullMotherRgbaEqualityAllSix": true,
+    "method": "Pillow/NumPy full-array comparison to conversion.source; frame rows round(r*724/3), columns543; alpha8 four-edge counts and alpha mass sum(alpha)/255.",
+    "fractionalHeight": "724/3 fractional; retain existing renderer source-row behavior.",
+    "noArbitraryMarginGate": true
+  },
+  "reviews": [
+    {
+      "id": "stormFlurry",
+      "candidate": "storm-flurry-wide-v2.webp",
+      "classification": "REJECT_SOURCE_EDGE_CROSSING",
+      "identity": "Clenched green fists and multiple directional wind strikes restored; prior v1 identity rejection is resolved.",
+      "edgeAlpha8Counts": [
+        22,
+        61,
+        121,
+        16,
+        10,
+        56,
+        108,
+        8,
+        0,
+        0,
+        0,
+        0
+      ],
+      "maxFrameEdgeAlpha": 118,
+      "edgeLocation": "Frames1-4 bottom row:22,61,121,16; frames5-8 top row:10,56,108,8. Adjacent first/second atlas rows contain real alpha8+ art at cut boundary, unlike low-alpha RGB residue.",
+      "sequence": "Contact flashes exist at7-8, tail becomes simple wind ribbons. Early frame1 already substantial; this is secondary to actual cross-row clipping.",
+      "next": "Do not use USB/runtime candidate. Regenerate only this source with complete contours and a true transparent row gap, preserving restored fists. Do not hide cuts by runtime shrinking/cropping."
+    },
+    {
+      "id": "explosiveFlurry",
+      "candidate": "explosive-flurry-wide-v2.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "alpha8EdgesAllZero": true,
+      "maxFrameEdgeAlpha": 1,
+      "identity": "Multiple pointed fire blades, crossed slashes and frame7-8 explosive contact restored. Clearly distinct from generic flame tongues; v1 identity rejection resolved.",
+      "sequence": "Peak alpha mass41122 at8 then35607/20491/12712/9704. Tail loses explosion core and dims into curling slash remnants, but final remnants remain nonempty.",
+      "phoneChecks": [
+        "Verify three fire sites do not read as an opaque connected orange blanket at peak.",
+        "Check frame1 activation is not perceived as hit before7-8.",
+        "Verify existing bounded fade removes residual final slash without pop."
+      ]
+    },
+    {
+      "id": "petrifyFist",
+      "candidate": "petrify-fist-wide-v1.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "alpha8EdgesAllZero": true,
+      "maxFrameEdgeAlpha": 1,
+      "identity": "Faceted clenched stone fists thrust diagonally into three localized impacts. These are punches, not three defensive bubbles. Golden curves are motion trails; caster shield remains separate gameplay/status responsibility.",
+      "sequence": "Contact burst at7, then fist disintegrates into stones/dust through12. Peak47598 at7, final2557.",
+      "phoneChecks": [
+        "Confirm knuckle silhouette survives small rendered size.",
+        "Verify golden trails do not falsely imply enemy shields.",
+        "Check contact baseline and target placement using unchanged owner."
+      ]
+    },
+    {
+      "id": "earthquakeCrush",
+      "candidate": "earthquake-crush-wide-v1.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "alpha8EdgesAllZero": true,
+      "maxFrameEdgeAlpha": 2,
+      "identity": "Heavy stone fists and local jagged earth eruptions retained. Forceful downward smash clearly differs from plain falling boulders.",
+      "sequence": "Fist builds and lands with star contact at7;8 continuing breakage;9-12 debris/dust taper. Peak52889 at7, final2869.",
+      "phoneChecks": [
+        "Verify large early descending fists stay below HUD.",
+        "Check impact eruption does not become a continuous ground slab.",
+        "Confirm hit7 and subsequent dust/petrify status are visually coherent."
+      ]
+    },
+    {
+      "id": "stoneThrow",
+      "formalName": "落石術",
+      "candidate": "stone-throw-wide-v1.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "alpha8EdgesAllZero": true,
+      "maxFrameEdgeAlpha": 2,
+      "identity": "Three irregular faceted boulders descend with short diagonal trails and ground impacts; correct falling-rock identity, not fist or sand tornado.",
+      "sequence": "Strong contact at7, grounded rubble/dust at8-12. Peak42567 at7, final8570. Final dust still present.",
+      "phoneChecks": [
+        "Check downward movement and contact baseline do not appear to hop at row transitions.",
+        "Verify contact residue fades cleanly and does not obscure next skill.",
+        "Do not reinterpret skill name as projectile throw and alter formal targets."
+      ]
+    },
+    {
+      "id": "sandWind",
+      "formalName": "滾石術",
+      "candidate": "rolling-stone-wide-v1.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED_WITH_TAIL_CHECK",
+      "alpha8EdgesAllZero": true,
+      "maxFrameEdgeAlpha": 1,
+      "identity": "Rugged rolling boulders with thin curved golden rotation streaks retained; correct rolling-rock identity, not a sand tornado. Separate low rock sites distinguish from falling-rock trails.",
+      "sequence": "Frame8 ground contacts and rock rotation detail present. Alpha mass peaks35175 at8 but remains16027 at12, approximately45.6%; final three boulders are still strongly readable rather than dissipated. This is a concrete tail risk requiring existing runtime fade evidence, not an arbitrary padding failure.",
+      "phoneChecks": [
+        "Mandatory: actual bounded fade must remove persistent final boulders smoothly before next effect; reject phone presentation if hard pop or stale rock remains.",
+        "Check rolling/rotation reads as motion rather than three static defensive balls.",
+        "Do not increase group scale/geometry to force rolling identity."
+      ]
+    }
+  ],
+  "counts": {
+    "reviewed": 6,
+    "rejectedSource": 1,
+    "usbEligible": 5
+  },
+  "stopRefinement": "Do not reopen already-passed windSpell/stormCircle/waterBall/healSpell source polish. For five eligible sources, defer further discretionary redraw until focused phone evidence shows concrete defects.",
+  "runtimeOrPhoneChangesMade": false
+}

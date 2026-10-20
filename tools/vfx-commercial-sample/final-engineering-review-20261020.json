@@ -1,0 +1,60 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "coverage_review",
+  "date": "2026-10-20",
+  "head": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
+  "baseRef": "origin/dev",
+  "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
+  "result": "PASS_NO_BLOCKING_FINDINGS",
+  "blockingFindings": [],
+  "scope": [
+    "js/39-v143-skill-animation.js",
+    "css/40-v143-combat-dungeon-polish.css",
+    "css/fixed-slot-battlefield-rendering-v2.css",
+    "js/54-v173.51-battle-qa.js"
+  ],
+  "method": "只讀 git diff origin/dev 及直接相關函式/呼叫點；未跑手機、未改runtime/tests，未重跑parent已完成的18 focused suites與buildcheck。此為最新完整指定runtime差異審查，獨立於舊final-runtime-code-review.json。",
+  "checks": [
+    {
+      "area": "recipient authority",
+      "result": "PASS",
+      "evidence": "render沿既有targetContract取side/type，initialTargetIndexes只取正式meta.targetIds/id並canReceive去重；presentation per-recipient只令placementFor回single，不改targetType。recipientTargets在起始集合建立快照，emitSprite/registerTarget皆拒集合外late target，未擴大all/tri語意或添加受益者。"
+    },
+    {
+      "area": "node and clock",
+      "result": "PASS",
+      "evidence": "single/targetTrajectory以index為spriteNodes key；同recipient不重複emit。requestCastTimeline只請求一次，完整nodes建立後將v143Raster tracks與motion animation對齊同performance時間並beginVisualTimeline重啟既有gate；無新gameplay時鐘或循環renderer。"
+    },
+    {
+      "area": "late feedback and cleanup",
+      "result": "PASS",
+      "evidence": "queueTargetHit對非impactOnly要求已emitted且side相同；scheduleImpact限制current未done、same side、已emitted。settleTargetVisual先檢state.current===current且!done，故未取消的有界doubleRAF在dispose/superseded後不可寫狀態/重建視覺。cleanup清hitCallbacks、owned pendingUpdateKeys、motion、pending classes、stage並sync正式HUD；dispose先clearTimers。"
+    },
+    {
+      "area": "status read-before-write",
+      "result": "PASS",
+      "evidence": "syncStatusVisualEffects先對全體readStatusPresentation收集body types、geometry、anchor/cardRect，再purge與逐項DOM更新；single-unit入口亦先snapshot。placeStatusBodyVisual只消費snapshot和formal artworkProjection/portraitRect，不在寫入後getBoundingClientRect。14個presentation profiles不改turnsLeft/status owner；rotation/hard-control/intentional-none沿原流程。"
+    },
+    {
+      "area": "status CSS position ownership",
+      "result": "PASS",
+      "evidence": "fixed-slot原強制left50/top42已移除；保留非互動transform。JS39為status left/top/width/height writer；CSS40只opacity/glow/層級/contain表現，detached HUD icons沿24px規則。"
+    },
+    {
+      "area": "renderer and range fit",
+      "result": "PASS",
+      "evidence": "維持既有DOM raster atlas與既有WAAPI travel/feedback；未新增Canvas/SVG/WebGL/procedural CSSparticles。fitRangeArt只取formal overlay/side rect做<=1等比例fit，未引入被否決group allowArtRecenter放大；per-recipient來源只用formal artworkProjection定中心。"
+    },
+    {
+      "area": "relic HUD",
+      "result": "PASS",
+      "evidence": "fixed-slot正式HUD owner以cinematic body selector將detached HUD提高到18135；未以縮九龍來源/另建HUD解決遮擋。QA js54 syncHud只將既有stage加入存在條件，仍保留battlePage active/battleActive/terminal/read-panel gate，clearUnitHud出口保留。"
+    }
+  ],
+  "validationBoundary": [
+    "18 focused tests及buildcheck PASS為parent提供的驗證狀態，本review未獨立重跑或把它們當商業品質PASS。",
+    "此工程review不替代USB動態/混合狀態/正式受益target視覺證據；相關視覺結論在各自review JSON。",
+    "不涵蓋其他module或Cloud/Save/數值/正式發布，未擴大audit。"
+  ],
+  "recommendation": "指定runtime範圍無需阻塞修正；保留已PASS視覺，繼續既有latest-head CI/整合Gate，不額外精修或新增renderer。"
+}

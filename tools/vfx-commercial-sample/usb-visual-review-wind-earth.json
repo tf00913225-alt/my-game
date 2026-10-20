@@ -1,0 +1,359 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "geometry_review",
+  "evidenceHead": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "device": "SM-N960F Android 10 physical USB Chrome (producer evidence)",
+  "method": "All 44 individual skill screenshots opened with view_image. Independent still-frame visual review only; reviewer did not control USB or rerun runtime.",
+  "limitations": [
+    "Evidence predates subsequent group-center/single-fit/hit-RAF changes; new candidate requires new USB evidence.",
+    "One still per skill cannot establish animation continuity, full peak/dissipation, hit synchronization or frame-time acceptance.",
+    "Screenshot review state is not commercial-readiness acceptance."
+  ],
+  "priorities": [
+    {
+      "priority": 1,
+      "issue": "Group art compressed to one target by edge primary and symmetric safe fitting",
+      "ids": [
+        "stormFlurry",
+        "windSpell",
+        "stormCircle",
+        "petrifyFist",
+        "earthquakeCrush",
+        "stoneThrow",
+        "sandWind",
+        "waterBall",
+        "iceSpin",
+        "rockWall"
+      ],
+      "fix": "Center non-travel group artwork on canonical bounds while preserving formal primary target/hit anchor and semantic target collection. Retest edge primaries and one-survivor formations."
+    },
+    {
+      "priority": 1,
+      "issue": "Single source reaches left viewport edge",
+      "ids": [
+        "flameSlash",
+        "stormFist",
+        "windCrossSlash",
+        "stoneSlash"
+      ],
+      "fix": "Apply original-owner aspect-preserving safety fit for single artwork without moving target anchor, then recheck readability."
+    },
+    {
+      "priority": 1,
+      "issue": "Material problems remain after geometry fixes",
+      "ids": [
+        "stormRain",
+        "dinghaishenzhen",
+        "flyingSandStrike",
+        "barrier",
+        "purifyMind",
+        "earthShield"
+      ],
+      "fix": "Use source-specific alpha/negative-space and identity edits; do not solve all with blanket scale reduction."
+    }
+  ],
+  "rows": [
+    {
+      "id": "stormFist",
+      "evidence": "artifacts/vfx-full/skill-stormFist.png",
+      "state": "needs-followup",
+      "reason": "Fist readable and HUD clear; the wide leftward trail reaches the left screen edge. Retest the new single-fit change before accepting."
+    },
+    {
+      "id": "stormFlurry",
+      "evidence": "artifacts/vfx-full/skill-stormFlurry.png",
+      "state": "needs-fix",
+      "reason": "All three fist groups occupy only the left monster; middle/right recipients have no visible strike. Retest canonical group-center correction."
+    },
+    {
+      "id": "windCrossSlash",
+      "evidence": "artifacts/vfx-full/skill-windCrossSlash.png",
+      "state": "needs-followup",
+      "reason": "Bright curved blades obscure the left target and reach the left edge; screenshot is before a clear X peak. Retest single-fit and motion sequence."
+    },
+    {
+      "id": "dizzyFist",
+      "evidence": "artifacts/vfx-full/skill-dizzyFist.png",
+      "state": "needs-followup",
+      "reason": "Tall tornado is recognizable, HUD stays readable; monster is almost entirely covered. Reduce prolonged pillar fill rather than all-frame brightness."
+    },
+    {
+      "id": "windSpell",
+      "evidence": "artifacts/vfx-full/skill-windSpell.png",
+      "state": "needs-fix",
+      "reason": "Three tornadoes are compressed around the left monster instead of spanning the three targets. Retest group-center fix."
+    },
+    {
+      "id": "stormCircle",
+      "evidence": "artifacts/vfx-full/skill-stormCircle.png",
+      "state": "needs-fix",
+      "reason": "Three small falling streaks surround only the left monster; other recipients remain unmarked. Group footprint placement needs correction."
+    },
+    {
+      "id": "windHowlLightning",
+      "evidence": "artifacts/vfx-full/skill-windHowlLightning.png",
+      "state": "needs-followup",
+      "reason": "Lightning burst is sharp and HUD readable but target disappears behind full circular blast and left rays reach edge. Validate single-fit and peak duration."
+    },
+    {
+      "id": "stormRain",
+      "evidence": "artifacts/vfx-full/skill-stormRain.png",
+      "state": "needs-art",
+      "reason": "Large opaque-looking cloud/tornado mass fills upper target zone and hides central target; HUD remains readable. Rework negative space/cloud alpha while retaining all-range identity."
+    },
+    {
+      "id": "dodgeSkill",
+      "evidence": "artifacts/vfx-full/skill-dodgeSkill.png",
+      "state": "needs-followup",
+      "reason": "Three wisps sit around the center ally only; screenshot cannot establish allyAll coverage. Confirm targets and phase, then span canonical all bounds or use recipient-local authored support feedback."
+    },
+    {
+      "id": "stealthSkill",
+      "evidence": "artifacts/vfx-full/skill-stealthSkill.png",
+      "state": "needs-art",
+      "reason": "Three distinct translucent bubbles surround the allies and obscure their forms. Reads as shielding rather than stealth; replace bubble silhouette with brief veil activation."
+    },
+    {
+      "id": "dinghaishenzhen",
+      "evidence": "artifacts/vfx-full/skill-dinghaishenzhen.png",
+      "state": "needs-art",
+      "reason": "One large ritual dome extends from ally bodies to near bottom stage edge, substantially below their feet. Move visual body toward unit artwork region and reduce dome fill; keep HUD on top."
+    },
+    {
+      "id": "stoneSlash",
+      "evidence": "artifacts/vfx-full/skill-stoneSlash.png",
+      "state": "needs-followup",
+      "reason": "Large dense slash hides left target and strikes through left screen edge. Single-fit retest plus source-tail continuity follow-up required."
+    },
+    {
+      "id": "petrifyFist",
+      "evidence": "artifacts/vfx-full/skill-petrifyFist.png",
+      "state": "needs-fix",
+      "reason": "Three small impacts are compressed around one left target. Retest group-center before judging source resolution."
+    },
+    {
+      "id": "stoneBreakSky",
+      "evidence": "artifacts/vfx-full/skill-stoneBreakSky.png",
+      "state": "needs-followup",
+      "reason": "Rock and downward trail readable, HUD clear; main object hides target and upper trail has abrupt rectangular cutoff. Review source padding and landing frame."
+    },
+    {
+      "id": "earthquakeCrush",
+      "evidence": "artifacts/vfx-full/skill-earthquakeCrush.png",
+      "state": "needs-fix",
+      "reason": "Three stone fist impacts sit within the left target's footprint instead of across the three recipients. Retest group-center correction."
+    },
+    {
+      "id": "stoneThrow",
+      "evidence": "artifacts/vfx-full/skill-stoneThrow.png",
+      "state": "needs-fix",
+      "reason": "Three rocks fall on the left monster only; a faint straight vertical sheet edge appears near x365. Fix group-center and verify alpha/export boundary in motion."
+    },
+    {
+      "id": "sandWind",
+      "evidence": "artifacts/vfx-full/skill-sandWind.png",
+      "state": "needs-fix",
+      "reason": "Three rock streams compressed over the left target. Source detail is readable, but group coverage presentation is incorrect."
+    },
+    {
+      "id": "flyingSandStrike",
+      "evidence": "artifacts/vfx-full/skill-flyingSandStrike.png",
+      "state": "needs-art",
+      "reason": "All-range burst spans enemy zone and HUD remains clear, but huge airborne stones/near-opaque dust hide the central target. Concentrate three landing flashes near targets and reduce air/dust coverage."
+    },
+    {
+      "id": "dustStorm",
+      "evidence": "artifacts/vfx-full/skill-dustStorm.png",
+      "state": "needs-followup",
+      "reason": "Bull silhouette is clear and bounded to the left target, but dense body fully hides recipient. Keep identity and reduce surrounding debris/hold duration."
+    },
+    {
+      "id": "earthShield",
+      "evidence": "artifacts/vfx-full/skill-earthShield.png",
+      "state": "needs-art",
+      "reason": "Three shields visibly cluster on one self target; the original source is still used here. Replace with independently reviewed single-shield candidate only after candidate USB verification."
+    },
+    {
+      "id": "rockWall",
+      "evidence": "artifacts/vfx-full/skill-rockWall.png",
+      "state": "needs-fix",
+      "reason": "Three stones all gather around the center ally rather than covering three ally positions. Retest canonical group-center correction; preserve character head visibility."
+    },
+    {
+      "id": "barrier",
+      "evidence": "artifacts/vfx-full/skill-barrier.png",
+      "state": "needs-art",
+      "reason": "Three large spheres span the allies but hide almost all bodies. Lower central fill/brightness and retain thin rim; HUD remains readable."
+    },
+    {
+      "id": "flameSlash",
+      "evidence": "artifacts/vfx-full/skill-flameSlash.png",
+      "state": "needs-followup",
+      "reason": "Slash is sharp but hides target and extends left of the stage. Retest new single-fit; preserve crisp crescent."
+    },
+    {
+      "id": "fireCritical",
+      "evidence": "artifacts/vfx-full/skill-fireCritical.png",
+      "state": "screenshot-reviewed",
+      "reason": "Narrow fiery blade clearly identifies one target, HUD remains readable and adjacent units remain clear; sequence/performance not accepted by still image."
+    },
+    {
+      "id": "fireRocket",
+      "evidence": "artifacts/vfx-full/skill-fireRocket.png",
+      "state": "needs-followup",
+      "reason": "Three arrows are in flight through center operation space; this still cannot establish endpoint/impact synchronization. Verify destination and size in motion."
+    },
+    {
+      "id": "flameTornado",
+      "evidence": "artifacts/vfx-full/skill-flameTornado.png",
+      "state": "needs-art",
+      "reason": "Large bright pillar hides the target and has a rectangular ground edge. Reduce solid core and repair alpha/source boundary."
+    },
+    {
+      "id": "dragonSlash",
+      "evidence": "artifacts/vfx-full/skill-dragonSlash.png",
+      "state": "needs-art",
+      "reason": "Large burst covers target with clear upper/left clipped-looking border. Source padding and single-fit need verification."
+    },
+    {
+      "id": "explosiveFlurry",
+      "evidence": "artifacts/vfx-full/skill-explosiveFlurry.png",
+      "state": "needs-followup",
+      "reason": "Slashes remain near left target and HUD readable but target largely concealed. Confirm whether tri target metadata requires group spread after correction."
+    },
+    {
+      "id": "blazeSpell",
+      "evidence": "artifacts/vfx-full/skill-blazeSpell.png",
+      "state": "needs-art",
+      "reason": "Dense fire column has a flat top cutoff and covers left target. Source boundary repair required."
+    },
+    {
+      "id": "phoenixCry",
+      "evidence": "artifacts/vfx-full/skill-phoenixCry.png",
+      "state": "needs-followup",
+      "reason": "Phoenix silhouette recognizable, HUD readable, middle target hidden by luminous core. Retain wings but reduce broad core fill and verify brief peak."
+    },
+    {
+      "id": "rage",
+      "evidence": "artifacts/vfx-full/skill-rage.png",
+      "state": "needs-followup",
+      "reason": "Buff arrows clearly visible around center ally with clear HUD; fire hides torso. Compare rage-v2 in actual runtime before adoption."
+    },
+    {
+      "id": "fireSoulResonance",
+      "evidence": "artifacts/vfx-full/skill-fireSoulResonance.png",
+      "state": "screenshot-reviewed",
+      "reason": "Focused orange ring/orb leaves head and adjacent units visible; HUD clear. Still image alone does not prove loop or impact timing."
+    },
+    {
+      "id": "bloodBurnArt",
+      "evidence": "artifacts/vfx-full/skill-bloodBurnArt.png",
+      "state": "needs-art",
+      "reason": "Tall red plume obscures center ally; a flat top cutoff is visible above head. Repair source padding and lower central fill."
+    },
+    {
+      "id": "waterKnife",
+      "evidence": "artifacts/vfx-full/skill-waterKnife.png",
+      "state": "screenshot-reviewed",
+      "reason": "Sharp horizontal water hit, HUD and adjacent units readable; still cannot prove endpoint timing."
+    },
+    {
+      "id": "waterBall",
+      "evidence": "artifacts/vfx-full/skill-waterBall.png",
+      "state": "needs-fix",
+      "reason": "Three small water orbs compressed at left monster rather than three recipients. Retest group-center."
+    },
+    {
+      "id": "iceSpin",
+      "evidence": "artifacts/vfx-full/skill-iceSpin.png",
+      "state": "needs-fix",
+      "reason": "Three blades cluster on left monster; canonical group-center retest required if formal target is tri."
+    },
+    {
+      "id": "frostPunch",
+      "evidence": "artifacts/vfx-full/skill-frostPunch.png",
+      "state": "needs-followup",
+      "reason": "Fist identity strong, target fully concealed, HUD readable. Verify single-fit edges and hold duration."
+    },
+    {
+      "id": "iceArrowRain",
+      "evidence": "artifacts/vfx-full/skill-iceArrowRain.png",
+      "state": "needs-art",
+      "reason": "All-range peak spans enemy zone but broad blue-white ground wash hides central target. Reduce filled mist while retaining arrows/landing bursts."
+    },
+    {
+      "id": "frostCrush",
+      "evidence": "artifacts/vfx-full/skill-frostCrush.png",
+      "state": "needs-art",
+      "reason": "Large blue burst hides target with visible straight bottom/side raster box edges. Source alpha and padding repair required."
+    },
+    {
+      "id": "freeze",
+      "evidence": "artifacts/vfx-full/skill-freeze.png",
+      "state": "needs-followup",
+      "reason": "Ice enclosure on one target is recognizable; HUD clear but target almost invisible. Validate transition into persistent freeze without duplicate cover."
+    },
+    {
+      "id": "floodBeast",
+      "evidence": "artifacts/vfx-full/skill-floodBeast.png",
+      "state": "needs-followup",
+      "reason": "Water beast is in transit through operation space, not at recipient in this still. Need travel/landing playback verification and source bottom-edge inspection."
+    },
+    {
+      "id": "healSpell",
+      "evidence": "artifacts/vfx-full/skill-healSpell.png",
+      "state": "screenshot-reviewed",
+      "reason": "Focused blue healing column around center ally leaves head visible; HUD readable. Verify heal timing separately."
+    },
+    {
+      "id": "revive",
+      "evidence": "artifacts/vfx-full/skill-revive.png",
+      "state": "needs-followup",
+      "reason": "Revive lotus visible but center ally/HUD deliberately faint; still cannot distinguish downed state from presentation defect. Verify recovery transition with real state."
+    },
+    {
+      "id": "purifyMind",
+      "evidence": "artifacts/vfx-full/skill-purifyMind.png",
+      "state": "needs-art",
+      "reason": "Three bright columns fully wash out ally bodies though HUD clear. Lower central white fill and keep thin cleansing ribbons."
+    }
+  ],
+  "candidateReviews": [
+    {
+      "asset": "tools/vfx-commercial-sample/assets/full/rage-v2.webp",
+      "state": "source-reviewed-for-runtime-candidate",
+      "runtimeQaState": "not-reviewed",
+      "reason": "No rectangular matte or dividers apparent in opened source. Single flame aura builds to clear three-arrow buff peak at frame8 and diminishes thereafter. Frame12 retains a modest flame body rather than only embers, but substantially lower density than peak; acceptable to test in phone runtime, not yet production approval. Check face/body readability at actual size and whether residual tail causes overlap."
+    },
+    {
+      "asset": "tools/vfx-commercial-sample/assets/full/earth-shield-v3.webp",
+      "state": "source-reviewed-for-runtime-candidate",
+      "runtimeQaState": "not-reviewed",
+      "reason": "Exactly one centered stone/amber shield per phase. Gathering arcs become one closed shield near frame7, then break into arcs and two motes by frame12. No obvious view-angle jump or duplicated shield. Independent full-border alpha>=64 scan found zero border contacts in all12 cells. Frame7 bottom margin9px/362 (~2.49%) is tight but not currently clipped at meaningful alpha; 12% prompt target alone is not a rejection gate. Suitable for phone candidate test; inspect faint gutter contamination and interior character visibility before integration.",
+      "dimensions": [
+        1448,
+        1086
+      ],
+      "alpha64BorderPixelsByFrame": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "alpha64Frame7Bounds": [
+        66,
+        61,
+        290,
+        353
+      ]
+    }
+  ]
+}

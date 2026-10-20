@@ -80,7 +80,11 @@
 - V142 只擁有視覺生命週期與剩餘時間；V143 只擁有 raster VFX（點陣視覺特效）渲染與幾何。
 - `00-main.js` 是 `finishPlayerAction()` 與 `processNextCombatant()` 唯一 owner。功能模組不得替換這兩個函式，也不得以 Promise（非同步承諾）阻塞回合佇列。
 - 功能模組需要觀察或暫時攔截完成通知時，只能使用 `FourSymbolsBattleFlow` 的訂閱／攔截 API（應用程式介面），並確保攔截器可解除。
-- single 的中心是實際目標格；tri 即使只剩一個單位也保留三人格視覺尺寸；all 永遠保留完整目標側範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- single 的中心是實際目標格；tri 的整張群體圖即使只剩一個單位也保留三人格基準尺寸；all 永遠保留完整目標側基準範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- 上述範圍是目標集合與基準幾何，不依存活數縮減。點陣素材保持原比例，在既有 Geometry Owner 的目標側與畫面交集內等比安全 fit；只限制藝術框，不改命中錨點或目標範圍。群體範圍由正式素材構圖與各實際目標的命中回饋共同表達，不以拉伸、裁切主體或新增範圍 Owner 填滿。
+- group／tri／row 的整張群體圖對齊正式形狀 bounds 中心，在原中心內等比安全 fit，不為填滿範圍而放大或搬移到角色腳下。primary 與各目標命中回饋仍對齊實際目標，飛行技能終點仍使用正式主要目標。
+- 明確標記 `presentation:"per-recipient"` 的單人構圖依正式 `targetIds` 快照逐人呈現，沿用立繪 Geometry、同一施放時鐘與清理；不改技能 targetType、命中或結算，也不得因非目標的遲到回饋增加節點。未標記的整張群體圖仍依前述固定形狀規則。
+- 持續狀態 body 由 V143 依既有 Render Geometry 的人物立繪範圍定位，區分頭頂、身側與腳邊呈現，不以含 HUD 的整張卡片放大。冰封／石化保留硬控包覆身份；來源維持 contain 比例，HUD、兩秒輪播與狀態生命週期仍沿原 Owner。
 - DOM 例外、MISS（未命中）、Buff（增益）、Heal、Shield、Debuff（減益）與 VFX 清理都不得讓同一 initiative（行動序）永久等待。
 
 ## 持續效果回合生命週期契約
@@ -249,10 +253,11 @@
 - Common Skill Frequency 與 Element Profile 分離，唯一塔 Owner 是 `gameplay-boss-tower-system.js`。1～30 層 65%、31～60 層 70%、61～90 層 75%、91～100 層 80%；Regular／Elite／Tower Boss 相同，canAct=false 機制物件排除。火塔舊額外 +8 Skill Chance 退休。
 - Skill Chance 是輪到可行動且有合法可負擔技能時進入技能決策的機率，不是技能命中率。Tower attack/heal/support/control 只能共用一次 roll；正式 `FourSymbolsEnemySkillAI` 與 V144 合法技能 Guard 選招，不增加第二套 AI。
 - Fire：最終爆擊 +15 個百分點，遵守 Crit Cap；自身普通攻擊與直接物理／法術技能傷害 ×1.15。DoT／Burn／Reflect／Relic／Boss Object／HP Cost／Self Damage／Environment 排除。Damage Owner 只套用一次塔 direct modifier。
-- Water：合法 Heal／Support／Freeze 技能決策偏輔助；友軍 HP <70% 優先治療。HP Healing ×1.15，SP 回復不加成。最新正式水系無獨立 Buff，沿用 Heal Support 及 Freeze，不引入跨元素 Buff 或新控制狀態。
+- Water：合法 Heal／Support／Freeze 技能決策偏輔助；實際 allyTri 目標中有友軍本體 HP <40% 才能進入治療候選，按 HP 缺口選目標。冰封與治療各全隊每大回合最多宣告 2 次；同一怪物於 N 回合宣告後，N+1、N+2 禁用、N+3 才可再用，MISS／抵抗亦計次。配額與冷卻由塔 Owner 訂閱正式 Round Start 管理，同回合換波不刷新；戰鬥結束釋放。移除額外 50% 冰封偏好。HP Healing ×1.15，SP 回復不加成。最新正式水系無獨立 Buff，沿用 Heal Support 及 Freeze，不引入跨元素 Buff 或新控制狀態。
 - Water Status Accuracy +15 個百分點適用 Soft／DoT／Hard Control。先加入 `calculateStatusEffectChance` 正式公式，最後 Clamp：一般 Status 5～95%；Player→Regular 5～90%、Elite 5～75%、Boss 5～60%；Enemy→Player Hard Control 5～60%，與施放怪物 rank 無關。30+15=45；52+15=67→60。
 - Wind：最終 Evasion +15 個百分點（不另設上限）；Agility／Speed ×1.15，只影響速度，不增加 Evasion 或 Accuracy。
 - Earth：Defense ×1.15、Max HP ×1.15、建立時 hp=maxHP，Profile 同場冪等，不在 render/reload/round 疊加。
+- 塔技能配置由同一塔 Owner 依元素、樓層與 physical／magic／support／commander 定位分配，精英增加互補技能、Boss 擁有完整同元素攻擊池；保留低 SP 招式。僅納入已支援的主動技能，未實作的敵方 rockWall 不再配置；土系沿用正式攻擊附帶護盾／石化／降防。正式 EnemySkillAI 負責合法候選加權抽選，有其他可用技能時排除上次宣告技能；不增加第二套選招引擎或施法率 roll。
 - Profile 僅套 Tower metadata；其他玩法的敵人数量、技能頻率與戰鬥數值保持既有規則。入口顯示當週元素特性、樓層施放率與每層兩波、每波六名敵人。普通層兩波各六名普通怪；精英層第一波六名普通怪、第二波二精英四普通；Boss 層第一波六精英、第二波一 Boss 五精英。
 
 本批已核准暫定獎勵：四象塔每週每10層首次通關體質寶石×1，沿用既有每週樓層領取記錄；裝備副本每次通關等機率抽取赤炎／寒泉／岩岳／青嵐碎片一種×10（各25%），與寶箱一起領取及廣告雙倍。數量與分布集中於各玩法正式 Reward Owner。

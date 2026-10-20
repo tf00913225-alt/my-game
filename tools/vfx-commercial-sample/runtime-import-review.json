@@ -1,0 +1,87 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "claim": "Candidate import provenance only; generated dimensions/alpha/pixel equality are in each generation record. Device playback and independent acceptance remain required.",
+  "rows": [
+    {
+      "id": "flameSlash",
+      "runtime": "assets/vfx/fire/flame-slash-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/flame-slash-v3.webp",
+      "sha256": "c20fd88c563d13796b155d0fb5da920b4ca96a141e3f1347ae3ba64efd6d11f8",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "rage",
+      "runtime": "assets/vfx/fire/rage-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rage-v2.webp",
+      "sha256": "094b9b53f8263f2520f83ac839ddb545af5b8e259f1a2ff1c0f80cae4e647d18",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "earthShield",
+      "runtime": "assets/vfx/earth/earth-shield-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/earth-shield-v3.webp",
+      "sha256": "4500d96865663ab45314796d68f8117db3cb8a5cae3d4ab3db5a45efd068576e",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": "Self-target asset now depicts one shield and uses single placement; gameplay target data unchanged."
+    },
+    {
+      "id": "fireSoulResonance",
+      "runtime": "assets/vfx/fire/fire-soul-resonance-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3.webp",
+      "sha256": "5f0017df5b96a7d70e0c2a77ee98ac3ae96128a5389b6f1c5ca65f826c3fc964",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "blazeSpell",
+      "runtime": "assets/vfx/fire/blaze-spell-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/blaze-spell-v2.webp",
+      "sha256": "5fd74e77bfa2b9544bc41478f5df01c9ef9ecb6a134338855bcc275fe57e5511",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "dragonSlash",
+      "runtime": "assets/vfx/fire/dragon-slash-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/dragon-slash-v2.webp",
+      "sha256": "b8deae02abb44d17e7e2ed099d98e5576a2b993cb2ff63179af138bb42ecb87f",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "flameTornado",
+      "runtime": "assets/vfx/fire/flame-tornado-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/flame-tornado-v2.webp",
+      "sha256": "8598d97f62e6b0ec4db22a660d15063d60715e912cfc540ea1e176765bf79b0e",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "stormRain",
+      "runtime": "assets/vfx/wind/storm-rain-cast-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/storm-rain-v2.webp",
+      "sha256": "518147f7f9afca6a63b825e2caf0250698e8d9d4702207c3293e2318148aa792",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": null
+    },
+    {
+      "id": "status:rage",
+      "runtime": "assets/vfx/status/rage-aura-v2.webp",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rage-status-v2.webp",
+      "sha256": "64886f9c879c23ee96b8f6acd9aac036d6dab890bf8d2c65bf8143f810167ba1",
+      "byteIdenticalToVerifiedCandidate": true,
+      "importState": "isolated-phone-candidate-pending-device-review",
+      "notes": "Body image only; existing rage HUD icon unchanged."
+    }
+  ]
+}

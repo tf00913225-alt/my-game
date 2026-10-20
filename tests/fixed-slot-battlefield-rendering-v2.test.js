@@ -77,7 +77,9 @@ assert.match(css,/--battle-ally-row-gap:8px/);
 assert.doesNotMatch(css,/v-fixed-mechanism-zone|MECH_L|MECH_C|MECH_R/,"retired function-card plane is absent");
 assert.match(css,/\.v-fixed-enemy-slot > \.battle-monster,[\s\S]*\.v-fixed-ally-slot > \.battle-player\{[\s\S]*position:absolute !important;[\s\S]*inset:0 !important;/);
 assert.match(css,/\.v174-battle-art\{[\s\S]*background-size:0 0 !important;[\s\S]*overflow:visible !important;/);
-assert.match(css,/\.v143-status-visual\{[\s\S]*left:50% !important;[\s\S]*top:42% !important;[\s\S]*transform:translate\(-50%,-50%\) !important;/,"status VFX must stay Slot-relative");
+const statusPaintRule=css.match(/\.v143-status-visual\{([^}]+)\}/)[1];
+assert.doesNotMatch(statusPaintRule,/(?:left|top)\s*:/,"fixed-slot CSS cannot override V143 head/body/feet placement");
+assert.match(statusPaintRule,/transform:translate\(-50%,-50%\) !important;/,"status artwork remains centered around its V143-owned local anchor");
 assert.match(css,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important;[\s\S]*contain:none !important;/);
 assert.match(feedbackCss,/body > \.battle-floating-feedback\{[\s\S]*position:fixed;/);
 assert.match(feedbackCss,/-webkit-text-stroke:\.85px #fff/);
@@ -97,7 +99,7 @@ const sizingContext={spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1}
 vm.createContext(sizingContext);
 vm.runInContext(vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
     vfxSource.slice(vfxSource.indexOf("    function frameAspectFor("),vfxSource.indexOf("    function requestSpriteAspect(")),sizingContext);
-for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,trajectory:1,group:1,battlefield:1})){
+for(const [placement,factor] of Object.entries({single:.70,targetTrajectory:.72,trajectory:1,group:1,battlefield:1})){
     const sprite={dataset:{placement},style:{left:"180px",top:"240px"}};
     sizingContext.applySpriteBox(sprite,200,200,{cellAspect:1});
     assert.equal(sprite.style.width,Math.round(200*factor)+"px",placement+" owns bounded raster width");
@@ -108,8 +110,8 @@ for(const [placement,factor] of Object.entries({single:.88,targetTrajectory:.80,
 }
 const portraitSprite={dataset:{placement:"single"},style:{}};
 sizingContext.applySpriteBox(portraitSprite,200,200,{cellAspect:.75});
-assert.equal(portraitSprite.style.width,"132px");
-assert.equal(portraitSprite.style.height,"176px");
+assert.equal(portraitSprite.style.width,"105px");
+assert.equal(portraitSprite.style.height,"140px");
 
 // Re-run the actual entry owner through initial entry, a same-battle redraw
 // (BOSS reinforcements), and the next battle. No replacement render algorithm.
