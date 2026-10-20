@@ -1,0 +1,207 @@
+{
+  "head": "a0d8d30779f5e48648a9bd4649a12876d4b3dfef",
+  "viewport": [
+    360,
+    640
+  ],
+  "scenes": [
+    {
+      "name": "relic-start",
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-tabs-end",
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    },
+    {
+      "name": "relic-last-selected",
+      "text": "秘 寶",
+      "box": {
+        "x": 16,
+        "y": 20.5,
+        "width": 229.59896850585938,
+        "height": 38
+      },
+      "textBox": {
+        "x": 125.25,
+        "y": 23.166667938232422,
+        "width": 57,
+        "height": 28.666667938232422
+      },
+      "inside": true
+    }
+  ],
+  "actions": [
+    {
+      "relicTabs": [
+        {
+          "text": "全部",
+          "onclick": "v174SetRelicFilter('all')"
+        },
+        {
+          "text": "攻擊",
+          "onclick": "v174SetRelicFilter('attack')"
+        },
+        {
+          "text": "回復",
+          "onclick": "v174SetRelicFilter('recovery')"
+        },
+        {
+          "text": "防禦",
+          "onclick": "v174SetRelicFilter('defense')"
+        },
+        {
+          "text": "增益",
+          "onclick": "v174SetRelicFilter('buff')"
+        },
+        {
+          "text": "控制",
+          "onclick": "v174SetRelicFilter('control')"
+        },
+        {
+          "text": "元素聯動",
+          "onclick": "v174SetRelicFilter('element')"
+        },
+        {
+          "text": "特殊",
+          "onclick": "v174SetRelicFilter('special')"
+        }
+      ]
+    },
+    {
+      "relicBeforeTap": {
+        "x": 582,
+        "width": 936,
+        "scroll": 1518
+      }
+    },
+    {
+      "selector": ".team-relic-tabs button:last-child",
+      "x": 308,
+      "y": 256.8333435058594,
+      "hit": true,
+      "target": "<button class=\"\" onclick=\"v174SetRelicFilter('special')\">特殊</button>"
+    },
+    {
+      "relicAfterTap": {
+        "x": 579,
+        "selected": [
+          "特殊"
+        ]
+      }
+    }
+  ],
+  "untested": [
+    "auth",
+    "startup",
+    "privacy",
+    "battle",
+    "prompt formal entry"
+  ],
+  "blocker": {
+    "selector": ".team-relic-tabs button:nth-child(1)",
+    "x": -142,
+    "y": 276.8333435058594,
+    "hit": false,
+    "ancestry": [
+      {
+        "id": "",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "cls": "team-relic-tabs",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "cls": "team-relic-page",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "homeFeatureModalBody",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "cls": "home-feature-modal-box wide",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "homeFeatureModal",
+        "cls": "home-feature-modal show team-relic-modal",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "game-ui",
+        "cls": "",
+        "pointer": "none",
+        "visibility": "visible"
+      },
+      {
+        "id": "game-overlay-layer",
+        "cls": "",
+        "pointer": "none",
+        "visibility": "visible"
+      },
+      {
+        "id": "game-stage",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "game-viewport",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      },
+      {
+        "id": "",
+        "cls": "",
+        "pointer": "auto",
+        "visibility": "visible"
+      }
+    ]
+  }
+}
