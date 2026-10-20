@@ -19,7 +19,9 @@ for(const target of rows){
 }
 for(const entry of registry.assetPool.entries.filter(e=>e.status==='adopted')){
  const monster={name:'天兵天將',element:entry.element,portraitKey:entry.assetId};
- context.v154BindMonsterPortraitIdentity(monster);assert.equal(monster.name,entry.displayName);
+ context.v154BindMonsterPortraitIdentity(monster);
+ assert.equal(monster.name,entry.assetClass==='shared-npc'?'天兵天將':entry.displayName,
+  'shared NPC art preserves the Content role; dedicated monsters bind their registry identity');
  assert.equal(context.v154ResolveMonsterPortraitRecord(monster).path,entry.runtimePath);
 }
 const known=rows.find(t=>t.status==='existing'),planned=rows.find(t=>t.status==='planned');

@@ -188,8 +188,14 @@ const sharedEntries=realSharedRegistry.assetPool.entries.filter(e=>e.assetClass=
     const runtime=loadRuntime([]);
     runtime.context.v154InstallMonsterPortraitRegistry(realSharedRegistry);
     for(const entry of sharedEntries){
-        for(const monster of [{portraitKey:entry.assetId,name:'天兵天將',element:'fire'}, {name:entry.displayName,element:'fire'}, {name:'未指定人物',element:'water'}]){
-            assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,null,entry.assetId+' reserved/name/element cannot resolve shared art');
+        const explicit={portraitKey:entry.assetId,name:'主線內容角色',element:'water',rank:'elite'};
+        assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(explicit).path,entry.status==='adopted'?entry.runtimePath:null,entry.assetId+' explicit adoption controls shared art');
+        if(entry.status==='adopted'){
+            runtime.context.v154BindMonsterPortraitIdentity(explicit);
+            assert.equal(explicit.name,'主線內容角色');assert.equal(explicit.element,'water');assert.equal(explicit.rank,'elite');
+        }
+        for(const monster of [{name:entry.displayName,element:'fire'}, {name:'未指定人物',element:'water'}]){
+            assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,null,entry.assetId+' name/element cannot resolve shared art');
         }
     }
     const adopted=structuredClone(realSharedRegistry);

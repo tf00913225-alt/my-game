@@ -17,11 +17,11 @@ function verify(m){
   for(const key of ['v132Dungeon','v132EquipmentDungeon','v141ExtraHP','v174AbyssDurabilityMultiplier'])assert.equal(Object.hasOwn(m,key),false,key);
   assert.equal(p.legacyMultiplier,'NONE');assert.deepEqual(p.pendingProductDecisions,[]);
 }
-test('all three formal encounters, nine identities, fixed levels and archetypes use one projection',()=>{
+test('seven formal and three retained encounters keep their exact data identities in one projection',()=>{
   const c=loadAdventureDiagnostic();c.makeZoneMonster=c.makeLegacyModeMonster=c.v132BuildDungeonMonster=()=>{throw Error('retired Adventure caller');};
   const seen=new Map();let count=0;
   for(const e of Object.values(c.FourSymbolsAdventureContent.encounters)){
-    const a=c.__adventureDiagnosticBuild(e.id),b=c.__adventureDiagnosticBuild(e.id);assert.equal(a.length,3);
+    const a=c.__adventureDiagnosticBuild(e.id),b=c.__adventureDiagnosticBuild(e.id);assert.equal(a.length,e.enemies.length);
     assert.deepEqual(plain(a.map(m=>m.balanceProjection)),plain(b.map(m=>m.balanceProjection)));
     for(let i=0;i<a.length;i++){
       const m=a[i],spec=e.enemies[i];verify(m);count++;
@@ -31,7 +31,9 @@ test('all three formal encounters, nine identities, fixed levels and archetypes 
       c.configureBuiltMonster(m);verify(m);assert.equal(c.getMonsterRank(m),m.rank==='smallBoss'?'boss':m.rank);
     }
   }
-  assert.equal(count,9);assert.equal(seen.size,8);
+  assert.equal(Object.keys(c.FourSymbolsAdventureContent.encounters).length,10);
+  assert.equal(c.FourSymbolsAdventureContent.chapters.chapter_v1.nodes.filter(n=>n.encounterId).length,7);
+  assert.equal(count,18);assert.equal(seen.size,8);
 });
 test('rank never adds points; stable explicit Adventure context fails closed',()=>{
   for(const level of [8,10,12,50,100])for(const archetype of Object.keys(MonsterBalance.archetypes)){
@@ -48,8 +50,8 @@ test('original carried skills, frequency, identity and portrait continuity survi
   for(const row of baseline.rows.filter(r=>r.partySize===1&&[8,10,12].includes(r.partyLevel))){
     const a=c.__adventureDiagnosticBuild(row.encounterId);
     for(let i=0;i<a.length;i++){
-      const m=a[i],old=row.initialMonsters[i];
-      assert.deepEqual(plain({name:m.name,level:m.level,element:m.element,skills:m.skillIds,support:m.v141SupportSkillIds||[],frequency:m.skillChance,portrait:m.portraitKey||null}),{name:old.name,level:old.level,element:old.element,skills:old.skillIds,support:old.supportIds,frequency:old.skillFrequency,portrait:old.portraitKey});
+      const m=a[i],old=row.initialMonsters[i],spec=c.FourSymbolsAdventureContent.encounters[row.encounterId].enemies[i];
+      assert.deepEqual(plain({name:m.name,level:m.level,element:m.element,skills:m.skillIds,support:m.v141SupportSkillIds||[],frequency:m.skillChance,portrait:m.portraitKey||null}),{name:old.name,level:old.level,element:old.element,skills:old.skillIds,support:old.supportIds,frequency:old.skillFrequency,portrait:spec.portraitKey||old.portraitKey});
     }
   }
 });
@@ -68,7 +70,7 @@ test('original adventure numerical edge is physically absent; shared legacy buil
 });
 test('all formal Adventure TTK references survive without a forced two-round target',()=>{
   for(const randomPolicy of ['neutral','seeded']){
-    const r=buildAdventureTtkMatrix({randomPolicy});assert.equal(r.cases,18);assert.equal(r.gate.passed,true);assert.deepEqual(r.gate.failures,[]);
+    const r=buildAdventureTtkMatrix({randomPolicy});assert.equal(r.cases,42);assert.equal(r.gate.passed,true);assert.deepEqual(r.gate.failures,[]);
     assert.ok(r.rows.some(x=>x.rounds>2));
     for(const row of r.rows){assert.ok(row.rounds<=6);assert.ok(row.reference.skillCost<=row.reference.skillBudget);assert.ok(row.initialMonsters.every(m=>m.owner==='MonsterBalance'));for(const roll of row.controlUsage)assert.ok(roll.chance<=({regular:90,elite:75}[roll.targetRank]||60));}
   }

@@ -4,6 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import crypto from 'node:crypto';
+import vm from 'node:vm';
 import {execFileSync} from 'node:child_process';
 import {auditSharedPortraits} from './lib/shared-portrait-audit.mjs';
 import {portraitImageMetadata} from './lib/portrait-image-metadata.mjs';
@@ -67,14 +68,15 @@ if(masterArg){
 const warnings=[];
 const discovered=[];
 const adventureIdentities=[];
-const adventureRegex=/\{monsterKey:"([^"]+)",archetype:"[^"]+",name:"([^"]+)",level:\d+,element:"([^"]+)",rank:"([^"]+)"\}/g;
-let adventureMatch;
-while((adventureMatch=adventureRegex.exec(adventure))!==null){
-    const [,portraitKey,name,element,rank]=adventureMatch;
+const adventureContext={window:{}};
+vm.runInNewContext(adventure,adventureContext,{timeout:1000});
+for(const entry of Object.values(adventureContext.window.FourSymbolsAdventureContent.encounters).flatMap(enc=>enc.enemies)){
+    const {monsterKey:portraitKey,name,element,rank}=entry;
     discovered.push(name);
     adventureIdentities.push(portraitKey);
     const target=targets.find(t=>t.portraitKey===portraitKey);
     if(!target||target.name!==name||target.element!==element||target.rank!==rank)errors.push('unregistered/mismatched Adventure identity: '+portraitKey);
+    if(entry.portraitKey&&!registry.assetPool.entries.some(row=>row.assetId===entry.portraitKey&&row.status==='adopted'&&row.allowedContexts?.includes('humanoid-enemy')))errors.push('unadopted Adventure portrait binding: '+entry.portraitKey);
 }
 if(!adventureIdentities.length)errors.push('Adventure encounter discovery empty');
 const poolTargets=(registry.assetPool?.entries||[]).filter(e=>e.status==='adopted').map(e=>({portraitKey:e.assetId,path:e.runtimePath,sizeClass:'standard',status:'existing'}));

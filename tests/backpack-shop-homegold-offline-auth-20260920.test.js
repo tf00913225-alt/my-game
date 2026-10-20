@@ -2,6 +2,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
+const vm=require("node:vm");
 
 const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
@@ -22,9 +23,12 @@ const auth=read("js/firebase/firebase-auth.js");
 assert.match(main,/RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*"hpPotion100"[\s\S]*"spPotion100"/);
 assert.match(main,/RETIRED_BACKPACK_POTION_IDS\.has\(String\(item\.id\|\|""\)\)/);
 assert.doesNotMatch(adventure,/id:"(?:hp|sp)Potion50"/);
-assert.match(adventure,/road_chest:\{gold:420,potions:\[\{id:"hpPotion30",count:1\}\]\}/);
-assert.match(adventure,/id:"hpPotion30",name:"大還丹"/);
-assert.match(adventure,/id:"spPotion30",name:"歸元丹"/);
+const adventureContext={window:null};adventureContext.window=adventureContext;vm.createContext(adventureContext);vm.runInContext(adventure,adventureContext);
+const adventureData=JSON.parse(JSON.stringify(adventureContext.FourSymbolsAdventureContent));
+assert.doesNotMatch(JSON.stringify(adventureData),/"id":"(?:hp|sp)Potion50"/);
+assert.deepEqual(adventureData.rewards.road_chest,{gold:420,potions:[{id:"hpPotion30",count:1}]});
+assert.equal(adventureData.merchantPool.find(item=>item.id==="hpPotion30").name,"大還丹");
+assert.equal(adventureData.merchantPool.find(item=>item.id==="spPotion30").name,"歸元丹");
 
 assert.match(shopUi,/FourSymbolsEquipmentShop\.render\(\)/,"shell delegates the equipment wallet to its canonical renderer");
 assert.match(equipment,/v17345-equipment-wallet"><span>目前金幣<\/span><b>'\+goldText\+'/);

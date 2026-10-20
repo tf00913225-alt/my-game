@@ -74,6 +74,14 @@
     function maybeResumeObjective(){
         const progress=getAdventureProgress();
         if(!progress||!progress.chapters||!window.FourSymbolsFeatures||typeof window.FourSymbolsFeatures.ensure!=="function"){ return; }
+        const onboarding=Object.values(progress.chapters).some(chapter=>chapter?.onboarding?.active);
+        if(progress.pendingStoryOpening||onboarding){
+            window.FourSymbolsFeatures.ensure("adventure","story-resume").then(()=>{
+                if(progress.pendingStoryOpening){window.FourSymbolsAdventure?.startFreshStory();}
+                else{window.FourSymbolsAdventure?.open({story:true});}
+            }).catch(error=>console.error("[adventure] story resume pending retry",error));
+            return;
+        }
         const active=Object.values(progress.chapters).some(chapter=>chapter&&chapter.objective&&chapter.objective.active&&!chapter.objective.turnedIn);
         if(active){
             window.FourSymbolsFeatures.ensure("adventure","objective-resume").catch(error=>{
