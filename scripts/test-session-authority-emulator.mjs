@@ -4607,7 +4607,57 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     for(const id of [equipIntent.operationId,"skill-sdk-loadout-select-01","skill-sdk-loadout-remove-01",sameIntent.operationId,winner.operationId])
         for(const namespace of ["ledgerEntries","grantOperations"])assert.equal((await root.collection(namespace).doc(id).get()).exists,false);
     assert.equal((await save.get()).get("serverRevision"),8);
-    console.log("PASS internal skill loadout: original learning actor, native rollback/lost-response/once-only races, exact first limit401 two-row inventory; fixture kernel first18/later23/replay8 reads and10 writes (Session3 reads separate), v2 presence/intent retention, non-economic six-point receipts, readonly full closure and missing earlier/current receipt refusal. Four authority flags remain false; hosted SDK evidence only, no production endpoint.");
+    console.log("PASS internal skill loadout: original learning actor, native rollback/lost-response/once-only races, exact first limit401 two-row inventory; fixture kernel first18/later23/replay8 reads and10 writes (Session3 reads separate), v2 presence/intent retention, non-economic six-point receipts, readonly full closure and missing earlier/current receipt refusal. Four authority flags remain false; no gameplay UI/Boot integration.");
+    // Same actor, now through the actual two exported HTTP callable boundaries.
+    // Neither service is a gameplay hook or a complete-save hydrate operation.
+    const captureLoadoutActor=async()=>{
+        const rows=[[save.path,(await save.get()).data()]];
+        for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);
+        return rows.sort(([a],[b])=>a.localeCompare(b));
+    };
+    const httpRead={...identity,expectedRevision:8},preRead=await captureLoadoutActor();
+    const configuration=await invoke("readCanonicalSkillLoadout",token,httpRead);fourFalse(configuration);
+    assert.equal(configuration.ownerUid,uid);assert.equal(configuration.serverRevision,8);assert.equal(configuration.canonicalRevision,8);
+    assert.equal(configuration.preferencesVersion,2);
+    assert.deepEqual(configuration.characters,[{characterId,slotIndex:0,skillLoadout:(await characterRef.get()).get("skillLoadout")}]);
+    assert.equal(Object.hasOwn(configuration.autoConfig2,"v136ActionIntent"),false);
+    assert.equal(Object.hasOwn(configuration.autoConfig3,"v136LastSkill"),false);
+    assert.deepEqual(Object.keys(configuration).sort(),["schemaVersion","ownerUid","serverRevision","canonicalRevision","preferencesVersion","characters",
+        "autoConfig","autoConfig2","autoConfig3","outcomeVerified","rewardEligible","readyForRestore","authoritativeStateReady"].sort());
+    assert.deepEqual(await captureLoadoutActor(),preRead,"HTTP configuration read writes no sources, Session or receipts");
+    const httpRemove={...identity,...args("skill-sdk-http-loadout-remove",8,"remove")};
+    const removedHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);fourFalse(removedHttp);
+    assert.equal(removedHttp.resultRevision,9);assert.equal(removedHttp.unchanged,false);await checkRecoveryArchive(uid,9);
+    const postMutation=await captureLoadoutActor(),retryHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);
+    fourFalse(retryHttp);assert.equal(retryHttp.unchanged,true);assert.deepEqual(await captureLoadoutActor(),postMutation);
+    const currentHttp=await invoke("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9});fourFalse(currentHttp);
+    assert.deepEqual(currentHttp.characters[0].skillLoadout.equippedSkills,[]);
+    assert.equal(currentHttp.autoConfig.v136LastSkill,"waterKnife");
+    const httpRefuses=async(name,authToken,input,code)=>{
+        const before=await captureLoadoutActor();
+        await assert.rejects(()=>invoke(name,authToken,input),error=>[code,code.toLowerCase().replaceAll("_","-")].includes(error.code));
+        assert.deepEqual(await captureLoadoutActor(),before);
+    };
+    for(const name of ["mutateCanonicalSkillLoadout","readCanonicalSkillLoadout"]){
+        const input=name.startsWith("mutate")?{...httpRemove,operationId:"skill-sdk-http-forged-loadout",expectedRevision:9}:{...identity,expectedRevision:9};
+        for(const key of ["amount","rawState","autoConfig","authoritativeStateReady"])
+            await httpRefuses(name,token,{...input,[key]:true},"INVALID_ARGUMENT");
+        await httpRefuses(name,null,input,"UNAUTHENTICATED");
+        await httpRefuses(name,token,{...input,uid:y},"SESSION_INVALID");
+        await httpRefuses(name,token,{...input,session:null},"SESSION_INVALID");
+    }
+    await httpRefuses("readCanonicalSkillLoadout",token,httpRead,"ABORTED");
+    await httpRefuses("mutateCanonicalSkillLoadout",token,{...httpRemove,operationId:"skill-sdk-http-null-skill",expectedRevision:9,skillId:null},"INVALID_ARGUMENT");
+    const httpHeadRef=root.collection("operations").doc(httpRemove.operationId),httpHead=(await httpHeadRef.get()).data();
+    await httpHeadRef.delete();
+    try{await httpRefuses("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9},"DATA_LOSS");}
+    finally{await httpHeadRef.set(httpHead);}
+    assert.deepEqual((await characterRef.get()).get("state"),learned.state);
+    assert.deepEqual(resourceFields((await root.collection("economy").doc("current").get()).data()),resourceFields(economic));
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    assert.deepEqual(await captureLoadoutActor(),postMutation);
+    console.log("PASS skill loadout HTTP boundary: exact protected intent and same-Session configuration read, v2 presence/stable IDs/revisions, non-economic remove/original retry, zero-write extra-field/unauthenticated/cross-UID/session/stale/null-skill/missing-head refusal. Four authority flags remain false; no UI/Boot hydrate or server combat activation.");
 }
 
 await db.terminate();

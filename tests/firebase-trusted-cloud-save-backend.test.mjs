@@ -23,6 +23,8 @@ test("Firebase deployment includes every exported callable and Firestore rules",
     const selected=new Set(deploySelection[1].split(","));
     const callables=[...functionsIndex.matchAll(/exports\.([A-Za-z0-9_]+)\s*=\s*onCall\(/g)].map(match=>match[1]);
     assert.ok(callables.includes("createInitialCanonicalCharacter"));
+    assert.ok(callables.includes("mutateCanonicalSkillLoadout"));
+    assert.ok(callables.includes("readCanonicalSkillLoadout"));
     assert.ok(callables.includes("restoreCanonicalCurrent"));
     assert.ok(callables.includes("maintainCanonicalRecoveryAudit"));
     for(const name of callables){
