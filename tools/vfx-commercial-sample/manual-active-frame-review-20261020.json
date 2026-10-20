@@ -1,7 +1,7 @@
 {
   "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
   "pr": 958,
-  "status": "IMPLEMENTED_BROWSER_VERIFIED_USB_PENDING",
+  "status": "USB_AND_BROWSER_ORIGINAL_SYMPTOM_VERIFIED_PASS_STOP",
   "symptom": "The current manual actor's rapidly flashing yellow frame was tied to the smaller logical card and painted in front of enlarged portrait artwork.",
   "owner": "css/fixed-slot-battlefield-rendering-v2.css",
   "change": "Move the existing indicator to active actor artwork ::before behind portrait paint (z-1). Artwork frame already owns depth and occupied-row height caps. Explicitly retire old card ::after frame. Keep original .3s flash, action/lunge/dodge owner, actual portrait sizes and ::after foot shadow.",
@@ -12,8 +12,34 @@
     "v174-cardless-battle-browser production bundle PASS including lunge/dodge frame survival",
     "Production build PASS"
   ],
-  "usb": "Pending matched physical before/after on three- and six-actor scenes",
+  "usb": {
+    "before": "../integration-usb/artifacts/active-frame-before-authorized/evidence.json",
+    "after": "artifacts/active-frame-after/evidence.json",
+    "result": "PASS",
+    "device": "Samsung SM-N960F authorized USB",
+    "testedActors": {
+      "three": [
+        0,
+        1,
+        2
+      ],
+      "six": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5
+      ]
+    },
+    "flash": "Actual two opacity phases differ for every actor; formal duration0.3s retained",
+    "cleanup": "auto clears every active class and both old/new frames",
+    "review": "geometry_review actual before/after all nine actor samples PASS STOP. Frame no longer cuts hair/body or covers HP/SP. Rear glow can softly tint nearby front SP but solid border stays below and does not obscure it.",
+    "video": "Native60s before/after, shot-ack timestamps identify captured phases; no60fps/endurance claim"
+  },
   "ci": "New Head required checks remain separate. Previously reported CI failures are not claimed repaired by this frame fix.",
   "latestDevObserved": "1ec7362be54a7e2f27525196294735ec2c9db39b",
-  "devImpact": "New Cloud recovery and skill-progression changes since prior observation do not change the fixed-slot frame Owner. Build Owner advanced separately; recheck merge scope and latest checks before integration."
+  "devImpact": "New Cloud recovery and skill-progression changes since prior observation do not change the fixed-slot frame Owner. Build Owner advanced separately; recheck merge scope and latest checks before integration.",
+  "runtimeCommit": "74e1bb4d25cf4f56507a168826c8c50b546c3660",
+  "normalizedCssSha256": "1398fa4d3d37d3039c8edf5a1baf7fc4862205442f49f86ad94ced62f4484ea5"
 }
