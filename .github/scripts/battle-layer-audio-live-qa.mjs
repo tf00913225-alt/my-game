@@ -1365,9 +1365,13 @@ try{
         const sprites=stage?Array.from(stage.querySelectorAll('.v143-vfx-sprite')):[];
         const sprite=sprites[0]||null;
         const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        const side=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=side&&overlay?{left:Math.max(side.left,overlay.left),right:Math.min(side.right,overlay.right),top:Math.max(side.top,overlay.top),bottom:Math.min(side.bottom,overlay.bottom)}:null;
         return {
             config:{id:config.id,targetType:config.targetType,duration:config.duration},
             targetId,primarySlot,
+            safeBounds,clipPath:sprite?.style.clipPath||null,
             stageCount:document.querySelectorAll('#v143-skill-stage').length,
             stageSkill:stage?.dataset.skill||null,
             spriteCount:sprites.length,
@@ -1396,8 +1400,17 @@ try{
     assert.equal(windFlame?.frameFit,"cover","Three-target VFX must preserve its source-frame aspect");
     assert.equal(windFlame?.targetIndexes.length,1,"This live check deliberately supplies only one surviving target");
     assert.equal(windFlame?.geometrySlots.length,3,"Wind Flame must retain a three-slot footprint for a single surviving target");
-    assert.ok(windFlame.spriteBox.width>=windFlame.bounds.width-1,"Wind Flame must cover the fixed three-slot width");
-    assert.ok(windFlame.spriteBox.height>=windFlame.bounds.height-1,"Wind Flame must cover the fixed three-slot height");
+    assert.ok(windFlame.safeBounds,"Wind Flame requires formal side safety geometry");
+    const windSafe=windFlame.safeBounds,windBox=windFlame.spriteBox;
+    const windWidth=2*Math.min(windFlame.bounds.centerX-windSafe.left,windSafe.right-windFlame.bounds.centerX);
+    const windHeight=2*Math.min(windFlame.bounds.centerY-windSafe.top,windSafe.bottom-windFlame.bounds.centerY);
+    const authoredHeight=Math.max(Math.round(windFlame.bounds.height),Math.round(windFlame.bounds.width)/windFlame.frameAspect);
+    const expectedWindHeight=Math.min(authoredHeight,windHeight,windWidth/windFlame.frameAspect);
+    assert.ok(windBox.width>0&&windBox.height>0,"Wind Flame must retain visible artwork");
+    assert.ok(Math.abs(windBox.height-expectedWindHeight)<=2,"Wind Flame must preserve its authored group size with only proportional safe fit");
+    assert.ok(Math.abs(windBox.left-windFlame.bounds.centerX)<=1&&Math.abs(windBox.top-windFlame.bounds.centerY)<=1,"Wind Flame must stay centered on its canonical tri shape");
+    assert.ok(windBox.left-windBox.width/2>=windSafe.left-1&&windBox.left+windBox.width/2<=windSafe.right+1&&windBox.top-windBox.height/2>=windSafe.top-1&&windBox.top+windBox.height/2<=windSafe.bottom+1,"Wind Flame must stay inside target-side safe bounds");
+    assert.equal(windFlame.clipPath||"none","none","Wind Flame must not crop its source");
     assert.ok(Math.abs(windFlame.spriteBox.width/windFlame.spriteBox.height-windFlame.frameAspect)<=.02,"Wind Flame must not flatten its source frame");
     assert.equal(windFlame.emitted,"true","Wind Flame must emit a visible production sprite");
 
@@ -1433,21 +1446,36 @@ try{
         const stage=document.getElementById('v143-skill-stage');
         const sprite=stage?.querySelector('.v143-vfx-sprite')||null;
         const bounds=owner.getGeometryRectFromShape('monster',primarySlot,'tri');
+        const side=owner.getSideRect('monster');
+        const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
+        const safeBounds=side&&overlay?{left:Math.max(side.left,overlay.left),right:Math.min(side.right,overlay.right),top:Math.max(side.top,overlay.top),bottom:Math.min(side.bottom,overlay.bottom)}:null;
         return {
-            targetId,primarySlot,bounds,
+            targetId,primarySlot,bounds,safeBounds,
+            targetType:config.targetType,placement:sprite?.dataset.placement||null,
+            spriteCount:stage?.querySelectorAll('.v143-vfx-sprite').length||0,
+            portrait:window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry('monster',targetId)?.artworkProjection?.rect||null,
+            clipPath:sprite?.style.clipPath||null,
             frameFit:sprite?.dataset.frameFit||null,
             frameAspect:Number(sprite?.dataset.frameAspect||0),
             geometrySlots:String(sprite?.dataset.geometrySlots||'').split(',').filter(Boolean),
             targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),
-            spriteBox:sprite?{width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null,
+            spriteBox:sprite?{left:Number.parseFloat(sprite.style.left),top:Number.parseFloat(sprite.style.top),width:Number.parseFloat(sprite.style.width),height:Number.parseFloat(sprite.style.height)}:null,
             emitted:sprite?.dataset.emittedVisual||null
         };
     })()`);
     evidence.checks.waterOrbTriRange=waterOrb;
-    assert.equal(waterOrb?.frameFit,"cover","Water Orb must preserve its source-frame aspect");
-    assert.equal(waterOrb?.geometrySlots.length,3,"Water Orb must keep a fixed three-slot footprint");
-    assert.equal(waterOrb?.targetIndexes.length,1,"Water Orb geometry must not depend on surviving target count");
-    assert.ok(waterOrb.spriteBox.width>=waterOrb.bounds.width-1&&waterOrb.spriteBox.height>=waterOrb.bounds.height-1,"Water Orb must cover its fixed three-slot geometry");
+    assert.equal(waterOrb.targetType,"tri","Water Orb keeps its formal three-target rule");
+    assert.equal(waterOrb.bounds.slots.length,3,"Water Orb keeps canonical tri targeting geometry");
+    assert.equal(waterOrb.placement,"single","Explicit recipient artwork uses the existing single-node emitter");
+    assert.equal(waterOrb.spriteCount,1,"The supplied single recipient must emit exactly one node");
+    assert.equal(waterOrb.frameFit,"contain","Recipient Water Orb must preserve its complete source");
+    assert.deepEqual(waterOrb.targetIndexes,[String(waterOrb.targetId)],"Late feedback must not expand the supplied recipient snapshot");
+    assert.ok(waterOrb.portrait&&waterOrb.safeBounds,"Recipient Water Orb requires formal portrait and safety geometry");
+    const waterBox=waterOrb.spriteBox,waterSafe=waterOrb.safeBounds;
+    assert.ok(waterBox.width>0&&waterBox.height>0,"Water Orb must retain visible recipient art");
+    assert.ok(Math.abs(waterBox.left-(waterOrb.portrait.left+waterOrb.portrait.width/2))<=1&&Math.abs(waterBox.top-(waterOrb.portrait.top+waterOrb.portrait.height/2))<=1,"Water Orb must center on the actual recipient portrait");
+    assert.ok(waterBox.left-waterBox.width/2>=waterSafe.left-1&&waterBox.left+waterBox.width/2<=waterSafe.right+1&&waterBox.top-waterBox.height/2>=waterSafe.top-1&&waterBox.top+waterBox.height/2<=waterSafe.bottom+1,"Water Orb must stay inside target-side safety bounds");
+    assert.equal(waterOrb.clipPath||"none","none","Water Orb must not crop its source");
     assert.ok(Math.abs(waterOrb.spriteBox.width/waterOrb.spriteBox.height-waterOrb.frameAspect)<=.02,"Water Orb must not flatten its square source frame");
     assert.equal(waterOrb.emitted,"true","Water Orb must emit a visible production sprite");
     const waterScreenshot=await client.send("Page.captureScreenshot",{format:"png",fromSurface:true});
