@@ -26,7 +26,9 @@
     "有問題": "有具體實畫缺陷，未表示已修",
     "已修改": "已落實修改，尚未批准修後操作",
     "已實際驗證": "必須逐裝置逐狀態連結提交與實畫操作證據",
-    "基準保留": "技能品質基準，仍需回歸證據"
+    "基準保留": "技能品質基準，仍需回歸證據",
+    "部分已實際驗證": "僅已列明呈現／操作狀態有固定Head與四尺寸證據；其他狀態仍未驗",
+    "不適用": "已查正式Owner確認現況無該功能／入口，不代表需新增"
   },
   "sources": [
     "index.html",
@@ -6961,7 +6963,7 @@
       "label": "玩法主頁 adventure",
       "entry": "showPage('adventure') 或正式玩法入口",
       "owner": "index.html; js/00-main.js; js/gameplay-boss-tower-system.js",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "未解鎖",
         "可進入",
@@ -7007,7 +7009,36 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "主頁題牌／原地圖座標保留／真城門入口與回城",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-map.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-map.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-map.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-map.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -7043,6 +7074,31 @@
           "art": "art_review：四尺寸主標題族實圖通過；詳情/比較/預覽普通框另列問題",
           "interaction": "interaction_review：主標題、help、返回、TAB未見互蓋；四尺寸控制另見title-controls-4d5c2ac6",
           "scope": "scope_review：393八族前後實圖無過度重排；JS scope僅原呈現修正"
+        }
+      },
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "主頁題牌／原地圖座標保留／真城門入口與回城"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
       }
     },
@@ -8668,7 +8724,7 @@
       "label": "adventure-chapter內頁",
       "entry": "玩法頁正式入口→adventure-chapter",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "解鎖",
@@ -8716,11 +8772,65 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "章節題牌／原版面保留",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "章節題牌／原版面保留"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
       }
     },
     {
@@ -8728,7 +8838,7 @@
       "label": "adventure-node內頁",
       "entry": "玩法頁正式入口→adventure-node",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "解鎖",
@@ -8776,11 +8886,65 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真節點／資訊sheet／primary轉內頁與返回",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-event-sheet.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-event-sheet.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-event-sheet.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-event-sheet.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真節點／資訊sheet／primary轉內頁與返回"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
       }
     },
     {
@@ -8788,7 +8952,7 @@
       "label": "adventure-event內頁",
       "entry": "玩法頁正式入口→adventure-event",
       "owner": "js/gameplay-boss-tower-system.js; js/26-v131-patrol-appearance.js; 具體owner待入口核對",
-      "status": "未檢查",
+      "status": "部分已實際驗證",
       "states": [
         "鎖定",
         "解鎖",
@@ -8836,11 +9000,65 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "真節點進入未處理事件／回城，未點選項",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-event.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-event.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-event.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-event.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
+      },
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真節點進入未處理事件／回城，未點選項"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
       }
     },
     {
@@ -12012,6 +12230,605 @@
           "interaction": "正式四類操作與另列long-formal長文，見報告限定"
         }
       }
+    },
+    {
+      "id": "gameplay.adventure-branch",
+      "label": "冒險內頁：路線選擇",
+      "entry": "正式冒險UI branch 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "未選",
+        "已選",
+        "另一條鎖定",
+        "通關回溯"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "未選／已選及另一條鎖定呈現（隔離fixture），未選路",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-branch-selected-locked.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-branch-locked.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-branch-selected-locked.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-branch-locked.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-branch-selected-locked.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-branch-locked.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-branch-selected-locked.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-branch-locked.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "未選／已選及另一條鎖定呈現（隔離fixture），未選路"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-objective",
+      "label": "冒險內頁：江湖委託",
+      "entry": "正式冒險UI objective 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "建立前",
+        "進行中",
+        "可交付",
+        "已交付待領",
+        "返回野怪區"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "真節點進入委託進行中與回城，未交付",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-objective.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-objective.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-objective.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-objective.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真節點進入委託進行中與回城，未交付"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-rest",
+      "label": "冒險內頁：休息驛站",
+      "entry": "正式冒險UI rest 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "尚未使用",
+        "已用",
+        "返回"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "真節點進入尚未使用畫面與回城，未休息",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-rest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-rest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-rest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-rest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真節點進入尚未使用畫面與回城，未休息"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-chest",
+      "label": "冒險內頁：旅途寶箱",
+      "entry": "正式冒險UI chest 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "未開",
+        "待領",
+        "已領",
+        "返回"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "真節點進入未開箱畫面與回城，未開箱",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-chest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-chest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-chest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-chest.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真節點進入未開箱畫面與回城，未開箱"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-merchant",
+      "label": "冒險內頁：神秘商人",
+      "entry": "正式冒險UI merchant 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "未出現",
+        "可見",
+        "已購買",
+        "金幣不足",
+        "背包不足",
+        "購買失敗",
+        "長名稱與數量",
+        "末端返回"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "真隱藏節點入口／末端離攤／同頁與返圖位置／已購顯示／合成長數量，未購買",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-merchant-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-merchant-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-merchant-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-merchant-end.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "真隱藏節點入口／末端離攤／同頁與返圖位置／已購顯示／合成長數量，未購買"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-event-result",
+      "label": "冒險內頁：事件結果",
+      "entry": "正式冒險UI event-result 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "空結果",
+        "獎勵結果",
+        "效果結果",
+        "繼續"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "空結果 API 呈現，未執行事件選項",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-event-result-empty.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-event-result-empty.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-event-result-empty.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-event-result-empty.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "空結果 API 呈現，未執行事件選項"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-node-reward",
+      "label": "冒險內頁：節點首通獎勵",
+      "entry": "正式冒險UI node-reward 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "待領",
+        "已領",
+        "滿包拒絕",
+        "返回"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "待領 API 呈現，未領獎",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-node-reward.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-node-reward.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-node-reward.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-node-reward.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "待領 API 呈現，未領獎"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-chapter-complete",
+      "label": "冒險內頁：章節完成",
+      "entry": "正式冒險UI chapter-complete 面板；真入口／API呈現fixture範圍見第11段",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; css/adventure-v1-20260915.css",
+      "status": "部分已實際驗證",
+      "states": [
+        "完成待領",
+        "已領",
+        "英雄同步中",
+        "同步失敗",
+        "已取得",
+        "回溯",
+        "返回"
+      ],
+      "operations": [
+        "進入／閱讀",
+        "捲動（實際相關時）",
+        "返回"
+      ],
+      "deviceEvidence": {},
+      "stateEvidence": [
+        {
+          "state": "未領／英雄同步錯誤文字 API 呈現；active存檔提示與真末端返回不重疊",
+          "status": "已實際驗證",
+          "scope": "僅本段已明列呈現與操作；API／synthetic不當真業務結算",
+          "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+          "devices": [
+            {
+              "device": "360x640",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/360x640-controls.json"
+            },
+            {
+              "device": "393x873",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/393x873-controls.json"
+            },
+            {
+              "device": "412x915",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/412x915-controls.json"
+            },
+            {
+              "device": "1280x800",
+              "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-chapter-complete.png",
+              "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
+            }
+          ]
+        }
+      ],
+      "presentationEvidence": {
+        "segment": "segment-11",
+        "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted",
+        "verified": [
+          "未領／英雄同步錯誤文字 API 呈現；active存檔提示與真末端返回不重疊"
+        ],
+        "notVerified": [
+          "交易／選路／休息／開箱／領獎／戰鬥／章節真正通關",
+          "真實帳號／雲端提交",
+          "實體裝置",
+          "其他未列狀態"
+        ],
+        "reviews": {
+          "art": "四尺寸主畫面＋真末端／notice／locked代表圖限定通過",
+          "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
+          "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
+        }
+      }
     }
   ],
   "segmentReviews": [
@@ -12230,6 +13047,16 @@
         "冒險內頁正式畫面取證與打磨",
         "其餘台帳未驗入口／狀態",
         "最新Head必要CI／部署"
+      ]
+    },
+    {
+      "segment": "segment-11",
+      "head": "5d905b7cb41574fc0e2a067d84b2d697611d370f",
+      "result": "冒險原標題／雕框／數量／禁用文字／存檔提示／原renderer捲動限定通過",
+      "pending": [
+        "鑲嵌長選單與末端真操作（原樣式先保留）",
+        "其他台帳未驗入口／狀態",
+        "最新Head Required CI／部署"
       ]
     }
   ],
