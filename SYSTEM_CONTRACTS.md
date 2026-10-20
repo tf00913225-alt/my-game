@@ -119,7 +119,8 @@
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
 - 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
-- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／Progression／玩家說明 projection owner，並隨 `gameplay-core` 固定載入；V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／玩家說明與技能變更 lifecycle owner，並隨 `gameplay-core` 固定載入；學習／升級資格、門檻與成本委派同 bundle 前載的純規則 `functions/src/skill-progression-core.js`，不複製公式。共用規則不建立技能所有權、伺服器 writer 或戰鬥執行。V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- `scripts/lib/player-skill-config-catalog.mjs` 在既有 production build／check 中，僅從原始技能資料、四元素 renderer predicate 與 Final Data 機械投影 `functions/src/generated/player-skill-config-catalog.json`。目錄只含玩家設定欄位與原傷害 ID 集合的分類標記，缺省 `requires` 保留缺省；不包含 SP／傷害／戰鬥 runtime，不授予學習、升級、技能點或雲端權利。來源不明、動態 selected field、歧義或未審核覆寫必須拒絕產物；既有全部 runtime 技能與純資格規則不因目錄投影被縮減。
 - 技能列表、詳細頁、Lv1～Max 明細與下一級傷害必須由正式 Skill Data 與 `getSkillDamageAtLevel()` 投影。禁止在 UI 寫第二份 10 級傷害表、舊「最高5級」或用「每級+X」假裝完整描述 Lv5/Lv10 突破。
 - Battle Quick Bar（戰鬥技能快捷列）必須驗證每格的 canonical structure（正式結構），並由正式 Skill Data／`FourSymbolsSkillSpec` 投影技能名稱、SP、目標範圍與效果說明；只檢查「有四顆按鈕」不得視為結構有效，缺少內部節點時必須重建正式結構。
 - 輔助技能 Runtime 必須讀正式 `...ByLevel`／duration／target 欄位；不得在施放前暫時 mutation `skill.xxx` 再還原作為等級縮放。敵方／深淵同名支援技能也必須讀同一份正式數值與 Targeting owner。
