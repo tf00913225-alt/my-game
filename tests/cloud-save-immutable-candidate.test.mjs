@@ -519,8 +519,11 @@ test('raw expected manifest hash is charged on the decoder private snapshot befo
     for(const expected of [undefined,sha(malformed)])try{helper.decodeRawRecoveryArchive(malformed,helper.createRecoveryAuditAssemblyBudget(),expected);}
     catch(error){errors.push([error.code,error.message]);}
     assert.equal(errors.length,2);assert.deepEqual(errors[0],errors[1]);
-    const external=Buffer.from(bytes),mutation=rawDecoderProbe(()=>external.fill(0));
-    assert.deepEqual(mutation.helper.decodeRawRecoveryArchive(external,mutation.helper.createRecoveryAuditAssemblyBudget(),sha(bytes)),original);
+    const external=Buffer.from(bytes);let mutate=false;
+    const mutation=rawDecoderProbe(()=>{if(mutate)external.fill(0);});
+    const baseline=mutation.helper.decodeRawRecoveryArchive(bytes,mutation.helper.createRecoveryAuditAssemblyBudget());
+    mutate=true;
+    assert.deepEqual(mutation.helper.decodeRawRecoveryArchive(external,mutation.helper.createRecoveryAuditAssemblyBudget(),sha(bytes)),baseline);
     assert(mutation.parses()>0);assert(external.every(byte=>byte===0));
 });
 test('raw publication snapshots through the fixed transport contract and mismatched exact bytes cannot parse, prove or ACK',async()=>{
