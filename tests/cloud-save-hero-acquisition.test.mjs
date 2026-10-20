@@ -8,7 +8,7 @@ const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const UID="hero-account-a",BASE=`serverUsers/${UID}`,ENV=`users/${UID}/saves/current`;
 const KING="vajraHeavenlyKing",CLAIM=`${BASE}/uniqueClaims/hero-v1-${KING}`;
 
-function harness(factory=createHeroAcquisition){
+function harness(factory=acquisitionWithPolicy(retainedChapterPolicy)){
     const data=new Map([[ENV,{ownerUid:UID,serverRevision:1,authoritativeStateReady:false}]]);
     let instant=Date.parse("2026-10-12T03:00:00Z"),active=true,failWrites=false,writes=0;
     const ref=path=>({path,collection:name=>collection(`${path}/${name}`)});
@@ -147,8 +147,9 @@ const replacementChapterPolicy={...structuredClone(retainedChapterPolicy),startN
 function acquisitionWithPolicy(current){
     function load(relative,overrides){
         const url=new URL(relative,import.meta.url),localRequire=createRequire(url),module={exports:{}};
-        const context={module,exports:module.exports,require:id=>Object.hasOwn(overrides,id)?overrides[id]:localRequire(id)};
-        vm.runInNewContext(fs.readFileSync(url,"utf8"),context,{filename:url.pathname});
+        const injectedRequire=id=>Object.hasOwn(overrides,id)?overrides[id]:localRequire(id);
+        const execute=vm.runInThisContext("(function(module,exports,require){\n"+fs.readFileSync(url,"utf8")+"\n})",{filename:url.pathname});
+        execute(module,module.exports,injectedRequire);
         return module.exports;
     }
     const chapterSource=load("../functions/src/hero-chapter-source.js",{
@@ -353,4 +354,27 @@ test("failed network observation remains a bounded live intent and drains in ord
     assert.equal((await h.read()).chapter.nextNodeId,"n01_arrival");
     c.online();await c.api.sync();assert.equal((await h.read()).chapter.nextNodeId,"n02_roadfight");
     assert.equal(c.api.getStatus().error,null);
+});
+
+test("current twenty-node adapter discards a mismatched head then recovers only through explicit story observations",async()=>{
+    const current=JSON.parse(fs.readFileSync("functions/src/generated/hero-chapter-qualification.json","utf8"));
+    const h=harness(acquisitionWithPolicy(current)),c=client(h);await c.api.sync();await c.api.beginChapter("chapter_v1");
+    await c.api.observeChapterNode("chapter_v1","c1_20");assert.match(c.api.getStatus().error,/補看故事紀錄/);
+    assert.equal(c.api.getRequiredStoryNode(),"c1_01");assert.equal((await h.read()).chapter.completedIntents.length,0);
+    // No local completion map is supplied: every server position must receive
+    // a fresh explicit observation, including after a prior queued mismatch.
+    for(const row of current.nodes){await c.api.observeChapterNode("chapter_v1",row.id);assert.equal(c.api.getStatus().error,null);}
+    assert.equal((await h.read()).chapter.phase,"completed");assert.ok(c.api.getEntitlement(DOG));
+    const before=structuredClone([...h.data]);await c.api.observeChapterNode("chapter_v1","c1_20");assert.deepEqual([...h.data],before);
+});
+
+test("new story actions can resume a retained ticket without filling unobserved server positions from cache",async()=>{
+    const h=harness();await h.ensure();await h.step("n01_arrival");
+    const c=client(h);await c.api.sync();assert.equal(c.api.getRequiredStoryNode(),"c1_02");
+    await c.api.observeChapterNode("chapter_v1","c1_20");assert.match(c.api.getStatus().error,/補看故事紀錄/);
+    assert.equal((await h.read()).chapter.nextNodeId,"n02_roadfight");
+    for(const id of ["c1_02","c1_06","c1_07","c1_08","c1_09","c1_10","c1_11","c1_20","c1_20"]){
+        assert.equal(c.api.getRequiredStoryNode(),id);await c.api.observeChapterNode("chapter_v1",id);assert.equal(c.api.getStatus().error,null);
+    }
+    assert.equal((await h.read()).chapter.phase,"completed");assert.ok(c.api.getEntitlement(DOG));
 });

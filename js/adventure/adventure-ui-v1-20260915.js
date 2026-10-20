@@ -128,7 +128,10 @@
         const branch=chapter.nodes.find(node=>node.type==="branch");
         const selected=branch&&state.branchSelections[branch.branchId];
         const backtrack=state.chapterCompleted?'<span class="adventure-backtrack-mark" aria-label="回溯探索已開放">↩ 回溯可走</span>':"";
-        return '<section class="adventure-map-screen">'+
+        const required=window.FourSymbolsHeroAcquisition?.getRequiredStoryNode?.();
+        const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
+        const legacy=(CONTENT().legacyNodes||[]).filter(n=>view.state.rewardClaims[n.id]==="ready").map(n=>'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.openLegacyReward(\''+attr(n.id)+'\')">舊旅程待領 · '+esc(n.title)+'</button>').join('');
+        return '<section class="adventure-map-screen">'+replay+legacy+
             '<div class="adventure-map-caption"><span>第一章 · '+esc(chapter.title)+'</span><b>'+esc(Object.keys(state.completedNodes||{}).length)+' / '+esc(chapter.mainProgressNodeCount||chapter.nodeCapacity||chapter.nodes.length)+' 關</b>'+backtrack+'</div>'+
             '<div class="adventure-map-canvas">'+
                 '<div class="adventure-map-depth adventure-map-far" aria-hidden="true"></div>'+
@@ -183,6 +186,49 @@
         return panelShell(event.title,"NPC／劇情事件",body,choices,"event-panel scene-"+esc(event.background||"road"));
     }
 
+    function renderStory(view){
+        const cursor=view.dialogue,node=view.chapter.nodes.find(n=>n.id===cursor?.nodeId);
+        if(!node){return renderMap(view);}
+        const lines=cursor.phase==="ending"?view.chapter.ending:cursor.phase==="guidance"?node.guidance:node.dialogue;
+        const line=lines?.[cursor.lineIndex];if(!line){return renderMap(view);}
+        const presentation=CONTENT().storyPresentation;
+        const playerActive=line.speaker==="player";
+        let portrait="",name="少俠";
+        try{if(typeof player!=="undefined"){portrait=getCharacterBattleArtworkPath(player);name=player.id||name;}}catch(_){}
+        const portraitKey=presentation.npcs[line.npcAssetId||node.npc];
+        const npc=window.v154ResolveMonsterPortraitRecord?.({portraitKey})?.path||"";
+        return '<section class="adventure-story scene-'+attr(node.scene)+'" aria-label="'+attr(node.title)+'">'+
+            '<img class="adventure-story-background" src="'+attr(presentation.scenes[node.scene])+'" alt="">'+
+            '<div class="adventure-story-shade" aria-hidden="true"></div>'+
+            '<span class="adventure-story-chapter">第一章 · 山關初行</span>'+
+            '<div class="adventure-story-cast">'+
+            '<img class="adventure-story-player '+(playerActive?'is-speaking':'')+'" src="'+attr(portrait)+'" alt="'+attr(name)+'">'+
+            '<img class="adventure-story-npc '+(!playerActive?'is-speaking':'')+'" src="'+attr(npc)+'" alt="'+attr(playerActive?'同行之人':line.name)+'">'+
+            '</div><div class="adventure-story-dialogue" aria-live="polite">'+
+            '<span class="adventure-story-speaker">'+esc(playerActive?name:line.name)+'</span>'+
+            '<p>'+esc(line.text)+'</p><button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.advanceDialogue()">'+
+            (cursor.lineIndex<lines.length-1?'下一句':cursor.phase==="ending"?'第一章完成':'繼續')+'　›</button></div></section>';
+    }
+    function renderTutorial(view){
+        const action=view.tutorial?.requiredAction||"skill";
+        const copy={skill:['招式與成長','先在技能頁學習並裝上本門技能，再回來挑戰同一名惡徒。'],
+            equipment:['穿上護具','先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。'],
+            recovery:['上路前的準備','紅色是 HP，歸零便無法繼續戰鬥；藍色是 SP，施展技能會消耗它。可從背包使用回春散／凝氣散，也可先確認目前狀態。準備好再出發。']}[action];
+        const owner=typeof player!=="undefined"?player:null;
+        const resources=owner?'<p class="adventure-preparation-resources">HP '+esc(Math.floor(owner.hp))+'　SP '+esc(Math.floor(owner.sp))+'</p>':'';
+        const actions='<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.openTutorialSystem()">'+(action==="skill"?'前往技能頁':'前往背包')+'</button>'+
+            (action==="equipment"&&view.state.rewardClaims.c1_03==="ready"?'<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.claimNodeReward(\'c1_03\')">領取追兵一戰的護具</button>':'')+
+            (action==="recovery"?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.confirmPreparation()">已確認 HP／SP 與補品</button>':'')+
+            '<button type="button" class="adventure-button primary" onclick="FourSymbolsAdventure.continueTutorial()">'+(action==="recovery"?'準備好，繼續上路':'完成準備，原關重試')+'</button>';
+        return panelShell(copy[0],"初入江湖",'<p class="adventure-lead">'+copy[1]+'</p>'+resources,actions,"tutorial-panel");
+    }
+    function syncTutorialReturn(page){
+        const state=runtimeView()?.tutorial,host=document.getElementById("game-ui");if(!host){return;}
+        let button=document.getElementById("adventureTutorialReturn");
+        if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
+        button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
+    }
+
     function renderEventResult(view){
         const result=view.state.lastEventResult||{};
         const parts=[];
@@ -218,7 +264,7 @@
     }
 
     function renderObjective(view){
-        const node=currentPanelNode(view,"objective")||view.chapter.nodes.find(n=>n.type==="objective");
+        const node=currentPanelNode(view,"objective")||view.chapter.nodes.find(n=>n.type==="objective")||(CONTENT().legacyNodes||[]).find(n=>n.id===view.objective?.sourceNodeId);
         if(!node){ return renderMap(view); }
         ui.lastFocusNodeId=node.id;
         const objective=view.state.objective;
@@ -273,8 +319,8 @@
     }
 
     function renderNodeReward(view){
-        const node=view.chapter.nodes.find(n=>view.state.rewardClaims[n.id]==="ready"&&(ui.lastFocusNodeId?n.id===ui.lastFocusNodeId:true))||
-            view.chapter.nodes.find(n=>view.state.rewardClaims[n.id]==="ready");
+        const all=[...view.chapter.nodes,...(CONTENT().legacyNodes||[])];
+        const node=all.find(n=>view.state.rewardClaims[n.id]==="ready"&&n.id===view.selectedNodeId)||all.find(n=>view.state.rewardClaims[n.id]==="ready");
         if(!node){ return renderMap(view); }
         ui.lastFocusNodeId=node.id;
         const typeLabel=node.type==="boss"?"Boss 首通獎勵":node.type==="elite"?"精英首通獎勵":"節點首通獎勵";
@@ -291,8 +337,8 @@
             heroStatus?.busy?"神犬紅包取得紀錄同步中。":
             heroStatus?.error||"神犬紅包需完成線上章節資格確認；舊本機通關紀錄不會自動補發。";
         const body='<div class="adventure-chapter-seal">章</div><h3>'+esc(view.chapter.title)+' · 完成</h3>'+
-            '<p>山路重新通行。你現在可以直接回到岔路，補走第一次沒有選的路線，不必從第一節重打。</p>'+
-            '<div class="adventure-result-box"><b>回溯探索</b><span>另一條岔路的節點仍可取得它自己的首次獎勵。</span></div>'+
+            '<p>黑松寨撤去了路障，山關重新通行。第一章的二十段旅程已告一段落。</p>'+
+            '<div class="adventure-result-box"><b>山關初行</b><span>可回看沿途故事，首通獎勵不會重複發放。</span></div>'+
             '<p>'+esc(heroNote)+'</p><button type="button" class="adventure-button secondary" onclick="FourSymbolsHeroAcquisition.refresh()">同步英雄取得紀錄</button>';
         const actions=(claimed?'<span class="adventure-used-mark">章節獎勵已領取</span>':'<button type="button" class="adventure-button primary attention" onclick="FourSymbolsAdventure.claimChapterReward()">領取章節獎勵</button>')+
             '<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">回到地圖探索</button>';
@@ -317,6 +363,8 @@
 
     function renderPanel(view){
         switch(view.panel){
+            case "story":return renderStory(view);
+            case "tutorial":return renderTutorial(view);
             case "event": return renderEvent(view,false);
             case "event-view": return renderEvent(view,true);
             case "event-result": return renderEventResult(view);
@@ -334,6 +382,7 @@
     function render(){
         const root=ensureRoot(),view=runtimeView();
         if(!root||!view||!view.chapter||!view.state){ return; }
+        root.dataset.panel=view.panel;
         const title=root.querySelector("#adventureHeaderTitle"),meta=root.querySelector("#adventureHeaderMeta");
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }
@@ -401,7 +450,7 @@
             '<em>'+(inBattle?'戰鬥結束後可返回':objective.ready?'返回章節':'返回冒險')+'</em></button>';
     }
 
-    window.FourSymbolsAdventureUI=Object.freeze({show:show,hide:hide,render:render,syncTracker:syncTracker});
+    window.FourSymbolsAdventureUI=Object.freeze({show:show,hide:hide,render:render,syncTracker:syncTracker,syncTutorialReturn:syncTutorialReturn});
 
     if(typeof document!=="undefined"){
         const ready=function(){ ensureRoot();ensureTracker();syncTracker(); };

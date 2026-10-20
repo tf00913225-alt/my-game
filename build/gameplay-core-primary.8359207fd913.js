@@ -3896,6 +3896,7 @@
             previousZone:currentZone,
             onComplete:onComplete,
             normalizeFailureResources:opts.normalizeFailureResources!==false,
+            tutorial:opts.mode==="adventure"&&opts.tutorial===true,
             startedAt:Date.now()
         };
 
@@ -4075,7 +4076,7 @@
             */
             battleActive=false;
             clearBattleRoundPrompt();
-            finishBattleStatisticsSession("lose");
+            finishBattleStatisticsSession(run.tutorial?"tutorial":"lose");
             autoBattle=false;
             actionReady=false;
             pendingAction=null;

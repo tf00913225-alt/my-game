@@ -260,6 +260,13 @@
     }
 
     function isSharedModalAvailableForAnnouncement(){
+        // Fresh-character onboarding owns its first playable presentation.
+        // Defer only the ordinary login announcement; forced updates keep
+        // their existing safety gate and are never dismissed by Story.
+        try{
+            const progress=typeof player!=="undefined"&&player?.adventureProgress;
+            if(progress?.pendingStoryOpening||Object.values(progress?.chapters||{}).some(chapter=>chapter?.onboarding?.active)){return false;}
+        }catch(_){}
         const parts=getSharedModalParts();
         return !!(
             parts&&

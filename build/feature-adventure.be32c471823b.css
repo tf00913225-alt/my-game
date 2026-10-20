@@ -1,6 +1,21 @@
 /* =====================================================
    出城冒險 V1 — chapter map / event / merchant UI owner
 ===================================================== */
+#adventurePage[data-panel="story"] .adventure-view{overflow:hidden;padding:0;}
+.adventure-story{position:relative;height:100%;min-height:0;overflow:hidden;background:#141b15;isolation:isolate;}
+.adventure-story-background,.adventure-story-shade{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.adventure-story-shade{background:linear-gradient(180deg,rgba(5,10,8,.3),transparent 35%,rgba(5,8,7,.22) 65%,#10120f);}
+.adventure-story-chapter{position:absolute;top:18px;left:18px;color:#f0d9ac;font-size:16px;letter-spacing:.12em;text-shadow:0 2px 4px #000;}
+.adventure-story-cast{position:absolute;inset:10% -8% 20%;display:flex;align-items:flex-end;justify-content:space-between;pointer-events:none;}
+.adventure-story-cast img{width:58%;height:100%;object-fit:contain;object-position:center bottom;filter:brightness(.65) saturate(.8);transition:filter .18s ease;}
+.adventure-story-cast .is-speaking{filter:brightness(1) saturate(1);}
+.adventure-story-player{margin-right:-16%;}
+.adventure-story-dialogue{position:absolute;left:4%;right:4%;bottom:4%;min-height:27%;padding:20px 20px 16px;box-sizing:border-box;background:linear-gradient(145deg,rgba(28,29,24,.97),rgba(10,15,12,.98));border:1px solid #b39560;border-radius:3px 18px 3px 18px;box-shadow:0 10px 24px #0009,inset 0 0 0 4px #ac8d4520;display:flex;flex-direction:column;gap:12px;}
+.adventure-story-speaker{align-self:flex-start;color:#f4d79d;font-size:20px;font-weight:700;letter-spacing:.08em;}
+.adventure-story-dialogue p{margin:0;color:#f5eddd;font-size:18px;line-height:1.7;overflow-wrap:anywhere;}
+.adventure-story-dialogue .adventure-button{flex:0 0 auto;align-self:flex-end;min-width:128px;margin-top:auto;}
+.adventure-tutorial-return{position:absolute;z-index:1200;left:50%;bottom:calc(82 * var(--ui-length-unit,3px));translate:-50% 0;min-height:calc(44 * var(--ui-length-unit,3px));padding:calc(10 * var(--ui-length-unit,3px)) calc(18 * var(--ui-length-unit,3px));font-size:calc(15 * var(--ui-length-unit,3px));border:calc(1 * var(--ui-length-unit,3px)) solid #b39560;border-radius:calc(8 * var(--ui-length-unit,3px));color:#f7e8c8;background:#292216;box-shadow:0 3px 12px #0008;}
+.adventure-tutorial-return[hidden]{display:none;}
 #adventurePage[hidden]{display:none!important;}
 #adventurePage.adventure-page{
     position:absolute;

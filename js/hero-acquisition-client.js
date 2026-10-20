@@ -4,6 +4,11 @@
     "use strict";
     let proof=null,error=null,busy=false,generation=0,pipeline=Promise.resolve(),draining=null;
     const pendingNodes=[];
+    // Retained tickets observe new, explicit story actions. A restored local
+    // completion map never creates or fills missing online positions.
+    const retainedStoryPositions={n01_arrival:'c1_01',n02_roadfight:'c1_02',n03_fork:'c1_06',
+        n04a_path:'c1_07',n04b_gate:'c1_07',n05_commission:'c1_08',n06_rest:'c1_09',
+        n07_chest:'c1_10',n08_truth:'c1_11',n09_boss:'c1_20',n10_finish:'c1_20'};
     const copy=value=>value==null?value:JSON.parse(JSON.stringify(value));
     function activeUid(){
         const uid=global.FourSymbolsAccountSave?.getActiveUid?.();
@@ -102,17 +107,21 @@
         while(pendingNodes.length){
             const intent=pendingNodes[0];
             if(intent.uid!==uid||intent.chapterId!==proof.chapter.chapterId){pendingNodes.shift();continue;}
-            const prior=proof.chapter.completedIntents.find(row=>row.nodeId===intent.nodeId);
+            const retained=retainedStoryPositions[proof.chapter.nextNodeId];
+            const nodeId=retained&&retained===intent.nodeId?proof.chapter.nextNodeId:intent.nodeId;
+            const choiceId=nodeId==='n03_fork'?'safe':intent.choiceId;
+            const prior=proof.chapter.completedIntents.find(row=>row.nodeId===nodeId);
             if(prior){
-                if(prior.choiceId!==intent.choiceId){throw new Error("章節岔路與線上紀錄不同，無法補發英雄。");}
+                if(prior.choiceId!==choiceId){throw new Error("章節岔路與線上紀錄不同，無法補發英雄。");}
                 pendingNodes.shift();continue;
             }
-            if(proof.chapter.nextNodeId!==intent.nodeId){
-                throw new Error("章節尚缺線上資格紀錄，不能依舊存檔自動補發英雄。請聯絡客服確認。");
+            if(proof.chapter.nextNodeId!==nodeId){
+                pendingNodes.shift();
+                throw new Error("章節尚缺線上紀錄，請從章節地圖的『補看故事紀錄』重看指定段落。");
             }
             const ticketId=proof.chapter.ticketId;
             await mutation(api,uid,token,revision=>api.completeHeroChapterNode({
-                ticketId,nodeId:intent.nodeId,choiceId:intent.choiceId,expectedRevision:revision}));
+                ticketId,nodeId,choiceId,expectedRevision:revision}));
             pendingNodes.shift();
         }
         return copy(proof);
@@ -140,7 +149,7 @@
         await drain(api,uid,token);
         if(proof.chapter.phase==="completed"){return copy(proof);}
         const id=proof.chapter.nextNodeId;
-        if(!id||global.FourSymbolsAdventureContent?.chapters[proof.chapter.chapterId]?.endNodeId!==id){
+        if(!id||(global.FourSymbolsAdventureContent?.chapters[proof.chapter.chapterId]?.endNodeId!==id&&id!=="n10_finish")){
             throw new Error("請先完成線上章節資格流程。");
         }
         return mutation(api,uid,token,revision=>api.completeHeroChapterNode({
@@ -152,6 +161,7 @@
         getStatus:()=>({ready:!!proof&&proof.ownerUid===activeUid(),busy,error,
             loginCount:proof?.ownerUid===activeUid()?proof.loginCount:null,
             chapter:proof?.ownerUid===activeUid()?copy(proof.chapter):null}),
+        getRequiredStoryNode:()=>proof?.ownerUid===activeUid()?(retainedStoryPositions[proof.chapter.nextNodeId]||proof.chapter.nextNodeId):null,
         sync,refresh:()=>sync().catch(()=>null),beginChapter,observeChapterNode,claimChapterHero
     });
     document.addEventListener("four-symbols:startup-ready",()=>{

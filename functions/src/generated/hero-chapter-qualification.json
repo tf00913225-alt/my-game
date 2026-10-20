@@ -1,86 +1,131 @@
 {
   "schemaVersion": 1,
   "chapterId": "chapter_v1",
-  "startNodeId": "n01_arrival",
-  "endNodeId": "n10_finish",
+  "startNodeId": "c1_01",
+  "endNodeId": "c1_20",
   "nodes": [
     {
-      "id": "n01_arrival",
-      "type": "event",
-      "next": "n02_roadfight",
-      "branches": []
-    },
-    {
-      "id": "n02_roadfight",
+      "id": "c1_01",
       "type": "battle",
-      "next": "n03_fork",
+      "next": "c1_02",
       "branches": []
     },
     {
-      "id": "n03_fork",
-      "type": "branch",
-      "next": null,
-      "branches": [
-        {
-          "id": "safe",
-          "nodeId": "n04a_path"
-        },
-        {
-          "id": "bold",
-          "nodeId": "n04b_gate"
-        }
-      ]
+      "id": "c1_02",
+      "type": "battle",
+      "next": "c1_03",
+      "branches": []
     },
     {
-      "id": "n04a_path",
+      "id": "c1_03",
+      "type": "battle",
+      "next": "c1_04",
+      "branches": []
+    },
+    {
+      "id": "c1_04",
+      "type": "battle",
+      "next": "c1_05",
+      "branches": []
+    },
+    {
+      "id": "c1_05",
+      "type": "battle",
+      "next": "c1_06",
+      "branches": []
+    },
+    {
+      "id": "c1_06",
       "type": "event",
-      "next": "n05_commission",
+      "next": "c1_07",
       "branches": []
     },
     {
-      "id": "n04b_gate",
-      "type": "elite",
-      "next": "n05_commission",
+      "id": "c1_07",
+      "type": "battle",
+      "next": "c1_08",
       "branches": []
     },
     {
-      "id": "n05_commission",
-      "type": "objective",
-      "next": "n06_rest",
-      "branches": []
-    },
-    {
-      "id": "n06_rest",
-      "type": "rest",
-      "next": "n07_chest",
-      "branches": []
-    },
-    {
-      "id": "n07_chest",
+      "id": "c1_08",
       "type": "chest",
-      "next": "n08_truth",
+      "next": "c1_09",
       "branches": []
     },
     {
-      "id": "n08_truth",
+      "id": "c1_09",
+      "type": "rest",
+      "next": "c1_10",
+      "branches": []
+    },
+    {
+      "id": "c1_10",
+      "type": "battle",
+      "next": "c1_11",
+      "branches": []
+    },
+    {
+      "id": "c1_11",
       "type": "event",
-      "next": "n09_boss",
+      "next": "c1_12",
       "branches": []
     },
     {
-      "id": "n09_boss",
-      "type": "boss",
-      "next": "n10_finish",
+      "id": "c1_12",
+      "type": "battle",
+      "next": "c1_13",
       "branches": []
     },
     {
-      "id": "n10_finish",
+      "id": "c1_13",
+      "type": "rest",
+      "next": "c1_14",
+      "branches": []
+    },
+    {
+      "id": "c1_14",
+      "type": "event",
+      "next": "c1_15",
+      "branches": []
+    },
+    {
+      "id": "c1_15",
+      "type": "elite",
+      "next": "c1_16",
+      "branches": []
+    },
+    {
+      "id": "c1_16",
+      "type": "event",
+      "next": "c1_17",
+      "branches": []
+    },
+    {
+      "id": "c1_17",
+      "type": "battle",
+      "next": "c1_18",
+      "branches": []
+    },
+    {
+      "id": "c1_18",
+      "type": "elite",
+      "next": "c1_19",
+      "branches": []
+    },
+    {
+      "id": "c1_19",
+      "type": "event",
+      "next": "c1_20",
+      "branches": []
+    },
+    {
+      "id": "c1_20",
       "type": "finish",
       "next": null,
       "branches": []
     }
   ],
   "sourcePath": "js/adventure/adventure-content-v1-20260915.js",
-  "sourceSha256": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+  "sourceSha256": "700e115542f89d93161ec7964fee45bd41ec8ce0ee9a911a4b6d62b073208c3c",
   "outcomeVerified": false
 }

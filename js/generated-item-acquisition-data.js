@@ -1400,6 +1400,24 @@ window.FourSymbolsItemAcquisitionData={
           "count": 1
         }
       ]
+    },
+    "story_first_growth": {
+      "sharedExp": 15
+    },
+    "story_starter_gear": {
+      "starterEquipment": "leatherArmor"
+    },
+    "story_supplies": {
+      "potions": [
+        {
+          "id": "hpPotion10",
+          "count": 2
+        },
+        {
+          "id": "spPotion10",
+          "count": 2
+        }
+      ]
     }
   },
   "adventureMerchants": [
