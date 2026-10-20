@@ -4,6 +4,7 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
+import {Worker} from "node:worker_threads";
 
 export const ROOT=process.cwd();
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
@@ -181,6 +182,142 @@ async function waitJson(url,{timeoutMs=15000}={}){
     throw error;
 }
 
+// Read only a bounded proc metadata window, never a mapped file's contents.
+function readProcWindow(file,limit){
+    let fd;
+    try{
+        fd=fs.openSync(file,'r');
+        const buffer=Buffer.alloc(limit+1);let bytes=0;
+        // proc seq_file reads can return one page before EOF. Keep reading
+        // inside the time-bounded worker, while retaining the byte ceiling.
+        while(bytes<buffer.length){
+            const count=fs.readSync(fd,buffer,bytes,buffer.length-bytes,null);
+            if(count===0)break;
+            bytes+=count;
+        }
+        return {text:buffer.subarray(0,Math.min(bytes,limit)).toString('utf8'),truncated:bytes>limit};
+    }catch(error){return {error:error.code||String(error.message)};}
+    finally{if(fd!==undefined)try{fs.closeSync(fd);}catch{}}
+}
+
+function observeProcPageWait(base,{timeoutMs=200,workerSource}={}){
+    const started=performance.now(),evidence={status:'pending',budgetMs:timeoutMs};
+    const source=workerSource||`const fs=require('node:fs');const {parentPort,workerData}=require('node:worker_threads');
+        const readProcWindow=${readProcWindow.toString()};
+        const started=performance.now();const result={syscall:readProcWindow(workerData+'/syscall',4096),maps:readProcWindow(workerData+'/maps',128*1024),stack:readProcWindow(workerData+'/stack',4096)};
+        parentPort.postMessage({...result,readDurationMs:Math.round(performance.now()-started)});`;
+    // A worker shares this parent's process credentials, unlike a sibling
+    // strace process. A stuck proc read must never block the launch deadline.
+    const worker=new Worker(source,{eval:true,workerData:base});
+    const stop=reason=>{
+        if(evidence.status!=='pending')return;
+        evidence.status=reason;evidence.settledAfterMs=Math.round(performance.now()-started);clearTimeout(timer);
+        worker.terminate().catch(()=>{}); // Never await a blocked native read.
+    };
+    const timer=setTimeout(()=>stop('timeout'),timeoutMs);timer.unref();
+    worker.once('message',result=>{
+        if(evidence.status!=='pending')return;
+        clearTimeout(timer);Object.assign(evidence,result,{status:'captured',settledAfterMs:Math.round(performance.now()-started)});
+    });
+    worker.once('error',error=>{if(evidence.status==='pending'){evidence.error=String(error.message);stop('error');}});
+    worker.unref();
+    return {evidence,stop};
+}
+
+// Observe the existing first launch only: no warmup, retry or acceptance change.
+function observeChromeStartup(child,{port,output}){
+    const started=performance.now(),timers=[],samples=[],procCollectors=[];
+    const evidence={pid:child.pid??null,platform:process.platform,port,samples,firstStderrMs:null,stderrHead:'',stderrTail:'',trace:null};
+    let finished=false,exited=false,tracer,traceTimer,traceClosed,traceStopPromise;
+    const elapsed=()=>Math.round(performance.now()-started);
+    child.stderr?.on('data',chunk=>{
+        if(finished)return;
+        if(evidence.firstStderrMs===null)evidence.firstStderrMs=elapsed();
+        if(evidence.stderrHead.length<4000)evidence.stderrHead=(evidence.stderrHead+chunk).slice(0,4000);
+        evidence.stderrTail=(evidence.stderrTail+chunk).slice(-4000);
+    });
+    child.once('error',error=>{evidence.spawnError=String(error.message);});
+    child.once('exit',(code,signal)=>{exited=true;timers.forEach(clearTimeout);stopTrace();evidence.exit={atMs:elapsed(),code,signal};});
+    function snapshot(){
+        const sample={atMs:elapsed(),processes:[],listeners:[]};
+        if(process.platform!=='linux'||exited)return sample;
+        const read=(file)=>{try{return fs.readFileSync(file,'utf8').trim();}catch(error){return 'READ_ERROR:'+error.code;}};
+        const pending=[child.pid],seen=new Set();
+        while(pending.length&&seen.size<32){
+            const pid=pending.shift();if(!Number.isInteger(pid)||seen.has(pid))continue;seen.add(pid);
+            const base='/proc/'+pid,record={pid};
+            for(const key of ['comm','stat','wchan','schedstat','io'])record[key]=read(base+'/'+key).slice(0,1200);
+            try{record.exe=fs.readlinkSync(base+'/exe');}catch(error){record.exe='READ_ERROR:'+error.code;}
+            try{record.files=fs.readdirSync(base+'/fd').sort((a,b)=>Number(a)-Number(b)).slice(0,24).map(fd=>{try{return {fd:Number(fd),target:fs.readlinkSync(base+'/fd/'+fd).slice(0,200)};}catch(error){return {fd:Number(fd),error:error.code};}});}catch(error){record.files=[{error:error.code}];}
+            // Existing evidence repeatedly identifies the main process in a
+            // folio wait. Preserve its raw syscall/PC, mappings and kernel stack
+            // to distinguish the next hypothesis; a PC mapping alone does not
+            // identify the data page being waited for. Denials remain evidence.
+            if(!finished&&pid===child.pid&&/folio_wait/.test(record.wchan)){
+                const collector=observeProcPageWait(base);procCollectors.push(collector);
+                record.pageWait=collector.evidence;record.pageWait.startedAtMs=elapsed();
+            }
+            const children=read(base+'/task/'+pid+'/children');
+            record.children=children;pending.push(...children.split(/\s+/).filter(p=>/^\d+$/.test(p)).map(Number));
+            sample.processes.push(record);
+        }
+        const hexPort=Number(port).toString(16).toUpperCase().padStart(4,'0');
+        for(const table of ['tcp','tcp6']){
+            const data=read('/proc/net/'+table);
+            sample.listeners.push(...data.split('\n').filter(line=>{const fields=line.trim().split(/\s+/);return fields[1]?.endsWith(':'+hexPort)&&fields[3]==='0A';}).map(line=>({table,row:line.trim()})));
+        }
+        return sample;
+    }
+    function stopTrace(){
+        clearTimeout(traceTimer);
+        if(!tracer)return Promise.resolve();
+        if(traceStopPromise)return traceStopPromise;
+        traceStopPromise=(async()=>{
+            if(tracer.exitCode===null)tracer.kill('SIGINT');
+            const waitClosed=ms=>new Promise(resolve=>{
+                const timer=setTimeout(()=>resolve(false),ms);
+                traceClosed.then(()=>{clearTimeout(timer);resolve(true);});
+            });
+            if(!await waitClosed(300)){
+                evidence.trace.closeTimedOut=true;
+                if(tracer.exitCode===null)tracer.kill('SIGKILL');
+                evidence.trace.drainedAfterKill=await waitClosed(100);
+            }
+        })().catch(error=>{evidence.trace.cleanupError=String(error.message);});
+        return traceStopPromise;
+    }
+    function sample(atMs){
+        if(finished||exited)return;
+        samples.push(snapshot());
+        if(atMs!==5000||process.platform!=='linux')return;
+        // Attach once for two seconds; missing tools/ptrace denial are evidence,
+        // never reasons to install tools, change kernel policy or retry Chrome.
+        const binary=['/usr/bin/strace','/bin/strace'].find(file=>fs.existsSync(file));
+        if(!binary){evidence.trace={unavailable:'strace not installed'};return;}
+        const pids=samples.at(-1).processes.filter(p=>!p.exe.startsWith('READ_ERROR:')).map(p=>String(p.pid));
+        if(!pids.length)return;
+        evidence.trace={startedAtMs:elapsed(),pids,text:''};
+        tracer=spawn(binary,['-f','-tt','-T','-s','120','-e','trace=%process,%file,futex,poll,ppoll,epoll_wait,connect,flock',...pids.flatMap(pid=>['-p',pid])],{stdio:['ignore','ignore','pipe']});
+        traceClosed=new Promise(resolve=>tracer.once('close',resolve));
+        tracer.stderr.on('data',chunk=>{evidence.trace.text=(evidence.trace.text+chunk).slice(-16000);});
+        tracer.once('error',error=>{evidence.trace.error=String(error.message);});
+        tracer.once('exit',(code,signal)=>{evidence.trace.exit={atMs:elapsed(),code,signal};});
+        traceTimer=setTimeout(stopTrace,2000);
+    }
+    if(process.platform==='linux')for(const ms of [1000,5000,10000])timers.push(setTimeout(()=>{try{sample(ms);}catch(error){evidence.observerError=String(error.message);}},ms));
+    return {async finish(outcome){
+        if(finished)return evidence;
+        finished=true;timers.forEach(clearTimeout);const cleanup=stopTrace();
+        try{
+            samples.push(snapshot());procCollectors.forEach(c=>c.stop('observer-finished'));evidence.outcome=outcome;evidence.finishedAtMs=elapsed();
+            await cleanup;
+            if(output)try{fs.writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');}catch(error){evidence.artifactError=String(error.message);}
+            try{console.log('Chrome startup observation: '+JSON.stringify(evidence));}catch{}
+        }catch(error){evidence.observerError=String(error.message);}
+        return evidence;
+    }};
+}
+
 class Cdp{
     constructor(url){
         this.ws=new WebSocket(url);this.id=0;this.pending=new Map();this.events=[];
@@ -208,4 +345,4 @@ class Cdp{
 }
 
 
-export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure};
+export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup,readProcWindow,observeProcPageWait};
