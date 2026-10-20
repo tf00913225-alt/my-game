@@ -12,18 +12,19 @@ const {createCanonicalCurrentRecovery}=require('../functions/src/canonical-curre
 const {createCanonicalPatrolSettlement}=require('../functions/src/canonical-patrol-settlement');
 const auditId='immutable-candidate-audit-001',operationId='immutable-publication-0001';
 const args={auditId,expectedEpoch:1,operationId};
-function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'}){
+function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'},artifactHelper){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
     let source=readFileSync(filename,'utf8');
     const needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(source.split(needle).length,2);
-    source=source.replace(needle,'return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
+    source=source.replace(needle,'return Object.freeze({pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
     if(enabled){
         source=source.replace('return buildRecoveryOwner(deps,null,false);','return buildRecoveryOwner(deps,require("test-only-immutable-candidate-io"),false);');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
-    source=source.replace('return Object.freeze({pinCandidatePublication,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinCandidatePublication,');
+    source=source.replace('return Object.freeze({pinRawCapture,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinRawCapture,');
+    if(artifactHelper){const native=compiled.require.bind(compiled);compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);}
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
 // Only the fixture adapts its in-memory references to SDK public query APIs.
@@ -37,7 +38,7 @@ function sdkDb(db){
         get:()=>db.runTransaction(tx=>tx.get(row))});
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path)),runTransaction:operation=>db.runTransaction(operation)};
 }
-async function fixture(io){
+async function fixture(io,artifactHelper){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);
     let authTime=Math.floor(h.clock/1000),session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,session}});
@@ -68,7 +69,7 @@ async function fixture(io){
         transactionDepth++;try{return await callback(facade);}finally{transactionDepth--;}
     });
     return {h,deps,request,root,sessions,original,traces,
-        private:lexicalFactory(true,io)(deps),disabled:lexicalFactory(false)(deps),get transactionDepth(){return transactionDepth;},
+        proof:lexicalFactory(false,undefined,artifactHelper)(deps),private:lexicalFactory(true,io)(deps),disabled:lexicalFactory(false)(deps),get transactionDepth(){return transactionDepth;},
         takeover:async()=>{h.advance(1000);authTime=Math.floor(h.clock/1000);session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});}};
 }
 async function artifact(f){const pin=await f.private.pinCandidatePublication(f.request(),args);
@@ -283,4 +284,98 @@ test('ACK rollback and concurrent proofs preserve exact tuple; takeover, expiry 
         await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared));
         assert.equal(f.h.writes,writes);assert.equal(f.io.calls.filter(([kind])=>kind==='create').length,creates);
     }
+});
+
+async function pinnedProofMaterial(f){
+    const pin=await f.proof.pinRawCapture(f.request(),args),material=await f.proof.loadPinnedRawMaterial(pin);
+    return {pin,material};
+}
+function clockedArtifact(clock){
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const native=compiled.require.bind(compiled);
+    compiled.require=name=>name==='node:perf_hooks'?{performance:{now:()=>clock.now}}:native(name);
+    compiled._compile(readFileSync(filename,'utf8'),filename);return compiled.exports;
+}
+test('null-IO private pinned proof uses literal loader and final thirteen-point gate without issuing authority',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');let builds=0,token;
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();}};
+    const f=await fixture(undefined,wrapped),before=copy([...f.h.data]),writes=f.h.writes;
+    for(const name of ['pinRawCapture','loadPinnedRawMaterial','verifyPinnedSegmentedProof'])assert.equal(Object.hasOwn(f.original,name),false);
+    const {pin,material}=await pinnedProofMaterial(f);assert.equal(builds,1);
+    const scans=f.traces.slice(1);assert(scans.length>=6);assert(scans.every(t=>t.queries===1&&t.points===0&&t.writes===0));
+    f.traces.length=0;
+    const result=await f.proof.verifyPinnedSegmentedProof(f.request(),pin,material);
+    assert.equal(builds,1);assert.equal(result.segmentedProofValid,true);
+    for(const flag of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[flag],false);
+    for(const key of ['bytes','artifact','records','documents','identity'])assert.equal(Object.hasOwn(result,key),false);
+    assert.deepEqual(f.traces,[{points:13,queries:0,writes:0}]);
+    const usage=helper.recoveryAuditAssemblyUsage(token);assert.deepEqual({...result.assemblyUsage,elapsedMs:0},{...usage,elapsedMs:0});
+    assert(usage.elapsedMs>=result.assemblyUsage.elapsedMs);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),pin,material),/original private/);
+});
+test('private pinned proof rejects forged, cross-pin and corrupt material without writes or new origin',async()=>{
+    const f=await fixture(),ready=await pinnedProofMaterial(f),other=await f.proof.pinRawCapture(f.request(),{...args,operationId:'pinned-proof-second-origin'});
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),{},ready.material),/original private/);
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,{}),/original private/);
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),other,ready.material),/another pin/);
+    const chunk=[...f.h.data.keys()].find(path=>path.startsWith(f.root+'/proofPayloadChunks/'));
+    f.h.data.get(chunk).payloadBytes[50]^=1;
+    const writes=f.h.writes;await assert.rejects(f.proof.loadPinnedRawMaterial(ready.pin),/chunk|payload/i);
+    assert.equal(f.h.writes,writes);
+});
+test('private pinned proof final gate rejects changed epoch, session, fence, raw head and expired approval',async()=>{
+    for(const change of [
+        f=>{f.h.data.get(f.root.replace('/recoveryAuditRuns/'+auditId,'')+'/recoveryAuditFence/current').epoch++;},
+        f=>{f.h.data.get(f.root).epoch++;},
+        f=>{f.h.data.get(f.root+'/proofState/current').stateSha256='f'.repeat(64);},
+        f=>f.h.advance(60000),
+        f=>f.takeover(),
+        f=>f.original.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'pinned-proof-cancel-audit'})
+    ]){
+        const f=await fixture(),ready=await pinnedProofMaterial(f);await change(f);const before=copy([...f.h.data]),writes=f.h.writes;
+        await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material));
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    }
+});
+test('private pinned proof shares loader sticky work and elapsed deadline including awaited IO and final resolve',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');let token;
+    const f=await fixture(undefined,{...helper,createRecoveryAuditAssemblyBudget:()=>token=helper.createRecoveryAuditAssemblyBudget()}),ready=await pinnedProofMaterial(f);
+    helper.chargeRecoveryAuditAssembly(token,'nodes',16000000);const writes=f.h.writes;f.traces.length=0;
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/nodes budget exceeded/);
+    assert.throws(()=>helper.recoveryAuditAssemblyUsage(token),/nodes budget exceeded/);assert.equal(f.traces.length,0);assert.equal(f.h.writes,writes);
+    for(const phase of ['loader-await','before-proof','final-resolve']){
+        const clock={now:0},g=await fixture(undefined,clockedArtifact(clock)),pin=await g.proof.pinRawCapture(g.request(),args);
+        if(phase==='loader-await'){
+            const native=g.h.dependencies.db.runTransaction;g.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);clock.now=30001;return result;};
+            await assert.rejects(g.proof.loadPinnedRawMaterial(pin),/deadline exceeded/);
+        }else{
+            const material=await g.proof.loadPinnedRawMaterial(pin);
+            if(phase==='before-proof')clock.now=30001;
+            else{const native=g.h.dependencies.db.runTransaction;g.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);clock.now=30001;return result;};}
+            const original=copy([...g.h.data]),count=g.h.writes;
+            await assert.rejects(g.proof.verifyPinnedSegmentedProof(g.request(),pin,material),/deadline exceeded/);
+            assert.deepEqual([...g.h.data],original);assert.equal(g.h.writes,count);
+        }
+    }
+});
+
+test('private pinned proof final SDK retry rechecks binding and rollback cannot return proof success',async()=>{
+    for(const change of [false,true]){
+        const f=await fixture(),ready=await pinnedProofMaterial(f),writes=f.h.writes,native=f.h.dependencies.db.runTransaction;let attempts=0;
+        f.h.dependencies.db.runTransaction=operation=>native(async tx=>{
+            const result=await operation(tx);
+            if(++attempts===1){if(change)f.h.data.get(f.root+'/proofState/current').stateSha256='e'.repeat(64);
+                throw Object.assign(Error('SDK retry'),{code:10});}
+            return result;
+        });
+        if(change)await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material));
+        else{const result=await f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material);assert.equal(result.segmentedProofValid,true);assert.equal(attempts,2);}
+        assert.equal(f.h.writes,writes);
+    }
+    const f=await fixture(),ready=await pinnedProofMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
+    f.h.abortNext();await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/rollback/);
+    assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);
+    await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/original private/);
 });
