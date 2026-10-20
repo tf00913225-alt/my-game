@@ -2,7 +2,23 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import crypto from "node:crypto";
 import {compactBootJavaScript} from "../scripts/lib/boot-javascript-compact.mjs";
+
+test("Production target hashes and publishes identical LF bytes for LF, CRLF and mixed sources",()=>{
+    const builder=fs.readFileSync(new URL("../scripts/build-production.mjs",import.meta.url),"utf8");
+    const hash=builder.match(/const hash=value=>[^\n]+/),target=builder.match(/function target\(name,extension,content\)\{[\s\S]*?\n\}/);
+    assert.ok(hash);assert.ok(target);
+    const context={crypto};vm.createContext(context);vm.runInContext(hash[0]+"\n"+target[0],context);
+    const canonical='/* 江湖 */\nconst title="山關";\nconst dialogue=`首句\n次句`;\n';
+    const digest=crypto.createHash('sha256').update(Buffer.from(canonical,'utf8')).digest('hex').slice(0,12);
+    for(const source of [canonical,canonical.replaceAll('\n','\r\n'),canonical.replace('*/\n','*/\r\n').replace('首句\n','首句\r\n')]){
+        const output=context.target('newline-regression','js',source);
+        assert.equal(output.content,canonical);assert.equal(output.digest,digest);assert.equal(output.path,`build/newline-regression.${digest}.js`);
+        assert.deepEqual(Buffer.from(output.content,'utf8'),Buffer.from(canonical,'utf8'));
+        const repeated=context.target('newline-regression','js',output.content);assert.equal(repeated.path,output.path);assert.equal(repeated.content,output.content);
+    }
+});
 
 test("Boot lexical compact retains ASI, operators, regex, templates and literal bytes",()=>{
     const source=String.raw`

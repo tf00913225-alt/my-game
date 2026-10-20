@@ -116,9 +116,10 @@
         const reward=CONTENT().rewards[node.rewardId];
         if(!reward){return '<span class="adventure-reward-note">沿途探索</span>';}
         const entries=[];
-        if(reward.gold){entries.push('<span title="金幣 '+reward.gold+'">◉<b>'+reward.gold+'</b></span>');}
-        if(reward.sharedExp){entries.push('<span title="共用經驗 '+reward.sharedExp+'">EXP<b>'+reward.sharedExp+'</b></span>');}
-        if(reward.starterEquipmentFunding){entries.push('<span title="護具購置金">◉<b>護具金</b></span>');}
+        const coin='<i class="adventure-reward-coin" aria-hidden="true">◆</i>';
+        if(reward.gold){entries.push('<span title="金幣 '+reward.gold+'">'+coin+'<b>'+reward.gold+'</b></span>');}
+        if(reward.sharedExp){entries.push('<span title="共用經驗 '+reward.sharedExp+'"><i class="adventure-reward-exp" aria-hidden="true">EXP</i><b>'+reward.sharedExp+'</b></span>');}
+        if(reward.starterEquipmentFunding){entries.push('<span title="護具購置金">'+coin+'<b>置裝</b></span>');}
         for(const potion of reward.potions||[]){
             const definition=typeof potionDefinitions!=="undefined"?potionDefinitions.find(p=>p.id===potion.id):null;
             entries.push('<span title="'+attr((definition?.name||potion.id)+' ×'+potion.count)+'">'+(definition?.icon||'藥')+'<b>×'+potion.count+'</b></span>');
@@ -138,11 +139,13 @@
         const required=window.FourSymbolsHeroAcquisition?.getRequiredStoryNode?.();
         const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
         const scene=CONTENT().storyPresentation.scenes[node.scene]||CONTENT().storyPresentation.scenes.road;
+        const reward=CONTENT().rewards[node.rewardId];
+        const rewardLabel=reward?(view.state.rewardClaims[node.id]==='claimed'?'首次獎勵 · 已領取':'首次獎勵'):'';
         return '<aside class="adventure-node-sheet is-'+esc(status)+'" aria-live="polite">'+
             '<img class="adventure-sheet-preview" src="'+attr(scene)+'" alt="'+attr(node.title)+'場景">'+
             '<div class="adventure-sheet-content"><div class="adventure-sheet-title"><span class="adventure-sheet-icon" aria-hidden="true">'+mapNodeIcon(node.type,false)+'</span><h2>'+esc(node.title)+'</h2><small>'+esc(labels[node.type]||'章節節點')+'</small></div>'+
             '<p>'+esc(node.detail||node.subtitle||'沿山路前行，探訪江湖。')+'</p>'+
-            '<div class="adventure-sheet-actions"><div class="adventure-reward-preview" aria-label="關卡獎勵">'+mapRewardPreview(node)+'</div><details class="adventure-stage-picker" id="adventureStagePicker"><summary aria-label="選擇已解鎖關卡">關卡一覽 ▴</summary><div class="adventure-stage-list" data-scroll-owner="y">'+replay+options+'</div></details>'+
+            '<div class="adventure-sheet-actions"><div class="adventure-reward-block">'+(rewardLabel?'<span class="adventure-reward-caption">'+esc(rewardLabel)+'</span>':'')+'<div class="adventure-reward-preview" aria-label="關卡獎勵">'+mapRewardPreview(node)+'</div></div><details class="adventure-stage-picker" id="adventureStagePicker"><summary aria-label="選擇已解鎖關卡">關卡一覽 ▴</summary><div class="adventure-stage-list" data-scroll-owner="y">'+replay+options+'</div></details>'+
             '<button type="button" class="adventure-button primary" aria-label="'+attr(action+'第 '+node.stage+' 關 · '+node.title)+'" '+(disabled?'disabled':'onclick="FourSymbolsAdventure.activateSelectedNode()"')+'>'+action+' <span aria-hidden="true">›</span></button></div></div></aside>';
     }
 
