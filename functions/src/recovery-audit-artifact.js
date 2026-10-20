@@ -373,22 +373,218 @@ function recoveryAuditQueryShapes(root){
     add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
     return queries;
 }
-function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBudget){
+// Version3 is a syntax-only container for the original raw material. It does
+// not run Recovery source/receipt-chain/rights proof or issue a trusted point.
+const RAW_ARCHIVE_SHAPES=Object.freeze({
+    header:["type","schemaVersion","kind","binding"],control:["type","name","data"],
+    "inventory-page":["type","id","metadata","payloadBase64","sha256"],
+    "raw-receipt":["type","id","data"],"raw-chunk":["type","id","metadata","payloadBase64","sha256"],
+    footer:["type","frameCount","inventoryPageCount","receiptCount","chunkCount","payloadByteLength","framesSha256"]
+});
+const RAW_CONTROL_NAMES=Object.freeze(["run","inventoryState","rawState"]);
+const RAW_GROUPS=Object.freeze([["inventoryPages","inventory-page",317,128*1024],["rawReceipts","raw-receipt",4096,0],
+    ["rawChunks","raw-chunk",4096*8,256*1024]]);
+function rawArchiveBudget(token){if(!assemblyBudgets.has(token))bad("unknown assembly budget");assemblyCharge(token);}
+function rawArchiveObject(row){
+    if(!row||![Object.prototype,null].includes(Object.getPrototypeOf(row)))bad("raw archive object");
+    for(const key of Object.keys(row))if(!Object.hasOwn(Object.getOwnPropertyDescriptor(row,key),"value"))bad("raw archive accessor");
+}
+function rawArchiveID(id,previous,token){
+    if(typeof id!=="string"||!id||id.includes("/")||!id.isWellFormed())bad("raw archive entry order or ID");
+    if(previous!==null){assemblyCharge(token,"bytes",Buffer.byteLength(previous,"utf8")+Buffer.byteLength(id,"utf8"));
+        if(compareNames(previous,id)>=0)bad("raw archive entry order or ID");}
+}
+function rawArchiveTyped(node,token){
+    const decoded=value(node),tree=encodedValue(decoded,0,{nodes:0},token),a=rawArchiveJSONMetrics(tree,token),b=rawArchiveJSONMetrics(node,token);
+    assemblyCharge(token,"bytes",a.length+b.length);
+    const canonical=JSON.stringify(tree),original=JSON.stringify(node);
+    if(canonical!==original)bad("raw archive typed encoding");
+    return decoded;
+}
+function rawArchiveBase64(text,maximum,token){
+    if(typeof text!=="string"||!text.length||text.length%4||! /^[A-Za-z0-9+/]*={0,2}$/.test(text))bad("raw archive base64");
+    const alphabet="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+    if((text.endsWith("==")&&(alphabet.indexOf(text.at(-3))&15))||
+       (!text.endsWith("==")&&text.endsWith("=")&&(alphabet.indexOf(text.at(-2))&3)))bad("raw archive base64");
+    const length=text.length/4*3-(text.endsWith("==")?2:text.endsWith("=")?1:0);
+    if(length<1||length>maximum)bad("raw archive payload size");
+    assemblyCharge(token,"bytes",length);
+    const bytes=Buffer.from(text,"base64");
+    assemblyCharge(token,"bytes",text.length);
+    if(bytes.length!==length||bytes.toString("base64")!==text)bad("raw archive base64");
+    return bytes;
+}
+// Resource oracle only: it emits no JSON/bytes and changes no value semantics.
+// Native candidateFrameText remains the only frame serializer.
+function rawArchiveJSONMetrics(input,token){
+    let nodes=0;const active=new WeakSet(),maximum=LIMITS.frameBytes;
+    const bounded=length=>{if(length>maximum)bad("frame size");return length;};
+    const stringLength=text=>{
+        let length=2;
+        for(let i=0;i<text.length;i++){
+            if((i&1023)===0)assemblyCharge(token);
+            const code=text.charCodeAt(i);
+            if(code===34||code===92)length+=2;
+            else if(code<32)length+=(code===8||code===9||code===10||code===12||code===13)?2:6;
+            else if(code<128)length++;
+            else if(code<2048)length+=2;
+            else if(code>=55296&&code<=56319){const next=text.charCodeAt(i+1);
+                if(next>=56320&&next<=57343){length+=4;i++;}else length+=6;
+            }else length+=code>=56320&&code<=57343?6:3;
+            bounded(length);
+        }
+        return length;
+    };
+    const visit=(row,depth)=>{
+        assemblyCharge(token,"nodes",1);nodes++;
+        if(nodes>LIMITS.nodes||depth>LIMITS.depth*3+8)bad("parsed node or depth limit");
+        if(row===null)return 4;
+        if(typeof row==="string")return stringLength(row);
+        if(typeof row==="boolean")return row?4:5;
+        if(typeof row==="number"&&Number.isFinite(row)){
+            // Native finite JSON-number spelling is at most24 ASCII bytes.
+            admitRecoveryAuditAssemblyBytes(token,24);const text=String(row);assemblyCharge(token,"bytes",text.length);return text.length;
+        }
+        if(!row||typeof row!=="object"||active.has(row)||
+           (!Array.isArray(row)&&![Object.prototype,null].includes(Object.getPrototypeOf(row))))bad("raw archive JSON resource shape");
+        active.add(row);let length=2;
+        const array=Array.isArray(row),keys=array?null:Object.keys(row);
+        if(array){let seen=0;for(const key in row){const index=Number(key);
+            if(!Object.hasOwn(row,key)||!Number.isSafeInteger(index)||index<0||index>=row.length||String(index)!==key)bad("raw archive array shape");
+            seen++;if((seen&1023)===0)assemblyCharge(token);}
+            if(seen!==row.length)bad("raw archive array shape");}
+        for(let i=0;i<(array?row.length:keys.length);i++){
+            const key=array?String(i):keys[i],descriptor=Object.getOwnPropertyDescriptor(row,key);
+            if(!descriptor||!Object.hasOwn(descriptor,"value"))bad("raw archive accessor");
+            if(i)length++;
+            if(!Array.isArray(row))length+=stringLength(key)+1;
+            length+=visit(descriptor.value,depth+1);bounded(length);
+        }
+        active.delete(row);return length;
+    };
+    return {length:visit(input,0),nodes};
+}
+function rawArchiveTypedEncode(row,token){
+    const active=new WeakSet();
+    const check=(value,depth)=>{
+        assemblyCharge(token,"nodes",1);if(depth>LIMITS.depth)bad("typed value or resource limit");
+        if(!value||typeof value!=="object")return;
+        if(active.has(value)||Buffer.isBuffer(value))bad("raw archive data cycle or shape");
+        active.add(value);
+        if(Array.isArray(value)){let seen=0;
+            if(Object.getPrototypeOf(value)!==Array.prototype)bad("raw archive array shape");
+            for(const key in value){const index=Number(key);
+                if(!Object.hasOwn(value,key)||!Number.isSafeInteger(index)||index<0||index>=value.length||String(index)!==key)bad("raw archive array shape");seen++;}
+            if(seen!==value.length)bad("raw archive array shape");}
+        for(const key of Object.keys(value)){const descriptor=Object.getOwnPropertyDescriptor(value,key);
+            if(!descriptor||!Object.hasOwn(descriptor,"value"))bad("raw archive accessor");check(descriptor.value,depth+1);}
+        // Do not execute a caller getter while the original typed Owner tests
+        // its Timestamp interface. Real Timestamp prototype methods are kept.
+        for(let proto=value;proto;proto=Object.getPrototypeOf(proto)){
+            const descriptor=Object.getOwnPropertyDescriptor(proto,"toMillis");if(descriptor){if(!Object.hasOwn(descriptor,"value"))bad("raw archive accessor");break;}}
+        active.delete(value);
+    };
+    check(row,0);return encodedValue(row,0,{nodes:0},token);
+}
+function encodeRawRecoveryArchive(material,token){
+    rawArchiveBudget(token);assemblyCharge(token,"passes",1);
+    exact(material,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"]);
+    rawArchiveObject(material);rawArchiveObject(material.binding);
+    exact(material.binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"]);
+    const plan=[];let size=MAGIC.length,payloadByteLength=0,base64Work=0,jsonWork=0,idWork=0,outerNodes=0;
+    const add=(frame,payloadBytes)=>{
+        const metric=rawArchiveJSONMetrics(frame,token),base64Length=payloadBytes?4*Math.ceil(payloadBytes.length/3):0,length=metric.length+base64Length;
+        if(length>LIMITS.frameBytes)bad("frame size");
+        if(size+length+4>LIMITS.bytes||plan.length>=LIMITS.frames)bad("bytes or frame limit");
+        if((outerNodes+=metric.nodes)>LIMITS.nodes)bad("parsed node or depth limit");
+        plan.push({frame,payloadBytes,length});size+=length+4;jsonWork+=length;base64Work+=base64Length;
+    };
+    add({type:"header",schemaVersion:3,kind:"canonical-recovery-raw-archive",binding:rawArchiveTypedEncode(material.binding,token)});
+    for(const name of RAW_CONTROL_NAMES){rawArchiveObject(material[name]);add({type:"control",name,data:rawArchiveTypedEncode(material[name],token)});}
+    for(const [key,type,maximum,leafMaximum] of RAW_GROUPS){
+        const entries=material[key];if(!Array.isArray(entries)||entries.length>maximum)bad("raw archive entry count");let previous=null;
+        for(const entry of entries){
+            assemblyCharge(token,"operations",1);rawArchiveObject(entry);exact(entry,["id","row"]);rawArchiveID(entry.id,null,token);
+            if(previous!==null)idWork+=Buffer.byteLength(previous,"utf8")+Buffer.byteLength(entry.id,"utf8");previous=entry.id;
+            rawArchiveObject(entry.row);
+            if(!leafMaximum){add({type,id:entry.id,data:rawArchiveTypedEncode(entry.row,token)});continue;}
+            const {payloadBytes,...metadata}=entry.row;
+            if(!Buffer.isBuffer(payloadBytes)||!payloadBytes.length||payloadBytes.length>leafMaximum)bad("raw archive payload size");
+            payloadByteLength+=payloadBytes.length;
+            add({type,id:entry.id,metadata:rawArchiveTypedEncode(metadata,token),payloadBase64:"",sha256:"0".repeat(64)},payloadBytes);
+        }
+    }
+    add({type:"footer",frameCount:plan.length+1,inventoryPageCount:material.inventoryPages.length,
+        receiptCount:material.rawReceipts.length,chunkCount:material.rawChunks.length,payloadByteLength,framesSha256:"0".repeat(64)});
+    // All frame/base64 lengths and the outer parsed-node count are known before
+    // any JSON/base64/Buffer output allocation. Admission cannot spend raw reservations.
+    admitRecoveryAuditAssemblyBytes(token,base64Work+jsonWork+size+4+idWork);
+    for(const [key] of RAW_GROUPS){let previous=null;for(const entry of material[key]){rawArchiveID(entry.id,previous,token);previous=entry.id;}}
+    assemblyCharge(token,"bytes",4);const prefix=Buffer.alloc(4),hash=createHash("sha256").update(MAGIC),frames=[];
+    for(let i=0;i<plan.length;i++){
+        assemblyCharge(token,"operations",1);const {frame,payloadBytes,length}=plan[i];
+        if(payloadBytes){assemblyCharge(token,"bytes",4*Math.ceil(payloadBytes.length/3));frame.payloadBase64=payloadBytes.toString("base64");
+            frame.sha256=createHash("sha256").update(payloadBytes).digest("hex");}
+        if(i===plan.length-1)frame.framesSha256=hash.digest("hex");
+        assemblyCharge(token,"bytes",length);const encoded=candidateFrameText(frame,token);
+        if(encoded.length!==length)bad("raw archive resource length differs");frames.push(encoded);
+        if(i<plan.length-1){prefix.writeUInt32BE(length);hash.update(prefix).update(encoded.text,"utf8");}
+    }
+    assemblyCharge(token,"bytes",size);const bytes=Buffer.alloc(size);MAGIC.copy(bytes);writeCandidateFrames(bytes,MAGIC.length,frames,token);return bytes;
+}
+function decodeRawRecoveryArchive(input,token){
+    rawArchiveBudget(token);assemblyCharge(token,"passes",1);
+    const {frames,bytes}=readRecoveryFrames(input,token,true);
+    if(frames.length<5)bad("raw archive header/footer");
+    const header=frames[0],footer=frames.at(-1);
+    if(header.type!=="header"||header.schemaVersion!==3||header.kind!=="canonical-recovery-raw-archive")bad("raw archive version");
+    if(footer.type!=="footer"||footer.frameCount!==frames.length)bad("raw archive footer");
+    const binding=rawArchiveTyped(header.binding,token);rawArchiveObject(binding);exact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"]);
+    const material={binding};let index=1,payloadByteLength=0;
+    for(const name of RAW_CONTROL_NAMES){const frame=frames[index++];
+        if(frame?.type!=="control"||frame.name!==name)bad("raw archive control order");material[name]=rawArchiveTyped(frame.data,token);rawArchiveObject(material[name]);}
+    for(const [key,type,maximum,leafMaximum] of RAW_GROUPS){
+        const entries=[];let previous=null;
+        while(index<frames.length-1&&frames[index].type===type){
+            assemblyCharge(token,"operations",1);const frame=frames[index++];if(entries.length>=maximum)bad("raw archive entry count");
+            rawArchiveID(frame.id,previous,token);previous=frame.id;let row;
+            if(leafMaximum){
+                const metadata=rawArchiveTyped(frame.metadata,token);rawArchiveObject(metadata);
+                if(Object.hasOwn(metadata,"payloadBytes"))bad("raw archive duplicate payload");
+                const payloadBytes=rawArchiveBase64(frame.payloadBase64,leafMaximum,token);
+                if(typeof frame.sha256!=="string"||! /^[a-f0-9]{64}$/.test(frame.sha256)||createHash("sha256").update(payloadBytes).digest("hex")!==frame.sha256)bad("raw archive payload hash");
+                payloadByteLength+=payloadBytes.length;row={...metadata,payloadBytes};
+            }else{row=rawArchiveTyped(frame.data,token);rawArchiveObject(row);}
+            entries.push({id:frame.id,row});
+        }
+        material[key]=entries;
+    }
+    if(index!==frames.length-1||footer.inventoryPageCount!==material.inventoryPages.length||footer.receiptCount!==material.rawReceipts.length||
+       footer.chunkCount!==material.rawChunks.length||footer.payloadByteLength!==payloadByteLength)bad("raw archive order or counts");
+    let footerOffset=MAGIC.length;for(let i=0;i<frames.length-1;i++){assemblyCharge(token);footerOffset+=4+bytes.readUInt32BE(footerOffset);}
+    if(typeof footer.framesSha256!=="string"||! /^[a-f0-9]{64}$/.test(footer.framesSha256)||
+       createHash("sha256").update(bytes.subarray(0,footerOffset)).digest("hex")!==footer.framesSha256)bad("raw archive frames hash");
+    return material;
+}
+function readRecoveryFrames(bytes,assemblyBudget,rawArchive=false){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
     // Copy before parsing: a caller cannot mutate the verified byte array later.
+    if(rawArchive)assemblyCharge(assemblyBudget,"bytes",bytes.length);
     bytes=Buffer.from(bytes);
     const frames=[];let offset=MAGIC.length,nodeCount=0;
     while(offset<bytes.length){
         if(frames.length>=LIMITS.frames||offset+4>bytes.length)bad("frame boundary");
         const size=bytes.readUInt32BE(offset);offset+=4;
         if(!size||size>LIMITS.frameBytes||offset+size>bytes.length)bad("frame size");
+        if(rawArchive)assemblyCharge(assemblyBudget,"operations",1);
         const raw=bytes.subarray(offset,offset+size),text=raw.toString("utf8");offset+=size;
         let frame;try{frame=JSON.parse(text);}catch(_){bad("frame JSON");}
-        const shapes={header:frame?.schemaVersion===2?["type","schemaVersion","ownerUid","expectedRevision","auditControl"]:
+        const shapes=rawArchive?RAW_ARCHIVE_SHAPES:{header:frame?.schemaVersion===2?["type","schemaVersion","ownerUid","expectedRevision","auditControl"]:
             ["type","schemaVersion","ownerUid","expectedRevision"],
             footer:["type","frameCount","documentCount","absenceCount"],document:["type","path","data"],
             absence:["type","path"],namespace:["type","path","ids","terminalEmpty"]};
+        if(rawArchive)charge(frame,0);
         if(!frame||!Object.hasOwn(shapes,frame.type))bad("unknown frame");
         exact(frame,shapes[frame.type]);
         // Bound parsed-tree overhead across frames as well as wire bytes. One
@@ -400,11 +596,22 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
             if(Array.isArray(row)){for(const child of row)charge(child,depth+1);}
             else if(row&&typeof row==="object")for(const child of Object.values(row))charge(child,depth+1);
         }
-        charge(frame,0);
+        if(!rawArchive)charge(frame,0);
         // Canonical JSON also rejects duplicate JSON keys and malformed UTF-8.
-        if(JSON.stringify(frame)!==text||!Buffer.from(text).equals(raw))bad("noncanonical JSON");
+        if(rawArchive){
+            const metric=rawArchiveJSONMetrics(frame,assemblyBudget),length=metric.length;
+            assemblyCharge(assemblyBudget,"bytes",length);
+            const canonical=JSON.stringify(frame);
+            if(canonical!==text)bad("noncanonical JSON");
+            assemblyCharge(assemblyBudget,"bytes",length);
+            if(!Buffer.from(canonical).equals(raw))bad("noncanonical JSON");
+        }else if(JSON.stringify(frame)!==text||!Buffer.from(text).equals(raw))bad("noncanonical JSON");
         frames.push(frame);
     }
+    return {frames,bytes};
+}
+function decodeRecoveryAuditArtifact(input,{uid,expectedRevision,db},assemblyBudget){
+    const {frames,bytes}=readRecoveryFrames(input,assemblyBudget);
     if(frames.length<2)bad("missing header/footer");
     const header=frames.shift(),footer=frames.pop();
     exact(header,header.schemaVersion===2?["type","schemaVersion","ownerUid","expectedRevision","auditControl"]:
@@ -506,5 +713,5 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
 
 module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
     chargeRecoveryAuditAssembly:assemblyCharge,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
-    encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    encodeRawRecoveryArchive,decodeRawRecoveryArchive,encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS};

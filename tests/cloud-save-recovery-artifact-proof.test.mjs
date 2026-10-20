@@ -532,3 +532,131 @@ test('v2 approval interval comparisons preserve exact nanosecond boundaries rath
     await assert.rejects(()=>recovery.resumeAudit(m.h.request(),{auditId:m.auditControl.auditId,expectedEpoch:1,expectedRevision:m.h.revision}),
         /operator approval/,'Live expiry retains expiresAt.toMillis() <= now semantics at the exact millisecond');
 });
+
+// Pure syntax pressure fixtures below make no earned-history/proof claim.
+function rawSyntaxMaterial(length=3){
+    const leaf=()=>({metadataMarker:'原😀 " \\ framing',payloadBytes:Buffer.alloc(length,7),sha256:'preserved-original-field'});
+    return {binding:{ownerUid:'syntax-owner',auditId:'syntax-audit-operation',epoch:1,sourceRevision:2,inventoryStateSha256:'a'.repeat(64)},
+        run:{stamp:new TimestampForRawSyntax(1700000000,999999999),nested:{documents:['文😀',-0]}},inventoryState:{syntax:true},rawState:{syntax:true},
+        inventoryPages:[{id:'inventory-a',row:leaf()}],rawReceipts:[{id:'receipt-a',row:{preserve:{unknownToCodec:true}}}],
+        rawChunks:[{id:'chunk-a',row:leaf()},{id:'chunk-b',row:leaf()}]};
+}
+class TimestampForRawSyntax{
+    constructor(seconds,nanoseconds){this.seconds=seconds;this.nanoseconds=nanoseconds;}
+    toMillis(){return this.seconds*1000+Math.floor(this.nanoseconds/1000000);}
+}
+function archiveFrames(bytes){const frames=[];for(let offset=6;offset<bytes.length;){const size=bytes.readUInt32BE(offset);offset+=4;
+    frames.push(JSON.parse(bytes.subarray(offset,offset+size).toString('utf8')));offset+=size;}return frames;}
+function syntaxFrames(frames,seal=true){
+    const parts=[Buffer.from('CSRA1\n')];
+    const append=frame=>{const bytes=Buffer.from(JSON.stringify(frame)),prefix=Buffer.alloc(4);prefix.writeUInt32BE(bytes.length);parts.push(prefix,bytes);};
+    frames.slice(0,-1).forEach(append);
+    if(seal)frames.at(-1).framesSha256=createHash('sha256').update(Buffer.concat(parts)).digest('hex');append(frames.at(-1));return Buffer.concat(parts);
+}
+test('raw archive fixed version frames reject extra, missing, duplicate, reordered, noncanonical and damaged syntax without authority',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),material=rawSyntaxMaterial(),bytes=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget());
+    const mutations=[
+        fs=>{fs[0].schemaVersion=99;},fs=>{fs[0].extra=true;},fs=>{fs[1].type='future-frame';},
+        fs=>{[fs[1],fs[2]]=[fs[2],fs[1]];},fs=>{fs.splice(1,1);},
+        fs=>{fs.findLast(row=>row.type==='raw-chunk').id='chunk-a';},
+        fs=>{const [a,b]=fs.map((r,i)=>r.type==='raw-chunk'?i:-1).filter(i=>i>=0);[fs[a],fs[b]]=[fs[b],fs[a]];},
+        fs=>{fs.at(-1).chunkCount++;},fs=>{fs.at(-1).payloadByteLength++;},
+        fs=>{fs.find(row=>row.type==='raw-chunk').payloadBase64='AB==';},
+        fs=>{fs.find(row=>row.type==='raw-chunk').payloadBase64='Bw==\n';},
+        fs=>{fs.find(row=>row.type==='raw-chunk').sha256='0'.repeat(64);},
+        fs=>{fs.find(row=>row.type==='raw-chunk').metadata=['object',[['z',['number',1]],['a',['number',2]]]];}
+    ];
+    for(const mutate of mutations){const frames=archiveFrames(bytes);mutate(frames);
+        assert.throws(()=>helper.decodeRawRecoveryArchive(syntaxFrames(frames),helper.createRecoveryAuditAssemblyBudget()));}
+    const frames=archiveFrames(bytes);frames.at(-1).framesSha256='0'.repeat(64);
+    assert.throws(()=>helper.decodeRawRecoveryArchive(syntaxFrames(frames,false),helper.createRecoveryAuditAssemblyBudget()),/frames hash/);
+    assert.throws(()=>helper.decodeRawRecoveryArchive(Buffer.concat([bytes,Buffer.from([0])]),helper.createRecoveryAuditAssemblyBudget()),/frame boundary/);
+    for(const mutate of [m=>{m.extra=true;},m=>{delete m.run;},m=>{m.rawChunks[1].id=m.rawChunks[0].id;},m=>{m.rawChunks.reverse();}]){
+        const invalid=rawSyntaxMaterial();mutate(invalid);assert.throws(()=>helper.encodeRawRecoveryArchive(invalid,helper.createRecoveryAuditAssemblyBudget()));
+    }
+    const decoded=helper.decodeRawRecoveryArchive(bytes,helper.createRecoveryAuditAssemblyBudget());
+    assert.equal(decoded.rawChunks[0].row.sha256,'preserved-original-field','syntax container never heals original source metadata');
+    assert.deepEqual(decoded.rawReceipts[0].row,{preserve:{unknownToCodec:true}});
+});
+test('raw archive caller budget is required and sticky, with byte and elapsed admission before Buffer allocation or parse',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),material=rawSyntaxMaterial(),bytes=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget());
+    for(const token of [undefined,{},Object.freeze({})]){
+        assert.throws(()=>helper.encodeRawRecoveryArchive(material,token),/unknown assembly budget/);
+        assert.throws(()=>helper.decodeRawRecoveryArchive(bytes,token),/unknown assembly budget/);
+    }
+    for(const operation of ['encode','decode']){
+        const limited=assemblyHelperFaults({bytes:0}),token=limited.createRecoveryAuditAssemblyBudget();let allocations=0,parses=0;
+        const from=Buffer.from,alloc=Buffer.alloc,parse=JSON.parse;
+        Buffer.from=(...a)=>{allocations++;return from(...a);};Buffer.alloc=(...a)=>{allocations++;return alloc(...a);};JSON.parse=(...a)=>{parses++;return parse(...a);};
+        try{assert.throws(()=>operation==='encode'?limited.encodeRawRecoveryArchive(material,token):limited.decodeRawRecoveryArchive(bytes,token),/bytes budget exceeded/);}
+        finally{Buffer.from=from;Buffer.alloc=alloc;JSON.parse=parse;}
+        assert.equal(allocations,0);assert.equal(parses,0);assert.throws(()=>limited.recoveryAuditAssemblyUsage(token),/bytes budget exceeded/);
+    }
+    let now=0;const timed=assemblyHelperFaults({clock:()=>now}),token=timed.createRecoveryAuditAssemblyBudget();now=30001;
+    assert.throws(()=>timed.encodeRawRecoveryArchive(material,token),/deadline/);assert.throws(()=>timed.decodeRawRecoveryArchive(bytes,token),/deadline/);
+    const small=assemblyHelperFaults({nodes:8}),nodeToken=small.createRecoveryAuditAssemblyBudget();
+    assert.throws(()=>small.decodeRawRecoveryArchive(bytes,nodeToken),/nodes budget/);
+    assert.throws(()=>small.recoveryAuditAssemblyUsage(nodeToken),/nodes budget/);
+    // Malformed frames still pay their actual parsed tree before shape refusal.
+    // A shape-first decoder would throw frame-shape instead and leave this token usable.
+    const malformed=archiveFrames(bytes);malformed[0].extra=Array(100).fill('dense');
+    const strict=assemblyHelperFaults({nodes:64}),badToken=strict.createRecoveryAuditAssemblyBudget();let first;
+    try{strict.decodeRawRecoveryArchive(syntaxFrames(malformed),badToken);}catch(error){first=error;}
+    assert.match(first?.message??'',/assembly nodes budget exceeded/);
+    assert.throws(()=>strict.recoveryAuditAssemblyUsage(badToken),error=>error===first);
+    assert.throws(()=>strict.encodeRawRecoveryArchive(material,badToken),error=>error===first);
+});
+test('raw archive pure syntax leaf pressure keeps original frame/container limits and exact canonical base64',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),material=rawSyntaxMaterial(128*1024),token=helper.createRecoveryAuditAssemblyBudget();
+    material.rawChunks[0].row.payloadBytes=Buffer.alloc(256*1024,255);
+    const bytes=helper.encodeRawRecoveryArchive(material,token),decoded=helper.decodeRawRecoveryArchive(bytes,token);
+    assert.deepEqual(decoded.rawChunks[0].row.payloadBytes,material.rawChunks[0].row.payloadBytes);
+    assert(bytes.length<32*1024*1024);
+    material.rawChunks[0].row.payloadBytes=Buffer.alloc(256*1024+1);
+    assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/payload size/);
+    material.rawChunks[0].row.payloadBytes=Buffer.alloc(1);material.run={oversized:'x'.repeat(2*1024*1024)};
+    assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/frame size/);
+    assert.throws(()=>helper.decodeRawRecoveryArchive(Buffer.alloc(32*1024*1024+1),helper.createRecoveryAuditAssemblyBudget()),/bytes or magic/);
+    const base=archiveFrames(helper.encodeRawRecoveryArchive(rawSyntaxMaterial(),helper.createRecoveryAuditAssemblyBudget()));
+    const tooMany=[...base.slice(0,4),...Array(12284).fill({type:'raw-receipt',id:'r',data:['object',[]]}),base.at(-1)];
+    assert.throws(()=>helper.decodeRawRecoveryArchive(syntaxFrames(tooMany),helper.createRecoveryAuditAssemblyBudget()),/frame boundary/);
+    const dense=['object',[['many',['array',Array(125000).fill(['null'])]]]];
+    for(let i=1;i<=3;i++)base[i].data=dense;base.find(row=>row.type==='raw-receipt').data=dense;
+    assert.throws(()=>helper.decodeRawRecoveryArchive(syntaxFrames(base),helper.createRecoveryAuditAssemblyBudget()),/parsed node or depth limit/);
+
+});
+
+test('raw archive encoder admits oversized metadata and complete planned work before JSON, base64 or Buffer allocation',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');
+    for(const [owner,material,pattern] of [
+        [helper,{...rawSyntaxMaterial(),run:{large:'x'.repeat(2*1024*1024)}},/frame size/],
+        [assemblyHelperFaults({bytes:512}),{...rawSyntaxMaterial(),run:{large:'x'.repeat(1024)}},/bytes budget exceeded/]
+    ]){
+        let strings=0,base64=0,allocations=0;const stringify=JSON.stringify,toString=Buffer.prototype.toString,from=Buffer.from,alloc=Buffer.alloc;
+        JSON.stringify=(...a)=>{strings++;return stringify(...a);};Buffer.prototype.toString=function(...a){if(a[0]==='base64')base64++;return toString.apply(this,a);};
+        Buffer.from=(...a)=>{allocations++;return from(...a);};Buffer.alloc=(...a)=>{allocations++;return alloc(...a);};
+        try{assert.throws(()=>owner.encodeRawRecoveryArchive(material,owner.createRecoveryAuditAssemblyBudget()),pattern);}
+        finally{JSON.stringify=stringify;Buffer.prototype.toString=toString;Buffer.from=from;Buffer.alloc=alloc;}
+        assert.equal(strings,0);assert.equal(base64,0);assert.equal(allocations,0);
+    }
+});
+
+test('raw archive resource oracle matches native JSON UTF8 escaping/numbers and refuses getters, cycles and unsupported trees',()=>{
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    compiled._compile(readFileSync(filename,'utf8')+'\nmodule.exports.lexicalResourceOracle=rawArchiveJSONMetrics;',filename);
+    const helper=compiled.exports,values=[null,true,false,-0,0,1e20,1e21,1e-6,1e-7,Number.MAX_VALUE,-Number.MAX_VALUE,Number.MIN_VALUE,
+        '"\\'+String.fromCharCode(...Array.from({length:32},(_,i)=>i)), 'é中文😀𐐷\u2028\u2029','\ud800','\udc00',
+        {nested:['原😀',-0,{documents:'"\\\n'}]},Array(7).fill(null)];
+    const count=row=>1+(row&&typeof row==='object'?Object.values(row).reduce((sum,v)=>sum+count(v),0):0);
+    for(const value of values){const token=helper.createRecoveryAuditAssemblyBudget(),metric=helper.lexicalResourceOracle(value,token);
+        assert.equal(metric.length,Buffer.byteLength(JSON.stringify(value),'utf8'));assert.equal(metric.nodes,count(value));}
+    let gets=0;const accessor={get x(){gets++;return 1;}},cycle={};cycle.self=cycle;
+    for(const bad of [accessor,cycle,undefined,()=>1,Symbol('unsupported'),BigInt(1),Object.create({foreign:true})])
+        assert.throws(()=>helper.lexicalResourceOracle(bad,helper.createRecoveryAuditAssemblyBudget()));
+    assert.equal(gets,0);
+    const array=[];Object.defineProperty(array,'0',{enumerable:true,get(){gets++;return 1;}});array.length=1;
+    const material=rawSyntaxMaterial();material.run={array};
+    assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/accessor/);assert.equal(gets,0);
+    material.run={cycle};assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/cycle/);
+});
