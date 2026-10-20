@@ -67,7 +67,7 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.match(mainCss,/#battlePage\{[\s\S]*?--battle-command-row-height:66px;[\s\S]*?--battle-command-art-overhang:0px;[\s\S]*?--battle-command-visual-height:calc\(var\(--battle-command-row-height\) \+ var\(--battle-command-art-overhang\)\);/);
   assert.doesNotMatch(mainCss,/--battle-center-min-height/);
   assert.doesNotMatch(css,/--battle-command-row-height:66px|--battle-command-art-overhang:0px/);
-  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(0,var\(--battle-center-region-track\)\)/);
+  assert.match(css,/grid-template-rows:[\s\S]*?minmax\(var\(--battle-center-min-height\),var\(--battle-center-region-track\)\)/);
   assert.match(css,/#battleActionRegion > \.turn-target-row\{[\s\S]*?position:absolute;[\s\S]*?top:0;[\s\S]*?bottom:auto;/);
 });
 

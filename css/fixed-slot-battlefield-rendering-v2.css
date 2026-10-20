@@ -6,11 +6,13 @@
    namespace so legacy card dimensions cannot override the Slot contract. */
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
-    --battle-enemy-region-track:42fr;
+    --battle-enemy-region-track:46fr;
     /* A shared 66px information band and 66px command row replace the
        decorative 100px raster command stack. Reclaimed space belongs to allies. */
-    --battle-center-region-track:21fr;
-    --battle-ally-region-track:37fr;
+    --battle-center-region-track:12fr;
+    --battle-ally-region-track:42fr;
+    --battle-bottom-safe-gap:24px;
+    --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 6px);
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -35,15 +37,12 @@
     --battle-item-menu-gap:8px;
 }
 
-/* Enemy tracks and normalized portraits stay unchanged; three former center
-   fractions enlarge the ally rows without borrowing enemy HUD space. */
+/* Both formations share compact middle controls and a real bottom reserve.
+   The ordinary six-slot profile retains its own title/portrait HUD policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2[data-enemy-battlefield-profile="standard-six"]{
-    --battle-enemy-region-track:40fr;
     --battle-title-height:0px;
     --battle-enemy-safe-top:12px;
     --battle-art-overhang-top:12px;
-    --battle-center-region-track:21fr;
-    --battle-ally-region-track:39fr;
 }
 
 
@@ -63,10 +62,11 @@
 
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
+    height:calc(100% - var(--battle-bottom-safe-gap)) !important;
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
-        minmax(0,var(--battle-center-region-track))
+        minmax(var(--battle-center-min-height),var(--battle-center-region-track))
         minmax(0,var(--battle-ally-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
@@ -399,9 +399,9 @@
    Normalized enemy height is bounded below the top HUD before scaling. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-battle-art{scale:var(--battle-art-depth, 1);}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.10;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.18;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .battle-player > .v174-battle-art{--battle-art-depth:1.02;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .battle-player > .v174-battle-art{--battle-art-depth:1.10;}
 /* Boss and generic fallback artwork keep the previous depth policy. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art,
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
