@@ -419,6 +419,7 @@
         });
         if(!committed){return false;}
         recordHeroChapterNode(node.id);
+        runtime.selectedNodeId=state.rewardClaims[node.id]==="ready"?node.id:state.currentNodeId;
         return first;
     }
 
@@ -595,8 +596,9 @@
         state.lastRestSummary=restored;
         state.completedNodes[node.id]={completedAt:now()};if(node.next){state.currentNodeId=node.next;}
         });
-        if(ok){recordHeroChapterNode(node.id);runtime.activePanel="map";}
+        if(ok){recordHeroChapterNode(node.id);runtime.selectedNodeId=state.currentNodeId;runtime.activePanel="map";}
         if(typeof updateUI==="function"){ updateUI(); }
+        if(ok){render();}
         return ok;
     }
 
@@ -1190,11 +1192,11 @@
             showMessage(status==="planned"?"此段江湖旅程仍在整備中。":branchLockReason(chapter,state,node)||"這個節點尚未解鎖。");
             return false;
         }
-        runtime.activePanel=node.type;
         if(node.dialogue){
             if(state.rewardClaims[node.id]==="ready"){runtime.activePanel="node-reward";render();return true;}
             return startStory(node.id);
         }
+        runtime.activePanel=node.type;
         if(node.type==="battle"||node.type==="elite"||node.type==="boss"){
             if(state.rewardClaims[node.id]==="ready"){
                 runtime.activePanel="node-reward";render();return true;

@@ -83,27 +83,27 @@
 .adventure-view{position:relative;z-index:2;flex:1 1 auto;min-height:0;max-width:100%;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:max(12px,calc(12px + env(safe-area-inset-bottom)));box-sizing:border-box;}
 #adventurePage[data-panel="map"] .adventure-view{overflow:hidden;padding-bottom:0;}
 .adventure-map-screen{position:relative;height:100%;min-height:0;overflow:hidden;}
-#adventurePage[data-panel="map"] .adventure-header{position:absolute;inset:0 0 auto;height:14%;min-height:0;padding:2% 3%;display:block;background:linear-gradient(180deg,#07100dd9,transparent);border:0;box-shadow:none;}
+#adventurePage[data-panel="map"] .adventure-header{position:absolute;inset:0 0 auto;height:13.8%;min-height:0;padding:2% 3%;display:block;background:linear-gradient(180deg,#07100dd9,transparent);border:0;box-shadow:none;}
 #adventurePage[data-panel="map"] .adventure-view{flex:1;height:100%;}
 #adventurePage[data-panel="map"] .adventure-back-button{position:absolute;z-index:2;left:2%;top:0;width:52px;height:52px;min-height:52px;padding:0;border:1px solid #a58a51;border-radius:50%;background:#11201b77;font-size:28px;}
 #adventurePage[data-panel="map"] .adventure-heading{text-align:left;padding-left:16%;font-family:"DFKai-SB","KaiTi","STKaiti",serif;}
 #adventurePage[data-panel="map"] .adventure-heading span{font-size:16px;color:#efcf90;letter-spacing:.12em;}
-#adventurePage[data-panel="map"] .adventure-heading strong{position:absolute;left:3%;top:40%;margin:0;font-size:26px;line-height:1.2;color:#ffe0a2;letter-spacing:.06em;overflow:visible;}
+#adventurePage[data-panel="map"] .adventure-heading strong{position:absolute;left:3%;top:55%;margin:0;font-size:26px;line-height:1.2;color:#ffe0a2;letter-spacing:.06em;overflow:visible;}
 .adventure-heading small{display:none;margin-top:3.5px;color:#d6c5a5;font-size:7.78px;white-space:nowrap;}
 #adventurePage[data-panel="map"] .adventure-header-meta{position:absolute;right:3%;top:43%;font-size:16px;gap:1.56px;background:#12201ba8;padding:1.56px 3.11px;}
 .adventure-header-meta progress{width:58.33px;height:3.11px;accent-color:#e5b95f;}
-.adventure-map-canvas{position:absolute;inset:0;overflow:hidden;}
+.adventure-map-canvas{position:absolute;inset:0;aspect-ratio:9/16;overflow:hidden;}
 .adventure-road-layer{position:absolute;inset:0;width:100%;height:100%;z-index:1;overflow:visible;}
 .adventure-road-layer path{fill:none;stroke:#e7cb83;stroke-width:3;stroke-dasharray:1 7;stroke-linecap:round;vector-effect:non-scaling-stroke;filter:drop-shadow(0 0 1.17px #f5cc72);}
 .adventure-road-layer .adventure-route-locked{opacity:.65;}
 .adventure-road-layer .adventure-route-completed{stroke:#ffe5a2;opacity:1;}
 .adventure-road-layer .adventure-route-current{stroke:#ffdf85;opacity:1;}
 .adventure-node,.adventure-route-pip{position:absolute;left:var(--node-x);top:var(--node-y);transform:translate(-50%,-50%);}
-.adventure-node{z-index:3;width:54px;height:54px;min-height:44px;padding:0;border:0;color:#f8e3b7;background:transparent;cursor:pointer;}
+#adventurePage .adventure-node{overflow:visible;z-index:3;width:54px;height:54px;min-height:44px;padding:0;border:0;color:#f8e3b7;background:transparent;cursor:pointer;}
 .adventure-node-icon{display:grid;place-items:center;width:29.56px;height:29.56px;margin:auto;border:1.17px solid #dfc58b;border-radius:50%;color:#f7d694;background:radial-gradient(circle at 35% 25%,#685438,#241d12);box-shadow:0 1.17px 3.89px #0009,0 0 4.67px #e6bd6b55;font:14.78px/1 "DFKai-SB","KaiTi",serif;}
 .adventure-node-icon svg{width:68%;height:68%;pointer-events:none;}
 .adventure-sheet-icon svg{display:block;width:22px;height:22px;}
-.adventure-node-copy{position:absolute;top:38.11px;left:50%;transform:translateX(-50%);display:block;width:max-content;max-width:105px;padding:1.17px 5.83px;background:linear-gradient(90deg,transparent,#111b16dd 18% 82%,transparent);text-shadow:0 0.78px 1.17px #000;}
+.adventure-node-copy{pointer-events:none;position:absolute;top:38.11px;left:50%;transform:translateX(-50%);display:block;width:max-content;max-width:105px;padding:1.17px 5.83px;background:linear-gradient(90deg,transparent,#111b16dd 18% 82%,transparent);text-shadow:0 0.78px 1.17px #000;}
 .adventure-node-copy strong{display:block;font:700 16px/1.2 "DFKai-SB","KaiTi",serif;white-space:nowrap;}
 .adventure-node:disabled{cursor:default;}
 .adventure-node.status-completed .adventure-node-icon,.adventure-node.status-branch-selected .adventure-node-icon{background:radial-gradient(circle at 35% 25%,#6a8652,#243c28);border-color:#d4d5a1;color:#f3edba;}
@@ -120,7 +120,7 @@
 .adventure-sheet-icon{color:#f6d28c;font:15.56px/1 serif;}
 .adventure-sheet-title h2{margin:0;color:#f7e1b0;font:700 19px/1.1 "DFKai-SB","KaiTi",serif;white-space:nowrap;}
 .adventure-sheet-title small{padding:1.17px 3.89px;border:0.39px solid #b28b49;border-radius:4.67px;color:#d2b77c;font-size:16px;white-space:nowrap;}
-.adventure-sheet-content>p{margin:5.44px 0;color:#d4c8ac;font-size:14px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
+.adventure-sheet-content>p{margin:5.44px 0;color:#d4c8ac;font-size:16px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;overflow:hidden;}
 .adventure-sheet-actions{display:flex;align-items:end;justify-content:space-between;gap:5.44px;margin-top:auto;min-height:0;}
 .adventure-stage-picker{position:absolute;right:0;bottom:105%;min-width:0;max-width:55%;color:#cdbb93;font-size:16px;}
 .adventure-stage-picker summary{display:flex;align-items:center;min-height:52px;cursor:pointer;list-style:none;}

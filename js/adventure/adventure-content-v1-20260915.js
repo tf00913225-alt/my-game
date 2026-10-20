@@ -134,7 +134,7 @@ const chapters={
           }
         ],
         "next": "c1_04",
-        "x": 29.7,
+        "x": 32.2,
         "y": 67.2,
         "tutorialEncounterId": "tutorial_3",
         "rewardId": "story_starter_gear"

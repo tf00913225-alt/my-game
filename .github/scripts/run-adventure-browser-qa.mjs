@@ -76,7 +76,9 @@ assert.match(sourceCss,/env\(safe-area-inset-bottom\)/);
 assert.match(sourceCss,/prefers-reduced-motion\s*:\s*reduce/i);
 assert.doesNotMatch(sourceCss,/transform\s*:\s*scale\s*\(/i,"Adventure feature CSS must not own whole-surface scaling");
 assert.match(sourceCss,/aspect-ratio\s*:\s*9\s*\/\s*16/i,"Adventure map must preserve the 9:16 chapter composition");
-const builtCss=[...entryBundle.styles,...adventureBundle.styles].map(read).join("\n").replace(/<\/style/gi,"<\\/style");
+const globalButtonClip=read('css/00-main.css').match(/button\{\s*position:relative;\s*overflow:hidden;\s*\}/);
+assert.ok(globalButtonClip,'layout fixture retains the canonical global button clipping default');
+const builtCss=(globalButtonClip[0]+'\n'+[...entryBundle.styles,...adventureBundle.styles].map(read).join("\n")).replace(/<\/style/gi,"<\\/style");
 const mapProvenance=JSON.parse(read('assets/inbox/chapter1-map-reference/provenance.json'));
 for(const [file,digest] of [[mapProvenance.master,mapProvenance.masterSha256],[mapProvenance.runtime,mapProvenance.runtimeSha256]])assert.equal(createHash('sha256').update(fs.readFileSync(file)).digest('hex'),digest,'reference plate provenance');
 
@@ -138,6 +140,13 @@ const scenarios={
 };
 
 for(let stage=1;stage<=20;stage++)scenarios['mapSelected'+stage]=formalMap(true,'c1_'+String(stage).padStart(2,'0'));
+if(process.argv.includes('--preflight-only')){
+    for(let stage=1;stage<=20;stage++){
+        const html=scenarios['mapSelected'+stage];assert.equal((html.match(/data-stage-id=/g)||[]).length,20);assert.doesNotMatch(html,/<select\b/);assert.match(html,/id="adventureStagePicker"/);
+    }
+    console.log(JSON.stringify({preflightOnly:true,sourceCss:true,buildBundleFiles:true,referenceHashes:true,selectedRendererCases:20,browserLaunched:false,playerFlowVerified:false}));
+    process.exit(0);
+}
 const layoutServer=await startServer();
 function fixtureHtml(){
     return `<!doctype html><html lang="zh-Hant"><head><base href="${layoutServer.url}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${builtCss}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}*{box-sizing:border-box}#game-viewport{position:fixed;inset:0;overflow:hidden;background:#050505}#game-stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6666667px;transform:scale(${1080/420});transform-origin:top left;overflow:hidden}#qa-result{display:none}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="game-content"></div></div></div><pre id="qa-result"></pre><script>
@@ -147,13 +156,15 @@ window.onunhandledrejection=event=>errors.push(String(event.reason||"unhandled r
 function overlap(a,b){return Math.max(0,Math.min(a.right,b.right)-Math.max(a.left,b.left))*Math.max(0,Math.min(a.bottom,b.bottom)-Math.max(a.top,b.top));}
 function outside(r){return r.left<-1||r.right>innerWidth+1||r.top<-1||r.bottom>innerHeight+1;}
 function normPoint(node,map){const r=node.getBoundingClientRect(),m=map.getBoundingClientRect();return{x:(r.left+r.width/2-m.left)/m.width,y:(r.top+r.height/2-m.top)/m.height};}
+function textRects(node){const range=document.createRange();range.selectNodeContents(node);return [...range.getClientRects()].filter(r=>r.width>0&&r.height>0).map(r=>({left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width,height:r.height}));}
+function overflowClips(node,rectangles){const clips=[];for(let ancestor=node;ancestor;ancestor=ancestor.parentElement){const style=getComputedStyle(ancestor),x=/hidden|clip|auto|scroll/.test(style.overflowX),y=/hidden|clip|auto|scroll/.test(style.overflowY);if(!x&&!y)continue;const r=ancestor.getBoundingClientRect();for(const text of rectangles)if(x&&(text.left<r.left-1||text.right>r.right+1)||y&&(text.top<r.top-1||text.bottom>r.bottom+1))clips.push({ancestor:ancestor.id||String(ancestor.className?.baseVal||ancestor.className),text,clip:{left:r.left,right:r.right,top:r.top,bottom:r.bottom}});}return clips;}
 function measure(name,html){
  const content=document.getElementById("game-content");content.style.width=name==="home"?"1080px":"420px";content.style.height=name==="home"?"1920px":"746.6666667px";content.style.transform=name==="home"?"none":"scale("+(1080/420)+")";content.style.setProperty("--home-scene-height","444px");content.innerHTML=html;void content.offsetHeight;
  const root=document.getElementById("adventurePage")||document.getElementById("homePage")||document.getElementById("mapPage");
  const buttons=[...content.querySelectorAll("button")].filter(node=>{const r=node.getBoundingClientRect();return r.width>0&&r.height>0;});const rects=buttons.map(node=>({node,r:node.getBoundingClientRect()}));const overlaps=[];
  for(let i=0;i<rects.length;i++)for(let j=i+1;j<rects.length;j++){const area=overlap(rects[i].r,rects[j].r);if(area>16)overlaps.push([i,j,Math.round(area)]);}
  const readable=[...content.querySelectorAll(".adventure-panel-title h2,.adventure-panel-card p,.adventure-dialogue,.adventure-route-choice p,.adventure-node-sheet p,.adventure-node-sheet h2,.adventure-node-copy strong")];
- const clipped=readable.filter(node=>node.scrollWidth>node.clientWidth+1||((getComputedStyle(node).overflowY==="hidden"||getComputedStyle(node).overflow==="hidden")&&node.scrollHeight>node.clientHeight+1)).map(node=>node.textContent.trim().slice(0,40));
+ const clipped=readable.filter(node=>overflowClips(node,textRects(node)).length>0).map(node=>node.textContent.trim().slice(0,40));
  const decorations=[...content.querySelectorAll(".adventure-scene-decor,.adventure-panel-scene,.adventure-road-layer,.adventure-landmark,.adventure-map-depth,.adventure-boss-landscape,.adventure-map-fog,.adventure-home-gate")];
  const badPointer=decorations.filter(node=>getComputedStyle(node).pointerEvents!=="none").map(node=>String(node.className&&node.className.baseVal||node.className||node.tagName));
  const rr=root&&root.getBoundingClientRect();const result={name,rootOutside:rr?outside(rr):true,badButtons:rects.filter(x=>outside(x.r)).map(x=>x.node.textContent.trim().slice(0,24)),overlaps,clipped,badPointer,docOverflow:document.documentElement.scrollWidth>innerWidth+1||document.documentElement.scrollHeight>innerHeight+1};
@@ -162,6 +173,10 @@ function measure(name,html){
   const scrollOwners=[...content.querySelectorAll("*")].filter(node=>{const style=getComputedStyle(node);return (style.overflowY==="auto"||style.overflowY==="scroll")&&node.scrollHeight>node.clientHeight+1;});
   if(view&&map){const sheetRect=sheet?.getBoundingClientRect(),active=[...map.querySelectorAll('button:not(:disabled)'),sheet.querySelector('.adventure-button.primary'),sheet.querySelector('summary'),content.querySelector('.adventure-back-button')].filter(Boolean),hits=active.map(node=>({id:node.dataset.nodeId||node.id||node.className,r:node.getBoundingClientRect()}));result.mapScroll={scrollOwnerCount:scrollOwners.length,sheetFullyVisible:!!sheetRect&&!outside(sheetRect),canvasOverflow:map.scrollHeight>map.clientHeight+1||map.scrollWidth>map.clientWidth+1};result.smallMapHits=active.filter(node=>{const r=node.getBoundingClientRect();return r.width<44||r.height<44;}).map(node=>node.dataset.nodeId||node.textContent.trim());result.activeHitOverlaps=[];for(let i=0;i<hits.length;i++)for(let j=i+1;j<hits.length;j++)if(overlap(hits[i].r,hits[j].r)>16)result.activeHitOverlaps.push([hits[i].id,hits[j].id]);result.stageButtons=[...content.querySelectorAll('#adventureStagePicker [data-stage-id]')].map(node=>({id:node.dataset.stageId,disabled:node.disabled,text:node.textContent}));result.hasNativeSelect=!!content.querySelector('select');}
   if(map){const mr=map.getBoundingClientRect();result.mapAspect=mr.width/mr.height;result.composition={};for(const el of map.querySelectorAll('[data-node-id]'))result.composition[el.dataset.nodeId]=normPoint(el,map);result.headerShare=header?header.getBoundingClientRect().height/root.getBoundingClientRect().height:1;}
+  const canvas=map.getBoundingClientRect(),labels=[...map.querySelectorAll('.adventure-node-copy strong')].map(node=>({id:node.closest('[data-node-id]')?.dataset.nodeId,text:node.textContent,rects:textRects(node),clips:overflowClips(node,textRects(node))}));
+  result.labelRanges=labels;result.labelClips=labels.filter(label=>label.clips.length).map(label=>({id:label.id,clips:label.clips}));result.labelsOutsideCanvas=labels.filter(label=>!label.rects.length||label.rects.some(r=>r.left<canvas.left-1||r.right>canvas.right+1||r.top<canvas.top-1||r.bottom>canvas.bottom+1)).map(label=>label.id);result.labelOverlaps=[];
+  for(let i=0;i<labels.length;i++)for(let j=i+1;j<labels.length;j++)if(labels[i].rects.some(a=>labels[j].rects.some(b=>overlap(a,b)>1)))result.labelOverlaps.push([labels[i].id,labels[j].id]);
+  result.flagClips=[...map.querySelectorAll('.adventure-current-position')].flatMap(node=>overflowClips(node,[node.getBoundingClientRect()]));
  }
  if(name==="tracker"){const t=content.querySelector("#adventureObjectiveTracker")?.getBoundingClientRect(),p=content.querySelector("#mockPlayer")?.getBoundingClientRect(),c=content.querySelector("#mockControl")?.getBoundingClientRect();result.trackerOverlapPlayer=t&&p?overlap(t,p):999;result.trackerOverlapControl=t&&c?overlap(t,c):999;}
  return result;
@@ -236,6 +251,10 @@ for(const [width,height] of VIEWPORTS){
                 assert.equal(result.mapScroll?.sheetFullyVisible,true,`map: complete selected sheet stays in the safe viewport at ${width}x${height}`);
                 assert.deepEqual(result.activeHitOverlaps,[],`map: active hit targets must not overlap at ${width}x${height}`);
                 assert.deepEqual(result.smallMapHits,[],`map: active controls retain 44px physical targets at ${width}x${height}`);
+                assert.deepEqual(result.labelClips,[],`map: full label text ranges cannot be clipped by any overflow ancestor at ${width}x${height}`);
+                assert.deepEqual(result.labelsOutsideCanvas,[],`map: full label text stays inside the canvas at ${width}x${height}`);
+                assert.deepEqual(result.labelOverlaps,[],`map: complete labels cannot cover each other at ${width}x${height}`);
+                assert.deepEqual(result.flagClips,[],`map: current position flag must not be clipped at ${width}x${height}`);
                 assert.equal(result.stageButtons.length,20);assert.equal(result.hasNativeSelect,false);
                 assert.equal(result.stageButtons.filter(n=>n.disabled).length,result.name==='map'?17:0);
                 assert.ok(Math.abs(result.mapAspect-9/16)<.01,`map: fixed chapter composition at ${width}x${height}`);

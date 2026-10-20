@@ -133,7 +133,7 @@
         const status=API().getNodeStatus(node.id),disabled=status==='locked'||status==='planned';
         const labels={battle:'普通戰鬥',event:'江湖事件',chest:'旅途寶箱',rest:'休息驛站',elite:'精英戰',boss:'章節頭目',branch:'路線選擇',objective:'江湖委託',finish:'章節終點'};
         const action=status==='reward-unclaimed'?'領獎':view.state.completedNodes[node.id]?'重訪':'進入';
-        const options=view.chapter.nodes.map(n=>{const st=API().getNodeStatus(n.id);return '<button type="button" data-stage-id="'+attr(n.id)+'"'+(['locked','planned'].includes(st)?' disabled':' onclick="FourSymbolsAdventure.openNode(\''+attr(n.id)+'\')"')+'>'+esc(n.stage+'. '+n.title)+'</button>';}).join('');
+        const options=view.chapter.nodes.map(n=>{const st=API().getNodeStatus(n.id);return '<button type="button" data-stage-id="'+attr(n.id)+'"'+(['locked','planned'].includes(st)?' disabled':' onclick="FourSymbolsAdventure.openNode(\''+attr(n.id)+'\')"')+' aria-label="'+attr('第'+n.stage+'關 '+n.title+'，'+statusLabel(st))+'">'+esc(n.stage+'. '+n.title)+'</button>';}).join('');
 
         const required=window.FourSymbolsHeroAcquisition?.getRequiredStoryNode?.();
         const replay=required&&view.state.completedNodes[required]?'<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.startStory(\''+attr(required)+'\')">補看故事紀錄</button>':'';
@@ -168,6 +168,8 @@
     }
 
     function currentPanelNode(view,type){
+        const selected=view.chapter.nodes.find(node=>node.id===view.selectedNodeId&&(!type||node.type===type));
+        if(selected){return selected;}
         if(ui.lastFocusNodeId){
             const focused=view.chapter.nodes.find(node=>node.id===ui.lastFocusNodeId&&(!type||node.type===type));
             if(focused){ return focused; }

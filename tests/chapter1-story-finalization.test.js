@@ -32,6 +32,16 @@ test("Chapter 1 formal combat, rest and chest placement follows the authored pac
     assert.equal(byId.c1_15.type,"elite");assert.equal(byId.c1_18.type,"elite");assert.equal(byId.c1_20.type,"boss");
 });
 
+test('map geometry audit rejects complete text ranges cut by a narrower overflow ancestor',()=>{
+    const source=fs.readFileSync('.github/scripts/run-adventure-browser-qa.mjs','utf8'),start=source.indexOf('function overflowClips('),end=source.indexOf('\nfunction measure(',start);
+    assert.ok(start>=0&&end>start);const context={getComputedStyle:node=>node.style};vm.createContext(context);vm.runInContext(source.slice(start,end),context);
+    const node=(id,width,overflow,parentElement)=>({id,parentElement,style:{overflowX:overflow,overflowY:overflow},getBoundingClientRect:()=>({left:0,top:0,right:width,bottom:200})});
+    const canvas=node('map',420,'hidden',null),button=node('button',54,'hidden',canvas),label=node('label',105,'visible',button),fullText={left:0,right:105,top:20,bottom:38};
+    const clipped=context.overflowClips(label,[fullText]);assert.equal(clipped.length,1);assert.equal(clipped[0].ancestor,'button');
+    button.style={overflowX:'visible',overflowY:'visible'};assert.equal(context.overflowClips(label,[fullText]).length,0);
+    assert.equal(context.overflowClips(label,[{...fullText,right:425}])[0].ancestor,'map','overflow-visible labels still cannot escape the real canvas');
+});
+
 test("canonical Hero qualification seals the same twenty-node Chapter 1 route",()=>{
     const policy=JSON.parse(fs.readFileSync("functions/src/generated/hero-chapter-qualification.json","utf8"));
     assert.equal(policy.chapterId,"chapter_v1");assert.equal(policy.outcomeVerified,false);
@@ -86,6 +96,80 @@ function installUi(h){
     vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),h.c);
     return ()=>body.innerHTML;
 }
+function formalMapAt(id){
+    const h=runtime(),nodes=content().chapters.chapter_v1.nodes,index=nodes.findIndex(n=>n.id===id);
+    h.state().currentNodeId=id;h.state().completedNodes=Object.fromEntries(nodes.slice(0,index).map(n=>[n.id,true]));
+    h.state().onboarding={active:false,phase:'complete'};h.c.player.adventureProgress.pendingStoryOpening=false;
+    if(index>=13)h.state().storyKeys.blackPineToken={sourceNodeId:'c1_11'};
+    h.c.v154ResolveMonsterPortraitRecord=()=>({path:'assets/ready-npc.webp'});h.c.getCharacterBattleArtworkPath=()=> 'assets/player.webp';
+    const html=installUi(h);assert.equal(h.api.open({panel:'map',focusNodeId:id}),true);return {...h,html};
+}
+
+test('every authored dialogue node enters through the map activation with the full UI renderer installed',()=>{
+    for(const node of content().chapters.chapter_v1.nodes){
+        const h=formalMapAt(node.id);assert.equal(h.api.openNode(node.id),true);
+        assert.doesNotThrow(()=>assert.equal(h.api.activateSelectedNode(),true),node.id+' must not render a generic event before its story commit');
+        assert.equal(h.api.getView().panel,'story');assert.equal(h.api.getView().dialogue.nodeId,node.id);assert.match(h.html(),/class="adventure-story /);
+    }
+});
+
+test('map activation save refusal or exception preserves the original map panel and cursor for all dialogue types',()=>{
+    for(const id of ['c1_06','c1_09','c1_08','c1_07'])for(const mode of [false,'throw']){
+        const h=formalMapAt(id),before=JSON.stringify(h.state()),panel=h.api.getView().panel,cursor=JSON.stringify(h.api.getView().dialogue);
+        h.save(mode);assert.equal(h.api.activateSelectedNode(),false,id);
+        assert.equal(h.api.getView().panel,panel);assert.equal(JSON.stringify(h.api.getView().dialogue),cursor);assert.equal(JSON.stringify(h.state()),before);assert.equal(h.c.battleActive,false);
+        assert.match(h.html(),/adventure-map-screen/);
+    }
+});
+
+test('story event map activation advances 6 to 7, key 11 to 12 and other authored events once',()=>{
+    for(const [id,next] of [['c1_06','c1_07'],['c1_11','c1_12'],['c1_16','c1_17'],['c1_19','c1_20']]){
+        const h=formalMapAt(id);assert.equal(h.api.activateSelectedNode(),true);finishDialogue(h);
+        assert.equal(h.state().currentNodeId,next);assert.equal(h.api.getView().selectedNodeId,next);assert.equal(h.api.getView().panel,'map');
+        const completed=JSON.stringify(h.state().completedNodes),key=JSON.stringify(h.state().storyKeys),gold=h.c.gold;
+        if(id==='c1_11')assert.equal(h.state().storyKeys.blackPineToken.sourceNodeId,id);
+        assert.equal(h.api.openNode(id),true);assert.equal(h.api.activateSelectedNode(),true);finishDialogue(h);
+        assert.equal(h.state().currentNodeId,next);assert.equal(JSON.stringify(h.state().completedNodes),completed);assert.equal(JSON.stringify(h.state().storyKeys),key);assert.equal(h.c.gold,gold);
+    }
+});
+
+test('map stage14 activation requires the actual stage11 key and its story replay cannot advance twice',()=>{
+    const h=formalMapAt('c1_14');delete h.state().storyKeys.blackPineToken;
+    assert.equal(h.api.activateSelectedNode(),false);assert.equal(h.api.getView().panel,'map');assert.equal(h.api.getView().dialogue,null);assert.equal(h.state().completedNodes.c1_14,undefined);
+    h.state().storyKeys.blackPineToken={sourceNodeId:'c1_11'};assert.equal(h.api.activateSelectedNode(),true);finishDialogue(h);
+    assert.equal(h.state().currentNodeId,'c1_15');assert.equal(h.api.getView().selectedNodeId,'c1_15');
+    h.api.openNode('c1_14');h.api.activateSelectedNode();finishDialogue(h);assert.equal(h.state().currentNodeId,'c1_15');
+});
+
+test('authored rest and chest stories use their real map actions and do not replenish or grant on replay',()=>{
+    for(const id of ['c1_09','c1_13']){
+        const h=formalMapAt(id);assert.equal(content().chapters.chapter_v1.nodes.find(n=>n.id===id).type,'rest');
+        h.api.activateSelectedNode();finishDialogue(h);assert.equal(h.api.getView().panel,'rest');assert.match(h.html(),/restAtNode/);
+        h.c.player.hp=1;h.c.player.sp=1;assert.equal(h.api.restAtNode(id),true);const hp=h.c.player.hp,sp=h.c.player.sp,next=h.state().currentNodeId;
+        assert.equal(h.api.getView().selectedNodeId,next);assert.equal(h.api.getView().panel,'map');assert.match(h.html(),/adventure-map-screen/);
+        assert.equal(h.api.restAtNode(id),false);h.api.openNode(id);h.api.activateSelectedNode();finishDialogue(h);assert.equal(h.state().currentNodeId,next);assert.equal(h.c.player.hp,hp);assert.equal(h.c.player.sp,sp);
+    }
+    const h=formalMapAt('c1_08');h.c.v132GetOreDefinition=id=>({id,type:'material',name:'白階礦石'});h.api.activateSelectedNode();finishDialogue(h);assert.equal(h.api.getView().panel,'chest');
+    assert.equal(h.api.openChest('c1_08'),true);assert.equal(h.state().rewardClaims.c1_08,'ready');assert.equal(h.api.getView().selectedNodeId,'c1_08');
+    assert.equal(h.api.claimNodeReward('c1_08'),true);assert.equal(h.state().currentNodeId,'c1_09');assert.equal(h.api.getView().selectedNodeId,'c1_09');
+    const gold=h.c.gold,potions={...h.potions};assert.equal(h.api.openChest('c1_08'),false);assert.equal(h.api.claimNodeReward('c1_08'),false);assert.equal(h.c.gold,gold);assert.deepEqual(h.potions,potions);
+});
+
+test('later rest rendering chooses selected stage13 instead of the previously visited stage9',()=>{
+    const h=formalMapAt('c1_09');h.api.activateSelectedNode();finishDialogue(h);assert.match(h.html(),/restAtNode\('c1_09'\)/);h.api.restAtNode('c1_09');
+    h.state().currentNodeId='c1_13';for(const id of ['c1_10','c1_11','c1_12'])h.state().completedNodes[id]=true;
+    h.api.openNode('c1_13');h.api.activateSelectedNode();finishDialogue(h);
+    assert.match(h.html(),/restAtNode\('c1_13'\)/);assert.doesNotMatch(h.html(),/restAtNode\('c1_09'\)/);
+    assert.equal(h.api.restAtNode('c1_13'),true);assert.equal(h.state().currentNodeId,'c1_14');assert.equal(h.api.getView().selectedNodeId,'c1_14');assert.match(h.html(),/adventure-map-screen/);
+});
+
+test('refused or throwing rest save cannot heal complete or leave the original selected rest panel',()=>{
+    for(const id of ['c1_09','c1_13'])for(const mode of [false,'throw']){
+        const h=formalMapAt(id);h.api.activateSelectedNode();finishDialogue(h);h.c.player.hp=1;h.c.player.sp=1;const before=JSON.stringify(h.state());h.save(mode);
+        assert.equal(h.api.restAtNode(id),false);assert.equal(h.c.player.hp,1);assert.equal(h.c.player.sp,1);assert.equal(JSON.stringify(h.state()),before);
+        assert.equal(h.api.getView().panel,'rest');assert.equal(h.api.getView().selectedNodeId,id);assert.match(h.html(),new RegExp("restAtNode\\('"+id+"'\\)"));
+    }
+});
 
 test("first victory exposes its reward then a successful claim selects the next fixed-sheet action",()=>{
     const h=runtime(),html=installUi(h);
