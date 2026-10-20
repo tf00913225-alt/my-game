@@ -9890,7 +9890,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "training.forest",
@@ -11621,7 +11630,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-node",
@@ -11735,7 +11753,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-event",
@@ -11849,7 +11876,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.patrol",
@@ -15548,7 +15584,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-objective",
@@ -15623,7 +15668,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-rest",
@@ -15696,7 +15750,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-chest",
@@ -15770,7 +15833,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-merchant",
@@ -15848,7 +15920,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-event-result",
@@ -15922,7 +16003,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-node-reward",
@@ -15996,7 +16086,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "gameplay.adventure-chapter-complete",
@@ -16073,7 +16172,16 @@
           "interaction": "四尺寸真入口／touch與wheel末端／map位置／active notice限定通過",
           "scope": "原Owner CSS／renderer scroll與兩文案及前後實圖限定通過"
         }
-      }
+      },
+      "versionImpact": [
+        {
+          "change": "story-onboarding-v2",
+          "status": "新版受影響待實圖驗證",
+          "preservedEvidence": "segment11 historical map/event/return states remain limited valid evidence",
+          "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+          "note": "Do not erase historical acceptance or treat it as new story/cursor/onboarding approval"
+        }
+      ]
     },
     {
       "id": "shop.preview",
@@ -24786,6 +24894,204 @@
         "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
         "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
       ]
+    },
+    {
+      "id": "gameplay.adventure-story-dialogue",
+      "label": "冒險正式故事對話（同一story面板）",
+      "entry": "FourSymbolsAdventure.startStory(nodeId, phase)→renderStory；下一句button→advanceDialogue()",
+      "states": [
+        "before/guidance/ending正式phase",
+        "玩家/NPC發話、正式scene/portrait",
+        "首句/中句/末句、下一句/繼續/第一章完成",
+        "短/長文字與合法16字玩家名稱",
+        "返回再開/合法cursor續讀"
+      ],
+      "note": "一個story面板的真實狀態，不是新增三個頁面。advanceDialogue使用commitChange且末句可進教學/戰鬥/完成與recordHeroChapterNode，不作無副作用點擊。",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+      "status": "未檢查",
+      "operations": [
+        "正式入口",
+        "閱讀",
+        "真控制/返回（只限安全呈現）"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-onboarding",
+      "label": "冒險正式新手引導面板",
+      "entry": "runtime.activePanel=tutorial→renderTutorial；原openTutorialSystem/continueTutorial/confirmPreparation",
+      "states": [
+        "requiredAction=skill/equipment/recovery",
+        "HP/SP資源與原條件說明",
+        "前往技能頁/前往背包按鈕",
+        "準備未完成/已完成的正式guard呈現",
+        "追兵護具待領按鈕僅呈現"
+      ],
+      "note": "claimNodeReward/confirmPreparation/continueTutorial皆可能改持久化/資源/啟戰，不點業務按鈕造呈現。",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+      "status": "未檢查",
+      "operations": [
+        "正式入口",
+        "閱讀",
+        "真控制/返回（只限安全呈現）"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-onboarding-return",
+      "label": "新手引導前往系統及正式返回",
+      "entry": "openTutorialSystem→hideOverlay/showPage(skill或inventory)；returnFromTutorial→open({panel:tutorial})；原tracker正式返回控制",
+      "states": [
+        "技能目的地與背包目的地",
+        "返回引導/同節點與requiredAction保留",
+        "未準備/準備後提示",
+        "返回時閱讀位置與modal/nav安全區"
+      ],
+      "note": "真可見返回控制要從實際DOM核定，不把API直接呼叫當真入口；不可為驗返回學習/裝備/用補品/領獎。",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+      "status": "未檢查",
+      "operations": [
+        "正式入口",
+        "閱讀",
+        "真控制/返回（只限安全呈現）"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      }
+    },
+    {
+      "id": "gameplay.adventure-story-cursor",
+      "label": "故事游標續讀／返回狀態",
+      "entry": "canonical state.dialogue={nodeId,lineIndex,phase}→runtime restore/open→renderStory",
+      "states": [
+        "合法首/中/末cursor重開",
+        "before/guidance/ending分支",
+        "無dialogue回map/正式tutorial分流",
+        "舊storySchemaVersion的正式guard/相容分流僅按既有fixture證據"
+      ],
+      "note": "cursor是同story面板資料狀態，不是獨立catalog或choice頁。invalid cursor/security/migration不能靠手改closure或fail-open造畫面。",
+      "owner": "js/adventure/adventure-ui-v1-20260915.js; js/adventure/adventure-runtime-v1-20260915.js; js/adventure/adventure-content-v1-20260915.js",
+      "status": "未檢查",
+      "operations": [
+        "正式入口",
+        "閱讀",
+        "真控制/返回（只限安全呈現）"
+      ],
+      "deviceEvidence": {
+        "360x640": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "393x873": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "412x915": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        },
+        "1280x800": {
+          "status": "未檢查",
+          "head": null,
+          "before": null,
+          "after": null,
+          "interaction": null
+        }
+      }
     }
   ],
   "segmentReviews": [
