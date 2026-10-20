@@ -35,6 +35,62 @@
     let openingDone=false;
     let creationRenderPromise=null;
     let accountTransitionReloading=false;
+    const READ_TIMEOUT=15*1000;
+    let readEpoch=0,cycle=0,checkedCycle=-1,readFlight=null,offlineUid=null;
+    let readStatus=Object.freeze({uid:null,status:"idle",observedRevision:null,message:null});
+
+    function sessionView(){ return JSON.stringify(firebase?.getGameSessionState?.()||null); }
+    function reportRead(status,observedRevision=null){
+        const error=status!=="confirmed",message=error?"雲端未確認或衝突；本機保留，尚未同步。":"已確認雲端讀取；本機保留，未上傳或替換。";
+        readStatus=Object.freeze({uid:activeUser.uid,status,observedRevision,message});
+        if(error){ accountUi(state,message,true); }else{ firebase.setUiState({mode:state,user:activeUser,message,error:false}); }
+    }
+    function recheckCloud(manual=false){
+        if(readFlight){ return readFlight; }
+        const uid=activeUser?.uid,repo=global.FourSymbolsAccountSave,session=firebase?.getGameSessionState?.();
+        if(!firebase||!uid||resolvedUid!==uid||repo.getActiveUid()!==uid||global.navigator?.onLine===false||
+           !(state===STATES.OFFLINE_READY||(state===STATES.READY&&offlineUid===uid))||
+           session?.status==="blocked"||(session?.uid&&session.uid!==uid)||(!manual&&checkedCycle===cycle)){
+            return Promise.resolve();
+        }
+        checkedCycle=cycle;
+        const epoch=readEpoch,token=transitionToken,user=activeUser,startupState=state,sessionBefore=sessionView();
+        const isCurrent=()=>epoch===readEpoch&&token===transitionToken&&activeUser===user&&resolvedUid===uid&&
+            state===startupState&&saveResolved&&global.navigator?.onLine!==false&&firebase.getUser()?.uid===uid&&
+            repo.getActiveUid()===uid&&sessionView()===sessionBefore;
+        readStatus=Object.freeze({uid,status:"checking",observedRevision:null,message:null});
+        let timer;
+        const task=Promise.resolve().then(async()=>{
+            try{
+                const before=JSON.stringify(repo.readForUid(uid));
+                const cloud=await Promise.race([
+                    firebase.resolveCloudSave(user,{serverOnly:true}),
+                    new Promise((_,reject)=>{timer=global.setTimeout(()=>reject(Error("Read timeout")),READ_TIMEOUT);})
+                ]);
+                if(!isCurrent()){ return; }
+                const local=repo.readForUid(uid),revision=cloud?.data?.serverRevision;
+                if(JSON.stringify(local)!==before||local.status!=="ready"||cloud?.uid!==uid||cloud.serverConfirmed!==true||!cloud.exists||
+                   cloud.data?.ownerUid!==uid||!Number.isSafeInteger(revision)||revision<1||revision>=Number.MAX_SAFE_INTEGER)throw Error("Unconfirmed");
+                const save=cloudPayload(cloud);if(!save)throw Error("Unconfirmed");
+                reportRead(repo.fingerprint(save)===repo.fingerprint(local.save)?"confirmed":"conflict",revision);
+            }catch(_){
+                if(isCurrent()){ reportRead("unconfirmed"); }
+            }finally{
+                global.clearTimeout(timer);
+                if(readFlight===task){ readFlight=null; }
+            }
+        });
+        readFlight=task;return task;
+    }
+    global.addEventListener("offline",()=>{
+        ++readEpoch;++cycle;offlineUid=activeUser?.uid||null;readFlight=null;
+    });
+    global.addEventListener("online",()=>{ void recheckCloud(); });
+    global.addEventListener("four-symbols:game-session-state",()=>{ ++readEpoch;readFlight=null; });
+    function retrySave(){
+        return activeUser?((state===STATES.OFFLINE_READY||(state===STATES.READY&&offlineUid===activeUser.uid))
+            ?recheckCloud(true):resolveSaveFor(activeUser)):boot();
+    }
 
     function mark(name){
         try{ if(global.performance&&typeof global.performance.mark==="function"){ global.performance.mark(name); } }catch(_){ }
@@ -333,6 +389,7 @@
         global.location.reload();
     }
     function onAuth(detail){
+        ++readEpoch;readFlight=null;
         const user=detail&&detail.user; const error=detail&&detail.error;
         if(error){ fail(error,"Firebase 身份解析失敗；不會顯示創角。"); return; }
         if(!user){
@@ -396,7 +453,7 @@
             global.addEventListener("four-symbols:firebase-auth-state",event=>onAuth(event.detail));
             global.addEventListener("four-symbols:account-ui-action",event=>{
                 const action=event.detail&&event.detail.action;
-                if(action==="retry"&&activeUser){ void resolveSaveFor(activeUser); }
+                if(action==="retry"&&activeUser){ void retrySave(); }
                 if(action==="confirm-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){
                     try{
                         const data=cloudResult&&cloudResult.data;
@@ -460,7 +517,8 @@
         canCreateCharacter:()=>contract.canCreateCharacter({state,userUid:activeUser&&activeUser.uid,resolvedUid,saveResolved,activeSaveUid:global.FourSymbolsAccountSave.getActiveUid()}),
         openAccountManager:()=>{
             if(!firebase||!activeUser){ return false; }
-            accountUi(state,"目前角色資料已綁定此帳號。");
+            const recent=readStatus.uid===activeUser.uid&&readStatus.message;
+            accountUi(state,recent||"目前角色資料已綁定此帳號。",!!recent&&readStatus.status!=="confirmed");
             return true;
         },
         notifyCharacterCreated:()=>{
@@ -470,7 +528,8 @@
             document.dispatchEvent(new CustomEvent("v173.20:startup-entered"));
             global.FourSymbolsFeatures.idle();
         },
-        retry:()=>activeUser?resolveSaveFor(activeUser):boot(),getLastError:()=>lastError
+        retry:retrySave,
+        getReconnectState:()=>readStatus,getLastError:()=>lastError
     });
     void boot();
 })(typeof window!=="undefined"?window:globalThis);
