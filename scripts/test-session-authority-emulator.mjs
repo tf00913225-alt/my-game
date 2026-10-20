@@ -3970,7 +3970,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const segmentedNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",segmentedSource=readFileSync(segmentedFilename,"utf8");
     assert.equal(segmentedSource.split(segmentedNeedle).length,2);
     segmentedModule._compile(segmentedSource.replace(segmentedNeedle,
-        "return Object.freeze({verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
+        "return Object.freeze({pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact"),segmentedFilename);
     assert.equal(Object.hasOwn(recovery,"verifySegmentedRawRecoveryProof"),false);
     const segmentedOwner=segmentedModule.exports.createCanonicalCurrentRecovery(deps),segmented=await segmentedOwner.verifySegmentedRawRecoveryProof(rawMaterial);
     assert.equal(segmented.segmentedProofValid,true);assert.equal(segmented.documentCount,candidate.documentCount);
@@ -3987,6 +3987,29 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
+    // The same actor now follows the actual private server pin and literal SDK
+    // loader; null IO stays disabled and no candidate/publication is issued.
+    for(const name of ["pinRawCapture","loadPinnedRawMaterial","verifyPinnedSegmentedProof"])
+        assert.equal(Object.hasOwn(recovery,name),false);
+    const pinnedAttemptStart=attempts.length,pinnedArgs={auditId,expectedEpoch:1,operationId:"inventory-private-pinned-proof"};
+    const pinned=await segmentedOwner.pinRawCapture(request(),pinnedArgs);
+    const pinnedMaterial=await segmentedOwner.loadPinnedRawMaterial(pinned);
+    const pinnedResult=await segmentedOwner.verifyPinnedSegmentedProof(request(),pinned,pinnedMaterial);
+    assert.equal(pinnedResult.segmentedProofValid,true);assert.equal(pinnedResult.documentCount,segmented.documentCount);
+    assert.equal(pinnedResult.absenceCount,segmented.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])
+        assert.equal(pinnedResult[flag],false);
+    for(const key of ["records","documents","artifact","artifactBytes","restorePermit","identity"])
+        assert.equal(Object.hasOwn(pinnedResult,key),false);
+    assert.ok(Object.isFrozen(pinnedResult));assert.ok(!Object.values(pinnedResult).some(value=>Buffer.isBuffer(value)));
+    assert.equal(pinnedResult.assemblyUsage.reservedBytes,0);assert.equal(pinnedResult.assemblyUsage.passes,1);
+    assert.ok(pinnedResult.assemblyUsage.bytes<=256*1024*1024);assert.ok(pinnedResult.assemblyUsage.nodes<=16000000);
+    assert.ok(pinnedResult.assemblyUsage.operations<=16384);assert.ok(pinnedResult.assemblyUsage.elapsedMs<=30000);
+    assert.equal(attempts.length,pinnedAttemptStart+2,"literal SDK scans are separate from protected pin/final attempts");
+    for(const attempt of attempts.slice(pinnedAttemptStart))assert.deepEqual(
+        {reads:attempt.reads,queries:attempt.queries,writes:attempt.writes},{reads:13,queries:0,writes:0});
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);
+    console.log("PASS private pinned recovery proof actual SDK: original two-page actor, null IO, protected pin, literal SDK loader and complete original proof on one elapsed budget, final thirteen-point binding recheck; four flags false, no publication or restore.");
     assert.deepEqual(await assets(),assetBefore);assert.deepEqual(await Promise.all([runRef.get(),fenceRef.get()]).then(rows=>rows.map(row)),controls);
     await assert.rejects(()=>patrol.observePresence(request(),{operationId:"inventory-fenced-heartbeat1",expectedRevision:2,
         expectedSequence:18,intent:"heartbeat",elementBox:"keep"}),/RECOVERY_AUDIT_MAINTENANCE/);
