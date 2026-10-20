@@ -6,6 +6,7 @@ import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.m
 import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
 import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
 import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
+import {syncPlayerSkillConfigCatalog} from "./lib/player-skill-config-catalog.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -23,6 +24,7 @@ await syncPatrolSourceCatalog(ROOT,checkOnly);
 syncPatrolItemCatalog(ROOT,checkOnly);
 syncPatrolProgressPolicy(ROOT,checkOnly);
 await syncCharacterExpThresholds(ROOT,checkOnly);
+await syncPlayerSkillConfigCatalog(ROOT,checkOnly);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
