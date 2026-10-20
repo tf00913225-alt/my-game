@@ -1,6 +1,7 @@
 "use strict";
 
 const https=require("node:https");
+const {performance}=require("node:perf_hooks");
 const {createHash,randomBytes}=require("node:crypto");
 const BUCKET="four-symbols-jianghu-recovery-private";
 const MAX_BYTES=32*1024*1024,JSON_BYTES=64*1024,DEADLINE_MS=20000;
@@ -36,16 +37,25 @@ function credential(){
 // One wall deadline spans credential acquisition and every response body. No
 // provider error, request object, credential or raw response escapes this IO.
 function operation(action){
+    const deadline=performance.now()+DEADLINE_MS;
     return new Promise((resolve,reject)=>{
         let finished=false,request,response,writeAttempted=false;
+        const deadlineError=()=>error(writeAttempted?"UNKNOWN_COMMIT":"DEADLINE_EXCEEDED");
         const stop=(failure,value)=>{
-            if(finished)return;finished=true;clearTimeout(timer);
+            if(finished)return;
+            if(!failure&&performance.now()>=deadline)failure=deadlineError();
+            finished=true;clearTimeout(timer);
             if(failure){request?.destroy();response?.destroy();reject(failure);}else resolve(value);
         };
-        const timer=setTimeout(()=>stop(error(writeAttempted?"UNKNOWN_COMMIT":"DEADLINE_EXCEEDED")),DEADLINE_MS);
+        const live=()=>{
+            if(finished)return false;
+            if(performance.now()>=deadline){stop(deadlineError());return false;}
+            return true;
+        };
+        const timer=setTimeout(()=>stop(deadlineError()),DEADLINE_MS);
         const transportFailure=()=>error(writeAttempted?"UNKNOWN_COMMIT":"UNAVAILABLE");
         const call=(method,path,{body,limit=JSON_BYTES,expectedSize,expectedMd5,write=false,missing=false}={})=>new Promise((done,fail)=>{
-            if(finished){fail(error("DEADLINE_EXCEEDED"));return;}
+            if(!live()){fail(deadlineError());return;}
             let complete=false;
             const end=(failure,value)=>{if(complete)return;complete=true;failure?fail(failure):done(value);};
             try{
@@ -53,6 +63,7 @@ function operation(action){
                 if(body){headers["Content-Type"]=body.type;headers["Content-Length"]=String(body.length);}
                 request=https.request({protocol:"https:",hostname:"storage.googleapis.com",port:443,method,path,headers},res=>{
                     response=res;
+                    if(!live()){end(deadlineError());res.destroy();return;}
                     const status=res.statusCode,encoding=res.headers["content-encoding"];
                     const rejectResponse=code=>{end(error(code));res.destroy();};
                     if(status===401||status===403){rejectResponse(status===401?"UNAUTHENTICATED":"PERMISSION_DENIED");return;}
@@ -68,7 +79,8 @@ function operation(action){
                     }
                     let count=0;const chunks=[],md5=expectedSize===undefined?null:createHash("md5");
                     res.on("data",chunk=>{
-                        if(complete||finished)return;
+                        if(complete)return;
+                        if(!live()){end(deadlineError());return;}
                         if(!Buffer.isBuffer(chunk)||count+chunk.length>limit||
                            (expectedSize!==undefined&&count+chunk.length>expectedSize)){rejectResponse("RESOURCE_EXHAUSTED");return;}
                         count+=chunk.length;chunks.push(chunk);md5?.update(chunk);
@@ -76,10 +88,12 @@ function operation(action){
                     res.on("error",()=>end(transportFailure()));
                     res.on("aborted",()=>end(transportFailure()));
                     res.on("end",()=>{
-                        if(complete||finished)return;
+                        if(complete)return;
+                        if(!live()){end(deadlineError());return;}
                         if(!res.complete||(expectedSize!==undefined&&count!==expectedSize)){end(error("DATA_LOSS"));return;}
                         const digest=md5?.digest("base64");
                         if(expectedMd5!==undefined&&digest!==expectedMd5){end(error("DATA_LOSS"));return;}
+                        if(!live()){end(deadlineError());return;}
                         // Size and MD5 both pass before materializing media.
                         end(null,{bytes:Buffer.concat(chunks,count),md5:digest});
                     });
@@ -97,8 +111,8 @@ function operation(action){
             catch(_){throw error("DATA_LOSS");}
         };
         let token,authenticated=false;
-        Promise.resolve().then(()=>credential().getAccessToken()).then(async value=>{
-            if(finished)return;
+        Promise.resolve().then(()=>live()?credential().getAccessToken():undefined).then(async value=>{
+            if(!live())return;
             if(!value||typeof value.access_token!=="string"||!value.access_token||/[\r\n]/.test(value.access_token))throw error("UNAUTHENTICATED");
             token=value.access_token;
             authenticated=true;

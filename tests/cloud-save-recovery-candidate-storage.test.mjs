@@ -12,7 +12,7 @@ const input={bucketName,objectName},bytes=Buffer.from('original immutable candid
 const md5=data=>createHash('md5').update(data).digest('base64');
 const meta=(generation='9007199254740993',data=bytes)=>({bucket:bucketName,name:objectName,generation,size:String(data.length),md5Hash:md5(data)});
 function harness(plans=[],{token=async()=>({access_token:'PRIVATE_TOKEN_DO_NOT_LEAK'}),concat=Buffer.concat}={}){
-    const calls=[],timers=new Map();let serial=0,tokenCalls=0;
+    const calls=[],timers=new Map();let serial=0,tokenCalls=0,now=0;
     const clock={setTimeout:(fn,ms)=>{assert.equal(ms,20000);const id=++serial;timers.set(id,fn);return id;},clearTimeout:id=>timers.delete(id)};
     const fakeHttps={request(options,callback){
         const plan=plans.shift();assert(plan,'unexpected network request');
@@ -25,7 +25,9 @@ function harness(plans=[],{token=async()=>({access_token:'PRIVATE_TOKEN_DO_NOT_L
             res.destroy=()=>{res.destroyed=true;queueMicrotask(()=>res.emit('close'));};
             calls.at(-1).response=res;callback(res);
             if(res.destroyed)return;
+            plan.beforeData?.();
             for(const chunk of plan.chunks??[Buffer.from(JSON.stringify(plan.json??meta()))]){if(res.destroyed)break;res.emit('data',chunk);}
+            plan.beforeEnd?.();
             if(plan.aborted)res.emit('aborted');else if(plan.earlyClose)res.emit('close');
             else if(!res.destroyed){res.emit('end');res.emit('close');}
         });};
@@ -38,12 +40,13 @@ function harness(plans=[],{token=async()=>({access_token:'PRIVATE_TOKEN_DO_NOT_L
         if(name==='test:buffer')return {from:Buffer.from.bind(Buffer),isBuffer:Buffer.isBuffer,concat};
         if(name==='firebase-admin/app')return {getApp:()=>({options:{credential:{getAccessToken:()=>{tokenCalls++;return token();}}}})};
         if(name==='node:crypto')return {createHash,randomBytes:size=>Buffer.alloc(size,7)};
+        if(name==='node:perf_hooks')return {performance:{now:()=>now}};
         throw Error('unexpected dependency '+name);
     };
     compiled._compile(source.replace('const https=require("node:https");',
         'const https=require("node:https");const {setTimeout,clearTimeout}=require("test:clock");const Buffer=require("test:buffer");'),filename.pathname);
     return {io:compiled.exports.createRecoveryCandidateStorage(),calls,timers,tokenCalls:()=>tokenCalls,
-        expire:()=>{for(const fn of [...timers.values()])fn();}};
+        advance:ms=>{now+=ms;},expire:()=>{for(const fn of [...timers.values()])fn();}};
 }
 const refused=(promise,code)=>assert.rejects(promise,error=>{
     assert.equal(error.code,code);assert(!String(error.stack).includes('PRIVATE_TOKEN_DO_NOT_LEAK'));assert.equal(Object.hasOwn(error,'cause'),false);return true;
@@ -168,5 +171,38 @@ test('invalid tuples, local size and generation inputs refuse before credentials
     }
     for(const payload of [Buffer.alloc(0),Buffer.alloc(32*1024*1024+1),'raw']){
         const h=harness();await refused(h.io.createOnly({...input,bytes:payload,ifGenerationMatch:'0'}),'INVALID_ARGUMENT');assert.equal(h.tokenCalls(),0);
+    }
+});
+
+test('overdue token microtask cannot open HTTPS before the delayed timer callback runs',async()=>{
+    let release;
+    const h=harness([{json:meta()}],{token:()=>new Promise(resolve=>{release=resolve;})});
+    const pending=h.io.lookupMetadata(input);await Promise.resolve();h.advance(20001);
+    release({access_token:'PRIVATE_TOKEN_DO_NOT_LEAK'});
+    await refused(pending,'DEADLINE_EXCEEDED');assert.equal(h.calls.length,0);assert.equal(h.timers.size,0);
+});
+
+test('overdue media chunks and end cannot retain or concatenate a successful body while timers are starved',async()=>{
+    for(const hook of ['beforeData','beforeEnd']){
+        let concats=0;
+        const plan={chunks:[bytes],[hook]:()=>h.advance(20001)};
+        const h=harness([{json:meta()},plan],{concat:(...args)=>{concats++;return Buffer.concat(...args);}});
+        await refused(h.io.readExact({...input,generation:'9007199254740993'}),'DEADLINE_EXCEEDED');
+        assert.equal(concats,1,'metadata only; overdue media cannot concatenate');
+        assert.equal(h.calls[1].req.destroyed,true);assert.equal(h.calls[1].response.destroyed,true);
+        assert.equal(h.timers.size,0);
+    }
+});
+
+test('deadline is checked again at the second request and final resolution; attempted create is uncertain',async()=>{
+    const h=harness([{json:meta()}],{concat:(...args)=>{const result=Buffer.concat(...args);h.advance(20001);return result;}});
+    await refused(h.io.readExact({...input,generation:'9007199254740993'}),'DEADLINE_EXCEEDED');
+    assert.equal(h.calls.length,1,'overdue metadata continuation cannot open the media request');
+    const lookup=harness([{json:meta()}],{concat:(...args)=>{const result=Buffer.concat(...args);lookup.advance(20001);return result;}});
+    await refused(lookup.io.lookupMetadata(input),'DEADLINE_EXCEEDED');
+    for(const hook of ['beforeData','beforeEnd']){
+        const plan={status:201,json:meta(),[hook]:()=>write.advance(20001)},write=harness([plan]);
+        await refused(write.io.createOnly({...input,bytes,ifGenerationMatch:'0'}),'UNKNOWN_COMMIT');
+        assert.equal(write.calls[0].req.destroyed,true);assert.equal(write.timers.size,0);
     }
 });
