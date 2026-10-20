@@ -7009,7 +7009,8 @@ body > .v169-rpg-dialog-layer{
 #game-stage #battlePage .battle-item-menu,
 #game-stage #battlePage .battle-target-prompt,
 #game-stage #battlePage .battle-status-detail-panel,
-#game-stage #battlePage .battle-boss-mechanism-drawer{
+#game-stage #battlePage .battle-boss-mechanism-drawer,
+#game-stage #adventurePage .adventure-story-dialogue{
     border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     border-radius:calc(10 * var(--ui-length-unit,1px));
@@ -7039,7 +7040,8 @@ body > .v169-rpg-dialog-layer{
 .v141-reward-toast > strong,
 .v17351-ad-panel h2,
 #game-stage #battlePage .battle-status-detail-panel h3,
-#game-stage #battlePage .battle-boss-mechanism-drawer > header b{
+#game-stage #battlePage .battle-boss-mechanism-drawer > header b,
+#game-stage #adventurePage .adventure-story-chapter{
     border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-text,#EEE7D8);

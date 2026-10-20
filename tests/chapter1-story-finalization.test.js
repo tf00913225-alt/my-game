@@ -71,6 +71,16 @@ function runtime(saved,initialSave=true){
 function finishDialogue(h){let guard=30;while(h.state().dialogue&&guard-->0)assert.equal(h.api.advanceDialogue(),true);assert.ok(guard>0);}
 function at(h,id){h.state().currentNodeId=id;h.state().onboarding={active:true,phase:"story",nodeId:"c1_01"};}
 
+test("story return keeps the onboarding guard and permits an existing-character reader to leave",()=>{
+    const h=runtime();at(h,"c1_01");h.api.startStory("c1_01");
+    assert.equal(h.api.closeToCity(),false,"active onboarding cannot be bypassed by a return control");
+    assert.equal(h.state().onboarding.active,true);
+    assert.equal(h.api.getView().panel,"story");
+    h.state().onboarding.active=false;
+    assert.equal(h.api.closeToCity(),true,"the original runtime allows an existing-character reader to return");
+    assert.equal(h.launches(),0,"reading and returning do not start a battle");
+});
+
 test("tutorial defeat requires learned equipped skill and equipped starter armor before same-node retry",()=>{
     for(const [id,action] of [["c1_02","skill"],["c1_04","equipment"]]){
         const h=runtime();at(h,id);assert.equal(h.api.beginBattle(id),true);assert.equal(h.options().tutorial,true);

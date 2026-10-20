@@ -383,6 +383,8 @@
         const root=ensureRoot(),view=runtimeView();
         if(!root||!view||!view.chapter||!view.state){ return; }
         root.dataset.panel=view.panel;
+        const back=root.querySelector(".adventure-back-button");
+        if(back){back.hidden=view.panel==="story"&&!!view.tutorial?.active;}
         const title=root.querySelector("#adventureHeaderTitle"),meta=root.querySelector("#adventureHeaderMeta");
         if(title){ title.textContent=view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>主線章節</span>'; }

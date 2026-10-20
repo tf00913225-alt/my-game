@@ -6,8 +6,8 @@ const vm=require('node:vm');
 test('adventure opens a different inner page at its title and preserves same-page/map positions',()=>{
     const body={innerHTML:'<div class="adventure-map-canvas"></div>',scrollTop:900,
         querySelector(selector){return selector==='.adventure-map-canvas'&&this.innerHTML.includes('class="adventure-map-canvas"')?{}:null;}};
-    const title={},meta={};
-    const root={isConnected:true,dataset:{},querySelector(selector){return selector==='#adventureView'?body:selector==='#adventureHeaderTitle'?title:selector==='#adventureHeaderMeta'?meta:null;}};
+    const title={},meta={},back={hidden:false};
+    const root={isConnected:true,dataset:{},querySelector(selector){return selector==='#adventureView'?body:selector==='#adventureHeaderTitle'?title:selector==='#adventureHeaderMeta'?meta:selector==='.adventure-back-button'?back:null;}};
     const state={currentNodeId:'rest',completedNodes:{},rewardClaims:{},branchSelections:{},chapterCompleted:false};
     const view={panel:'map',chapter:{title:'山關初行',suggestedLevel:10,nodes:[{id:'rest',type:'rest',title:'山路驛站',x:50,y:50}],routes:[],hiddenNodes:[]},state};
     const document={readyState:'loading',addEventListener(){},getElementById(id){return id==='adventurePage'?root:null;}};
@@ -22,4 +22,10 @@ test('adventure opens a different inner page at its title and preserves same-pag
     view.panel='event-result';render();assert.equal(body.scrollTop,0,'changing between inner pages starts at the new title');
     view.panel='map';render();assert.equal(body.scrollTop,900,'returning to the map restores its own saved position');
     body.scrollTop=950;render();assert.equal(body.scrollTop,950,'map rerender keeps the latest position');
+    view.panel='story';view.tutorial={active:true};render();
+    assert.equal(back.hidden,true,'active onboarding does not offer a return rejected by the runtime guard');
+    view.tutorial.active=false;render();
+    assert.equal(back.hidden,false,'a story reader whose formal guard allows returning gets the original return control');
+    view.tutorial.active=true;view.panel='rest';render();
+    assert.equal(back.hidden,false,'leaving the story restores the original page-header control');
 });
