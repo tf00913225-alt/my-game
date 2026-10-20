@@ -20,7 +20,7 @@ function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'}){
     assert.equal(source.split(needle).length,2);
     source=source.replace(needle,'return Object.freeze({pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
     if(enabled){
-        source=source.replace('const immutableCandidateIO=null;','const immutableCandidateIO=require("test-only-immutable-candidate-io");');
+        source=source.replace('return buildRecoveryOwner(deps,null,false);','return buildRecoveryOwner(deps,require("test-only-immutable-candidate-io"),false);');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
     source=source.replace('return Object.freeze({pinCandidatePublication,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinCandidatePublication,');
