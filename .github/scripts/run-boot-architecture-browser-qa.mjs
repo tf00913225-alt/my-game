@@ -84,15 +84,17 @@ function gameSave(uid){
   const blade={id:"qa-blade-"+suffix,name:"QA Blade "+suffix,icon:"",type:"hand",count:1,price:1,stats:{attack:suffix==="B"?2:1}};
   return {player:{id:"角色-"+suffix,element:"fire",gender:"female",level:10,exp:0,expNext:100,attack:1,vitality:1,energy:1,intelligence:1,spirit:1,agility:1,bonusHP:0,bonusSP:0,hp:150,sp:65,attributePoints:0,skillPoints:2,activeBuffs:[],statusEffects:[],isDefending:false},sharedExp:suffix==="B"?222:111,gold:suffix==="B"?2222:1111,inventoryItems:[token],characterEquipment:{fire:{head:null,hand:blade,shoulder:null,armor:null,shoes:null,ring:null}},characterSkillLoadouts:{fire:{name:"角色-"+suffix,skillLevels:{flameSlash:1},equippedSkills:["flameSlash"]}}};
 }
-export async function readCurrentCloudSave(){
+export async function readCurrentCloudSave({serverOnly=false}={}){
+  window.__qaCloudReads=(window.__qaCloudReads||0)+1;
   await new Promise(resolve=>setTimeout(resolve,35));
   const uid=window.__qaAuthUser&&window.__qaAuthUser.uid;
   if(!uid){const error=new Error("auth required");error.code="firebase/auth-required";throw error;}
+  if(sessionStorage.getItem('__qa_cloud_offline')==='1'){throw new Error('simulated reconnect network failure');}
   if(uid==="uid-cloud-error"){const error=new Error("simulated Firestore read failure");error.code="permission-denied";throw error;}
   if(uid==="uid-guest"||uid==="uid-legacy"||uid==="uid-corrupt"||uid==="uid-google"){
     return Object.freeze({exists:false,uid,path:"users/"+uid+"/saves/current",data:null});
   }
-  return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",data:{ownerUid:uid,authoritativeStateReady:true,status:"ready",gameSave:gameSave(uid)}});
+  return Object.freeze({exists:true,uid,path:"users/"+uid+"/saves/current",...(serverOnly?{serverConfirmed:true}:{}),data:{ownerUid:uid,serverRevision:1,authoritativeStateReady:true,status:"ready",gameSave:serverOnly&&window.__qaReconnectCloudSave?window.__qaReconnectCloudSave:gameSave(uid)}});
 }
 export async function bootstrapTrustedCloudSave(){return {status:"qa-no-write"};}
 export async function observeCanonicalAccountMode(){throw new Error("QA canonical earning intents are isolated");}export async function beginCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function completeCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function abandonCanonicalElementBoxAd(){throw new Error("QA canonical earning intents are isolated");}export async function issueCanonicalPatrolTicket(){throw new Error("QA canonical earning intents are isolated");}export async function settleCanonicalPatrolMember(){throw new Error("QA canonical earning intents are isolated");}export async function settleCanonicalPatrolTerminal(){throw new Error("QA canonical earning intents are isolated");}export async function abandonCanonicalPatrolTicket(){throw new Error("QA canonical earning intents are isolated");}export async function createAdditionalCanonicalCharacter(){throw new Error("QA canonical intents are isolated");}export async function allocateCanonicalSharedExp(){throw new Error("QA canonical intents are isolated");}export async function allocateCanonicalAttributePoint(){throw new Error("QA canonical intents are isolated");}export async function createInitialCanonicalCharacter(){throw new Error("QA never creates a cloud character");}
@@ -262,6 +264,7 @@ async function browserDiagnostic(client){
           readyState:document.readyState,
           startupState:window.FourSymbolsStartupPolicy?.getState?.()||null,
           startupUid:window.FourSymbolsStartupPolicy?.getUid?.()||null,
+          reconnect:window.FourSymbolsStartupPolicy?.getReconnectState?.()||null,
           loaderState:document.getElementById("startupLoader")?.dataset?.state||null,
           loaderHidden:document.getElementById("startupLoader")?.hidden??null,
           title:document.getElementById("startupStatusTitle")?.textContent||null,
@@ -609,6 +612,30 @@ try{
     assert.ok(countdown.includes(5)&&countdown.includes(4)&&countdown.includes(3)&&countdown.includes(2)&&countdown.includes(1)&&countdown.includes(0));
     assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
     evidence.checks.resumeCountdown=countdown;
+    // A real offline destination reconnects through the read-only Owner. Keep
+    // every UID save/metadata/sidecar byte and the hydrated character intact.
+    await client.eval(`sessionStorage.setItem('__qa_cloud_offline','1');location.reload()`);
+    await waitFor(client,"window.FourSymbolsStartupPolicy?.getState()==='OFFLINE_READY'&&performance.getEntriesByName('four-symbols:main-city-interactive').length>0","existing UID offline city",20000);
+    const offlineBytes=await client.eval(`JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('four_symbols_')).sort().map(key=>[key,localStorage.getItem(key)])))`);
+    await client.eval(`window.dispatchEvent(new Event('online'))`);
+    await waitFor(client,"FourSymbolsStartupPolicy.getReconnectState().status==='unconfirmed'","offline reconnect refusal");
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthBackButton').hidden`),false);
+    assert.equal(await client.eval(`FourSymbolsStartupPolicy.getState()`),'OFFLINE_READY');
+    await client.eval(`sessionStorage.removeItem('__qa_cloud_offline');FourSymbolsFirebaseLifecycle.closeAuth();window.dispatchEvent(new Event('offline'));window.dispatchEvent(new Event('online'))`);
+    await waitFor(client,"FourSymbolsStartupPolicy.getReconnectState().status==='conflict'","local descendant conflict without overwrite");
+    // The old remote fixture is intentionally smaller than the hydrated local
+    // descendant. Now explicitly stage equal bytes as a separate server fixture.
+    await client.eval(`window.__qaReconnectCloudSave=structuredClone(FourSymbolsAccountSave.readForUid('uid-A').save);FourSymbolsFirebaseLifecycle.closeAuth();window.dispatchEvent(new Event('offline'));window.dispatchEvent(new Event('online'))`);
+    await waitFor(client,"FourSymbolsStartupPolicy.getReconnectState().status==='confirmed'","server-confirmed read-only reconnect");
+    assert.equal(await client.eval(`JSON.stringify(Object.fromEntries(Object.keys(localStorage).filter(key=>key.startsWith('four_symbols_')).sort().map(key=>[key,localStorage.getItem(key)])))`),offlineBytes);
+    assert.equal(await client.eval(`document.getElementById('firebaseAuthOverlay').classList.contains('show')`),false);
+    assert.equal(await client.eval(`FourSymbolsStartupPolicy.getState()`),'OFFLINE_READY');
+    const readsBeforeRetry=await client.eval(`window.__qaCloudReads`);
+    await client.eval(`FourSymbolsStartupPolicy.retry()`);
+    assert.equal(await client.eval(`window.__qaCloudReads`),readsBeforeRetry+1);
+    assert.equal(await client.eval(`FourSymbolsStartupPolicy.getState()`),'OFFLINE_READY');
+    evidence.checks.readOnlyReconnect=await client.eval(`({state:FourSymbolsStartupPolicy.getState(),status:FourSymbolsStartupPolicy.getReconnectState().status,playerId:player.id,gold})`);
+
     evidence.status="PASS";evidence.finishedAt=new Date().toISOString();fs.writeFileSync(evidenceFile,JSON.stringify(evidence,null,2)+"\n");
     console.log(`✓ Boot / First Play mobile browser QA passed (pack ${manifest.firstPlay.totalResources} resources / ${manifest.firstPlay.totalBytes} bytes; returning auth ${evidence.performance.coldAuth.readyMs}ms; warm city ${evidence.performance.warmExisting.readyMs}ms)`);
 }catch(error){
