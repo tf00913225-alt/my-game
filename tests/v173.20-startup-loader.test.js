@@ -51,14 +51,14 @@ console.log("✓ account-first startup state machine with real readiness");
         activeUser:{uid:'failed-read'},STATES:{ERROR:'ERROR',SAVE_LOADING:'SAVE_LOADING'},
         global:{getComputedStyle:()=>({transitionDuration:'0.36s'}),setTimeout(fn){timers.push(fn);return timers.length;},clearTimeout(){}},
         showCity(){},status(){},emit(){},Promise,parseFloat,String,
-        firebase:{setUiState(s){calls.push(['state',s.mode,s.error]);},openAuth(){calls.push(['account']);},closeAuth(){calls.push(['close']);}}
+        firebase:{setUiState(s){calls.push(['state',s.mode,s.error,s.message]);},openAuth(){calls.push(['account']);},closeAuth(){calls.push(['close']);}}
     };
     context.transition=next=>{context.state=next;};
     vm.createContext(context);
     vm.runInContext(source.slice(source.indexOf('    let exit=null;'),source.indexOf('    function safeCloudEmpty('))+
         source.slice(source.indexOf('    function fail('),source.indexOf('    function reloadForAccountTransition('))+'this.failRead=fail;',context);
     const error=new Error('read failed');context.failRead(error,'Cannot read safely.',7);
-    assert.deepEqual(calls,[['state','ERROR',true],['account']]);
+    assert.deepEqual(calls,[['state','ERROR',true,'Cannot read safely.'],['account']], 'player copy uses the supplied explanation; raw error stays diagnostic');
     assert.equal(context.state,'ERROR');assert.equal(context.saveResolved,false);assert.equal(context.lastError,error);
     assert.ok(classes.has('is-leaving'),'account retry must not remain behind the loader');
     timers.at(-1)();assert.equal(root.hidden,true);
