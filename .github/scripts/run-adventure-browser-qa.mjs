@@ -141,6 +141,8 @@ const scenarios={
 
 for(let stage=1;stage<=20;stage++)scenarios['mapSelected'+stage]=formalMap(true,'c1_'+String(stage).padStart(2,'0'));
 if(process.argv.includes('--preflight-only')){
+    const inline=fixtureHtml('http://127.0.0.1/').match(/<script>([\s\S]*)<\/script>/);
+    assert.ok(inline,'complete inline layout fixture exists');new vm.Script(inline[1],{filename:'adventure-layout-inline.js'});
     for(let stage=1;stage<=20;stage++){
         const html=scenarios['mapSelected'+stage];assert.equal((html.match(/data-stage-id=/g)||[]).length,20);assert.doesNotMatch(html,/<select\b/);assert.match(html,/id="adventureStagePicker"/);
     }
@@ -148,8 +150,8 @@ if(process.argv.includes('--preflight-only')){
     process.exit(0);
 }
 const layoutServer=await startServer();
-function fixtureHtml(){
-    return `<!doctype html><html lang="zh-Hant"><head><base href="${layoutServer.url}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${builtCss}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}*{box-sizing:border-box}#game-viewport{position:fixed;inset:0;overflow:hidden;background:#050505}#game-stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6666667px;transform:scale(${1080/420});transform-origin:top left;overflow:hidden}#qa-result{display:none}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="game-content"></div></div></div><pre id="qa-result"></pre><script>
+function fixtureHtml(baseUrl=layoutServer.url){
+    return `<!doctype html><html lang="zh-Hant"><head><base href="${baseUrl}"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><style>${builtCss}</style><style>html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#050505}*{box-sizing:border-box}#game-viewport{position:fixed;inset:0;overflow:hidden;background:#050505}#game-stage{position:absolute;left:50%;top:50%;width:1080px;height:1920px;transform-origin:center center}#game-content{position:absolute;left:0;top:0;width:420px;height:746.6666667px;transform:scale(${1080/420});transform-origin:top left;overflow:hidden}#qa-result{display:none}</style></head><body><div id="game-viewport"><div id="game-stage"><div id="game-content"></div></div></div><pre id="qa-result"></pre><script>
 const scenarios=${JSON.stringify(scenarios)};const errors=[];
 window.onerror=(message,source,line,column)=>errors.push(String(message)+"@"+line+":"+column);
 window.onunhandledrejection=event=>errors.push(String(event.reason||"unhandled rejection"));
@@ -182,11 +184,13 @@ function measure(name,html){
  return result;
 }
 function run(){
+ try{
  const scale=Math.min(innerWidth/1080,innerHeight/1920);document.getElementById("game-stage").style.transform="translate(-50%,-50%) scale("+scale+")";
  const results=Object.entries(scenarios).map(([name,html])=>measure(name,html));
  document.getElementById("game-content").innerHTML=scenarios.map;void document.body.offsetHeight;
- const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;const reducedAnimation=getComputedStyle(document.querySelector(".adventure-map-fog")).animationName;
+ const reduced=matchMedia("(prefers-reduced-motion: reduce)").matches;const animationTarget=document.querySelector('.adventure-node.status-current .adventure-node-icon');if(!animationTarget)throw Error('selected map node icon missing');const reducedAnimation=getComputedStyle(animationTarget).animationName;
  document.getElementById("qa-result").textContent="QA_JSON:"+JSON.stringify({viewport:[innerWidth,innerHeight],errors,results,reduced,reducedAnimation});
+ }catch(error){errors.push(String(error.stack||error));document.getElementById('qa-result').textContent='QA_JSON:'+JSON.stringify({viewport:[innerWidth,innerHeight],errors,fixtureFailed:true,diagnostic:{name:error.name,message:error.message,stack:error.stack}});}
 }
 run();
 </script></body></html>`;
@@ -217,6 +221,9 @@ async function runChromeViewport(chrome,width,height,reduced){
             qaText=evaluation.result?.value||"";if(qaText.startsWith("QA_JSON:")){ break; }await sleep(50);
         }
         assert.match(qaText,/^QA_JSON:/,`missing QA metrics at ${width}x${height}`);
+        const fixtureData=JSON.parse(qaText.slice('QA_JSON:'.length));
+        fs.writeFileSync(path.join(ARTIFACT_DIR,`adventure-layout-${width}x${height}${reduced?'-reduced':''}.json`),JSON.stringify(fixtureData,null,2));
+        assert.equal(fixtureData.fixtureFailed,undefined,`layout fixture failed at ${width}x${height}: ${JSON.stringify(fixtureData.diagnostic)}`);
         const pixels=await cdp.send('Runtime.evaluate',{expression:`(async()=>{const load=async source=>{const image=new Image();image.src=source;await image.decode();return image;};const a=await load(${JSON.stringify('data:image/png;base64,'+fs.readFileSync(mapProvenance.master).toString('base64'))}),b=await load(${JSON.stringify('data:image/webp;base64,'+fs.readFileSync(mapProvenance.runtime).toString('base64'))});if(a.width!==941||a.height!==1672||a.width!==b.width||a.height!==b.height)throw Error('reference dimensions');const c=document.createElement('canvas');c.width=a.width;c.height=a.height;const context=c.getContext('2d');context.drawImage(a,0,0);const first=context.getImageData(0,0,c.width,c.height).data;context.clearRect(0,0,c.width,c.height);context.drawImage(b,0,0);const second=context.getImageData(0,0,c.width,c.height).data;for(let i=0;i<first.length;i++)if(first[i]!==second[i])throw Error('reference pixels differ at '+i);const source=getComputedStyle(document.querySelector('.adventure-world-bg')).backgroundImage;if(!source.includes('chapter1-route-map.webp'))throw Error('runtime map not using reference plate');return {width:a.width,height:a.height,decodedPixelsEqual:true,background:source};})()`,returnByValue:true,awaitPromise:true});
         assert.equal(pixels.exceptionDetails,undefined,'reference WebP and master PNG decode to identical pixels');
         if(!reduced){
