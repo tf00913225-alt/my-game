@@ -136,7 +136,7 @@
           "build/feature-adventure-ui.a4792f08e4db.js"
         ],
         "styles": [
-          "build/feature-adventure.8612b62010c8.css"
+          "build/feature-adventure.aabb995d8719.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -915,9 +915,9 @@
       "sha256": "f68f5350eccc",
       "bytes": 1306
     },
-    "build/feature-adventure.8612b62010c8.css": {
-      "sha256": "8612b62010c8",
-      "bytes": 28061
+    "build/feature-adventure.aabb995d8719.css": {
+      "sha256": "aabb995d8719",
+      "bytes": 28081
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",
