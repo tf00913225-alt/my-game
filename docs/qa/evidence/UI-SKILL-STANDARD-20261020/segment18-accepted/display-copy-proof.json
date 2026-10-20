@@ -1,0 +1,60 @@
+{
+  "baseHead": "ff7e8cb671119e1053f56abaf090a317b793ae80",
+  "file": "js/60-team-relic-system.js",
+  "sourceBeforeSha256": "f5fb48031b920625ccacc11cdb109c086f0230b61feac200d82722f0ff5a3fd8",
+  "sourceAfterSha256": "4e9d0c96d827f0afb6703d204f4ac7a3366c8679aa912fd9cb7215e2788ec006",
+  "allOtherSourceBytesIdentical": true,
+  "pairs": [
+    [
+      "返還取floor",
+      "返還數量無條件捨去小數",
+      2
+    ],
+    [
+      "不影響DOT與環境傷害",
+      "不影響持續傷害與環境傷害",
+      1
+    ],
+    [
+      "MISS也計入；硬控完整跳過、DOT及狀態Tick不計",
+      "未命中也計入；因控制而完整跳過的行動、持續傷害及狀態結算不計",
+      1
+    ],
+    [
+      "MISS、完全Barrier格擋、DOT及其他非敵方直接傷害不消耗",
+      "未命中、被結界完全抵擋、持續傷害及其他非敵方直接傷害不消耗",
+      1
+    ],
+    [
+      "秘寶、DOT、反擊、追擊、反射、環境擊殺不觸發；無敵人不演出",
+      "秘寶、持續傷害、反擊、追擊、反射、環境擊殺不觸發；無存活敵人時不顯示追擊動畫",
+      1
+    ],
+    [
+      "傷害併入普通加算桶（上限50%），爆擊上限95%；DOT、反擊、追擊、秘寶不受益",
+      "傷害加成與其他普通直接傷害加成相加計算（合計上限50%），爆擊上限95%；持續傷害、反擊、追擊、秘寶不受益",
+      1
+    ],
+    [
+      "只認正式一般負面，不把Boss機制或工程標記當負面",
+      "僅計算有效的一般負面狀態，Boss 機制不列入",
+      1
+    ],
+    [
+      "敵方DOT計入",
+      "敵方持續傷害計入",
+      1
+    ],
+    [
+      "正式成功寫入可淨化負面後",
+      "可淨化的負面狀態成功生效後",
+      1
+    ],
+    [
+      "在可解除負面成功寫入後",
+      "在可解除的負面狀態成功生效後",
+      1
+    ]
+  ],
+  "scope": "Only whitelisted player-facing string fragments changed. All runtime tokens, Math.floor, scalars, triggers, costs, flags and remaining bytes preserved."
+}
