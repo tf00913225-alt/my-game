@@ -1,0 +1,7 @@
+{
+  "schemaVersion": 1,
+  "policyVersion": "player-skill-loadout-v1",
+  "ruleVersion": "v1",
+  "learningPolicySha256": "08c643b8a0a147b604c1eb8d5102b97cae51eaed277cfb7b2ce303b3cb62100a",
+  "ruleSemanticSha256": "4e9a0db56fdc1c9050028ac44d9824ed9eea246af88d93dabcc444cf869c1bb8"
+}

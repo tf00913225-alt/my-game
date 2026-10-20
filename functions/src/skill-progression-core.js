@@ -129,6 +129,74 @@ const getRulesForVersion=function(version,catalog,damageSkillIds){
 if(version==="v1"){return createRulesV1(catalog,damageSkillIds);}
 throw new RangeError("Unsupported skill progression rules version");
 };
-global.FourSymbolsSkillProgressionCore=Object.freeze({createRules,getRulesForVersion,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
+// Separate retained loadout policy. Learning v1 above is intentionally unchanged.
+const createLoadoutRulesV1=function(catalog){
+if(!catalog||typeof catalog!=="object"||Array.isArray(catalog))throw new TypeError("skill catalogue required");
+const progression=createRulesV1(catalog,[]);
+function normalizeCrossElementEquip(equippedSkills,character){
+    if(!character||!Array.isArray(equippedSkills))return {equippedSkills:null,changed:false};
+    let seen=false,changed=false;
+    const next=equippedSkills.filter(skillId=>{
+        const skill=catalog[skillId];
+        if(!skill||!progression.isCrossElementSkill(character,skill))return true;
+        if(!seen){seen=true;return true;}
+        changed=true;return false;
+    }).slice(0,4);
+    return {equippedSkills:next,changed};
+}
+function equipSkill(character,loadout,skillId){
+    const skill=catalog[skillId];
+    if(!skill||!character||!loadout)return {status:"invalid",equippedSkills:null};
+    const raw=Number(loadout.skillLevels&&loadout.skillLevels[skillId]);
+    const level=Math.max(0,Math.floor(Number.isFinite(raw)?raw:0));
+    if(level<=0)return {status:"invalid",equippedSkills:null};
+    const normalized=normalizeCrossElementEquip(loadout.equippedSkills,character);
+    const equipped=normalized.equippedSkills||(loadout.equippedSkills||[]);
+    if(equipped.includes(skillId))return {status:"already-equipped",equippedSkills:equipped};
+    if(progression.isCrossElementSkill(character,skill)&&equipped.some(id=>catalog[id]&&progression.isCrossElementSkill(character,catalog[id])))
+        return {status:"cross-limit",equippedSkills:equipped};
+    if(equipped.length>=4)return {status:"full",equippedSkills:equipped};
+    equipped.push(skillId);return {status:"equipped",equippedSkills:equipped};
+}
+function removeEquippedSkill(equippedSkills,index){
+    const next=equippedSkills.slice();next.splice(index,1);return next;
+}
+function normalizeAction(action){return typeof action==="string"&&action?action:"normal";}
+function isUnsupportedAutoCategory(skill){return !!(skill&&["buff","passive","heal","revive"].includes(skill.category));}
+function isEquippedAndLearnedAutoSkill(loadout,skillId){
+    const skill=catalog[skillId];
+    return !!(skill&&!isUnsupportedAutoCategory(skill)&&loadout&&Array.isArray(loadout.equippedSkills)&&
+        loadout.equippedSkills.includes(skillId)&&((loadout.skillLevels&&loadout.skillLevels[skillId])||0)>0);
+}
+function rememberExplicitAction(config,action){
+    const next={...config},selected=normalizeAction(action);next.skill=selected;
+    if(selected==="normal")next.v136ActionIntent="normal";
+    else if(selected==="defend")next.v136ActionIntent="defend";
+    else{next.v136ActionIntent="skill";next.v136LastSkill=selected;}
+    return next;
+}
+function migrateCurrentIntent(config){
+    const next={...config},selected=normalizeAction(config.skill);
+    if(config.v136ActionIntent)return next;
+    if(selected==="normal")next.v136ActionIntent="normal";
+    else if(selected==="defend")next.v136ActionIntent="defend";
+    else{next.v136ActionIntent="skill";next.v136LastSkill=selected;}
+    return next;
+}
+function restoreSkillAfterLegacySync(config,loadout){
+    const next={...config};
+    if(config.v136ActionIntent==="skill"&&config.skill==="normal"&&isEquippedAndLearnedAutoSkill(loadout,config.v136LastSkill)){
+        next.skill=config.v136LastSkill;return {config:next,restored:true};
+    }
+    return {config:next,restored:false};
+}
+return Object.freeze({normalizeCrossElementEquip,equipSkill,removeEquippedSkill,normalizeAction,isUnsupportedAutoCategory,
+    isEquippedAndLearnedAutoSkill,rememberExplicitAction,migrateCurrentIntent,restoreSkillAfterLegacySync});
+};
+const getLoadoutRulesForVersion=function(version,catalog){
+if(version==="v1")return createLoadoutRulesV1(catalog);
+throw new RangeError("Unsupported skill loadout rules version");
+};
+global.FourSymbolsSkillProgressionCore=Object.freeze({createRules,getRulesForVersion,getLoadoutRulesForVersion,upgradeCosts:SKILL_UPGRADE_COST_BY_TARGET_LEVEL});
 if(typeof module!=="undefined"&&module.exports){module.exports=global.FourSymbolsSkillProgressionCore;}
 })(typeof window!=="undefined"?window:globalThis);

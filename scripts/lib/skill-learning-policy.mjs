@@ -51,3 +51,40 @@ export function verifySkillLearningPolicy(root){
  }
  return policy.ruleSemanticSha256;
 }
+
+// Separate versioned loadout policy; never rewrites retained learning v1.
+export function skillLoadoutRuleSemanticDigest(source){
+ const program=parse(source,{ecmaVersion:2022});
+ const wrapper=program.body[0]?.expression;
+ if(program.body.length!==1||wrapper?.type!=='CallExpression'||wrapper.callee?.id?.name!=='installSkillProgressionCore')
+  throw Error('Skill loadout UMD Owner is unsupported.');
+ const names=['createLoadoutRulesV1','getLoadoutRulesForVersion'];
+ const declarations=names.map(name=>wrapper.callee.body.body.filter(node=>node.type==='VariableDeclaration'&&node.kind==='const'&&
+  node.declarations.length===1&&node.declarations[0].id.name===name));
+ if(declarations.some(rows=>rows.length!==1||rows[0].declarations[0].init?.type!=='FunctionExpression'))
+  throw Error('Retained loadout v1 bindings are missing or ambiguous.');
+ const selector=declarations[1][0].declarations[0].init;
+ const expected=parse('(function(version,catalog){if(version==="v1")return createLoadoutRulesV1(catalog);throw new RangeError("Unsupported skill loadout rules version");})',{ecmaVersion:2022}).body[0].expression;
+ if(JSON.stringify(semantic(selector))!==JSON.stringify(semantic(expected)))throw Error('Retained loadout selector must directly forward its original arguments.');
+ function rejectRebinding(node){
+  if(!node||typeof node!=='object')return;
+  if((node.type==='AssignmentExpression'&&node.left.type==='Identifier'&&names.includes(node.left.name))||
+   (node.type==='UpdateExpression'&&node.argument.type==='Identifier'&&names.includes(node.argument.name)))
+   throw Error('Retained loadout binding cannot be reassigned.');
+  for(const child of Object.values(node))if(Array.isArray(child))child.forEach(rejectRebinding);else rejectRebinding(child);
+ }
+ rejectRebinding(wrapper);
+ return createHash('sha256').update(JSON.stringify(semantic(declarations.flat()))).digest('hex');
+}
+export function verifySkillLoadoutPolicy(root){
+ const policy=JSON.parse(readFileSync(join(root,'functions/src/skill-loadout-policy-v1.json'),'utf8'));
+ const source=readFileSync(join(root,'functions/src/skill-progression-core.js'),'utf8');
+ const learning=readFileSync(join(root,'functions/src/skill-learning-policy-v1.json'));
+ if(Object.keys(policy).sort().join(',')!=='learningPolicySha256,policyVersion,ruleSemanticSha256,ruleVersion,schemaVersion'||
+  policy.schemaVersion!==1||policy.ruleVersion!=='v1'||policy.policyVersion!=='player-skill-loadout-v1'||
+  policy.learningPolicySha256!==createHash('sha256').update(learning).digest('hex')||
+  policy.ruleSemanticSha256!==skillLoadoutRuleSemanticDigest(source))
+  throw Error('Retained skill loadout v1 changed; preserve v1 and add an explicit new version.');
+ verifySkillLearningPolicy(root);
+ return policy.ruleSemanticSha256;
+}

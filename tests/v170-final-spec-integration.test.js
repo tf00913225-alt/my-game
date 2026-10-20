@@ -58,6 +58,7 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/28-v133-economy-rebalance.js",
     "js/29-v134-fixes.js",
     "js/30-v135-fixes.js",
+    "functions/src/skill-progression-core.js",
     "js/31-v136-auto-battle-fix.js",
     "js/32-v139-rested-experience.js",
     "js/33-v140-four-element-balance.js",
@@ -79,7 +80,7 @@ const EXPECTED_RUNTIME_PATHS=[
     "js/49-v169-element-box-settings.js",
     "js/50-v169-water-skill-rules.js",
     "js/51-v169-rpg-ui.js",
-    "functions/src/skill-progression-core.js","js/60-v173.64-skill-progression-rebalance.js",
+    "js/60-v173.64-skill-progression-rebalance.js",
     "js/59-abyss-two-tier-runtime.js",
 ];
 

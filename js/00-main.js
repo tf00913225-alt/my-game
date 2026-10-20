@@ -30253,11 +30253,10 @@ function removeEquippedSkill(index){
     }
 
 
-    character.equippedSkills
-        .splice(
-            index,
-            1
-        );
+    const nextEquippedSkills=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .removeEquippedSkill(character.equippedSkills,index);
+    character.equippedSkills.splice(0,character.equippedSkills.length,...nextEquippedSkills);
 
 
     renderSkillLoadout();

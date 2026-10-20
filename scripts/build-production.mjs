@@ -8,7 +8,7 @@ import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
 import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
 import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
 import {syncPlayerSkillConfigCatalog} from "./lib/player-skill-config-catalog.mjs";
-import {verifySkillLearningPolicy} from "./lib/skill-learning-policy.mjs";
+import {verifySkillLearningPolicy,verifySkillLoadoutPolicy} from "./lib/skill-learning-policy.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -28,6 +28,7 @@ syncPatrolProgressPolicy(ROOT,checkOnly);
 await syncCharacterExpThresholds(ROOT,checkOnly);
 await syncPlayerSkillConfigCatalog(ROOT,checkOnly);
 verifySkillLearningPolicy(ROOT);
+verifySkillLoadoutPolicy(ROOT);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
@@ -99,6 +100,7 @@ const gameplayScripts=[
     "js/28-v133-economy-rebalance.js",
     "js/29-v134-fixes.js",
     "js/30-v135-fixes.js",
+    "functions/src/skill-progression-core.js",
     "js/31-v136-auto-battle-fix.js",
     "js/32-v139-rested-experience.js",
     "js/33-v140-four-element-balance.js",
@@ -128,7 +130,6 @@ const gameplayScripts=[
     "js/58-v173.63-functional-fixes.js",
     "js/battlefield-render-geometry-adapter.js",
     "js/battle-floating-feedback-owner.js",
-    "functions/src/skill-progression-core.js",
     "js/60-v173.64-skill-progression-rebalance.js",
     "js/60-team-relic-system.js"
 ];
