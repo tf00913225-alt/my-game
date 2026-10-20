@@ -580,13 +580,13 @@ button:disabled{
 /* Main city uses the existing native canvas; no viewport-specific layout. */
 #homePage{
     position:relative;height:calc(100% - 216px);min-height:0;
-    padding:0 18px 12px;box-sizing:border-box;overflow:hidden;
+    padding:0 18px 12px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;
     background-image:url(../assets/ui/home-background-v17344.png);background-position:center;background-size:cover;background-repeat:no-repeat;
     isolation:isolate;
 }
 #homePage.active{
     display:grid;grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;
+    grid-template-rows:auto auto minmax(900px,1fr) auto;gap:10px;
 }
 #homePage .home-city-hud{grid-row:1;}
 #homePage .v146-home-roster{grid-column:1;grid-row:2;}
