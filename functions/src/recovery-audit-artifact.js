@@ -471,12 +471,22 @@ function rawArchiveTypedEncode(row,token){
         if(!value||typeof value!=="object")return;
         if(active.has(value)||Buffer.isBuffer(value))bad("raw archive data cycle or shape");
         active.add(value);
-        if(Array.isArray(value)){let seen=0;
-            if(Object.getPrototypeOf(value)!==Array.prototype)bad("raw archive array shape");
-            for(const key in value){const index=Number(key);
-                if(!Object.hasOwn(value,key)||!Number.isSafeInteger(index)||index<0||index>=value.length||String(index)!==key)bad("raw archive array shape");seen++;}
-            if(seen!==value.length)bad("raw archive array shape");}
-        for(const key of Object.keys(value)){const descriptor=Object.getOwnPropertyDescriptor(value,key);
+        let keys;
+        if(Array.isArray(value)){
+            if(Object.getPrototypeOf(value)!==Array.prototype||value.length>LIMITS.nodes)bad("raw archive array shape");
+            keys=Reflect.ownKeys(value);
+            if(keys.length!==value.length+1)bad("raw archive array shape");
+            for(const key of keys){
+                const descriptor=Object.getOwnPropertyDescriptor(value,key);
+                if(typeof key!=="string"||!descriptor)bad("raw archive array shape");
+                if(!Object.hasOwn(descriptor,"value"))bad("raw archive accessor");
+                if(key==="length")continue;
+                const index=Number(key);
+                if(!Number.isSafeInteger(index)||index<0||index>=value.length||String(index)!==key)bad("raw archive array shape");
+            }
+            keys=keys.filter(key=>key!=="length");
+        }else keys=Object.keys(value);
+        for(const key of keys){const descriptor=Object.getOwnPropertyDescriptor(value,key);
             if(!descriptor||!Object.hasOwn(descriptor,"value"))bad("raw archive accessor");check(descriptor.value,depth+1);}
         // Do not execute a caller getter while the original typed Owner tests
         // its Timestamp interface. Real Timestamp prototype methods are kept.

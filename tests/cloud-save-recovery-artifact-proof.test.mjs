@@ -660,3 +660,25 @@ test('raw archive resource oracle matches native JSON UTF8 escaping/numbers and 
     assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/accessor/);assert.equal(gets,0);
     material.run={cycle};assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/cycle/);
 });
+
+test('raw archive array precheck rejects nonenumerable map overrides and nondata shapes before getters execute',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');let getters=0;
+    const cases=[
+        ()=>{const a=[1];Object.defineProperty(a,'map',{get(){getters++;return Array.prototype.map;}});return a;},
+        ()=>{const a=[1];Object.defineProperty(a,'map',{value:Array.prototype.map});return a;},
+        ()=>{const a=[1];a[Symbol('extra')]=2;return a;},
+        ()=>{const a=[1];a.extra=2;return a;},
+        ()=>new Array(1),
+        ()=>{const a=[1];Object.defineProperty(a,'0',{get(){getters++;return 1;}});return a;}
+    ];
+    for(const build of cases){const material=rawSyntaxMaterial();material.run={array:build()};
+        assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/array shape|accessor/);}
+    assert.equal(getters,0);
+    const nested=[1];Object.defineProperty(nested,'map',{get(){getters++;return Array.prototype.map;}});
+    const array=[];Object.defineProperty(array,'0',{value:nested});array.length=1;
+    const material=rawSyntaxMaterial();material.run={array};
+    assert.throws(()=>helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),/array shape/);assert.equal(getters,0);
+    material.run={array:[0,-0,['中😀',null,true]],stamp:new TimestampForRawSyntax(1700000000,999999999)};
+    const token=helper.createRecoveryAuditAssemblyBudget(),bytes=helper.encodeRawRecoveryArchive(material,token),decoded=helper.decodeRawRecoveryArchive(bytes,token);
+    assert.deepEqual(helper.encodeProofPayload(decoded.run),helper.encodeProofPayload(material.run));
+});
