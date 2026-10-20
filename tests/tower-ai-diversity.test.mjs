@@ -1,0 +1,159 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import {loadTowerAiRuntime,simulateTowerAi} from '../scripts/tower-ai-diversity-simulation.mjs';
+
+const r=loadTowerAiRuntime();
+const database=r.run("skillDatabase");
+function setup(element='water',floor=100,count=6){
+ r.timers.clear();r.setElement(element);r.c.__setup={floor,count};
+ r.run(`
+  battleActive=false;prepareWildBalanceReferenceParty(100,3);
+  monsters=GameplaySystem.buildTowerWaves(__setup.floor)[0];
+  while(monsters.length<__setup.count)monsters.push(__shadowTower.troop(100,'water','elite',100,2));
+  currentBattleMonsters=monsters.map((m,i)=>i);battleActive=true;battleToken++;turn=1;battlePhase='resolve';
+  battleRoundBoundaryKeys=new Set();FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot();
+  v138EnsureEnemyFormationSnapshot(currentBattleMonsters);
+  notifyBattleRoundBoundary('round_start',battleToken);
+  __declarations=[];__finished=0;window.__savedFinish=finishPlayerAction;finishPlayerAction=()=>{__finished++;};
+ `);
+}
+function attack(index,random=0){r.run(`Math.random=()=>${random};processSingleMonsterAttack(${index},battleToken);`);}
+function round(n){r.run(`notifyBattleRoundBoundary('round_end',battleToken);turn=${n};notifyBattleRoundBoundary('round_start',battleToken);`);}
+function cleanup(){r.run('finishPlayerAction=__savedFinish;if(window.__savedStatusRoll){rollNamedPersistentStatusEffect=__savedStatusRoll;delete window.__savedStatusRoll;}battleActive=false;');}
+
+test('four elements, floor/level boundaries: legal final-data IDs, ranks, roles, SP fallback and unchanged wave topology',()=>{
+ for(const element of ['fire','earth','water','wind']){
+  r.setElement(element);
+  for(const floor of [1,5,10,20,21,30,31,40,41,60,61,90,91,100]){
+   r.c.__floor=floor;const waves=r.run('GameplaySystem.buildTowerWaves(__floor)');
+   assert.deepEqual(Array.from(waves,w=>w.length),[6,6]);
+   const sets=new Set();
+   for(const m of waves.flat()){
+    sets.add(m.skillIds.join(','));assert.ok(m.skillIds.length>=2);
+    assert.ok(m.skillIds.some(id=>database[id].spCost<=10));
+    for(const id of [...m.skillIds,...m.v141SupportSkillIds]){
+     const skill=database[id];assert.ok(skill,id);assert.equal(skill.element,element);assert.notEqual(skill.category,'passive');assert.ok(!id.endsWith('EX'));
+    }
+    if(m.vGameplayTowerBoss)assert.ok(m.skillIds.length>=8);
+   }
+   assert.ok(sets.size>=2,element+' floor '+floor);
+   assert.equal(waves[1].filter(m=>m.rank==='smallBoss').length,floor%10===0?1:0);
+  }
+ }
+ assert.equal(database.freeze.spCost,32);assert.equal(database.healSpell.spCost,45);
+});
+
+test('single decision roll, no same skill while another affordable option exists, SP exhaustion uses normal attack',()=>{
+ setup('water');r.run(`monsters[0].skillIds=['waterKnife','waterBall'];monsters[0].v141SupportSkillIds=[];monsters[0].skillChance=1;`);
+ attack(0);attack(0);assert.deepEqual(r.json('__declarations.map(d=>d.skillId)'),['waterKnife','waterBall']);
+ r.run('monsters[0].sp=0;');attack(0);assert.equal(r.json('__declarations.at(-1).skillId'),'normal');
+ assert.equal(r.run('__finished'),3);cleanup();
+});
+
+test('water ten-enemy pressure: each team quota counts declaration even if freeze is resisted/MISS; skips/death consume neither action nor quota',()=>{
+ setup('water',100,10);
+ r.run(`monsters.forEach(m=>{m.skillIds=['freeze','waterKnife'];m.v141SupportSkillIds=[];m.skillChance=1;});window.__savedStatusRoll=rollNamedPersistentStatusEffect;rollNamedPersistentStatusEffect=()=>({hit:false,duplicate:false});`);
+ // Force the legal carried freeze; failure is still a declaration.
+ for(let i=0;i<10;i++){r.run(`monsters[${i}].v175ForcedAttackSkillId='freeze';`);attack(i);}
+ assert.equal(r.json('__declarations.filter(d=>d.skillId==="freeze").length'),2);
+ assert.equal(r.run('__finished'),10);
+ assert.ok(r.json('__declarations.filter(d=>d.skillId!=="freeze").every(d=>d.skillId==="waterKnife")'));
+ round(2);r.run(`monsters[2].alive=false;monsters[3].statusEffects=[{type:'freeze',turnsLeft:2}];`);
+ attack(2);attack(3);
+ // Neither departed nor skipped caster refreshed the team quota.
+ assert.equal(r.json('__declarations.filter(d=>d.round===2).length'),0);
+ r.run('monsters[4].v175ForcedAttackSkillId="freeze";');attack(4);
+ assert.equal(r.json('__declarations.filter(d=>d.round===2&&d.skillId==="freeze").length'),1);cleanup();
+});
+
+test('pure-control freeze uses resistance only; damaging skill MISS consumes one action and one SP cost',()=>{
+ setup();r.run(`monsters[0].skillIds=['freeze','waterKnife'];monsters[0].v141SupportSkillIds=[];monsters[0].skillChance=1;monsters[0].v175ForcedAttackSkillId='freeze';window.__savedStatusRoll=rollNamedPersistentStatusEffect;rollNamedPersistentStatusEffect=()=>({hit:false,duplicate:false});window.__savedMiss=showMissEffect;window.__misses=[];showMissEffect=(enemy,index,label)=>__misses.push(label);window.__spBefore=monsters[0].sp;`);
+ attack(0);assert.equal(r.run('__finished'),1);assert.equal(r.json('__declarations.length'),1);assert.equal(r.json('__declarations[0].skillId'),'freeze');assert.equal(r.run('__spBefore-monsters[0].sp'),32);assert.ok(r.json('__misses').every(label=>label==='抵抗'));
+ r.run(`monsters[1].skillIds=['waterKnife'];monsters[1].v141SupportSkillIds=[];monsters[1].skillChance=1;window.__savedHitRoll=rollHitChance;rollHitChance=()=>false;window.__spBefore=monsters[1].sp;__misses=[];`);
+ attack(1);assert.equal(r.run('__finished'),2);assert.equal(r.run('__spBefore-monsters[1].sp'),6);assert.ok(r.json('__misses').includes('MISS'));
+ r.run('rollHitChance=__savedHitRoll;showMissEffect=__savedMiss;');round(2);assert.equal(r.run('FourSymbolsTowerSkillPolicy.allows(monsters[0],"freeze")'),false);cleanup();
+});
+
+test('freeze cooldown N+1/N+2, duplicate boundaries and same-round replacement wave cannot reset quotas; new token resets',()=>{
+ setup();r.run(`monsters.forEach(m=>{m.skillIds=['freeze','waterKnife'];m.v141SupportSkillIds=[];m.skillChance=1;});`);
+ for(const i of [0,1]){r.run(`monsters[${i}].v175ForcedAttackSkillId='freeze';`);attack(i);}
+ r.run(`notifyBattleRoundBoundary('round_start',battleToken);monsters[2]=__shadowTower.troop(100,'water','elite',100,2);monsters[2].skillIds=['freeze','waterKnife'];monsters[2].v141SupportSkillIds=[];monsters[2].skillChance=1;monsters[2].v175ForcedAttackSkillId='freeze';`);attack(2);
+ assert.equal(r.json('__declarations.filter(d=>d.skillId==="freeze").length'),2);
+ for(const n of [2,3]){round(n);r.run('monsters[0].v175ForcedAttackSkillId="freeze";');attack(0);assert.notEqual(r.json('__declarations.at(-1).skillId'),'freeze');}
+ round(4);r.run('monsters[0].v175ForcedAttackSkillId="freeze";');attack(0);assert.equal(r.json('__declarations.at(-1).skillId'),'freeze');
+ r.run(`battleToken++;turn=1;notifyBattleRoundBoundary('round_start',battleToken);monsters[0].v175ForcedAttackSkillId='freeze';`);attack(0);assert.equal(r.json('__declarations.at(-1).skillId'),'freeze');cleanup();
+});
+
+test('healing uses actual HP <40%, HP-ranked formal tri targets, exact heal/SP and two declarations/round with individual cooldown',()=>{
+ setup('water',100,10);
+ r.run(`monsters.forEach(m=>{m.hp=m.maxHP*.39;m.skillIds=['waterKnife'];m.v141SupportSkillIds=['healSpell'];m.skillChance=1;});`);
+ for(let i=0;i<4;i++){r.run(`monsters[${i}].v175ForcedSupportSkillId='healSpell';`);attack(i,.9);}
+ assert.equal(r.json('__declarations.filter(d=>d.skillId==="healSpell").length'),2);
+ assert.equal(r.run('__finished'),4);
+ for(const n of [2,3]){round(n);r.run('monsters[0].hp=100;monsters[0].v175ForcedSupportSkillId="healSpell";');attack(0,.9);assert.notEqual(r.json('__declarations.at(-1).skillId'),'healSpell');}
+ round(4);r.run('monsters[0].hp=100;monsters[0].v175ForcedSupportSkillId="healSpell";');attack(0,.9);assert.equal(r.json('__declarations.at(-1).skillId'),'healSpell');cleanup();
+ setup();r.run(`monsters.forEach(m=>{m.hp=m.maxHP;m.sp=0;});monsters[2].sp=200;monsters[2].skillIds=['waterKnife'];monsters[2].v141SupportSkillIds=['healSpell'];monsters[2].skillChance=1;monsters[0].hp=monsters[0].maxHP*.4;`);
+ attack(2,.9);assert.notEqual(r.json('__declarations.at(-1).skillId'),'healSpell');
+ r.run(`monsters[0].hp=100;monsters[2].v175ForcedSupportSkillId='healSpell';window.__before=monsters.map(m=>({hp:m.hp,sp:m.sp}));`);
+ attack(2,.9);
+ assert.equal(r.json('__declarations.at(-1).skillId'),'healSpell');
+ assert.equal(r.run('monsters[0].hp-__before[0].hp'),Math.floor(640*1.15)); // forced Lv4 at tower Lv100
+ assert.equal(r.run('monsters[2].sp'),r.run('__before[2].sp')-45,'caster does not restore own SP');
+ assert.ok(r.run('monsters.every(m=>m.hp<=m.maxHP)'));cleanup();
+});
+
+test('Tower rage reads final Skill Data at each level and keeps the same formal tri target shape',()=>{
+ for(const level of [1,2,4,5]){
+  setup('fire');r.c.__rageLevel=level;
+  r.run(`monsters[2].v141ForceSkillLevel=__rageLevel;monsters[2].v175ForcedSupportSkillId='rage';monsters[2].sp=200;monsters[2].skillChance=1;monsters[2].v141SupportSkillIds=['rage'];`);
+  attack(2,0);
+  assert.equal(r.json('__declarations.at(-1).skillId'),'rage');
+  const recipients=r.json('monsters.filter(m=>m.v141TeamBuffs?.some(b=>b.type==="rage")).map(m=>({buff:m.v141TeamBuffs.find(b=>b.type==="rage"),mirror:m.activeBuffs.find(b=>b.type==="rage")}))');
+  assert.ok(recipients.length>0&&recipients.length<=3);
+  r.c.__expectedRageChance=database.rage.critChanceBonusByLevel[level-1];r.c.__expectedRageDamage=database.rage.critDamageBonusByLevel[level-1];
+  assert.ok(r.run('monsters.filter(m=>m.v141TeamBuffs?.some(b=>b.type==="rage")).every(m=>getActiveRageCriticalBonuses(m).chance===__expectedRageChance&&getActiveRageCriticalBonuses(m).damage===__expectedRageDamage)'));
+  for(const target of recipients){
+   assert.equal(target.buff.critChanceBonusPercent,database.rage.critChanceBonusByLevel[level-1]);assert.equal(target.buff.critDamageBonusPercent,database.rage.critDamageBonusByLevel[level-1]);
+   assert.equal(target.mirror.critChanceBonusPercent,target.buff.critChanceBonusPercent);assert.equal(target.mirror.critDamageBonusPercent,target.buff.critDamageBonusPercent);
+  }
+  cleanup();
+ }
+});
+
+test('formal same-round wave transition preserves spent team quota',async()=>{
+ const w=loadTowerAiRuntime();w.setElement('water');
+ w.run(`prepareWildBalanceReferenceParty(100,3);autoBattle=false;autoConfig.enabled=false;autoConfig2.enabled=false;autoConfig3.enabled=false;__waves=GameplaySystem.buildTowerWaves(100);v132LaunchDungeonBattle(__waves[0],outcome=>__outcomes.push(outcome.result),{mode:'tower',waves:__waves});`);
+ for(let n=0;n<30&&!w.run('declaredCharacterIndexes.has(0)');n++){assert.ok(w.next());await new Promise(resolve=>setImmediate(resolve));}
+ w.run(`window.__formalFinish=finishPlayerAction;finishPlayerAction=()=>{};Math.random=()=>0;for(const i of [0,1]){monsters[i].skillIds=['freeze'];monsters[i].v141SupportSkillIds=[];monsters[i].skillChance=1;processSingleMonsterAttack(i,battleToken);}finishPlayerAction=__formalFinish;`);
+ assert.equal(w.json('__declarations.filter(d=>d.skillId==="freeze").length'),2);
+ w.run(`battlePhase='resolve';initiativeQueue=buildInitiativeQueue();initiativeIndex=0;currentBattleMonsters.forEach(i=>{monsters[i].hp=0;monsters[i].alive=false;});finishPlayerAction();`);
+ for(let n=0;n<100&&w.run('FourSymbolsBattleWaves.getState().index')===0;n++){assert.ok(w.next());await new Promise(resolve=>setImmediate(resolve));}
+ assert.equal(w.run('FourSymbolsBattleWaves.getState().index'),1);assert.equal(w.run('turn'),1);
+ assert.equal(w.run('FourSymbolsTowerSkillPolicy.allows(monsters[currentBattleMonsters[0]],"freeze")'),false);
+ w.run(`finishPlayerAction=()=>{};const i=currentBattleMonsters[0];monsters[i].skillIds=['freeze','waterKnife'];monsters[i].v141SupportSkillIds=[];monsters[i].skillChance=1;monsters[i].v175ForcedAttackSkillId='freeze';processSingleMonsterAttack(i,battleToken);`);
+ assert.equal(w.json('__declarations.at(-1).skillId'),'waterKnife');
+ w.run('finishPlayerAction=__formalFinish;v132AbortDungeonBattle("test-complete");');
+});
+
+test('healing excludes dead units, gives zero overheal, and leaves every out-of-shape HP unchanged',()=>{
+ setup();r.run(`monsters.forEach(m=>{m.hp=m.maxHP;m.sp=0;});monsters[0].hp=100;monsters[2].alive=false;monsters[2].hp=0;monsters[5].sp=200;monsters[5].skillIds=['waterKnife'];monsters[5].v141SupportSkillIds=['healSpell'];monsters[5].skillChance=1;monsters[5].v175ForcedSupportSkillId='healSpell';window.__healingTargets=v141GetMonsterAllyTriTargeting(5,undefined,.4).entries.map(e=>e.index);window.__hpBefore=monsters.map(m=>m.hp);`);
+ assert.ok(!r.json('__healingTargets').includes(2));attack(5,.9);assert.equal(r.json('__declarations.at(-1).skillId'),'healSpell');
+ for(let i=0;i<6;i++){if(i===0)assert.ok(r.run('monsters[0].hp>__hpBefore[0]'));else assert.equal(r.run('monsters['+i+'].hp'),r.run('__hpBefore['+i+']'));}
+ cleanup();
+});
+
+test('seeded complete queue battles across four elements and low/mid/high floors finish exactly once',async()=>{
+ const report=await simulateTowerAi({seeds:[1,7]});
+ for(const row of report.rows){
+  assert.equal(row.outcomes.length,1,JSON.stringify({...row,declarations:undefined}));
+  assert.equal(row.active,false);assert.ok(row.rounds<=100);
+  const rounds=new Map(),last=new Map();
+  for(const d of row.declarations){
+   if(!['freeze','healSpell'].includes(d.skillId))continue;
+   const key=d.round+':'+d.skillId;rounds.set(key,(rounds.get(key)||0)+1);assert.ok(rounds.get(key)<=2);
+   const caster=d.index+':'+d.skillId;
+   if(last.has(caster))assert.ok(d.round-last.get(caster)>=3);
+   last.set(caster,d.round);
+  }
+ }
+});
