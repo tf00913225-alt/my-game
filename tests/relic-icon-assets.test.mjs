@@ -36,3 +36,20 @@ test("inventory fragment definitions use img markup for confirmed WebP art",()=>
   assert.match(source,/decoding="async" onerror="this\.hidden=true"/);
   assert.ok(!source.includes(".png"));
 });
+
+test("six progression material icons retain lossless square alpha canvases",()=>{
+  const source=fs.readFileSync("js/relic-progression-drop-system.js","utf8");
+  const block=source.slice(source.indexOf("const MATERIAL_ICON_PATHS="),source.indexOf("function materialSvg("));
+  const paths=[...block.matchAll(/assets\/relics\/materials\/[^"\s]+\.webp/g)].map(m=>m[0]);
+  assert.equal(new Set(paths).size,6);
+  for(const path of paths){
+    assertWebP(path);
+    const bytes=fs.readFileSync(path);
+    assert.equal(bytes.subarray(12,16).toString("ascii"),"VP8L",`not lossless ${path}`);
+    assert.equal(bytes[20],0x2f);
+    const header=bytes.readUInt32LE(21);
+    assert.equal((header&0x3fff)+1,1254,`canvas width ${path}`);
+    assert.equal(((header>>>14)&0x3fff)+1,1254,`canvas height ${path}`);
+    assert.equal((header>>>28)&1,1,`alpha missing ${path}`);
+  }
+});

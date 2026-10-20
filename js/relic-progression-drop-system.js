@@ -134,7 +134,19 @@
         "four-symbol":Object.freeze({main:"#E5C06B",light:"#FFFFFF",dark:"#8A6730"})
     });
 
+    const MATERIAL_ICON_PATHS=Object.freeze({
+        essence:"assets/relics/materials/relic-essence.4c8469805189.webp",
+        stone:"assets/relics/materials/relic-breakthrough-stone.2d2814201552.webp",
+        box:Object.freeze({
+            blue:"assets/relics/materials/relic-choice-box-blue.8a6cfdd5fb40.webp",
+            purple:"assets/relics/materials/relic-choice-box-purple.0cbbe8fd9b70.webp",
+            orange:"assets/relics/materials/relic-choice-box-orange.6f30554e90e6.webp",
+            pink:"assets/relics/materials/relic-choice-box-pink.32e7de00c345.webp"
+        })
+    });
     function materialSvg(kind,tierKey){
+        const iconPath=kind==="box"?MATERIAL_ICON_PATHS.box[tierKey]:MATERIAL_ICON_PATHS[kind];
+        if(typeof iconPath==="string"){ return fragmentIconMarkup(iconPath); }
         const tier=TIER_COLORS[tierKey]||TIER_COLORS.white;
         if(tierKey==="four-symbol"){
             return '<svg viewBox="0 0 64 64" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">'+
