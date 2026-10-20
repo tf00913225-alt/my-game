@@ -90,8 +90,10 @@ try{
             };
             const dismiss=async()=>{
                 for(let i=0;i<12;i++){
-                    const selector='.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button';
+                    const selector='.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:not([hidden])';
                     if(!await client.eval(`!!document.querySelector(${JSON.stringify(selector)})`))break;
+                    assert.equal(await client.eval(`window.v169GetRpgDialogState().active`),'alert','only original alert acknowledgements may be dismissed');
+                    await wait(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e||!e.checkVisibility({checkOpacity:true,checkVisibilityCSS:true}))return false;const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.width>0&&r.height>0&&(hit===e||e.contains(hit));})()`,'original alert acknowledgement paints and owns its pointer center');
                     const text=await client.eval(`document.querySelector(${JSON.stringify(selector)}).textContent`);
                     assert.match(text,/知道|收下|確定|好的/,'only a visible ordinary acknowledgement is dismissed');await tap(selector);
                 }

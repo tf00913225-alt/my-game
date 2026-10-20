@@ -380,6 +380,17 @@ test('pointer creation waits for actual original input hit ownership after start
     assert.ok(source.indexOf("'fresh creation ready'")<source.indexOf(match[0]));assert.ok(source.indexOf(match[0])<source.indexOf("await tap('#creationId')"));
 });
 
+test('pointer acknowledgement excludes the original hidden cancel without accepting return or confirmations',()=>{
+    const fixture=fs.readFileSync('tests/fixtures/run-chapter1-guided-pointer-qa.mjs','utf8'),owner=fs.readFileSync('js/51-v169-rpg-ui.js','utf8');
+    assert.match(owner,/cancelButton\.hidden=activeDialog\.kind!=="confirm"/);
+    const block=fixture.slice(fixture.indexOf('const dismiss=async()=>'),fixture.indexOf('const reveal=async selector=>'));
+    const selector=block.match(/const selector='([^']+)'/)[1];assert.equal(selector,'.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button:not([hidden])');
+    const expression=block.match(/assert\.match\(text,(\/[^/]+\/),'only a visible ordinary acknowledgement/)[1],ack=vm.runInNewContext(expression);
+    const buttons=[{hidden:true,textContent:'返回'},{hidden:false,textContent:'知道了'}],selected=buttons.find(button=>!selector.includes(':not([hidden])')||!button.hidden);
+    assert.equal(selected.textContent,'知道了');assert.equal(ack.test(selected.textContent),true);assert.equal(ack.test('返回'),false);
+    assert.match(block,/v169GetRpgDialogState\(\)\.active/);assert.match(block,/'alert','only original alert acknowledgements/);assert.match(block,/await tap\(selector\)/,'original strict visible hit-test tap remains required');
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};
