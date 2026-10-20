@@ -4,6 +4,7 @@ import http from "node:http";
 import os from "node:os";
 import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
+import {Worker} from "node:worker_threads";
 
 export const ROOT=process.cwd();
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
@@ -181,9 +182,44 @@ async function waitJson(url,{timeoutMs=15000}={}){
     throw error;
 }
 
+// Read only a bounded proc metadata window, never a mapped file's contents.
+function readProcWindow(file,limit){
+    let fd;
+    try{
+        fd=fs.openSync(file,'r');
+        const buffer=Buffer.alloc(limit+1),bytes=fs.readSync(fd,buffer,0,buffer.length,null);
+        return {text:buffer.subarray(0,Math.min(bytes,limit)).toString('utf8'),truncated:bytes>limit};
+    }catch(error){return {error:error.code||String(error.message)};}
+    finally{if(fd!==undefined)try{fs.closeSync(fd);}catch{}}
+}
+
+function observeProcPageWait(base,{timeoutMs=200,workerSource}={}){
+    const started=performance.now(),evidence={status:'pending',budgetMs:timeoutMs};
+    const source=workerSource||`const fs=require('node:fs');const {parentPort,workerData}=require('node:worker_threads');
+        const readProcWindow=${readProcWindow.toString()};
+        const started=performance.now();const result={syscall:readProcWindow(workerData+'/syscall',4096),maps:readProcWindow(workerData+'/maps',128*1024),stack:readProcWindow(workerData+'/stack',4096)};
+        parentPort.postMessage({...result,readDurationMs:Math.round(performance.now()-started)});`;
+    // A worker shares this parent's process credentials, unlike a sibling
+    // strace process. A stuck proc read must never block the launch deadline.
+    const worker=new Worker(source,{eval:true,workerData:base});
+    const stop=reason=>{
+        if(evidence.status!=='pending')return;
+        evidence.status=reason;evidence.settledAfterMs=Math.round(performance.now()-started);clearTimeout(timer);
+        worker.terminate().catch(()=>{}); // Never await a blocked native read.
+    };
+    const timer=setTimeout(()=>stop('timeout'),timeoutMs);timer.unref();
+    worker.once('message',result=>{
+        if(evidence.status!=='pending')return;
+        clearTimeout(timer);Object.assign(evidence,result,{status:'captured',settledAfterMs:Math.round(performance.now()-started)});
+    });
+    worker.once('error',error=>{if(evidence.status==='pending'){evidence.error=String(error.message);stop('error');}});
+    worker.unref();
+    return {evidence,stop};
+}
+
 // Observe the existing first launch only: no warmup, retry or acceptance change.
 function observeChromeStartup(child,{port,output}){
-    const started=performance.now(),timers=[],samples=[];
+    const started=performance.now(),timers=[],samples=[],procCollectors=[];
     const evidence={pid:child.pid??null,platform:process.platform,port,samples,firstStderrMs:null,stderrHead:'',stderrTail:'',trace:null};
     let finished=false,exited=false,tracer,traceTimer,traceClosed,traceStopPromise;
     const elapsed=()=>Math.round(performance.now()-started);
@@ -205,7 +241,15 @@ function observeChromeStartup(child,{port,output}){
             const base='/proc/'+pid,record={pid};
             for(const key of ['comm','stat','wchan','schedstat','io'])record[key]=read(base+'/'+key).slice(0,1200);
             try{record.exe=fs.readlinkSync(base+'/exe');}catch(error){record.exe='READ_ERROR:'+error.code;}
-            try{record.files=fs.readdirSync(base+'/fd').slice(0,24).map(fd=>{try{return fs.readlinkSync(base+'/fd/'+fd).slice(0,200);}catch(error){return 'READ_ERROR:'+error.code;}});}catch(error){record.files=['READ_ERROR:'+error.code];}
+            try{record.files=fs.readdirSync(base+'/fd').sort((a,b)=>Number(a)-Number(b)).slice(0,24).map(fd=>{try{return {fd:Number(fd),target:fs.readlinkSync(base+'/fd/'+fd).slice(0,200)};}catch(error){return {fd:Number(fd),error:error.code};}});}catch(error){record.files=[{error:error.code}];}
+            // Existing evidence repeatedly identifies the main process in a
+            // folio wait. Preserve its raw syscall/PC, mappings and kernel stack
+            // to distinguish the next hypothesis; a PC mapping alone does not
+            // identify the data page being waited for. Denials remain evidence.
+            if(!finished&&pid===child.pid&&/folio_wait/.test(record.wchan)){
+                const collector=observeProcPageWait(base);procCollectors.push(collector);
+                record.pageWait=collector.evidence;record.pageWait.startedAtMs=elapsed();
+            }
             const children=read(base+'/task/'+pid+'/children');
             record.children=children;pending.push(...children.split(/\s+/).filter(p=>/^\d+$/.test(p)).map(Number));
             sample.processes.push(record);
@@ -258,7 +302,7 @@ function observeChromeStartup(child,{port,output}){
         if(finished)return evidence;
         finished=true;timers.forEach(clearTimeout);const cleanup=stopTrace();
         try{
-            samples.push(snapshot());evidence.outcome=outcome;evidence.finishedAtMs=elapsed();
+            samples.push(snapshot());procCollectors.forEach(c=>c.stop('observer-finished'));evidence.outcome=outcome;evidence.finishedAtMs=elapsed();
             await cleanup;
             if(output)try{fs.writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');}catch(error){evidence.artifactError=String(error.message);}
             try{console.log('Chrome startup observation: '+JSON.stringify(evidence));}catch{}
@@ -294,4 +338,4 @@ class Cdp{
 }
 
 
-export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup};
+export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup,readProcWindow,observeProcPageWait};

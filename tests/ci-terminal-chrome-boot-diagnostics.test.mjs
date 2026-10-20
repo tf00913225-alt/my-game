@@ -5,7 +5,31 @@ import path from 'node:path';
 import {spawn,spawnSync} from 'node:child_process';
 import test from 'node:test';
 import http from 'node:http';
-import {waitJson,observeChromeStartup} from '../.github/scripts/runtime-browser-qa-support.mjs';
+import {waitJson,observeChromeStartup,readProcWindow,observeProcPageWait} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+test('blocked proc metadata cannot block the foreground DevTools deadline',async()=>{
+    const collector=observeProcPageWait('/unused',{timeoutMs:30,workerSource:'Atomics.wait(new Int32Array(new SharedArrayBuffer(4)),0,0,3000);'});
+    const server=http.createServer((req,res)=>setTimeout(()=>res.end('[]'),40));
+    await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
+    const start=Date.now();
+    try{
+        await assert.rejects(waitJson('http://127.0.0.1:'+server.address().port+'/json/list',{timeoutMs:10}),error=>error.code==='ETIMEDOUT');
+        assert.ok(Date.now()-start<1000,'metadata must not hold the launch deadline');
+        await new Promise(resolve=>setTimeout(resolve,40));
+        assert.equal(collector.evidence.status,'timeout');
+        assert.ok(Number.isFinite(collector.evidence.settledAfterMs));
+    }finally{collector.stop('test-finished');server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});
+
+test('proc metadata capture bounds bytes and preserves denial/missing evidence',()=>{
+    const directory=fs.mkdtempSync(path.join(os.tmpdir(),'proc-window-'));
+    try{
+        const file=path.join(directory,'metadata');fs.writeFileSync(file,'0123456789');
+        assert.deepEqual(readProcWindow(file,4),{text:'0123',truncated:true});
+        assert.deepEqual(readProcWindow(file,10),{text:'0123456789',truncated:false});
+        assert.equal(readProcWindow(path.join(directory,'missing'),4).error,'ENOENT');
+    }finally{fs.rmSync(directory,{recursive:true,force:true});}
+});
 
 test('startup observation cannot mask a child failure when its artifact cannot be written',async()=>{
     const directory=fs.mkdtempSync(path.join(os.tmpdir(),'chrome-observer-'));
