@@ -31644,7 +31644,7 @@ function openItemModal(
             "不可裝備";
 
         equipButton.style.opacity =
-            ".4";
+            item.type==="material"?"1":".4";
 
     }
     else{

@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.201a0fc6b9da.js"
+          "build/app-shell.8e6259c4baef.js"
         ],
         "styles": [
           "build/app-shell.058b860fa3fc.css"
@@ -570,9 +570,9 @@
         "decode": false
       },
       {
-        "path": "build/app-shell.201a0fc6b9da.js",
-        "sha256": "201a0fc6b9da",
-        "bytes": 1188552,
+        "path": "build/app-shell.8e6259c4baef.js",
+        "sha256": "8e6259c4baef",
+        "bytes": 1188579,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -826,8 +826,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "b440e887df37",
-    "totalBytes": 24036934,
+    "manifestHash": "66c5c5868d95",
+    "totalBytes": 24036961,
     "totalResources": 79
   },
   "assets": {
@@ -835,9 +835,9 @@
       "sha256": "92c7957bd528",
       "bytes": 69991
     },
-    "build/app-shell.201a0fc6b9da.js": {
-      "sha256": "201a0fc6b9da",
-      "bytes": 1188552
+    "build/app-shell.8e6259c4baef.js": {
+      "sha256": "8e6259c4baef",
+      "bytes": 1188579
     },
     "build/gameplay-core-primary.9c828c5bf57c.js": {
       "sha256": "9c828c5bf57c",
