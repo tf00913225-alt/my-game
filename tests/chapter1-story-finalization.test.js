@@ -368,6 +368,18 @@ test('pointer fixture preserves the generated armor offer price expression and r
     assert.throws(()=>evaluate('購買護具'),/formal armor offer price missing/);
 });
 
+test('pointer creation waits for actual original input hit ownership after startup authority is ready',()=>{
+    const source=fs.readFileSync('tests/fixtures/run-chapter1-guided-pointer-qa.mjs','utf8');
+    const match=source.match(/await wait\(`([^`]+)`,'original creation input receives pointer after startup presentation'\)/);assert.ok(match);
+    const expression=vm.runInNewContext('`'+match[1]+'`');new vm.Script(expression);
+    let hit,disabled=false,visibility='visible';const input={get disabled(){return disabled;},getBoundingClientRect:()=>({x:10,y:20,width:100,height:40}),contains:node=>node===input};
+    const context={document:{getElementById:id=>{assert.equal(id,'creationId');return input;},elementFromPoint:()=>hit},getComputedStyle:()=>({visibility,display:'block'}),innerWidth:393,innerHeight:873};
+    hit={id:'startupLoader'};assert.equal(vm.runInNewContext(expression,context),false,'canCreate does not bypass a painted startup blocker');
+    hit=input;assert.equal(vm.runInNewContext(expression,context),true,'original center hit admits the later strict pointer tap');
+    disabled=true;assert.equal(vm.runInNewContext(expression,context),false);disabled=false;visibility='hidden';assert.equal(vm.runInNewContext(expression,context),false);
+    assert.ok(source.indexOf("'fresh creation ready'")<source.indexOf(match[0]));assert.ok(source.indexOf(match[0])<source.indexOf("await tap('#creationId')"));
+});
+
 test("story reading guide keeps the real Next target and toggles reading presentation without an acknowledgement step",()=>{
     const h=guideHarness(),story=h.element(),next=h.element(),other=h.element();let advances=0;
     h.c.battleActive=false;next.action=()=>{advances++;};
