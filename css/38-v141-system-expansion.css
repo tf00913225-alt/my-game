@@ -51,7 +51,7 @@
 :is(#game-stage,#game-ui) .system-panel-row strong{font-size:calc(16 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .system-panel-row small{font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.55;}
 
-#game-stage #dungeonTabBtnDaily{min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
+#game-stage #dungeonTabBtnDaily{border-radius:0;border-color:#d3ab68;background:linear-gradient(#76502a,#37251a);color:#fff0cd;min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
 
 /* Native skill/status/character detail presentation is owned by css/23. */
 

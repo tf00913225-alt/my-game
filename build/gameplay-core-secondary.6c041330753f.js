@@ -7287,13 +7287,13 @@
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
         const odds=equipmentChestOddsText("　・　");
         const html='<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
-            '<div class="v17363-preview-heading"><small>DAILY DUNGEON</small><h3>裝備副本獎勵預覽</h3></div>'+
+            '<div class="v17363-preview-heading"><small>日常副本</small><h3>裝備副本獎勵預覽</h3></div>'+
             '<div class="v17363-preview-groups">'+
                 '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
                 '<section class="v17363-preview-group"><b>元素系列碎片</b><em>隨機一種 ×'+EQUIPMENT_DUNGEON_FRAGMENT_REWARD.count+'</em><p>赤炎／寒泉／岩岳／青嵐等機率；暫定，每種'+(100/EQUIPMENT_DUNGEON_FRAGMENT_REWARD.setIds.length)+'%；廣告雙倍亦適用。</p></section>'+
                 '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
             '</div>'+
-            '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
+            '<div class="v17363-preview-note">裝備品階機率依正式裝備寶箱掉落表顯示。</div>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
@@ -8506,7 +8506,7 @@ function syncCanonicalItemArt(){
 /* ---------- 5. Actual text-only premium reward previews (no pseudo-image preview). ---------- */
 function previewMarkup(title,eyebrow,groups,note){
     return '<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
-        '<div class="v17363-preview-heading"><small>'+esc(eyebrow||"REWARD PREVIEW")+'</small><h3>'+esc(title)+'</h3></div>'+
+        '<div class="v17363-preview-heading"><small>'+esc(eyebrow||"獎勵預覽")+'</small><h3>'+esc(title)+'</h3></div>'+
         '<div class="v17363-preview-groups">'+groups.map(group=>
             '<section class="v17363-preview-group"><b>'+esc(group.title)+'</b>'+
             (group.badge?'<em>'+esc(group.badge)+'</em>':'')+
@@ -8521,18 +8521,18 @@ window.v148ShowDailyDungeonPreview=function(type){
         exp:{title:"經驗副本獎勵預覽",groups:[
             {title:"共用經驗池",badge:"EXP",text:"通關所得經驗直接存入共用經驗池，不綁定單一角色，可自由分配給隊伍角色。"},
             {title:"結算方式",text:"完成副本後直接結算；若該結算提供廣告加倍，可自行選擇是否加倍領取。"}
-        ],note:"重點養成資源一眼看懂，不再用獎勵圖片佔據版面。"},
+        ],note:"共用經驗可於角色頁分配，用於角色升級。"},
         material:{title:"材料副本獎勵預覽",groups:[
             {title:"材料寶箱",badge:"×1～3",text:"通關回合越少，取得寶箱數越高；寶箱內含白／藍／紫／橙階礦石、基礎／30%／50%補品及還魂丹；分布暫定。"},
             {title:"用途",text:"礦石可用於冶煉與礦石升階；補品與還魂丹供戰鬥使用。裝備設計圖已取消。"}
         ],note:"寶箱數量依副本結算規則決定。"},
         gold:{title:"金幣副本獎勵預覽",groups:[
-            {title:"金幣獎勵",badge:"GOLD",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
+            {title:"金幣獎勵",badge:"金幣",text:"依目前副本難度與結算規則獲得金幣，通關後直接入帳。"},
             {title:"加倍選項",text:"若結算提供廣告加倍，可選擇觀看廣告取得加倍金幣，不影響直接領取。"}
-        ],note:"僅顯示實際會影響玩家決策的資訊。"}
+        ],note:"金幣數量依目前副本難度與結算結果決定。"}
     };
     const meta=table[type]||table.exp;
-    window.v132ShowRewardModal(previewMarkup(meta.title,"DAILY DUNGEON",meta.groups,meta.note));
+    window.v132ShowRewardModal(previewMarkup(meta.title,"日常副本",meta.groups,meta.note));
 };
 
 /* ---------- 8. Equipment dungeon art path authority. ---------- */

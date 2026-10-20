@@ -92,7 +92,7 @@ assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
 assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(read(owners.skillSkin), /\.skill-loadout-slot-name\{[^}]*font-size:15px/);
 assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
-assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
+assert.match(read('css/33-v132-content-expansion.css'), /\.v132-reward-modal \.v17363-preview-group p\{[^}]*font-size:15px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);
 // V177 owns backpack typography in css/22; css/52 must not reclaim it.
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
@@ -110,7 +110,8 @@ assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
 assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
 assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
 assert.match(read('css/25-stage-v90-quest-interface-core.css'), /\.quest-card-desc\{[^}]*font-size:15px/);
-assert.match(qa, /\.v17363-preview-group p\{font-size:15px!important/);
+assert.doesNotMatch(qa, /\.v17363-preview-group p\{/);
+assert.doesNotMatch(homePolish, /\.v17363-preview-group p\{/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
 

@@ -185,7 +185,7 @@
     text-shadow:0 2px 8px #000;
 }
 #game-stage .v174-abyss-selection-head > span{color:#aa8a55;font-size:16px;font-weight:800;letter-spacing:.18em;}
-#game-stage .v174-abyss-selection-head > b{color:#fff1c9;font-family:"Noto Serif TC",serif;font-size:24px;line-height:1.2;letter-spacing:.12em;}
+#game-stage .v174-abyss-selection-head > b{box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid transparent;border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;background:#151515;align-self:stretch;color:#fff1c9;font-family:"Noto Serif TC",serif;font-size:24px;line-height:1.2;letter-spacing:.12em;}
 #game-stage .v174-abyss-selection-head > small{color:#92836d;font-size:16px;line-height:1.4;}
 #game-stage .v174-abyss-card-list{
     display:flex;

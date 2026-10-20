@@ -183,7 +183,17 @@ try{
  for(const page of ['training','dungeon','boss']){
   await c.eval(`closeHomeFeature();showPage(${JSON.stringify(page)})`);await capture(page,'#'+page+'Page');
  }
- for(const type of ['exp','material','equipment']){await c.eval(`v141ShowDungeonRewardPreview(${JSON.stringify(type)})`);await capture('dungeon-reward-'+type,'#v132RewardModal');await c.eval('v132CloseRewardModal()');}
+ await c.eval("showPage('dungeon');switchDungeonTab('daily')");
+ for(const type of ['exp','material','gold','equipment']){
+  const selector='#dungeonTabContent [data-dungeon-cover="'+type+'"] .v141-dungeon-cover-actions button:first-child';
+  await c.eval('document.querySelector('+JSON.stringify(selector)+').scrollIntoView({block:"center"})');await settle();await tap(selector);
+  await capture('dungeon-reward-'+type,'#v132RewardModal');
+  const preview=await c.eval("(()=>{const b=document.querySelector('#v132RewardModal .v17363-text-reward-preview'),r=b.getBoundingClientRect(),scale=document.querySelector('#game-ui').getBoundingClientRect().width/document.querySelector('#game-ui').offsetWidth;return {width:r.width,title:b.querySelector('h3').textContent,body:[...b.querySelectorAll('p')].map(e=>parseFloat(getComputedStyle(e).fontSize)*scale)};})()");
+  assert.ok(preview.width>=Math.min(viewport[0]-40,280),'formal preview must use readable stage width: '+JSON.stringify(preview));
+  assert.ok(preview.body.length&&preview.body.every(n=>n>=14),'formal preview body must stay readable: '+JSON.stringify(preview));
+  await c.eval("(()=>{const b=document.querySelector('#v132RewardModal .v132-reward-modal-inner');b.scrollTop=b.scrollHeight;})()");await settle();
+  await capture('dungeon-reward-'+type+'-bottom','#v132RewardModal');await tap('#v132RewardModal .v132-reward-actions button');
+ }
  await c.eval('vGameplayOpenBoss()');
  for(const type of ['personal','world']){
   await c.eval(`vGameplaySwitchBossTab(${JSON.stringify(type)})`);await capture('boss-'+type,'#bossPage');

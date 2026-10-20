@@ -329,7 +329,7 @@
     overflow:hidden !important;
 }
 #game-stage #dungeonPage.active{display:flex !important;flex-direction:column !important;}
-#game-stage #dungeonPage > h2{flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;text-align:center;}
+#game-stage #dungeonPage > h2{box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid transparent;border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;background:#151515;flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;text-align:center;}
 #game-stage #dungeonPage > h2 + div{flex:0 0 auto;margin:3px 4px 6px !important;}
 #game-stage #dungeonTabContent{
     flex:1 1 auto !important;

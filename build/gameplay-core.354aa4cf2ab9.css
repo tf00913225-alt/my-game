@@ -2469,7 +2469,7 @@
     color:#6a6255;
 }
 
-/* 2026-09-07 — body-mounted text-only dungeon reward preview owner */
+/* Text-only reward preview geometry and typography; shared artwork is owned by css/49. */
 .v132-reward-modal .v132-reward-modal-inner.v17363-text-reward-preview{
     width:min(calc(calc(100 * var(--layout-inline-size,420px) / 100) - calc(32 * var(--ui-length-unit,1px))),calc(392 * var(--ui-length-unit,1px))) !important;
     height:min(calc(600 * var(--ui-length-unit,1px)),calc(calc(100 * var(--layout-block-size,746.6667px) / 100) - calc(32 * var(--ui-length-unit,1px)))) !important;
@@ -2477,22 +2477,18 @@
     max-height:calc(calc(100 * var(--layout-block-size,746.6667px) / 100) - calc(32 * var(--ui-length-unit,1px))) !important;
     min-height:min(calc(520 * var(--ui-length-unit,1px)),calc(calc(100 * var(--layout-block-size,746.6667px) / 100) - calc(32 * var(--ui-length-unit,1px)))) !important;
     padding:calc(18 * var(--ui-length-unit,1px)) !important;
-    border:calc(1 * var(--ui-length-unit,1px)) solid rgba(213,164,82,.82) !important;
-    border-radius:calc(15 * var(--ui-length-unit,1px)) !important;
-    background:radial-gradient(circle at 50% 0,rgba(232,177,77,.16),transparent 36%),linear-gradient(160deg,#22170e,#090807 76%) !important;
-    box-shadow:0 calc(22 * var(--ui-length-unit,1px)) calc(52 * var(--ui-length-unit,1px)) rgba(0,0,0,.78),inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) rgba(255,231,171,.07) !important;
     overflow-x:hidden !important;
     overflow-y:auto !important;
 }
-.v132-reward-modal .v17363-preview-heading{text-align:left;padding-bottom:calc(11 * var(--ui-length-unit,1px));margin-bottom:calc(11 * var(--ui-length-unit,1px));border-bottom:calc(1 * var(--ui-length-unit,1px)) solid rgba(196,149,75,.4);}
-.v132-reward-modal .v17363-preview-heading small{display:block;color:#8f7956;font:700 calc(9 * var(--ui-length-unit,1px))/1.2 Cinzel,serif;letter-spacing:.2em;}
+.v132-reward-modal .v17363-preview-heading{flex:0 0 auto;text-align:center;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));margin-bottom:calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid transparent;}
+.v132-reward-modal .v17363-preview-heading small{display:block;color:#b9ad98;font:700 calc(13 * var(--ui-length-unit,1px))/1.3 "Noto Serif TC",serif;letter-spacing:.12em;}
 .v132-reward-modal .v17363-preview-heading h3{position:static;margin:calc(4 * var(--ui-length-unit,1px)) 0 0;padding:0;color:#f4d78f;background:none;font-family:"Noto Serif TC",serif;font-size:calc(20 * var(--ui-length-unit,1px));line-height:1.35;letter-spacing:.04em;}
 .v132-reward-modal .v17363-preview-groups{display:grid;gap:calc(8 * var(--ui-length-unit,1px));flex:0 0 auto;}
-.v132-reward-modal .v17363-preview-group{position:relative;padding:calc(12 * var(--ui-length-unit,1px)) calc(13 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(119,89,52,.7);border-radius:calc(10 * var(--ui-length-unit,1px));background:linear-gradient(180deg,rgba(31,23,15,.96),rgba(13,10,8,.98));text-align:left;}
-.v132-reward-modal .v17363-preview-group b{display:block;padding-right:calc(80 * var(--ui-length-unit,1px));color:#f0d39a;font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.4;}
-.v132-reward-modal .v17363-preview-group em{position:absolute;right:calc(12 * var(--ui-length-unit,1px));top:calc(11 * var(--ui-length-unit,1px));color:#e5b966;font:900 calc(11 * var(--ui-length-unit,1px))/1.4 Cinzel,"Noto Sans TC",sans-serif;font-style:normal;}
-.v132-reward-modal .v17363-preview-group p{margin:calc(6 * var(--ui-length-unit,1px)) 0 0;color:#cdbfa7;font-size:calc(12 * var(--ui-length-unit,1px));line-height:1.72;}
-.v132-reward-modal .v17363-preview-note{margin:calc(10 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px)) 0;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));border-left:calc(2 * var(--ui-length-unit,1px)) solid #b98b45;color:#9f927d;background:rgba(184,134,62,.06);font-size:calc(11 * var(--ui-length-unit,1px));line-height:1.6;text-align:left;}
+.v132-reward-modal .v17363-preview-group{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:start;gap:calc(6 * var(--ui-length-unit,1px)) calc(8 * var(--ui-length-unit,1px));padding:calc(12 * var(--ui-length-unit,1px)) calc(13 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid rgba(119,89,52,.7);border-radius:calc(3 * var(--ui-length-unit,1px));background:linear-gradient(180deg,rgba(31,23,15,.96),rgba(13,10,8,.98));text-align:left;}
+.v132-reward-modal .v17363-preview-group b{display:block;min-width:0;color:#f0d39a;font-size:calc(16 * var(--ui-length-unit,1px));line-height:1.4;}
+.v132-reward-modal .v17363-preview-group em{color:#e5b966;font:900 calc(13 * var(--ui-length-unit,1px))/1.4 "Noto Sans TC",sans-serif;font-style:normal;text-align:right;}
+.v132-reward-modal .v17363-preview-group p{grid-column:1 / -1;margin:0;color:#cdbfa7;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.6;}
+.v132-reward-modal .v17363-preview-note{margin:calc(10 * var(--ui-length-unit,1px)) calc(1 * var(--ui-length-unit,1px)) 0;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px));border-left:calc(2 * var(--ui-length-unit,1px)) solid #b98b45;color:#b9ad98;background:rgba(184,134,62,.06);font-size:calc(14 * var(--ui-length-unit,1px));line-height:1.55;text-align:left;}
 .v132-reward-modal .v17363-text-reward-preview .v132-reward-actions{margin-top:auto;}
 
 
@@ -2817,7 +2813,7 @@
 :is(#game-stage,#game-ui) .system-panel-row strong{font-size:calc(16 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .system-panel-row small{font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.55;}
 
-#game-stage #dungeonTabBtnDaily{min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
+#game-stage #dungeonTabBtnDaily{border-radius:0;border-color:#d3ab68;background:linear-gradient(#76502a,#37251a);color:#fff0cd;min-height:48px;padding:8px 12px;font-size:18px;line-height:1.4;}
 
 /* Native skill/status/character detail presentation is owned by css/23. */
 
@@ -3951,7 +3947,7 @@
     overflow:hidden !important;
 }
 #game-stage #dungeonPage.active{display:flex !important;flex-direction:column !important;}
-#game-stage #dungeonPage > h2{flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;text-align:center;}
+#game-stage #dungeonPage > h2{box-sizing:border-box;min-height:44px;padding:8px 12px;border:1px solid transparent;border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;background:#151515;flex:0 0 auto;margin:2px 0 3px !important;font-size:22px !important;line-height:28px !important;text-align:center;}
 #game-stage #dungeonPage > h2 + div{flex:0 0 auto;margin:3px 4px 6px !important;}
 #game-stage #dungeonTabContent{
     flex:1 1 auto !important;
@@ -4342,11 +4338,6 @@
 .v132-ticket-preview-modal p,.v132-ticket-preview-modal .v132-preview-item{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.45!important;}
 .v132-set-title{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.35!important;}
 .v132-set-bonus{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.5!important;}
-.v132-reward-modal .v17363-preview-heading small{font:700 calc(13 * var(--ui-length-unit,1px))/1.3 Cinzel,serif!important;letter-spacing:.16em!important;}
-.v132-reward-modal .v17363-preview-group b{font-size:calc(16 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}
-.v132-reward-modal .v17363-preview-group em{font-size:calc(13 * var(--ui-length-unit,1px))!important;line-height:1.4!important;}
-.v132-reward-modal .v17363-preview-group p{font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:1.6!important;}
-.v132-reward-modal .v17363-preview-note{font-size:calc(14 * var(--ui-length-unit,1px))!important;line-height:1.55!important;}
 .v132-reward-modal .v132-reward-actions button{min-height:calc(40 * var(--ui-length-unit,1px))!important;font-size:calc(15 * var(--ui-length-unit,1px))!important;line-height:1.25!important;}
 
 
@@ -4454,7 +4445,7 @@
 }
 
 /* V173.61 — image-first daily reward previews */
-#game-stage .v17361-reward-preview{max-width:420px;}
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview){max-width:420px;}
 #game-stage .v17361-reward-visual{display:grid;gap:10px;margin:10px auto 14px;}
 #game-stage .v17361-reward-visual.single{grid-template-columns:minmax(0,170px);justify-content:center;}
 #game-stage .v17361-reward-visual.equipment{grid-template-columns:repeat(2,minmax(0,1fr));}
@@ -4483,7 +4474,7 @@
 #game-stage .v17361-chest-count b{font-size:14px;}
 
 /* V173.62 — patrol power-saving entry removed and dungeon previews become premium text summaries. */
-#game-stage .v17361-reward-preview{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview){
     width:min(360px,calc(100% - 24px)) !important;
     max-width:360px !important;
     padding:18px !important;
@@ -4494,7 +4485,7 @@
         linear-gradient(165deg,#21170e,#0b0907 74%) !important;
     box-shadow:0 18px 42px rgba(0,0,0,.72),inset 0 0 0 1px rgba(255,224,154,.06) !important;
 }
-#game-stage .v17361-reward-preview > h3{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) > h3{
     margin:0 0 12px !important;
     padding-bottom:11px !important;
     border-bottom:1px solid rgba(196,148,74,.42) !important;
@@ -4505,7 +4496,7 @@
     letter-spacing:.04em !important;
     text-align:left !important;
 }
-#game-stage .v17361-reward-preview > h3::after{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) > h3::after{
     content:"REWARD PREVIEW";
     display:block;
     margin-top:3px;
@@ -4515,16 +4506,16 @@
     font-weight:700;
     letter-spacing:.18em;
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual{
     display:block !important;
     width:100% !important;
     margin:0 0 14px !important;
 }
-#game-stage .v17361-reward-preview .v17361-reward-icon,
-#game-stage .v17361-reward-preview .v17361-chest-count{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-icon,
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-chest-count{
     display:none !important;
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual::before{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual::before{
     display:block;
     padding:15px 14px;
     border:1px solid rgba(126,96,57,.64);
@@ -4539,22 +4530,22 @@
     text-align:left;
     white-space:pre-line;
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.material)::before{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual.single:has(.material)::before{
     content:"材料寶箱  ×1～3\A━━━━━━━━━━━━\A通關回合越少，獲得的寶箱越多。\A寶箱可取得礦石、基礎／30%／50%補品與還魂丹。";
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual.single:has(.cover)::before{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual.single:has(.cover)::before{
     content:"金幣獎勵\A━━━━━━━━━━━━\A依目前副本等級結算金幣數量。\A通關後可直接領取，或觀看廣告取得雙倍獎勵。";
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual.single:not(:has(.material)):not(:has(.cover))::before{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual.single:not(:has(.material)):not(:has(.cover))::before{
     content:"共用經驗池  EXP\A━━━━━━━━━━━━\A通關經驗直接存入共用經驗池，不綁定單一角色。\A可用於後續角色分配與升級；結算可選擇廣告雙倍。";
 }
-#game-stage .v17361-reward-preview .v17361-reward-visual.equipment::before{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v17361-reward-visual.equipment::before{
     content:"裝備寶箱  ×2\A━━━━━━━━━━━━\A每個寶箱隨機取得 3 件裝備。\A白階 40%　・　藍階 40%\A紫階 10%　・　橙階 10%";
 }
-#game-stage .v17361-reward-preview .v132-reward-actions{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v132-reward-actions{
     margin-top:0 !important;
 }
-#game-stage .v17361-reward-preview .v132-reward-actions button{
+#game-stage .v17361-reward-preview:not(.v17363-text-reward-preview) .v132-reward-actions button{
     min-height:42px !important;
     border-color:#9e783d !important;
     color:#f0ddba !important;
@@ -6995,6 +6986,7 @@ body > .v169-rpg-dialog-layer{
 #game-stage .creation-skill-detail-header,
 #game-stage .v132-reward-modal-title,
 .v132-reward-modal-inner:not(.v141-affix-modal) > h3,
+.v132-reward-modal .v17363-preview-heading,
 #game-ui #itemModal .v17351-compare-header,
 .v169-rpg-dialog h2,
 .v141-reward-toast > strong,
@@ -7319,12 +7311,6 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal.v131-shop-open .shop-potion-effect{font-size:42px!important;line-height:54px!important}
 #game-ui #homeFeatureModal.v131-shop-open .v146-shop-total{font-size:39px!important;line-height:51px!important}
 
-/* Reward preview typography. */
-#game-stage .v17363-preview-heading small{font-size:13px!important;line-height:1.3!important}
-#game-stage .v17363-preview-group b{font-size:16px!important;line-height:1.4!important}
-#game-stage .v17363-preview-group em{font-size:13px!important;line-height:1.4!important}
-#game-stage .v17363-preview-group p{font-size:15px!important;line-height:1.6!important}
-#game-stage .v17363-preview-note{font-size:14px!important;line-height:1.55!important}
 
 
 #game-ui #homeFeatureModal .v17351-achievement-shell{height:100%!important;min-height:0!important;display:flex!important;flex-direction:column!important;gap:27px!important}

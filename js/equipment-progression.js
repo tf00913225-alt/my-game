@@ -1224,13 +1224,13 @@
         if(typeof window.v132ShowRewardModal!=="function"){ return; }
         const odds=equipmentChestOddsText("　・　");
         const html='<div class="v132-reward-modal-inner v17361-reward-preview v17363-text-reward-preview">'+
-            '<div class="v17363-preview-heading"><small>DAILY DUNGEON</small><h3>裝備副本獎勵預覽</h3></div>'+
+            '<div class="v17363-preview-heading"><small>日常副本</small><h3>裝備副本獎勵預覽</h3></div>'+
             '<div class="v17363-preview-groups">'+
                 '<section class="v17363-preview-group"><b>裝備寶箱</b><em>×2</em><p>勝利後取得 2 個裝備寶箱；每個寶箱固定隨機取得 3 件裝備。</p></section>'+
                 '<section class="v17363-preview-group"><b>元素系列碎片</b><em>隨機一種 ×'+EQUIPMENT_DUNGEON_FRAGMENT_REWARD.count+'</em><p>赤炎／寒泉／岩岳／青嵐等機率；暫定，每種'+(100/EQUIPMENT_DUNGEON_FRAGMENT_REWARD.setIds.length)+'%；廣告雙倍亦適用。</p></section>'+
                 '<section class="v17363-preview-group"><b>裝備品階機率</b><p>'+escapeHtml(odds)+'</p></section>'+
             '</div>'+
-            '<div class="v17363-preview-note">機率直接取自正式裝備寶箱掉落表，不載入大型裝備預覽圖。</div>'+
+            '<div class="v17363-preview-note">裝備品階機率依正式裝備寶箱掉落表顯示。</div>'+
             '<div class="v132-reward-actions"><button type="button" onclick="v132CloseRewardModal()">返回</button></div></div>';
         window.v132ShowRewardModal(html);
     };
