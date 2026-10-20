@@ -6,6 +6,7 @@ const {spawnSync}=require("node:child_process");
 const {spawn}=require("node:child_process");
 const os=require("node:os");
 const crypto=require("node:crypto");
+const {pathToFileURL}=require("node:url");
 function findChrome(){
     if(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH&&fs.existsSync(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH))return process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){const p=spawnSync("bash",["-lc",`command -v ${name}`],{encoding:"utf8"});if(p.status===0&&p.stdout.trim())return p.stdout.trim();}return "";}
 function decode(v){return v.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">").replace(/&quot;/g,'"').replace(/&#39;/g,"'");}
@@ -33,20 +34,21 @@ async function verifyCreationStates(){
    await c.send('Emulation.setDeviceMetricsOverride',{width:viewport[0],height:viewport[1],deviceScaleFactor:1,mobile:false});
    for(const state of ['empty-name','long-name','processing','retry']){
     const page=html.replace('</head>','<meta name="viewport" content="width=device-width,initial-scale=1"><link rel="stylesheet" href="css/31-v131-fix-batch.css"><style>html,body{width:100%!important;height:100%!important}#result{display:none}</style></head>');
-    const pageUrl='file:///'+stateFile.replace(/\\/g,'/')+'?state='+state+'&viewport='+viewport.join('x');
+    const pageUrl=pathToFileURL(stateFile).href+'?state='+state+'&viewport='+viewport.join('x');
     fs.writeFileSync(stateFile,page,'utf8');await c.send('Page.navigate',{url:pageUrl});
     // DOM existence can precede external CSS. Measure this navigation only,
     // after its real styles/fonts/layout settle, within the original 2s budget.
-    const readyBy=Date.now()+2000;let ready=false;
+    const readyBy=Date.now()+2000;let ready=false,lastReady=null;
     while(Date.now()<readyBy){
      const loaded=await c.eval(`({current:location.href===${JSON.stringify(pageUrl)},complete:document.readyState==='complete',input:!!document.querySelector('.creation-input'),styles:[...document.querySelectorAll('link[rel="stylesheet"]')].map(link=>({href:link.href,ready:!!link.sheet&&link.sheet.cssRules.length>0}))})`);
+     lastReady=loaded;
      if(loaded.current&&loaded.complete){
       assert.ok(loaded.styles.length>=3&&loaded.styles.every(link=>link.ready),'creation stylesheet failed to load: '+JSON.stringify(loaded.styles));
       if(loaded.input){ready=true;break;}
      }
      await new Promise(r=>setTimeout(r,20));
     }
-    assert.ok(ready,'creation document/styles did not load within the readiness budget');
+    assert.ok(ready,'creation document/styles did not load within the readiness budget: '+JSON.stringify(lastReady));
     await c.eval(`Promise.race([document.fonts.ready.then(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)))),new Promise((_,reject)=>setTimeout(()=>reject(new Error('creation fonts/layout readiness timed out')),${Math.max(1,readyBy-Date.now())}))])`);
     const measured=await c.eval(`(()=>{
      const root=document.getElementById('creationPage');const fit=Math.min(innerWidth/1080,innerHeight/1920);root.style.setProperty('transform-origin','top left','important');root.style.setProperty('transform','translate('+((innerWidth-1080*fit)/2)+'px,'+((innerHeight-1920*fit)/2)+'px) scale('+fit+')','important');
