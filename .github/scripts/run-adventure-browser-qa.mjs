@@ -150,6 +150,13 @@ if(process.argv.includes('--preflight-only')){
     for(let stage=1;stage<=20;stage++){
         const html=scenarios['mapSelected'+stage];assert.equal((html.match(/data-stage-id=/g)||[]).length,20);assert.doesNotMatch(html,/<select\b/);assert.match(html,/id="adventureStagePicker"/);
     }
+    for(const stage of [6,7]){
+        const html=scenarios['mapSelected'+stage],id='c1_'+String(stage).padStart(2,'0');
+        assert.ok(html.includes('data-node-id="'+id+'"'),'selected stage retains its original map button: '+id);
+        assert.ok(!html.includes('data-node-id="c1_05"'),'nearby stage5 title is demoted to a route pip: '+id);
+        assert.ok(html.includes('data-stage-id="c1_05"'),'demotion retains stage5 in the canonical twenty-stage picker');
+        assert.match(html,/class="adventure-route-pip /,'demoted stages retain visible route pips');
+    }
     console.log(JSON.stringify({preflightOnly:true,sourceCss:true,buildBundleFiles:true,referenceHashes:true,selectedRendererCases:20,browserLaunched:false,playerFlowVerified:false}));
     process.exit(0);
 }

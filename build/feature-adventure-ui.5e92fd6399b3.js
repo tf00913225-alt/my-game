@@ -150,7 +150,9 @@
         const selected=view.chapter.nodes.find(n=>n.id===view.selectedNodeId)||view.chapter.nodes.find(n=>n.id===view.state.currentNodeId);
         const milestones=[1,3,5,10,12,14,16,18,20];
         const mainNodes=view.chapter.nodes.map(node=>{
-            const close=selected&&node.id!==selected.id&&Math.abs((node.x-selected.x)*10.8)<145&&Math.abs((node.y-selected.y)*19.2)<145;
+            // Reserve the full title width as well as the circular hit target in
+            // the original 420px scene; nearby milestones remain route pips.
+            const close=selected&&node.id!==selected.id&&Math.abs((node.x-selected.x)*4.2)<140&&Math.abs((node.y-selected.y)*(746.6666667/100))<58;
             const major=node.id===selected?.id||(milestones.includes(node.stage)&&!close);
             return mapNodeButton(node,API().getNodeStatus(node.id),major,node.id===selected?.id);
         }).join('');
