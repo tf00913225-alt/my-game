@@ -53,7 +53,7 @@ try{
                 const api=FourSymbolsAdventure,first=api.getView();
                 check(first.dialogue.nodeId==='c1_01','first story node');
                 const root=document.getElementById('adventurePage');check(root,'story root');
-                window.captureStoryQa=async label=>{console.log('STORY_QA_CAPTURE:'+label);await new Promise(r=>setTimeout(r,400));};
+                window.dismissStoryQaAlerts=async()=>{for(let count=0;count<20;count++){const button=Array.from(document.querySelectorAll('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button')).find(b=>!b.hidden&&b.textContent.includes('知道'));if(!button)break;button.click();await new Promise(r=>setTimeout(r,30));}check(!document.querySelector('.v169-rpg-dialog-layer.show'),'all ordinary QA acknowledgement dialogs closed');};window.storyQaSceneMetadata=[];window.captureStoryQa=async label=>{await dismissStoryQaAlerts();const button=document.querySelector('.adventure-story-dialogue button');if(button){const r=button.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);check(button===hit||button.contains(hit),'story scene Next topmost');}storyQaSceneMetadata.push({label,dialogue:JSON.parse(JSON.stringify(FourSymbolsAdventure.getView().dialogue)),npcSrc:document.querySelector('.adventure-story-npc')?.getAttribute('src'),speaker:document.querySelector('.adventure-story-speaker')?.textContent});console.log('STORY_QA_CAPTURE:'+label);await new Promise(r=>setTimeout(r,400));};
                 await Promise.all(Array.from(root.querySelectorAll('.adventure-story img'),image=>image.decode()));
                 await window.captureStoryQa('opening-npc-active');
                 for(let reopen=0;reopen<3;reopen++){api.hide();api.open();}
@@ -99,8 +99,8 @@ try{
                     const check=(v,m)=>{if(!v)throw Error(m);};
                     const wait=async(fn,label)=>{const deadline=Date.now()+45000;while(!fn()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,50));check(fn(),label);};
                     const api=FourSymbolsAdventure,evidence=window.chapter1QaBattleEvidence;
-                    const dismiss=()=>{for(const button of document.querySelectorAll('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button'))if(!button.hidden&&button.textContent.includes('知道'))button.click();};
-                    const dialogue=async()=>{let limit=30;while(api.getView().dialogue&&limit-->0){const cursor=api.getView().dialogue;if(cursor.phase==='guidance')await captureStoryQa('guidance-'+cursor.nodeId+'-'+cursor.lineIndex);check(api.advanceDialogue(),'dialogue commit');await new Promise(r=>setTimeout(r,40));}check(limit>0,'dialogue bounded');};
+                    const dismiss=window.dismissStoryQaAlerts;
+                    const dialogue=async()=>{let limit=30;while(api.getView().dialogue&&limit-->0){const cursor=api.getView().dialogue;if(cursor.phase==='guidance')await captureStoryQa('guidance-'+cursor.nodeId+'-'+cursor.lineIndex);if(cursor.nodeId==='c1_02'&&cursor.phase==='before')await captureStoryQa('stage2-cast-'+cursor.lineIndex);check(api.advanceDialogue(),'dialogue commit');await new Promise(r=>setTimeout(r,40));}check(limit>0,'dialogue bounded');};
                     const fight=async(skill=false)=>{
                         await wait(()=>battleActive,'lesson battle begins');const rounds=[];let actions=0;
                         while(battleActive&&actions<25){
@@ -119,7 +119,7 @@ try{
                     check(api.advanceDialogue(),'persist one guidance line');const cursorBeforeReload=JSON.stringify(api.getView().dialogue);
                     check(loadGame()!==false,'reload through original UID Save Owner during guidance');api.open();
                     check(JSON.stringify(api.getView().dialogue)===cursorBeforeReload,'guidance cursor retained after save reload');await dialogue();
-                    check(!api.continueTutorial(),'unlearned skill blocked');dismiss();check(api.openTutorialSystem(),'open original skill system');await captureStoryQa('skill-page');
+                    check(!api.continueTutorial(),'unlearned skill blocked');await dismiss();check(api.openTutorialSystem(),'open original skill system');await captureStoryQa('skill-page');
                     learnSkill('flameSlash');equipSkill('flameSlash');
                     check(characterSkillLoadouts.fire.skillLevels.flameSlash>0&&characterSkillLoadouts.fire.equippedSkills.includes('flameSlash'),'real learn and equip');
                     api.returnFromTutorial();check(api.continueTutorial(),'return same stage2 retry');const retry2=await fight(true);check(api.getChapterState().completedNodes.c1_02,'stage2 passed');
@@ -127,11 +127,11 @@ try{
                     check(api.startStory('c1_04'),'stage4 story');await dialogue();const before4={gold,sharedExp,hpPotion:getPotionCount('hpPotion10'),spPotion:getPotionCount('spPotion10')};const defeat4=await fight();check(!api.getChapterState().completedNodes.c1_04,'stage4 natural tutorial defeat');
                     check(gold===before4.gold&&sharedExp===before4.sharedExp&&getPotionCount('hpPotion10')===before4.hpPotion&&getPotionCount('spPotion10')===before4.spPotion,'tutorial defeat4 has no death penalty or auto potion consumption');await dialogue();
                     const claim=document.querySelector('#adventurePage [onclick*="claimNodeReward"]');check(claim,'visible tutorial equipment reward action');claim.click();
-                    const uid=api.getChapterState().grantedEquipmentUid;check(uid,'starter grant receipt');check(!api.continueTutorial(),'unequipped armor blocks retry');dismiss();
+                    const uid=api.getChapterState().grantedEquipmentUid;check(uid,'starter grant receipt');check(!api.continueTutorial(),'unequipped armor blocks retry');await dismiss();
                     api.openTutorialSystem();await captureStoryQa('equipment-page');rebuildInventorySlots();const slot=inventorySlots.findIndex(item=>item?.v141Uid===uid);check(slot>=0,'grant exists in original inventory');
                     openItemModal(slot);check(equipSelectedItem(),'original equipment transfer');api.returnFromTutorial();check(api.continueTutorial(),'equipped exact grant allows retry');
                     const retry4=await fight(true);check(api.getChapterState().completedNodes.c1_04,'stage4 passed');
-                    check(api.startStory('c1_05'),'stage5 story');await dialogue();check(!api.continueTutorial(),'preparation required');dismiss();
+                    check(api.startStory('c1_05'),'stage5 story');await dialogue();check(!api.continueTutorial(),'preparation required');await dismiss();
                     api.openTutorialSystem();rebuildInventorySlots();const potionSlot=inventorySlots.findIndex(item=>item?.id==='spPotion10');
                     check(potionSlot>=0,'starter SP potion available');const beforeSP=player.sp,beforePotion=getPotionCount('spPotion10');
                     check(v17342UseInventoryPotion(potionSlot),'use original inventory SP potion');check(player.sp>beforeSP&&getPotionCount('spPotion10')===beforePotion-1,'real capped recovery and consumption');
@@ -143,15 +143,15 @@ try{
                     const check=(v,m)=>{if(!v)throw Error(m);};
                     const wait=async(fn,label)=>{const deadline=Date.now()+45000;while(!fn()&&Date.now()<deadline)await new Promise(r=>setTimeout(r,50));check(fn(),label);};
                     const api=FourSymbolsAdventure,stages=[];
-                    const dismiss=()=>{for(const button of document.querySelectorAll('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button'))if(!button.hidden&&button.textContent.includes('知道'))button.click();};
-                    const recover=()=>{
+                    const dismiss=window.dismissStoryQaAlerts;
+                    const recover=async()=>{
                         for(const [id,resource,max] of [['hpPotion10','hp',getPartyBattleStats(0).maxHP],['spPotion10','sp',getPartyBattleStats(0).maxSP]]){
-                            let limit=10;while(player[resource]<max*.75&&getPotionCount(id)>0&&limit-->0){rebuildInventorySlots();const slot=inventorySlots.findIndex(item=>item?.id===id);check(slot>=0&&v17342UseInventoryPotion(slot),'formal preparation consumes existing potion');dismiss();}
+                            let limit=10;while(player[resource]<max*.75&&getPotionCount(id)>0&&limit-->0){rebuildInventorySlots();const slot=inventorySlots.findIndex(item=>item?.id===id);check(slot>=0&&v17342UseInventoryPotion(slot),'formal preparation consumes existing potion');await dismiss();}
                         }
                     };
                     for(let stage=6;stage<=20;stage++){
                         const id='c1_'+String(stage).padStart(2,'0');check(api.getChapterState().currentNodeId===id,'linear current '+id);
-                        recover();if(stage===6)await captureStoryQa('map-after-tutorial');check(api.startStory(id),'start formal story '+id);if(stage===11||stage===19)await captureStoryQa('scene-'+id);let lines=30;
+                        await recover();if(stage===6)await captureStoryQa('map-after-tutorial');check(api.startStory(id),'start formal story '+id);if(stage===11||stage===19)await captureStoryQa('scene-'+id);let lines=30;
                         while(api.getView().dialogue&&lines-->0){check(api.advanceDialogue(),'formal dialogue '+id);await new Promise(r=>setTimeout(r,40));}check(lines>0,'formal dialogue bounded');
                         const node=FourSymbolsAdventureContent.chapters.chapter_v1.nodes.find(n=>n.id===id),rounds=[];
                         if(node.type==='rest')check(api.restAtNode(id),'formal rest');
@@ -172,7 +172,7 @@ try{
                         if(api.getChapterState().rewardClaims[id]==='ready')check(api.claimNodeReward(id),'formal node reward');
                         if(stage===11){const key=JSON.stringify(api.getChapterState().storyKeys);check(api.getChapterState().storyKeys.blackPineToken.sourceNodeId===id,'one story key');api.startStory(id);while(api.getView().dialogue)check(api.advanceDialogue(),'reopen key dialogue');check(JSON.stringify(api.getChapterState().storyKeys)===key,'story key repeat adds nothing');}
                         stages.push({id,type:node.type,rounds,hp:player.hp,sp:player.sp});
-                        if(stage===20){await captureStoryQa('ending-guard');let ending=30;while(api.getView().dialogue&&ending-->0)check(api.advanceDialogue(),'ending dialogue');check(ending>0,'ending bounded');}
+                        if(stage===20){let ending=30;while(api.getView().dialogue&&ending-->0){const cursor=api.getView().dialogue;await captureStoryQa(cursor.lineIndex===2?'ending-guard':'ending-line-'+cursor.lineIndex);check(api.advanceDialogue(),'ending dialogue');}check(ending>0,'ending bounded');}
                     }
                     check(api.getChapterState().chapterCompleted,'twenty-node chapter completed');
                     check(Object.keys(api.getChapterState().completedNodes).filter(id=>/^c1_/.test(id)).length===20,'20 of 20 completed');
@@ -180,7 +180,8 @@ try{
                     return {stages,state:api.getChapterState()};
                 })()`);
             }
-            await captureQueue;
+            await captureQueue;result.sceneMetadata=await client.eval("window.storyQaSceneMetadata");
+            if(width===393||width===1920){const scene=label=>result.sceneMetadata.find(row=>row.label===label);assert.equal(scene("stage2-cast-0").npcSrc,scene("stage2-cast-1").npcSrc,"stage2 cast persists during player reply");assert.equal(scene("ending-guard").dialogue.lineIndex,2);assert.equal(scene("ending-guard").speaker,"守驛人");assert.equal(scene("ending-line-3").dialogue.lineIndex,3);assert.equal(scene("ending-guard").npcSrc,scene("ending-line-3").npcSrc,"guard persists during final player reply");}
             results.push({width,height,result});
         }catch(error){
             const diagnostic=await Promise.race([client?.eval('({startup:window.FourSymbolsStartupPolicy?.getState?.(),creation:window.FourSymbolsStartupPolicy?.canCreateCharacter?.(),body:document.body.innerText.slice(-3500)})').catch(()=>null),new Promise(r=>setTimeout(()=>r(null),2000))]);
