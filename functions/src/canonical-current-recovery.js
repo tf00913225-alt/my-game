@@ -11,7 +11,7 @@ const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
+const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,recoveryAuditQueryShapes,
     prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
@@ -200,9 +200,9 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
            binding.approvalBindingSha256!==run.approvalBindingSha256)fail("data-loss","Candidate audit approval binding differs.");
     }
     async function verifyRetainedAuditControls(view,uid,expectedRevision,operations,verifiedRecoveryIDs){
-        const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=new Map(operations.docs.map(doc=>[doc.id,doc.data()]));
+        const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=await recoveryIndex(operations,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{kind:row.kind,ownerUid:row.ownerUid,operationId:row.operationId,sourceRevision:row.sourceRevision,sourceSha256:row.sourceSha256,approvedBy:row.approvedBy,restoredRevision:row.restoredRevision,createdAt:row.createdAt}:row;});
         const approvals=new Map(),compare=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
-        for(const doc of view.rows("recoveryApprovals").docs){
+        for await(const doc of recoveryRows(view.rows("recoveryApprovals"))){
             const approval=doc.data(),used=approval?.status==="used";
             inventoryExact(approval,["schemaVersion","kind","ownerUid","operationId","sourceRevision","sourceSha256","snapshotSha256",
                 "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[])],"retained approval");
@@ -234,11 +234,12 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             // it cannot authorize reuse of a used or expired approval.
             approvals.set(doc.id,{approval,binding:{...binding,status:"approved"}});
         }
-        const runs=view.rows(RECOVERY_AUDIT_RUN_COLLECTION).docs.map(doc=>{
+        const runs=[];
+        for await(const doc of recoveryRows(view.rows(RECOVERY_AUDIT_RUN_COLLECTION))){
             const run=inspectAuditRun(doc.data(),uid,doc.id);
-            if(doc.id!==run.auditId)fail("data-loss","Retained audit run ID differs.");
-            return run;
-        }).sort((a,b)=>a.epoch-b.epoch);
+            if(doc.id!==run.auditId)fail("data-loss","Retained audit run ID differs.");runs.push(run);
+        }
+        runs.sort((a,b)=>a.epoch-b.epoch);
         if(runs.length!==control.epoch)fail("data-loss","Retained audit epoch inventory differs.");
         let previous;
         for(let index=0;index<runs.length;index++){
@@ -255,7 +256,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             // than expiry. Neither commit timestamp is a new expiry gate.
             previous=run;
         }
-        const fences=view.rows(RECOVERY_AUDIT_FENCE_COLLECTION).docs;
+        const fences=[];for await(const doc of recoveryRows(view.rows(RECOVERY_AUDIT_FENCE_COLLECTION)))fences.push(doc);
         if(fences.length!==1||fences[0].id!=="current")fail("data-loss","Retained audit fence inventory differs.");
         matchingAuditFence(inspectRecoveryAuditFence(fences[0].data(),uid,fail),runs.at(-1));
     }
@@ -682,7 +683,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
     // Structural review of already-materialized schema3 bytes only. No SDK
     // reads, semantic Owner dispatch, candidate approval or restore capability.
     // Decode one bounded capsule at a time; do not concatenate the full capture.
-    function inspectCompleteRawCapture(input,assemblyBudget){
+    function inspectCompleteRawCapture(input,assemblyBudget,segmented=false){
         inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
         const {binding}=input;
         inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
@@ -718,7 +719,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             if(entry.id!==row.operationId||receipts.has(entry.id))fail("data-loss","Complete raw capture receipt IDs differ.");
             receipts.set(entry.id,row);
         }
-        const ordered=[...receipts.values()].sort((a,b)=>a.sequence-b.sequence),documents=[],paths=new Set();
+        const ordered=[...receipts.values()].sort((a,b)=>a.sequence-b.sequence),documents=[],paths=new Set(),locators=new Map(),capsules=new Map();
         let sequence=1,offset=0,previous=null,last;
         for(const receipt of ordered){
             if(receipt.sequence!==sequence++||receipt.startOrdinal!==offset||receipt.previousReceiptSha256!==previous)
@@ -737,8 +738,11 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             for(const row of payload.documents){
                 if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
                 if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
-                paths.add(row.path);documents.push(row);
+                paths.add(row.path);
+                if(segmented)locators.set(row.path,{operationId:receipt.operationId,offset:locators.size-receipt.startOrdinal});
+                else documents.push(row);
             }
+            if(segmented)capsules.set(receipt.operationId,Object.freeze({...receipt,chunkSha256s:Object.freeze(receipt.chunkSha256s.slice())}));
             offset=receipt.endOrdinal;previous=rawReceiptHash(receipt);last=receipt;
         }
         if(chunks.size||offset!==inventory.capturedCount||paths.size!==index.size||
@@ -746,10 +750,34 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
            state.lastReceiptSha256!==previous||state.lastStartOrdinal!==last.startOrdinal||state.lastCount!==last.count)
             fail("data-loss","Complete raw capture terminal or retained inventory differs.");
         if(assemblyBudget)finishRecoveryAuditRawInputs(assemblyBudget);
-        return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),
-            namespaces:Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
-                ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
-                    .map(key=>key.slice(key.lastIndexOf("/")+1)))})))});
+        const sealedNamespaces=Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
+            ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
+                .map(key=>key.slice(key.lastIndexOf("/")+1)))})));
+        if(!segmented)return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),namespaces:sealedNamespaces});
+        // One private sealed-capture reader. Keep only metadata locations after
+        // validating the entire original chain; never expose this capability.
+        const chunkRows=new Map(rawChunks.map(entry=>[entry.id,entry.row]));
+        let resident=null,residentId=null;
+        const metrics={capsuleDecodes:ordered.length,maxResidentCapsuleBytes:Math.max(...ordered.map(row=>row.payloadByteLength))};
+        const release=()=>{resident=null;residentId=null;};
+        const read=path=>{
+            const location=locators.get(path);if(!location)return null;
+            if(residentId!==location.operationId){
+                release();const receipt=capsules.get(location.operationId),parts=[];
+                for(let number=0;number<receipt.chunkSha256s.length;number++)parts.push(inspectCapsuleChunk(
+                    chunkRows.get(receipt.operationId+"_"+String(number).padStart(2,"0")),number,receipt,run,3));
+                const bytes=Buffer.concat(parts);
+                if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
+                    fail("data-loss","Segmented raw payload changed.");
+                resident=decodeProofPayload(bytes,assemblyBudget);
+                checkRawCapsule(resident,run,inventory,index,namespaces,3,undefined,undefined,receipt,assemblyBudget);
+                residentId=location.operationId;metrics.capsuleDecodes++;
+            }
+            const row=resident.documents[location.offset];
+            if(row?.path!==path)fail("data-loss","Segmented raw locator differs.");
+            return row;
+        };
+        return {index,namespaces:sealedNamespaces,read,release,metrics};
     }
     async function captureRawInventory(request,args){
         auditIntent("capture raw inventory",args,["auditId","expectedEpoch","operationId","expectedSequence","startOrdinal","count"]);
@@ -1020,70 +1048,77 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         return {restoredRevision:receipt.restoredRevision,unchanged:true,
             authoritativeStateReady:false};
     }
+    const segmentedScopes=new WeakMap(),segmentedRowSets=new WeakMap();
+    const recoveryRows=query=>segmentedRowSets.get(query)?.iterate()??query.docs;
+    const recoveryCount=query=>segmentedRowSets.get(query)?.count??query.docs.length;
+    function recoveryUnit(tx){return segmentedScopes.get(tx)?.unit()??tx;}
+    async function recoveryIndex(query,project){
+        const result=new Map();for await(const doc of recoveryRows(query))result.set(doc.id,project(doc));return result;
+    }
     async function verifyRecoveryRights(tx,root,uid,expectedRevision,records,{
         claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
         patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
         patrolOwnedModeEvents,patrolOperationIds}){
         const verifiedRecoveryIDs=new Set();
         const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
-        if(claims.docs.length!==archivedClaims.size){
+        if(recoveryCount(claims)!==archivedClaims.size){
             fail("data-loss","Independent claims differ from the recovery archive.");
         }
         // A lost claim/receipt index cannot hide a retained economic delta.
         // Reuse the original credit/debit Owners; never infer a missing
         // receipt from a balance or regenerate an operation during repair.
-        const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+        const receiptById=await recoveryIndex(receipts,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{grantId:row.grantId,operationId:row.operationId,creditedToCharacter:row.creditedToCharacter}:row;});
         const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
-        for(const doc of patrolTickets.docs){
-            const proof=await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
-            ticketProofs.set(doc.id,proof);
+        for await(const doc of recoveryRows(patrolTickets)){
+            const proof=await patrolEvidence.verifyRetainedTicket(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
+            ticketProofs.set(doc.id,{stateSha256:snapshotDigest(proof.state),status:proof.state.status,terminalOperationId:proof.state.terminalOperationId});
             for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
         }
-        if(patrolStates.docs.length!==ticketProofs.size){
+        if(recoveryCount(patrolStates)!==ticketProofs.size){
             fail("data-loss","Patrol ticket checkpoint inventory differs from retained sources.");
         }
-        for(const doc of patrolStates.docs){
+        for await(const doc of recoveryRows(patrolStates)){
             const {createdAt,updatedAt,...state}=doc.data();
-            if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==snapshotDigest(ticketProofs.get(doc.id).state)){
+            if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==ticketProofs.get(doc.id).stateSha256){
                 fail("data-loss","An orphaned Patrol checkpoint blocks recovery.");
             }
         }
-        for(const doc of patrolSettlements.docs){
+        for await(const doc of recoveryRows(patrolSettlements)){
             if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
-            await patrolEvidence.verifyRetainedSettlement(tx,root,uid,records.account,doc,expectedRevision);
+            await patrolEvidence.verifyRetainedSettlement(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
-        for(const doc of patrolClosures.docs){
+        for await(const doc of recoveryRows(patrolClosures)){
             const proof=ticketProofs.get(doc.get("ticketId"));
-            if(!proof||proof.state.status!=="abandoned"||proof.state.terminalOperationId!==doc.id){
+            if(!proof||proof.status!=="abandoned"||proof.terminalOperationId!==doc.id){
                 fail("data-loss","An orphaned Patrol closure blocks recovery.");
             }
-            await patrolEvidence.verifyRetainedClosure(tx,root,uid,records.account,doc,expectedRevision);
+            await patrolEvidence.verifyRetainedClosure(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
-        for(const doc of [...patrolModeEvents.docs,...patrolOwnedModeEvents.docs]){
+        for await(const doc of (async function*(){yield* recoveryRows(patrolModeEvents);yield* recoveryRows(patrolOwnedModeEvents);})()){
             if(doc.get("schemaVersion")!==2||doc.get("resultOwner")!=="forest-patrol-settlement"||
                !verifiedPatrolOperations.has(doc.id)||!patrolOperationIds.has(doc.id)){
                 fail("data-loss","A Forest mode component lacks its original earning source.");
             }
         }
-        await patrolEvidence.verifyCurrentEvidence(tx,root,uid,records.account,expectedRevision);
-        await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
-        for(const doc of modeSources.docs){
-            await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
+        await patrolEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,expectedRevision);
+        await modeEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,records,expectedRevision);
+        for await(const doc of recoveryRows(modeSources)){
+            await modeEvidence.verifyRetainedSource(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
         const verifiedModeOperations=new Set();
-        for(const doc of modeEvents.docs){
+        for await(const doc of recoveryRows(modeEvents)){
             if(doc.get("schemaVersion")===2){
                 if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An orphaned Forest value event blocks recovery.");
                 continue; // Full source-specific proof already checked this exact component.
             }
-            await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
+            await modeEvidence.verifyRetainedEvent(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
             verifiedModeOperations.add(doc.id);
         }
         // Debit receipts survive independently of their ledger. Every known
         // purchase/allocation must reach the original full debit proof below,
         // even when its ledger was lost with the current canonical sources.
-        const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
-        for(const doc of operations.docs){
+        const ledgerIds=new Set((await recoveryIndex(ledgers,()=>true)).keys());
+        for await(const doc of recoveryRows(operations)){
             const value=doc.data();
             if(value.schemaVersion!==1||value.ownerUid!==uid){
                 fail("data-loss","Operation inventory identity blocks recovery.");
@@ -1097,7 +1132,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                     fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
                 }
                 if(!verifiedModeOperations.has(doc.id)){
-                    await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
+                    await modeEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
                 }
                 verifiedModeOperations.add(doc.id);
             }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
@@ -1138,15 +1173,15 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                         {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
                     verifiedRecoveryIDs.add(doc.id);
                 }else{
-                    await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
+                    await sourceEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc);
                 }
             }
         }
         // Events survive independently of grants. Losing a grant must not
         // hide an original reward observation or authorize recreating it.
-        const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));
-        for(const doc of events.docs){
-            const grant=grantById.get(doc.id);
+        const grantById=await recoveryIndex(grants,doc=>segmentedScopes.has(tx)?true:doc.data());
+        for await(const doc of recoveryRows(events)){
+            const grant=segmentedScopes.has(tx)?(grantById.has(doc.id)?(await tx.get(root.collection("pendingGrants").doc(doc.id))).data():undefined):grantById.get(doc.id);
             if(!grant){fail("data-loss","An orphaned reward event blocks recovery.");}
             const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
             if(!proof||proof.event.sourceRevision>expectedRevision||
@@ -1157,8 +1192,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         // Retained consumed grants need their original receipt too. Pending
         // rights need an independently versioned event; never use an old
         // balance, creation time or absent receipt as evidence of eligibility.
-        const receiptsByGrant=new Set(receipts.docs.map(doc=>doc.get("grantId")));
-        for(const doc of grants.docs){
+        const receiptsByGrant=new Set((await recoveryIndex(receipts,doc=>doc.get("grantId"))).values());
+        for await(const doc of recoveryRows(grants)){
             const grant=doc.data();
             if(grant.status==="pending"){
                 verifyServerIssuedGrant({uid,grant,fail});
@@ -1183,7 +1218,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             }
         }
         let creditLedgerCount=0;
-        for(const doc of ledgers.docs){
+        for await(const doc of recoveryRows(ledgers)){
             const ledger=doc.data(),receipt=receiptById.get(doc.id);
             if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                ledger.schemaVersion!==1||ledger.ownerUid!==uid){
@@ -1206,13 +1241,13 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 creditLedgerCount++;
                 continue; // Full credit proof is checked below.
             }
-            await verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt);
+            await verifyDebitRecoveryEvidence(recoveryUnit(tx),root,uid,expectedRevision,records,doc,ledger,receipt);
         }
         if(creditLedgerCount!==archivedClaims.size){
             fail("data-loss","Credit ledger inventory differs from the recovery archive.");
         }
         let creditedCount=0;
-        for(const doc of receipts.docs){
+        for await(const doc of recoveryRows(receipts)){
             const receipt=doc.data();
             if(receipt.operationId!==doc.id||!OPERATION_ID.test(doc.id)){
                 fail("data-loss","Grant receipt identity blocks recovery.");
@@ -1238,7 +1273,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         if(creditedCount!==archivedClaims.size){
             fail("data-loss","Credited receipt inventory differs from the recovery archive.");
         }
-        for(const doc of claims.docs){
+        for await(const doc of recoveryRows(claims)){
             const record=archivedClaims.get(doc.id),claim=doc.data();
             if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
                 fail("data-loss","Unsupported or unmatched recovery claim.");
@@ -1495,6 +1530,133 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             if(error instanceof HttpsError)throw error;
             fail("data-loss",error.message);
         }
+    }
+    // Private verification view over this Owner's already sealed raw capture.
+    // It is not a provider, live SDK transaction, publication candidate or
+    // caller-configurable loader. Only original exact query shapes are valid.
+    function segmentedRawView(capture,budget,uid){
+        const root=db.collection("serverUsers").doc(uid),namespaces=new Map(capture.namespaces.map(row=>[row.path,row.ids]));
+        const used=new Set(),absences=new Set(),shapes=recoveryAuditQueryShapes(root),pending=new Set();
+        const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
+        const metrics={units:0,maxUnitReads:0,maxUnitTypedBytes:0};
+        const snapshot=path=>{
+            chargeRecoveryAuditAssembly(budget,"operations",1);
+            const slash=path.lastIndexOf("/"),ids=namespaces.get(path.slice(0,slash));
+            if(!ids)fail("data-loss","Segmented dependency namespace is unsupported.");
+            const row=capture.read(path);
+            if(!row){
+                if(ids.includes(path.slice(slash+1)))fail("data-loss","Segmented present dependency is missing.");
+                if(capture.index.size+absences.size>=4096&&!absences.has(path))fail("resource-exhausted","Segmented dependency limit exceeded.");
+                absences.add(path);used.add(path);return proofSnapshot(path,{exists:false});
+            }
+            used.add(path);return proofSnapshot(path,row);
+        };
+        const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
+        const lookup=async reference=>{
+            if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string"){
+                if(!db.doc(reference.path).isEqual?.(reference)&&typeof reference.isEqual==="function")
+                    fail("data-loss","Segmented document reference differs.");
+                return snapshot(reference.path);
+            }
+            const matches=shapes.filter(entry=>typeof reference?.isEqual==="function"&&reference.isEqual(entry.query));
+            if(matches.length!==1)fail("data-loss","Segmented query is unknown or ambiguous.");
+            chargeRecoveryAuditAssembly(budget,"operations",1);
+            const shape=matches[0],selected=[];
+            for(const id of namespaces.get(root.path+"/"+shape.name)){
+                const path=root.path+"/"+shape.name+"/"+id,doc=snapshot(path);
+                if(shape.filter(doc.data()))selected.push(doc);
+                if(!shape.order&&selected.length===shape.maximum)break;
+            }
+            if(shape.order){
+                if(selected.some(doc=>!Number.isSafeInteger(doc.get(shape.order))))fail("data-loss","Segmented query sequence is invalid.");
+                selected.sort((a,b)=>b.get(shape.order)-a.get(shape.order)||Buffer.compare(Buffer.from(b.id),Buffer.from(a.id)));
+            }
+            return result(selected.slice(0,shape.maximum));
+        };
+        const tracked=reference=>{
+            const promise=lookup(reference);pending.add(promise);
+            void promise.then(()=>pending.delete(promise),()=>pending.delete(promise));return promise;
+        };
+        const tx=Object.freeze({get:tracked});
+        const unit=()=>{
+            capture.release();let reads=0,typedBytes=0;const paths=new Set();metrics.units++;
+            // A new readonly identity gives original Owners a unit-local cache.
+            // It never calls beginEvidenceAttempt on an existing live attempt.
+            return Object.freeze({get:async reference=>{
+                if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
+                const row=await tracked(reference),docs=row.docs??[row];
+                for(const doc of docs)if(doc.exists&&!paths.has(doc.ref.path)){
+                    paths.add(doc.ref.path);typedBytes+=capture.index.get(doc.ref.path).typedDataByteLength;
+                    if(typedBytes>PATROL_PROOF_LIMITS.bytes)fail("resource-exhausted","Segmented proof resident data exceeds2MiB.");
+                }
+                metrics.maxUnitReads=Math.max(metrics.maxUnitReads,reads);metrics.maxUnitTypedBytes=Math.max(metrics.maxUnitTypedBytes,typedBytes);
+                return row;
+            }});
+        };
+        segmentedScopes.set(tx,{unit});
+        const rows=(name,filter=null)=>{
+            const path=root.path+"/"+name,ids=namespaces.get(path);
+            if(!ids)fail("data-loss","Segmented inventory namespace differs.");
+            const query=Object.freeze({});segmentedRowSets.set(query,{count:filter?undefined:ids.length,
+                iterate:async function*(){for(const id of ids){const doc=snapshot(path+"/"+id);if(!filter||filter(doc))yield doc;}}});return query;
+        };
+        const finish=()=>{
+            const unused=[...capture.index.keys()].find(path=>!used.has(path));
+            if(unused)fail("data-loss","Segmented unused dependency "+unused);
+            capture.release();return {documentCount:capture.index.size,absenceCount:absences.size,dependencyCount:used.size,
+                residentUsage:Object.freeze({...metrics,...capture.metrics})};
+        };
+        return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
+            close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
+    }
+    async function verifySegmentedRawRecoveryProof(input){
+        const budget=createRecoveryAuditAssemblyBudget();let view;
+        try{
+            chargeRecoveryAuditAssembly(budget,"passes",1);
+            const capture=inspectCompleteRawCapture(input,budget,true),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
+            view=segmentedRawView(capture,budget,uid);const {tx,root}=view;
+            const selected=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId));
+            if(!selected.exists||!encodeProofPayload(selected.data(),budget).equals(encodeProofPayload(input.run,budget)))
+                fail("data-loss","Segmented selected run differs.");
+            const run=selected.data(),recorded=timestampPair(run.createdAt);
+            view.auditControl={auditId,epoch:run.epoch,sessionId:run.sessionId,sessionRevision:run.sessionRevision,
+                recordedAt:run.createdAt};
+            const envelopeSnap=await tx.get(view.save),archiveSnap=await tx.get(root.collection("recoveryArchives").doc(String(revision))),
+                snapshotSnap=await tx.get(root.collection("playableSnapshots").doc(String(revision)));
+            const {envelope,records}=inspectCurrentRecoverySource(uid,revision,{envelopeSnap,archiveSnap,snapshotSnap});
+            if(envelope.serverRevision!==revision)fail("aborted","CLOUD_REVISION_CONFLICT");
+            await verifyCandidateAuditControl(tx,root,uid,revision,view.auditControl);
+            for(const name of Object.keys(SINGLES)){
+                const doc=await tx.get(root.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc(SINGLES[name]));
+                if(doc.exists&&(!Number.isSafeInteger(doc.get("serverRevision"))||doc.get("serverRevision")<1||doc.get("serverRevision")>revision))
+                    fail("data-loss","Surviving source revision blocks segmented proof.");
+            }
+            for(const name of Object.keys(SETS)){
+                const keys=new Set(records[name].map(SETS[name]));
+                for await(const doc of recoveryRows(view.rows(name)))if(!keys.has(doc.id)||!Number.isSafeInteger(doc.get("serverRevision"))||
+                    doc.get("serverRevision")<1||doc.get("serverRevision")>revision)fail("data-loss","Unexpected current source blocks segmented proof.");
+            }
+            const collections={};for(const [key,name] of Object.entries({claims:"uniqueClaims",receipts:"grantOperations",ledgers:"ledgerEntries",
+                grants:"pendingGrants",events:"rewardEvents",operations:"operations",modeSources:"simulatedAdSources",patrolTickets:"patrolTickets",
+                patrolStates:"patrolTicketStates",patrolSettlements:"patrolSettlements",patrolClosures:"patrolClosures"}))collections[key]=view.rows(name);
+            const modeEvents=view.rows("modeTimeEvents",doc=>doc.get("modeChanged")===true),
+                patrolModeEvents=view.rows("modeTimeEvents",doc=>doc.get("schemaVersion")===2),
+                patrolOwnedModeEvents=view.rows("modeTimeEvents",doc=>doc.get("resultOwner")==="forest-patrol-settlement"),
+                patrolOperationIds=new Set((await recoveryIndex(collections.patrolSettlements,()=>true)).keys());
+            const verified=await verifyRecoveryRights(tx,root,uid,revision,records,{...collections,modeEvents,patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds});
+            for await(const doc of recoveryRows(view.rows("modeTimeEvents"))){
+                if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false)
+                    await modeEvidence.verifyRetainedNonValueEvent(recoveryUnit(tx),root,uid,records.account,doc,revision);
+                else if(!(doc.get("schemaVersion")===1&&doc.get("modeChanged")===true)&&
+                    !(doc.get("schemaVersion")===2&&doc.get("resultOwner")==="forest-patrol-settlement"))
+                    fail("data-loss","An unclassified private mode event blocks segmented proof.");
+            }
+            await verifyRetainedAuditControls(view,uid,revision,collections.operations,verified);
+            const summary=view.finish();
+            return Object.freeze({...inventoryFlags,segmentedProofValid:true,ownerUid:uid,sourceRevision:revision,...summary,
+                assemblyUsage:recoveryAuditAssemblyUsage(budget)});
+        }catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
+        finally{if(view)await view.close();}
     }
     async function verifyRawRecoveryAuditCandidate(input){
         return (await assembleRawCandidate(input)).summary;
@@ -1779,7 +1941,7 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
         }
     }
     if(maintenanceMode)return Object.freeze({maintain});
-    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
+    return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,verifySegmentedRawRecoveryProof,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
 module.exports={createCanonicalCurrentRecovery,createCanonicalRecoveryMaintenance,inspectRecoveryAuditFence,

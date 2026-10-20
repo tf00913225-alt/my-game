@@ -293,6 +293,25 @@ function prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditContro
     writeCandidateFrames(suffixBytes,0,suffix,token);assemblyCharge(token);
     return fixedCandidateEncoder(prefixBytes,suffixBytes,documents.length,prefix.length+suffix.length,token);
 }
+// Fixed original query surface shared by strict readonly verification modes.
+// No caller-supplied query evaluator or data-loader contract.
+function recoveryAuditQueryShapes(root){
+    const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
+    const queries=[],add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
+    for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
+    for(const name of ["uniqueClaims","grantOperations","ledgerEntries","pendingGrants","rewardEvents","operations",
+        "simulatedAdSources","patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
+        add(root.collection(name).limit(401),name,()=>true,401);
+    for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents","simulatedAdSources",
+        "patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
+        add(root.collection(name).limit(1),name,()=>true,1);
+    for(const [key,expected] of [["modeChanged",true],["schemaVersion",2],["resultOwner","forest-patrol-settlement"]])
+        add(root.collection("modeTimeEvents").where(key,"==",expected).limit(401),"modeTimeEvents",row=>field(row,key)===expected,401);
+    for(const name of ["operations","ledgerEntries"])
+        add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
+    add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
+    return queries;
+}
 function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBudget){
     if(!Buffer.isBuffer(bytes)||bytes.length>LIMITS.bytes||!bytes.subarray(0,MAGIC.length).equals(MAGIC))bad("bytes or magic");
     assemblyDecodeBytes(assemblyBudget,bytes.length,false);
@@ -387,19 +406,7 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
     }
     function rows(name){assemblyCharge(assemblyBudget,"operations",1);return Object.freeze(inventories.get(`${root.path}/${name}`).map(id=>document(`${root.path}/${name}/${id}`)));}
     const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
-    const add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
-    for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
-    for(const name of ["uniqueClaims","grantOperations","ledgerEntries","pendingGrants","rewardEvents","operations",
-        "simulatedAdSources","patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
-        add(root.collection(name).limit(401),name,()=>true,401);
-    for(const name of ["pendingGrants","grantOperations","uniqueClaims","ledgerEntries","rewardEvents","simulatedAdSources",
-        "patrolTickets","patrolTicketStates","patrolSettlements","patrolClosures"])
-        add(root.collection(name).limit(1),name,()=>true,1);
-    for(const [key,expected] of [["modeChanged",true],["schemaVersion",2],["resultOwner","forest-patrol-settlement"]])
-        add(root.collection("modeTimeEvents").where(key,"==",expected).limit(401),"modeTimeEvents",row=>field(row,key)===expected,401);
-    for(const name of ["operations","ledgerEntries"])
-        add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
-    add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
+    queries.push(...recoveryAuditQueryShapes(root));
     const lookup=async reference=>{
         assemblyCharge(assemblyBudget,"operations",1);
         if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string")return document(reference.path);
@@ -437,5 +444,6 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
 }
 
 module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
+    chargeRecoveryAuditAssembly:assemblyCharge,recoveryAuditQueryShapes,
     encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS};

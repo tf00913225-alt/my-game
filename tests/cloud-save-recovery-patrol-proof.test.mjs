@@ -1169,3 +1169,18 @@ test('raw capture requires exact SDK source versions and typed bytes, never a mi
         await unchanged(f,()=>bad.captureRawInventory(f.request(),input),error=>error.code==='data-loss');
     }
 });
+
+
+test('segmented strict proof streams sealed raw capsules through original complete ticket units without candidate authority',async t=>{
+    for(const options of [{battles:2,three:true},{battles:20,three:false,adStatus:'abandoned'}]){
+        const f=await fixture(options),material=await completeRawMaterial(f),before=copy([...f.h.data]),input=JSON.stringify(material),writes=f.h.writes;
+        const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db),runProtected:()=>{throw Error('segmented proof cannot enter SDK');}});
+        const result=await owner.verifySegmentedRawRecoveryProof(material);
+        assert.equal(result.segmentedProofValid,true);assert.equal(result.documentCount,inventoryOrder(f).length);
+        for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+        assert(result.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);assert(result.residentUsage.maxUnitReads<=60);
+        assert(result.residentUsage.maxUnitTypedBytes<=2*1024*1024);assert.equal(result.assemblyUsage.reservedBytes,0);
+        assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.equal(JSON.stringify(material),input);
+        t.diagnostic(JSON.stringify({battles:options.battles,...result.residentUsage,...result.assemblyUsage}));
+    }
+});
