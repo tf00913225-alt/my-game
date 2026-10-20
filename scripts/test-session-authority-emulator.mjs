@@ -4372,15 +4372,13 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.equal(nativeReuse.segmentedProofValid,true);assert.ok(usage.settlementReuseHits>0);
     assert.equal(usage.enumeratedSettlementRows,settlementCount);assert.equal(usage.settlementReuseHits,settlementCount);
     assert.equal(usage.units,usage.executedProofUnits);
-    assert.equal(usage.executedProofUnits+usage.settlementReuseHits,usage.units+settlementCount,
-        "Every original logical proof unit is either executed or exact-row reused after a complete ticket proof");
     for(const flag of ["candidateProofValid","trustedCaptureVerified","restoreAuthorized","authoritativeStateReady"])assert.equal(nativeReuse[flag],false);
     for(const key of ["records","documents","artifact","artifactBytes","identity","restorePermit"])assert.equal(Object.hasOwn(nativeReuse,key),false);
     assert.equal(JSON.stringify(reuseInput),reuseBytes);assert.equal(JSON.stringify(traces),reuseTrace);
     assert.ok(nativeReuse.assemblyUsage.bytes<=256*1024*1024);assert.ok(nativeReuse.assemblyUsage.nodes<=16000000);
     assert.ok(nativeReuse.assemblyUsage.operations<=16384);assert.ok(nativeReuse.assemblyUsage.elapsedMs<=30000);
     assert.equal(nativeReuse.assemblyUsage.passes,1);assert.equal(nativeReuse.assemblyUsage.reservedBytes,0);
-    console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+", logical="+(usage.executedProofUnits+usage.settlementReuseHits)+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
+    console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
     const artifact=await publication.assemblePinnedCandidate(pin,material);
     assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
     const manifestRef=run.collection("candidatePublications").doc(args.operationId);
