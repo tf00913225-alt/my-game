@@ -173,6 +173,9 @@ function decodeInventoryPayload(bytes,assemblyBudget,reserved=false){
     return value(parsed);
 }
 const PATROL_PROOF_LIMITS=Object.freeze({bytes:2*1024*1024,chunkBytes:256*1024,chunks:8,reads:400,kernelReads:60,inventoryDocuments:4096,inventoryPages:317});
+// Canonical syntax qualifications only, never source/proof/restore authority.
+// They are scoped to one original assembly token and never serialized.
+const indexedRawRows=new WeakMap();
 function proofPayloadEncoding(payload,assemblyBudget){
     const tree=encodedValue(payload,0,{nodes:0},assemblyBudget),text=JSON.stringify(tree);
     assemblyCharge(assemblyBudget,"bytes",Buffer.byteLength(text,"utf8"));
@@ -215,10 +218,32 @@ function decodeProofPayloadInternal(bytes,assemblyBudget,reserved,indexRaw){
         offset+=3;
     }
     if(!found||offset+2!==bytes.length||!bytes.subarray(offset).equals(Buffer.from(']]')))bad("raw document framing");
-    return {payload:result,spans:Object.freeze(spans)};
+    assemblyCharge(assemblyBudget);
+    if(!assemblyBudgets.has(assemblyBudget))bad("raw row requires an assembly budget");
+    const qualified=spans.map((span,index)=>{
+        const qualification=Object.freeze({});
+        indexedRawRows.set(qualification,{budget:assemblyBudget,version:3,path:result.documents[index].path,
+            length:span.length,sha256:span.sha256});
+        return Object.freeze({...span,qualification});
+    });
+    return {payload:result,spans:Object.freeze(qualified)};
 }
 function decodeProofPayload(bytes,assemblyBudget,reserved=false){return decodeProofPayloadInternal(bytes,assemblyBudget,reserved,false);}
 function indexRawProofPayload(bytes,assemblyBudget,reserved=false){return decodeProofPayloadInternal(bytes,assemblyBudget,reserved,true);}
+function decodeIndexedRawProofRow(bytes,qualification,assemblyBudget){
+    assemblyCharge(assemblyBudget); // Sticky failure and real deadline precede hash/parse.
+    const row=indexedRawRows.get(qualification);
+    if(!row||row.budget!==assemblyBudget||row.version!==3||!Buffer.isBuffer(bytes)||bytes.length!==row.length)
+        bad("raw row qualification differs");
+    if(createHash("sha256").update(bytes).digest("hex")!==row.sha256)bad("raw row bytes differ");
+    assemblyDecodeBytes(assemblyBudget,bytes.length,false);
+    let parsed;try{parsed=JSON.parse(bytes.toString("utf8"));}catch(_){bad("raw row JSON");}
+    assemblyParsedNodes(parsed,assemblyBudget);
+    const result=value(parsed);
+    if(result?.path!==row.path)bad("raw row identity differs");
+    assemblyCharge(assemblyBudget);
+    return result;
+}
 function inventoryDocumentMetadata(snapshot,namespace,assemblyBudget){
     if(!snapshot?.exists||typeof snapshot.id!=="string"||!snapshot.id||snapshot.id.includes("/")||
        Buffer.from(snapshot.id,"utf8").toString("utf8")!==snapshot.id||snapshot.ref?.path!==`${namespace}/${snapshot.id}`)
@@ -482,4 +507,4 @@ function decodeRecoveryAuditArtifact(bytes,{uid,expectedRevision,db},assemblyBud
 module.exports={createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
     chargeRecoveryAuditAssembly:assemblyCharge,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
     encodeRecoveryAuditCandidate,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,PATROL_PROOF_LIMITS};
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS};

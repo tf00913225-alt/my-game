@@ -1228,9 +1228,13 @@ test('segmented private proof rejects semantic orphans, lost economic pairs and 
 
 test('segmented private chunk copies isolate external mutation and charge one sticky whole-lifecycle budget',async()=>{
     const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
-    let builds=0,token;const tokens=new Set(),wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
+    let builds=0,token,metadataChecks=0,qualifiedReads=0;const tokens=new Set(),wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
+        inventoryDocumentMetadata:(...args)=>{metadataChecks++;return helper.inventoryDocumentMetadata(...args);},
+        decodeIndexedRawProofRow:(...args)=>{qualifiedReads++;return helper.decodeIndexedRawProofRow(...args);},
         chargeRecoveryAuditAssembly:(budget,...args)=>{tokens.add(budget);return helper.chargeRecoveryAuditAssembly(budget,...args);}};
     const expected=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
+    assert.equal(metadataChecks,inventoryOrder(f).length,'each initial raw row reaches original membership validation exactly once');
+    assert.equal(qualifiedReads,expected.residentUsage.rowDecodes);assert(qualifiedReads>metadataChecks);
     const privateBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
     assert.equal(expected.residentUsage.privateChunkBytes,privateBytes);assert.equal(expected.residentUsage.copyChargedBytes,privateBytes);
     assert.equal(expected.residentUsage.initialHashCheckedBytes,2*privateBytes);assert(expected.residentUsage.rowSpanHashBytes>0);
@@ -1272,4 +1276,35 @@ test('segmented chunk shape and aggregate copy admission reject before private a
     await assert.rejects(()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports,buffers)(copy(base)),/bytes budget exceeded/);
     assert.equal(copies,0,'aggregate admission includes reserved input plus fresh copies before any allocation');
     assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+});
+
+
+test('indexed raw row qualifications bind one canonical span and original sticky assembly budget without authority',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),budget=helper.createRecoveryAuditAssemblyBudget();
+    const documents=['a','b'].map(id=>({path:'serverUsers/qualification/operations/'+id,exists:true,
+        updateTime:{seconds:1700000000,nanoseconds:123},data:{text:'中文😀',minusZero:-0}}));
+    const bytes=helper.encodeProofPayload({schemaVersion:3,documents}),indexed=helper.indexRawProofPayload(bytes,budget),
+        raw=indexed.spans.map(span=>bytes.subarray(span.start,span.start+span.length));
+    assert.equal(raw[0].length,raw[1].length);const first=indexed.spans[0],before=helper.recoveryAuditAssemblyUsage(budget);
+    const decoded=helper.decodeIndexedRawProofRow(raw[0],first.qualification,budget),after=helper.recoveryAuditAssemblyUsage(budget);
+    assert.deepEqual(helper.encodeProofPayload(decoded),helper.encodeProofPayload(documents[0]));
+    assert.equal(after.bytes-before.bytes,raw[0].length,'only actual decode work is charged; canonical re-encoding is not executed');
+    assert(after.nodes>before.nodes);assert.equal(Object.keys(first.qualification).length,0);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],{},budget),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[1],first.qualification,budget),/bytes differ/);
+    const changed=Buffer.from(raw[0]);changed[changed.length-2]^=1;
+    assert.throws(()=>helper.decodeIndexedRawProofRow(changed,first.qualification,budget),/bytes differ/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0].subarray(1),first.qualification,budget),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,{}),/unknown assembly budget/);
+    helper.reserveRecoveryAuditRawInputs(budget,[]);
+    assert.throws(()=>helper.chargeRecoveryAuditAssembly(budget,'operations',16385),/operations budget exceeded/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,budget),/operations budget exceeded/);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);compiled.filename=filename;
+    compiled.paths=Module._nodeModulePaths(dirname(filename));let clock=0;const native=compiled.require.bind(compiled);
+    compiled.require=name=>name==='node:perf_hooks'?{performance:{now:()=>clock}}:native(name);compiled._compile(readFileSync(filename,'utf8'),filename);
+    const timed=compiled.exports,timedBudget=timed.createRecoveryAuditAssemblyBudget(),timedIndex=timed.indexRawProofPayload(bytes,timedBudget);
+    clock=30001;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
+    clock=0;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
 });

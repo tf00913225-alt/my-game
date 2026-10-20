@@ -13,7 +13,7 @@ const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
 const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
     prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
 const {createRecoveryCandidateStorage}=require("./recovery-candidate-storage");
 
@@ -755,7 +755,8 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
                 if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
                 if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
                 paths.add(row.path);
-                if(segmented)locators.set(row.path,{operationId:receipt.operationId,...indexed.spans[locators.size-receipt.startOrdinal]});
+                if(segmented)locators.set(row.path,Object.freeze({operationId:receipt.operationId,
+                    ...indexed.spans[locators.size-receipt.startOrdinal],metadata:index.get(row.path)}));
                 else documents.push(row);
             }
             if(segmented)capsules.set(receipt.operationId,Object.freeze({...receipt,chunkSha256s:Object.freeze(receipt.chunkSha256s.slice())}));
@@ -788,11 +789,18 @@ function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
             }
             chargeRecoveryAuditAssembly(assemblyBudget,"bytes",location.length);
             const bytes=Buffer.concat(parts);
-            if(bytes.length!==location.length||inventoryHash(bytes)!==location.sha256)fail("data-loss","Segmented raw row span differs.");
+            if(bytes.length!==location.length)fail("data-loss","Segmented raw row span differs.");
             metrics.rowSpanHashBytes+=bytes.length;
-            const row=decodeProofPayload(bytes,assemblyBudget);metrics.rowDecodes++;
-            if(row?.path!==path)fail("data-loss","Segmented raw locator differs.");
-            proofMembership(path,row,index,namespaces,assemblyBudget);return row;
+            const row=decodeIndexedRawProofRow(bytes,location.qualification,assemblyBudget);metrics.rowDecodes++;
+            const metadata=index.get(path);
+            if(row?.path!==path||row.exists!==true||metadata!==location.metadata||
+               metadata.id!==path.slice(path.lastIndexOf("/")+1)||
+               row.updateTime?.seconds!==metadata.updateTime.seconds||row.updateTime?.nanoseconds!==metadata.updateTime.nanoseconds)
+                fail("data-loss","Segmented raw locator or validated membership differs.");
+            // Full canonical row and exact membership were verified before the
+            // locator was installed. The opaque same-budget row qualification
+            // and immutable private bytes prove that exact data is unchanged.
+            return row;
         };
         return {index,namespaces:sealedNamespaces,read,release,metrics};
     }
