@@ -1453,7 +1453,10 @@ try{
             targetId,primarySlot,bounds,safeBounds,
             targetType:config.targetType,placement:sprite?.dataset.placement||null,
             spriteCount:stage?.querySelectorAll('.v143-vfx-sprite').length||0,
-            portrait:window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry('monster',targetId)?.artworkProjection?.rect||null,
+            portrait:(()=>{
+                const rect=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry('monster',targetId)?.artworkProjection?.rect;
+                return rect?{left:rect.left,top:rect.top,width:rect.width,height:rect.height}:null;
+            })(),
             clipPath:sprite?.style.clipPath||null,
             frameFit:sprite?.dataset.frameFit||null,
             frameAspect:Number(sprite?.dataset.frameAspect||0),
