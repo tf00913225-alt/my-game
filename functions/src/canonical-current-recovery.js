@@ -16,6 +16,7 @@ const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRec
     prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
     inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
+const {createRecoveryCandidateStorage}=require("./recovery-candidate-storage");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -77,17 +78,22 @@ function restoredRecords(records,revision){
 // No earlier revision or later claim/receipt can be rolled back. Approval must
 // be written through a separately authorized server operator path, never by a
 // browser. There is deliberately no callable or player recovery UI.
-function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
-    runRecoveryAuditMaintenance,inspectExistingEnvelope,nextRevision,now=Date.now}){
+function createCanonicalCurrentRecovery(deps){
+    return buildRecoveryOwner(deps,null,false);
+}
+function createCanonicalRecoveryMaintenance(deps){
+    return buildRecoveryOwner(deps,createRecoveryCandidateStorage(),true);
+}
+function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
+    runRecoveryAuditMaintenance,inspectExistingEnvelope,nextRevision,now=Date.now},immutableCandidateIO,maintenanceMode){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const modeEvidence=patrolEvidence.modeOwner;
-    // Publication preparation is deliberately unreachable from the factory and has no
-    // production IO adapter. Tests may inspect these lexical functions only.
-    const immutableCandidateIO=null;
+    // The original factory remains disabled. Only the maintenance constructor
+    // binds the sole production Storage Owner; no request/dependency can select IO.
     const publicationPins=new WeakMap(),publicationMaterials=new WeakMap(),publicationArtifacts=new WeakMap(),publicationPreparations=new WeakMap();
     const publicationReadProofs=new WeakMap();
     function requirePublicationPreparation(){
@@ -1727,8 +1733,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         // Only successful transaction resolution consumes a usable proof.
         proof.consumed=true;return result;
     }
-    // Keep every private identity inside one server invocation. The production
-    // binding remains unavailable and this function is not a factory/API exit.
+    // Keep every private identity inside one server invocation.
     async function publishCapturedCandidate(request,args){
         requirePublicationPreparation();
         const pin=await pinCandidatePublication(request,args);
@@ -1757,8 +1762,33 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             await drainAndCloseRecoveryAuditLookups(view);
         }
     }
+    async function maintain(request){
+        const data=request?.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).sort().join("|")!=="action|intent|session|uid"||
+           typeof data.uid!=="string"||!data.uid||data.uid.includes("/")||
+           !data.session||typeof data.session!=="object"||Array.isArray(data.session)||
+           typeof data.action!=="string"||!data.intent||typeof data.intent!=="object"||Array.isArray(data.intent))
+            fail("invalid-argument","An exact recovery maintenance action is required.");
+        for(const [key,value] of Object.entries(data.intent)){
+            if(["expectedRevision","expectedEpoch","expectedSequence","startOrdinal","count"].includes(key)?
+                !Number.isSafeInteger(value):typeof value!=="string")
+                fail("invalid-argument","Recovery maintenance intent fields have invalid types.");
+        }
+        switch(data.action){
+        case "begin":return beginAudit(request,data.intent);
+        case "resume":return resumeAudit(request,data.intent);
+        case "cancel":return cancelAudit(request,data.intent);
+        case "prepareInventory":return prepareInventory(request,data.intent);
+        case "captureInventoryPage":return captureInventoryPage(request,data.intent);
+        case "captureRawInventory":return captureRawInventory(request,data.intent);
+        case "publish":return publishCapturedCandidate(request,data.intent);
+        default:fail("invalid-argument","Unsupported recovery maintenance action.");
+        }
+    }
+    if(maintenanceMode)return Object.freeze({maintain});
     return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
-module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
+module.exports={createCanonicalCurrentRecovery,createCanonicalRecoveryMaintenance,inspectRecoveryAuditFence,
     RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION,RECOVERY_INVENTORY_STATE_COLLECTION,RECOVERY_INVENTORY_PAGE_COLLECTION};
