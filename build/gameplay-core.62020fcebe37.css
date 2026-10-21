@@ -7592,7 +7592,9 @@ body > .v169-rpg-dialog-layer{
     display:none;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion:has(> .turn-target-row.skill-picker-open){
-    --battle-turn-overlay-bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + 8px);
+    /* The skill picker ends below enemy identity rows. Keep its independent
+       round/countdown plaque in the clear band above those identities. */
+    --battle-turn-overlay-bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + var(--battle-turn-row-height) + 24px);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion:has(> .turn-target-row.battle-item-open){
     --battle-turn-overlay-bottom:calc(var(--battle-item-menu-bottom) + var(--battle-item-menu-height) + var(--battle-item-menu-gap));
