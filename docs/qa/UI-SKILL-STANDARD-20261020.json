@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：35靜態巡邏四尺寸限定驗收；快捷圖字與全UI/所有標題剩餘狀態未完成",
+  "status": "施工中：35E黑鐵中文快捷OFF四尺寸限定驗收；全UI/所有標題剩餘狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12521,7 +12521,34 @@
         "8項raw/meta/actors/inventory/loadouts/equipment/patrol-key/saveAPI精確還原；currentZone/monsters/grid/path/animation與私有selected/decode/generation/cache不主張完全還原，隔離profile丟棄",
         "原route重建怪物與reset位置屬既有進場effects；僅比對靜態期間HP/SP/gold/inventory/equipment/hours/auto/battle/token/timer同baseline",
         "本機targeted2靜態contract與build/check通過；內建modal Browser因未配置exe跳過，不代此四尺寸圖證；最新Head必要Actions未確認，未merge/deploy"
-      ]
+      ],
+      "quickCaptionEvidence": {
+        "segment": "segment35e-material-caption-accepted",
+        "head": "241cb3edce33d421dc9d1fac020accda310fcac2",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35e-material-caption-accepted",
+        "status": "已實際驗證（僅OFF限定）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "screens": 8,
+        "inputs": 24,
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "limits": [
+          "僅OFF中文與關閉/原menu開關/返回，未操作quick toggle/choice/map；ON、真自動/巡怪/回復/戰鬥/交易未驗",
+          "3actor長名/其他地區/真實手機硬體未驗；8欄raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI精確還原，私有cache與map進場瞬態不主張完全還原",
+          "原PNG微字未重畫，功能名稱/狀態由可讀caption補充；不宣稱整素材已重製",
+          "本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何",
+          "99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代",
+          "build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy"
+        ]
+      }
     },
     {
       "id": "gameplay.monster-catalog",
@@ -26886,6 +26913,33 @@
       "limits": [
         "原report complete=true僅操作流程，不代art批准",
         "僅OFF，ON/開關/巡怪/戰鬥/硬體/私有cache未驗"
+      ]
+    },
+    {
+      "segment": "segment35e-material-caption-accepted",
+      "head": "241cb3edce33d421dc9d1fac020accda310fcac2",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35e-material-caption-accepted",
+      "status": "已實際驗證（僅OFF限定）",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "screens": 8,
+      "inputs": 24,
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "limits": [
+        "僅OFF中文與關閉/原menu開關/返回，未操作quick toggle/choice/map；ON、真自動/巡怪/回復/戰鬥/交易未驗",
+        "3actor長名/其他地區/真實手機硬體未驗；8欄raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI精確還原，私有cache與map進場瞬態不主張完全還原",
+        "原PNG微字未重畫，功能名稱/狀態由可讀caption補充；不宣稱整素材已重製",
+        "本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何",
+        "99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代",
+        "build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy"
       ]
     }
   ],

@@ -42,3 +42,14 @@ Before見522d/segment35-static-patrol-accepted各尺寸patrol-map-static實圖�
 99b四size8圖/24tap與8還原通過，但獨立art明確指出caption純黑矩形像臨時貼片，未接原圖古銅工藝。完整report complete=true僅流程通過，全部圖/三方結果保存segment35e-caption-art-rejected，不得冒稱本段已驗收。
 
 原rpg-window-iron變數實為色值，非材質。修同captionOwner沿原frame中央黑鐵fill/2px克制銅緣；padding4/4/3搭全border1，原4/5搭topborder1的總box與ink origin數學保持，仍須實際前後量測確認。字級/圖78/原active/handler不變，build/check過，修後四尺寸及三方審核待驗。
+
+## 35E 材質修後OFF限定驗收
+
+Source 241cb3edce33d421dc9d1fac020accda310fcac2，四尺寸8實圖/24tap，三方新圖獨立審核見segment35e-material-caption-accepted。原frame115fill/2px提供真黑鐵中心/克制銅緣，文字/原圖/原handler/active及44/EFP完整；同99b每size120幾何值獨立重算maxDiff0（不只算式）。原native返回/domain/8還原通過。舊99b art-rejected保留，未執行舊版acceptance腳本。
+
+- 僅OFF中文與關閉/原menu開關/返回，未操作quick toggle/choice/map；ON、真自動/巡怪/回復/戰鬥/交易未驗
+- 3actor長名/其他地區/真實手機硬體未驗；8欄raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI精確還原，私有cache與map進場瞬態不主張完全還原
+- 原PNG微字未重畫，功能名稱/狀態由可讀caption補充；不宣稱整素材已重製
+- 本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何
+- 99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代
+- build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy
