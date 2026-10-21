@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：戰場倒數材質/普通提示四尺寸限定驗收；其餘UI/所有標題狀態仍未完成",
+  "status": "施工中：原戰場空技能/空補品/普通提示四尺寸限定驗收；主指令美術與剩餘全UI狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12674,50 +12674,54 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/360x640",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/../battle-timer-material-accepted/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/393x873",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/412x915",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/1280x800",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         }
       },
@@ -12749,12 +12753,30 @@
             "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
             "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
           ]
+        },
+        {
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "status": "部分已實際驗證",
+          "scope": "同牌HUD/普通攻擊目標提示/原返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
       }
     },
     {
@@ -12762,7 +12784,7 @@
       "label": "戰鬥 skills",
       "entry": "隔離QA帳號→正式戰鬥控制 skills",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "可操作",
         "禁用",
@@ -12781,40 +12803,83 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/skill-before360",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "status": "部分已實際驗證",
+          "scope": "原四格全空技能選單真開關、回合/倒數可見",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
@@ -12891,7 +12956,7 @@
       "label": "戰鬥 items-potion",
       "entry": "隔離QA帳號→正式戰鬥控制 items-potion",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "可操作",
         "禁用",
@@ -12910,40 +12975,83 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/item-before360",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/360x640/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/393x873/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/412x915/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
+          "status": "部分已實際驗證",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
           "before": null,
-          "after": null,
-          "interaction": null
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/1280x800/report.json.gz",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "status": "部分已實際驗證",
+          "scope": "原補品空資料選單真開關、回合/倒數可見",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
@@ -13169,50 +13277,54 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/360x640",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/../battle-timer-material-accepted/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/393x873",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/412x915",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/1280x800",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800/report.json",
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "before": null,
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800/report.json.gz",
           "limits": [
-            "HUD至取消不足1秒，未驗跨秒/完整倒數",
-            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
-            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
         }
       },
@@ -13234,12 +13346,30 @@
             "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
             "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
           ]
+        },
+        {
+          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+          "status": "部分已實際驗證",
+          "scope": "同牌HUD/普通攻擊目標提示/原返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal",
+          "limits": [
+            "8overlay自然20→19，未驗timeout/後續回合",
+            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
+            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
+            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
