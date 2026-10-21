@@ -1,0 +1,110 @@
+[
+  {
+    "size": "360x640",
+    "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+    "complete": true,
+    "clean": true,
+    "sourceUnchanged": true,
+    "profileRemoved": true,
+    "comparisons": 102,
+    "maxDiff": 0,
+    "allHit": true,
+    "frame": {
+      "src": "url(\"http://127.0.0.1:59538/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "slice": "115 fill",
+      "width": "4px"
+    },
+    "round": [
+      "第1回合"
+    ],
+    "timers": [
+      20
+    ],
+    "econEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "nonGET": 0
+  },
+  {
+    "size": "393x873",
+    "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+    "complete": true,
+    "clean": true,
+    "sourceUnchanged": true,
+    "profileRemoved": true,
+    "comparisons": 102,
+    "maxDiff": 0,
+    "allHit": true,
+    "frame": {
+      "src": "url(\"http://127.0.0.1:58298/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "slice": "115 fill",
+      "width": "4px"
+    },
+    "round": [
+      "第1回合"
+    ],
+    "timers": [
+      20
+    ],
+    "econEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "nonGET": 0
+  },
+  {
+    "size": "412x915",
+    "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+    "complete": true,
+    "clean": true,
+    "sourceUnchanged": true,
+    "profileRemoved": true,
+    "comparisons": 102,
+    "maxDiff": 0,
+    "allHit": true,
+    "frame": {
+      "src": "url(\"http://127.0.0.1:62416/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "slice": "115 fill",
+      "width": "4px"
+    },
+    "round": [
+      "第1回合"
+    ],
+    "timers": [
+      20
+    ],
+    "econEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "nonGET": 0
+  },
+  {
+    "size": "1280x800",
+    "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+    "complete": true,
+    "clean": true,
+    "sourceUnchanged": true,
+    "profileRemoved": true,
+    "comparisons": 102,
+    "maxDiff": 0,
+    "allHit": true,
+    "frame": {
+      "src": "url(\"http://127.0.0.1:55247/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "slice": "115 fill",
+      "width": "4px"
+    },
+    "round": [
+      "第1回合"
+    ],
+    "timers": [
+      20
+    ],
+    "econEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "nonGET": 0
+  }
+]

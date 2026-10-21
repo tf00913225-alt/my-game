@@ -17,3 +17,7 @@ ab82ea30fc8912154f15be657100fc4d9fed9001 已消除重複回合文字，但真360
 ## c002 四尺寸：互動通過，美術拒絕
 
 12圖與四報告已經三方實看：普通提示/取消及完整20/單一回合的讀性與範圍限定通過，但美術明確拒絕大片普通黑底圓角細框。不是全項驗收。全圖/報告及三方結論保存 battle-timer-material-source/c002-art-rejected；不能用 complete=true 冒稱美術通過。材質修正只在原fixed-slot倒數牌規則加既有 --rpg-window-frame 的115 fill/4px黑鐵古銅邊，4px角與深鐵底，不改border-width/padding/64px尺寸/font26/tick1.55/任何JS。新來源四尺寸實畫與獨立審核待驗。
+
+## 00936719 材質四尺寸限定通過
+
+12實圖由三方獨立審核；原黑鐵素材/115fill/4px實際載入，回合唯一、倒數完整、普通提示/返回可讀。408項固定控制幾何與c002同裝置同phase比較最大差0px（不對自然怪物RNG/跳動字形要求相同）。source及完整CSS只三宣告可逆exact，JS/functions/config/release未變。四尺寸20真輸入44/EFP皆通過，profileRemoved=true，runtimeRestoreExact=false；原宣告窗口domain/raw/meta/save觀察不外推開戰零副作用。仍未跨秒、未驗技能/物品/auto/resolve/波次/結果/實體裝置。主操作列與其他全介面仍須逐項打磨；未合併、未部署，必要CI未確認。原c002美術拒絕歷史保留。證據：battle-timer-material-accepted。

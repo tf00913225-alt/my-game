@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：戰場倒數材質已修改待四尺寸審核；全UI/所有標題剩餘狀態未完成",
+  "status": "施工中：戰場倒數材質/普通提示四尺寸限定驗收；其餘UI/所有標題狀態仍未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12654,7 +12654,7 @@
       "label": "戰鬥 hud",
       "entry": "隔離QA帳號→正式戰鬥控制 hud",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "可操作",
         "禁用",
@@ -12673,32 +12673,52 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/393x873",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/412x915",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
@@ -12712,12 +12732,29 @@
             "未跨秒/技能/物品/auto/resolve/勝敗/波次/實體裝置",
             "不代表完整戰鬥狀態驗收"
           ]
+        },
+        {
+          "scope": "原forest catalogue/startBattle API隔離fixture：手動declare HUD、完整倒數字形、唯一回合標籤、普通攻擊提示及真取消；不是實際攻擊或地圖點怪驗收",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "status": "部分已實際驗證",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         }
       ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-scope-review.md"
       }
     },
     {
@@ -13112,7 +13149,7 @@
       "label": "戰鬥 target",
       "entry": "隔離QA帳號→正式戰鬥控制 target",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "已修改",
+      "status": "部分已實際驗證",
       "states": [
         "可操作",
         "禁用",
@@ -13131,40 +13168,78 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/360x640/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/393x873",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/393x873/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/412x915",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/412x915/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source/c002-art-rejected/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/1280x800/report.json",
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "scope": "原forest catalogue/startBattle API隔離fixture：手動declare HUD、完整倒數字形、唯一回合標籤、普通攻擊提示及真取消；不是實際攻擊或地圖點怪驗收",
+          "head": "0093671975423b85d4b1cbb464567ea15a71c9b2",
+          "status": "部分已實際驗證",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "limits": [
+            "HUD至取消不足1秒，未驗跨秒/完整倒數",
+            "技能/物品/auto/resolve/波次/長名/狀態/勝敗/結算/硬體待驗",
+            "開戰原副作用保留，runtimeRestoreExact=false，只清自有profile"
+          ]
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-accepted/fixedslot-prompt88-material-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
