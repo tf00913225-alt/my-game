@@ -582,7 +582,7 @@
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+' / 20 關</span><progress max="20" value="'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+'" aria-label="章節進度"></progress>'; }
         if(ui.body){
             const selected=view.chapter.nodes.find(node=>node.id===view.selectedNodeId)||view.chapter.nodes.find(node=>node.id===view.state.currentNodeId);
-            const mapKey=view.panel==='map'?JSON.stringify([view.chapter.id,selected?.id]):null;
+            const mapKey=view.visible&&view.panel==='map'?JSON.stringify([view.chapter.id,selected?.id]):null;
             const picker=ui.body.querySelector('#adventureStagePicker');
             const list=picker?.querySelector('.adventure-stage-list');
             // Hero sync may update map actions while the player is browsing.
@@ -607,6 +607,7 @@
         if(!root){ return; }
         const opts=options||{};
         if(opts.focusNodeId){ ui.lastFocusNodeId=opts.focusNodeId; }
+        ui.lastMapKey=null;
         showPage("adventure");
         render();
 
