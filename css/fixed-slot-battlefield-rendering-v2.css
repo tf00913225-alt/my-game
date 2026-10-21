@@ -147,6 +147,9 @@
     min-height:var(--battle-turn-row-height);
     max-height:var(--battle-turn-row-height);
     margin:0;
+    border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;
+    border-radius:4px;
+    background:#15130f;
     opacity:1;
     transform:none !important;
     transition:opacity .16s ease-out;

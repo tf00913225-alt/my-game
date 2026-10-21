@@ -13,3 +13,7 @@ Work ID: UI-SKILL-STANDARD-20261020；Branch: fix/ui-skill-standard-polish-20261
 ## 原倒數跳動裁切
 
 ab82ea30fc8912154f15be657100fc4d9fed9001 已消除重複回合文字，但真360圖的倒數20上下遭裁，正式gate拒絕，未批准；報告和圖保留 battle-timer-clipping-source。timer自身Range高46.48screen，牌高17.14screen，非先前aggregate誤判。原26px字/1.55倍跳動未改；原fixed-slot token留64px容納完整跳動字形，獨立回合標籤垂直置中同列。原center最小公式繼續讓提示/操作列有自己的位置，不移原單位座標Owner。既有排版test只將21%美觀上限讓位給已存在的centerMinimum安全下限；控制框不重疊、底部保留、整體空間守恆等必要斷言維持。4 targeted tests/build/check通過。四尺寸及三方審核仍待驗，不能稱戰鬥驗收完成。
+
+## c002 四尺寸：互動通過，美術拒絕
+
+12圖與四報告已經三方實看：普通提示/取消及完整20/單一回合的讀性與範圍限定通過，但美術明確拒絕大片普通黑底圓角細框。不是全項驗收。全圖/報告及三方結論保存 battle-timer-material-source/c002-art-rejected；不能用 complete=true 冒稱美術通過。材質修正只在原fixed-slot倒數牌規則加既有 --rpg-window-frame 的115 fill/4px黑鐵古銅邊，4px角與深鐵底，不改border-width/padding/64px尺寸/font26/tick1.55/任何JS。新來源四尺寸實畫與獨立審核待驗。

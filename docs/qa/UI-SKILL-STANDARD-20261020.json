@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：35F三長名四尺寸限定驗收；全UI/所有標題剩餘狀態未完成",
+  "status": "施工中：戰場倒數材質已修改待四尺寸審核；全UI/所有標題剩餘狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12654,7 +12654,7 @@
       "label": "戰鬥 hud",
       "entry": "隔離QA帳號→正式戰鬥控制 hud",
       "owner": "index.html; js/00-main.js; js/42-v148-combat-dungeon-fixes.js",
-      "status": "未檢查",
+      "status": "已修改",
       "states": [
         "可操作",
         "禁用",
@@ -12702,7 +12702,18 @@
         }
       },
       "notes": "只查呈現/互動，不調戰鬥數值、效果或結算。戰鬥既有字級例外依UI_GUIDELINES。",
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "scope": "c002四尺寸手動HUD/普通目標提示取消，輸入與範圍限定通過，美術拒絕普通黑牌；新材質未驗",
+          "head": "c00218f35ad45abe96ea52aad741b1b9f3e94d78",
+          "status": "有問題",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-timer-material-source",
+          "limits": [
+            "未跨秒/技能/物品/auto/resolve/勝敗/波次/實體裝置",
+            "不代表完整戰鬥狀態驗收"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
