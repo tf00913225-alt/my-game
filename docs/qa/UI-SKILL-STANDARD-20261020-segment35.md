@@ -36,3 +36,9 @@ Source 4325f3df9ea36cf496723a21edef5cd575eaf8b0，四尺寸32張圖/32項真輸�
 ## 35E 快捷中文標籤（修後待驗）
 
 Before見522d/segment35-static-patrol-accepted各尺寸patrol-map-static實圖：原78px圖工藝保留，但內嵌主字/OFF微字難讀。原index兩個button添aria-hidden可讀中文名/關閉/開啟span；原CSS00給18/16px明確行高、薄黑鐵底/古銅分隔，唯一原.active切換state顯示，不新增JS或旗標。原id/onclick/aria/四張PNG/source handlers保留，圖尺寸78不改，只水平置中。新增caption會自然增加控制高度，不能聲稱幾何不變；需四尺寸看文字Range/命中/錨點及角色/形象menu安全區。build/check通過，修後未驗；ON/切換/巡怪/戰鬥等仍未驗。
+
+## 35E 美術退回：非整段通過
+
+99b四size8圖/24tap與8還原通過，但獨立art明確指出caption純黑矩形像臨時貼片，未接原圖古銅工藝。完整report complete=true僅流程通過，全部圖/三方結果保存segment35e-caption-art-rejected，不得冒稱本段已驗收。
+
+原rpg-window-iron變數實為色值，非材質。修同captionOwner沿原frame中央黑鐵fill/2px克制銅緣；padding4/4/3搭全border1，原4/5搭topborder1的總box與ink origin數學保持，仍須實際前後量測確認。字級/圖78/原active/handler不變，build/check過，修後四尺寸及三方審核待驗。

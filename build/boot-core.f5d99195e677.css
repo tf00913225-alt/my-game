@@ -679,8 +679,9 @@ button:disabled{
     display:block;
     min-width:82px;
     margin-top:4px;
-    padding:4px 5px;
-    border-top:1px solid #8a6a3a;
+    padding:4px 4px 3px;
+    border:1px solid #8a6a3a;
+    border-image:var(--rpg-window-frame) 115 fill / 2px / 0 stretch;
     border-radius:0 0 4px 4px;
     background:var(--rpg-window-iron,#17130f);
     color:#f2e3bf;

@@ -1,0 +1,22 @@
+{
+  "base": "99b39edc496a9f4706c99695855c512ed59cc93e",
+  "onlyExactMaterialPaddingReplacement": true,
+  "from": "    padding:4px 5px;\n    border-top:1px solid #8a6a3a;",
+  "to": "    padding:4px 4px 3px;\n    border:1px solid #8a6a3a;\n    border-image:var(--rpg-window-frame) 115 fill / 2px / 0 stretch;",
+  "sourceBefore": "96054a22adec8c5bd822af2fef57913fd50961a85a1ef6005fab544d5af17c09",
+  "sourceAfter": "78be5774d8689d9a52b4d867048fc0fa6393e5cd772eed41a4fea94a37e97b0a",
+  "generatedBefore": "build/boot-core.6eddb4647dab.css",
+  "generatedAfter": "build/boot-core.f5d99195e677.css",
+  "wholeBundleExpectedExact": true,
+  "generatedSha256": "f5d99195e67784641a6535e8c3f735f61d1ac8430ae585cb924591fb53d74fda",
+  "htmlOnlyGeneratedCssHref": true,
+  "jsUnchanged": true,
+  "algebraOnly": {
+    "oldHorizontalInset": 5,
+    "newHorizontalInset": 5,
+    "oldVerticalExtra": 9,
+    "newVerticalExtra": 9
+  },
+  "actualGeometryVerified": false,
+  "artApproved": false
+}

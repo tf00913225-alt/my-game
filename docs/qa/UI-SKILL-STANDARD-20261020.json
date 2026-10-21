@@ -12474,7 +12474,8 @@
         "35B eb5實測及CSSOM證明JS17 inline!important仍壓min-height52；修原Owner：移除純樣式啟動函式，實際font20/pad6 14/line1.15收回CSS00，map mappings保留。after待驗。",
         "35C：501首360列表末項實際被native nav壓住且無可捲動祖先。修原列表內部scroll保留84舊座標導覽區，訓練祖先不再禁pan；map坐標及固定背景保留。修後待驗。",
         "35D：60ce首360形象選項32.57px，修原CSS32之選項52/font18與面板黑鐵雕框；修後四尺寸待驗。快捷圖內小字仍另列待改善。",
-        "35E原quick增可讀中文caption，沿原active唯一狀態；新高度/實畫與四尺寸審核待驗。"
+        "35E原quick增可讀中文caption，沿原active唯一狀態；新高度/實畫與四尺寸審核待驗。",
+        "35E99b四size操作通過但美術拒純黑caption；同原Owner引入真正frame fill材質與2px銅緣，字級/ink/outer尺寸保持預期，修後待驗。"
       ],
       "diagnosticEvidence": {
         "head": "297d72abb474186b2c9c0130c4d2a6d55bde70ac",
@@ -26874,6 +26875,17 @@
       "limits": [
         "只來源/生成包scope預審，不代四尺寸實畫",
         "ON/實際切換/巡怪/戰鬥仍未驗，OFF圖內bitmap微字未重畫但另提供可讀文字"
+      ]
+    },
+    {
+      "segment": "segment35e-caption-art-rejected",
+      "head": "99b39edc496a9f4706c99695855c512ed59cc93e",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35e-caption-art-rejected",
+      "status": "有問題/美術未通過，不得稱整段驗收",
+      "result": "四size8圖操作/Range/8restore通過，但art指出純黑caption像臨時貼片。原iron變數僅色值；改以原frame fill中央黑鐵材質/克制2px銅緣，修後待驗。",
+      "limits": [
+        "原report complete=true僅操作流程，不代art批准",
+        "僅OFF，ON/開關/巡怪/戰鬥/硬體/私有cache未驗"
       ]
     }
   ],
