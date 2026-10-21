@@ -53,3 +53,14 @@ Source 241cb3edce33d421dc9d1fac020accda310fcac2，四尺寸8實圖/24tap，三�
 - 本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何
 - 99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代
 - build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy
+
+## 35F 三角色長名限定驗收
+
+無產品修改，source 7b0e9eb43b500d2d2f59bc6e6e1ad5f570a81316，四尺寸8張圖/24真tap，三方獨立圖證見segment35f-three-long-names-accepted。三16字名各兩行完整，列高58.61/63.98/67.07/73.26px，44/EFP/末項native安全區通過。原純factory種第三只display、不register/create，creation讀取值與前兩actor除id原值前後相同。
+
+- 僅三16字名原選單顯示/開關/返回；未點choice/quicktoggle/map，不是真選角/創角/ON/巡怪/戰鬥/獎勵交易驗收
+- 第三actor僅原純buildAdditionalCharacter返回值，未register/create，前兩actor僅id變；creation讀取值與原數值前後相同，不改level/成本/資料schema
+- popup合理前景覆部分地圖，不承諾其下人物全部可見；三列全文/末項/nav/可操作控件無裁切
+- 8欄精確還原只raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI；map進場瞬態/private cache非exact，隔離profile丟棄
+- 真手機硬體、其他名字/其他地區仍未驗；art看靜態圖，真關閉/返回由interaction及scope追操作證據，不把closed-before圖片充關閉結果
+- 無產品修改，源7b四尺寸8圖/24真tap，最新必要CI未確認，未merge/deploy

@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：35E黑鐵中文快捷OFF四尺寸限定驗收；全UI/所有標題剩餘狀態未完成",
+  "status": "施工中：35F三長名四尺寸限定驗收；全UI/所有標題剩餘狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -12547,6 +12547,33 @@
           "本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何",
           "99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代",
           "build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy"
+        ]
+      },
+      "longNamePresentationEvidence": {
+        "segment": "segment35f-three-long-names-accepted",
+        "head": "7b0e9eb43b500d2d2f59bc6e6e1ad5f570a81316",
+        "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35f-three-long-names-accepted",
+        "status": "已實際驗證（限定三長名顯示）",
+        "devices": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "screens": 8,
+        "inputs": 24,
+        "reviewers": [
+          "art_review",
+          "interaction_review",
+          "scope_review"
+        ],
+        "limits": [
+          "僅三16字名原選單顯示/開關/返回；未點choice/quicktoggle/map，不是真選角/創角/ON/巡怪/戰鬥/獎勵交易驗收",
+          "第三actor僅原純buildAdditionalCharacter返回值，未register/create，前兩actor僅id變；creation讀取值與原數值前後相同，不改level/成本/資料schema",
+          "popup合理前景覆部分地圖，不承諾其下人物全部可見；三列全文/末項/nav/可操作控件無裁切",
+          "8欄精確還原只raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI；map進場瞬態/private cache非exact，隔離profile丟棄",
+          "真手機硬體、其他名字/其他地區仍未驗；art看靜態圖，真關閉/返回由interaction及scope追操作證據，不把closed-before圖片充關閉結果",
+          "無產品修改，源7b四尺寸8圖/24真tap，最新必要CI未確認，未merge/deploy"
         ]
       }
     },
@@ -26940,6 +26967,33 @@
         "本次材質delta與99b同尺寸同階段120值各size實測maxDiff0；初加caption確比35增加寬高，不宣稱與35完全同幾何",
         "99b讀性/操作通過但art退回完整保留；新241獨立實圖審核才有限批准，不拿report.complete或舊審核替代",
         "build/check及完整CSS/生成包逆向scope proof通過；最新Head必要CI未確認，未merge/deploy"
+      ]
+    },
+    {
+      "segment": "segment35f-three-long-names-accepted",
+      "head": "7b0e9eb43b500d2d2f59bc6e6e1ad5f570a81316",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment35f-three-long-names-accepted",
+      "status": "已實際驗證（限定三長名顯示）",
+      "devices": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "screens": 8,
+      "inputs": 24,
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "limits": [
+        "僅三16字名原選單顯示/開關/返回；未點choice/quicktoggle/map，不是真選角/創角/ON/巡怪/戰鬥/獎勵交易驗收",
+        "第三actor僅原純buildAdditionalCharacter返回值，未register/create，前兩actor僅id變；creation讀取值與原數值前後相同，不改level/成本/資料schema",
+        "popup合理前景覆部分地圖，不承諾其下人物全部可見；三列全文/末項/nav/可操作控件無裁切",
+        "8欄精確還原只raw/meta/actors/inventory/loadouts/equipment/patrolkey/saveAPI；map進場瞬態/private cache非exact，隔離profile丟棄",
+        "真手機硬體、其他名字/其他地區仍未驗；art看靜態圖，真關閉/返回由interaction及scope追操作證據，不把closed-before圖片充關閉結果",
+        "無產品修改，源7b四尺寸8圖/24真tap，最新必要CI未確認，未merge/deploy"
       ]
     }
   ],
