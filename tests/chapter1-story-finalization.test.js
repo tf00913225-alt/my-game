@@ -89,13 +89,53 @@ function installCanonicalInventoryFilter(c){
     assert.ok(start>=0&&end>start&&retired);vm.runInContext(retired[0]+'\n'+source.slice(start,end),c);
 }
 
-function installUi(h){
-    const body={innerHTML:"",querySelector:()=>null};
+function installUi(h,body={innerHTML:"",querySelector:()=>null}){
     const root={isConnected:true,dataset:{},classList:{contains:()=>false},querySelector:selector=>selector==="#adventureView"?body:null};
     h.c.document.getElementById=id=>id==="adventurePage"?root:null;
     vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),h.c);
     return ()=>body.innerHTML;
 }
+
+test('Hero updates preserve native map browsing only for the same rendered chapter and selection',()=>{
+    const h=runtime(),listeners=new Map();let markup='',picker=null,required=null;
+    const body={
+        get innerHTML(){return markup;},
+        set innerHTML(value){
+            markup=value;
+            const list={scrollTop:0};
+            picker=value.includes('id="adventureStagePicker"')?{open:false,querySelector:selector=>selector==='.adventure-stage-list'?list:null}:null;
+        },
+        querySelector:selector=>selector==='#adventureStagePicker'?picker:null
+    };
+    h.state().currentNodeId='c1_12';
+    h.state().completedNodes=Object.fromEntries(nodeIds.slice(0,11).map(id=>[id,true]));
+    h.state().onboarding={active:false,phase:'complete'};
+    h.c.player.adventureProgress.pendingStoryOpening=false;
+    h.c.FourSymbolsHeroAcquisition={getRequiredStoryNode:()=>required,beginChapter(){},observeChapterNode(){}};
+    h.c.document.addEventListener=(name,callback)=>listeners.set(name,callback);
+    h.c.v154ResolveMonsterPortraitRecord=()=>({path:'assets/ready-npc.webp'});
+    h.c.getCharacterBattleArtworkPath=()=> 'assets/player.webp';
+    installUi(h,body);h.api.open({panel:'map',focusNodeId:'c1_12'});
+    const notify=()=>listeners.get('four-symbols:hero-acquisition-state')();
+    const browse=()=>{picker.open=true;picker.querySelector('.adventure-stage-list').scrollTop=437;};
+    browse();const previous=picker;required='c1_11';notify();
+    assert.notEqual(picker,previous,'the original renderer really rebuilt its DOM');
+    assert.equal(picker.open,true);assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,437);
+    assert.match(markup,/補看故事紀錄/,'Hero-required action still updates');
+    required=null;notify();assert.doesNotMatch(markup,/補看故事紀錄/);
+    assert.equal(picker.open,true);assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,437);
+    picker.open=false;notify();assert.equal(picker.open,false,'a closed disclosure must not open itself');
+    browse();h.api.openNode('c1_11');
+    assert.equal(picker.open,false,'a different selected node closes the list');
+    assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,0);
+    browse();h.api.startStory('c1_11');assert.equal(picker,null);
+    h.api.setPanel('map');assert.equal(picker.open,false,'returning from another panel starts closed');
+    browse();const original=h.c.FourSymbolsAdventure;
+    h.c.FourSymbolsAdventure={...original,getView:()=>{const view=original.getView();return {...view,chapter:{...view.chapter,id:'other-chapter'}};}};
+    h.c.FourSymbolsAdventureUI.render();
+    assert.equal(picker.open,false,'a different chapter must not inherit browsing');
+    assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,0);
+});
 function formalMapAt(id){
     const h=runtime(),nodes=content().chapters.chapter_v1.nodes,index=nodes.findIndex(n=>n.id===id);
     h.state().currentNodeId=id;h.state().completedNodes=Object.fromEntries(nodes.slice(0,index).map(n=>[n.id,true]));

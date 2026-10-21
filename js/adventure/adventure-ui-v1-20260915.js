@@ -8,7 +8,7 @@
 
     const API=()=>window.FourSymbolsAdventure;
     const CONTENT=()=>window.FourSymbolsAdventureContent;
-    const ui={root:null,body:null,tracker:null,lastFocusNodeId:null};
+    const ui={root:null,body:null,tracker:null,lastFocusNodeId:null,lastMapKey:null};
 
     function esc(value){
         return String(value==null?"":value)
@@ -44,6 +44,7 @@
                 '<div class="adventure-view" id="adventureView"></div>';
             stage.appendChild(root);
         }
+        ui.lastMapKey=null;
         ui.root=root;
         ui.body=root.querySelector("#adventureView");
         return root;
@@ -580,7 +581,23 @@
         if(title){ title.textContent="第一章 · "+view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+' / 20 關</span><progress max="20" value="'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+'" aria-label="章節進度"></progress>'; }
         if(ui.body){
+            const selected=view.chapter.nodes.find(node=>node.id===view.selectedNodeId)||view.chapter.nodes.find(node=>node.id===view.state.currentNodeId);
+            const mapKey=view.panel==='map'?JSON.stringify([view.chapter.id,selected?.id]):null;
+            const picker=ui.body.querySelector('#adventureStagePicker');
+            const list=picker?.querySelector('.adventure-stage-list');
+            // Hero sync may update map actions while the player is browsing.
+            // Preserve only this same map selection's native disclosure state.
+            const browsing=mapKey&&mapKey===ui.lastMapKey&&picker?{open:picker.open,scrollTop:list?.scrollTop||0}:null;
             ui.body.innerHTML=renderPanel(view);
+            ui.lastMapKey=mapKey;
+            if(browsing){
+                const nextPicker=ui.body.querySelector('#adventureStagePicker');
+                if(nextPicker){
+                    nextPicker.open=browsing.open;
+                    const nextList=nextPicker.querySelector('.adventure-stage-list');
+                    if(nextList){nextList.scrollTop=browsing.scrollTop;}
+                }
+            }
         }
         syncTracker(view);
     }
