@@ -27008,6 +27008,30 @@
         "不跑Cloud或Chrome根因工程",
         "最新Head必要CI/部署未完成"
       ]
+    },
+    {
+      "segment": "dev758-two-device-dependency-smoke",
+      "head": "bee66eaa6a8d4470b0e04565b7bb06e6b5d2d77d",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev758-two-device-dependency-smoke",
+      "status": "已實際驗證（僅2尺寸相依smoke）",
+      "devices": [
+        "360x640",
+        "1280x800"
+      ],
+      "screens": 16,
+      "inputs": 16,
+      "reviewers": [
+        "art_review",
+        "interaction_review",
+        "scope_review"
+      ],
+      "limits": [
+        "僅新Head短屏/桌面原training gesture與靜態巡邏原返回依賴，不重跑舊四尺寸全矩陣",
+        "393/412未於新merge重驗；舊source四尺寸證據不重標新Head全驗",
+        "新88prompt/新戰場tracks另實畫待驗；首battle採集仍entryoverlay時不算可見目標提示證據，不據此判真裁切",
+        "無choice/ON/auto/戰鬥/獎勵交易；8restore限定與private cache/map瞬態非exact沿35",
+        "最新Head必要CI/部署未確認，未merge dev/main"
+      ]
     }
   ],
   "titleAudit": {

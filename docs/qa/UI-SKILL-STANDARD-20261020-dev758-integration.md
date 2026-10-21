@@ -13,3 +13,13 @@ Work ID UI-SKILL-STANDARD-20261020 / PR #955。正常merge父UI 246815098b6d2783
 目前只來源整合審核通過；新merge Head實際依賴smoke及targetprompt衝突實畫/獨立審核仍待完成。先訓練原list真touch/nativewheel代表裝置；戰鬥提示如不能沿原自然計時/正式安全fixture取得就明列未驗，不凍結timer、不繞protected guard。舊各段四尺寸證據綁原source，不冒稱新Head全UI重驗。
 
 完整來源/政策/獨立審核見evidence/dev758-dependency-merge-source。尚未合併dev、部署或宣稱全UI/所有標題完成。
+
+## 新merge Head兩尺寸依賴smoke
+
+Source bee66eaa6a8d4470b0e04565b7bb06e6b5d2d77d，360×640與1280×800共16圖/16輸入，原list真touch/nativewheel→top51末項→top0森林→原資訊/靜態map/形象開關/原返回，域不變與8還原通過。三方各實看4代表圖及報告見dev758-two-device-dependency-smoke。
+
+- 僅新Head短屏/桌面原training gesture與靜態巡邏原返回依賴，不重跑舊四尺寸全矩陣
+- 393/412未於新merge重驗；舊source四尺寸證據不重標新Head全驗
+- 新88prompt/新戰場tracks另實畫待驗；首battle採集仍entryoverlay時不算可見目標提示證據，不據此判真裁切
+- 無choice/ON/auto/戰鬥/獎勵交易；8restore限定與private cache/map瞬態非exact沿35
+- 最新Head必要CI/部署未確認，未merge dev/main
