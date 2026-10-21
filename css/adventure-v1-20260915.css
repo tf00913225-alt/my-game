@@ -81,7 +81,7 @@
     box-shadow:0 5px 13px rgba(0,0,0,.25);
 }
 .adventure-back-button,.adventure-button,.adventure-choice,.adventure-route-choice,.adventure-merchant-item button,.adventure-node,.adventure-tracker-main{font:inherit;touch-action:manipulation;-webkit-tap-highlight-color:transparent;}
-.adventure-back-button{white-space:nowrap;justify-self:start;min-height:52px;padding:7px 9px;border:1px solid #775b31;border-radius:8px;color:#ecd8aa;background:linear-gradient(#2d2417,#17120d);font-size:18px;font-weight:800;}
+.adventure-back-button{white-space:nowrap;justify-self:start;min-width:52px;min-height:52px;padding:7px 9px;border:1px solid #775b31;border-radius:8px;color:#ecd8aa;background:linear-gradient(#2d2417,#17120d);font-size:18px;font-weight:800;}
 .adventure-heading{box-sizing:border-box;text-align:center;min-width:0;line-height:1.05;padding:6px 8px;border:1px solid transparent;border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 7px / 0 stretch;background:#151515;}
 .adventure-heading span{display:block;color:#b19a6b;font-size:16px;letter-spacing:.12em;}
 .adventure-heading strong{display:block;margin-top:3px;color:#f2da9d;font:900 21px/1.1 "Noto Serif TC",serif;white-space:normal;overflow-wrap:anywhere;}
@@ -93,8 +93,8 @@
 #adventurePage[data-panel="map"] .adventure-view{flex:1;height:100%;}
 #adventurePage[data-panel="map"] .adventure-back-button{position:absolute;z-index:2;isolation:isolate;left:2%;top:0;width:52px;height:52px;min-height:52px;padding:0;border:0;border-radius:0;background:transparent;font-size:28px;}
 #adventurePage[data-panel="map"] .adventure-back-button::before{content:"";position:absolute;z-index:-1;inset:10px;border:1px solid #b6975d;transform:rotate(45deg);background:linear-gradient(135deg,#3e3d2bd9,#101e19e8);box-shadow:inset 0 0 0 3px #101a16,0 0 0 1px #252a20;pointer-events:none;}
-#adventurePage[data-panel="map"] .adventure-heading{text-align:left;padding-left:16%;font-family:"DFKai-SB","KaiTi","STKaiti",serif;}
-#adventurePage[data-panel="map"] .adventure-heading span{font-size:16px;color:#efcf90;letter-spacing:.12em;}
+#adventurePage[data-panel="map"] .adventure-heading{text-align:center;padding-inline:52px;font-family:"DFKai-SB","KaiTi","STKaiti",serif;}
+#adventurePage[data-panel="map"] .adventure-heading span{font-size:20px;line-height:1.4;font-weight:900;color:#efcf90;letter-spacing:.12em;}
 #adventurePage[data-panel="map"] .adventure-heading strong{position:absolute;left:3%;top:55%;margin:0;font-size:26px;line-height:1.2;color:#ffe0a2;letter-spacing:.06em;overflow:visible;}
 .adventure-heading small{display:none;margin-top:3.5px;color:#d6c5a5;font-size:7.78px;white-space:nowrap;}
 #adventurePage[data-panel="map"] .adventure-header-meta{position:absolute;right:3%;top:43%;font-size:16px;gap:1.56px;background:#12201ba8;padding:1.56px 3.11px;}
@@ -119,9 +119,8 @@
 .adventure-current-position{position:absolute;left:35.39px;top:0;width:7.78px;height:18.67px;border-left:1.17px solid #cba25c;}
 .adventure-current-position::after{content:"";position:absolute;left:0;top:0;width:10.5px;height:10.11px;background:#a62e24;clip-path:polygon(0 0,100% 12%,78% 50%,100% 86%,0 100%);}
 .adventure-route-pip{z-index:2;width:3.5px;height:3.5px;border:0.39px solid #f1d79a;border-radius:50%;background:#c6a86a;box-shadow:0 0 3.11px #ffdf98;pointer-events:none;}
-.adventure-node-sheet{position:absolute;z-index:6;left:2%;right:2%;bottom:2%;height:20%;box-sizing:border-box;display:grid;grid-template-columns:27% minmax(0,1fr);gap:3%;padding:2.5%;border:1.17px solid #b39457;border-radius:12px 4px 12px 4px;color:#e9d7b0;background:linear-gradient(135deg,#26302beF,#101b17f5);box-shadow:0 0 0 2.33px #16211c,0 0 0 3.11px #8c6c3b,0 3.11px 9.33px #000b;}
+.adventure-node-sheet{position:absolute;z-index:6;left:2%;right:2%;bottom:2%;height:20%;box-sizing:border-box;display:grid;grid-template-columns:27% minmax(0,1fr);gap:3%;padding:2.5%;border:1.17px solid #b39457;border-image:var(--rpg-window-frame) 115 fill / 6px / 0 stretch;border-radius:4px;color:#e9d7b0;background:#15130f;box-shadow:0 3.11px 9.33px #000b;}
 .adventure-node-sheet::before{content:"◆";position:absolute;top:-8px;left:calc(50% - 28px);width:56px;text-align:center;color:#d2aa63;background:linear-gradient(transparent 46%,#b39457 47% 56%,transparent 57%);font-size:12px;line-height:14px;text-shadow:0 0 3px #142019;pointer-events:none;}
-.adventure-node-sheet::after{content:"";position:absolute;inset:4px;border:1px solid #9b794747;border-radius:8px 2px 8px 2px;pointer-events:none;}
 .adventure-sheet-preview{width:100%;height:100%;min-height:0;object-fit:cover;border:1px solid #bb9657;border-radius:5px 1px 5px 1px;box-shadow:0 0 0 2px #101b17,0 0 0 3px #89713d77;box-sizing:border-box;}
 .adventure-sheet-content{min-width:0;display:flex;flex-direction:column;}
 .adventure-sheet-title{display:flex;align-items:center;gap:4.67px;min-width:0;}
@@ -133,7 +132,7 @@
 .adventure-stage-picker{position:absolute;right:0;bottom:100%;min-width:0;max-width:55%;color:#ddc896;font-size:16px;}
 .adventure-stage-picker summary{display:flex;align-items:center;min-height:52px;padding:0 10px;cursor:pointer;list-style:none;background:linear-gradient(transparent 20%,#13211ed9 21% 78%,transparent 79%);text-shadow:0 1px 2px #000;}
 .adventure-stage-picker summary::-webkit-details-marker{display:none;}
-.adventure-stage-list{position:absolute;z-index:10;bottom:100%;right:0;width:185px;max-height:240px;overflow:auto;padding:5px;border:1px solid #b58d4b;border-radius:8px;background:#17231df5;box-shadow:0 4px 15px #000b;}
+.adventure-stage-list{position:absolute;z-index:10;bottom:100%;right:0;width:185px;max-height:240px;overflow:auto;padding:5px;border:1px solid #b58d4b;border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;border-radius:4px;background:#15130f;box-shadow:0 4px 15px #000b;}
 .adventure-stage-list button{display:block;width:100%;min-height:52px;padding:8px;border:0;border-bottom:1px solid #78623b;color:#ead7b0;background:transparent;text-align:left;font:inherit;font-size:16px;line-height:1.3;}
 .adventure-stage-list button:disabled{color:#968c79;}
 
