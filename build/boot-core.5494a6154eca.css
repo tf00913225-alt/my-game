@@ -5662,11 +5662,10 @@ button:active{
 }
 
 /* =====================================================
-   V105 — 戰鬥五大指令改用使用者提供的整組圖像面板
-   - 使用原圖，不重新生成、不重畫。
-   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列、元素匣、
-     戰鬥資訊框因 UI 改圖而位移。
-   - 圖像本身向上延伸，五個透明點擊區分別覆蓋：
+   戰鬥五大指令 — 同一黑鐵古銅底軌，保留原五欄與操作
+   - 使用既有技能頁材質，不新增圖片或互動 Owner。
+   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列與元素匣位移。
+   - 共用底軌不接收指標，五個原點擊區分別操作：
      技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
    - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
 ===================================================== */
@@ -5706,7 +5705,9 @@ button:active{
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:linear-gradient(180deg,#9c7130 0%,#31210d 9%,#120e08 50%,#31210d 91%,#9c7130 100%);
+    border:1px solid #73582d;
+    border-image:var(--rpg-window-frame) 115 fill / 6px / 0 stretch;
+    background:#15130f;
     background-repeat:no-repeat;
     background-position:center center;
     background-size:100% 100%;
@@ -5722,10 +5723,10 @@ button:active{
     min-height:0 !important;
     margin:0 !important;
     padding:0 !important;
-    border:1px solid #b78d45 !important;
-    border-radius:12px !important;
-    background:linear-gradient(180deg,#453016,#171007 48%,#30200d) !important;
-    box-shadow:inset 0 0 0 2px #1c140b !important;
+    border:1px solid transparent !important;
+    border-radius:4px !important;
+    background:transparent !important;
+    box-shadow:none !important;
     color:#ffe3a1 !important;
     font-size:16px !important;
     line-height:22px !important;
@@ -5733,6 +5734,10 @@ button:active{
     z-index:3 !important;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
+}
+
+#mainBattleMenu > .menu-button + .menu-button{
+    border-left-color:#73582d !important;
 }
 
 #mainBattleMenu > .menu-button.skill{
