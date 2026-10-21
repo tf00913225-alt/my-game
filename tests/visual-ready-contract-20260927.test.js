@@ -22,7 +22,7 @@ function portraitContext(fetchImpl,ensureAssets){
     const fetchPromise=new Promise(resolve=>{ releaseFetch=resolve; });
     const context={
         window:null,document:{getElementById(){return null;},createElement(){return {className:"",dataset:{},style:{setProperty(){},removeProperty(){}},classList:{toggle(){}}};}},
-        console,Math,Number,Object,Array,Set,Map,Promise,
+        console,Math,Number,Object,Array,Set,Map,Promise,setTimeout,clearTimeout,
         currentBattleMonsters:[],monsters:[],fetch:fetchImpl||(()=>fetchPromise),
         FourSymbolsFeatures:{ensureAssets:ensureAssets||(()=>Promise.resolve())}
     };

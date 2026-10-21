@@ -3,10 +3,34 @@ import assert from "node:assert/strict";
 import {createRequire} from "node:module";
 import fs from "node:fs";
 import vm from "node:vm";
+import os from "node:os";
+import path from "node:path";
+import {createHash} from "node:crypto";
+import {syncHeroChapterQualification,HERO_CHAPTER_PATH} from "../scripts/lib/hero-chapter-qualification.mjs";
 const require=createRequire(import.meta.url);
 const {createHeroAcquisition}=require("../functions/src/hero-acquisition.js");
 const UID="hero-account-a",BASE=`serverUsers/${UID}`,ENV=`users/${UID}/saves/current`;
 const KING="vajraHeavenlyKing",CLAIM=`${BASE}/uniqueClaims/hero-v1-${KING}`;
+
+test("real Hero qualification sync seals identical canonical LF bytes and strictly rejects changed source",()=>{
+    const root=fs.mkdtempSync(path.join(os.tmpdir(),'hero-chapter-newlines-'));
+    try{
+        const sourcePath='js/adventure/adventure-content-v1-20260915.js',file=path.join(root,sourcePath),target=path.join(root,HERO_CHAPTER_PATH);
+        const canonical=fs.readFileSync(new URL('../'+sourcePath,import.meta.url),'utf8').replace(/\r\n/g,'\n');
+        fs.mkdirSync(path.dirname(file),{recursive:true});fs.writeFileSync(file,canonical);
+        syncHeroChapterQualification(root,false);const expected=fs.readFileSync(target);
+        const policy=JSON.parse(expected);assert.equal(policy.sourceSha256,createHash('sha256').update(canonical).digest('hex'));assert.equal(policy.outcomeVerified,false);
+        for(const source of [canonical.replaceAll('\n','\r\n'),canonical.replace('\n','\r\n')]){
+            fs.writeFileSync(file,source);syncHeroChapterQualification(root,true);syncHeroChapterQualification(root,false);
+            assert.deepEqual(fs.readFileSync(target),expected,'real sync produces byte-identical graph, source digest and outcome flags');
+        }
+        fs.writeFileSync(file,canonical+'\n// genuine authored source change\n');
+        assert.throws(()=>syncHeroChapterQualification(root,true),/Hero chapter qualification projection is stale/);
+        assert.deepEqual(fs.readFileSync(target),expected,'strict check never rewrites the accepted projection');
+        syncHeroChapterQualification(root,false);const changed=JSON.parse(fs.readFileSync(target,'utf8'));
+        assert.notEqual(changed.sourceSha256,policy.sourceSha256);assert.deepEqual(changed.nodes,policy.nodes);assert.equal(changed.outcomeVerified,false);
+    }finally{fs.rmSync(root,{recursive:true,force:true});}
+});
 
 function harness(factory=acquisitionWithPolicy(retainedChapterPolicy)){
     const data=new Map([[ENV,{ownerUid:UID,serverRevision:1,authoritativeStateReady:false}]]);
@@ -182,6 +206,28 @@ test("retained v1 ticket survives policy replacement, renews its prefix and gran
         assert.equal(h.writes,commits);assert.deepEqual([...h.data],before);
         assert.equal([...h.data.keys()].filter(p=>p===BASE+"/uniqueClaims/hero-v1-"+DOG).length,1);
     }
+});
+
+test("exact retained twenty-node tickets advance and renew across edits while same-graph unknown policies cannot write",async()=>{
+    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+    assert.equal(retained.nodes.length,20);assert.equal(retained.outcomeVerified,false);
+    const h=harness(acquisitionWithPolicy(retained)),issued=await h.ensure();await h.step('c1_01');
+    h.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));await h.step('c1_02');
+    const prefix=structuredClone(h.data.get(BASE+'/heroChapter/current').steps);h.advance(8);
+    const beforeExpiry=structuredClone([...h.data]),beforeWrites=h.writes;
+    await assert.rejects(h.step('c1_03'),e=>e.code==='failed-precondition');assert.equal(h.writes,beforeWrites);assert.deepEqual([...h.data],beforeExpiry);
+    const renewed=await h.ensure(),ticket=h.data.get(BASE+'/heroChapterTickets/'+renewed.chapter.ticketId);
+    assert.notEqual(renewed.chapter.ticketId,issued.chapter.ticketId);assert.deepEqual(JSON.parse(JSON.stringify(ticket.policy)),retained);
+    assert.equal(ticket.startingStepCount,prefix.length);assert.equal(ticket.startingStepSha256,h.data.get(BASE+'/heroChapterSteps/'+prefix.at(-1)).sha256);assert.deepEqual(h.data.get(BASE+'/heroChapter/current').steps,prefix);
+    for(let stage=3;stage<=20;stage++)await h.step('c1_'+String(stage).padStart(2,'0'));
+    const completed=await h.read();assert.equal(completed.chapter.phase,'completed');assert.equal(completed.chapter.outcomeVerified,false);assert.equal(completed.entitlements[DOG].allocationSeed,987654321);
+    const snapshot=structuredClone([...h.data]),writes=h.writes;await h.step('c1_20',null,{expectedRevision:1});h.advance(30);await h.ensure();assert.equal(h.writes,writes);assert.deepEqual([...h.data],snapshot);
+    assert.equal([...h.data.keys()].filter(p=>p===BASE+'/uniqueClaims/hero-v1-'+DOG).length,1);
+    const unknown={...structuredClone(retained),sourceSha256:'f'.repeat(64)},bad=harness(acquisitionWithPolicy(unknown)),badIssued=await bad.ensure();
+    bad.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));const unchanged=structuredClone([...bad.data]),zero=bad.writes;
+    assert.equal((await bad.read()).chapter.nextNodeId,'c1_01','sealed unknown historical evidence remains readable');
+    await assert.rejects(bad.step('c1_01'),e=>e.code==='failed-precondition');bad.advance(8);await assert.rejects(bad.ensure(),e=>e.code==='failed-precondition');
+    assert.equal(bad.writes,zero);assert.deepEqual([...bad.data],unchanged);assert.ok(badIssued.chapter.ticketId);
 });
 
 test("new tickets use current policy while unknown sealed policies cannot advance or renew",async()=>{

@@ -8,7 +8,8 @@ export const HERO_CHAPTER_PATH='functions/src/generated/hero-chapter-qualificati
 // Owner. No encounter stats, combat execution, victory proof or reward amounts.
 export function syncHeroChapterQualification(root,checkOnly){
  const sourcePath='js/adventure/adventure-content-v1-20260915.js';
- const source=fs.readFileSync(path.join(root,sourcePath),'utf8');
+ // Bind the graph to the LF source bytes published by Git on every platform.
+ const source=fs.readFileSync(path.join(root,sourcePath),'utf8').replace(/\r\n/g,'\n');
  const context={window:{}};vm.runInNewContext(source,context,{timeout:1000});
  const chapter=context.window.FourSymbolsAdventureContent.chapters.chapter_v1;
  const nodes=chapter.nodes.filter(node=>node.availability!=='planned').map(node=>({

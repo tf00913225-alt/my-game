@@ -22,6 +22,7 @@ const chapters={
         "id": "c1_01",
         "type": "battle",
         "title": "山前初戰",
+        "detail": "初遇惡徒，以普攻迎敵。",
         "subtitle": "初入江湖",
         "stage": 1,
         "npc": "guard",
@@ -49,8 +50,8 @@ const chapters={
           }
         ],
         "next": "c1_02",
-        "x": 30,
-        "y": 96,
+        "x": 19,
+        "y": 73.3,
         "tutorialEncounterId": "tutorial_1",
         "rewardId": "story_first_growth"
       },
@@ -58,6 +59,7 @@ const chapters={
         "id": "c1_02",
         "type": "battle",
         "title": "山道惡徒",
+        "detail": "學會招式，再戰山道惡徒。",
         "subtitle": "初入江湖",
         "stage": 2,
         "npc": "guard",
@@ -77,8 +79,8 @@ const chapters={
           }
         ],
         "next": "c1_03",
-        "x": 65,
-        "y": 91.3,
+        "x": 24.8,
+        "y": 70.5,
         "tutorialEncounterId": "tutorial_2",
         "guidance": [
           {
@@ -107,6 +109,7 @@ const chapters={
         "id": "c1_03",
         "type": "battle",
         "title": "追兵",
+        "detail": "擊退追兵，備妥護具。",
         "subtitle": "初入江湖",
         "stage": 3,
         "npc": "traveler",
@@ -125,7 +128,7 @@ const chapters={
           {
             "speaker": "npc",
             "name": "旅人",
-            "text": "這件護具是我帶來備用的。等追兵退了，就交給你防身。"
+            "text": "多謝你相助。等追兵退了，我會給你一筆置裝費，到主城商店買件合用的護具。"
           },
           {
             "speaker": "player",
@@ -134,8 +137,8 @@ const chapters={
           }
         ],
         "next": "c1_04",
-        "x": 35,
-        "y": 86.6,
+        "x": 32.2,
+        "y": 67.2,
         "tutorialEncounterId": "tutorial_3",
         "rewardId": "story_starter_gear"
       },
@@ -143,6 +146,7 @@ const chapters={
         "id": "c1_04",
         "type": "battle",
         "title": "寨外守衛",
+        "detail": "買好護具，穿戴後再戰。",
         "subtitle": "初入江湖",
         "stage": 4,
         "npc": "guard",
@@ -160,8 +164,8 @@ const chapters={
           }
         ],
         "next": "c1_05",
-        "x": 70,
-        "y": 81.9,
+        "x": 37,
+        "y": 64,
         "tutorialEncounterId": "tutorial_4",
         "guidance": [
           {
@@ -172,12 +176,12 @@ const chapters={
           {
             "speaker": "player",
             "name": "玩家",
-            "text": "有了新護具，沒穿在身上也擋不了刀。"
+            "text": "只顧著練招，還沒把護具備好。"
           },
           {
             "speaker": "npc",
             "name": "守驛人",
-            "text": "先到裝備頁穿好方才取得的護具，再回這裡重試。"
+            "text": "先到主城商店買件護具，再從背包穿上，回來這裡重試。"
           },
           {
             "speaker": "player",
@@ -190,6 +194,7 @@ const chapters={
         "id": "c1_05",
         "type": "battle",
         "title": "受困旅人",
+        "detail": "備妥補品，救回受困旅人。",
         "subtitle": "初入江湖",
         "stage": 5,
         "npc": "herbalist",
@@ -217,8 +222,8 @@ const chapters={
           }
         ],
         "next": "c1_06",
-        "x": 35,
-        "y": 77.2,
+        "x": 46,
+        "y": 60.4,
         "tutorialEncounterId": "tutorial_5",
         "rewardId": "story_supplies"
       },
@@ -226,6 +231,7 @@ const chapters={
         "id": "c1_06",
         "type": "event",
         "title": "村民求援",
+        "detail": "傾聽村民，尋找進寨道路。",
         "subtitle": "山關主線",
         "stage": 6,
         "npc": "traveler",
@@ -253,13 +259,14 @@ const chapters={
           }
         ],
         "next": "c1_07",
-        "x": 30,
-        "y": 72.5
+        "x": 53,
+        "y": 59
       },
       {
         "id": "c1_07",
         "type": "battle",
         "title": "山道巡哨",
+        "detail": "擊散巡哨，繼續沿路前行。",
         "subtitle": "山關主線",
         "stage": 7,
         "npc": "guard",
@@ -287,14 +294,15 @@ const chapters={
           }
         ],
         "next": "c1_08",
-        "x": 65,
-        "y": 67.8,
+        "x": 60,
+        "y": 57.8,
         "encounterId": "chapter1_enc_7"
       },
       {
         "id": "c1_08",
         "type": "chest",
         "title": "荒驛舊箱",
+        "detail": "開啟舊箱，收取沿途補給。",
         "subtitle": "山關主線",
         "stage": 8,
         "npc": "traveler",
@@ -322,8 +330,8 @@ const chapters={
           }
         ],
         "next": "c1_09",
-        "x": 35,
-        "y": 63.1,
+        "x": 68,
+        "y": 56.8,
         "rewardId": "story_road_chest",
         "legacyRewardId": "road_chest"
       },
@@ -331,6 +339,7 @@ const chapters={
         "id": "c1_09",
         "type": "rest",
         "title": "落雁驛",
+        "detail": "驛站歇腳，恢復後再上山。",
         "subtitle": "山關主線",
         "stage": 9,
         "npc": "guard",
@@ -359,12 +368,13 @@ const chapters={
         ],
         "next": "c1_10",
         "x": 70,
-        "y": 58.4
+        "y": 55.2
       },
       {
         "id": "c1_10",
         "type": "battle",
         "title": "黑松斥候",
+        "detail": "越過斥候，前往寨下石橋。",
         "subtitle": "山關主線",
         "stage": 10,
         "npc": "traveler",
@@ -392,14 +402,15 @@ const chapters={
           }
         ],
         "next": "c1_11",
-        "x": 35,
-        "y": 53.699999999999996,
+        "x": 62.5,
+        "y": 53.5,
         "encounterId": "chapter1_enc_10"
       },
       {
         "id": "c1_11",
         "type": "event",
         "title": "寨下石橋",
+        "detail": "取得信物，探明側門去路。",
         "subtitle": "山關主線",
         "stage": 11,
         "npc": "herbalist",
@@ -427,14 +438,15 @@ const chapters={
           }
         ],
         "next": "c1_12",
-        "x": 30,
-        "y": 49,
+        "x": 49.5,
+        "y": 50.4,
         "grantsStoryKey": "blackPineToken"
       },
       {
         "id": "c1_12",
         "type": "battle",
         "title": "石橋伏兵",
+        "detail": "突破伏兵，守住石橋道路。",
         "subtitle": "山關主線",
         "stage": 12,
         "npc": "guard",
@@ -462,14 +474,15 @@ const chapters={
           }
         ],
         "next": "c1_13",
-        "x": 65,
-        "y": 44.3,
+        "x": 38.2,
+        "y": 47.8,
         "encounterId": "chapter1_enc_12"
       },
       {
         "id": "c1_13",
         "type": "rest",
         "title": "旅途整備",
+        "detail": "清點行裝，為進寨做準備。",
         "subtitle": "山關主線",
         "stage": 13,
         "npc": "merchant",
@@ -497,13 +510,14 @@ const chapters={
           }
         ],
         "next": "c1_14",
-        "x": 35,
-        "y": 39.599999999999994
+        "x": 51,
+        "y": 45.6
       },
       {
         "id": "c1_14",
         "type": "event",
         "title": "寨外側門",
+        "detail": "帶著信物，從側門進寨。",
         "subtitle": "山關主線",
         "stage": 14,
         "npc": "guard",
@@ -531,14 +545,15 @@ const chapters={
           }
         ],
         "next": "c1_15",
-        "x": 70,
-        "y": 34.9,
+        "x": 66,
+        "y": 42.4,
         "requiresStoryKey": "blackPineToken"
       },
       {
         "id": "c1_15",
         "type": "elite",
         "title": "斷嶺哨所",
+        "detail": "清除哨所，打通上山道路。",
         "subtitle": "山關主線",
         "stage": 15,
         "npc": "guard",
@@ -566,14 +581,15 @@ const chapters={
           }
         ],
         "next": "c1_16",
-        "x": 35,
-        "y": 30.200000000000003,
+        "x": 56,
+        "y": 39.6,
         "encounterId": "chapter1_enc_15"
       },
       {
         "id": "c1_16",
         "type": "event",
         "title": "寨前情報",
+        "detail": "聽取情報，弄清封路緣由。",
         "subtitle": "山關主線",
         "stage": 16,
         "npc": "traveler",
@@ -601,13 +617,14 @@ const chapters={
           }
         ],
         "next": "c1_17",
-        "x": 30,
-        "y": 25.5
+        "x": 44.6,
+        "y": 36.6
       },
       {
         "id": "c1_17",
         "type": "battle",
         "title": "寨門攻防",
+        "detail": "突破寨門，打開商旅道路。",
         "subtitle": "山關主線",
         "stage": 17,
         "npc": "guard",
@@ -635,14 +652,15 @@ const chapters={
           }
         ],
         "next": "c1_18",
-        "x": 65,
-        "y": 20.799999999999997,
+        "x": 51.5,
+        "y": 33.8,
         "encounterId": "chapter1_enc_17"
       },
       {
         "id": "c1_18",
         "type": "elite",
         "title": "寨中頭目",
+        "detail": "擊敗頭目，直面黑松寨主。",
         "subtitle": "山關主線",
         "stage": 18,
         "npc": "guard",
@@ -670,14 +688,15 @@ const chapters={
           }
         ],
         "next": "c1_19",
-        "x": 35,
-        "y": 16.099999999999994,
+        "x": 58.7,
+        "y": 30.5,
         "encounterId": "chapter1_enc_18"
       },
       {
         "id": "c1_19",
         "type": "event",
         "title": "寨主現身",
+        "detail": "面見寨主，爭取山關通行。",
         "subtitle": "山關主線",
         "stage": 19,
         "npc": "chief",
@@ -706,12 +725,13 @@ const chapters={
         ],
         "next": "c1_20",
         "x": 70,
-        "y": 11.399999999999991
+        "y": 25
       },
       {
         "id": "c1_20",
         "type": "boss",
         "title": "黑松寨主",
+        "detail": "擊敗寨主，讓山關通行。",
         "subtitle": "山關主線",
         "stage": 20,
         "npc": "chief",
@@ -739,8 +759,8 @@ const chapters={
           }
         ],
         "next": null,
-        "x": 35,
-        "y": 6.700000000000003,
+        "x": 76.5,
+        "y": 18.5,
         "encounterId": "chapter1_enc_20",
         "rewardId": "boss_first"
       }
@@ -1198,7 +1218,7 @@ const rewards={
     "sharedExp": 15
   },
   "story_starter_gear": {
-    "starterEquipment": "leatherArmor"
+    "starterEquipmentFunding": "leatherArmor"
   },
   "story_supplies": {
     "potions": [
