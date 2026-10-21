@@ -11,7 +11,9 @@
        decorative 100px raster command stack. Reclaimed space belongs to allies. */
     --battle-center-region-track:12fr;
     --battle-ally-region-track:45.215fr;
-    --battle-turn-row-height:20px;
+    /* Original 26px countdown retains its 1.55x tick animation. Reserve its
+       full glyph paint bounds instead of clipping it into a 20px strip. */
+    --battle-turn-row-height:64px;
     --battle-bottom-safe-gap:24px;
     --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 6px);
     --battle-target-prompt-height:88px;
@@ -76,7 +78,7 @@
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
-    top:8px;
+    top:calc((var(--battle-turn-row-height) - 20px) / 2);
     left:140px;
     right:82px;
     z-index:2;

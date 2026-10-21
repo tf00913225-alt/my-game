@@ -236,7 +236,7 @@ for(const contentHeight of [600,717,840]){
     const enemyHeight=(usable-centerHeight)*enemyWeight/(enemyWeight+allyWeight);
     const allyHeight=(usable-centerHeight)*allyWeight/(enemyWeight+allyWeight);
     assert.ok(centerHeight>=turnHeight+commandHeight+6&&centerHeight>=turnHeight+layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px')+6,'controls must fit without overlaying each other at '+contentHeight);
-    assert.ok(centerHeight<(contentHeight-regionGap*2)*.21,'middle gap must actually decrease at '+contentHeight);
+    assert.ok(centerHeight===centerMinimum||centerHeight<(contentHeight-regionGap*2)*.21,'preferred middle gap stays compact; its original animated countdown and readable prompt minimum take precedence at '+contentHeight);
     assert.ok(enemyHeight>0&&allyHeight>0);
     assert.ok(Math.abs(contentHeight-(enemyHeight+centerHeight+allyHeight+regionGap*2)-bottomReserve)<.001,'bottom reserve cannot be consumed by fractional tracks');
 }
