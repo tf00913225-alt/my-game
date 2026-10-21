@@ -1,0 +1,11 @@
+# 新商店借頁返回UI橋接預審
+
+已核現實merge marker中的runtime727–744：新增equipment未granted分支確實home→openHomeFeature(shop)，末參數卻仍非skill皆inventory。UI251–267只允inventory/skill/status，inventory附單一button到inactive inventory shell，確實不符合當前可見shop宿主。此為兩邊合併相依缺口，不是交易問題。
+
+必要最小橋接可接受：runtime僅同步參數skill→skill、equipment且未granted→shop、其餘inventory；UI白名單兩處同步加入shop，shop沿既有homeFeatureModal.show .home-feature-modal-box原宿主與normalflow append。沿原唯一button/onclick與returnFromTutorial先close modal；不要新增wrapper/buttonOwner或改offer intent/750/receipts/購置資金。
+
+JS00 showPage(home)會先sync(home)隱藏舊button，runtime在openShop後再sync(shop)投影合法宿主；closeHomeFeature原sync(home)仍應隱藏，保29B殘留返回回歸。需用真DOM測首次商店進入、關閉/取消→其他home feature不殘留、返回故事後再開、已granted走inventory，既有skill借頁/返回與inactive guard保留。
+
+重要限制：dev guideStep291–296對equipment shop未購時明確聚焦chapter1TutorialArmorBuy（或裝備分類），購後聚焦closeHomeFeature；新返回button顯示不代表當下guide允許點擊。不得為UI smoke放寬guide遮罩/guard或替換交易。若guide正阻擋返回，記限制，僅用非active閱讀fixture驗normalflow呈現，或沿正式允許步驟另測，不能宣稱取消流程已通。
+
+CSS衝突合併方向合理：combine提示lane與guide；tutorial return保原staticnormalflow；新固定map以dev正式布局替舊map，但非map仍保UI44底提示lane；renderer同panel保nonmapscroll、fixedmap0，退休mapScrollTop只在確認新mapOwner不再需要後移除。需保新guide/render/back.hidden狀態，後續實圖確認，不預批after。未改產品、未開Chrome。

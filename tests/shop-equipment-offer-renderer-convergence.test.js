@@ -18,7 +18,7 @@ function fixture(seed=new Map(),uid='shop-A'){
  });c.window=c;c.FourSymbolsEquipmentReforge=require("../functions/src/equipment-reforge");c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");
  c.FourSymbolsInventoryStackPolicy=require('../functions/src/inventory-stack-policy');
  vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
- c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems},options);return true;}catch(_){return false;}};
+ c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems,...(c.player?{player:c.player}:{})},options);return true;}catch(_){return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};
  vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);
  vm.runInContext(inventoryOwner,c);vm.runInContext(gear,c);
@@ -69,4 +69,72 @@ test('main, metadata or shop storage failure roll back all prior bytes, runtime 
 test('corrupt shop state blocks purchase and refresh, UID B does not inherit A receipts',()=>{
  const f=fixture();f.seed.set(f.key,'{bad');assert.equal(f.buy(0),false);assert.equal(f.c.v17345RefreshEquipmentShop(),false);assert.match(f.read(),/購買與刷新已暫停/);
  const a=fixture();a.buy(0);const b=fixture(a.seed,'shop-B');assert.doesNotMatch(b.read(),/已購買/);assert.equal(b.buy(0),true);assert.equal(b.key,'four_symbols_account:shop-B:equipment-shop-daily');assert.match(fixture(a.seed).read(),/已購買/);
+});
+
+function equipmentLessonFixture(){
+ const f=fixture(),c=f.c;
+ Object.assign(c,{player:{id:'lesson-player',element:'fire',hp:100,sp:40,adventureProgress:{schemaVersion:3,pendingStoryOpening:true,activeChapterId:'chapter_v1',chapters:{}}},
+  FourSymbolsStartupPolicy:{getUid:()=> 'shop-A'},setInterval:()=>1,clearInterval(){},clearTimeout(){},addEventListener(){},CustomEvent:function(){},getPotionCount:()=>0,
+  getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>c.player,getPartyBattleStats:()=>({maxHP:100,maxSP:40})});
+ c.document.dispatchEvent=()=>{};c.document.addEventListener=()=>{};
+ vm.runInContext(fs.readFileSync('js/adventure/adventure-content-v1-20260915.js','utf8'),c);
+ vm.runInContext(fs.readFileSync('js/adventure/adventure-runtime-v1-20260915.js','utf8'),c);
+ const state=c.player.adventureProgress.chapters.chapter_v1;
+ state.currentNodeId='c1_04';state.completedNodes.c1_03=true;state.rewardClaims.c1_03='ready';
+ state.onboarding={active:true,phase:'guidance',nodeId:'c1_04',requiredAction:'equipment'};
+ assert.equal(c.FourSymbolsAdventure.claimNodeReward('c1_03'),true);
+ return {...f,state,buyLesson:()=>c.FourSymbolsEquipmentShop.buyLessonArmor()};
+}
+
+test('lesson funding buys one exact Factory armor through the original transaction, independent of daily offers',()=>{
+ const f=equipmentLessonFixture(),beforeGold=f.c.gold,originalOffers=f.c.FourSymbolsEquipmentShop.offers().map(x=>x.offerId);
+ assert.equal(f.state.equipmentLessonFunding.amount,750);assert.equal(f.c.inventoryItems.length,0);
+ assert.match(f.read(),/id="chapter1TutorialArmorBuy"/);
+ assert.equal(f.buyLesson(),true);assert.equal(f.c.gold,beforeGold-750);assert.equal(f.c.inventoryItems.length,1);
+ assert.equal(f.state.grantedEquipmentUid,f.c.inventoryItems[0].v141Uid);assert.equal(f.state.equipmentLessonPurchase.paidGold,750);
+ assert.equal(f.seed.get(f.key),undefined,'permanent lesson purchase does not write daily sold receipts');
+ assert.equal(f.buyLesson(),false);f.day('2026-10-07');assert.equal(f.buyLesson(),false);
+ assert.equal(f.repo.readForUid('shop-A').save.player.adventureProgress.chapters.chapter_v1.equipmentLessonPurchase.equipmentUid,f.state.grantedEquipmentUid);
+ assert.equal(originalOffers.length,6);assert.equal(f.c.FourSymbolsEquipmentShop.offers().length,6);
+});
+
+test('lesson purchase refusal or exception restores gold, inventory and the exact Adventure root',()=>{
+ for(const mode of ['false','throw','full','stale']){
+  const f=equipmentLessonFixture(),root=f.c.player.adventureProgress,before=JSON.stringify(root),money=f.c.gold;
+  if(mode==='false')f.fail(f.repo.saveKey('shop-A'));
+  if(mode==='throw')f.c.saveGame=()=>{throw Error('denied');};
+  if(mode==='full')f.c.inventoryItems=Array.from({length:120},(_,i)=>({id:'full'+i,type:'weapon',count:1}));
+  if(mode==='stale')f.repo.activate('shop-B');
+  const inventory=JSON.stringify(f.c.inventoryItems);
+  assert.equal(f.buyLesson(),false,mode);assert.equal(f.c.gold,money);assert.equal(JSON.stringify(f.c.inventoryItems),inventory);
+  assert.equal(f.c.player.adventureProgress,root);assert.equal(JSON.stringify(root),before);
+ }
+});
+
+test('an old gifted armor never becomes new funding or a second lesson purchase',()=>{
+ const f=fixture(),gift=f.c.FourSymbolsEquipmentFactory.starter('leatherArmor');
+ const raw={schemaVersion:3,activeChapterId:'chapter_v1',chapters:{chapter_v1:{storySchemaVersion:2,storyKeys:{},dialogue:null,currentNodeId:'c1_04',completedNodes:{c1_01:true,c1_02:true,c1_03:true},rewardClaims:{c1_03:'claimed'},branchSelections:{},chapterCompleted:false,chapterRewardClaimed:false,grantedEquipmentUid:gift.v141Uid,onboarding:{active:true,phase:'guidance',nodeId:'c1_04',requiredAction:'equipment'}}}};
+ Object.assign(f.c,{player:{id:'old-gift-owner',element:'fire',hp:100,sp:40,adventureProgress:JSON.parse(JSON.stringify(raw))},FourSymbolsStartupPolicy:{getUid:()=> 'shop-A'},setInterval:()=>1,clearInterval(){},clearTimeout(){},addEventListener(){},CustomEvent:function(){}});
+ f.c.document.dispatchEvent=()=>{};vm.runInContext(fs.readFileSync('js/adventure/adventure-content-v1-20260915.js','utf8'),f.c);vm.runInContext(fs.readFileSync('js/adventure/adventure-runtime-v1-20260915.js','utf8'),f.c);
+ const state=f.c.FourSymbolsAdventure.getChapterState(),money=f.c.gold;
+ assert.equal(state.grantedEquipmentUid,gift.v141Uid);assert.equal(state.equipmentLessonFunding,undefined);
+ assert.equal(f.c.FourSymbolsAdventure.getEquipmentLessonOfferIntent(),null);assert.equal(f.c.FourSymbolsEquipmentShop.buyLessonArmor(),false);
+ assert.equal(f.c.FourSymbolsAdventure.claimNodeReward('c1_03'),false);assert.equal(f.c.gold,money);
+});
+
+test('lesson rendered offer and purchased armor retain the exact cached UID and name across a refused purchase',()=>{
+ const f=equipmentLessonFixture(),factory=f.c.FourSymbolsEquipmentFactory;let created=[];
+ f.c.FourSymbolsEquipmentFactory={...factory,starter:id=>{const item=factory.starter(id);created.push(item);return item;}};
+ const first=f.read(),shown=created[0];assert.equal(created.length,1);assert.ok(first.includes(shown.name));assert.equal(first,f.read());
+ f.fail(f.repo.saveKey('shop-A'));assert.equal(f.buyLesson(),false);assert.equal(f.read(),first);assert.equal(created.length,1);
+ f.fail(null);assert.equal(f.buyLesson(),true);assert.equal(f.c.inventoryItems[0].v141Uid,shown.v141Uid);assert.equal(f.c.inventoryItems[0].name,shown.name);
+ assert.doesNotMatch(f.read(),/chapter1TutorialArmorBuy/);
+});
+
+test('a different lesson owner intent cannot reuse another character cached offer',()=>{
+ const f=equipmentLessonFixture(),factory=f.c.FourSymbolsEquipmentFactory,created=[];
+ f.c.FourSymbolsStartupPolicy={getUid:()=>f.repo.getActiveUid()};
+ f.c.FourSymbolsEquipmentFactory={...factory,starter:id=>{const item=factory.starter(id);created.push(item);return item;}};
+ f.read();f.repo.activate('shop-B');f.c.player.id='second-character';f.read();assert.equal(created.length,2);assert.notEqual(created[0].v141Uid,created[1].v141Uid);
+ assert.equal(f.buyLesson(),true);assert.equal(f.c.inventoryItems[0].v141Uid,created[1].v141Uid);
 });

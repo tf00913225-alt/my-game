@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：主指令黑鐵底軌四尺寸限定驗收；最新dev章節相依與剩餘全UI/標題狀態待辦",
+  "status": "施工中：正常吸收e5章節相依來源已核，必要實畫待驗；其餘全UI/所有標題狀態未完成",
   "devices": [
     {
       "id": "360x640",
@@ -27500,6 +27500,21 @@
           "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
         ]
       }
+    ]
+  },
+  "latestDevDependency": {
+    "dev": "e5e307122f84edd3fda7d12c6395336c8b2a51c9",
+    "uiParent": "a199300d9dae288044204fb7eecadf7f6e6fad67",
+    "status": "來源已修改／獨立source審核；新map/guide/shop與普通battle依賴實畫待驗",
+    "sourceEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev-e5e307-merge-source",
+    "skillCoreLoadoutConfigFixtureChanged": false,
+    "historicalEvidenceRetained": true,
+    "limits": [
+      "舊segment11/28圖不能當新map/guide驗收",
+      "58targeted測試與60來源proof不代實圖",
+      "不改750/交易/獎勵/存檔/受保護authority；新功能與source policy皆由dev原Owner保留",
+      "教學guide禁止點時不得為驗取消繞過guard",
+      "Chrome工程獨立；CI/部署仍未確認"
     ]
   }
 }

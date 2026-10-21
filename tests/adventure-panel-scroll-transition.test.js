@@ -3,7 +3,7 @@ const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const vm=require('node:vm');
 
-test('adventure opens a different inner page at its title and preserves same-page/map positions',()=>{
+test('adventure opens inner titles, preserves same-page reading and resets the fixed map scroll',()=>{
     const body={innerHTML:'<div class="adventure-map-canvas"></div>',scrollTop:900,
         querySelector(selector){return selector==='.adventure-map-canvas'&&this.innerHTML.includes('class="adventure-map-canvas"')?{}:null;}};
     const title={},meta={},back={hidden:false};
@@ -11,17 +11,18 @@ test('adventure opens a different inner page at its title and preserves same-pag
     const state={currentNodeId:'rest',completedNodes:{},rewardClaims:{},branchSelections:{},chapterCompleted:false};
     const view={panel:'map',chapter:{title:'山關初行',suggestedLevel:10,nodes:[{id:'rest',type:'rest',title:'山路驛站',x:50,y:50}],routes:[],hiddenNodes:[]},state};
     const document={readyState:'loading',addEventListener(){},getElementById(id){return id==='adventurePage'?root:null;}};
-    const window={FourSymbolsAdventure:{getView:()=>view,getNodeStatus:()=>'current'},FourSymbolsAdventureContent:{}};
+    const window={FourSymbolsAdventure:{getView:()=>view,getNodeStatus:()=>'current'}};
     const context={window,document};vm.createContext(context);
+    vm.runInContext(fs.readFileSync('js/adventure/adventure-content-v1-20260915.js','utf8'),context);
     vm.runInContext(fs.readFileSync('js/adventure/adventure-ui-v1-20260915.js','utf8'),context);
     const render=window.FourSymbolsAdventureUI.render;
-    render();assert.equal(body.scrollTop,900,'initial map position remains');
+    render();assert.equal(body.scrollTop,0,'the canonical fixed map cannot retain a retired scroll offset');
     view.panel='rest';render();assert.equal(body.scrollTop,0,'a long map offset cannot hide the new inner title');
     body.scrollTop=120;state.completedNodes.rest={completedAt:1};render();
     assert.equal(body.scrollTop,120,'an update to the same inner page preserves reading position');
     view.panel='event-result';render();assert.equal(body.scrollTop,0,'changing between inner pages starts at the new title');
-    view.panel='map';render();assert.equal(body.scrollTop,900,'returning to the map restores its own saved position');
-    body.scrollTop=950;render();assert.equal(body.scrollTop,950,'map rerender keeps the latest position');
+    view.panel='map';render();assert.equal(body.scrollTop,0,'returning to the fixed map starts at its canonical viewport');
+    body.scrollTop=950;render();assert.equal(body.scrollTop,0,'map rerender cannot inherit an inner page offset');
     view.panel='story';view.tutorial={active:true};render();
     assert.equal(back.hidden,true,'active onboarding does not offer a return rejected by the runtime guard');
     view.tutorial.active=false;render();
@@ -46,6 +47,9 @@ test('tutorial return reuses one button in the active system flow and hides it o
     assert.equal(button.parentElement,modal);assert.equal(button.hidden,false);
     sync('skill');assert.equal(nodes.filter(n=>n.id==='adventureTutorialReturn').length,1);
     for(const action of ['equipment','recovery']){tutorial.requiredAction=action;sync('inventory');assert.equal(button.parentElement,inventory);assert.equal(button.hidden,false);}
+    tutorial.requiredAction='equipment';sync('shop');
+    assert.equal(button.parentElement,modal,'the original shop modal owns its borrowed return, not the hidden inventory');
+    assert.equal(button.hidden,false);
     button.onclick();assert.equal(returns,1,'the original button delegates to the runtime return Owner');
     sync('adventure');assert.equal(button.hidden,true);
     tutorial.active=false;sync('inventory');assert.equal(button.hidden,true);

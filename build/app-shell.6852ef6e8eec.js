@@ -4926,6 +4926,10 @@ const battleRoundEndObservers=new Set();
 const battleActionFinishInterceptors=[];
 let battleRoundBoundaryKeys=new Set();
 const battlePresentationLocks=new Set();
+const battleInputGuideHolds=new Set();
+function isBattleInputGuideHeld(token){
+    return Array.from(battleInputGuideHolds).some(hold=>hold.token===token);
+}
 let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
@@ -5084,6 +5088,17 @@ if(typeof window!=="undefined"){
             return window.FourSymbolsBattleFlow.acquirePresentationLock("pause:"+String(owner||"battle-flow"));
         },
         isPaused(){ return battlePresentationLocks.size>0; },
+        acquireInputGuideHold(owner){
+            if(!battleActive){ return function(){}; }
+            const hold={owner:String(owner||"input-guide"),token:battleToken};
+            battleInputGuideHolds.add(hold);
+            let active=true;
+            return function(){
+                if(!active){ return; }
+                active=false;
+                battleInputGuideHolds.delete(hold);
+            };
+        },
         isAutoBattle(){ return !!autoBattle; },
         isBattleActive(){ return !!battleActive; },
         interceptActionFinish(interceptor){
@@ -5843,10 +5858,9 @@ function getPartyCharacterKey(index){
 
 
 function getPartyAutoConfig(index){
-    if(index>=3&&index<6){ return {...HERO_BASIC_ATTACK_CONFIG}; }
-    if(index===1){ return autoConfig2; }
-    if(index===2){ return autoConfig3; }
-    return autoConfig;
+    const config=index>=3&&index<6?HERO_BASIC_ATTACK_CONFIG:index===1?autoConfig2:index===2?autoConfig3:autoConfig;
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){ return {...config,enabled:false}; }
+    return index>=3&&index<6?{...config}:config;
 }
 
 
@@ -11863,6 +11877,7 @@ function startBattle(triggerIndex){
     clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
+    battleInputGuideHolds.clear();
     battleInputResumeToken=null;
     battleResolutionResumeToken=null;
     battleAutoActionResume=null;
@@ -12571,6 +12586,9 @@ function beginCharacterTurn(token){
             }
 
 
+            // Guide the real declaration controls without hiding their HUD
+            // or suspending action resolution through a presentation lock.
+            if(isBattleInputGuideHeld(token)){ return; }
             timer--;
 
             updateTimer();
@@ -21038,6 +21056,7 @@ function applyPotionEffect(potionId,characterIndex,targetAlly){
 ===================================================== */
 
 function toggleAutoBattle(){
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){return;}
 
     /*
        ★ 修正（依照使用者要求，讓巡邏頁面的
@@ -36203,7 +36222,7 @@ window.FourSymbolsItemAcquisitionData={
       "sharedExp": 15
     },
     "story_starter_gear": {
-      "starterEquipment": "leatherArmor"
+      "starterEquipmentFunding": "leatherArmor"
     },
     "story_supplies": {
       "potions": [
