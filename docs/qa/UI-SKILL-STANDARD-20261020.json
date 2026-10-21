@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：原戰場空技能/空補品/普通提示四尺寸限定驗收；主指令美術與剩餘全UI狀態未完成",
+  "status": "施工中：主指令黑鐵底軌四尺寸限定驗收；最新dev章節相依與剩餘全UI/標題狀態待辦",
   "devices": [
     {
       "id": "360x640",
@@ -12674,54 +12674,58 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/../battle-timer-material-accepted/360x640",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/360x640/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/393x873/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/393x873/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/412x915/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/412x915/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/1280x800/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         }
       },
@@ -12771,12 +12775,31 @@
             "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
             "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
+        },
+        {
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "status": "部分已實際驗證",
+          "scope": "主五指令材質/實際文字中心與44/EFP；原skill native按下取消/真空選單開關",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands",
+          "limits": [
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-scope-review.md"
       }
     },
     {
@@ -12804,54 +12827,58 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/skill-before360",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/360x640/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "393x873": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/393x873",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/393x873/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "412x915": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/412x915",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/412x915/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/skill/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands/1280x800/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         }
       },
@@ -12874,12 +12901,31 @@
             "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
             "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
+        },
+        {
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "status": "部分已實際驗證",
+          "scope": "主五指令材質/實際文字中心與44/EFP；原skill native按下取消/真空選單開關",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/commands",
+          "limits": [
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
@@ -12976,15 +13022,16 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/item-before360",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/360x640/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/item-smoke/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/item-smoke/360x640/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "393x873": {
@@ -13015,15 +13062,16 @@
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/1280x800/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/item/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/item-smoke/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/item-smoke/1280x800/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         }
       },
@@ -13046,12 +13094,29 @@
             "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
             "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
+        },
+        {
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "status": "部分已實際驗證",
+          "scope": "新底軌下原空補品選單開關限定smoke",
+          "devices": [
+            "360x640",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/item-smoke",
+          "limits": [
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,
@@ -13277,15 +13342,16 @@
       "deviceEvidence": {
         "360x640": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-source/../battle-timer-material-accepted/360x640",
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/360x640",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/normal-smoke/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/normal-smoke/360x640/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         },
         "393x873": {
@@ -13316,15 +13382,16 @@
         },
         "1280x800": {
           "status": "部分已實際驗證",
-          "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
-          "before": null,
-          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800",
-          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800/report.json.gz",
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/normal/1280x800",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/normal-smoke/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/normal-smoke/1280x800/report.json.gz",
           "limits": [
-            "8overlay自然20→19，未驗timeout/後續回合",
-            "非空/鎖定/滿資料/技能施放/物品使用/符咒/auto/resolve/波次/勝敗/結算/硬體未驗",
-            "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
-            "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
         }
       },
@@ -13364,12 +13431,29 @@
             "原隔離startBattle API fixture，不是真地圖點怪；runtimeRestoreExact=false，僅移除自有profile",
             "選單正常覆蓋敵方背景/部分HUD，不聲稱open時敵我HUD全不遮；我方姓名/HP及回合可見、關閉恢復"
           ]
+        },
+        {
+          "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+          "status": "部分已實際驗證",
+          "scope": "新底軌下原普通目標提示/返回限定smoke",
+          "devices": [
+            "360x640",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/normal-smoke",
+          "limits": [
+            "只skill安全native按下，其他四命令pressed/防禦逃脫執行未驗",
+            "手機CSSactive=false僅真ripple，桌面CSSactive=true；不偽造active class",
+            "五新button矩形無舊逐項歷史，僅menu與skill trigger可精確比較；不捏造全五exact",
+            "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
+            "393/412本Head item/normal未重驗，保留cc224快照界線"
+          ]
         }
       ],
       "reviews": {
-        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-art-review.md",
-        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-interaction-review.md",
-        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-overlay-round-accepted/battle-overlay-cc224766-scope-review.md"
+        "art": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-art-review.md",
+        "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-interaction-review.md",
+        "scope": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/battle-command-rail-accepted/command-rail-1b2b750c-scope-review.md"
       },
       "presentationEvidence": {
         "segment": 5,

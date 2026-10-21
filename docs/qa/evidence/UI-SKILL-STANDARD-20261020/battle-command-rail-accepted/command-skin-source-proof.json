@@ -1,0 +1,8 @@
+{
+  "base": "dbb3c42a3f9036d33a7efa5b3947d1400eb28ec0",
+  "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+  "sourceAndFullBootCssExactTransforms": true,
+  "indexOnlyGeneratedCssHref": true,
+  "jsFunctionsConfigScriptsReleaseAssetsUnchanged": true,
+  "limits": "Source proof only; all actual geometry/state/picture gates still required."
+}

@@ -1,0 +1,74 @@
+[
+  {
+    "kind": "commands",
+    "device": "360x640",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "commands/360x640/report.json.gz",
+    "uncompressedSha256": "111e511a3e26623b64214a82c06a4bc3bd1e7b58c6abadffbae38d938fd30f6c"
+  },
+  {
+    "kind": "commands",
+    "device": "393x873",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "commands/393x873/report.json.gz",
+    "uncompressedSha256": "50a9c4f14da13038427290bd82fd59821b5e8f94292e30c5772d6f5fcc76c318"
+  },
+  {
+    "kind": "commands",
+    "device": "412x915",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "commands/412x915/report.json.gz",
+    "uncompressedSha256": "d6a755a35bf35d44086388af2f42c0c6c4944165dfab1942c4ccea86c83eaa04"
+  },
+  {
+    "kind": "commands",
+    "device": "1280x800",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "commands/1280x800/report.json.gz",
+    "uncompressedSha256": "07a31589e0f38f8db29e9dc9477dbc90604c7970e2e234604fac2ceff9bfdeca"
+  },
+  {
+    "kind": "item-smoke",
+    "device": "360x640",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "item-smoke/360x640/report.json.gz",
+    "uncompressedSha256": "ec99fb22461f6bc5b66820a62d31cd70609d0535b6c7d546ad5932e247475740"
+  },
+  {
+    "kind": "normal-smoke",
+    "device": "360x640",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "normal-smoke/360x640/report.json.gz",
+    "uncompressedSha256": "a1d89263baeb9d29484d466813643143dc3b6f9a4b93cf43b9d92ea95511567c"
+  },
+  {
+    "kind": "item-smoke",
+    "device": "1280x800",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "item-smoke/1280x800/report.json.gz",
+    "uncompressedSha256": "329b2fbdd975405a8399f4b60c3603bd9c44274d153b47bbd422912aced2c5d4"
+  },
+  {
+    "kind": "normal-smoke",
+    "device": "1280x800",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "report": "normal-smoke/1280x800/report.json.gz",
+    "uncompressedSha256": "5e387b795e7ac2babd7c5fdd5f18d76e1074b8274122d4ac9b27c394176e6968"
+  },
+  {
+    "kind": "excluded-decorative-range-failure",
+    "device": "360x640",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": false,
+    "report": "excluded-decorative-range-failure/360x640/report.json.gz",
+    "uncompressedSha256": "9634e18657c32d18292015e88600d1f6b6ea4d382d3fa312d89d5bb5735d8449"
+  }
+]
