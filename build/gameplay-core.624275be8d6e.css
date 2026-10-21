@@ -7508,9 +7508,9 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
     top:calc((var(--battle-turn-row-height) - 20px) / 2);
-    left:140px;
-    right:82px;
-    z-index:2;
+    left:68px;
+    right:auto;
+    z-index:18071;
     color:#f5cf72;
     font-size:14px;
     line-height:20px;
@@ -7571,11 +7571,12 @@ body > .v169-rpg-dialog-layer{
     align-self:flex-start;
     flex:0 0 var(--battle-turn-row-height);
     width:max-content;
-    min-width:112px;
+    min-width:180px;
     height:var(--battle-turn-row-height);
     min-height:var(--battle-turn-row-height);
     max-height:var(--battle-turn-row-height);
     margin:0;
+    justify-content:flex-start;
     border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;
     border-radius:4px;
     background:#15130f;
@@ -7590,15 +7591,22 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #turnTargetRow > .turn-number{
     display:none;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion:has(> .turn-target-row.skill-picker-open){
+    --battle-turn-overlay-bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + 8px);
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion:has(> .turn-target-row.battle-item-open){
+    --battle-turn-overlay-bottom:calc(var(--battle-item-menu-bottom) + var(--battle-item-menu-height) + var(--battle-item-menu-gap));
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row:is(.skill-picker-open,.battle-item-open){
     top:auto;
-    bottom:calc(var(--battle-command-visual-height) + var(--battle-skill-menu-top-offset) + 8px);
+    bottom:var(--battle-turn-overlay-bottom);
     opacity:1;
 }
-#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.battle-item-open{
+/* Keep the independent round lifecycle, while both labels share the picker
+   offset and the same iron plaque. Do not reparent into the auto-hidden row. */
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion:has(> .turn-target-row:is(.skill-picker-open,.battle-item-open)) > #battleTurnIndicator{
     top:auto;
-    bottom:calc(var(--battle-item-menu-bottom) + var(--battle-item-menu-height) + var(--battle-item-menu-gap));
-    opacity:1;
+    bottom:calc(var(--battle-turn-overlay-bottom) + (var(--battle-turn-row-height) - 20px) / 2);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #skillQuickBar.skill-quick-bar{
     left:14px;
