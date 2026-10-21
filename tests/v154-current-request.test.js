@@ -49,6 +49,14 @@ function element(){
     const node={
         className:"",classList:classList(),style:style(),dataset:{},attributes:{},textContent:"",
         children:[],parentNode:null,src:"",
+        addEventListener(){},
+        closest(selector){
+            for(let current=this;current;current=current.parentNode){
+                if(selector.startsWith('#')&&current.id===selector.slice(1)){ return current; }
+                if(selector.startsWith('.')&&String(current.className||'').split(/\s+/).includes(selector.slice(1))){ return current; }
+            }
+            return null;
+        },
         setAttribute(name,value){ this.attributes[name]=String(value); },
         appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
         insertBefore(child,before){

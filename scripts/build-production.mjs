@@ -218,6 +218,8 @@ function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
 function target(name,extension,content){
+    // Git text normalization must not change bytes after the filename is hashed.
+    content=content.replace(/\r\n?/g,"\n");
     const digest=hash(content); return {content,digest,path:`build/${name}.${digest}.${extension}`};
 }
 function writeTarget(output){

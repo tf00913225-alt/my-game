@@ -2,7 +2,26 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import {createHash} from "node:crypto";
 import {compactBootJavaScript} from "../scripts/lib/boot-javascript-compact.mjs";
+
+test("Production text bundles keep identical filenames and served hashes across Git line endings",()=>{
+    const builder=fs.readFileSync(new URL("../scripts/build-production.mjs",import.meta.url),"utf8");
+    const start=builder.indexOf('function target('),end=builder.indexOf('function writeTarget(',start);
+    const context={hash:value=>createHash('sha256').update(value).digest('hex').slice(0,12)};
+    vm.createContext(context);vm.runInContext(builder.slice(start,end),context);
+    for(const extension of ['js','css']){
+        const lf=extension==='js'?'const value=`first\nsecond`;\nglobalThis.result=value;\n':'body {\n color: red;\n}\n';
+        const a=context.target('example',extension,lf),b=context.target('example',extension,lf.replaceAll('\n','\r\n'));
+        assert.equal(b.path,a.path);assert.equal(b.content,a.content);
+        assert.equal(createHash('sha256').update(Buffer.from(b.content)).digest('hex').slice(0,12),b.digest);
+        assert.equal(b.content.includes('\r'),false);
+        if(extension==='js'){
+            const before={},after={};vm.runInNewContext(lf.replaceAll('\n','\r\n'),before);vm.runInNewContext(b.content,after);
+            assert.equal(after.result,before.result);
+        }
+    }
+});
 
 test("Boot lexical compact retains ASI, operators, regex, templates and literal bytes",()=>{
     const source=String.raw`

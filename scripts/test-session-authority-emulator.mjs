@@ -4376,12 +4376,15 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     // injection into the deployed factory or an actual provider operation.
     const filename=require.resolve("../functions/src/canonical-current-recovery.js"),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(filename.slice(0,Math.max(filename.lastIndexOf("/"),filename.lastIndexOf("\\"))));
-    const native=compiled.require.bind(compiled);compiled.require=name=>name==="test-only-publication-fake-io"?io:
+    const publicationAssemblyTokens=[],artifactHelper=require("../functions/src/recovery-audit-artifact.js");
+    const observedArtifact={...artifactHelper,createRecoveryAuditAssemblyBudget:()=>{
+        const token=artifactHelper.createRecoveryAuditAssemblyBudget();publicationAssemblyTokens.push(token);return token;}};
+    const native=compiled.require.bind(compiled);compiled.require=name=>name==="./recovery-audit-artifact"?observedArtifact:name==="test-only-publication-fake-io"?io:
         name==="./recovery-candidate-storage"?{createRecoveryCandidateStorage:()=>io}:native(name);
     const needle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",source=readFileSync(filename,"utf8");
     assert.equal(source.split(needle).length,2);
     compiled._compile(source.replace("return buildRecoveryOwner(deps,null,false);","return buildRecoveryOwner(deps,require('test-only-publication-fake-io'),false);")
-        .replace(needle,"return Object.freeze({verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
+        .replace(needle,"return Object.freeze({assemblePinnedRawArchive,verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
     const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
     assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
     async function gate(operation,writes){const start=traces.length,result=await operation();
@@ -4407,7 +4410,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.ok(nativeReuse.assemblyUsage.operations<=16384);assert.ok(nativeReuse.assemblyUsage.elapsedMs<=30000);
     assert.equal(nativeReuse.assemblyUsage.passes,1);assert.equal(nativeReuse.assemblyUsage.reservedBytes,0);
     console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
-    const artifact=await publication.assemblePinnedCandidate(pin,material);
+    const artifact=await publication.assemblePinnedRawArchive(pin,material);
     assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
     const manifestRef=run.collection("candidatePublications").doc(args.operationId);
     rollbackOnce=true;await assert.rejects(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),/staged rollback/);
@@ -4415,7 +4418,18 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     abortOnce=true;const prepared=await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),1);
     await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),0);
     const manifest=(await manifestRef.get()).data();
+    assert.equal(manifest.schemaVersion,2);assert.equal(manifest.candidateEncodingVersion,3);
+    assert.equal(manifest.artifactKind,"canonical-recovery-raw-archive");assert.equal(manifest.proofKind,"segmented-original-rights-v1");
+    const preparationUsage=artifactHelper.recoveryAuditAssemblyUsage(publicationAssemblyTokens[0]),readPhaseStart=publicationAssemblyTokens.length;
+    assert.equal(preparationUsage.passes,2);assert.equal(preparationUsage.reservedBytes,0);
     const proof=await gate(()=>publication.publishPreparedCandidate(h.request(),prepared),0);
+    assert.equal(publicationAssemblyTokens.length,readPhaseStart+1,"One original fullread phase token, no reset inside raw decode/fullproof");
+    const readbackUsage=artifactHelper.recoveryAuditAssemblyUsage(publicationAssemblyTokens.at(-1));
+    assert.equal(readbackUsage.passes,2);assert.equal(readbackUsage.reservedBytes,0);
+    for(const value of [preparationUsage,readbackUsage]){
+        assert.ok(value.bytes<=256*1024*1024);assert.ok(value.nodes<=16000000);assert.ok(value.operations<=16384);assert.ok(value.elapsedMs<=30000);
+    }
+    console.log("PASS raw-v3 publication actual SDK phases on existing20-battle actor (fake Storage only): "+JSON.stringify({wireBytes:manifest.artifactByteLength,preparation:preparationUsage,readback:readbackUsage})+"; no real provider or201 capacity claim.");
     assert.equal(ioCalls.filter(name=>name==="create").length,1);assert.equal(objects.size,1);
     loseResponse=true;await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,proof),/lost ACK response/);
     assert.equal((await manifestRef.get()).get("status"),"acknowledged");

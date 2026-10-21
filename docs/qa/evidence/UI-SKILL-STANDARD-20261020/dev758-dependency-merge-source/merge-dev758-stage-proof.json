@@ -1,0 +1,15 @@
+{
+  "ui": "246815098b6d278355d944c107003ce49c933fef",
+  "dev": "758fe75cbdfe66a80a11a36b339fcbc7b6e21126",
+  "stagedFiles": 46,
+  "stagedEqualsWorktree": true,
+  "unmerged": [],
+  "markers": [],
+  "policySemanticEqualsBoth": true,
+  "policySourceHashesExact": true,
+  "indexBuildRefs": [
+    "build/boot-core.f5d99195e677.css",
+    "build/boot-core.b447fc7be00c.js"
+  ],
+  "indexRefsExist": true
+}

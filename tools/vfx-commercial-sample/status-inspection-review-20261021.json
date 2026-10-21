@@ -1,0 +1,20 @@
+{
+  "workId": "BATTLE-PORTRAIT-DEPTH-20261020",
+  "pr": 958,
+  "scope": "User-requested target inspection: larger existing portrait and current battle agility; enemy foot-icon placement tracked separately until validated.",
+  "modal": {
+    "status": "PASS STOP",
+    "portrait": "160 logical px, contain, copied from the selected formal artwork source; no asset modification",
+    "agilityOwners": ["getMonsterAgility", "getPartyBattleStats"],
+    "unitRegression": "Enemy/player switching, source clearing, formal agility, target-selection priority, scroll reset and unavailable-stat marker pass",
+    "physicalDevice": "Samsung Note9 USB 2858d1d9c23f7ece",
+    "usbEvidence": "artifacts/status-modal-focused-usb/evidence.json",
+    "usbResetEvidence": "artifacts/status-modal-reset-usb/evidence.json",
+    "loadedBundles": ["app-shell.7e1888582c57.js", "app-shell.1b836e975116.js"],
+    "checks": ["player and enemy portrait source matches", "current agility matches formal Owner, including agilityDown", "long CJK and Latin names do not overflow horizontally", "21 status rows scroll to bottom", "target selection takes priority", "switch from scrolled enemy to player resets scrollTop from 830.095 to 0"],
+    "corrections": ["scope-only wrapping for long names", "reset the existing panel scroll on each open"],
+    "limitations": "USB is a fresh-origin QA scene, not a deployed commit; source/build fingerprints bind the tested pending sources. No new endurance or frame-rate claim. The final unavailable-stat fallback is additionally covered by the unit regression."
+  },
+  "enemyFootIcons": {"status": "PENDING geometry and USB validation"},
+  "acceptedVfx": "Frozen; this change does not retune effects or gameplay."
+}

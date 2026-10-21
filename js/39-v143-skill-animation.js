@@ -66,7 +66,7 @@
     }
 
     const RAW_MANIFEST={
-        normal:{hit:.57,sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
+        normal:{hit:.57,projectile:{src:"assets/vfx/normal/normal-air-shot-v1.webp",minSize:52,maxSize:64},sprite:castSheet("assets/vfx/normal/normal-impact.webp","single",{hitFrame:6,scale:.85,maxSize:100,impactOnly:true})},
 
         flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast-v2.webp","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
@@ -249,6 +249,7 @@
         const model=RAW_MANIFEST[id];
         const sprite=model&&model.sprite;
         if(sprite&&sprite.src&&!model.lazyAsset){ preflightAsset(sprite.src); }
+        if(model.projectile?.src&&!model.lazyAsset){ preflightAsset(model.projectile.src); }
     });
     Object.keys(RAW_STATUS_VISUALS).forEach(type=>{
         const source=RAW_STATUS_VISUALS[type]&&RAW_STATUS_VISUALS[type].src;
@@ -259,6 +260,7 @@
         const sprite=model&&model.sprite;
         if(!sprite||!sprite.src){ return false; }
         preflightAsset(sprite.src);
+        if(model.projectile?.src){ preflightAsset(model.projectile.src); }
         return true;
     };
 
@@ -1502,6 +1504,43 @@
         }
     }
 
+    function addNormalProjectile(current,index,target){
+        const projectile=current.model.projectile;
+        if(current.config.id!=="normal"||!projectile||current.spriteNodes.has("air:"+index)){ return; }
+        const actor=slotAnchor(current.side,current.actorIndex,current.actorCard);
+        if(!actor){ return; }
+        const node=appendSpriteNode(current);
+        const size=clamp(Math.min(target.rect.width,target.rect.height)*.6,projectile.minSize,projectile.maxSize);
+        const dx=target.x-actor.x,dy=target.y-actor.y;
+        const angle=Math.atan2(dy,dx)*180/Math.PI;
+        const transform=progress=>"translate(calc(-50% + "+dx*progress+"px),calc(-50% + "+dy*progress+"px)) rotate("+angle+"deg)";
+        node.dataset.presentationRole="normal-projectile";
+        node.dataset.actorSide=current.side;
+        node.dataset.actorIndex=String(current.actorIndex);
+        node.dataset.targetIndex=String(index);
+        node.dataset.targetIndexes=String(index);
+        node.style.left=actor.x+"px";
+        node.style.top=actor.y+"px";
+        node.style.width=size+"px";
+        node.style.height=size+"px";
+        node.style.backgroundImage='url("'+projectile.src+'")';
+        node.style.backgroundSize="contain";
+        node.style.backgroundPosition="center";
+        node.setAttribute("aria-hidden","true");
+        // The existing impact clock owns both this attempted flight and feedback.
+        // A MISS still travels, but never reveals the confirmed impact sprite.
+        node.v143MotionAnimation=node.animate([
+            {offset:0,opacity:0,transform:transform(0)},
+            {offset:.08,opacity:.85,transform:transform(.08)},
+            {offset:.90,opacity:.85,transform:transform(.90)},
+            {offset:1,opacity:0,transform:transform(1)}
+        ],{duration:Math.max(1,targetHitTime(current,index)-(current.visualStartedAt||current.startedAt)),fill:"both",easing:"linear"});
+        node.v143MotionAnimation.pause();
+        node.v143MotionAnimation.currentTime=0;
+        current.spriteNodes.set("air:"+index,node);
+        if(current.firstVisibleFrameAt){ startNormalProjectiles(current); }
+    }
+
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
@@ -1537,6 +1576,7 @@
         }
         placeSprite(current,node,index,target);
         requestSpriteAspect(sprite,current,node,index,target);
+        if(current.config?.id==="normal"){ addNormalProjectile(current,index,target); }
         /* A formal cast Sprite represents the attempted skill, not only a landed hit.
            Reveal it as soon as the official owner has a real fixed-slot position.
            Outcome confirmation still marks the node and controls hit feedback, but
@@ -1562,6 +1602,17 @@
         callbacks.push({callback:callback,phase:phase||"feedback"});
         current.hitCallbacks.set(index,callbacks);
         return true;
+    }
+
+    function startNormalProjectiles(current){
+        current.spriteNodes.forEach(node=>{
+            if(node.dataset?.presentationRole!=="normal-projectile"||node.dataset.flightStarted==="true"){ return; }
+            node.dataset.flightStarted="true";
+            node.style.visibility="visible";
+            const animation=node.v143MotionAnimation;
+            animation.play();
+            animation.currentTime=Math.max(0,Date.now()-current.visualStartedAt);
+        });
     }
 
     function requestCastTimeline(current){
@@ -1616,6 +1667,7 @@
         const start=function(){
             if(state.current!==current||current.done){ return; }
             beginVisualTimeline(current);
+            startNormalProjectiles(current);
             current.targetIndexes.forEach(index=>setTimer(
                 ()=>settleTargetVisual(current,index),Math.max(0,targetHitTime(current,index)-Date.now())
             ));
@@ -1667,6 +1719,8 @@
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
+        const projectile=current.spriteNodes.get("air:"+index);
+        if(projectile){ projectile.style.visibility="hidden"; }
         const callbacks=current.hitCallbacks&&current.hitCallbacks.get(index)||[];
         if(current.hitCallbacks){ current.hitCallbacks.delete(index); }
         callbacks.filter(entry=>entry.phase==="projection").forEach(entry=>entry.callback());

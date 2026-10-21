@@ -3,7 +3,7 @@
   "policyId": "restricted-forest-instance-v1",
   "scope": "private-initial-state-only",
   "sourceDigests": {
-    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "js/00-main.js": "7cb93562405b5261edb18a1a96ea1bfa7c494ca5d56b5f9982648d3166d86f7c",
     "js/34-v141-core-systems.js": "0c16a7e90839a6651009bcf14bb16e9e788700d8a0bbb7f9ce1969e475d6870c",
     "js/40-v144-rules-and-abyss.js": "9c1ea3134a8b7e5aff92a00e35de96b169a0af9b144d72edc1aa64dd780580c3"
   },

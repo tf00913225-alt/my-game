@@ -26995,6 +26995,19 @@
         "真手機硬體、其他名字/其他地區仍未驗；art看靜態圖，真關閉/返回由interaction及scope追操作證據，不把closed-before圖片充關閉結果",
         "無產品修改，源7b四尺寸8圖/24真tap，最新必要CI未確認，未merge/deploy"
       ]
+    },
+    {
+      "segment": "dev758-source-integration",
+      "uiParent": "246815098b6d278355d944c107003ce49c933fef",
+      "devParent": "758fe75cbdfe66a80a11a36b339fcbc7b6e21126",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev758-dependency-merge-source",
+      "status": "來源整合/獨立三方proof通過；新Head實畫與CI未驗",
+      "next": "minimal原訓練gesture依賴及target88+新戰場tracks實畫；再剩餘shared toast/其他UI states",
+      "limits": [
+        "不重標舊四尺寸為新Head全驗",
+        "不跑Cloud或Chrome根因工程",
+        "最新Head必要CI/部署未完成"
+      ]
     }
   ],
   "titleAudit": {
