@@ -128,10 +128,10 @@ test('Hero updates preserve native map browsing only for the same rendered chapt
     browse();h.api.openNode('c1_11');
     assert.equal(picker.open,false,'a different selected node closes the list');
     assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,0);
-    browse();h.api.closeToCity();h.api.open({panel:'map',focusNodeId:'c1_11'});
+    h.api.openNode('c1_12');browse();h.api.closeToCity();h.api.open({panel:'map',focusNodeId:'c1_12'});
     assert.equal(picker.open,false,'returning from the city starts a fresh map visit');
     assert.equal(picker.querySelector('.adventure-stage-list').scrollTop,0);
-    browse();h.api.startStory('c1_11');assert.equal(picker,null);
+    h.api.openNode('c1_11');browse();h.api.startStory('c1_11');assert.equal(picker,null);
     h.api.setPanel('map');assert.equal(picker.open,false,'returning from another panel starts closed');
     browse();const original=h.c.FourSymbolsAdventure;
     h.c.FourSymbolsAdventure={...original,getView:()=>{const view=original.getView();return {...view,chapter:{...view.chapter,id:'other-chapter'}};}};
