@@ -1,0 +1,13 @@
+{
+  "method": "Two validated generated-path conflicts only; all auto-merged content retained; original builder regenerates descriptors",
+  "plans": [
+    {
+      "path": "asset-manifest.json",
+      "conflicts": 2
+    },
+    {
+      "path": "build/asset-manifest.json",
+      "conflicts": 2
+    }
+  ]
+}

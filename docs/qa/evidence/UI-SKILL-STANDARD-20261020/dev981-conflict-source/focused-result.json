@@ -1,0 +1,10 @@
+{
+  "command": "node --test tests/chapter1-story-finalization.test.js tests/adventure-panel-scroll-transition.test.js",
+  "tests": 52,
+  "pass": 52,
+  "fail": 0,
+  "skipped": 0,
+  "build": "node scripts/build-production.mjs --check",
+  "buildExitCode": 0,
+  "note": "Observed exact command result; does not substitute latest Head Browser/CI."
+}

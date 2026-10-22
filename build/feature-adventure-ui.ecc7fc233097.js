@@ -8,7 +8,7 @@
 
     const API=()=>window.FourSymbolsAdventure;
     const CONTENT=()=>window.FourSymbolsAdventureContent;
-    const ui={root:null,body:null,tracker:null,lastFocusNodeId:null};
+    const ui={root:null,body:null,tracker:null,lastFocusNodeId:null,lastMapKey:null};
 
     function esc(value){
         return String(value==null?"":value)
@@ -44,6 +44,7 @@
                 '<div class="adventure-view" id="adventureView"></div>';
             stage.appendChild(root);
         }
+        ui.lastMapKey=null;
         ui.root=root;
         ui.body=root.querySelector("#adventureView");
         return root;
@@ -596,9 +597,25 @@
         if(ui.body){
             const samePanel=ui.renderedPanel===view.panel;
             const panelScrollTop=ui.body.scrollTop;
+            const selected=view.chapter.nodes.find(node=>node.id===view.selectedNodeId)||view.chapter.nodes.find(node=>node.id===view.state.currentNodeId);
+            const mapKey=view.visible&&view.panel==='map'?JSON.stringify([view.chapter.id,selected?.id]):null;
+            const picker=ui.body.querySelector('#adventureStagePicker');
+            const list=picker?.querySelector('.adventure-stage-list');
+            // Hero sync may update map actions while the player is browsing.
+            // Preserve only this same map selection's native disclosure state.
+            const browsing=mapKey&&mapKey===ui.lastMapKey&&picker?{open:picker.open,scrollTop:list?.scrollTop||0}:null;
             ui.body.innerHTML=renderPanel(view);
             ui.body.scrollTop=view.panel==="map"?0:(samePanel?panelScrollTop:0);
             ui.renderedPanel=view.panel;
+            ui.lastMapKey=mapKey;
+            if(browsing){
+                const nextPicker=ui.body.querySelector('#adventureStagePicker');
+                if(nextPicker){
+                    nextPicker.open=browsing.open;
+                    const nextList=nextPicker.querySelector('.adventure-stage-list');
+                    if(nextList){nextList.scrollTop=browsing.scrollTop;}
+                }
+            }
         }
         syncTracker(view);
     }
@@ -608,6 +625,7 @@
         if(!root){ return; }
         const opts=options||{};
         if(opts.focusNodeId){ ui.lastFocusNodeId=opts.focusNodeId; }
+        ui.lastMapKey=null;
         showPage("adventure");
         render();
 

@@ -1,0 +1,9 @@
+const fs=require('fs'),cp=require('child_process'),zlib=require('zlib');
+const root='docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev981-conflict-source';fs.mkdirSync(root,{recursive:true});
+const plans=[];for(const p of ['asset-manifest.json','build/asset-manifest.json']){const before=fs.readFileSync(p,'utf8');fs.writeFileSync(root+'/'+p.replaceAll('/','_')+'.conflicted.gz',zlib.gzipSync(before));let count=0;const after=before.replace(/^<<<<<<< HEAD\r?\n([\s\S]*?)^=======\r?\n([\s\S]*?)^>>>>>>> origin\/dev\r?\n/gm,(all,ours,theirs)=>{count++;const allowed=/^\s*(?:"build\/feature-adventure-(?:runtime|ui)\.[0-9a-f]{12}\.js"(?:: \{)?[,]?|"sha256": "[0-9a-f]{12}",|"bytes": \d+)\s*$/;for(const line of (ours+theirs).trimEnd().split(/\r?\n/))if(!allowed.test(line))throw Error('Non-generated manifest conflict '+p+': '+line);return ours;});if(count!==2||/^(?:<<<<<<<|=======|>>>>>>>)$/m.test(after))throw Error('Unexpected conflict count '+p);JSON.parse(after);plans.push({p,after,count});}
+// Preserve all auto-merged manifest content; resolve only validated generated
+// bundle hashes provisionally. The original builder recomputes these from the
+// merged source, including upstream map browsing and our panel-scroll contract.
+for(const p of plans)fs.writeFileSync(p.p,p.after);
+fs.writeFileSync(root+'/resolution.json',JSON.stringify({method:'Two validated generated-path conflicts only; all auto-merged content retained; original builder regenerates descriptors',plans:plans.map(x=>({path:x.p,conflicts:x.count}))},null,2));
+const r=cp.spawnSync(process.execPath,['scripts/build-production.mjs'],{encoding:'utf8',windowsHide:true});fs.writeFileSync('artifacts/dev981-build.log',(r.stdout||'')+(r.stderr||''));console.log((r.stdout||'').slice(-1400),(r.stderr||'').slice(-1400));process.exitCode=r.status??1;
