@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：正常吸收e5章節相依來源已核，必要實畫待驗；其餘全UI/所有標題狀態未完成",
+  "status": "施工中：8fb新地圖四尺寸限定審核已保存，必要CI失敗待診斷；非全UI完成",
   "devices": [
     {
       "id": "360x640",
@@ -10298,6 +10298,25 @@
               "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
             }
           ]
+        },
+        {
+          "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+          "status": "部分已實際驗證",
+          "scope": "新地圖頂題置中/技能黑鐵材質/原picker真末端及返首/首句合法返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/adventure-map-material-reviewed",
+          "limits": [
+            "僅既有角色非active教學、map/picker鎖定20末端/返首、c1_01首句及原合法返回",
+            "其餘20關對話、active onboarding/guard/shop借頁/交易/戰鬥結算未驗",
+            "7項還原依報告；private cache/route closure不宣稱exact，隔離profile移除",
+            "四尺寸瀏覽器不等於實機",
+            "必要CI39532551714 attempt1失敗，禁止合併/部署通過宣稱"
+          ]
         }
       ],
       "reviews": {
@@ -12121,6 +12140,25 @@
               "screenshot": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-adventure-chapter-complete.png",
               "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment11-accepted/1280x800-controls.json"
             }
+          ]
+        },
+        {
+          "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+          "status": "部分已實際驗證",
+          "scope": "新地圖頂題置中/技能黑鐵材質/原picker真末端及返首/首句合法返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/adventure-map-material-reviewed",
+          "limits": [
+            "僅既有角色非active教學、map/picker鎖定20末端/返首、c1_01首句及原合法返回",
+            "其餘20關對話、active onboarding/guard/shop借頁/交易/戰鬥結算未驗",
+            "7項還原依報告；private cache/route closure不宣稱exact，隔離profile移除",
+            "四尺寸瀏覽器不等於實機",
+            "必要CI39532551714 attempt1失敗，禁止合併/部署通過宣稱"
           ]
         }
       ],
@@ -25944,6 +25982,25 @@
             "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
             "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
             "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
+          ]
+        },
+        {
+          "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+          "status": "部分已實際驗證",
+          "scope": "新地圖頂題置中/技能黑鐵材質/原picker真末端及返首/首句合法返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/adventure-map-material-reviewed",
+          "limits": [
+            "僅既有角色非active教學、map/picker鎖定20末端/返首、c1_01首句及原合法返回",
+            "其餘20關對話、active onboarding/guard/shop借頁/交易/戰鬥結算未驗",
+            "7項還原依報告；private cache/route closure不宣稱exact，隔離profile移除",
+            "四尺寸瀏覽器不等於實機",
+            "必要CI39532551714 attempt1失敗，禁止合併/部署通過宣稱"
           ]
         }
       ]
