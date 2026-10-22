@@ -1,0 +1,14 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "reviewer": "independent coverage_review; recorded by root from review messages",
+  "candidate": "tools/vfx-commercial-sample/assets/full/nine-dragon-safe-v4.webp",
+  "classification": "SOURCE_PASS_FOCUSED_USB_ONLY_STOP_SOURCE_REFINEMENT",
+  "alpha8And64EdgesAll12Frames": 0,
+  "maxEdgeAlpha": 6,
+  "motherRgbaEqual": true,
+  "identity": "Multiple complete dragon heads, interwoven slender bodies and fire ring remain recognizable compared with the formal original atlas and prior v3 reference.",
+  "overcorrectionCorrection": "An initial rejection based only on counting fewer than nine separately visible heads was withdrawn: exact per-frame head counting was not an established product requirement and would impose an extra refinement gate. Actual dragon identity remains mandatory.",
+  "phonePending": ["Multiple dragons remain recognizable at physical fit rather than reading as a generic fireball", "Peak actor and HUD clearance", "Continuous release with existing bounded CSS fade despite visible tail source"],
+  "scope": "Only the originally requested Nine Dragon Fire relic. Other relics remain excluded. Source approval is not commercial or USB acceptance. No new renderer or bespoke impact-keyframe override."
+}

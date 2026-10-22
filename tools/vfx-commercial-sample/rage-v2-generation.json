@@ -1,0 +1,301 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "sourceHead": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "mode": "builtin-imagegen-edit",
+  "editTarget": "assets/vfx/fire/rage-cast.png",
+  "selectedMotherPath": "C:\\Users\\User\\.codex\\generated_images\\01a1547a-7158-78a2-ae5f-0bf74afde211\\exec-a2e22d2b-b8e9-46de-a39d-22e4c4ffedc0.png",
+  "output": "tools/vfx-commercial-sample/assets/full/rage-v2.webp",
+  "generationAttempts": 2,
+  "prompts": [
+    "Use case: precise-object-edit. Edit target: attached original rage-cast sprite sheet. Create a production-ready fire-element support/buff cast animation sheet. Keep exactly 4 equal columns by 3 equal rows, 12 frames in left-to-right row-major order. Original layout is 1536x1152; use same 4:3 sheet aspect if possible, square equal cells. Remove the entire orange-red rectangular background and every black divider: actual RGBA transparent background, no matte, no checkerboard artwork, no lines or gaps that shift the equal-cell grid. Every frame must contain the complete effect with at least 12 percent fully transparent safety padding to all four cell edges. No content may cross cell boundaries. Maintain a consistent centre and ground line within all cells. Preserve polished fiery red/orange/gold identity and high-resolution fine flame edges. Animation sequence: frames1-3 small ground ring gathering upward wisps; frames4-6 open-centred slender spiraling flame ribbons gathering power; frame7 expands, frame8 strongest crisp upward amplification burst with three clear upward golden arrows; frames9-10 rings and arrows relax and extinguish; frames11-12 sparse embers dissipating. Consistent shape evolution, no giant solid demonic fire face, no characters, no text or numbers, no tiles, no labels, no rectangles, no background scene. The aura must leave a clear open centre so a game character remains visible. Frame8 is the single luminous amplification peak, not a flat uniform glow across the sheet. Preserve exactly twelve complete distinguishable phases.",
+    "Use case: precise-object-edit. Edit target: attached original rage-cast sprite sheet. Create a production-ready fire-element support/buff cast animation sheet. Keep exactly 4 equal columns by 3 equal rows, 12 frames in left-to-right row-major order. Original layout is 1536x1152; use same 4:3 sheet aspect if possible, square equal cells. Remove the entire orange-red rectangular background and every black divider: actual RGBA transparent background, no matte, no checkerboard artwork, no lines or gaps that shift the equal-cell grid. Every frame must contain the complete effect with at least 12 percent fully transparent safety padding to all four cell edges. No content may cross cell boundaries. Maintain a consistent centre and ground line within all cells. Preserve polished fiery red/orange/gold identity and high-resolution fine flame edges. Animation sequence: frames1-3 small ground ring gathering upward wisps; frames4-6 open-centred slender spiraling flame ribbons gathering power; frame7 expands, frame8 strongest crisp upward amplification burst with three clear upward golden arrows; frames9-10 rings and arrows relax and extinguish; frames11-12 sparse embers dissipating. Consistent shape evolution, no giant solid demonic fire face, no characters, no text or numbers, no tiles, no labels, no rectangles, no background scene. The aura must leave a clear open centre so a game character remains visible. Frame8 is the single luminous amplification peak, not a flat uniform glow across the sheet. Preserve exactly twelve complete distinguishable phases.\nCritical correction: drastically reduce each flame sprite to no more than 65% of its cell width and 65% of its cell height, with at least 17.5% completely empty transparent gutters on every edge of EVERY cell. Do not fill the cells. Especially last frame MUST be only a few isolated sparse embers and a tiny fading ground ring, not a full flame. Frame1 is tiny. Frames7-8 are largest but still within central65% box. This is an animation atlas, not a montage of large illustrations. Exact equal4x3 grid. No cell dividers. Frame8 golden arrows remain. Remove solid central flame pillar in frames4-10, use open-centred narrow ribbon spirals instead."
+  ],
+  "grid": {
+    "columns": 4,
+    "rows": 3,
+    "frames": 12,
+    "order": "row-major",
+    "peakFrame": 8
+  },
+  "motherSize": [
+    1448,
+    1086
+  ],
+  "webpSize": [
+    1448,
+    1086
+  ],
+  "conversion": {
+    "lossless": true,
+    "exactRGBAEquality": true,
+    "alphaEquality": true,
+    "noResize": true,
+    "noCrop": true,
+    "noRearrange": true
+  },
+  "frameMeasurements": [
+    {
+      "frame": 1,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        84,
+        108,
+        278,
+        318
+      ],
+      "alpha16Margins": [
+        84,
+        108,
+        84,
+        44
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 13
+    },
+    {
+      "frame": 2,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        76,
+        90,
+        291,
+        319
+      ],
+      "alpha16Margins": [
+        76,
+        90,
+        71,
+        43
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 1
+    },
+    {
+      "frame": 3,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        76,
+        84,
+        289,
+        320
+      ],
+      "alpha16Margins": [
+        76,
+        84,
+        73,
+        42
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 2
+    },
+    {
+      "frame": 4,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        78,
+        68,
+        289,
+        316
+      ],
+      "alpha16Margins": [
+        78,
+        68,
+        73,
+        46
+      ],
+      "boundaryAlphaMax": 0,
+      "boundaryAlphaNonzero": 0
+    },
+    {
+      "frame": 5,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        70,
+        82,
+        291,
+        314
+      ],
+      "alpha16Margins": [
+        70,
+        82,
+        71,
+        48
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 3
+    },
+    {
+      "frame": 6,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        57,
+        64,
+        316,
+        321
+      ],
+      "alpha16Margins": [
+        57,
+        64,
+        46,
+        41
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 4
+    },
+    {
+      "frame": 7,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        45,
+        60,
+        320,
+        323
+      ],
+      "alpha16Margins": [
+        45,
+        60,
+        42,
+        39
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 2
+    },
+    {
+      "frame": 8,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        49,
+        47,
+        317,
+        325
+      ],
+      "alpha16Margins": [
+        49,
+        47,
+        45,
+        37
+      ],
+      "boundaryAlphaMax": 0,
+      "boundaryAlphaNonzero": 0
+    },
+    {
+      "frame": 9,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        73,
+        58,
+        295,
+        304
+      ],
+      "alpha16Margins": [
+        73,
+        58,
+        67,
+        58
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 88
+    },
+    {
+      "frame": 10,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        82,
+        74,
+        275,
+        301
+      ],
+      "alpha16Margins": [
+        82,
+        74,
+        87,
+        61
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 43
+    },
+    {
+      "frame": 11,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        71,
+        74,
+        294,
+        310
+      ],
+      "alpha16Margins": [
+        71,
+        74,
+        68,
+        52
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 71
+    },
+    {
+      "frame": 12,
+      "cellSize": [
+        362,
+        362
+      ],
+      "alpha16Bounds": [
+        88,
+        72,
+        278,
+        309
+      ],
+      "alpha16Margins": [
+        88,
+        72,
+        84,
+        53
+      ],
+      "boundaryAlphaMax": 1,
+      "boundaryAlphaNonzero": 37
+    }
+  ],
+  "artReviewState": "needs-independent-review",
+  "runtimeQaState": "not-reviewed",
+  "selfReview": [
+    "True transparent background replaces original opaque orange backdrop; black horizontal separators removed.",
+    "Frame8 carries explicit gold amplification arrows. Fire-face monster is removed.",
+    "Mother1448x1086 has square362px cells, and all cell boundary alpha maxima must be checked from measurements.",
+    "Generation did not fully obey open-centre narrow-ribbon request: still dense central flame.",
+    "Frame12 remains a substantial flame instead of sparse final embers; therefore NOT claiming commercial-quality animation pass.",
+    "Second attempt improves safety padding over first; no post-generation resizing, cropping, alpha cleanup or retiming performed."
+  ],
+  "sha256": "094b9b53f8263f2520f83ac839ddb545af5b8e259f1a2ff1c0f80cae4e647d18"
+}

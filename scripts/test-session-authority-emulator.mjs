@@ -2904,6 +2904,57 @@ assert.equal((await storyRoot.collection("uniqueClaims").get()).size,1);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapter/current`,storyOther.idToken),403);
 assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${storyTicket}`,storyOther.idToken,"PATCH"),403);
 console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, concurrent day/node intents, legal chapter route, permanent stable-seed rights, lost/stale retry, takeover, private rules and corruption rejection; ordinary battle outcomes remain unverified.");
+// Historical issuance uses the original protected writer against actual Firestore;
+// only its server catalog/time dependencies differ. Never manufacture ticket proofs.
+{
+    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+    function historicalFactory(policy){
+        const load=(relative,overrides={})=>{const url=new URL(relative,import.meta.url),local=createRequire(url),module={exports:{}};
+            vm.runInThisContext('(function(module,exports,require){\n'+readFileSync(url,'utf8')+'\n})',{filename:url.pathname})(module,module.exports,id=>Object.hasOwn(overrides,id)?overrides[id]:local(id));return module.exports;};
+        const source=load('../functions/src/hero-chapter-source.js',{'./generated/hero-chapter-qualification.json':policy});
+        return load('../functions/src/hero-acquisition.js',{'./hero-chapter-source':source}).createHeroAcquisition;
+    }
+    async function actor(label,policy,clock){
+        const user=await login('accounts:signUp',{email:`hero-retained-${label}@example.test`,password}),uid=user.localId;
+        const session=await invoke('createGameSession',user.idToken,{uid});await invoke('bootstrapCloudSave',user.idToken,{uid,session});
+        const data={uid,session},root=db.collection('serverUsers').doc(uid),envelope=db.doc(`users/${uid}/saves/current`);
+        const deps={db,FieldValue,HttpsError,runProtected:heroSessions.runProtected,inspectExistingEnvelope,nextRevision,now:()=>clock.value,seed:()=>20261020};
+        const owner=historicalFactory(policy)(deps),current=createHeroAcquisition(deps),request=extra=>({auth:{uid,token:claims(user.idToken)},data:{...data,...extra}});
+        const capture=async()=>{const rows=[];for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);rows.push([envelope.path,(await envelope.get()).data()]);return rows.sort((a,b)=>a[0].localeCompare(b[0]));};
+        return {user,uid,data,root,envelope,owner,current,request,capture};
+    }
+    const clock={value:Date.now()-8*86400000},a=await actor('twenty',retained,clock);
+    let proof=await a.owner.ensureChapterTicket(a.request({expectedRevision:1}));const originalId=proof.chapter.ticketId;
+    proof=await a.owner.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_01',choiceId:null}));
+    proof=await a.current.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_02',choiceId:null}));
+    const oldTicket=(await a.root.collection('heroChapterTickets').doc(originalId).get()).data(),marker=(await a.root.collection('heroChapter').doc('current').get()).data();
+    const prefix=marker.steps,stepRows=await Promise.all(prefix.map(id=>a.root.collection('heroChapterSteps').doc(id).get()));
+    const before=await a.capture();
+    await rejected('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_03',choiceId:null},'FAILED_PRECONDITION');
+    assert.deepEqual(await a.capture(),before,'expired HTTP step performs zero writes');
+    proof=await invoke('ensureHeroChapterTicket',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision});const renewedId=proof.chapter.ticketId;
+    assert.notEqual(renewedId,originalId);const renewed=(await a.root.collection('heroChapterTickets').doc(renewedId).get()).data();
+    assert.deepEqual(renewed.policy,retained);assert.equal(renewed.startingStepCount,2);assert.equal(renewed.startingStepSha256,stepRows.at(-1).get('sha256'));
+    assert.deepEqual((await a.root.collection('heroChapter').doc('current').get()).get('steps'),prefix);
+    assert.deepEqual((await a.root.collection('heroChapterTickets').doc(originalId).get()).data(),oldTicket);
+    for(const row of stepRows)assert.deepEqual((await row.ref.get()).data(),row.data(),'renewal preserves original step evidence');
+    for(const [docPath,value] of before.filter(([docPath])=>/\/(operations|ledgerEntries)\//.test(docPath)))assert.deepEqual((await db.doc(docPath).get()).data(),value,'renewal retains original receipt and ledger bytes');
+    assert.equal(renewed.ownerUid,a.uid);assert.equal(renewed.sessionId,oldTicket.sessionId);assert.equal(renewed.serverRevision,renewed.sourceRevision+1);
+    for(let stage=3;stage<=20;stage++)proof=await invoke('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:proof.serverRevision,ticketId:renewedId,nodeId:'c1_'+String(stage).padStart(2,'0'),choiceId:null});
+    assert.equal(proof.chapter.phase,'completed');assert.equal(proof.chapter.outcomeVerified,false);assert.equal(proof.authoritativeStateReady,false);
+    assert.equal((await a.root.collection('heroChapterSteps').get()).size,20);assert.equal((await a.root.collection('uniqueClaims').get()).size,1);
+    const grant=proof.entitlements.divineDogHongbao;assert.ok(grant);assert.equal((await a.root.collection('uniqueClaims').doc('hero-v1-divineDogHongbao').get()).get('allocationSeed'),grant.allocationSeed);
+    assert.equal((await a.root.collection('operations').get()).size,22);assert.equal((await a.root.collection('ledgerEntries').get()).size,22);
+    const completed=await a.capture();assert.equal((await invoke('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:1,ticketId:renewedId,nodeId:'c1_20',choiceId:null})).unchanged,true);assert.equal((await invoke('ensureHeroChapterTicket',a.user.idToken,{...a.data,expectedRevision:1})).unchanged,true);assert.deepEqual(await a.capture(),completed);
+    assert.equal(await rulesRequest(`serverUsers/${a.uid}/heroChapterTickets/${originalId}`,a.user.idToken,'PATCH'),403);
+    const badClock={value:Date.now()},bad=await actor('unknown',{...retained,sourceSha256:'f'.repeat(64)},badClock);
+    const badProof=await bad.owner.ensureChapterTicket(bad.request({expectedRevision:1})),sealed=await bad.capture();
+    assert.equal((await invoke('readHeroAcquisition',bad.user.idToken,bad.data)).chapter.nextNodeId,'c1_01');
+    await rejected('completeHeroChapterNode',bad.user.idToken,{...bad.data,expectedRevision:badProof.serverRevision,ticketId:badProof.chapter.ticketId,nodeId:'c1_01',choiceId:null},'FAILED_PRECONDITION');
+    badClock.value+=8*86400000;await assert.rejects(bad.current.ensureChapterTicket(bad.request({expectedRevision:badProof.serverRevision})),error=>error.code==='failed-precondition');
+    assert.deepEqual(await bad.capture(),sealed,'unknown same-graph policy cannot advance or renew or create rights');
+    console.log('PASS retained twenty-node policy actual Firestore/HTTP: original protected historical issuance, current advance, expiry zero-write refusal, immutable prefix renewal, twenty steps and once-only claim; same-graph unknown SHA refuses new writes. Outcomes remain unverified.');
+}
 console.log(`PASS (${direct?"direct exported handlers":"HTTP callable"}): A SUCCESS -> B takeover -> A SESSION_REVOKED -> B SUCCESS; logout, UID isolation, tampering, private rules, protected writers, concurrent takeover/write ordering, revoked/disabled Firebase identity.`);
 // Disposable emulator-only resources. No production grant surface is added.
 const growthUser=await login("accounts:signUp",{email:"hero-growth-emulator@example.test",password});
@@ -3987,6 +4038,35 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>segmentedOwner.verifySegmentedRawRecoveryProof(missingChunk));
     assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
     console.log("PASS private segmented recovery proof actual SDK: same two-page native Timestamp bytes, original source coverage, missing historical chunk refusal, one shared budget and four authority flags false; no publication or restore.");
+    // Format roundtrip is one caller-owned syntax budget. The original private
+    // Recovery proof below is a separate consumer verification phase/token;
+    // this does not claim a combined prepare pipeline or201-history capacity.
+    const rawArchiveCodec=require("../functions/src/recovery-audit-artifact.js"),rawArchiveBudget=rawArchiveCodec.createRecoveryAuditAssemblyBudget();
+    const rawArchiveBytes=rawArchiveCodec.encodeRawRecoveryArchive(rawMaterial,rawArchiveBudget);
+    const decodedRawArchive=rawArchiveCodec.decodeRawRecoveryArchive(rawArchiveBytes,rawArchiveBudget);
+    const rawArchiveUsage=rawArchiveCodec.recoveryAuditAssemblyUsage(rawArchiveBudget);
+    assert.ok(rawArchiveBytes.length<=32*1024*1024);assert.equal(rawArchiveUsage.passes,2);assert.equal(rawArchiveUsage.reservedBytes,0);
+    assert.ok(rawArchiveUsage.bytes<=256*1024*1024);assert.ok(rawArchiveUsage.nodes<=16000000);
+    assert.ok(rawArchiveUsage.operations<=16384);assert.ok(rawArchiveUsage.elapsedMs<=30000);
+    for(const name of ["binding","run","inventoryState","rawState"])assert.deepEqual(
+        rawArchiveCodec.encodeProofPayload(decodedRawArchive[name]),rawArchiveCodec.encodeProofPayload(rawMaterial[name]));
+    for(const name of ["inventoryPages","rawReceipts","rawChunks"]){
+        assert.deepEqual(decodedRawArchive[name].map(row=>row.id),rawMaterial[name].map(row=>row.id));
+        for(let i=0;i<rawMaterial[name].length;i++){
+            const {payloadBytes:actual,...decoded}=decodedRawArchive[name][i].row,{payloadBytes:expected,...original}=rawMaterial[name][i].row;
+            assert.deepEqual(rawArchiveCodec.encodeProofPayload(decoded),rawArchiveCodec.encodeProofPayload(original));
+            if(expected)assert.deepEqual(actual,expected);
+        }
+    }
+    const archiveConsumer=await segmentedOwner.verifySegmentedRawRecoveryProof(decodedRawArchive);
+    assert.equal(archiveConsumer.segmentedProofValid,true);assert.equal(archiveConsumer.documentCount,segmented.documentCount);
+    assert.equal(archiveConsumer.absenceCount,segmented.absenceCount);
+    for(const flag of ["candidateProofValid","authoritativeStateReady","trustedCaptureVerified","restoreAuthorized"])assert.equal(archiveConsumer[flag],false);
+    for(const key of ["records","documents","artifactBytes","restorePermit","identity"])assert.equal(Object.hasOwn(archiveConsumer,key),false);
+    assert.ok(Object.isFrozen(archiveConsumer));assert.ok(!Object.values(archiveConsumer).some(value=>Buffer.isBuffer(value)));
+    assert.equal(JSON.stringify(rawMaterial),materialBefore);assert.equal(attempts.length,candidateAttemptStart);
+    console.log("PASS versioned raw archive codec actual SDK: original two-page native Timestamp capture bytes, shared syntax encode/decode token, separate original complete-proof consumer with four flags false, no new SDK attempts/publication/Storage/restore; format bytes="+rawArchiveBytes.length);
+
     // The same actor now follows the actual private server pin and literal SDK
     // loader; null IO stays disabled and no candidate/publication is issued.
     for(const name of ["pinRawCapture","loadPinnedRawMaterial","verifyPinnedSegmentedProof"])
@@ -4287,12 +4367,26 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     };
     const deps={...h.deps,Timestamp,now:()=>clock,runProtected:authority.runProtected,runRecoveryAuditMaintenance:maintenance};
     const recovery=createCanonicalCurrentRecovery(deps),auditId="publication-sdk-audit-0001",approvalId="publication-sdk-approval-01";
+    const canonicalRevision=(await h.root.collection("account").doc("current").get()).get("serverRevision");
+    const beforeHeroRevision=await h.revision(),hero=createHeroAcquisition(deps);
+    const heroRequest=expectedRevision=>({...h.request(),data:{...h.request().data,expectedRevision}});
+    await hero.observeLogin(heroRequest(beforeHeroRevision));
+    const heroTicket=await hero.ensureChapterTicket(heroRequest(await h.revision()));
+    assert.equal(heroTicket.chapter.phase,"active");
+    assert.equal(heroTicket.chapter.completedIntents.length,0,"The original issued ticket is deliberately unused");
     const sourceRevision=await h.revision();
+    assert.equal(sourceRevision,beforeHeroRevision+2);
+    assert.equal((await h.root.collection("account").doc("current").get()).get("serverRevision"),canonicalRevision);
+    assert.ok(canonicalRevision<sourceRevision,"Hero observations advance only the envelope cut");
+    assert.equal((await h.root.collection("heroAcquisitionHistory").get()).size,1);
+    assert.equal((await h.root.collection("heroChapterTickets").get()).size,1);
+    assert.equal((await h.root.collection("heroChapterSteps").get()).size,0);
+    assert.equal((await h.root.collection("recoveryArchives").doc(String(sourceRevision)).get()).exists,false,"No archive is fabricated at the Hero envelope revision");
     assert.ok((await h.root.collection("patrolTickets").get()).size>=20);
-    const before=await checkRecoveryArchive(h.uid,sourceRevision);
+    const before=await checkRecoveryArchive(h.uid,canonicalRevision);
     assert.equal(before.get("sourceRecords.characters").length,2);assert.equal(before.get("sourceRecords.characters")[0].state.level,10);
     await createCanonicalRecoveryApproval(deps).issue({auth:{uid:"publication-operator",token:{cloudSaveOperator:true}},
-        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision,ttlSeconds:900}});
+        data:{ownerUid:h.uid,operationId:approvalId,sourceRevision,canonicalRevision,ttlSeconds:900}});
     // Exercise the actual staged callable over the existing emulator HTTP
     // boundary. Publication below deliberately fails its epoch gate before IO;
     // successful provider publication remains SDK + lexical fake-Storage only.
@@ -4308,6 +4402,11 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const assets=await h.capture();
     const args={auditId,expectedEpoch:2,operationId:"publication-sdk-manifest-01"},run=h.root.collection("recoveryAuditRuns").doc(auditId);
     const publicationApproval=(await h.root.collection("recoveryApprovals").doc(approvalId).get()).data(),publicationRun=(await run.get()).data();
+    assert.equal(publicationApproval.namespaceVersion,3);assert.equal(publicationApproval.canonicalRevision,canonicalRevision);
+    assert.equal(publicationRun.schemaVersion,2);assert.equal(publicationRun.namespaceVersion,3);
+    assert.equal(publicationRun.canonicalRevision,canonicalRevision);assert.equal(publicationRun.sourceRevision,sourceRevision);
+    // h.capture enumerates every top-level server collection, including all
+    // five Hero namespaces; it is not a fixed pre-Hero collection allowlist.
     const comparePublicationTime=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
     assert.ok(comparePublicationTime(publicationApproval.issuedAt,publicationRun.createdAt)<=0&&
         comparePublicationTime(publicationRun.createdAt,publicationApproval.expiresAt)<0,"Publication audit commit must lie within its exact approval interval");
@@ -4347,27 +4446,36 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     // injection into the deployed factory or an actual provider operation.
     const filename=require.resolve("../functions/src/canonical-current-recovery.js"),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(filename.slice(0,Math.max(filename.lastIndexOf("/"),filename.lastIndexOf("\\"))));
-    const native=compiled.require.bind(compiled);compiled.require=name=>name==="test-only-publication-fake-io"?io:
+    const publicationAssemblyTokens=[],artifactHelper=require("../functions/src/recovery-audit-artifact.js");
+    const observedArtifact={...artifactHelper,createRecoveryAuditAssemblyBudget:()=>{
+        const token=artifactHelper.createRecoveryAuditAssemblyBudget();publicationAssemblyTokens.push(token);return token;}};
+    const native=compiled.require.bind(compiled);compiled.require=name=>name==="./recovery-audit-artifact"?observedArtifact:name==="test-only-publication-fake-io"?io:
         name==="./recovery-candidate-storage"?{createRecoveryCandidateStorage:()=>io}:native(name);
     const needle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact",source=readFileSync(filename,"utf8");
     assert.equal(source.split(needle).length,2);
     compiled._compile(source.replace("return buildRecoveryOwner(deps,null,false);","return buildRecoveryOwner(deps,require('test-only-publication-fake-io'),false);")
-        .replace(needle,"return Object.freeze({verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
+        .replace(needle,"return Object.freeze({assemblePinnedRawArchive,verifySegmentedRawRecoveryProof,loadedRawMaterial:identity=>publicationValue(publicationMaterials,identity).input,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,publishPreparedCandidate,ackCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact"),filename);
     const publication=compiled.exports.createCanonicalCurrentRecovery(deps);
     assert.equal(Object.hasOwn(recovery,"pinCandidatePublication"),false);
     async function gate(operation,writes){const start=traces.length,result=await operation();
-        assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,13);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
+        assert.ok(traces.length>start);for(const trace of traces.slice(start)){assert.equal(trace.reads,14);assert.equal(trace.queries,0);assert.ok(trace.writes<=writes);}return result;}
     const pin=await gate(()=>publication.pinCandidatePublication(h.request(),args),0),scanStart=traces.length;
     const material=await publication.loadPinnedRawCapture(pin);
     // Independent memory-proof acceptance on the existing native20-battle
     // capture, not a shared publication preparation/readback budget claim.
     const reuseInput=publication.loadedRawMaterial(material),reuseBytes=JSON.stringify(reuseInput),reuseTrace=JSON.stringify(traces);
     const {decodeInventoryPayload}=require("../functions/src/recovery-audit-artifact.js");
+    const capturedNamespaces=new Set(reuseInput.inventoryPages.map(page=>decodeInventoryPayload(page.row.payloadBytes).namespacePath));
+    for(const name of ["heroAcquisition","heroAcquisitionHistory","heroChapter","heroChapterTickets","heroChapterSteps"])
+        assert.ok(capturedNamespaces.has(h.root.path+"/"+name),"Namespace3 captures the complete Hero namespace, including empty steps");
     const settlementCount=reuseInput.inventoryPages.reduce((count,page)=>{
         const payload=decodeInventoryPayload(page.row.payloadBytes);
         return count+(payload.namespacePath===h.root.path+"/patrolSettlements"?payload.entries.length:0);
     },0);
     const nativeReuse=await publication.verifySegmentedRawRecoveryProof(reuseInput),usage=nativeReuse.residentUsage;
+    assert.equal(reuseInput.binding.namespaceVersion,3);assert.equal(reuseInput.binding.canonicalRevision,canonicalRevision);
+    assert.equal(nativeReuse.namespaceVersion,3);assert.equal(nativeReuse.canonicalRevision,canonicalRevision);
+    assert.equal(nativeReuse.sourceRevision,sourceRevision);
     assert.equal(nativeReuse.segmentedProofValid,true);assert.ok(usage.settlementReuseHits>0);
     assert.equal(usage.enumeratedSettlementRows,settlementCount);assert.equal(usage.settlementReuseHits,settlementCount);
     assert.equal(usage.units,usage.executedProofUnits);
@@ -4378,7 +4486,7 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.ok(nativeReuse.assemblyUsage.operations<=16384);assert.ok(nativeReuse.assemblyUsage.elapsedMs<=30000);
     assert.equal(nativeReuse.assemblyUsage.passes,1);assert.equal(nativeReuse.assemblyUsage.reservedBytes,0);
     console.log("PASS native segmented settlement reuse: existing20-battle Lv10/slot2 capture; all "+settlementCount+" settlement rows enumerated and exact-metadata reused after complete original ticket proofs; executed="+usage.executedProofUnits+"; independent original budget, no extra SDK attempts/reads, unchanged material, four flags false; no publication-capacity or201 claim.");
-    const artifact=await publication.assemblePinnedCandidate(pin,material);
+    const artifact=await publication.assemblePinnedRawArchive(pin,material);
     assert.equal(traces.length,scanStart,"Outside SDK snapshot scans and memory proof do not run a protected transaction");
     const manifestRef=run.collection("candidatePublications").doc(args.operationId);
     rollbackOnce=true;await assert.rejects(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),/staged rollback/);
@@ -4386,7 +4494,19 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     abortOnce=true;const prepared=await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),1);
     await gate(()=>publication.prepareCandidatePublication(h.request(),pin,artifact),0);
     const manifest=(await manifestRef.get()).data();
+    assert.equal(manifest.schemaVersion,3);assert.equal(manifest.candidateEncodingVersion,4);
+    assert.equal(manifest.namespaceVersion,3);assert.equal(manifest.canonicalRevision,canonicalRevision);
+    assert.equal(manifest.artifactKind,"canonical-recovery-raw-archive");assert.equal(manifest.proofKind,"segmented-original-rights-v2");
+    const preparationUsage=artifactHelper.recoveryAuditAssemblyUsage(publicationAssemblyTokens[0]),readPhaseStart=publicationAssemblyTokens.length;
+    assert.equal(preparationUsage.passes,2);assert.equal(preparationUsage.reservedBytes,0);
     const proof=await gate(()=>publication.publishPreparedCandidate(h.request(),prepared),0);
+    assert.equal(publicationAssemblyTokens.length,readPhaseStart+1,"One original fullread phase token, no reset inside raw decode/fullproof");
+    const readbackUsage=artifactHelper.recoveryAuditAssemblyUsage(publicationAssemblyTokens.at(-1));
+    assert.equal(readbackUsage.passes,2);assert.equal(readbackUsage.reservedBytes,0);
+    for(const value of [preparationUsage,readbackUsage]){
+        assert.ok(value.bytes<=256*1024*1024);assert.ok(value.nodes<=16000000);assert.ok(value.operations<=16384);assert.ok(value.elapsedMs<=30000);
+    }
+    console.log("PASS raw-v4 Hero publication actual SDK phases on existing20-battle actor (fake Storage only): "+JSON.stringify({sourceRevision,canonicalRevision,wireBytes:manifest.artifactByteLength,preparation:preparationUsage,readback:readbackUsage})+"; genuine login and unused chapter ticket, namespace3 complete original rights; no real provider or201 capacity claim.");
     assert.equal(ioCalls.filter(name=>name==="create").length,1);assert.equal(objects.size,1);
     loseResponse=true;await assert.rejects(()=>publication.ackCandidatePublication(h.request(),prepared,proof),/lost ACK response/);
     assert.equal((await manifestRef.get()).get("status"),"acknowledged");
@@ -4422,10 +4542,10 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared),/epoch or session/);
     await callMaintenance("cancel",{auditId,expectedEpoch:2,operationId:"publication-sdk-cancel-audit"});
     await assert.rejects(()=>publication.publishPreparedCandidate(h.request(),prepared));
-    assert.deepEqual((await checkRecoveryArchive(h.uid,sourceRevision)).data(),before.data());
+    assert.deepEqual((await checkRecoveryArchive(h.uid,canonicalRevision)).data(),before.data());
     assert.equal((await h.save.get()).get("authoritativeStateReady"),false);
     console.log("PASS staged Recovery maintenance: actual Auth/HTTP six successful actions, unknown/excess/foreign/replaced-session rejection, publish stale epoch before provider IO; SDK + lexical fake Storage positive publish/replay keeps four flags false. Representative RSS below 1GiB, not maximum payload capacity or real GCS proof.");
-    console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 actor; original raw full-chain/strict proofs;13-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
+    console.log("PASS private immutable candidate publication: actual Firestore Session/SDK cursors/Timestamps on existing20-battle Lv10/slot2 plus genuine Hero login/unused-ticket actor; namespace3/raw4 original full-chain/strict proofs with separate canonical/envelope cuts;14-point gates, rollback/SDK retry, exact immutable tuple, fakeStorage-only64-bit generation/fullread/lost responses/read-only ACK races, expiry/takeover/cancel refusal. No actual GCS, production adapter, trusted backup or restore authority.");
 }
 
 // Internal skill configuration only. A fresh isolated account keeps all prior
@@ -4441,12 +4561,14 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     const request={auth:{uid,token:decoded},data:identity},accountSource=await root.collection("account").doc("current").get();
     const characterId=accountSource.get("slots")[0],characterRef=root.collection("characters").doc(characterId);
     const originalCharacter=(await characterRef.get()).data(),before=await checkRecoveryArchive(uid,2);
-    const traces=[];
-    const protectedRun=(req,fn)=>writerSessions.runProtected(req,async(tx,active)=>{
-        const trace={reads:0,writes:0};traces.push(trace);
+    const traces=[],firstLoadoutQuery=root.collection("operations").orderBy("__name__").limit(401);
+    const protectedRun=(req,fn,label="learning")=>writerSessions.runProtected(req,async(tx,active)=>{
+        const trace={label,reads:0,writes:0,firstRows:[]};traces.push(trace);
         const observed={get:async reference=>{
             assert.equal(trace.writes,0,"skill transactions finish all reads before any write");
-            const snapshot=await tx.get(reference);trace.reads+=snapshot.docs?Math.max(1,snapshot.size):1;return snapshot;
+            const snapshot=await tx.get(reference);trace.reads+=snapshot.docs?Math.max(1,snapshot.size):1;
+            if(snapshot.docs&&reference.isEqual(firstLoadoutQuery))trace.firstRows.push(snapshot.docs.map(row=>row.id));
+            return snapshot;
         }};
         for(const method of ["create","update","set","delete"])observed[method]=(...args)=>{trace.writes++;return tx[method](...args);};
         return fn(observed,active);
@@ -4488,6 +4610,173 @@ let patrolProofSdkFixture; // Script-private handle to the already-earned multi-
     assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
     assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
     console.log("PASS internal skill learning: real Auth/Session and Firestore atomic initial-point debit, immutable snapshot/archive transition, committed lost response, zero-write original-policy replay and stale/foreign/missing-source refusal. No callable, equip, combat or readiness activation.");
+
+    // Extend this same earned learning actor; these are additional protected
+    // calls and native SDK optimistic retries, not additional actors or grants.
+    const {createCanonicalSkillLoadout}=require("../functions/src/canonical-skill-loadout.js");
+    const loadoutDeps={...deps,runProtected:(req,fn)=>protectedRun(req,fn,"loadout")};
+    const loadout=createCanonicalSkillLoadout(loadoutDeps);
+    const economic=(await root.collection("economy").doc("current").get()).data();
+    const resourceFields=value=>Object.fromEntries(Object.entries(value).filter(([key])=>!["serverRevision","createdAt","updatedAt"].includes(key)));
+    const fourFalse=value=>{for(const key of ["authoritativeStateReady","readyForRestore","rewardEligible","outcomeVerified"])assert.equal(value[key],false);};
+    const args=(id,revision,action,skillId="waterKnife")=>({operationId:id,expectedRevision:revision,characterId,action,skillId});
+    const assertTraces=(start,first=false)=>{
+        const attempts=traces.slice(start);assert.ok(attempts.length>0);
+        for(const trace of attempts){
+            assert.equal(trace.label,"loadout");
+            if(trace.writes){assert.equal(trace.writes,10);assert.equal(trace.reads,first?18:23);}
+            else assert.ok(trace.reads<=23);
+            assert.equal(trace.firstRows.length,first?1:0);
+            if(first)assert.deepEqual([...trace.firstRows[0]].sort(),[intent.operationId,initialOperationId].sort());
+        }
+    };
+    const initialRows=await firstLoadoutQuery.get();assert.equal(initialRows.size,2);
+    const initialOperationId=initialRows.docs.find(row=>row.id!==intent.operationId).id;
+    assert.equal(initialRows.docs.find(row=>row.id===initialOperationId).get("kind"),"initial-character-sources");
+    const rollbackIntent=args("skill-sdk-loadout-rollback-01",3,"equip"),rollbackStart=traces.length;
+    const rollback=createCanonicalSkillLoadout({...loadoutDeps,runProtected:(req,fn)=>protectedRun(req,async(tx,active)=>{
+        await fn(tx,active);throw Error("loadout SDK staged rollback");
+    },"loadout")});
+    await assert.rejects(()=>rollback.mutateLoadout(request,rollbackIntent),/staged rollback/);
+    assertTraces(rollbackStart,true);
+    assert.equal((await save.get()).get("serverRevision"),3);
+    assert.deepEqual((await characterRef.get()).data(),learned);
+    for(const [namespace,id] of [["operations",rollbackIntent.operationId],["playableSnapshots","4"],["recoveryArchives","4"]])
+        assert.equal((await root.collection(namespace).doc(id).get()).exists,false);
+    const equipIntent=args("skill-sdk-loadout-equip-001",3,"equip"),equipStart=traces.length;
+    const lostLoadout=createCanonicalSkillLoadout({...loadoutDeps,runProtected:async(req,fn)=>{
+        await protectedRun(req,fn,"loadout");throw Error("loadout SDK committed response lost");
+    }});
+    await assert.rejects(()=>lostLoadout.mutateLoadout(request,equipIntent),/committed response lost/);
+    assertTraces(equipStart,true);await checkRecoveryArchive(uid,4);
+    const firstReceipt=(await root.collection("operations").doc(equipIntent.operationId).get()).data();
+    assert.equal(firstReceipt.previousLoadoutSource,null);
+    const firstProgress=(await root.collection("progress").doc("current").get()).get("playableState");
+    assert.equal(firstProgress.preferencesVersion,2);
+    for(const key of ["autoConfig","autoConfig2","autoConfig3"])
+        for(const optional of ["v136ActionIntent","v136LastSkill"])assert.equal(Object.hasOwn(firstProgress[key],optional),false);
+    const retryStart=traces.length,retry=await loadout.mutateLoadout(request,equipIntent);
+    fourFalse(retry);assert.equal(retry.unchanged,true);
+    for(const trace of traces.slice(retryStart)){assert.equal(trace.reads,8);assert.equal(trace.writes,0);assert.deepEqual(trace.firstRows,[]);}
+    async function mutate(value){const start=traces.length,result=await loadout.mutateLoadout(request,value);
+        fourFalse(result);assertTraces(start);await checkRecoveryArchive(uid,result.resultRevision);return result;}
+    await mutate(args("skill-sdk-loadout-select-01",4,"select-auto-action"));
+    await mutate(args("skill-sdk-loadout-remove-01",5,"remove"));
+    const removed=(await root.collection("progress").doc("current").get()).get("playableState.autoConfig");
+    assert.equal(removed.skill,"normal");assert.equal(removed.v136ActionIntent,"skill");assert.equal(removed.v136LastSkill,"waterKnife");
+    assert.deepEqual((await characterRef.get()).get("skillLoadout.equippedSkills"),[]);
+    const sameIntent=args("skill-sdk-loadout-same-race-01",6,"equip"),sameStart=traces.length;
+    const sameRace=await Promise.all([loadout.mutateLoadout(request,sameIntent),loadout.mutateLoadout(request,sameIntent)]);
+    assert.deepEqual(sameRace.map(row=>row.unchanged).sort(),[false,true]);sameRace.forEach(fourFalse);assertTraces(sameStart);
+    const noOpStart=traces.length;
+    await assert.rejects(()=>loadout.mutateLoadout(request,args("skill-sdk-loadout-noop-001",7,"equip")),/does not change/);
+    assert.ok(traces.slice(noOpStart).every(trace=>trace.writes===0));
+    assert.equal((await root.collection("operations").doc("skill-sdk-loadout-noop-001").get()).exists,false);
+    const contenders=[args("skill-sdk-loadout-race-normal",7,"select-auto-action","normal"),args("skill-sdk-loadout-race-defend",7,"select-auto-action","defend")];
+    const race=await Promise.allSettled(contenders.map(value=>loadout.mutateLoadout(request,value)));
+    assert.equal(race.filter(row=>row.status==="fulfilled").length,1);
+    const winner=race.find(row=>row.status==="fulfilled").value;fourFalse(winner);
+    assert.match(race.find(row=>row.status==="rejected").reason.message,/CLOUD_REVISION_CONFLICT/);
+    assert.equal((await save.get()).get("serverRevision"),8);await checkRecoveryArchive(uid,8);
+    // Original private rights function, compiled lexically only in this test.
+    // Production still has no such factory method, callable or authority hook.
+    const recoveryFilename=require.resolve("../functions/src/canonical-current-recovery.js"),readerModule=new Module(recoveryFilename);
+    readerModule.filename=recoveryFilename;readerModule.paths=Module._nodeModulePaths(recoveryFilename.slice(0,Math.max(recoveryFilename.lastIndexOf("/"),recoveryFilename.lastIndexOf("\\"))));
+    const recoverySource=readFileSync(recoveryFilename,"utf8"),rightsNeedle="return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact";
+    assert.equal(recoverySource.split(rightsNeedle).length,2);
+    readerModule._compile(recoverySource.replace(rightsNeedle,"return Object.freeze({verifyRecoveryRights,restoreCurrent,verifyRecoveryAuditArtifact"),recoveryFilename);
+    const rights=readerModule.exports.createCanonicalCurrentRecovery(deps);
+    assert.equal(Object.hasOwn(require(recoveryFilename).createCanonicalCurrentRecovery(deps),"verifyRecoveryRights"),false);
+    const closure=()=>protectedRun(request,async tx=>{
+        const account=(await tx.get(root.collection("account").doc("current"))).data();
+        const snapshot=await tx.get(root.collection("playableSnapshots").doc(String(account.serverRevision)));
+        const archive=await tx.get(root.collection("recoveryArchives").doc(String(account.serverRevision)));
+        assert.equal(snapshot.get("sha256"),account.snapshotSha256);
+        const records=inspectRecoveryArchive(archive.data(),uid,account.serverRevision,snapshot.data()),collections={};
+        for(const [key,namespace] of Object.entries({claims:"uniqueClaims",receipts:"grantOperations",ledgers:"ledgerEntries",grants:"pendingGrants",events:"rewardEvents",operations:"operations",modeSources:"simulatedAdSources",patrolTickets:"patrolTickets",patrolStates:"patrolTicketStates",patrolSettlements:"patrolSettlements",patrolClosures:"patrolClosures"})){
+            collections[key]=await tx.get(root.collection(namespace).limit(401));assert.ok(collections[key].size<401);
+        }
+        assert.equal((await tx.get(root.collection("modeTimeEvents").limit(1))).empty,true);
+        for(const [key,field,value] of [["modeEvents","modeChanged",true],["patrolModeEvents","schemaVersion",2],["patrolOwnedModeEvents","resultOwner","forest-patrol-settlement"]])
+            collections[key]=await tx.get(root.collection("modeTimeEvents").where(field,"==",value).limit(401));
+        collections.patrolOperationIds=new Set(collections.patrolSettlements.docs.map(row=>row.id));
+        return rights.verifyRecoveryRights(tx,root,uid,8,records,collections);
+    },"loadout-closure");
+    const closureStart=traces.length;await closure();
+    assert.ok(traces.slice(closureStart).every(trace=>trace.writes===0&&trace.reads<=400));
+    const earlyRef=root.collection("operations").doc(equipIntent.operationId);
+    await earlyRef.delete();const gapStart=traces.length;
+    try{await assert.rejects(closure,/loadout|Loadout/);assert.ok(traces.slice(gapStart).every(trace=>trace.writes===0));}
+    finally{await earlyRef.set(firstReceipt);}
+    const headRef=root.collection("operations").doc(winner.operationId),head=(await headRef.get()).data();
+    await headRef.delete();const missingHeadStart=traces.length;
+    try{await assert.rejects(()=>loadout.mutateLoadout(request,args("skill-sdk-loadout-missing-head",8,"remove")),/source receipt is missing/);
+        assert.ok(traces.slice(missingHeadStart).every(trace=>trace.writes===0));}
+    finally{await headRef.set(head);}
+    assert.deepEqual((await headRef.get()).data(),head);
+    assert.deepEqual((await earlyRef.get()).data(),firstReceipt);
+    assert.equal((await root.collection("operations").doc("skill-sdk-loadout-missing-head").get()).exists,false);
+    for(const namespace of ["playableSnapshots","recoveryArchives"])assert.equal((await root.collection(namespace).doc("9").get()).exists,false);
+    await closure();
+    assert.deepEqual((await characterRef.get()).get("state"),learned.state);
+    assert.deepEqual((await characterRef.get()).get("skillLoadout.skillLevels"),learned.skillLoadout.skillLevels);
+    assert.deepEqual(resourceFields((await root.collection("economy").doc("current").get()).data()),resourceFields(economic));
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    for(const id of [equipIntent.operationId,"skill-sdk-loadout-select-01","skill-sdk-loadout-remove-01",sameIntent.operationId,winner.operationId])
+        for(const namespace of ["ledgerEntries","grantOperations"])assert.equal((await root.collection(namespace).doc(id).get()).exists,false);
+    assert.equal((await save.get()).get("serverRevision"),8);
+    console.log("PASS internal skill loadout: original learning actor, native rollback/lost-response/once-only races, exact first limit401 two-row inventory; fixture kernel first18/later23/replay8 reads and10 writes (Session3 reads separate), v2 presence/intent retention, non-economic six-point receipts, readonly full closure and missing earlier/current receipt refusal. Four authority flags remain false; no gameplay UI/Boot integration.");
+    // Same actor, now through the actual two exported HTTP callable boundaries.
+    // Neither service is a gameplay hook or a complete-save hydrate operation.
+    const captureLoadoutActor=async()=>{
+        const rows=[[save.path,(await save.get()).data()]];
+        for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);
+        return rows.sort(([a],[b])=>a.localeCompare(b));
+    };
+    const httpRead={...identity,expectedRevision:8},preRead=await captureLoadoutActor();
+    const configuration=await invoke("readCanonicalSkillLoadout",token,httpRead);fourFalse(configuration);
+    assert.equal(configuration.ownerUid,uid);assert.equal(configuration.serverRevision,8);assert.equal(configuration.canonicalRevision,8);
+    assert.equal(configuration.preferencesVersion,2);
+    assert.deepEqual(configuration.characters,[{characterId,slotIndex:0,skillLoadout:(await characterRef.get()).get("skillLoadout")}]);
+    assert.equal(Object.hasOwn(configuration.autoConfig2,"v136ActionIntent"),false);
+    assert.equal(Object.hasOwn(configuration.autoConfig3,"v136LastSkill"),false);
+    assert.deepEqual(Object.keys(configuration).sort(),["schemaVersion","ownerUid","serverRevision","canonicalRevision","preferencesVersion","characters",
+        "autoConfig","autoConfig2","autoConfig3","outcomeVerified","rewardEligible","readyForRestore","authoritativeStateReady"].sort());
+    assert.deepEqual(await captureLoadoutActor(),preRead,"HTTP configuration read writes no sources, Session or receipts");
+    const httpRemove={...identity,...args("skill-sdk-http-loadout-remove",8,"remove")};
+    const removedHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);fourFalse(removedHttp);
+    assert.equal(removedHttp.resultRevision,9);assert.equal(removedHttp.unchanged,false);await checkRecoveryArchive(uid,9);
+    const postMutation=await captureLoadoutActor(),retryHttp=await invoke("mutateCanonicalSkillLoadout",token,httpRemove);
+    fourFalse(retryHttp);assert.equal(retryHttp.unchanged,true);assert.deepEqual(await captureLoadoutActor(),postMutation);
+    const currentHttp=await invoke("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9});fourFalse(currentHttp);
+    assert.deepEqual(currentHttp.characters[0].skillLoadout.equippedSkills,[]);
+    assert.equal(currentHttp.autoConfig.v136LastSkill,"waterKnife");
+    const httpRefuses=async(name,authToken,input,code)=>{
+        const before=await captureLoadoutActor();
+        await assert.rejects(()=>invoke(name,authToken,input),error=>[code,code.toLowerCase().replaceAll("_","-")].includes(error.code));
+        assert.deepEqual(await captureLoadoutActor(),before);
+    };
+    for(const name of ["mutateCanonicalSkillLoadout","readCanonicalSkillLoadout"]){
+        const input=name.startsWith("mutate")?{...httpRemove,operationId:"skill-sdk-http-forged-loadout",expectedRevision:9}:{...identity,expectedRevision:9};
+        for(const key of ["amount","rawState","autoConfig","authoritativeStateReady"])
+            await httpRefuses(name,token,{...input,[key]:true},"INVALID_ARGUMENT");
+        await httpRefuses(name,null,input,"UNAUTHENTICATED");
+        await httpRefuses(name,token,{...input,uid:y},"SESSION_INVALID");
+        await httpRefuses(name,token,{...input,session:null},"SESSION_INVALID");
+    }
+    await httpRefuses("readCanonicalSkillLoadout",token,httpRead,"ABORTED");
+    await httpRefuses("mutateCanonicalSkillLoadout",token,{...httpRemove,operationId:"skill-sdk-http-null-skill",expectedRevision:9,skillId:null},"INVALID_ARGUMENT");
+    const httpHeadRef=root.collection("operations").doc(httpRemove.operationId),httpHead=(await httpHeadRef.get()).data();
+    await httpHeadRef.delete();
+    try{await httpRefuses("readCanonicalSkillLoadout",token,{...identity,expectedRevision:9},"DATA_LOSS");}
+    finally{await httpHeadRef.set(httpHead);}
+    assert.deepEqual((await characterRef.get()).get("state"),learned.state);
+    assert.deepEqual(resourceFields((await root.collection("economy").doc("current").get()).data()),resourceFields(economic));
+    assert.deepEqual((await root.collection("operations").doc(intent.operationId).get()).data(),operation.data());
+    assert.deepEqual((await root.collection("ledgerEntries").doc(intent.operationId).get()).data(),ledger.data());
+    assert.deepEqual(await captureLoadoutActor(),postMutation);
+    console.log("PASS skill loadout HTTP boundary: exact protected intent and same-Session configuration read, v2 presence/stable IDs/revisions, non-economic remove/original retry, zero-write extra-field/unauthenticated/cross-UID/session/stale/null-skill/missing-head refusal. Four authority flags remain false; no UI/Boot hydrate or server combat activation.");
 }
 
 await db.terminate();

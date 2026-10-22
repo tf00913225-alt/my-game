@@ -2,7 +2,24 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import vm from "node:vm";
+import crypto from "node:crypto";
+import {createHash} from "node:crypto";
 import {compactBootJavaScript} from "../scripts/lib/boot-javascript-compact.mjs";
+
+test("Production target hashes and publishes identical LF bytes for LF, CRLF and mixed sources",()=>{
+    const builder=fs.readFileSync(new URL("../scripts/build-production.mjs",import.meta.url),"utf8");
+    const hash=builder.match(/const hash=value=>[^\n]+/),target=builder.match(/function target\(name,extension,content\)\{[\s\S]*?\n\}/);
+    assert.ok(hash);assert.ok(target);
+    const context={crypto};vm.createContext(context);vm.runInContext(hash[0]+"\n"+target[0],context);
+    const canonical='/* 江湖 */\nconst title="山關";\nconst dialogue=`首句\n次句`;\n';
+    const digest=crypto.createHash('sha256').update(Buffer.from(canonical,'utf8')).digest('hex').slice(0,12);
+    for(const source of [canonical,canonical.replaceAll('\n','\r\n'),canonical.replace('*/\n','*/\r\n').replace('首句\n','首句\r\n')]){
+        const output=context.target('newline-regression','js',source);
+        assert.equal(output.content,canonical);assert.equal(output.digest,digest);assert.equal(output.path,`build/newline-regression.${digest}.js`);
+        assert.deepEqual(Buffer.from(output.content,'utf8'),Buffer.from(canonical,'utf8'));
+        const repeated=context.target('newline-regression','js',output.content);assert.equal(repeated.path,output.path);assert.equal(repeated.content,output.content);
+    }
+});
 
 test("Boot lexical compact retains ASI, operators, regex, templates and literal bytes",()=>{
     const source=String.raw`
@@ -43,4 +60,21 @@ test("Boot compact validates the full actual boot sources and prefix without run
     const compact=compactBootJavaScript(source);
     assert.ok(Buffer.byteLength(compact)<=70_000);
     assert.equal(compactBootJavaScript(compact),compact);
+});
+test("Production text bundles keep identical filenames and served hashes across Git line endings",()=>{
+    const builder=fs.readFileSync(new URL("../scripts/build-production.mjs",import.meta.url),"utf8");
+    const start=builder.indexOf('function target('),end=builder.indexOf('function writeTarget(',start);
+    const context={hash:value=>createHash('sha256').update(value).digest('hex').slice(0,12)};
+    vm.createContext(context);vm.runInContext(builder.slice(start,end),context);
+    for(const extension of ['js','css']){
+        const lf=extension==='js'?'const value=`first\nsecond`;\nglobalThis.result=value;\n':'body {\n color: red;\n}\n';
+        const a=context.target('example',extension,lf),b=context.target('example',extension,lf.replaceAll('\n','\r\n'));
+        assert.equal(b.path,a.path);assert.equal(b.content,a.content);
+        assert.equal(createHash('sha256').update(Buffer.from(b.content)).digest('hex').slice(0,12),b.digest);
+        assert.equal(b.content.includes('\r'),false);
+        if(extension==='js'){
+            const before={},after={};vm.runInNewContext(lf.replaceAll('\n','\r\n'),before);vm.runInNewContext(b.content,after);
+            assert.equal(after.result,before.result);
+        }
+    }
 });

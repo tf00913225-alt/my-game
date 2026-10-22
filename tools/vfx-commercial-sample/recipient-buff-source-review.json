@@ -1,0 +1,82 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Only three replacement buff CAST recipient candidates and stormRain recipient source. Seven USB-passed casts and all approved persistent states remain closed to discretionary refinement.",
+  "qualityClaim": "SourcePASS/USB-candidate eligibility only. Does not resolve prior phone placement failures by itself.",
+  "technical": {
+    "dimensions": [
+      1448,
+      1086
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cell": [
+      362,
+      362
+    ],
+    "fullDecodedMotherRgbaEqualityAll4": true,
+    "alpha8EdgesAll48FramesZero": true,
+    "alpha64EdgesAll48FramesZero": true,
+    "maxEdgeAlpha": {
+      "rage": 1,
+      "dodgeSkill": 1,
+      "rockWall": 1,
+      "stormRain": 2
+    },
+    "method": "Pillow/NumPy decoded original RGBA arrays compared against conversion.source. Four edges of every frame inspected quantitatively. Generation/conversion metadata read and all three new images viewed; stormRain source/reference viewed in preceding review."
+  },
+  "reviews": [
+    {
+      "id": "rage",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rage-recipient-v1.webp",
+      "classification": "SOURCE_PASS_USB_CANDIDATE",
+      "identity": "Single gold upward buff arrow and orange spiral flame ribbon preserve rage amplification; no face, attacking slash or three-site conflation. Simplification does not erase skill identity.",
+      "activation": "Arrow rises3-6; frame7 has clear gold activation star,8 relaxes. Alpha mass peaks31030 at7, ends423 (~1.4%) at12 in isolated embers.",
+      "risks": [
+        "Peak contains bright orange fill behind arrow. Verify red player remains readable and effect identifiable, without arbitrary further source enlargement.",
+        "Authored activation is7; runtime timing owner must consciously align recipient activation to existing skill hit contract rather than claim source alone validates timing."
+      ],
+      "next": "Only prototype via already validated calm per-recipient geometry; explicit correct formal targets. Check each recipient and HUD on phone."
+    },
+    {
+      "id": "dodgeSkill",
+      "candidate": "tools/vfx-commercial-sample/assets/full/dodge-recipient-v1.webp",
+      "classification": "SOURCE_PASS_USB_CANDIDATE",
+      "identity": "Green curved wind ribbons and leaves maintain evasive wind buff. Hollow U leaves character center open; it is neither a damaging tornado nor a generic heal lotus.",
+      "activation": "Largest aura6 (mass18729); clear small white activation star7 (15400).8-12 unwind into strokes/leaves, final515 (~2.7% peak). Brightness peak and activation marker are not identical and need not be rejected for that alone.",
+      "risks": [
+        "Shape becomes horizontal at peak; verify actual character width and that ribbons stay off name/Lv strip.",
+        "Check final strokes contract smoothly without baseline jump; persistent windwalk must remain untouched."
+      ],
+      "next": "USB after calm recipient geometry passes; preserve formal allyAll and select only actual beneficiaries."
+    },
+    {
+      "id": "rockWall",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rock-wall-recipient-v1.webp",
+      "classification": "SOURCE_PASS_USB_CANDIDATE",
+      "identity": "One pair of angular brown rock pillars with amber cracks preserves protective rock-wall identity. Open central gap is deliberate and sufficient. Not over-simplified into generic dust or shield ball.",
+      "activation": "Pillars grow2-6, frame7 golden activation between them,8 relaxes;9-12 sink/disassemble into small rock nubs. Mass30448 peak7 to737 at12 (~2.4%).",
+      "risks": [
+        "Two tall pillars can still cover recipient side silhouette if wrong fitted scale; verify actual flanking rather than inward empty-space placement.",
+        "Cast center star is brief, but confirm no face/name/HP obstruction."
+      ],
+      "next": "USB after calm recipient geometry passes. Do not alter approved persistent rockWall or compensate with global recenter/enlarge."
+    },
+    {
+      "id": "stormRain",
+      "candidate": "tools/vfx-commercial-sample/assets/full/storm-rain-recipient-v1.webp",
+      "classification": "SOURCE_PASS_USB_CANDIDATE",
+      "identity": "One green funnel, winding cutting ribbons and leaves preserve original storm-rain-cast-v2 tornado identity; three authored funnels are replaced by one reusable recipient motif without changing formal all-target semantics.",
+      "activation": "Frame7 base contact star,8 recoil,9-12 wind taper into leaves. Mass29564 peak7 to955 final (~3.2%).",
+      "risks": [
+        "Recipient runtime must explicitly retain all formal targets; one-funnel source is not permission to narrow targets.",
+        "Inspect actual peak height/opacity and actor/HUD clearance on phone."
+      ],
+      "next": "Reuse only after calm explicit per-recipient geometry USB gate passes, then independently validate stormRain phone presentation."
+    }
+  ],
+  "overcorrection": "No source-level overcorrection demonstrated in these four candidates. Preserve them and stop additional source generation unless actual phone evidence reveals a specific failure.",
+  "runtimeOrPhoneChangesMade": false
+}

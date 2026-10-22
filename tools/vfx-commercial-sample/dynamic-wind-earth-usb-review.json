@@ -1,0 +1,153 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "head": "7cdebfb2d9bd2a2fcf98b22e4ab559be94e362a9",
+  "evidence": "artifacts/vfx-freeze-relic-final-usb/skill-video.json",
+  "framesRoot": "artifacts/vfx-freeze-relic-final-usb/sequence-frames",
+  "method": "Independent viewing of original-size 12 fps decoded frames, using at/hit/duration and visible labels. Each assigned skill checked at start/middle, adjacent impact frames and tail. No phone operation or runtime/test edits.",
+  "scope": "Eight assigned skills; static review already passed. Only concrete dynamic jump/crop/identity/alignment/HUD/over-shrink regressions assessed.",
+  "rows": [
+    {
+      "id": "earthShield",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        481,
+        486,
+        491,
+        492,
+        497,
+        501
+      ],
+      "observation": "Small gold-brown protective rim gathers around the caster lower body, stays at the same recipient and fades in place. Shield ring remains identifiable; face and HP remain readable. Warm orange highlight resembles fire at peak but is a source color preference, not a new sequence regression.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 491
+    },
+    {
+      "id": "flyingSandStrike",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        508,
+        513,
+        519,
+        520,
+        525,
+        529
+      ],
+      "observation": "Broad sand-and-rock spiral changes into multiple ground eruptions across the same battlefield region, then disperses. Adjacent519/520 preserve spatial region during topology change; no emitter relocation or hard viewport cut. Central portrait briefly obscured at impact, HP bars retained. Existing large area silhouette retained; no further enlargement recommended.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 519
+    },
+    {
+      "id": "stealthSkill",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        536,
+        541,
+        546,
+        547,
+        552,
+        555
+      ],
+      "observation": "Cyan-green transparent envelope forms around caster, breaks into thin arcs and dissolves locally. Adjacent546/547 show expected dissolution, no position jump. Portrait remains visible; effect does not swallow neighbors or hide HP.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 541
+    },
+    {
+      "id": "stoneBreakSky",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        562,
+        566,
+        571,
+        572,
+        578,
+        581
+      ],
+      "observation": "Concentrated rock mass becomes vertical ground strike and fragmented shock at the same enemy. Adjacent571/572 retain the impact anchor while rock silhouette breaks apart; localized peak portrait coverage is expected. Tail fades, HP remains readable.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 572
+    },
+    {
+      "id": "stoneSlash",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        590,
+        593,
+        596,
+        597,
+        600,
+        603
+      ],
+      "observation": "Rock energy resolves into a diagonal slash, then short local rock burst and fade. Adjacent596/597 retain burst center during alpha reduction. No visible border clipping, recipient drift or excessive shrinking; HP remains readable.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 596
+    },
+    {
+      "id": "stormFist",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        608,
+        612,
+        615,
+        616,
+        620,
+        623
+      ],
+      "observation": "Wind spiral becomes a recognizable fist and local burst; adjacent615/616 change into a circular wind tail without translating to another unit. Strong impact briefly covers target portrait, HP stays above it; tail clears.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 615
+    },
+    {
+      "id": "windCrossSlash",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        630,
+        634,
+        639,
+        640,
+        646,
+        650
+      ],
+      "observation": "Two curved wind blades resolve into a bright X at recipient, then X fades locally. Adjacent639/640 keep center stable. X extends behind HUD but text and red HP are still readable; no viewport clip or undersized identity.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 639
+    },
+    {
+      "id": "windHowlLightning",
+      "result": "PASS_DYNAMIC_SAMPLE",
+      "frames": [
+        656,
+        660,
+        665,
+        666,
+        672,
+        677
+      ],
+      "observation": "Wind cone and blue lightning converge into a compact radiant strike then fade at recipient. Adjacent665/666 retain center and identity through impact. No visible crop, adjacent-recipient obstruction or persistent tail; HP remains readable.",
+      "remaining": 0,
+      "hitHud": 6,
+      "battleActive": true,
+      "peakFrame": 666
+    }
+  ],
+  "decision": "No new blocking dynamic defect observed in assigned eight samples. Preserve accepted sources and geometry; stop additional art refinement for these items.",
+  "limitations": [
+    "12 fps sampling cannot certify every display frame or FPS performance.",
+    "QA selection border and browser/label overlays are fixture UI.",
+    "Results apply to captured formation and cast sample, not exhaustive every side/recipient topology validation.",
+    "A bright impact may briefly cover its intended portrait; no requirement that every effect retain a perfectly centered white point."
+  ]
+}

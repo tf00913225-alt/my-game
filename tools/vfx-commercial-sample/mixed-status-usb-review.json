@@ -1,0 +1,126 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewer": "timing_review independent commercial visual gate",
+  "workspaceHead": "d4f91a7c9a26a93d874aa6869d023fb0885bc3b0",
+  "captureHead": "not recorded in mixed-status.json",
+  "gate": "PASS",
+  "gateScope": "Four captured mixed-status static presentation samples",
+  "evidence": "artifacts/vfx-merged-smoke-usb/mixed-status.json",
+  "method": "Viewed all four original full-phone PNGs directly with view_image; no screenshot processing and no phone operations.",
+  "observations": [
+    {
+      "image": "artifacts/vfx-merged-smoke-usb/mixed-status-0.png",
+      "gate": "PASS",
+      "detail": "六單位冰牢內另有暖色環，角色頭臉受硬控冰牢遮蔽符合既定完整包覆規格；外框不跨鄰位，姓名/等級/HP與五個狀態圖示清楚分開。"
+    },
+    {
+      "image": "artifacts/vfx-merged-smoke-usb/mixed-status-1.png",
+      "gate": "PASS",
+      "detail": "冰牢與淡色護體同時存在，沒有合成全排大霧；玩家角色原有藍/紅/金輪廓仍部分可辨，敵方姓名及血條可辨，無溢出遮鄰位。"
+    },
+    {
+      "image": "artifacts/vfx-merged-smoke-usb/mixed-status-2.png",
+      "gate": "PASS",
+      "detail": "金色符環與冰牢疊合雖較密，範圍仍限制在單位主體；沒有蓋到名稱或HP，六個獨立位置保持，未見整隊合成大球。"
+    },
+    {
+      "image": "artifacts/vfx-merged-smoke-usb/mixed-status-3.png",
+      "gate": "PASS",
+      "detail": "金色外環較淡，主體外接範圍受控；五個圖示與姓名/血條仍可讀，未見輪替後重複累積成更多body或跨槽殘影。"
+    }
+  ],
+  "counts": [
+    {
+      "image": 0,
+      "body": 12,
+      "icons": 30,
+      "detachedHudCount": 0,
+      "reportedBodyTypes": [
+        "freeze",
+        "dodgeSkill",
+        "freeze",
+        "dodgeSkill",
+        "freeze",
+        "dodgeSkill",
+        "freeze",
+        "dodgeSkill",
+        "freeze",
+        "dodgeSkill",
+        "freeze",
+        "dodgeSkill"
+      ]
+    },
+    {
+      "image": 1,
+      "body": 12,
+      "icons": 30,
+      "detachedHudCount": 0,
+      "reportedBodyTypes": [
+        "freeze",
+        "shield",
+        "freeze",
+        "shield",
+        "freeze",
+        "shield",
+        "freeze",
+        "shield",
+        "freeze",
+        "shield",
+        "freeze",
+        "shield"
+      ]
+    },
+    {
+      "image": 2,
+      "body": 12,
+      "icons": 30,
+      "detachedHudCount": 0,
+      "reportedBodyTypes": [
+        "freeze",
+        "rockWall",
+        "freeze",
+        "rockWall",
+        "freeze",
+        "rockWall",
+        "freeze",
+        "rockWall",
+        "freeze",
+        "rockWall",
+        "freeze",
+        "rockWall"
+      ]
+    },
+    {
+      "image": 3,
+      "body": 12,
+      "icons": 30,
+      "detachedHudCount": 0,
+      "reportedBodyTypes": [
+        "freeze",
+        "yuanZuBlessing",
+        "freeze",
+        "yuanZuBlessing",
+        "freeze",
+        "yuanZuBlessing",
+        "freeze",
+        "yuanZuBlessing",
+        "freeze",
+        "yuanZuBlessing",
+        "freeze",
+        "yuanZuBlessing"
+      ]
+    }
+  ],
+  "decision": "No new player-visible blocker demonstrated by these four mixed-status stills. Retain accepted hard-control coverage; do not reduce all effects to transparency or reopen previously accepted sources.",
+  "priorEvidence": {
+    "statusStatic": "21 statuses static PASS on both sides at recorded status gate",
+    "pulseSampled": "Eight pulse cycles sampled PASS on direct FFmpeg frames",
+    "owner": "tools/vfx-commercial-sample/status-commercial-gate-20261020.json"
+  },
+  "limits": [
+    "Not a performance timing run; four stills cannot certify smooth rotation, frame pacing, cleanup or endurance.",
+    "All four samples retain freeze, so this does not visually sample every possible pair among 17 configured statuses or independently revalidate each secondary identity.",
+    "mixed-status.json hud:0 denotes no cast-induced detached HUD in this persistent-status fixture; the original formal card names/HP are visibly present and readable. It is not evidence of a missing HUD.",
+    "Current workspace SHA is not substituted for absent capture SHA."
+  ]
+}

@@ -18,12 +18,12 @@ function lexicalFactory(enabled,io={bucketName:'private-fake-test-bucket'},artif
     let source=readFileSync(filename,'utf8');
     const needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(source.split(needle).length,2);
-    source=source.replace(needle,'return Object.freeze({pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
+    source=source.replace(needle,'return Object.freeze({registerPrivateReadbackOwnership,verifySegmentedRawRecoveryProof,readbackOwnershipTestValue:input=>privateReadbackOwnership.has(input),assemblePinnedRawArchive,publicationMaterialTestValue:identity=>publicationValue(publicationMaterials,identity),publicationArtifactTestValue:identity=>publicationValue(publicationArtifacts,identity),publicationPreparationTestValue:identity=>publicationValue(publicationPreparations,identity),pinRawCapture,loadPinnedRawMaterial,verifyPinnedSegmentedProof,pinCandidatePublication,loadPinnedRawCapture,assemblePinnedCandidate,prepareCandidatePublication,restoreCurrent,verifyRecoveryAuditArtifact');
     if(enabled){
         source=source.replace('return buildRecoveryOwner(deps,null,false);','return buildRecoveryOwner(deps,require("test-only-immutable-candidate-io"),false);');
         const native=compiled.require.bind(compiled);compiled.require=name=>name==='test-only-immutable-candidate-io'?io:native(name);
     }
-    source=source.replace('return Object.freeze({pinRawCapture,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,pinRawCapture,');
+    source=source.replace('return Object.freeze({registerPrivateReadbackOwnership,','return Object.freeze({publishCapturedCandidate,publishPreparedCandidate,ackCandidatePublication,registerPrivateReadbackOwnership,');
     if(artifactHelper){const native=compiled.require.bind(compiled);compiled.require=name=>name==='./recovery-audit-artifact'?artifactHelper:native(name);}
     compiled._compile(source,filename);return compiled.exports.createCanonicalCurrentRecovery;
 }
@@ -38,7 +38,7 @@ function sdkDb(db){
         get:()=>db.runTransaction(tx=>tx.get(row))});
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path)),runTransaction:operation=>db.runTransaction(operation)};
 }
-async function fixture(io,artifactHelper){
+async function fixture(io,artifactHelper,beforeAudit,namespaceVersion=2){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);
     let authTime=Math.floor(h.clock/1000),session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,session}});
@@ -50,8 +50,10 @@ async function fixture(io,artifactHelper){
     await forest.issueTicket(request(),{operationId:ticketId,expectedRevision:2,triggerEntryId:'forest:0',availableEntryIds:['forest:0']});
     await forest.settleMember(request(),{operationId:'immutable-forest-member-001',expectedRevision:h.revision,ticketId,memberIndex:0});
     await forest.settleTerminal(request(),{operationId:'immutable-forest-win-00001',expectedRevision:h.revision,ticketId,kind:'win'});
+    if(beforeAudit)await beforeAudit(h,{deps,request});
     const approvalOperationId='immutable-operator-approval';
-    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision:h.revision,ttlSeconds:60}});
+    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision:h.revision,ttlSeconds:60,
+        ...(namespaceVersion===3?{canonicalRevision:h.data.get(h.root+'/account/current').serverRevision}:{})}});
     const original=createCanonicalCurrentRecovery(deps);
     await original.beginAudit(request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId});
     await original.prepareInventory(request(),{...args,operationId:'immutable-inventory-prepare'});
@@ -378,4 +380,292 @@ test('private pinned proof final SDK retry rechecks binding and rollback cannot 
     f.h.abortNext();await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/rollback/);
     assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);
     await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/original private/);
+});
+async function rawPreparedFixture(artifactHelper,hero=false){
+    const io=fakeStorage(),f=await fixture(io,artifactHelper,hero?async(h,{deps,request})=>{
+        const acquisition=require('../functions/src/hero-acquisition').createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1});
+        await acquisition.observeLogin({...request(),data:{...request().data,expectedRevision:h.revision}});
+        await acquisition.ensureChapterTicket({...request(),data:{...request().data,expectedRevision:h.revision}});
+    }:undefined,hero?3:2);
+    io.outside=()=>assert.equal(f.transactionDepth,0);
+    const owner=artifactHelper?lexicalFactory(true,io,artifactHelper)(f.deps):f.private;
+    const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin);
+    const identity=await owner.assemblePinnedRawArchive(pin,material);
+    const prepared=await owner.prepareCandidatePublication(f.request(),pin,identity);
+    return {...f,private:owner,io,pin,material,identity,prepared};
+}
+test('raw publication uses one loader/proof/encoding/cut token and a separate original fullread token; v2 stays exact',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),tokens=[];
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{const token=helper.createRecoveryAuditAssemblyBudget();tokens.push(token);return token;}};
+    const f=await rawPreparedFixture(wrapped),manifest=f.h.data.get(f.root+'/candidatePublications/'+operationId);
+    assert.equal(tokens.length,1);assert.equal(manifest.schemaVersion,2);assert.equal(manifest.candidateEncodingVersion,3);
+    assert.equal(manifest.artifactKind,'canonical-recovery-raw-archive');assert.equal(manifest.proofKind,'segmented-original-rights-v1');
+    assert.equal(helper.recoveryAuditAssemblyUsage(tokens[0]).passes,2);
+    assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.candidateProofValid,false);
+    assert.equal(f.private.publicationArtifactTestValue(f.identity).summary.segmentedProofValid,true);
+    const prepareUsage=helper.recoveryAuditAssemblyUsage(tokens[0]);
+    const original=copy([...f.h.data]),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    t.diagnostic(JSON.stringify({wireBytes:manifest.artifactByteLength,preparation:prepareUsage,fullread:helper.recoveryAuditAssemblyUsage(tokens[1]),scope:"Node fakeStorage; excludes total provider heap and end-to-end real SDK/GCS timing"}));
+    assert.equal(tokens.length,2);assert.notEqual(tokens[0],tokens[1]);assert.equal(helper.recoveryAuditAssemblyUsage(tokens[1]).passes,2);
+    for(const trace of f.traces.filter(row=>row.points))assert.deepEqual(trace,{points:13,queries:0,writes:trace.writes});
+    const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[key],false);
+    assert.equal(result.generation,'9007199254740993');assert.equal(f.io.objects.size,1);
+    assert.equal((await f.private.publishCapturedCandidate(f.request(),args)).unchanged,true);
+    const v2=await preparedFixture(),row=copy(v2.h.data.get(v2.root+'/candidatePublications/'+operationId));
+    assert.equal(row.schemaVersion,1);assert.equal(row.candidateEncodingVersion,2);assert.equal(Object.hasOwn(row,'proofKind'),false);
+    const bytes=copy(v2.private.publicationArtifactTestValue(v2.ready.artifact).bytes);
+    await v2.private.publishCapturedCandidate(v2.request(),args);
+    assert.deepEqual(v2.private.publicationArtifactTestValue(v2.ready.artifact).bytes,bytes);
+    const after=v2.h.data.get(v2.root+'/candidatePublications/'+operationId),{generation,objectSize,ackAt,...unchanged}=after;
+    assert.deepEqual(unchanged,{...row,status:'acknowledged'});assert.equal(objectSize,bytes.length);assert(generation);assert(ackAt);
+    assert.deepEqual(original.filter(([path])=>!path.includes('/candidatePublications/')),copy([...f.h.data]).filter(([path])=>!path.includes('/candidatePublications/')));
+});
+
+test('Hero raw-v4 publication closes mixed original Forest and Hero sources with dual cuts and separate original readback budget',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),tokens=[];
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{const token=helper.createRecoveryAuditAssemblyBudget();tokens.push(token);return token;}};
+    const f=await rawPreparedFixture(wrapped,true),manifest=f.h.data.get(f.root+'/candidatePublications/'+operationId);
+    assert.equal(manifest.schemaVersion,3);assert.equal(manifest.candidateEncodingVersion,4);
+    assert.equal(manifest.namespaceVersion,3);assert.equal(manifest.canonicalRevision,4);assert.equal(manifest.sourceRevision,6);
+    assert.equal(manifest.proofKind,'segmented-original-rights-v2');
+    assert.equal(tokens.length,1);assert.equal(helper.recoveryAuditAssemblyUsage(tokens[0]).passes,2);
+    const before=copy([...f.h.data]),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal(tokens.length,2);assert.notEqual(tokens[0],tokens[1]);
+    assert.equal(helper.recoveryAuditAssemblyUsage(tokens[1]).passes,2);
+    const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[key],false);
+    assert.equal(result.generation,'9007199254740993');assert.equal(f.io.objects.size,1);
+    for(const trace of f.traces.filter(row=>row.points))assert.deepEqual(trace,{points:14,queries:0,writes:trace.writes});
+    assert.deepEqual(before.filter(([path])=>!path.includes('/candidatePublications/')),
+        copy([...f.h.data]).filter(([path])=>!path.includes('/candidatePublications/')));
+    t.diagnostic(JSON.stringify({scope:'Node fakeStorage only',wireBytes:manifest.artifactByteLength,
+        preparation:helper.recoveryAuditAssemblyUsage(tokens[0]),fullread:helper.recoveryAuditAssemblyUsage(tokens[1])}));
+});
+
+test('Hero raw-v4 lost ACK requires a fresh fullread and incompatible versions refuse before provider IO',async()=>{
+    const f=await rawPreparedFixture(undefined,true),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    const native=f.h.dependencies.db.runTransaction,lost=Error('Hero lost ACK response');let once=true;
+    f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);if(once){once=false;throw lost;}return result;};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),error=>error===lost);
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/original unconsumed exact/);
+    const fresh=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,fresh)).unchanged,true);
+    assert.equal(f.io.calls.filter(row=>row[0]==='create').length,1);
+    assert.equal(f.io.calls.filter(row=>row[0]==='read').length,2);
+    for(const patch of [{candidateEncodingVersion:3},{schemaVersion:2},{namespaceVersion:2},{canonicalRevision:5},
+        {proofKind:'segmented-original-rights-v1'}]){
+        const g=await rawPreparedFixture(undefined,true),path=g.root+'/candidatePublications/'+operationId;
+        Object.assign(g.h.data.get(path),patch);
+        const calls=g.io.calls.length,before=copy([...g.h.data]),writes=g.h.writes;
+        await assert.rejects(g.private.publishPreparedCandidate(g.request(),g.prepared));
+        assert.equal(g.io.calls.length,calls);assert.equal(g.h.writes,writes);assert.deepEqual([...g.h.data],before);
+    }
+});
+test('raw publication refuses cross-version manifests and never reinterprets old candidate bytes as raw proof',async()=>{
+    for(const mutate of [row=>row.candidateEncodingVersion=2,row=>row.proofKind='candidate-proof',row=>row.artifactKind='candidate',row=>row.schemaVersion=1]){
+        const f=await rawPreparedFixture(),path=f.root+'/candidatePublications/'+operationId;mutate(f.h.data.get(path));
+        const before=copy([...f.h.data]),calls=f.io.calls.length,writes=f.h.writes;
+        await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared),/version|encoding|proof|manifest/i);
+        await assert.rejects(f.private.publishCapturedCandidate(f.request(),args));
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.io.calls.length,calls);
+    }
+});
+test('raw fullread refuses canonically resealed missing chunks; preparation rejects self-consistent captured economic corruption',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),hash=bytes=>require('node:crypto').createHash('sha256').update(bytes).digest('hex');
+    const f=await rawPreparedFixture(),artifact=f.private.publicationArtifactTestValue(f.identity);
+    const material=helper.decodeRawRecoveryArchive(artifact.bytes,helper.createRecoveryAuditAssemblyBudget());material.rawChunks.pop();
+    // Stronger test-only adversary reseals container/manifest/private tuple;
+    // original complete capture/source proof must still refuse.
+    const bytes=helper.encodeRawRecoveryArchive(material,helper.createRecoveryAuditAssemblyBudget()),prepared=f.private.publicationPreparationTestValue(f.prepared);
+    artifact.bytes=bytes;prepared.tuple.artifactSha256=hash(bytes);prepared.tuple.artifactByteLength=bytes.length;
+    Object.assign(f.h.data.get(f.root+'/candidatePublications/'+operationId),{artifactSha256:hash(bytes),artifactByteLength:bytes.length});
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    await assert.rejects(f.private.publishPreparedCandidate(f.request(),f.prepared));
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    // The real capture writers seal all inventory/version/hash relationships
+    // around a corrupt retained ledger. Integrity alone grants no authority.
+    const bad=await fixture(fakeStorage(),undefined,h=>{
+        const path=[...h.data.keys()].find(path=>path.startsWith(h.root+'/ledgerEntries/'));h.data.get(path).kind='shop-purchase';
+    });
+    const pin=await bad.private.pinCandidatePublication(bad.request(),args),loaded=await bad.private.loadPinnedRawCapture(pin);
+    const badBefore=copy([...bad.h.data]),badWrites=bad.h.writes;
+    await assert.rejects(bad.private.assemblePinnedRawArchive(pin,loaded),/Embedded Forest mode receipt or ledger binding differs/);
+    assert.deepEqual([...bad.h.data],badBefore);assert.equal(bad.h.writes,badWrites);
+});
+test('raw preparation sticky resource/cut drift refuses without manifest; old material never refreshes its token',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');let token;
+    const io=fakeStorage(),f=await fixture(io),owner=lexicalFactory(true,io,{...helper,createRecoveryAuditAssemblyBudget:()=>token=helper.createRecoveryAuditAssemblyBudget()})(f.deps);
+    const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin);
+    helper.chargeRecoveryAuditAssembly(token,'bytes',256*1024*1024);
+    await assert.rejects(owner.assemblePinnedRawArchive(pin,material),/bytes budget exceeded/);
+    await assert.rejects(owner.assemblePinnedRawArchive(pin,material),/original private/);
+    assert.equal(f.h.data.has(f.root+'/candidatePublications/'+operationId),false);assert.equal(io.calls.length,0);
+    const g=await fixture(fakeStorage()),p=await g.private.pinCandidatePublication(g.request(),args),m=await g.private.loadPinnedRawCapture(p);
+    const a=await g.private.assemblePinnedRawArchive(p,m);g.h.data.get(g.root+'/proofState/current').stateSha256='e'.repeat(64);
+    const writes=g.h.writes;await assert.rejects(g.private.prepareCandidatePublication(g.request(),p,a));assert.equal(g.h.writes,writes);
+});
+test('raw ACK lost response requires fresh original fullread; expiry takeover and cancel retain final live gates',async()=>{
+    const f=await rawPreparedFixture(),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared),native=f.h.dependencies.db.runTransaction;
+    f.h.dependencies.db.runTransaction=async operation=>{await native(operation);throw Error('raw lost ACK response');};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/raw lost ACK response/);
+    f.h.dependencies.db.runTransaction=native;const before=f.traces.length;
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/unconsumed/);assert.equal(f.traces.length,before);
+    const refreshed=await f.private.publishPreparedCandidate(f.request(),f.prepared);assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,refreshed)).unchanged,true);
+    for(const mutate of [g=>g.h.advance(60000),g=>g.takeover(),g=>g.original.cancelAudit(g.request(),{auditId,expectedEpoch:1,operationId:'raw-publication-cancel-audit'})]){
+        const g=await rawPreparedFixture(),ready=await g.private.publishPreparedCandidate(g.request(),g.prepared);await mutate(g);
+        const writes=g.h.writes,calls=g.io.calls.length;
+        await assert.rejects(g.private.ackCandidatePublication(g.request(),g.prepared,ready));
+        await assert.rejects(g.private.publishPreparedCandidate(g.request(),g.prepared));
+        assert.equal(g.h.writes,writes);assert.equal(g.io.calls.length,calls);
+    }
+});
+test('raw publication deadlines include preparation resolution and awaited fullread without minting reusable proof',async()=>{
+    for(const phase of ['prepare-resolve','fullread-await']){
+        const clock={now:0},helper=clockedArtifact(clock),io=fakeStorage(),f=await fixture(io),owner=lexicalFactory(true,io,helper)(f.deps);
+        const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin),artifact=await owner.assemblePinnedRawArchive(pin,material);
+        if(phase==='prepare-resolve'){
+            const native=f.h.dependencies.db.runTransaction;f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);clock.now=30001;return result;};
+            await assert.rejects(owner.prepareCandidatePublication(f.request(),pin,artifact),/deadline exceeded/);
+            assert.equal(io.calls.length,0,'No private prepared identity escaped the late transaction resolution');
+        }else{
+            const prepared=await owner.prepareCandidatePublication(f.request(),pin,artifact),read=io.readExact;
+            io.readExact=async input=>{const result=await read(input);clock.now=30001;return result;};
+            const writes=f.h.writes;await assert.rejects(owner.publishPreparedCandidate(f.request(),prepared),/deadline exceeded/);
+            assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');assert.equal(f.h.writes,writes);
+        }
+    }
+});
+
+function rawDecoderProbe(onParse=()=>{}){
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const native=compiled.require.bind(compiled);let parses=0;
+    compiled.require=name=>name==='test-only-json'?{parse:(...args)=>{parses++;onParse();return JSON.parse(...args);},stringify:JSON.stringify}:native(name);
+    compiled._compile('const JSON=require("test-only-json");\n'+readFileSync(filename,'utf8'),filename);
+    return {helper:compiled.exports,parses:()=>parses};
+}
+test('raw expected manifest hash is charged on the decoder private snapshot before parsing; original two-argument path stays exact',async()=>{
+    const f=await rawPreparedFixture(),bytes=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const helper=require('../functions/src/recovery-audit-artifact'),hash=require('node:crypto').createHash;
+    const sha=value=>hash('sha256').update(value).digest('hex');
+    const oldToken=helper.createRecoveryAuditAssemblyBudget(),newToken=helper.createRecoveryAuditAssemblyBudget();
+    const original=helper.decodeRawRecoveryArchive(bytes,oldToken),verified=helper.decodeRawRecoveryArchive(bytes,newToken,sha(bytes));
+    assert.deepEqual(verified,original);
+    const oldUsage=helper.recoveryAuditAssemblyUsage(oldToken),newUsage=helper.recoveryAuditAssemblyUsage(newToken);
+    for(const key of ['nodes','operations','passes','reservedBytes'])assert.equal(newUsage[key],oldUsage[key]);
+    assert.equal(newUsage.bytes,oldUsage.bytes+bytes.length);
+    const probe=rawDecoderProbe();
+    for(const expected of ['0'.repeat(64),null,true,{},sha(bytes)+'\n']){
+        assert.throws(()=>probe.helper.decodeRawRecoveryArchive(bytes,probe.helper.createRecoveryAuditAssemblyBudget(),expected),/expected hash/);
+        assert.equal(probe.parses(),0);
+    }
+    const malformed=Buffer.from(bytes);malformed[10]=0x7e;
+    const errors=[];
+    for(const expected of [undefined,sha(malformed)])try{helper.decodeRawRecoveryArchive(malformed,helper.createRecoveryAuditAssemblyBudget(),expected);}
+    catch(error){errors.push([error.code,error.message]);}
+    assert.equal(errors.length,2);assert.deepEqual(errors[0],errors[1]);
+    const external=Buffer.from(bytes);let mutate=false;
+    const mutation=rawDecoderProbe(()=>{if(mutate)external.fill(0);});
+    const baseline=mutation.helper.decodeRawRecoveryArchive(bytes,mutation.helper.createRecoveryAuditAssemblyBudget());
+    mutate=true;
+    assert.deepEqual(mutation.helper.decodeRawRecoveryArchive(external,mutation.helper.createRecoveryAuditAssemblyBudget(),sha(bytes)),baseline);
+    assert(mutation.parses()>0);assert(external.every(byte=>byte===0));
+});
+test('raw publication snapshots through the fixed transport contract and mismatched exact bytes cannot parse, prove or ACK',async()=>{
+    const f=await rawPreparedFixture(),artifact=f.private.publicationArtifactTestValue(f.identity),originalBytes=Buffer.from(artifact.bytes);
+    const create=f.io.createOnly;
+    f.io.createOnly=async input=>{
+        assert.equal(input.bytes,artifact.bytes,'raw owner delegates its original private bytes to the fixed synchronous-copy transport');
+        const pending=create(input);artifact.bytes.fill(0);return pending;
+    };
+    const proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.deepEqual([...f.io.objects.values()][0].bytes,originalBytes);
+    await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    const probe=rawDecoderProbe(),bad=await rawPreparedFixture(probe.helper),reads=bad.io.readExact;
+    bad.io.readExact=async input=>{const response=await reads(input);response.bytes[12]^=1;return response;};
+    const before=copy([...bad.h.data]),writes=bad.h.writes,parses=probe.parses();
+    await assert.rejects(bad.private.publishPreparedCandidate(bad.request(),bad.prepared),/expected hash differs/);
+    assert.equal(probe.parses(),parses,'manifest mismatch is refused before parsing or complete proof');
+    assert.deepEqual([...bad.h.data],before);assert.equal(bad.h.writes,writes);
+    assert.equal(bad.h.data.get(bad.root+'/candidatePublications/'+operationId).status,'prepared');
+});
+
+test('private readback ownership saves only the second chunk copy and is exact-input/token single-use',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await rawPreparedFixture(),wire=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    const a=helper.createRecoveryAuditAssemblyBudget(),b=helper.createRecoveryAuditAssemblyBudget();
+    const original=helper.decodeRawRecoveryArchive(wire,a),owned=helper.decodeRawRecoveryArchive(wire,b);
+    const ordinary=await f.private.verifySegmentedRawRecoveryProof(original,a);
+    f.private.registerPrivateReadbackOwnership(owned,b);
+    assert.equal(f.private.readbackOwnershipTestValue(owned),true);
+    const borrowed=await f.private.verifySegmentedRawRecoveryProof(owned,b);
+    assert.equal(f.private.readbackOwnershipTestValue(owned),false);
+    const p=ordinary.residentUsage.privateChunkBytes;
+    assert(p>0);assert.equal(ordinary.residentUsage.copyChargedBytes,p);assert.equal(borrowed.residentUsage.copyChargedBytes,0);
+    for(const [key,value] of Object.entries(ordinary.residentUsage))if(key!=='copyChargedBytes')assert.equal(borrowed.residentUsage[key],value,key);
+    assert.equal(borrowed.assemblyUsage.bytes,ordinary.assemblyUsage.bytes-p);
+    assert.equal(borrowed.assemblyUsage.nodes,ordinary.assemblyUsage.nodes+1);
+    assert.equal(borrowed.assemblyUsage.operations,ordinary.assemblyUsage.operations+2,'brand set/get/delete3 versus ordinary lookup1');
+    assert.equal(borrowed.assemblyUsage.reservedBytes,0);assert.equal(ordinary.assemblyUsage.reservedBytes,0);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(owned,b),/already reserved/,'the original one-reservation-per-token gate remains');
+    assert.equal((await f.private.verifySegmentedRawRecoveryProof(owned,helper.createRecoveryAuditAssemblyBudget())).residentUsage.copyChargedBytes,p,'consumed input uses the original copy path on a fresh verification');
+    const c=helper.createRecoveryAuditAssemblyBudget(),wrong=helper.createRecoveryAuditAssemblyBudget(),input=helper.decodeRawRecoveryArchive(wire,c);
+    f.private.registerPrivateReadbackOwnership(input,c);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(input,wrong),/ownership differs/);
+    assert.equal(f.private.readbackOwnershipTestValue(input),false);
+    assert.equal((await f.private.verifySegmentedRawRecoveryProof(input,c)).residentUsage.copyChargedBytes,p);
+    const d=helper.createRecoveryAuditAssemblyBudget(),bad=helper.decodeRawRecoveryArchive(wire,d);bad.binding={...bad.binding,epoch:bad.binding.epoch+1};
+    f.private.registerPrivateReadbackOwnership(bad,d);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(bad,d));
+    assert.equal(f.private.readbackOwnershipTestValue(bad),false,'early source failure consumes memory ownership');
+    for(const mutate of [x=>{x.rawChunks[0].extra=true;},x=>{x.rawChunks[0].row.payloadBytes=Buffer.alloc(0);},
+        x=>{x.rawChunks[0].row.payloadBytes=Buffer.alloc(256*1024+1);},x=>{x.rawChunks[0].row.payloadBytes='not-bytes';}]){
+        const budget=helper.createRecoveryAuditAssemblyBudget(),invalid=helper.decodeRawRecoveryArchive(wire,budget);mutate(invalid);
+        f.private.registerPrivateReadbackOwnership(invalid,budget);
+        await assert.rejects(f.private.verifySegmentedRawRecoveryProof(invalid,budget));
+        assert.equal(f.private.readbackOwnershipTestValue(invalid),false,'borrowing never skips entry or Buffer bounds');
+    }
+    const sticky=helper.createRecoveryAuditAssemblyBudget(),expired=helper.decodeRawRecoveryArchive(wire,sticky);
+    f.private.registerPrivateReadbackOwnership(expired,sticky);
+    assert.throws(()=>helper.chargeRecoveryAuditAssembly(sticky,'bytes',256*1024*1024),/bytes budget/);
+    await assert.rejects(f.private.verifySegmentedRawRecoveryProof(expired,sticky),/bytes budget/);
+    assert.equal(f.private.readbackOwnershipTestValue(expired),false,'a preexisting sticky failure still consumes before throwing');
+    assert.equal(borrowed.segmentedProofValid,true);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(borrowed[key],false);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+});
+test('unbranded source copy isolation and private decoded readback isolation survive late external mutation',async()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await rawPreparedFixture(),wire=f.private.publicationArtifactTestValue(f.identity).bytes;
+    const token=helper.createRecoveryAuditAssemblyBudget(),input=helper.decodeRawRecoveryArchive(wire,token);
+    const before=copy([...f.h.data]),writes=f.h.writes,pending=f.private.verifySegmentedRawRecoveryProof(input,token);
+    queueMicrotask(()=>input.rawChunks[0].row.payloadBytes.fill(0));
+    const result=await pending;assert(result.residentUsage.copyChargedBytes>0);assert(input.rawChunks[0].row.payloadBytes.every(byte=>byte===0));
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    let external,scheduled=false;
+    const probe=rawDecoderProbe(()=>{if(external&&!scheduled){scheduled=true;queueMicrotask(()=>external.fill(0));}}),g=await rawPreparedFixture(probe.helper);
+    const read=g.io.readExact;g.io.readExact=async args=>{const response=await read(args);external=response.bytes;return response;};
+    const proof=await g.private.publishPreparedCandidate(g.request(),g.prepared);
+    assert(scheduled);assert(external.every(byte=>byte===0));
+    assert.equal((await g.private.ackCandidatePublication(g.request(),g.prepared,proof)).status,'acknowledged');
+    let rejectedInput;
+    const invalid={...helper,decodeRawRecoveryArchive:(...args)=>{rejectedInput=helper.decodeRawRecoveryArchive(...args);rejectedInput.binding={...rejectedInput.binding,sourceRevision:rejectedInput.binding.sourceRevision+1};return rejectedInput;}};
+    const badFixture=await rawPreparedFixture(invalid),badBefore=copy([...badFixture.h.data]),badWrites=badFixture.h.writes;
+    await assert.rejects(badFixture.private.publishPreparedCandidate(badFixture.request(),badFixture.prepared),/binding differs/);
+    assert.equal(badFixture.private.readbackOwnershipTestValue(rejectedInput),false,'tuple rejection cannot register memory ownership');
+    assert.deepEqual([...badFixture.h.data],badBefore);assert.equal(badFixture.h.writes,badWrites);
+});
+
+test('raw metadata lookup deadline expires before any create or exact-read side effect',async()=>{
+    const clock={now:0},helper=clockedArtifact(clock),f=await rawPreparedFixture(helper);
+    let release,enter;const pending=new Promise(resolve=>{release=resolve;}),entered=new Promise(resolve=>{enter=resolve;});
+    f.io.lookupMetadata=async()=>{enter();await pending;return null;};
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    const publishing=f.private.publishPreparedCandidate(f.request(),f.prepared);
+    await Promise.race([entered,publishing.then(()=>assert.fail('metadata lookup was not awaited'))]);
+    clock.now=30001;release();
+    await assert.rejects(publishing,/deadline exceeded/);
+    assert.equal(f.io.calls.filter(([kind])=>kind==='create'||kind==='read').length,0);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.equal(f.h.data.get(f.root+'/candidatePublications/'+operationId).status,'prepared');
 });

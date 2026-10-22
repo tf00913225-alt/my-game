@@ -115,6 +115,11 @@
         const indexes=activeEnemyIndexes();
         const snapshot=activeEnemySnapshot(indexes);
         if(!snapshot){ return; }
+        // Presentation consumes this canonical profile while preparing the HUD.
+        // Publish before the first card, including initial entry/profile changes.
+        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
+        const page=document.getElementById("battlePage");
+        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
 
         const cards=new Map();
         indexes.forEach(index=>{
@@ -164,9 +169,6 @@
         area.dataset.geometryOwner="fixed-slot";
         area.dataset.monsterCount=String(indexes.length);
         area.dataset.formationType=String(snapshot.originalFormationType||indexes.length);
-        area.dataset.battlefieldProfile=snapshot.battlefieldProfile;
-        const page=document.getElementById("battlePage");
-        if(page){ page.dataset.enemyBattlefieldProfile=snapshot.battlefieldProfile; }
         area.dataset.migrationStatus=snapshot.migrationStatus;
         area.classList.toggle("gameplay-boss-active",!!bossCard);
     }
@@ -367,7 +369,10 @@
                 "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
             };
         }
-        const hudRects=hudNodes
+        const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
+        const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
+        const statusBadgeRect=badgeRect&&badgeRect.width>0&&badgeRect.height>0?badgeRect:null;
+        const hudRects=hudNodes.filter(node=>node!==statusBadge)
             .map(node=>typeof node.getBoundingClientRect==="function"?plainRect(node.getBoundingClientRect()):null)
             .filter(rect=>rect&&rect.width>0&&rect.height>0);
         const hudTop=hudRects.length?Math.min(...hudRects.map(rect=>rect.top)):unitRect.bottom;
@@ -392,7 +397,9 @@
         // projection and reserve feedback below it; allies retain bottom HUDs.
         if(hud.dataset?.anchor==="top"){
             feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,hudBottom+8));
-            feedbackBottom=unitRect.bottom-6;
+            feedbackBottom=Math.min(unitRect.bottom-6,statusBadgeRect?statusBadgeRect.top-4:unitRect.bottom-6);
+            feedbackBottom=Math.max(unitRect.top+6,feedbackBottom);
+            feedbackTop=Math.min(feedbackTop,feedbackBottom);
         }
         const feedbackSafeRect={
             left:unitRect.left+4,top:feedbackTop,right:unitRect.right-4,bottom:feedbackBottom,
@@ -411,7 +418,7 @@
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
-            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,
+            unitRect:unitRect,portraitRect:portraitRect,hpRect:hpRect,spRect:spRect,artworkProjection:artworkProjection,hpProjection:hpProjection,spProjection:spProjection,hudSafeRect:hudSafeRect,statusBadgeRect:statusBadgeRect,
             feedbackSafeRect:feedbackSafeRect,
             center:{x:unitRect.left+unitRect.width/2,y:unitRect.top+unitRect.height/2},
             feedbackAnchor:{

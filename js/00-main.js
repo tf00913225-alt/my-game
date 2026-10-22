@@ -4079,6 +4079,10 @@ const battleRoundEndObservers=new Set();
 const battleActionFinishInterceptors=[];
 let battleRoundBoundaryKeys=new Set();
 const battlePresentationLocks=new Set();
+const battleInputGuideHolds=new Set();
+function isBattleInputGuideHeld(token){
+    return Array.from(battleInputGuideHolds).some(hold=>hold.token===token);
+}
 let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
@@ -4237,6 +4241,17 @@ if(typeof window!=="undefined"){
             return window.FourSymbolsBattleFlow.acquirePresentationLock("pause:"+String(owner||"battle-flow"));
         },
         isPaused(){ return battlePresentationLocks.size>0; },
+        acquireInputGuideHold(owner){
+            if(!battleActive){ return function(){}; }
+            const hold={owner:String(owner||"input-guide"),token:battleToken};
+            battleInputGuideHolds.add(hold);
+            let active=true;
+            return function(){
+                if(!active){ return; }
+                active=false;
+                battleInputGuideHolds.delete(hold);
+            };
+        },
         isAutoBattle(){ return !!autoBattle; },
         isBattleActive(){ return !!battleActive; },
         interceptActionFinish(interceptor){
@@ -4996,10 +5011,9 @@ function getPartyCharacterKey(index){
 
 
 function getPartyAutoConfig(index){
-    if(index>=3&&index<6){ return {...HERO_BASIC_ATTACK_CONFIG}; }
-    if(index===1){ return autoConfig2; }
-    if(index===2){ return autoConfig3; }
-    return autoConfig;
+    const config=index>=3&&index<6?HERO_BASIC_ATTACK_CONFIG:index===1?autoConfig2:index===2?autoConfig3:autoConfig;
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){ return {...config,enabled:false}; }
+    return index>=3&&index<6?{...config}:config;
 }
 
 
@@ -11016,6 +11030,7 @@ function startBattle(triggerIndex){
     clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
+    battleInputGuideHolds.clear();
     battleInputResumeToken=null;
     battleResolutionResumeToken=null;
     battleAutoActionResume=null;
@@ -11724,6 +11739,9 @@ function beginCharacterTurn(token){
             }
 
 
+            // Guide the real declaration controls without hiding their HUD
+            // or suspending action resolution through a presentation lock.
+            if(isBattleInputGuideHeld(token)){ return; }
             timer--;
 
             updateTimer();
@@ -20191,6 +20209,7 @@ function applyPotionEffect(potionId,characterIndex,targetAlly){
 ===================================================== */
 
 function toggleAutoBattle(){
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){return;}
 
     /*
        ★ 修正（依照使用者要求，讓巡邏頁面的
@@ -22707,12 +22726,14 @@ function ensureBattleStatusDetailModal(){
         '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
             '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
             '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-portrait" role="img"></div>'+
             '<div class="battle-status-detail-core">'+
                 '<span data-field="element"></span>'+
                 '<span data-field="name"></span>'+
                 '<span data-field="level"></span>'+
                 '<span data-field="hp"></span>'+
                 '<span data-field="sp"></span>'+
+                '<span data-field="agility"></span>'+
             '</div>'+
             '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
             '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
@@ -22778,6 +22799,14 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const portrait=modal.querySelector('.battle-status-detail-portrait');
+    const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
+    const artwork=card&&card.querySelector('.v174-battle-art');
+    const source=artwork&&artwork.style.backgroundImage;
+    portrait.style.backgroundImage=source&&source!=='none'?source:'none';
+    portrait.textContent=source&&source!=='none'?'':'◇';
+    portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
+    const agility=isMonster?getMonsterAgility(entity):stats?Number(stats.agility):NaN;
     const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
     const maxSP=isMonster?entity.maxSP:
@@ -22790,7 +22819,8 @@ function openBattleStatusDetailModal(side,index){
         name:"名稱："+String(entity.name||entity.id||"角色"),
         level:"等級：Lv."+String(entity.level),
         hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
-        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
+        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP),
+        agility:"敏捷："+(Number.isFinite(agility)?Math.round(agility*100)/100:'—')
     };
     Object.keys(fields).forEach(key=>{
         const node=modal.querySelector('[data-field="'+key+'"]');
@@ -22800,6 +22830,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    modal.querySelector('.battle-status-detail-panel').scrollTop=0;
     syncBattleUiPriorityLayer();
     return true;
 }
@@ -30263,11 +30294,10 @@ function removeEquippedSkill(index){
     }
 
 
-    character.equippedSkills
-        .splice(
-            index,
-            1
-        );
+    const nextEquippedSkills=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .removeEquippedSkill(character.equippedSkills,index);
+    character.equippedSkills.splice(0,character.equippedSkills.length,...nextEquippedSkills);
 
 
     renderSkillLoadout();
@@ -31809,20 +31839,9 @@ function populateAutoSkillOptions(){
        修正：把"defend"也視為合法值。
     */
 
-    const stillValid =
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig.skill=
-            "normal";
-
-    }
+    autoConfig.skill=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .syncPrimaryAction(autoConfig,character).skill;
 
 
     if(homeSelect){

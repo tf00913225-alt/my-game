@@ -743,6 +743,11 @@
     }
 
     function syncElementBoxForBattle(options){
+        if(window.v132ActiveDungeonRun?.tutorial){
+            elementBoxActive=false;
+            elementBoxLastTick=Date.now();
+            return false;
+        }
         const silent=!!(options && options.silent);
         if(hasAnyAutoBattleEnabled() && elementBoxState.remainingMs<=0){
             stopElementBoxWhenTimeEnds(
@@ -943,6 +948,7 @@
     if(typeof toggleAutoBattle==="function"){
         const originalToggleAutoBattle=toggleAutoBattle;
         toggleAutoBattle=function(){
+            if(window.v132ActiveDungeonRun?.tutorial){return false;}
             const isTurningOn=!autoBattle;
             if(isTurningOn && elementBoxState.remainingMs<=0){
                 alert("元素匣目前沒有可用時數，請先觀看廣告取得8小時時數。");

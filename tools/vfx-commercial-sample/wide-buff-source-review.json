@@ -1,0 +1,75 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "reviewDate": "2026-10-20",
+  "scope": "Only three buff CAST source candidates; persistent status assets and previously passed status presentation are excluded and must remain unchanged.",
+  "qualityClaim": "Source eligibility for focused USB only; not phone or commercial acceptance. No prior non-battle HUD video result is used.",
+  "technical": {
+    "dimensions": [
+      2172,
+      724
+    ],
+    "grid": [
+      4,
+      3
+    ],
+    "cellAspect": 2.25,
+    "fullRgbaEqualityToSelectedMotherAll": true,
+    "all36FrameAlpha8EdgesZero": true,
+    "all36FrameAlpha64EdgesZero": true,
+    "maxEdgeAlpha": 1,
+    "method": "Independently decoded each WebP and generation.selectedMother PNG using Pillow/NumPy and compared all RGBA pixels. Frame boundaries use rounded fractional 724/3 row coordinates; four-edge alpha and mass measured.",
+    "heightNote": "Fractional atlas row height requires current source-row stepping; do not crop/resize source to force divisibility."
+  },
+  "reviews": [
+    {
+      "id": "rage",
+      "formalTarget": "allyTri",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rage-wide-v1.webp",
+      "original": "assets/vfx/fire/rage-cast-v2.webp",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "identity": "Orange rising fire ribbon, thin ground ring and upward activation arrow preserve rage amplification. Three distinct beneficiary sites; source is visibly a buff rather than a damaging fire-blade barrage. Less arrow clutter than original peak, without loss of upward-power identity.",
+      "sequence": "Builds to frame8 strongest arrow/glow, then narrower and dimmer9-12. Peak alpha mass46900, final4883. End remains small rings/flames; verify runtime fade clears them.",
+      "phoneChecks": [
+        "Highest glow is a fairly filled orange envelope: confirm faces and player HP/name remain readable at actual fitted size.",
+        "Compare red portrait off/on so cast remains detectable without further source enlargement.",
+        "Check frame8-to9 baseline change and release transition for visual jump.",
+        "Do not reuse this cast as persistent rage body or change passed status opacity/position."
+      ]
+    },
+    {
+      "id": "dodgeSkill",
+      "formalTarget": "allyAll",
+      "candidate": "tools/vfx-commercial-sample/assets/full/dodgeSkill-wide-v1.webp",
+      "original": "assets/vfx/wind/dodge-skill-cast.png",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "identity": "Three mint-green wind streams, leaves and low elliptical rings retain evasive wind-flow identity. Lower short ribbons distinguish from upright damaging tornadoes and healing lotus.",
+      "sequence": "Frame7 has concentrated ring activation glints;8-12 unwind and fade. Peak mass20211 at7, final3009. Three sites stay horizontally distinct.",
+      "phoneChecks": [
+        "Check ring glints convey activation at7 without obscuring beneficiaries.",
+        "Check row2-to3 contraction does not cause perceived floor hop.",
+        "Verify small fitted streams remain distinguishable from persistent windwalk state; do not alter passed persistent state."
+      ]
+    },
+    {
+      "id": "rockWall",
+      "formalTarget": "allyTri",
+      "candidate": "tools/vfx-commercial-sample/assets/full/rockWall-wide-v1.webp",
+      "original": "assets/vfx/earth/rock-wall-cast.png",
+      "classification": "SOURCE_CANDIDATE_USB_ALLOWED",
+      "identity": "Three paired jagged stone guards and golden defensive cracks retain rock-wall protection. Open central gaps replace previous enclosing tall rock domes; enough hard stone silhouette remains to identify earth defense, so smaller height is not by itself identity failure.",
+      "sequence": "Grows short protective fins through7, dims/sinks toward localized rubble9-12. Peak mass34657 at7, final5813. No defensive ball is assigned to enemy cast.",
+      "phoneChecks": [
+        "Verify paired guards flank actual allied beneficiaries instead of empty floor.",
+        "Ensure peak gold haze does not join into a full-row opaque slab or cover HUD.",
+        "Check sinking tail reads as natural cast release rather than flicker; persistent rockWall continues under existing approved status owner."
+      ]
+    }
+  ],
+  "counts": {
+    "reviewed": 3,
+    "usbEligible": 3,
+    "rejected": 0
+  },
+  "next": "Retain these source candidates and run focused in-battle phone presentation gate. Stop discretionary source refinement absent concrete phone failures; do not change geometry/fit/targets or approved persistent states to accommodate source.",
+  "runtimeOrPhoneChangesMade": false
+}

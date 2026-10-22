@@ -59,6 +59,12 @@ function syncUnitArtwork(card,kind,selectedRecord){
     art.style.backgroundImage=source||"none";
     let action=art.querySelector(":scope > .v174-action-motion");
     if(!action){action=document.createElement("div");action.className="v174-action-motion";art.appendChild(action);}
+    // One stationary manual-turn marker shares the formal art frame. CSS uses
+    // the existing active-turn state; no second selection or coordinate owner.
+    if(kind==="player"&&!art.querySelector(":scope > .v174-manual-turn-arrow")){
+        const arrow=document.createElement("span");arrow.className="v174-manual-turn-arrow";
+        arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
+    }
     let paint=action.querySelector(":scope > .v174-portrait-paint");
     if(record?.generic){if(paint)paint.remove();paint=null;}
     else if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}
@@ -206,9 +212,21 @@ function prepareUnitHud(card,side){
         hud.v174Card=card;
         card.v174UnitHud=hud;
         card.appendChild(hud);
+        if(side==="monster")hud.addEventListener("click",event=>{
+            const band=event.target?.closest?.('.monster-status-badges');
+            if(event.defaultPrevented||!band||!hud.contains(band)||card.contains(hud)||!card.isConnected)return;
+            // Detached HUDs preserve the original Core card target/detail click.
+            // In-card badges bubble normally; the gesture Owner suppresses drags.
+            event.stopPropagation();card.click();
+        });
     }
     card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
+    if(side==="monster")hud.dataset.enemyProfile=card.closest('#battlePage')?.dataset.enemyBattlefieldProfile||"";
+    if(side==="monster"){
+        const badges=hud.querySelector('.monster-status-badges');
+        if(badges)badges.dataset.scrollOwner="x";
+    }
     hud.dataset.anchor=side==="monster"?"top":"bottom";
     syncIdentity(card,side);
     return hud;
@@ -223,12 +241,15 @@ function clearUnitHud(side){
             for(const property of ["left","top","width","height","transform","opacity","visibility"]){ hud.style.removeProperty(property); }
         }else{ if(card){ card.v174UnitHud=null; } hud.remove(); }
     });
-    if(!hudLayer.children.length){ hudLayer.remove(); hudLayer=null; }
+    if(!hudLayer.children.length){
+        window.FourSymbolsGestureArbiter?.unregisterSurface?.(hudLayer);
+        hudLayer.remove();hudLayer=null;
+    }
 }
 function syncHud(){
     const page=document.getElementById("battlePage");
     if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()||document.body.classList.contains("v174-battle-reading-open")||
-       !document.querySelector(".v143-hit-feedback-overlay")){ clearUnitHud(); return; }
+       !document.querySelector(".v143-hit-feedback-overlay,.v143-skill-stage")){ clearUnitHud(); return; }
     const geometry=window.FourSymbolsBattlefieldRenderGeometry;
     if(!geometry){ return; }
     if(hudLayer){
@@ -245,6 +266,7 @@ function syncHud(){
             hudLayer=document.createElement("div");
             hudLayer.className="v174-battle-hud-layer";
             document.body.appendChild(hudLayer);
+            window.FourSymbolsGestureArbiter?.registerSurface?.(hudLayer);
         }
         hudLayer.appendChild(hud);
         hud.style.visibility="visible";

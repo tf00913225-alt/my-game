@@ -88,12 +88,16 @@ test('shield and barrier retain current-only labels and unrounded shield geometr
 });
 
 test('enemy details share projection while player details and player resource state stay unchanged',()=>{
-  const fields=new Map(['element','name','hp','sp'].map(key=>[key,{textContent:''}]));
-  const modal={querySelector:s=>fields.get(s.match(/data-field="(.*?)"/)?.[1])||null,setAttribute(){}};
+  const fields=new Map(['element','name','level','hp','sp','agility'].map(key=>[key,{textContent:''}]));
+  const portrait={style:{},textContent:'',setAttribute(){}};
+  const panel={scrollTop:120};
+  const modal={querySelector:s=>s==='.battle-status-detail-portrait'?portrait:s==='.battle-status-detail-panel'?panel:fields.get(s.match(/data-field="(.*?)"/)?.[1])||null,setAttribute(){}};
   c.ensureBattleStatusDetailModal=()=>modal;c.isBattleStatusInspectionBlocked=()=>false;
   c.renderBattleStatusDetailList=()=>{};c.syncBattleUiPriorityLayer=()=>{};
   set('{name:"QA",hp:66.666666,maxHP:100.25,sp:37.25,maxSP:100.75,alive:true,statusEffects:[],activeBuffs:[]}');
   run('openBattleStatusDetailModal("monster",0)');
+  assert.equal(portrait.style.backgroundImage,'none');
+  assert.equal(panel.scrollTop,0);
   assert.equal(fields.get('hp').textContent,'HP：66 / 100');
   assert.equal(fields.get('sp').textContent,'SP：37 / 100');
   run('monsters[0].maxHP=0;monsters[0].maxSP=0');

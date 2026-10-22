@@ -96,9 +96,9 @@ assert.match(index,/<section class="battle-enemy-region"[\s\S]*id="battleMonster
 const centerMarkup=index.slice(index.indexOf('<section class="battle-center-region"'),index.indexOf('<section class="battle-ally-region"'));
 assert.doesNotMatch(centerMarkup,/id="battleInfo"/,"the bottom battle log must not be owned by the middle controls");
 assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"legacy space-filler must not own battle layout");
-assert.match(layoutCss,/--battle-enemy-region-track:42fr/);
-assert.match(layoutCss,/--battle-center-region-track:21fr/);
-assert.match(layoutCss,/--battle-ally-region-track:37fr/);
+assert.match(layoutCss,/--battle-enemy-region-track:54\.785fr/);
+assert.match(layoutCss,/--battle-center-region-track:12fr/);
+assert.match(layoutCss,/--battle-ally-region-track:45\.215fr/);
 assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/);
 assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not consume a structural grid track");
 assert.match(layoutCss,/grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/,"enemy slots remain equal width");
@@ -172,6 +172,11 @@ assert.doesNotMatch(feedbackCss,/0 0 (?:7|8|10|14|16)px|rgba\([^)]*(?:255,32,32|
     "canonical battle feedback must not use coloured neon glow");
 assert.match(relicCss,/body\.team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130!important;\}/,
     "formal relic VFX remains above the viewport cinematic presentation");
+const relicHudCss=fs.readFileSync("css/fixed-slot-battlefield-rendering-v2.css","utf8");
+assert.match(relicHudCss,/body\.team-relic-cinematic-active > \.v174-battle-hud-layer > \.v174-unit-hud\[data-relic-target-focus="true"\]\{z-index:18135;\}/,
+    "only actual recipient HUDs stay above relic VFX without shrinking artwork");
+assert.doesNotMatch(relicHudCss,/body\.team-relic-cinematic-active > \.v174-battle-hud-layer\{z-index:18135;\}/,
+    "non-recipient HUDs must remain below the cinematic dim");
 
 const relicPresentation=relicRuntime.slice(
     relicRuntime.indexOf("const RELIC_VFX_PRESENTATION=Object.freeze({"),
