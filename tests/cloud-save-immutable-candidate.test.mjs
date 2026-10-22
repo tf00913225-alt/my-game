@@ -38,7 +38,7 @@ function sdkDb(db){
         get:()=>db.runTransaction(tx=>tx.get(row))});
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path)),runTransaction:operation=>db.runTransaction(operation)};
 }
-async function fixture(io,artifactHelper,beforeAudit){
+async function fixture(io,artifactHelper,beforeAudit,namespaceVersion=2){
     const h=storeHarness({optimisticTransactions:true}),sessions=createSessionAuthority(h.dependencies);
     let authTime=Math.floor(h.clock/1000),session=await sessions.create({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid}});
     const request=()=>({auth:{uid:h.uid,token:{auth_time:authTime}},data:{uid:h.uid,session}});
@@ -50,9 +50,10 @@ async function fixture(io,artifactHelper,beforeAudit){
     await forest.issueTicket(request(),{operationId:ticketId,expectedRevision:2,triggerEntryId:'forest:0',availableEntryIds:['forest:0']});
     await forest.settleMember(request(),{operationId:'immutable-forest-member-001',expectedRevision:h.revision,ticketId,memberIndex:0});
     await forest.settleTerminal(request(),{operationId:'immutable-forest-win-00001',expectedRevision:h.revision,ticketId,kind:'win'});
-    if(beforeAudit)await beforeAudit(h);
+    if(beforeAudit)await beforeAudit(h,{deps,request});
     const approvalOperationId='immutable-operator-approval';
-    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision:h.revision,ttlSeconds:60}});
+    await createCanonicalRecoveryApproval(deps).issue({auth:{uid:'operator',token:{cloudSaveOperator:true}},data:{ownerUid:h.uid,operationId:approvalOperationId,sourceRevision:h.revision,ttlSeconds:60,
+        ...(namespaceVersion===3?{canonicalRevision:h.data.get(h.root+'/account/current').serverRevision}:{})}});
     const original=createCanonicalCurrentRecovery(deps);
     await original.beginAudit(request(),{operationId:auditId,expectedRevision:h.revision,approvalOperationId});
     await original.prepareInventory(request(),{...args,operationId:'immutable-inventory-prepare'});
@@ -380,8 +381,12 @@ test('private pinned proof final SDK retry rechecks binding and rollback cannot 
     assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);
     await assert.rejects(f.proof.verifyPinnedSegmentedProof(f.request(),ready.pin,ready.material),/original private/);
 });
-async function rawPreparedFixture(artifactHelper){
-    const io=fakeStorage(),f=await fixture(io,artifactHelper);
+async function rawPreparedFixture(artifactHelper,hero=false){
+    const io=fakeStorage(),f=await fixture(io,artifactHelper,hero?async(h,{deps,request})=>{
+        const acquisition=require('../functions/src/hero-acquisition').createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1});
+        await acquisition.observeLogin({...request(),data:{...request().data,expectedRevision:h.revision}});
+        await acquisition.ensureChapterTicket({...request(),data:{...request().data,expectedRevision:h.revision}});
+    }:undefined,hero?3:2);
     io.outside=()=>assert.equal(f.transactionDepth,0);
     const owner=artifactHelper?lexicalFactory(true,io,artifactHelper)(f.deps):f.private;
     const pin=await owner.pinCandidatePublication(f.request(),args),material=await owner.loadPinnedRawCapture(pin);
@@ -415,6 +420,47 @@ test('raw publication uses one loader/proof/encoding/cut token and a separate or
     const after=v2.h.data.get(v2.root+'/candidatePublications/'+operationId),{generation,objectSize,ackAt,...unchanged}=after;
     assert.deepEqual(unchanged,{...row,status:'acknowledged'});assert.equal(objectSize,bytes.length);assert(generation);assert(ackAt);
     assert.deepEqual(original.filter(([path])=>!path.includes('/candidatePublications/')),copy([...f.h.data]).filter(([path])=>!path.includes('/candidatePublications/')));
+});
+
+test('Hero raw-v4 publication closes mixed original Forest and Hero sources with dual cuts and separate original readback budget',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),tokens=[];
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{const token=helper.createRecoveryAuditAssemblyBudget();tokens.push(token);return token;}};
+    const f=await rawPreparedFixture(wrapped,true),manifest=f.h.data.get(f.root+'/candidatePublications/'+operationId);
+    assert.equal(manifest.schemaVersion,3);assert.equal(manifest.candidateEncodingVersion,4);
+    assert.equal(manifest.namespaceVersion,3);assert.equal(manifest.canonicalRevision,4);assert.equal(manifest.sourceRevision,6);
+    assert.equal(manifest.proofKind,'segmented-original-rights-v2');
+    assert.equal(tokens.length,1);assert.equal(helper.recoveryAuditAssemblyUsage(tokens[0]).passes,2);
+    const before=copy([...f.h.data]),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal(tokens.length,2);assert.notEqual(tokens[0],tokens[1]);
+    assert.equal(helper.recoveryAuditAssemblyUsage(tokens[1]).passes,2);
+    const result=await f.private.ackCandidatePublication(f.request(),f.prepared,proof);
+    for(const key of ['candidateProofValid','trustedCaptureVerified','restoreAuthorized','authoritativeStateReady'])assert.equal(result[key],false);
+    assert.equal(result.generation,'9007199254740993');assert.equal(f.io.objects.size,1);
+    for(const trace of f.traces.filter(row=>row.points))assert.deepEqual(trace,{points:14,queries:0,writes:trace.writes});
+    assert.deepEqual(before.filter(([path])=>!path.includes('/candidatePublications/')),
+        copy([...f.h.data]).filter(([path])=>!path.includes('/candidatePublications/')));
+    t.diagnostic(JSON.stringify({scope:'Node fakeStorage only',wireBytes:manifest.artifactByteLength,
+        preparation:helper.recoveryAuditAssemblyUsage(tokens[0]),fullread:helper.recoveryAuditAssemblyUsage(tokens[1])}));
+});
+
+test('Hero raw-v4 lost ACK requires a fresh fullread and incompatible versions refuse before provider IO',async()=>{
+    const f=await rawPreparedFixture(undefined,true),proof=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    const native=f.h.dependencies.db.runTransaction,lost=Error('Hero lost ACK response');let once=true;
+    f.h.dependencies.db.runTransaction=async callback=>{const result=await native(callback);if(once){once=false;throw lost;}return result;};
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),error=>error===lost);
+    await assert.rejects(f.private.ackCandidatePublication(f.request(),f.prepared,proof),/original unconsumed exact/);
+    const fresh=await f.private.publishPreparedCandidate(f.request(),f.prepared);
+    assert.equal((await f.private.ackCandidatePublication(f.request(),f.prepared,fresh)).unchanged,true);
+    assert.equal(f.io.calls.filter(row=>row[0]==='create').length,1);
+    assert.equal(f.io.calls.filter(row=>row[0]==='read').length,2);
+    for(const patch of [{candidateEncodingVersion:3},{schemaVersion:2},{namespaceVersion:2},{canonicalRevision:5},
+        {proofKind:'segmented-original-rights-v1'}]){
+        const g=await rawPreparedFixture(undefined,true),path=g.root+'/candidatePublications/'+operationId;
+        Object.assign(g.h.data.get(path),patch);
+        const calls=g.io.calls.length,before=copy([...g.h.data]),writes=g.h.writes;
+        await assert.rejects(g.private.publishPreparedCandidate(g.request(),g.prepared));
+        assert.equal(g.io.calls.length,calls);assert.equal(g.h.writes,writes);assert.deepEqual([...g.h.data],before);
+    }
 });
 test('raw publication refuses cross-version manifests and never reinterprets old candidate bytes as raw proof',async()=>{
     for(const mutate of [row=>row.candidateEncodingVersion=2,row=>row.proofKind='candidate-proof',row=>row.artifactKind='candidate',row=>row.schemaVersion=1]){

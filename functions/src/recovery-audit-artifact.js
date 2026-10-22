@@ -12,6 +12,7 @@ const NAMES=Object.freeze(["account","characters","economy","inventory","equipme
     "uniqueClaims","grantOperations","ledgerEntries","pendingGrants","rewardEvents","operations",
     "simulatedAdSources","modeTimeEvents","modeTime","patrol","patrolTickets","patrolTicketStates",
     "patrolSettlements","patrolClosures","recoveryApprovals","recoveryAudits"]);
+const HERO_NAMES=Object.freeze(["heroAcquisition","heroAcquisitionHistory","heroChapter","heroChapterTickets","heroChapterSteps"]);
 const bad=message=>{throw Error(`Invalid recovery audit artifact: ${message}`);};
 const ASSEMBLY_LIMITS=Object.freeze({bytes:256*1024*1024,nodes:16000000,operations:16384,passes:64,milliseconds:30000});
 const assemblyBudgets=new WeakMap();
@@ -91,8 +92,8 @@ async function drainAndCloseRecoveryAuditLookups(view){
 const compareNames=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
 const INVENTORY_LIMITS=Object.freeze({rows:16,payloadBytes:128*1024});
 function recoveryAuditNamespaces(uid,version=2){
-    if(typeof uid!=="string"||!uid||uid.includes("/")||![1,2].includes(version))bad("namespace identity");
-    const names=version===2?[...NAMES,"recoveryAuditFence","recoveryAuditRuns"]:NAMES;
+    if(typeof uid!=="string"||!uid||uid.includes("/")||![1,2,3].includes(version))bad("namespace identity");
+    const names=version===1?NAMES:[...NAMES,"recoveryAuditFence","recoveryAuditRuns",...(version===3?HERO_NAMES:[])];
     return Object.freeze([...names.map(name=>`serverUsers/${uid}/${name}`),`users/${uid}/saves`]);
 }
 const exact=(value,keys)=>{
@@ -357,7 +358,8 @@ function prepareRecoveryAuditCandidateEncoding({uid,expectedRevision,auditContro
 }
 // Fixed original query surface shared by strict readonly verification modes.
 // No caller-supplied query evaluator or data-loader contract.
-function recoveryAuditQueryShapes(root){
+function recoveryAuditQueryShapes(root,namespaceVersion=2){
+    if(![2,3].includes(namespaceVersion))bad("query namespace version");
     const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
     const queries=[],add=(query,name,filter=()=>true,maximum=Infinity,order=null)=>queries.push({query,name,filter,maximum,order});
     for(const name of ["characters","inventory","equipment","relics","claimRecords"])add(root.collection(name),name);
@@ -372,6 +374,12 @@ function recoveryAuditQueryShapes(root){
     for(const name of ["operations","ledgerEntries"])
         add(root.collection(name).where("kind","==","account-mode-time").limit(1),name,row=>row.kind==="account-mode-time",1);
     add(root.collection("modeTimeEvents").orderBy("sequence","desc").limit(2),"modeTimeEvents",row=>Object.hasOwn(row,"sequence"),2,"sequence");
+    if(namespaceVersion===3){
+        add(root.collection("heroAcquisitionHistory").limit(8),"heroAcquisitionHistory",()=>true,8);
+        for(const name of ["operations","ledgerEntries"])
+            add(root.collection(name).where("kind","==","hero-login-observation").limit(8),name,row=>row.kind==="hero-login-observation",8);
+        add(root.collection("heroChapterTickets").orderBy("serverRevision","desc").limit(1),"heroChapterTickets",()=>true,1,"serverRevision");
+    }
     return queries;
 }
 // Version3 is a syntax-only container for the original raw material. It does
@@ -498,11 +506,19 @@ function rawArchiveTypedEncode(row,token){
     };
     check(row,0);return encodedValue(row,0,{nodes:0},token);
 }
+function rawArchiveBindingVersion(binding,version){
+    exact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256",
+        ...(version===4?["canonicalRevision","namespaceVersion"]:[])]);
+    if(version===4&&(binding.namespaceVersion!==3||!Number.isSafeInteger(binding.canonicalRevision)||
+       binding.canonicalRevision<2||!Number.isSafeInteger(binding.sourceRevision)||binding.canonicalRevision>binding.sourceRevision))
+        bad("raw archive revision or namespace version");
+}
 function encodeRawRecoveryArchive(material,token){
     rawArchiveBudget(token);assemblyCharge(token,"passes",1);
     exact(material,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"]);
     rawArchiveObject(material);rawArchiveObject(material.binding);
-    exact(material.binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"]);
+    const version=Object.hasOwn(material.binding,"namespaceVersion")?4:3;
+    rawArchiveBindingVersion(material.binding,version);
     const plan=[];let size=MAGIC.length,payloadByteLength=0,base64Work=0,jsonWork=0,idWork=0,outerNodes=0;
     const add=(frame,payloadBytes)=>{
         const metric=rawArchiveJSONMetrics(frame,token),base64Length=payloadBytes?4*Math.ceil(payloadBytes.length/3):0,length=metric.length+base64Length;
@@ -511,7 +527,7 @@ function encodeRawRecoveryArchive(material,token){
         if((outerNodes+=metric.nodes)>LIMITS.nodes)bad("parsed node or depth limit");
         plan.push({frame,payloadBytes,length});size+=length+4;jsonWork+=length;base64Work+=base64Length;
     };
-    add({type:"header",schemaVersion:3,kind:"canonical-recovery-raw-archive",binding:rawArchiveTypedEncode(material.binding,token)});
+    add({type:"header",schemaVersion:version,kind:"canonical-recovery-raw-archive",binding:rawArchiveTypedEncode(material.binding,token)});
     for(const name of RAW_CONTROL_NAMES){rawArchiveObject(material[name]);add({type:"control",name,data:rawArchiveTypedEncode(material[name],token)});}
     for(const [key,type,maximum,leafMaximum] of RAW_GROUPS){
         const entries=material[key];if(!Array.isArray(entries)||entries.length>maximum)bad("raw archive entry count");let previous=null;
@@ -551,9 +567,9 @@ function decodeRawRecoveryArchive(input,token,expectedSha256){
     const {frames,bytes}=readRecoveryFrames(input,token,true,expectedSha256);
     if(frames.length<5)bad("raw archive header/footer");
     const header=frames[0],footer=frames.at(-1);
-    if(header.type!=="header"||header.schemaVersion!==3||header.kind!=="canonical-recovery-raw-archive")bad("raw archive version");
+    if(header.type!=="header"||![3,4].includes(header.schemaVersion)||header.kind!=="canonical-recovery-raw-archive")bad("raw archive version");
     if(footer.type!=="footer"||footer.frameCount!==frames.length)bad("raw archive footer");
-    const binding=rawArchiveTyped(header.binding,token);rawArchiveObject(binding);exact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"]);
+    const binding=rawArchiveTyped(header.binding,token);rawArchiveObject(binding);rawArchiveBindingVersion(binding,header.schemaVersion);
     const material={binding};let index=1,payloadByteLength=0;
     for(const name of RAW_CONTROL_NAMES){const frame=frames[index++];
         if(frame?.type!=="control"||frame.name!==name)bad("raw archive control order");material[name]=rawArchiveTyped(frame.data,token);rawArchiveObject(material[name]);}
