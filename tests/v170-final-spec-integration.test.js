@@ -236,7 +236,7 @@ function makeContext(){
         MutationObserver:EmptyObserver,ResizeObserver:EmptyObserver,
         HTMLElement:function(){},Node:function(){},Event:EmptyEvent,CustomEvent:EmptyEvent,
         Image:function(){ return dummy; },Audio:function(){ return dummy; },
-        FileReader:function(){ return dummy; },Blob:function(){},URL:{createObjectURL:()=>"",revokeObjectURL:noop},
+        FileReader:function(){ return dummy; },Blob:function(){},URL:Object.assign(class extends URL {},{createObjectURL:()=>"",revokeObjectURL:noop}),
         fetch:async()=>({ok:true,json:async()=>({}),text:async()=>""}),
         alert:noop,confirm:()=>true,prompt:()=>null,
         performance:{now:()=>0},crypto:{randomUUID:()=>"v170-test-id-"+(++equipmentUidSequence)},
@@ -348,6 +348,7 @@ test("the baseline and the real index/js20 runtime order are pinned",()=>{
 test("all formal runtimes execute once in production order",()=>{
     const runtime=loadFinalRuntime();
     assert.deepEqual(runtime.loaded,EXPECTED_DIRECT_SCRIPT_PATHS.concat(EXPECTED_RUNTIME_PATHS));
+    assert.equal(vm.runInContext("new URL('assets/dungeons/abyss/maps/floor-1.png','https://qa.invalid/game/').href",runtime.context),"https://qa.invalid/game/assets/dungeons/abyss/maps/floor-1.png");
 });
 
 test("new Lv1 characters start with two skill points while level-up remains plus two",()=>{
