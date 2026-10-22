@@ -412,12 +412,33 @@ async function runProductionAdventureBalanceQa(){
       }finally{Math.random=oldRandom;showMonsterSkillNameBadge=badge;rollStatusEffectHit=statusRoll;autoBattle=false;autoConfig.enabled=false;}
     })()`;
     const server=await startServer({baseUrl});const file=path.join(process.cwd(),'artifacts/browser-qa/adventure-balance.json');fs.mkdirSync(path.dirname(file),{recursive:true});const results=[];let client,proc,profile;
-    const close=()=>{client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}};
+    let diagnosticGroup=null;
+    const close=()=>{
+        client?.close();client=null;
+        if(diagnosticGroup!==null){
+            const cleanup={groupId:diagnosticGroup,signal:'SIGKILL',signalSent:false,exitConfirmed:false};
+            try{process.kill(-diagnosticGroup,'SIGKILL');cleanup.signalSent=true;}catch(error){if(error.code==='ESRCH')cleanup.exitConfirmed=true;else cleanup.errorCode=error.code||'UNKNOWN';}
+            if(!cleanup.exitConfirmed)try{process.kill(-diagnosticGroup,0);}catch(error){if(error.code==='ESRCH')cleanup.exitConfirmed=true;else cleanup.probeErrorCode=error.code||'UNKNOWN';}
+            diagnosticGroup=null;
+            try{fs.writeFileSync(file.replace('.json','-first-chrome-cleanup.json'),JSON.stringify(cleanup,null,2)+'\n');}catch(error){console.error('Diagnostic cleanup record unavailable:',error.code||'UNKNOWN');}
+        }else proc?.kill('SIGTERM');
+        proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}
+    };
     try{
         for(const [width,height] of [[390,844],[412,915]]){
             profile=fs.mkdtempSync(path.join(os.tmpdir(),'adventure-balance-'));const port=await reservePort();
             const chrome=findChrome();let launchError='';
-            proc=spawn(chrome,['--headless=new','--no-sandbox','--remote-allow-origins=*','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','pipe'],windowsHide:true});
+            const chromeArgs=['--headless=new','--no-sandbox','--remote-allow-origins=*','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'];
+            // TEMPORARY #976 diagnostic experiment. Revert before any merge/normal Gate.
+            // Tracing and a private process group perturb timing; no result is repair proof.
+            const traceFirst=results.length===0;
+            const tracer=traceFirst?['/usr/bin/strace','/bin/strace'].find(candidate=>fs.existsSync(candidate)):null;
+            if(traceFirst)assert.ok(process.platform==='linux'&&tracer,'STOP: diagnostic strace unavailable; no fallback');
+            const traceFile=file.replace('.json','-first-chrome-diagnostic.strace');
+            if(traceFirst)fs.writeFileSync(file.replace('.json','-first-chrome-diagnostic.json'),JSON.stringify({diagnosticOnly:true,normalGateEvidence:false,syscallLimit:1000,stringLimit:80,firstLaunchOnly:true,processGroupIsolated:true,timingPerturbed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local'},null,2)+'\n');
+            const traceArgs=['-D','--syscall-limit=1000','-f','-tt','-T','-s','80','-e','trace=%file,%process,mmap,mprotect,munmap,futex,poll,ppoll,epoll_wait,connect','-o',traceFile,'--',chrome,...chromeArgs];
+            proc=spawn(traceFirst?tracer:chrome,traceFirst?traceArgs:chromeArgs,{stdio:['ignore','ignore','pipe'],windowsHide:true,detached:traceFirst});
+            if(traceFirst&&proc.pid)diagnosticGroup=proc.pid;
             proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});
             proc.on('error',error=>{launchError=String(error);});
             const tabs=await waitJson('http://127.0.0.1:'+port+'/json/list').catch(error=>{throw new Error('Adventure Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});});client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
