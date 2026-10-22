@@ -196,7 +196,16 @@ try{
                 }
                 await tap('#mapInventoryOverlayClose');await tap('#adventureHomeEntry');
             };
-            const chooseStage=async id=>{await tap('#adventureStagePicker summary');const selector='[data-stage-id="'+id+'"]';await reveal(selector);await tap(selector);assert.equal((await observe()).view.selectedNodeId,id);};
+            const chooseStage=async id=>{
+                await tap('#adventureStagePicker summary');const selector='[data-stage-id="'+id+'"]';await reveal(selector);
+                const browsing=()=>client.eval(`(()=>{const picker=document.getElementById('adventureStagePicker');return {open:picker.open,scrollTop:picker.querySelector('.adventure-stage-list').scrollTop};})()`);
+                const before=await browsing();assert.equal(before.open,true);
+                // Model the external sync notification, never a gameplay action.
+                await client.eval(`document.dispatchEvent(new CustomEvent('four-symbols:hero-acquisition-state'));true`);
+                const after=await browsing();assert.deepEqual(after,before,'background Hero refresh retains native map browsing');
+                trace.push({kind:'background-hero-notification',stage:id,browsingBefore:before,browsingAfter:after});
+                await reveal(selector);await tap(selector);assert.equal((await observe()).view.selectedNodeId,id);
+            };
             const enterCurrent=async stage=>{
                 const action=await client.eval('document.querySelector(".adventure-sheet-actions > .adventure-button.primary")?.getAttribute("aria-label")||""');
                 if(!action.includes('進入第 '+stage+' 關'))await chooseStage('c1_'+String(stage).padStart(2,'0'));
