@@ -11,7 +11,7 @@ async function fixture(retained=false){
  let factory=createHeroAcquisition;
  if(retained){
   const Module=require('node:module'),load=(filename,substitute)=>{const m=new Module(filename);m.filename=filename;m.paths=Module._nodeModulePaths(require('node:path').dirname(filename));const native=m.require.bind(m);m.require=name=>Object.hasOwn(substitute,name)?substitute[name]:native(name);m._compile(fs.readFileSync(filename,'utf8'),filename);return m.exports;};
-  const chapter=load(require.resolve('../functions/src/hero-chapter-source'),{'./generated/hero-chapter-qualification.json':require('../functions/src/generated/hero-chapter-qualification-v1.json')});
+  const chapter=load(require.resolve('../functions/src/hero-chapter-source'),{'./generated/hero-chapter-qualification.json':require(retained==='story-v2'?'../functions/src/generated/hero-chapter-qualification-v2-20261020.json':'../functions/src/generated/hero-chapter-qualification-v1.json')});
   factory=load(require.resolve('../functions/src/hero-acquisition'),{'./hero-chapter-source':chapter}).createHeroAcquisition;
  }
  const hero=factory({...h.dependencies,seed:()=>123});
@@ -70,4 +70,14 @@ test('retained units reject missing receipt and canonically resealed unknown pol
 test('retained V1 route and renewal use the same unit and full-closure Owner',async()=>{
  const f=await fixture(true),before=copy([...f.h.data]),{input,counts,result}=await proof(f);
  assert.equal(input.steps.length,10);assert.equal(input.tickets.length,3);assert.equal(result.entitlements.length,2);assert.ok(counts.every(n=>n<=38));assert.deepEqual([...f.h.data],before);
+});
+
+
+test('retained published twenty-node policy closes unchanged original history after the current catalogue changes',async()=>{
+ const f=await fixture('story-v2'),before=copy([...f.h.data]),writes=f.h.writes,{input,counts,result}=await proof(f);
+ assert.equal(input.steps.length,20);assert.equal(input.tickets.length,3);assert.equal(result.entitlements.length,2);
+ assert.ok(counts.every(n=>n<=38));assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+ const policy=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+ assert.notEqual(digest(policy),digest(require('../functions/src/generated/hero-chapter-qualification.json')));
+ for(const [,row] of f.h.data)if(row.kind==='hero-chapter-ticket'&&row.policy)assert.deepEqual(row.policy,policy);
 });

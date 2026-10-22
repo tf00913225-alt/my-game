@@ -1,0 +1,16 @@
+{
+  "workId": "CHAPTER1-GUIDED-ONBOARDING-REPAIR-20261021",
+  "mode": "built-in image_gen reference edit",
+  "master": "assets/inbox/chapter1-map-reference/chapter1-route-map-master.png",
+  "runtime": "assets/story/backgrounds/chapter1-route-map.webp",
+  "size": [
+    941,
+    1672
+  ],
+  "lossless": true,
+  "decodedPixelsEqual": true,
+  "masterSha256": "d6b50d1acec93dc7798f77c8c62521e785b7464e57fc117946a08efd73ae35bc",
+  "runtimeSha256": "7eafcdf2e5d065dae4f58d6407f91aa956c1c75df92f0e2fea0af840cd8e368f",
+  "reference": "User-provided chapter-map screenshot, 2026-10-21; landscape and facilities preserved, UI removed for real dynamic controls.",
+  "promptSummary": "Edit the supplied map screenshot into a clean unlettered wuxia chapter-map landscape plate. Preserve its camera, composition, mountains, waterfalls, stream, trees, warm village at left, bridge at lower right, zigzag stone stairway and upper-right fortified stockade. Remove header, all text, progress, every node/marker/label, golden route dots/line, red boss emblem, bottom card/buttons/icons/borders; reconstruct scenery behind overlays and extend foreground to bottom. Keep reference palette, lighting, brushwork, facility placement and approximately 9:16 portrait framing. No text, numbers, UI, nodes, route guides or watermark."
+}
