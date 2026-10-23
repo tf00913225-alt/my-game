@@ -71,7 +71,7 @@ assert.doesNotMatch(css,/--battle-info-region-track/,"bottom info drawer must no
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
-assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:0 !important;\}/,"ally front row must be nearest the enemy zone");
+assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:-24px !important;\}/,"ally front row must be nearest the enemy zone");
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:0 !important;\}/,"ally back row must stay inside its separated row");
 assert.match(css,/--battle-ally-row-gap:8px/);
 assert.doesNotMatch(css,/v-fixed-mechanism-zone|MECH_L|MECH_C|MECH_R/,"retired function-card plane is absent");
@@ -90,7 +90,7 @@ assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must n
 const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
-assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:var\(--battle-enemy-safe-top\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
+assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:calc\(var\(--battle-enemy-safe-top\) - 8px\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
 assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[^}]*\}/)?.[0]||"",/\bscale\s*:/,"VFX raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never

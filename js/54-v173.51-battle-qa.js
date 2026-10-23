@@ -33,7 +33,7 @@ function removeRetiredPresentationStyles(){
     if(style){ style.remove(); }
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
-/* Offline alpha-area metadata. Same optical footprint in every party Slot;
+/* Offline alpha-area metadata. User-approved rear-size optical footprint in every party Slot;
    no image mutation, runtime pixel scan, row multiplier or gameplay clock. */
 const PARTY_ART_DENSITY=Object.freeze({
     "assets/characters/battle_female_earth.png": {
@@ -77,7 +77,7 @@ const PARTY_ART_DENSITY=Object.freeze({
         "sha256": "528324b5d2467bd14cc0c3e38e8fd6151e98d4d6d92047a610d17c4cbedb13bf"
     }
 });
-const PARTY_ART_REFERENCE_DENSITY=Math.min(...Object.values(PARTY_ART_DENSITY).map(record=>record.density));
+const PARTY_ART_REFERENCE_DENSITY=Math.max(...Object.values(PARTY_ART_DENSITY).map(record=>record.density));
 function partyPortraitHeight(source){
     const match=String(source||"").match(/url\(["']?([^"')]+)["']?\)/i);
     const path=match?match[1].split(/[?#]/)[0].replace(/^https?:\/\/[^/]+\//,"").replace(/^\//,""):"";

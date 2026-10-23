@@ -7696,8 +7696,8 @@ body > .v169-rpg-dialog-layer{
     contain:none !important;
     align-items:stretch !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:var(--battle-enemy-safe-top) !important;}
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="front"]{bottom:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:calc(var(--battle-enemy-safe-top) - 8px) !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="front"]{bottom:28px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot{
     position:relative !important;
     width:auto !important;
@@ -7741,7 +7741,7 @@ body > .v169-rpg-dialog-layer{
 }
 /* The enemy is above this zone, so an ally front row belongs at the top.
    Keep the Slot names semantic; only this visual projection changes. */
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{top:0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{top:-24px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
@@ -7844,12 +7844,14 @@ body > .v169-rpg-dialog-layer{
     background-repeat:no-repeat;
     transform-origin:center bottom;
     animation:v174BattleIdle 3.4s ease-in-out var(--battle-idle-phase,0ms) infinite;
+    scale:1.3225;
     pointer-events:none;
 }
 #game-stage #battlePage .battle-player > .v174-battle-art .v174-portrait-paint{
     top:auto;
     height:var(--party-art-height,100%);
 }
+#game-stage #battlePage .battle-monster > .v174-battle-art{--battle-paint-offset-y:12px;}
 #game-stage #battlePage .v174-normalized-portrait .v174-portrait-paint{
     position:absolute;
     inset:auto;
@@ -7857,7 +7859,7 @@ body > .v169-rpg-dialog-layer{
     aspect-ratio:var(--portrait-aspect);
     height:auto;
     left:calc(50% - var(--portrait-width) * var(--portrait-center));
-    top:calc(var(--portrait-baseline) - var(--portrait-width) / var(--portrait-aspect) * var(--portrait-bottom));
+    top:calc(var(--portrait-baseline) - var(--portrait-width) / var(--portrait-aspect) * var(--portrait-bottom) + var(--battle-paint-offset-y, 0px));
     background-image:inherit;
     background-size:contain;
     background-position:center;
