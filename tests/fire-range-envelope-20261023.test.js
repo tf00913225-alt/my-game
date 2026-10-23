@@ -44,3 +44,6 @@ assert.equal(recipient.current.model.sprite.recipientSlice,'center-third','reuse
 assert.equal(recipient.tracks.length,3);
 assert.ok(recipient.tracks.every(t=>t.options.duration===1450),'recipient tracks retain original duration');
 assert.equal(recipient.current.model.hit,7/12);
+const noWaapi=setup();noWaapi.node.animate=undefined;
+assert.doesNotThrow(()=>noWaapi.c.addSprite(noWaapi.current,0,{}),'optional envelope must not prevent original CSS raster visibility');
+assert.equal(noWaapi.node.style.visibility,'visible');assert.equal(noWaapi.tracks.length,0);

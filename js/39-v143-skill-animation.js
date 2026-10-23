@@ -1583,7 +1583,7 @@
         // One range representative: contract inside the fitted source box,
         // reach authored size at the existing hit, then settle. Never grow
         // beyond the geometry owner's HUD-safe fit or restart on remeasure.
-        if(current.config?.id==="explosiveFlurry"&&!node.v143MotionAnimation&&
+        if(current.config?.id==="explosiveFlurry"&&typeof node.animate==="function"&&!node.v143MotionAnimation&&
            !(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
             node.dataset.motion="fire-range-envelope";
             node.v143MotionAnimation=node.animate([

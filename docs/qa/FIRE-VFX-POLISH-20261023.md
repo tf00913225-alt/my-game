@@ -1,3 +1,13 @@
+# Current recipient fire sample — human re-review pending
+
+User rejected the old17s4b93/50fa wide art and weak ring. Product3bedebfe uses existing per-recipient path and central-third of unchanged source bitmap, individually centered on actual artwork projection; stronger transient ring remains on original cast clock. No Core/target/damage/timing/skill count change. New natural Android recording and independent actual phone-frame review obtained. Current later delta only guards optional node.animate after reproducing the CI Boss regression;7files11tests/build/check PASS, no fixture or assertion weakening.
+
+New native59.6368s/3996447bytes and4.511s short review copy under8MB; recorded SHA3bedebfe explicitly retained. Formal6v6 first round→round2,0QA pause/finish intercept, natural action RNG; encounter selection only fixed to6. Sixth QA identity reuses real existing Hero art. New source has local targets; ordinary/crit/MISS desktop controlled regression separately documented.
+
+Modal paint FAIL remains with955 sole repair Owner, Android audio Context suspended/acoustic acceptance unverified, x2/x3 dependency unverified. Human art direction and latest Head CI pending; Draft DO NOT MERGE. Old reports below are history, not current art acceptance. Current compact evidence: [recipient report](FIRE-VFX-POLISH-20261023-recipient.json).
+
+---
+
 # Current complete fire range representative (2026-10-23)
 
 Same Work ID / branch / Draft #983. Product Head4b93e1c8aaf9fac34de0a75166755ec3651b6f43. User rejected the earlier range art; retained below as history, not current art approval. Actual supplied phone reference was decoded and inspected. Only explosiveFlurry now adds forward-return cast motion, distinct foot aura, ivory ordinary / gold critical bouncing feedback, MISS retreat and one bounded portrait-only critical shake; fixed HUD stays still. Original damage/targets1450ms clock and crit follow-up retained.
