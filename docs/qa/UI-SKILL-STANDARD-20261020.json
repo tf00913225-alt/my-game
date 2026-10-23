@@ -9737,7 +9737,23 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+          "status": "部分已實際驗證",
+          "scope": "桌面1280×800原一般nav Tab/Enter入口/返回/可見focus，非戰鬥",
+          "devices": [
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/nav-keyboard-context-reviewed",
+          "limits": [
+            "只原training/hub/boss overview/tower overview，不批准整頁或所有context",
+            "手機鍵盤/Escape/browserBack/disabled/loading/failure/實機未驗",
+            "nav事件trace僅部分；nav文字被藝術/aria-hidden呈現，0 text不等於頁面字級驗收",
+            "runtimeRestoreExact=false；未啟動戰鬥或交易；Latest Head必要CI仍待"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -9998,7 +10014,23 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+          "status": "部分已實際驗證",
+          "scope": "桌面1280×800原一般nav Tab/Enter入口/返回/可見focus，非戰鬥",
+          "devices": [
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/nav-keyboard-context-reviewed",
+          "limits": [
+            "只原training/hub/boss overview/tower overview，不批准整頁或所有context",
+            "手機鍵盤/Escape/browserBack/disabled/loading/failure/實機未驗",
+            "nav事件trace僅部分；nav文字被藝術/aria-hidden呈現，0 text不等於頁面字級驗收",
+            "runtimeRestoreExact=false；未啟動戰鬥或交易；Latest Head必要CI仍待"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -10119,7 +10151,23 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+          "status": "部分已實際驗證",
+          "scope": "桌面1280×800原一般nav Tab/Enter入口/返回/可見focus，非戰鬥",
+          "devices": [
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/nav-keyboard-context-reviewed",
+          "limits": [
+            "只原training/hub/boss overview/tower overview，不批准整頁或所有context",
+            "手機鍵盤/Escape/browserBack/disabled/loading/failure/實機未驗",
+            "nav事件trace僅部分；nav文字被藝術/aria-hidden呈現，0 text不等於頁面字級驗收",
+            "runtimeRestoreExact=false；未啟動戰鬥或交易；Latest Head必要CI仍待"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -10239,7 +10287,23 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+          "status": "部分已實際驗證",
+          "scope": "桌面1280×800原一般nav Tab/Enter入口/返回/可見focus，非戰鬥",
+          "devices": [
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/nav-keyboard-context-reviewed",
+          "limits": [
+            "只原training/hub/boss overview/tower overview，不批准整頁或所有context",
+            "手機鍵盤/Escape/browserBack/disabled/loading/failure/實機未驗",
+            "nav事件trace僅部分；nav文字被藝術/aria-hidden呈現，0 text不等於頁面字級驗收",
+            "runtimeRestoreExact=false；未啟動戰鬥或交易；Latest Head必要CI仍待"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,

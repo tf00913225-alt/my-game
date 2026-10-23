@@ -1,0 +1,39 @@
+[
+  {
+    "name": "training-entry-focus",
+    "rows": [],
+    "controls": [
+      {
+        "label": "背包\n背包",
+        "width": 90,
+        "height": 90,
+        "overflow": false
+      },
+      {
+        "label": "野怪區\n野怪區",
+        "width": 90,
+        "height": 90,
+        "overflow": false
+      },
+      {
+        "label": "主城\n主城",
+        "width": 90,
+        "height": 90,
+        "overflow": false
+      },
+      {
+        "label": "副本\n副本",
+        "width": 90,
+        "height": 90,
+        "overflow": false
+      },
+      {
+        "label": "玩法\n玩法",
+        "width": 90,
+        "height": 90,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

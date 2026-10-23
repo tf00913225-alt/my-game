@@ -1,0 +1,24 @@
+[
+  {
+    "kind": "native-Tab",
+    "name": "training-entry",
+    "selector": "#trainingNav",
+    "count": 19,
+    "tag": "BUTTON",
+    "label": "野怪區",
+    "rect": {
+      "x": 505,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 595,
+      "bottom": 800,
+      "left": 505
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  }
+]
