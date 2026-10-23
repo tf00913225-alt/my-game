@@ -402,11 +402,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify battle target lifecycle with final production owners
         id: battle_target_browser
@@ -523,11 +519,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run canonical bottom navigation and fixed home browser QA
         id: bottom_nav_home_browser
@@ -676,11 +668,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run Daily Dungeon WebP decode and lifecycle browser QA
         id: daily_dungeon_webp_browser
@@ -737,11 +725,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify Four Symbols Tower challenge convergence
         id: tower_challenge
@@ -795,11 +779,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run Fire Tower identity and first-frame mobile browser QA
         id: fire_tower_identity_browser
@@ -898,11 +878,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run Adventure V1 mobile browser QA
         id: adventure_browser
@@ -951,11 +927,7 @@ jobs:
         run: mkdir -p artifacts/browser-qa
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run account-first cold/warm mobile browser QA
         if: success()
@@ -996,11 +968,7 @@ jobs:
           node-version: "24"
           package-manager-cache: false
       - name: Ensure CJK font support
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
       - name: Verify Abyss focus, TTK and production Chrome
         env:
           EXPECTED_COMMIT_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
@@ -1039,11 +1007,7 @@ jobs:
           node-version: "24"
           package-manager-cache: false
       - name: Ensure CJK font support
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
       - name: Verify Adventure focus, TTK and production Chrome
         env:
           EXPECTED_COMMIT_SHA: ${{ inputs.candidate_sha || github.event.pull_request.head.sha || github.sha }}
@@ -1082,11 +1046,7 @@ jobs:
           node-version: "24"
           package-manager-cache: false
       - name: Ensure CJK font support
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
       - name: Verify Fast implementation when CI policy changes
         if: needs.classify.outputs.workflow_changed == 'true'
         env:
