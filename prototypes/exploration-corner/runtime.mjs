@@ -16,7 +16,7 @@ export function mountCorner(root){
     el.innerHTML=`<svg viewBox="0 0 ${item.width} ${item.height}" aria-hidden="true"><use href="./art.svg#${item.art}"/></svg>`;
     world.append(el);
   }
-  function cancelRoute(){route=[];destination=null;}
+  function cancelRoute(){route=[];destination=null;gesture=null;}
   function clearInput(){directions.clear();cancelRoute();gesture=null;state.moving=false;last=0;render();}
   function interact(){
     if(disposed||opened||!nearNpc(state))return;
@@ -40,13 +40,10 @@ export function mountCorner(root){
     for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,e=>directions.delete('pointer:'+e.pointerId),{signal});
   }
   viewport.addEventListener('pointerdown',e=>{
-    if(opened||!e.isPrimary||e.button!==0){gesture=null;return;}
-    gesture={id:e.pointerId,x:e.clientX,y:e.clientY};
-  },{signal});
-  viewport.addEventListener('pointercancel',()=>{gesture=null;},{signal});
-  viewport.addEventListener('pointerup',e=>{
-    const tap=gesture;gesture=null;
-    if(opened||!tap||tap.id!==e.pointerId||Math.hypot(e.clientX-tap.x,e.clientY-tap.y)>12)return;
+    if(opened||!e.isPrimary||e.button!==0)return;
+    gesture={id:e.pointerId};viewport.setPointerCapture(e.pointerId);
+    // Commit at contact, using the current position/camera. Release must not
+    // replay a stale target after the character and camera have moved.
     e.preventDefault();directions.clear();
     const point=window.eventToGamePoint(e),camera=cameraFor(state);
     const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
@@ -57,6 +54,8 @@ export function mountCorner(root){
     status.textContent=destination?(npcHit?'走近村民後，按招呼確認':'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
     root.focus({preventScroll:true});render();
   },{signal});
+  viewport.addEventListener('pointerup',e=>{if(gesture?.id===e.pointerId)gesture=null;},{signal});
+  viewport.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)clearInput();},{signal});
   prompt.addEventListener('click',interact,{signal});
   dialog.querySelector('button').addEventListener('click',close,{signal});
   window.addEventListener('blur',clearInput,{signal});
