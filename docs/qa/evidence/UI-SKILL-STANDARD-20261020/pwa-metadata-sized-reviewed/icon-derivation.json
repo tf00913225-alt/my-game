@@ -1,0 +1,24 @@
+{
+  "source": "assets/relics/icons/relic_all_returning_array.webp",
+  "sourceSha256": "183c2bf9d9473d379d369c50c79eec244d5d949fb6685f90f5dd7c82366d00bd",
+  "authorization": "User approved same-image PWA-specific smaller dimensions; original retained",
+  "transform": "whole-image Lanczos3 resize only; no crop/trim/rotation/art changes; lossless WebP encoding",
+  "outputs": [
+    {
+      "path": "assets/ui/pwa/four-symbols-192.webp",
+      "width": 192,
+      "height": 192,
+      "channels": 3,
+      "losslessPixelsExact": true,
+      "sha256": "fef3ab45605eeb6a4f53438f0679382c5c00d1aab1f860d20cb2387622983d11"
+    },
+    {
+      "path": "assets/ui/pwa/four-symbols-512.webp",
+      "width": 512,
+      "height": 512,
+      "channels": 3,
+      "losslessPixelsExact": true,
+      "sha256": "88cd1d766556748976b5fbb03c49b8126b28d4e4c92aa81a897f9f24854123f4"
+    }
+  ]
+}

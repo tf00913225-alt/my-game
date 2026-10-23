@@ -27,3 +27,13 @@ Boot契約160–170的hash cache、index/release no-store、no-SW保持；正式
 ## 探索相依邊界（尚未接線）
 
 已讀指定 exploration-formal-ui-contract.txt（#985 0f51f383）：接受 section#explorationPage.page.explore-corner 在既有game-overlay-layer與game-ui同層，不加scaler。探索Owner交付classic單一來源與 mount(root,{requestExit,dialoguePresentation})/enter/leave/destroy；UI只負責正式註冊、導航、原頁保留、stale取消、焦點與既有nav同步。Story純呈現adapter尚待正式交付，不假造簽名或呼叫劇情推進。當前沒有探索source修改。
+
+## 877abcac：授權專用尺寸後解除桌面圖示阻塞
+
+使用者明確同意加入同圖PWA專用尺寸，保留原圖與既有用途。新增192/512平方lossless WebP，完整畫面等比縮小、不裁切/trim/旋轉/重畫；原素材SHA256仍183c2bf9d9473d379d369c50c79eec244d5d949fb6685f90f5dd7c82366d00bd。衍生縮圖raw pixels與其lossless WebP解碼結果逐byte相同；母圖不含alpha，衍生保持RGB。這是已授權尺寸變體，不是擅改一般轉檔尺寸。
+
+manifest宣告真實192x192/512x512與purpose any。兩focused tests通過，回歸新增精確尺寸及桌面144–1024上限；production build --check與diff check通過。原Chrome隔離QA實測1280×800：manifest解析、root/prefix路徑、READY、9:16/noSW正常，Page.getInstallabilityErrors=[]，原1254錯誤不再出現。
+
+三位獨審已確認最小scope、來源不變與實際畫面。Art/Input發現首次512預覽使用192來源造成柔糊；僅修QA按尺寸選真實檔案並重新拍攝，所有preview Image.decode均已等待；產品SHA不變。有效證據在 `evidence/UI-SKILL-STANDARD-20261020/pwa-metadata-sized-reviewed/`，舊失敗及誤放大預覽不當成新圖品質證據。
+
+只通過桌面metadata/CDP安裝條件，沒有聲稱真正安裝或standalone啟動；Android系統圖示裁切、安全區、登入返回、存檔/更新重載仍未驗。Latest Head Required CI未完成，PR維持Draft不合併。探索classic接口已由協調者回報#985 d8a895b5 ready；本段不混入接線，下一段先核對正式來源與Story純呈現相依。
