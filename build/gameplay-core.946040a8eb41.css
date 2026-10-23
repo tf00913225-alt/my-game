@@ -3670,10 +3670,10 @@
 /* One fire representative: caster ground ring, behind its action paint. */
 #battlePage .v174-battle-art > .v174-fire-cast-ring{
     position:absolute;left:50%;top:var(--battle-portrait-baseline,100%);
-    width:76%;height:12%;z-index:-1;pointer-events:none;
-    border:2px solid #ffb552;border-radius:50%;
-    background:radial-gradient(ellipse,rgba(255,176,49,.08) 30%,rgba(255,84,25,.55) 65%,transparent 75%);
-    box-shadow:0 0 7px #ff6428,inset 0 0 6px #ffb34c;
+    width:104%;height:18%;z-index:1;pointer-events:none;
+    border:3px solid #ffd578;border-radius:50%;
+    background:radial-gradient(ellipse,transparent 32%,rgba(255,85,12,.35) 48%,#ffdb63 58%,#ff791b 66%,rgba(226,39,7,.85) 73%,transparent 80%);
+    box-shadow:0 -3px 10px #ff7e1b,0 0 16px rgba(255,62,9,.85),inset 0 0 8px #ffe194;
     transform:translate(-50%,-50%);
 }
 .v143-skill-stage{

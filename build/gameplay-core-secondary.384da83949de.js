@@ -8147,8 +8147,8 @@ function startCharacterCast(card,config,duration){
         node.setAttribute("aria-hidden","true");art.insertBefore(node,art.firstChild);
         const animation=reduced?null:node.animate([
             {opacity:0,transform:"translate(-50%,-50%) scale(.65)"},
-            {opacity:1,transform:"translate(-50%,-50%) scale(1)",offset:.18},
-            {opacity:.9,transform:"translate(-50%,-50%) scale(1.04)",offset:.58},
+            {opacity:1,transform:"translate(-50%,-50%) scale(1)",offset:.1},
+            {opacity:1,transform:"translate(-50%,-50%) scale(1.04)",offset:.75},
             {opacity:0,transform:"translate(-50%,-50%) scale(1.1)"}
         ],{duration:duration,easing:"ease-out",fill:"both"});
         motion.fireAura={node,animation};

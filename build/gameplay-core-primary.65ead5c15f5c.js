@@ -11626,7 +11626,7 @@
         flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast-v2.webp","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
         fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
-        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-wide-v2.webp","single",{scale:1.4,minSize:96,maxSize:184,presentation:"per-recipient",recipientSlice:"center-third",cellAspect:2.25})},
         dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         fireRocket:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-rocket-cast.png?v=165","trajectory",{travelToTargets:true,scale:.72,minSize:180,maxSize:280})},
         blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast-v2.webp","single",{scale:2.15,maxSize:260})},
@@ -12907,7 +12907,10 @@
             node.style.visibility="hidden";
             return;
         }
-        const fit=Math.min(1,availableWidth/width,availableHeight/height);
+        // The reused wide sheet is clipped to its central authored strike per recipient.
+        // Fit its visible third, not the transparent/clipped neighbor regions.
+        const visibleWidth=current.model.sprite.recipientSlice==="center-third"?width/3:width;
+        const fit=Math.min(1,availableWidth/visibleWidth,availableHeight/height);
         node.style.width=(width*fit)+"px";
         node.style.height=(height*fit)+"px";
         node.dataset.artFit="safe";
@@ -12976,7 +12979,9 @@
             node.dataset.geometrySlot=target.slot;
             node.style.left=center.x+"px";
             node.style.top=center.y+"px";
-            applySpriteBox(node,size,size,sprite);
+            const sliced=sprite.recipientSlice==="center-third";
+            applySpriteBox(node,sliced?size*3:size,sliced?size*3:size,sprite);
+            if(sliced){ node.style.clipPath="inset(0 33.333333%)";node.dataset.recipientSlice="center-third"; }
             fitRangeArt(node,current,target.rect,center);
             return;
         }
