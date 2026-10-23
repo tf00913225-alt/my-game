@@ -7381,6 +7381,12 @@ body > .v169-rpg-dialog-layer{
    battlefield-render-geometry-adapter.js. Canonical rules use the real app host
    namespace so legacy card dimensions cannot override the Slot contract. */
 
+:is(#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer){
+    --battle-enemy-hp-top:16px;
+    --battle-portrait-hud-clearance:6px;
+    --battle-paint-scale:1.3225;
+}
+
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-region-track:54.785fr;
     /* Compact footer controls leave real separation between formations. */
@@ -7696,7 +7702,7 @@ body > .v169-rpg-dialog-layer{
     contain:none !important;
     align-items:stretch !important;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:calc(var(--battle-enemy-safe-top) - 8px) !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="back"]{top:calc(var(--battle-enemy-safe-top) - 26px) !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleMonsterArea > .v-fixed-enemy-row[data-slot-row="front"]{bottom:28px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot{
     position:relative !important;
@@ -7844,7 +7850,7 @@ body > .v169-rpg-dialog-layer{
     background-repeat:no-repeat;
     transform-origin:center bottom;
     animation:v174BattleIdle 3.4s ease-in-out var(--battle-idle-phase,0ms) infinite;
-    scale:1.3225;
+    scale:var(--battle-paint-scale);
     pointer-events:none;
 }
 #game-stage #battlePage .battle-player > .v174-battle-art .v174-portrait-paint{
@@ -7859,7 +7865,12 @@ body > .v169-rpg-dialog-layer{
     aspect-ratio:var(--portrait-aspect);
     height:auto;
     left:calc(50% - var(--portrait-width) * var(--portrait-center));
-    top:calc(var(--portrait-baseline) - var(--portrait-width) / var(--portrait-aspect) * var(--portrait-bottom) + var(--battle-paint-offset-y, 0px));
+    /* Preserve the approved size. Shift only enough to clear the real top HUD,
+       accounting for stationary depth and paint scale about its bottom. */
+    top:max(
+        calc(var(--portrait-baseline) - var(--portrait-width) / var(--portrait-aspect) * var(--portrait-bottom) + var(--battle-paint-offset-y, 0px)),
+        calc((var(--battle-enemy-hp-top) + var(--battle-resource-bar-height) + var(--battle-portrait-hud-clearance) + var(--battle-art-overhang-top) + (var(--battle-art-depth, 1) - 1) * 100cqh) / var(--battle-art-depth, 1) + var(--portrait-width) / var(--portrait-aspect) * (var(--battle-paint-scale) - 1 - var(--battle-paint-scale) * var(--portrait-top)))
+    );
     background-image:inherit;
     background-size:contain;
     background-position:center;
@@ -7977,7 +7988,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     padding:0 !important;margin:-1px !important;overflow:hidden !important;clip-path:inset(50%);white-space:nowrap;
 }
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .battle-monster-name{top:0 !important;bottom:auto !important;}
-:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-hp{top:16px !important;bottom:auto !important;}
+:is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-hp{top:var(--battle-enemy-hp-top) !important;bottom:auto !important;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges{
     position:absolute !important;left:0 !important;right:0 !important;bottom:46px !important;
     width:auto !important;min-height:14px !important;max-height:24px !important;overflow:visible !important;z-index:32 !important;

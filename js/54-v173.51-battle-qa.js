@@ -146,10 +146,11 @@ function syncUnitArtwork(card,kind,selectedRecord){
         paint.style.setProperty("--portrait-aspect",String(aspect));
         paint.style.setProperty("--portrait-center",String((left+right)/2/metadata.width));
         paint.style.setProperty("--portrait-bottom",String(bottom/metadata.height));
+        paint.style.setProperty("--portrait-top",String(top/metadata.height));
         paint.style.setProperty("--portrait-baseline","var(--battle-portrait-baseline, "+String(contract.baseline*100)+"%)");
         card.dataset.portraitSizeClass=sizeClass;
     }else{
-        if(paint)for(const property of ["--portrait-width","--portrait-aspect","--portrait-center","--portrait-bottom","--portrait-baseline"]){paint.style.removeProperty(property);}
+        if(paint)for(const property of ["--portrait-width","--portrait-aspect","--portrait-center","--portrait-bottom","--portrait-top","--portrait-baseline"]){paint.style.removeProperty(property);}
         if(!record)delete card.dataset.portraitSizeClass;
     }
     if(record){

@@ -90,7 +90,7 @@ assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must n
 const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
-assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:calc\(var\(--battle-enemy-safe-top\) - 8px\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
+assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:calc\(var\(--battle-enemy-safe-top\) - 26px\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
 assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[^}]*\}/)?.[0]||"",/\bscale\s*:/,"VFX raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never

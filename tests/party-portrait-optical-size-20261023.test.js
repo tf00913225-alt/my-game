@@ -27,9 +27,10 @@ test('party optical metadata matches all current binary assets and equalizes are
 
 test('approved paint enlargement retains depth and cannot be replaced by critical translate shake',()=>{
  const css=fs.readFileSync(path.join(root,'css/fixed-slot-battlefield-rendering-v2.css'),'utf8');
- assert.match(css,/scale:1\.3225;/);
+ assert.match(css,/--battle-paint-scale:1\.3225;/);
+ assert.match(css,/scale:var\(--battle-paint-scale\);/);
  assert.match(css,/\.battle-monster > \.v174-battle-art\{--battle-paint-offset-y:12px;\}/);
- assert.match(css,/top:calc\(var\(--portrait-baseline\)[^;]+\+ var\(--battle-paint-offset-y, 0px\)\);/);
+ assert.match(css,/top:max\([\s\S]*?var\(--battle-paint-offset-y, 0px\)[\s\S]*?var\(--battle-portrait-hud-clearance\)/);
  assert.doesNotMatch(css,/\.battle-monster \.v174-portrait-paint\{translate:/);
  assert.match(css,/--battle-art-depth:1\.18/);
  assert.match(css,/--battle-art-depth:1\.10/);
