@@ -1075,10 +1075,10 @@ try{
             regions:{wrap,enemy,center,ally,action,elementBox,elementBoxLogical,enemyArea,allyArea},
             centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage,
             separation:{
-                enemyBeforeCenter:enemy.bottom<=center.top+1,
-                centerBeforeAlly:center.bottom<=ally.top+1,
+                enemyBeforeAlly:enemy.bottom<=ally.top+1,
+                allyBeforeCenter:ally.bottom<=center.top+1,
                 actionInsideCenter:inside(action,center),
-                allyFillsBattleBottom:Math.abs(ally.bottom-wrap.bottom)<=1,
+                centerFillsBattleBottom:Math.abs(center.bottom-wrap.bottom)<=1,
                 enemyAreaInsideEnemy:inside(enemyArea,enemy),
                 allyAreaInsideAlly:inside(allyArea,ally),
                 enemyCardsClearCenter:enemyCards.every(card=>!intersects(card,center)),
@@ -1100,8 +1100,8 @@ try{
     assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
     assert.ok(layout.allySlots.maxWidth-layout.allySlots.minWidth<=1,"Ally slot widths must be equal");
     assert.ok(layout.allySlots.maxHeight-layout.allySlots.minHeight<=1,"Ally slot heights must be equal");
-    assert.equal(layout.regions.elementBoxLogical.width,66,"Element Box button width must be the restored 66px layout size");
-    assert.equal(layout.regions.elementBoxLogical.height,66,"Element Box button height must be the restored 66px layout size");
+    assert.equal(layout.regions.elementBoxLogical.width,52,"Element Box button width must be the authorized52px shared utility size");
+    assert.equal(layout.regions.elementBoxLogical.height,52,"Element Box button height must be the authorized52px shared utility size");
     assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
     assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
     assert.ok(layout.hud.length>=7,"The real Abyss battle must expose one ally and six enemy card HUDs");
