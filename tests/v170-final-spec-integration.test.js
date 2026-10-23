@@ -218,7 +218,7 @@ function makeContext(){
         };
     };
     const document={
-        readyState:"loading",hidden:false,body:dummy,head:dummy,documentElement:dummy,
+        readyState:"loading",baseURI:"https://qa.invalid/game/",hidden:false,body:dummy,head:dummy,documentElement:dummy,
         activeElement:null,getElementById:()=>dummy,querySelector:()=>null,querySelectorAll:()=>[],
         createElement:()=>dummy,createTextNode:()=>dummy,
         addEventListener:noop,removeEventListener:noop,dispatchEvent:()=>true
@@ -348,7 +348,7 @@ test("the baseline and the real index/js20 runtime order are pinned",()=>{
 test("all formal runtimes execute once in production order",()=>{
     const runtime=loadFinalRuntime();
     assert.deepEqual(runtime.loaded,EXPECTED_DIRECT_SCRIPT_PATHS.concat(EXPECTED_RUNTIME_PATHS));
-    assert.equal(vm.runInContext("new URL('assets/dungeons/abyss/maps/floor-1.png','https://qa.invalid/game/').href",runtime.context),"https://qa.invalid/game/assets/dungeons/abyss/maps/floor-1.png");
+    assert.equal(vm.runInContext("new URL('assets/dungeons/abyss/maps/floor-1.png',document.baseURI).href",runtime.context),"https://qa.invalid/game/assets/dungeons/abyss/maps/floor-1.png");
 });
 
 test("new Lv1 characters start with two skill points while level-up remains plus two",()=>{
