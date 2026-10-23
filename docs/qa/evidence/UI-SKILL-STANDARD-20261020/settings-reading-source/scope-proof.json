@@ -1,0 +1,7 @@
+{
+  "base": "6834260c7f4b0afc6267e27e1628ac54074ba150",
+  "mainReverseExact": true,
+  "settingsLifecycleReverseExact": true,
+  "policySemanticsUnchanged": true,
+  "scope": "Only reading eligibility + immediate sync, no CSS/float/VFX/time/business changes"
+}

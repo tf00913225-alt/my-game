@@ -32993,7 +32993,8 @@ function syncBattleUiPriorityLayer(){
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
-    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer);
+    const settingsOpen=body&&body.classList.contains("v162-element-box-settings-open");
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||settingsOpen);
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
