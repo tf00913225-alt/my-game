@@ -158,9 +158,9 @@ html, body{
     transform:none;
     box-sizing:border-box;
     border:0;
-    border-top:2px solid #8a6a3a;
     border-radius:0;
-    background:linear-gradient(0deg,#0e0c0a,#1c1712);
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 18px / 0 stretch;
+    background:#151515;
 }
 #game-stage > #game-overlay-layer #bottomNav > .nav-button{
     position:relative;
