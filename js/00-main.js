@@ -12080,6 +12080,7 @@ function syncTurnTimerWithBattlePickers(){
 
 
 function toggleSkillQuickBar(){
+    setBattleUtilityMenuOpen(false);
 
     const overlay=
         $("skillQuickBar");
@@ -12464,6 +12465,7 @@ function timeoutTurn(token){
 ===================================================== */
 
 function prepareAction(type){
+    setBattleUtilityMenuOpen(false);
 
     /*
        ★ 修正：
@@ -19810,6 +19812,7 @@ function openItemMenu(){
 
 
 function closeMenus(){
+    setBattleUtilityMenuOpen(false);
 
     const quickBar=
         $("skillQuickBar");
@@ -20486,7 +20489,25 @@ function toggleAutoBattle(){
 }
 
 
+function setBattleUtilityMenuOpen(open){
+    const region=$("battleActionRegion"),more=$("battleMoreButton");
+    const allowed=!!open&&region?.dataset.controlMode==="manual"&&!region.classList.contains("target-selecting");
+    if(region){ region.classList.toggle("utility-menu-open",allowed); }
+    if(more){ more.setAttribute("aria-expanded",allowed?"true":"false"); }
+}
+function toggleBattleUtilityMenu(){
+    const region=$("battleActionRegion");
+    setBattleUtilityMenuOpen(!region?.classList.contains("utility-menu-open"));
+}
+
 function updateAutoButton(){
+    const battleToggle=$("battleAutoToggle");
+    if(battleToggle){
+        battleToggle.classList.toggle("is-active",!!autoBattle);
+        battleToggle.setAttribute("aria-pressed",autoBattle?"true":"false");
+        battleToggle.setAttribute("aria-label",autoBattle?"停止自動戰鬥":"啟用自動戰鬥");
+    }
+
 
     /*
        ★ 修正（依照使用者指定版面）：
@@ -32293,6 +32314,9 @@ function updateActionHudVisibility(){
 
     const shouldHide=
         activeAuto || battlePhase==="resolve" || battlePresentationActive;
+    const actionRegion=$("battleActionRegion");
+    if(actionRegion){ actionRegion.dataset.controlMode=shouldHide?"utility":"manual"; }
+    if(shouldHide){ setBattleUtilityMenuOpen(false); }
 
 
     /*

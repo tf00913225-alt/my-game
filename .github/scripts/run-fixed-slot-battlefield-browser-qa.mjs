@@ -12,32 +12,21 @@ const VIEWPORTS=[[412,915],[393,873],[390,844],[360,800]];
 const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
 
 function assertFloatingCommandReachability(evidence){
-    assert.equal(evidence.before.length,5,'all five default command centers must be observed');
-    for(const button of evidence.before)assert.ok(button.hit||button.blockedByElementBox,'only the approved floating Element Box may intercept a default command center: '+JSON.stringify(button));
-    if(evidence.before.some(button=>!button.hit)){
-        assert.equal(evidence.dragReady,true,'the production Element Box drag Owner must be bound');
-        assert.equal(evidence.moved,true,'the original pointer drag must actually move the Element Box');
-    }
-    assert.equal(evidence.after.length,5);
-    evidence.after.forEach(button=>assert.equal(button.hit,true,'dragging the floating Element Box must restore every complete command center: '+JSON.stringify(button)));
+ assert.equal(evidence.before.length,5);assert.equal(evidence.after.length,5);
+ evidence.before.concat(evidence.after).forEach(button=>assert.equal(button.hit,true,'every complete command center must remain reachable without dragging'));
+ assert.equal(evidence.moreHit,true,'more button center must be reachable');
+ assert.ok(evidence.moreRect.width>=44&&evidence.moreRect.height>=44,'more physical touch target');
+ assert.equal(evidence.utility.length,3);evidence.utility.forEach(button=>{assert.equal(button.hit,true,'expanded utility center reachable');assert.ok(button.rect.width>=44&&button.rect.height>=44,'utility physical touch target');});
+ assert.equal(evidence.folded,true,'utility tray folds after inspection');
 }
-
 function exerciseFloatingCommandReachability(){
-    const box=document.getElementById('battleElementBoxButton');
-    const buttons=[...document.querySelectorAll('#mainBattleMenu > .menu-button')];
-    const capture=()=>buttons.map(button=>{const r=button.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {text:button.textContent,point:[x,y],hit:hit===button,blockedByElementBox:hit===box||!!hit&&box.contains(hit),interceptor:hit?{id:hit.id,className:hit.className}:null};});
-    const before=capture(),start=box.getBoundingClientRect();
-    if(before.some(button=>!button.hit&&button.blockedByElementBox)){
-        // Move the actual floating button between neighboring command centers.
-        // The source drag Owner retains bounds, scaling and click suppression.
-        const centers=before.map(button=>button.point[0]).sort((a,b)=>a-b);
-        const gap=centers.slice(1).map((right,i)=>({left:centers[i],right})).find(pair=>pair.right-pair.left>start.width+4);
-        if(!gap)throw new Error('No draggable Element Box location clears all command centers');
-        const x=start.left+start.width/2,y=start.top+start.height/2,targetX=(gap.left+gap.right)/2;
-        for(const [type,clientX,buttons] of [['pointerdown',x,1],['pointermove',targetX,1],['pointerup',targetX,0]])box.dispatchEvent(new PointerEvent(type,{bubbles:true,cancelable:true,pointerId:174,pointerType:'touch',isPrimary:true,button:0,buttons,clientX,clientY:y}));
-    }
-    const end=box.getBoundingClientRect();
-    return {before,after:capture(),dragReady:box.dataset.dragReady==='1',moved:Math.abs(end.left-start.left)>.5||Math.abs(end.top-start.top)>.5,from:start.toJSON(),to:end.toJSON()};
+ const buttons=[...document.querySelectorAll('#mainBattleMenu > .menu-button')],more=document.getElementById('battleMoreButton');
+ const probe=button=>{const r=button.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {text:button.textContent,rect:r.toJSON(),hit:hit===button||!!hit&&button.contains(hit)};};
+ const before=buttons.map(probe),moreHit=probe(more).hit;
+ setBattleUtilityMenuOpen(true);
+ const utility=[...document.querySelectorAll('#battleUtilityTray button')].map(probe),after=buttons.map(probe);
+ setBattleUtilityMenuOpen(false);
+ return {before,after,moreHit,moreRect:more.getBoundingClientRect().toJSON(),utility,folded:getComputedStyle(document.getElementById('battleUtilityTray')).display==='none'};
 }
 
 function findChrome(){
@@ -92,9 +81,10 @@ const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/styl
 const presentationSource=read("js/54-v173.51-battle-qa.js");
 const portraitSource=presentationSource.slice(presentationSource.indexOf("function numericValue("),presentationSource.indexOf("function syncUnitArtwork("))+presentationSource.slice(presentationSource.indexOf("function syncUnitArtwork("),presentationSource.indexOf("function clearUnitHud("));
 const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json")).presentation;
+const utilityProjectionSource=mainSource.slice(mainSource.indexOf('function setBattleUtilityMenuOpen('),mainSource.indexOf('function updateAutoButton(){'));
 const elementBoxSource=read('js/20-anonymous-20.js');
-const elementBoxDragSource=elementBoxSource.slice(elementBoxSource.indexOf('(function initBattleElementBoxDrag(){')).replace(/<\/script/gi,'<\\/script');
-assert.ok(elementBoxDragSource.startsWith('(function initBattleElementBoxDrag(){'),'fixture must load the original Element Box drag Owner');
+const elementBoxDragSource=elementBoxSource.slice(elementBoxSource.indexOf('(function initBattleUtilityControls(){')).replace(/<\/script/gi,'<\\/script');
+assert.ok(elementBoxDragSource.startsWith('(function initBattleUtilityControls(){'),'fixture must load the original utility interaction Owner');
 const portraitSamples=Object.keys(portraitRegistry.assets).filter(p=>p.startsWith("assets/monsters/wild/zone-01/")).slice(0,6);
 const allyPortraitSamples=[...read("js/26-v131-patrol-appearance.js").matchAll(/front:"(assets\/characters\/patrol\/[^" ]+)"/g)].map(match=>({path:match[1],data:"data:image/webp;base64,"+fs.readFileSync(path.join(ROOT,match[1])).toString("base64")}));
 assert.equal(allyPortraitSamples.length,8,"formal patrol front portrait coverage");
@@ -118,7 +108,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <section class="battle-enemy-region"><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
-<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1"><button class="menu-button skill">技能</button><button class="menu-button">普通攻擊</button><button class="menu-button defend">防禦</button><button class="menu-button item">背包</button><button class="menu-button run">逃脫</button></div></div></div></div></section>
+<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" data-control-mode="manual" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><div id="battleUtilityTray"><button id="battleAutoToggle" class="battle-utility-button">AUTO</button><button id="battleElementBoxButton" class="battle-element-box-button battle-utility-button" type="button">設定</button><button id="battleSpeedControl" class="battle-utility-button" disabled>1×</button></div><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1"><button class="menu-button skill">技能</button><button class="menu-button">普通攻擊</button><button class="menu-button defend">防禦</button><button class="menu-button item">背包</button><button class="menu-button run">逃脫</button></div><button id="battleMoreButton" type="button">⋯</button></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
 </div></section></div></div></div><pre id="result" hidden></pre>
 <script>
@@ -135,7 +125,7 @@ window.FourSymbolsBattlePresentation={getUnitHud:function(card){return card.v174
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
 </script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
-<script>${elementBoxDragSource}</script><script>
+<script>${utilityProjectionSource}</script><script>${elementBoxDragSource}</script><script>
 (async function(){
  if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
  const exerciseFloatingCommandReachability=${exerciseFloatingCommandReachability.toString()};
@@ -350,13 +340,13 @@ function runViewport(chrome,width,height){
     assert.equal(data.legacyStyle.owner,null);assert.equal(data.legacyStyle.textLength,-1,"legacy runtime geometry style must be removed rather than kept as an override");
     assert.doesNotMatch(data.legacyClasses.enemy,/battle-monsters|v131-formation|v141-fixed-formation/);assert.doesNotMatch(data.legacyClasses.ally,/battle-player-row/);
     const baseline=data.scenarios[1].lower;
-    assert.ok(baseline.enemy.bottom<=baseline.center.top+.5,"enemy region must end before the center operation region");
-    assert.ok(baseline.center.bottom<=baseline.allyRegion.top+.5,"center operation region must end before the ally region");
+    assert.ok(baseline.enemy.bottom<=baseline.allyRegion.top+.5,"enemy region must end before the separated party");
+    assert.ok(baseline.allyRegion.bottom<=baseline.center.top+.5,"party must end before bottom operation region");
     assert.ok(baseline.action.top>=baseline.center.top-.5&&baseline.action.bottom<=baseline.center.bottom+.5,"action controls stay inside the center region");
     assert.equal(baseline.centerBackground,"none","center controls must not own a black translucent background");
     assert.equal(data.logRetirement.absent,true,"retired battle log DOM must be absent");
     assert.equal(data.logRetirement.turnOpacity,"1","current round remains visible");
-    assert.ok(data.logRetirement.turn.height>0&&data.logRetirement.turn.bottom<=baseline.allyRegion.bottom+.5,"current round stays in the battlefield");
+    assert.ok(data.logRetirement.turn.height>0&&data.logRetirement.turn.bottom<=baseline.center.bottom+.5,"current round stays in the battlefield");
     assert.equal(data.turnUi.normal.opacity,"1");
     assert.equal(data.turnUi.normal.pointerEvents,"none","turn timer must never block target selection");
     assert.equal(data.turnUi.skillPicker.opacity,"1");
@@ -392,15 +382,12 @@ function runViewport(chrome,width,height){
     assert.equal(data.manualControl.targetSelection.reticleAnimation,"none","multi-target reticles remain static");
     assert.equal(data.manualControl.targetSelection.frame.behindPaint,true,"target selection retains the behind-art frame plane");
     close(data.turnUi.normal.rect.top,baseline.action.top,"turn timer occupies the shared information band",.8);
-    assert.ok(baseline.command.height/canvasScale>=66-.1,"command touch row retains 66 logical pixels");
-    assert.ok(baseline.elementBox.height/canvasScale>=66-.1,"Element Box retains 66 logical pixels");
-    // Product decision: Element Box is a floating button and may overlap the
-    // command region; its hit target and the existing command targets remain usable.
-    assert.equal(baseline.elementBoxHit,true,"floating Element Box must retain its own hit target");
+    assert.ok(baseline.command.height>=44,"command touch row retains44 physical pixels");
+    assert.equal(baseline.elementBoxHit,false,"folded utilities cannot intercept manual commands");
     assertFloatingCommandReachability(data.commandDrag);
     assert.equal(baseline.commandButtons.length,5);
-    baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height/canvasScale>=66-.1);assert.ok(button.rect.width/canvasScale>=70);assert.equal(button.font,"16px");assert.equal(button.hit,true,"visible command center must hit its own control");});
-    assert.ok(data.allyScenarios[6].hudRects[0].art.height/canvasScale/.94>99,"far-row depth preserves the original artwork box before its 6% paint projection");
+    baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height>=44);assert.ok(button.rect.width>=44);assert.equal(button.font,"14px");assert.equal(button.hit,true,"visible command center must hit its own control");});
+    const partyFrames=data.allyScenarios[6].hudRects.map(row=>row.art.height);assert.ok(partyFrames.every(h=>h>0));assert.ok(Math.max(...partyFrames)-Math.min(...partyFrames)<1,"all party rows share the same artwork frame");
     assert.ok(data.turnUi.normal.rect.bottom<=baseline.commandVisualTop+.8,"turn timer must not overlap command art");
     assert.ok(data.turnUi.targetSelecting.rect.top>=baseline.center.top-.5,"target-selecting turn timer stays inside center region");
     assert.ok(
@@ -409,7 +396,7 @@ function runViewport(chrome,width,height){
         JSON.stringify({turn:data.turnUi.targetSelecting.rect,prompt:data.turnUi.targetSelecting.promptRect,center:baseline.center})
     );
     assert.ok(data.turnUi.targetSelecting.promptRect.bottom<=baseline.center.bottom+.5,"target prompt stays inside center region");
-    close(baseline.elementBox.width,66*canvasScale,"element box width");close(baseline.elementBox.height,66*canvasScale,"element box height");
+
     for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count],profileBaseline=data.scenarios[count<=6?1:8].lower;assert.equal(scenario.slots,count<=6?6:10);close(scenario.lower.enemy.height,profileBaseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,profileBaseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,profileBaseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,profileBaseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,profileBaseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[count<=6?1:8][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[count<=6?1:8][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
     fs.writeFileSync(path.join(ARTIFACT_DIR,"six-slot-portrait-probe.json"),JSON.stringify(data.portraits,null,2));
     assert.equal(data.sixProfile,"standard-six");

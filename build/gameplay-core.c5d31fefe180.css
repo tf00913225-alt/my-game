@@ -7386,10 +7386,10 @@ body > .v169-rpg-dialog-layer{
     /* Compact footer controls leave real separation between formations. */
     --battle-center-region-track:12fr;
     --battle-ally-region-track:45.215fr;
-    --battle-turn-row-height:20px;
+    --battle-turn-row-height:24px;
     --battle-command-row-height:52px;
-    --battle-formation-separation:16px;
-    --battle-top-name-reserve:72px;
+    --battle-formation-separation:44px;
+    --battle-top-name-reserve:44px;
     --battle-bottom-safe-gap:8px;
     --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 12px);
     --battle-target-prompt-height:46px;
@@ -7415,6 +7415,9 @@ body > .v169-rpg-dialog-layer{
     --battle-item-menu-top-offset:116px;
     --battle-item-menu-gap:8px;
 }
+
+/* Only a visible original notice needs the larger name band. */
+#game-stage:has(#releaseUpdateMarquee:not([hidden])) #battlePage.v-fixed-slot-render-v2{--battle-top-name-reserve:72px;}
 
 /* Both formations share compact middle controls and a real bottom reserve.
    The ordinary six-slot profile retains its own title/portrait HUD policy. */
@@ -7456,12 +7459,12 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
     top:0;
-    left:140px;
-    right:82px;
+    left:0;
+    right:100px;
     z-index:2;
     color:#f5cf72;
-    font-size:14px;
-    line-height:20px;
+    font-size:13px;
+    line-height:24px;
     font-weight:900;
     pointer-events:none;
 }
@@ -7516,12 +7519,14 @@ body > .v169-rpg-dialog-layer{
     justify-content:flex-end;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleCommandRow{
-    width:calc(100% - 60px);
-    margin-right:60px;
+    width:100%;
+    margin-right:0;
+    flex:0 0 var(--battle-command-row-height) !important;
+    gap:4px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu{
     height:var(--battle-command-row-height) !important;
-    flex-basis:var(--battle-command-row-height) !important;
+    flex:1 1 0 !important;
     box-sizing:border-box;
     min-height:var(--battle-command-row-height) !important;
 }
@@ -7530,22 +7535,24 @@ body > .v169-rpg-dialog-layer{
     line-height:18px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTargetPrompt{
-    right:60px;
+    right:0;
     width:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
     position:absolute;
-    left:0;
+    left:auto;
     right:0;
     top:0;
     bottom:auto;
     align-self:flex-start;
     flex:0 0 var(--battle-turn-row-height);
-    width:max-content;
-    min-width:112px;
-    height:var(--battle-turn-row-height);
-    min-height:var(--battle-turn-row-height);
-    max-height:var(--battle-turn-row-height);
+    width:88px;
+    min-width:0;
+    box-sizing:border-box;
+    padding:0 6px;
+    height:24px;
+    min-height:24px;
+    max-height:24px;
     margin:0;
     opacity:1;
     transform:none !important;
@@ -7553,6 +7560,9 @@ body > .v169-rpg-dialog-layer{
     pointer-events:none;
     z-index:18070 !important;
 }
+#game-stage #battlePage.v-fixed-slot-render-v2 #turnTargetRow .turn-number{display:none;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #turnTargetRow .timer{font-size:20px;line-height:24px;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #turnTargetRow .timer::before{content:"倒數 ";font-size:12px;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row.skill-picker-open{
     top:auto;
     bottom:calc(var(--battle-command-visual-height) + 44px);
@@ -7797,27 +7807,14 @@ body > .v169-rpg-dialog-layer{
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
     --battle-art-hud-reserve:44px;
-    --battle-art-overhang-top:7px;
+    --battle-art-overhang-top:0px;
 }
-/* Depth is paint-only; the camera is behind the party. Width compensation
-   preserves the existing painted horizontal envelope for wide silhouettes.
-   Normalized enemy height is bounded below the top HUD before scaling. */
+/* Party rows share one paint scale and frame; only enemies have depth. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-battle-art{scale:var(--battle-art-depth, 1);}
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{--battle-art-depth:1;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.18;}
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .battle-player > .v174-battle-art{--battle-art-depth:1.10;}
-/* Boss and generic fallback artwork keep the previous depth policy. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot-row[data-slot-row="front"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
-/* A filled front slot owns the information band directly above its paired
-   back slot. Bound only that back portrait's height, keeping its feet and
-   source aspect. Empty front slots keep the approved larger silhouette. */
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F1"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B1"] > .battle-player > .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F2"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B2"] > .battle-player > .v174-battle-art,
-#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow:has(> [data-slot-row="front"] > [data-slot="ALLY_F3"] > .battle-player) > [data-slot-row="back"] > [data-slot="ALLY_B3"] > .battle-player > .v174-battle-art{
-    --battle-art-overhang-top:calc((100% + var(--battle-ally-row-gap) - 6px - var(--battle-art-hud-reserve)) / var(--battle-art-depth) - 100% + var(--battle-art-hud-reserve));
-}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.10;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art{scale:var(--battle-art-depth, .94);}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster > .v174-battle-art{
     --battle-art-overhang-top:-24px;
     --battle-art-hud-reserve:30px;
@@ -8115,14 +8112,54 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     contain:none !important;
 }
 
-/* Compact original controls retain at least44px physical touch height at360px. */
-#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .battle-element-box-button{
-    left:auto !important;
-    right:8px !important;
-    top:0 !important;
-    bottom:auto !important;
-    width:52px !important;
-    height:52px !important;
+/* Manual commands and utility mode share one bottom row. */
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleUtilityTray{
+    position:absolute;right:0;bottom:0;width:172px;height:52px;display:none;z-index:18080;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion[data-control-mode="utility"] #battleUtilityTray{display:block;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion.utility-menu-open #battleUtilityTray{
+    display:block;bottom:60px;padding:6px;width:184px;height:64px;box-sizing:border-box;
+    border:1px solid #8b7857;border-radius:12px;background:#111923;box-shadow:0 4px 12px #0009;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion.utility-menu-open .battle-utility-button{top:5px !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion.utility-menu-open #battleSpeedControl{right:6px;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion.utility-menu-open #battleElementBoxButton{right:66px !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion.utility-menu-open #battleAutoToggle{right:126px;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleMoreButton{
+    flex:0 0 52px;height:52px;box-sizing:border-box;margin:0;padding:0;font:700 24px/1 sans-serif;
+    border:1px solid #8b7857;border-radius:8px;background:linear-gradient(#23303b,#111923);color:#f4dfb2;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 #mainBattleMenu{min-width:0;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion[data-control-mode="utility"] #battleTurnIndicator{
+    top:auto;bottom:14px;right:180px;line-height:24px;
+}
+/* One visual family; utility controls remain available during auto resolve. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-utility-button{
+    position:absolute !important;top:0 !important;bottom:auto !important;left:auto !important;
+    width:52px !important;height:52px !important;box-sizing:border-box;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;
+    border:1px solid #8b7857 !important;border-radius:50% !important;
+    background:linear-gradient(#23303b,#111923) !important;color:#f4dfb2;
+    font:700 12px/16px sans-serif;padding:3px;touch-action:manipulation;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleAutoToggle{right:120px;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleElementBoxButton{right:60px !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleSpeedControl{right:0;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-utility-button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.6;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-utility-button small{font-size:9px;line-height:11px;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-utility-button:disabled{opacity:.5;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-utility-button:active:not(:disabled),
+#game-stage #battlePage.v-fixed-slot-render-v2 #mainBattleMenu > .menu-button:active{background:#344755 !important;border-color:#ffe0a0 !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleAutoToggle.is-active{color:#ffe6a4;border-color:#ffd474 !important;box-shadow:0 0 8px #dba54c66;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battleAutoToggle.is-active::before{content:"";position:absolute;inset:3px;border:2px solid #ffd474;border-left-color:transparent;border-bottom-color:transparent;border-radius:50%;animation:battleAutoHalo 1.8s linear infinite;pointer-events:none;}
+@keyframes battleAutoHalo{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){#game-stage #battlePage.v-fixed-slot-render-v2 #battleAutoToggle.is-active::before{animation:none;}}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu::before,
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu > .menu-button::after{display:none;}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu > .menu-button{
+    border:1px solid #8b7857 !important;border-radius:8px !important;
+    background:linear-gradient(#23303b,#111923) !important;color:#f4dfb2 !important;
+    box-shadow:none !important;font-weight:700;
 }
 
 /* V143 sizes raster boxes before applying center/travel transforms. Independent

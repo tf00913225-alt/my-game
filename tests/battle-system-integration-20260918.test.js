@@ -83,7 +83,7 @@ assert.match(css,/--battle-ally-row-gap:8px/);
 assert.match(css,/data-slot-row="back"\]\{bottom:0 !important;\}/);
 assert.match(css,/\.v174-unit-hud\[data-side="monster"\] \.battle-monster-name\{top:0 !important;bottom:auto !important/);
 assert.match(css,/\.v174-unit-hud :is\(\.battle-monster-name,\.battle-player-id\)\{[^}]*bottom:16px !important/);
-assert.match(css,/\.battle-element-box-button\{[\s\S]*width:52px !important;[\s\S]*height:52px !important/);
+assert.match(css,/\.battle-utility-button\{[\s\S]*width:52px !important;[\s\S]*height:52px !important/);
 assert.match(adapter,/slice\(0,6\)/);
 
 // The existing formation owner is lazy-loaded on the first click instead of opening an empty shell.

@@ -1,3 +1,13 @@
+# Current single-row mode-switch candidate
+
+Same PR983/Work ID. User authorized one-row manual5commands+more, upward utility popup, AUTO/gear/speed on same bottom baseline, party farther down. Original UI sources only; no Core/clock/accepted-normal change. Party scale1/equal frames/no row depth; enemy depth retained;44px default top,72px only original visible notice;44px formation spacer. AUTO original time Gate preserved, speed disabled/pending. Prior text crowding review was insufficient and no blanket PASS carries forward.
+
+Focused production360/411 and physical SM-N960F controlled original handlers/center hits/target/return/settings/Esc/outside PASS. Final phone manual andAUTO bottoms both705.3506; original AUTO halo progresses33.4→183.366ms afteractualready. Original1h grant used only disposable QA account. All controls inclmore>=44px; official focused360 fixed-slot QA caught arrow/SP overlap and uniform party overhang0 fixes it without weakening assertion.24 targeted tests/build-check/diffcheck PASS. More popup transiently covers some back-rowHUD: explicit overlay tradeoff, not all-state no-collision approval. Not natural/fullCore/native movie/acoustic/multiplier acceptance.
+
+[Current bounded evidence](FIRE-VFX-POLISH-20261023-single-row.json). Latest source checkpoint/requiredCI plus human layout/fire review pending; Draft DO NOT MERGE. Old sections below retain rejected/superseded snapshots only. #976 formal tool fix will be normally absorbed at this safe checkpoint; no duplicate Chrome fix or old run retry.
+
+---
+
 # Current compact footer correction
 
 Human rejected bc3d's oversized bottom controls because formations were too close. Same PR983: original command/settings52px (was66), settings column60px, button text14px/18px; explicit16px spacer plus two4px gaps separates enemy and party (24px CSS, ~20.57px at360). Original top72px name reserve retained. No JS/Core/clock/art/normal motion change. Exact66px legacy contract expectations in two integration tests updated to authorized52px, not removed; existing fixed-slot budget includes spacer/three gaps and minimum44px physical touch bound.
