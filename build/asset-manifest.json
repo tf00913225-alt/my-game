@@ -299,64 +299,64 @@
       },
       {
         "path": "assets/characters/player_female_01.webp",
-        "sha256": "9c94f8d47338",
-        "bytes": 1244400,
+        "sha256": "dc5058974a47",
+        "bytes": 1295046,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_female_02.webp",
-        "sha256": "2d4ca7757b43",
-        "bytes": 928604,
+        "sha256": "5cb04f00ce72",
+        "bytes": 1092118,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_female_03.webp",
-        "sha256": "ecd93d4722dd",
-        "bytes": 1306022,
+        "sha256": "4cabe19a63af",
+        "bytes": 1250292,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_female_04.webp",
-        "sha256": "b0e0332f8b22",
-        "bytes": 1044066,
+        "sha256": "907d2b62a1ba",
+        "bytes": 1284410,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_male_01.webp",
-        "sha256": "99578c878c22",
-        "bytes": 1335030,
+        "sha256": "d25acae6ab94",
+        "bytes": 1178648,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_male_02.webp",
-        "sha256": "1f44493a70ae",
-        "bytes": 933530,
+        "sha256": "00eb785f7b0b",
+        "bytes": 1086984,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_male_03.webp",
-        "sha256": "ed7965f76f25",
-        "bytes": 1108382,
+        "sha256": "2946ba0e51ed",
+        "bytes": 1170932,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
         "path": "assets/characters/player_male_04.webp",
-        "sha256": "372ab50d0ae6",
-        "bytes": 1163202,
+        "sha256": "5fa20547517b",
+        "bytes": 1125640,
         "priority": "P1",
         "type": "image",
         "decode": true
@@ -826,8 +826,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "9e69c1be3bd5",
-    "totalBytes": 29175812,
+    "manifestHash": "7239a8828f25",
+    "totalBytes": 29596646,
     "totalResources": 79
   },
   "assets": {
