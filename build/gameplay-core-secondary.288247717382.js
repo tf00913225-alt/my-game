@@ -4314,6 +4314,7 @@
     function setElementBoxSettingsLayer(active){
         if(typeof document==="undefined"||!document.body||!document.body.classList){ return; }
         document.body.classList.toggle("v162-element-box-settings-open",!!active);
+        if(typeof window.syncBattleUiPriorityLayer==="function"){ window.syncBattleUiPriorityLayer(); }
     }
 
     if(typeof openHomeFeature==="function"){

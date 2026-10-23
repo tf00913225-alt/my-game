@@ -1,3 +1,15 @@
+# Current Modal cross-Owner integration checkpoint
+
+Base86ca8edb + selected original Owner delta8938e239 (UI evidence0f5fee0a), clean three-way apply of js00/js45 + original reading test only. No whole955 UI branch, VFX/float CSS, action timing or skill art change. Original builder regenerated derived artifacts; restricted policy changed only main source digest, policy semantics asserted equal.
+
+Desktop412x915 isolated natural6v6 first round→round2,0QA pause/finish interception: during actual explosiveFlurry three-target hit, settings opens original reading state; stage, hit overlay, skill label and three damage nodes hidden/opacity0. Closing clears reading state and remaining paint returns. First300ms screenshot missed open state; same-source900ms focused screenshot supplies actual before/modal/after evidence. Independent scope/picture review PASS within this bounded desktop case.
+
+This supersedes Modal FAIL only for the integrated candidate; old unintegrated phone/screenshots remain FAIL for their own snapshots. No new user art movie, no physical Modal/full matrix or acoustic/x2/x3 claim. User art approval and latest integration Head CI pending, Draft DO NOT MERGE. CI86ca backpack/Abyss/tower DevTools startup failures remain Chrome976 evidence, not whole-suite proof of optional animate fix. No rerun/timeout/tool change.
+
+Current [integration evidence](FIRE-VFX-POLISH-20261023-modal-integration.json); recorded3bed new fire art movie retained unchanged. Older reports below are historical snapshot scope.
+
+---
+
 # Current recipient fire sample — human re-review pending
 
 User rejected the old17s4b93/50fa wide art and weak ring. Product3bedebfe uses existing per-recipient path and central-third of unchanged source bitmap, individually centered on actual artwork projection; stronger transient ring remains on original cast clock. No Core/target/damage/timing/skill count change. New natural Android recording and independent actual phone-frame review obtained. Current later delta only guards optional node.animate after reproducing the CI Boss regression;7files11tests/build/check PASS, no fixture or assertion weakening.
