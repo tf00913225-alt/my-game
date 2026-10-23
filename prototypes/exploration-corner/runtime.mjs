@@ -4,6 +4,7 @@ import {scene,move,cameraFor,nearNpc,findRoute,followRoute,npcRoute} from './sce
 // from Adventure, Patrol, Player, Save or Economy are accessed.
 export function mountCorner(root){
   const world=root.querySelector('[data-world]'),actor=root.querySelector('[data-player]');
+  const sprites=[...actor.querySelectorAll('[data-pose]')];
   const prompt=root.querySelector('[data-interact]'),dialog=root.querySelector('[data-dialog]');
   const viewport=root.querySelector('.explore-viewport'),marker=root.querySelector('[data-destination]'),status=root.querySelector('[data-status]');
   const directions=new Map(),abort=new AbortController(),signal=abort.signal;
@@ -66,8 +67,13 @@ export function mountCorner(root){
     actor.style.left=state.x+'px';actor.style.top=state.y+'px';actor.style.zIndex=String(Math.round(state.y));
     actor.dataset.facing=state.facing;actor.classList.toggle('is-walking',state.moving);
     const pose=state.moving?(Math.floor(walkTime/.16)%4===0?1:Math.floor(walkTime/.16)%4===2?2:0):0;
-    const sprite=actor.querySelector('use'),href=`./traveller.svg#${state.facing}-${pose}`;
-    if(sprite.getAttribute('href')!==href)sprite.setAttribute('href',href);
+    // Keep external SVG instances stable: changing href briefly clears their
+    // geometry in Chrome. The same render owner selects one preloaded pose.
+    const activePose=`${state.facing}-${pose}`;
+    for(const sprite of sprites){
+      const visibility=sprite.dataset.pose===activePose?'visible':'hidden';
+      if(sprite.getAttribute('visibility')!==visibility)sprite.setAttribute('visibility',visibility);
+    }
     marker.hidden=!destination;if(destination){marker.style.left=destination.x+'px';marker.style.top=destination.y+'px';}
     prompt.disabled=opened||!nearNpc(state);prompt.textContent=nearNpc(state)?'與村民招呼 · E':'靠近村民可招呼';
     for(const button of root.querySelectorAll('[data-direction]'))button.classList.toggle('is-held',[...directions.values()].at(-1)===button.dataset.direction);

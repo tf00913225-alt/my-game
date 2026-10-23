@@ -14,6 +14,9 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<700});
   await client.send('Emulation.setTouchEmulationEnabled',{enabled:width<700,maxTouchPoints:1});
   await client.send('Page.navigate',{url});await new Promise(r=>setTimeout(r,900));
+  // Observe the active painted pose on every animation frame, including
+  // direction/stride changes and remount. A loaded idle pose alone hid flicker.
+  await client.eval(`(()=>{window.poseQA={frames:0,empty:[],seen:[],hrefChanges:0};const actor=document.querySelector('[data-player]');new MutationObserver(rows=>{poseQA.hrefChanges+=rows.length}).observe(actor,{subtree:true,attributes:true,attributeFilter:['href']});function sample(){const active=[...actor.querySelectorAll('use')].filter(u=>getComputedStyle(u).visibility==='visible');const b=active[0]?.getBBox();poseQA.frames++;if(active.length!==1||!b||b.width<50||b.height<100)poseQA.empty.push({t:performance.now(),count:active.length,width:b?.width,height:b?.height});const pose=active[0]?.dataset.pose;if(pose&&!poseQA.seen.includes(pose))poseQA.seen.push(pose);requestAnimationFrame(sample)}requestAnimationFrame(sample);return true})()`);
   const read=()=>client.eval(`(()=>{const r=document.querySelector('.explore-corner'),p=document.querySelector('[data-player]'),s=document.getElementById('game-stage').getBoundingClientRect();return {position:r.dataset.position,camera:r.dataset.camera,facing:p.dataset.facing,walking:p.classList.contains('is-walking'),prompt:document.querySelector('[data-interact]').disabled,dialog:!document.querySelector('[data-dialog]').hidden,stage:{width:s.width,height:s.height},saveKeys:Object.keys(localStorage)}})()`);
   const capture=async label=>{const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(output,`${width}-${label}.png`),Buffer.from(shot.data,'base64'));};
   const hold=async(direction,ms)=>{
@@ -21,7 +24,7 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
    else{const key={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'}[direction];await client.send('Input.dispatchKeyEvent',{type:'keyDown',key,code:key});await new Promise(r=>setTimeout(r,ms));await client.send('Input.dispatchKeyEvent',{type:'keyUp',key,code:key});}
    await new Promise(r=>setTimeout(r,90));
   };
-  const spriteVisible=async()=>{const box=await client.eval(`(()=>{const b=document.querySelector('[data-player] use').getBBox();return {width:b.width,height:b.height}})()`);assert.ok(box.width>50&&box.height>100,'player SVG geometry must actually load');};
+  const spriteVisible=async()=>{const box=await client.eval(`(()=>{const b=document.querySelector('[data-player] use[visibility="visible"]').getBBox();return {width:b.width,height:b.height}})()`);assert.ok(box.width>50&&box.height>100,'active player SVG geometry must actually load');};
   const start=await read();assert.ok(start.position);assert.ok(Math.abs(start.stage.width/start.stage.height-9/16)<.001);assert.deepEqual(start.saveKeys,[]);await spriteVisible();await capture('start');
   await hold('up',1600);const house=await read();assert.ok(Number(house.position.split(',')[1])>=1053);await capture('house-collision');
   await hold('down',800);await hold('right',1050);const near=await read();assert.equal(near.prompt,false);await capture('npc-near');
@@ -35,6 +38,7 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   // Lifecycle-only fixture: simulate restored visible dialog without injecting player state.
   await client.eval(`window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));document.querySelector('[data-dialog]').hidden=false;window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));true`);
   const remount=await read();assert.equal(remount.dialog,false);assert.equal(remount.position,start.position);assert.equal(remount.walking,false);
+  assert.equal(await client.eval(`document.querySelectorAll('[data-player] use[data-pose]').length`),12,'remount must retain exactly twelve fixed poses');
   await hold('down',200);assert.notEqual((await read()).position,remount.position);
   const tapWorld=async(x,y)=>{
     const started=Date.now();
@@ -70,7 +74,8 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   await client.send('Emulation.setDeviceMetricsOverride',{width:width<700?360:1440,height:width<700?800:900,deviceScaleFactor:1,mobile:width<700});
   await new Promise(r=>setTimeout(r,150));await tapWorld(800,1500);assert.equal(await destination(),'800.00,1500.00');await arrive();await capture('tap-resized');
   const errors=client.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(errors,[]);
-  results.push({width,height,start,house,near,dialog,stop,depth,remount,houseRoute,npcTap,takeover,retap:{elapsedMs:retapMs,target:retarget,error:Math.hypot(retarget[0]-500,retarget[1]-1100)},errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
+  const poses=await client.eval('poseQA');assert.ok(poses.frames>100);assert.deepEqual(poses.empty,[],'active sprite must never lose geometry');assert.equal(poses.hrefChanges,0,'animation must keep external references stable');assert.equal(poses.seen.length,12,'all four directions and three poses exercised');
+  results.push({width,height,start,house,near,dialog,stop,depth,remount,houseRoute,npcTap,takeover,poses,retap:{elapsedMs:retapMs,target:retarget,error:Math.hypot(retarget[0]-500,retarget[1]-1100)},errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
  }catch(error){results.push({width,height,status:'FAIL',error:String(error.stack)});throw error;}
  finally{client?.close();proc.kill();}
 }}finally{server.closeAllConnections();server.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({output,results}));}
