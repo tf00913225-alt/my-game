@@ -1,0 +1,4 @@
+{
+  "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+  "error": "AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:\n\n  assert(long.gold.ink.left>=long.gold.box.left-1&&long.gold.ink.right<=long.gold.box.right+1&&long.gold.ink.bottom<=long.gold.box.bottom+1)\n\n    at file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/bag-density-after.mjs:94:174"
+}

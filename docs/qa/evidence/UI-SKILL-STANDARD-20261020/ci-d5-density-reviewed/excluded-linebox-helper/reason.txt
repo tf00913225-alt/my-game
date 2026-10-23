@@ -1,0 +1,1 @@
+One-time QA incorrectly treated visible overflowing text ink outside its 18px line box as clipping. Actual 44px header contains the full 26.33px ink, no clipping/overlap. Qualified check uses the true allocated header bounds and preserves original three-row threshold. No product change for this QA error. Failed attempts excluded, not PASS.

@@ -3856,6 +3856,24 @@
               "lastOccupied": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment15-accepted/1280x800-populated-page5-3bb.json"
             }
           ]
+        },
+        {
+          "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+          "status": "部分已實際驗證",
+          "scope": "原CI populated fixture三列密度/長金幣/原scroll末端/關閉返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ci-d5-density-reviewed",
+          "limits": [
+            "僅當前24件頁，未重新批准120格5頁、其他分類/資料狀態",
+            "未執行使用/裝備/出售/交易/戰鬥；無真帳號或實機",
+            "runtimeRestoreExact=false，隔離profile已清除；一次性linebox誤判另存excluded",
+            "Latest Head必要CI仍待，不以本段本機focused驗證代替"
+          ]
         }
       ],
       "reviews": {

@@ -1,0 +1,578 @@
+[
+  {
+    "name": "populated-backpack",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 24.041924328537462,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "金幣",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "5,740,767",
+        "font": 18.008718801099203,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "關閉",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "色彩從此",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13.05740273517111,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 16,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 15.005395003442484,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 15.005395003442484,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 15.030572073800222,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "8300",
+        "font": 17.053124999999998,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 15.037802419354838,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "1200",
+        "font": 17.053124999999998,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "手",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "護腕",
+        "font": 17.00000762939453,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "衣服",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "鞋子",
+        "font": 17.00000762939453,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "戒指",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "裝備",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "重新整理",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      },
+      {
+        "text": "一鍵售出",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryQuickSellButton",
+        "parent": "inventoryBottomActions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 56,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 44.00001525878906,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "一鍵售出",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "long-gold-before-gate",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 24.041926034489034,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "金幣",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "9,999,999,999",
+        "font": 18.01212938005391,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "關閉",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "色彩從此",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13.05740273517111,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 16,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 15.005395003442484,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 15.005395003442484,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 15.030572073800222,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "8300",
+        "font": 17.053124999999998,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 15.037802419354838,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "1200",
+        "font": 17.053124999999998,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "手",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "護腕",
+        "font": 17.00000762939453,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "衣服",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "鞋子",
+        "font": 17.00000762939453,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "戒指",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "span.equipment-rarity-name",
+        "parent": "inventory-equipment-slot-label"
+      },
+      {
+        "text": "裝備",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 18,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "重新整理",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      },
+      {
+        "text": "一鍵售出",
+        "font": 18,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryQuickSellButton",
+        "parent": "inventoryBottomActions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 56,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 44.00001525878906,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 79,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 44,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "一鍵售出",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]
