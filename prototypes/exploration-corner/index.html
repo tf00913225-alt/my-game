@@ -1,0 +1,33 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>桃溪一隅 · 操作樣板</title>
+<link rel="stylesheet" href="/css/00-main.css"><link rel="stylesheet" href="/css/03-stage-v4-viewport-lock.css">
+<link rel="stylesheet" href="./style.css"></head><body>
+<div id="game-viewport"><div id="game-stage"><div id="game-overlay-layer">
+<main class="explore-corner" tabindex="0" aria-label="桃溪村探索操作樣板">
+  <header class="explore-heading"><span>四 象 江 湖 傳</span><h1>桃溪一隅</h1><p>沿溪而行，且聽風過桃枝。</p><small>探索操作樣板</small></header>
+  <div class="explore-viewport"><div class="explore-world" data-world>
+    <svg class="explore-ground" viewBox="0 0 1400 2600" aria-hidden="true"><use href="./art.svg#ground"/></svg>
+    <div class="explore-player" data-player data-facing="up">
+      <span class="explore-shadow"></span>
+      <svg viewBox="0 0 140 200" aria-label="行走中的俠客">
+        <g class="explore-leg left"><path d="M53 140l-5 41 17 3 8-43" fill="#313d37"/><path d="M47 178l-8 12q16 8 29-1l-2-10" fill="#282b27"/></g>
+        <g class="explore-leg right"><path d="M74 140l2 43 17-2-1-43" fill="#313d37"/><path d="M77 180l-1 12q17 6 29-2l-13-13" fill="#282b27"/></g>
+        <g class="explore-body"><path d="M47 72Q30 82 25 126l20 7 8-30-10 57q27 17 57-2l-8-57 12 31 18-9q-9-43-29-51" fill="#42776c" stroke="#264e45" stroke-width="4"/>
+        <path d="M52 78l20 29 19-31-11 55H60z" fill="#ece4c7"/><path d="M45 123l53-1 3 16-58 1z" fill="#705137"/><path d="M84 136l8 31 12-4-9-32" fill="#bc7849"/>
+        <path d="M33 104l-12 43 7 2 17-40" fill="#b09c70" stroke="#43463a" stroke-width="3"/>
+        <ellipse cx="72" cy="54" rx="26" ry="32" fill="#dcb98f"/><path d="M46 54q-9-45 27-43 35 0 26 47l-10-24-16 6-20-8z" fill="#293a34"/>
+        <ellipse cx="73" cy="13" rx="16" ry="12" fill="#293a34"/><path d="M53 27l40-1" stroke="#af7047" stroke-width="7"/>
+        <g class="explore-face"><path d="M59 55h4m18 0h4" stroke="#383c30" stroke-width="4"/><path d="M68 72q5 3 10-1" fill="none" stroke="#996e53" stroke-width="2"/></g>
+        <path class="explore-back" d="M46 44q23-20 51 0l-4 42-17 7-25-12z" fill="#293a34"/>
+        </g></svg>
+    </div>
+  </div><div class="explore-vignette"></div></div>
+  <footer class="explore-controls"><div class="explore-pad" aria-label="方向控制">
+    <button data-direction="up" aria-label="向上走">↑</button><button data-direction="left" aria-label="向左走">←</button><span>行</span><button data-direction="right" aria-label="向右走">→</button><button data-direction="down" aria-label="向下走">↓</button>
+  </div><div class="explore-actions"><button data-interact disabled>靠近村民可招呼</button><p>方向鍵 / WASD 移動<br>靠近後按 E 或輕觸招呼</p></div></footer>
+  <section class="explore-dialog" data-dialog hidden role="dialog" aria-modal="true" aria-label="村民招呼"><small>桃溪村民</small><p>少俠，慢些走。<br>繞過老桃樹，前面便是村道。</p><button>繼續散步</button></section>
+</main></div></div></div>
+<script src="/prototype-display-owner.js"></script><script src="/js/01-stage-v8-touch-lock.js"></script>
+<script type="module">import {mountCorner} from './runtime.mjs';let dispose=mountCorner(document.querySelector('.explore-corner'));window.addEventListener('pagehide',()=>{dispose?.();dispose=null;});window.addEventListener('pageshow',()=>{if(!dispose)dispose=mountCorner(document.querySelector('.explore-corner'));});</script>
+</body></html>
