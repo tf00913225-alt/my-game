@@ -11,14 +11,23 @@ export function displaySource(){
  if(start<0||end<0)throw Error('Canonical Display boundary changed; review fixture');
  return source.slice(start,end+'window.eventToGamePoint = getGamePointFromEvent;'.length);
 }
+export function sampleHtml(){
+ const template=fs.readFileSync(path.join(root,'prototypes/exploration-corner/index.html'),'utf8');
+ const marker='<!-- canonical-display-owner -->',source=displaySource();
+ if(template.split(marker).length!==2||/<\/script/i.test(source))throw Error('Canonical Display insertion boundary changed; review fixture');
+ return template.replace(marker,()=>`<script>${source}</script>`);
+}
 export function startSample(port=0){return new Promise(resolve=>{
  const server=http.createServer((req,res)=>{
   const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);
-  if(pathname==='/prototype-display-owner.js'){res.setHeader('Content-Type','text/javascript');res.end(displaySource());return;}
   const relative=pathname==='/'?'/prototypes/exploration-corner/index.html':pathname;
   const target=path.resolve(root,'.'+relative);
   if(!target.startsWith(root)||!fs.existsSync(target)||!fs.statSync(target).isFile()){res.writeHead(404);res.end();return;}
   res.setHeader('Cache-Control','no-store');res.setHeader('Content-Type',({'.html':'text/html; charset=utf-8','.mjs':'text/javascript','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml'})[path.extname(target)]||'application/octet-stream');
+  if(relative==='/prototypes/exploration-corner/index.html'){
+   try{res.end(sampleHtml());}catch(error){res.writeHead(500);res.end('Sample Display initialization failed');console.error(error);}
+   return;
+  }
   fs.createReadStream(target).pipe(res);
  });server.listen(port,'127.0.0.1',()=>resolve({server,url:`http://127.0.0.1:${server.address().port}/prototypes/exploration-corner/index.html`}));
 });}

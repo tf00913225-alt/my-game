@@ -2,15 +2,15 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>桃溪一隅 · 操作樣板</title>
 <link rel="stylesheet" href="/css/00-main.css"><link rel="stylesheet" href="/css/03-stage-v4-viewport-lock.css">
-<link rel="stylesheet" href="./style.css"></head><body>
+<link rel="stylesheet" href="/prototypes/exploration-corner/style.css"></head><body>
 <div id="game-viewport"><div id="game-stage"><div id="game-overlay-layer">
 <main class="explore-corner" tabindex="0" aria-label="桃溪村探索操作樣板">
   <header class="explore-heading"><span>四 象 江 湖 傳</span><h1>桃溪一隅</h1><p>沿溪而行，且聽風過桃枝。</p><small>探索操作樣板</small></header>
   <div class="explore-viewport"><div class="explore-world" data-world>
-    <svg class="explore-ground" viewBox="0 0 1400 2600" aria-hidden="true"><use href="./art.svg#ground"/></svg>
+    <svg class="explore-ground" viewBox="0 0 1400 2600" aria-hidden="true"><use href="/prototypes/exploration-corner/art.svg#ground"/></svg>
     <div class="explore-player" data-player data-facing="up">
       <span class="explore-shadow"></span>
-      <svg viewBox="0 0 140 200" aria-label="行走中的俠客"><use href="./traveller.svg#up-0"/></svg>
+      <svg viewBox="0 0 140 200" aria-label="行走中的俠客"><use href="/prototypes/exploration-corner/traveller.svg#up-0"/></svg>
     </div>
     <span class="explore-destination" data-destination hidden aria-hidden="true"></span>
   </div><div class="explore-vignette"></div></div>
@@ -19,6 +19,6 @@
   </div><div class="explore-actions"><button data-interact disabled>靠近村民可招呼</button><p data-status role="status">點地面移動<br>點村民走近再招呼</p></div></footer>
   <section class="explore-dialog" data-dialog hidden role="dialog" aria-modal="true" aria-label="村民招呼"><small>桃溪村民</small><p>少俠，慢些走。<br>繞過老桃樹，前面便是村道。</p><button>繼續散步</button></section>
 </main></div></div></div>
-<script src="/prototype-display-owner.js"></script><script src="/js/01-stage-v8-touch-lock.js"></script>
+<!-- canonical-display-owner --><script src="/js/01-stage-v8-touch-lock.js"></script>
 <script type="module">import {mountCorner} from './runtime.mjs';let dispose=mountCorner(document.querySelector('.explore-corner'));window.addEventListener('pagehide',()=>{dispose?.();dispose=null;});window.addEventListener('pageshow',()=>{if(!dispose)dispose=mountCorner(document.querySelector('.explore-corner'));});</script>
 </body></html>

@@ -1,5 +1,21 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {scene,move,canStand,cameraFor,nearNpc,findRoute,followRoute,npcRoute} from './scene.mjs';import {displaySource} from './serve.mjs';
+import {scene,move,canStand,cameraFor,nearNpc,findRoute,followRoute,npcRoute} from './scene.mjs';import {displaySource,startSample} from './serve.mjs';
+test('sample host serves real static references and canonical Display before consumers',async()=>{
+ const {server,url}=await startSample();
+ try{
+  const response=await fetch(url),html=await response.text();assert.equal(response.status,200);
+  assert.ok(html.includes(`<script>${displaySource()}</script>`));
+  assert.ok(html.indexOf('window.eventToGamePoint =')<html.indexOf('src="/js/01-stage-v8-touch-lock.js"'));
+  const template=fs.readFileSync(new URL('./index.html',import.meta.url),'utf8');
+  for(const [,reference] of template.matchAll(/(?:src|href)="([^"]+)"/g)){
+   const relative=reference.split('#')[0];assert.ok(relative.startsWith('/'));
+   assert.ok(fs.statSync(new URL('../..'+relative,import.meta.url)).isFile(),reference);
+   const resource=await fetch(new URL(reference,url));assert.equal(resource.status,200,reference);
+   assert.match(resource.headers.get('content-type'),/text\/css|text\/javascript|image\/svg\+xml/);
+  }
+  assert.equal((await fetch(new URL('/prototype-display-owner.js',url))).status,404);
+ }finally{server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
+});
 test('safe spawn, boundary and solid furniture cannot be entered',()=>{
  assert.ok(canStand(scene.spawn.x,scene.spawn.y));assert.equal(canStand(0,100),false);
  for(const {solid:b} of scene.objects)assert.equal(canStand(b.x+b.width/2,b.y+b.height/2),false);
