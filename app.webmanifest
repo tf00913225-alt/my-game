@@ -1,0 +1,19 @@
+{
+  "id": "./",
+  "name": "四象江湖傳",
+  "short_name": "四象江湖",
+  "lang": "zh-Hant",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b0907",
+  "theme_color": "#0b0907",
+  "icons": [
+    {
+      "src": "assets/relics/icons/relic_all_returning_array.webp",
+      "sizes": "1254x1254",
+      "type": "image/webp",
+      "purpose": "any"
+    }
+  ]
+}
