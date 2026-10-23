@@ -1,0 +1,166 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "productHead": "938361014a711d3c3d9a0e1bbefc5bd4abb6af89",
+  "status": "Representative presentation fixture verified; art direction and true Core acceptance pending",
+  "device": "physical Samsung SM-N960F / Chrome / serial2858d1d9c23f7ece",
+  "nativeVideo": {
+    "width": 720,
+    "sha256": "AA1ED5B8F44DAEBAB4C6804B70EC0068DF8A941D074EB5DA07DC780583D7C307",
+    "duration": 12.019811,
+    "height": 1280,
+    "path": "artifacts/fire-sample-usb/native-preview.mp4"
+  },
+  "desktop": {
+    "scope": "CDP screenshots sampled with host timestamps; WebM replay encoded from those frames, not native framebuffer/FPS evidence",
+    "passed": true,
+    "sampledFrames": 27
+  },
+  "usb": {
+    "cleanup": true,
+    "passed": true,
+    "sequenceDurationMs": 3202,
+    "rows": [
+      {
+        "sampleCount": 53,
+        "kind": "damage",
+        "after": {
+          "unit": [
+            13.392857551574707,
+            174.79522705078125,
+            125.64999389648438,
+            153.77699279785156
+          ],
+          "hud": [
+            13.392857551574707,
+            174.79522705078125,
+            125.64999389648438,
+            153.77699279785156
+          ]
+        },
+        "targetSide": "monster",
+        "activeSamples": 9,
+        "hpAfter": 816,
+        "before": {
+          "unit": [
+            13.392857551574707,
+            174.79522705078125,
+            125.64999389648438,
+            153.77699279785156
+          ],
+          "hud": [
+            13.392857551574707,
+            174.79522705078125,
+            125.64999389648438,
+            153.77699279785156
+          ]
+        },
+        "hpBefore": 816,
+        "index": 0,
+        "duration": 760,
+        "side": "player",
+        "gate": "v142-v143-visual-complete"
+      },
+      {
+        "sampleCount": 54,
+        "kind": "criticalDamage",
+        "after": {
+          "unit": [
+            272.3857116699219,
+            424.7329406738281,
+            125.6500244140625,
+            130.2119140625
+          ],
+          "hud": [
+            272.3857116699219,
+            424.7329406738281,
+            125.6500244140625,
+            130.2119140625
+          ]
+        },
+        "targetSide": "player",
+        "activeSamples": 9,
+        "hpAfter": 100000,
+        "before": {
+          "unit": [
+            272.3857116699219,
+            424.7329406738281,
+            125.6500244140625,
+            130.2119140625
+          ],
+          "hud": [
+            272.3857116699219,
+            424.7329406738281,
+            125.6500244140625,
+            130.2119140625
+          ]
+        },
+        "hpBefore": 100000,
+        "index": 2,
+        "duration": 760,
+        "side": "monster",
+        "gate": "v142-v143-visual-complete"
+      },
+      {
+        "sampleCount": 58,
+        "kind": "miss",
+        "after": {
+          "unit": [
+            272.3857116699219,
+            174.79522705078125,
+            125.6500244140625,
+            153.77699279785156
+          ],
+          "hud": [
+            272.3857116699219,
+            174.79522705078125,
+            125.6500244140625,
+            153.77699279785156
+          ]
+        },
+        "targetSide": "monster",
+        "activeSamples": 0,
+        "hpAfter": 1000000,
+        "before": {
+          "unit": [
+            272.3857116699219,
+            174.79522705078125,
+            125.6500244140625,
+            153.77699279785156
+          ],
+          "hud": [
+            272.3857116699219,
+            174.79522705078125,
+            125.6500244140625,
+            153.77699279785156
+          ]
+        },
+        "hpBefore": 1000000,
+        "index": 2,
+        "duration": 760,
+        "side": "player",
+        "gate": "v142-v143-visual-complete"
+      }
+    ]
+  },
+  "limits": [
+    "Presentation director and feedback fixture, not actual Core damage/lunge entry.",
+    "HP stays unchanged; -1HP is explicitly fixture feedback.",
+    "No full fire skill, six-v-six, reduced-motion USB or shield/death USB matrix claim.",
+    "Phone and host clocks unsynchronized; direct Date.now subtraction is invalid. Native decoded images are evidence.",
+    "Earlier startup-only/incomplete/QA failures retained and excluded."
+  ],
+  "ci": {
+    "conclusion": "failure",
+    "reruns": 0,
+    "attempt": 1,
+    "run": 39876607582,
+    "head": "938361014a711d3c3d9a0e1bbefc5bd4abb6af89",
+    "owner": "Existing #976; no Chrome fix or rerun here",
+    "failed": [
+      "portrait120163938613 Chrome startup",
+      "Abyss120163938876 Chrome startup",
+      "Session120163939118 boot Chrome startup",
+      "aggregate120173654599"
+    ]
+  }
+}
