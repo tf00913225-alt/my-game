@@ -87,7 +87,8 @@ assert.equal(below13(nonBattlePolish).length, 0, 'V146 non-battle typography mus
 // Hierarchy: 13px is a floor, not a blanket replacement.
 assert.match(homeRoster, /\.v146-home-roster>header\{[^}]*font-size:13px/);
 assert.match(homeRoster, /\.v146-home-character\{[^}]*font-size:13px/);
-assert.match(homeRoster, /\.v146-home-character span\{[^}]*white-space:nowrap/);
+assert.match(homeRoster, /\.v146-home-character>span\{[^}]*white-space:nowrap/,'the direct level label must remain on one line');
+assert.match(homeRoster, /\.v146-home-character b\{[^}]*white-space:normal;[^}]*overflow-wrap:anywhere;/,'long character names must remain readable inside their own card');
 assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
 assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(read(owners.skillSkin), /\.skill-loadout-slot-name\{[^}]*font-size:15px/);
