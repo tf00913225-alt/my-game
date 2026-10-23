@@ -17,8 +17,9 @@ test('installed launch identity and icons remain same-origin and in scope at roo
   for(const icon of manifest.icons){assert.equal(new URL(icon.src,url).origin,url.origin);assert(new URL(icon.src,url).pathname.startsWith(scope.pathname));}
  }
 });
-test('declared existing WebP icon dimensions and cache metadata agree with served assets',()=>{
+test('PWA WebP icons have truthful dimensions within desktop installability bounds',()=>{
  assert.ok(manifest.icons.length);
+  assert.deepEqual(manifest.icons.map(icon=>icon.sizes).sort(),['192x192','512x512']);
  for(const icon of manifest.icons){
   const file=path.resolve(icon.src);assert(file.startsWith(path.resolve('assets')+path.sep));
   const bytes=fs.readFileSync(file);assert.equal(bytes.toString('ascii',0,4),'RIFF');assert.equal(bytes.toString('ascii',8,12),'WEBP');
@@ -26,7 +27,7 @@ test('declared existing WebP icon dimensions and cache metadata agree with serve
   if(kind==='VP8X'){width=1+bytes.readUIntLE(24,3);height=1+bytes.readUIntLE(27,3);}
   else if(kind==='VP8L'){const n=bytes.readUInt32LE(21);width=(n&16383)+1;height=((n>>>14)&16383)+1;}
   else{assert.equal(kind,'VP8 ');width=bytes.readUInt16LE(26)&16383;height=bytes.readUInt16LE(28)&16383;}
-  assert.equal(icon.sizes,width+'x'+height);assert.equal(width,height);assert(width>=512);assert.equal(icon.type,'image/webp');
+   assert.equal(icon.sizes,width+'x'+height);assert.equal(width,height);assert(width>=144&&width<=1024);assert.equal(icon.type,'image/webp');assert.equal(icon.purpose,'any');
  }
  assert.match(fs.readFileSync('_headers','utf8'),/\/app\.webmanifest\r?\n  Content-Type: application\/manifest\+json\r?\n  Cache-Control: no-cache, no-store, must-revalidate/);
 });

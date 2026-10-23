@@ -10,8 +10,14 @@
   "theme_color": "#0b0907",
   "icons": [
     {
-      "src": "assets/relics/icons/relic_all_returning_array.webp",
-      "sizes": "1254x1254",
+      "src": "assets/ui/pwa/four-symbols-192.webp",
+      "sizes": "192x192",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/ui/pwa/four-symbols-512.webp",
+      "sizes": "512x512",
       "type": "image/webp",
       "purpose": "any"
     }
