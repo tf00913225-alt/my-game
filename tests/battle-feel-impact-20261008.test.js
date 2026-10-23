@@ -100,12 +100,12 @@ assert.equal(cancelled,2);assert.equal(cleanupContext.state.impactFlashes.size,0
 const spriteClasses=new Set();
 const spriteNode={style:{setProperty(key,value){this[key]=value;}},dataset:{},setAttribute(){},classList:{contains:key=>spriteClasses.has(key),add:key=>spriteClasses.add(key)}};
 const rasterMicrotasks=[];
-const spriteCurrent={duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',targetIndexes:[0],model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
+const spriteCurrent={config:{id:'normal'},duration:520,startedAt:100,firstVisibleFrameAt:0,targetSide:'monster',targetIndexes:[0],model:{sprite:{src:'normal.webp',columns:4,rows:3,frames:12,hitFrame:6,impactOnly:true}},spriteNodes:new Map(),confirmedTargets:new Set([0])};
 const raster={window:{},state:{current:spriteCurrent,stage:{}},Date:{now:()=>100},placementFor:()=> 'single',appendSpriteNode:()=>spriteNode,
     queueMicrotask:fn=>rasterMicrotasks.push(fn),setTimer(){},targetHitTime:()=>397,
     beginVisualTimeline(current){assert.ok(spriteClasses.has('v143-vfx-sprite-active'));assert.equal(spriteNode.style.animationPlayState,'paused');current.firstVisibleFrameAt=100;current.visualStartedAt=100;},placeSprite(_current,node){node.style.left='10px';node.style.top='20px';},requestSpriteAspect(){},cardFor:()=>({classList:{remove(){}}}),syncStatusVisualsForUnit(){}};
 vm.createContext(raster);
-vm.runInContext(source.slice(source.indexOf('    function addSprite('),source.indexOf('    function targetHitTime(')),raster);
+vm.runInContext(source.slice(source.indexOf('    function addNormalProjectile('),source.indexOf('    function targetHitTime(')),raster);
 vm.runInContext(source.slice(source.indexOf('    function settleTargetVisual('),source.indexOf('    function registerTarget(')),raster);
 raster.addSprite(spriteCurrent,0,{});assert.equal(spriteNode.style.visibility,'hidden');assert.equal(spriteNode.style.animationPlayState,'paused');assert.equal(spriteNode.style['--v143-sprite-delay'],'-260ms');
 assert.equal(spriteCurrent.firstVisibleFrameAt,0);assert.equal(rasterMicrotasks.length,1);rasterMicrotasks[0]();
