@@ -12,7 +12,10 @@ const f=setup();f.c.addSprite(f.current,0,{});f.c.addSprite(f.current,1,{});f.c.
 assert.equal(f.current.spriteNodes.size,1,'one shared group source, not three damage clips');
 assert.equal(f.tracks.length,1,'remeasuring another target does not restart envelope');
 assert.equal(f.tracks[0].options.duration,1450);assert.equal(f.tracks[0].frames[2].offset,7/12);
-assert.ok(f.tracks[0].frames.every(k=>k.scale<=1&&k.scale>=.9),'within original fitted box');
+assert.ok(f.tracks[0].frames.every(k=>{
+ assert.match(k.transform,/^translate\(-50%,-50%\) scale\(/,'translation precedes scale, preserving fitted center');
+ const scale=Number(k.transform.match(/scale\(([^)]+)\)/)[1]);return scale<=1&&scale>=.9;
+}),'within original fitted box');
 assert.equal(f.node.style.left,'80px');assert.equal(f.node.style.top,'100px');
 for(const [id,reduced] of [['phoenixCry',false],['flameSlash',false],['explosiveFlurry',true]]){
  const x=setup(id,reduced);x.c.addSprite(x.current,0,{});assert.equal(x.tracks.length,0);

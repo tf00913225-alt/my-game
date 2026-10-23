@@ -1582,10 +1582,10 @@
            !(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
             node.dataset.motion="fire-range-envelope";
             node.v143MotionAnimation=node.animate([
-                {scale:.90,offset:0},
-                {scale:.94,offset:.25},
-                {scale:1,offset:Number(current.model.hit)||DEFAULT_HIT},
-                {scale:.98,offset:1}
+                {transform:"translate(-50%,-50%) scale(.90)",offset:0},
+                {transform:"translate(-50%,-50%) scale(.94)",offset:.25},
+                {transform:"translate(-50%,-50%) scale(1)",offset:Number(current.model.hit)||DEFAULT_HIT},
+                {transform:"translate(-50%,-50%) scale(.98)",offset:1}
             ],{duration:current.duration,fill:"both",easing:"linear"});
             if(current.firstVisibleFrameAt){ node.v143MotionAnimation.currentTime=Math.max(0,Date.now()-current.visualStartedAt); }
         }
