@@ -470,6 +470,10 @@
     animation:v174BattleIdle 3.4s ease-in-out var(--battle-idle-phase,0ms) infinite;
     pointer-events:none;
 }
+#game-stage #battlePage .battle-player > .v174-battle-art .v174-portrait-paint{
+    top:auto;
+    height:var(--party-art-height,100%);
+}
 #game-stage #battlePage .v174-normalized-portrait .v174-portrait-paint{
     position:absolute;
     inset:auto;

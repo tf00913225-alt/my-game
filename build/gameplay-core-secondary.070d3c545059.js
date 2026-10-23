@@ -8014,6 +8014,57 @@ function removeRetiredPresentationStyles(){
     if(style){ style.remove(); }
 }
 function numericValue(value){const n=Number(value);return Number.isFinite(n)?Math.max(0,Math.floor(n)):0;}
+/* Offline alpha-area metadata. Same optical footprint in every party Slot;
+   no image mutation, runtime pixel scan, row multiplier or gameplay clock. */
+const PARTY_ART_DENSITY=Object.freeze({
+    "assets/characters/battle_female_earth.png": {
+        "density": 0.42186618327911163,
+        "sha256": "7add06d9c47cb7490e352a71600cfcf85f0c804d39c9377fd753e0db5a2bb0ec"
+    },
+    "assets/characters/battle_female_fire.png": {
+        "density": 0.4527419832519206,
+        "sha256": "cf43645eb6fdf75ba13a021b723538bb7f18c20f4d5644653e2d8159280ffb0f"
+    },
+    "assets/characters/battle_female_water.png": {
+        "density": 0.44937922113313844,
+        "sha256": "cd8f1b74be9f502ebd564ae7bff5eeee89b121e99a64ddca38323cc303448fea"
+    },
+    "assets/characters/battle_female_wind.png": {
+        "density": 0.43685583469524253,
+        "sha256": "ef5be3d2f6cb084c06561755b949933e614186e1542396c8d27fb9109973e58f"
+    },
+    "assets/characters/battle_male_earth.png": {
+        "density": 0.4382343409588743,
+        "sha256": "2f120e082c789157f1431bfac14100aea7dc1382bffdc59d51031e79c7d14918"
+    },
+    "assets/characters/battle_male_fire.png": {
+        "density": 0.4403820635895895,
+        "sha256": "058712570f014d8acde999593bec3348c8524d64e67e56e213274a0072b13a3b"
+    },
+    "assets/characters/battle_male_water.png": {
+        "density": 0.4396561308553197,
+        "sha256": "3ef9a794f90337a45745fff0d13bbd3cf3658be4732e043d7ab6d0aaa43b47ac"
+    },
+    "assets/characters/battle_male_wind.png": {
+        "density": 0.42985031998931345,
+        "sha256": "07454a11ee0806bf0d79e2f0e19dda4191ed21552799a6402d099e45db1d0d65"
+    },
+    "assets/heroes/divine-dog-hongbao.webp": {
+        "density": 0.49974072097419614,
+        "sha256": "9ff4926bcaefc6ccadd2b4543184f04edc5b99c194da4b991de7cf20e97870b5"
+    },
+    "assets/heroes/vajra-heavenly-king.webp": {
+        "density": 0.520696867047023,
+        "sha256": "528324b5d2467bd14cc0c3e38e8fd6151e98d4d6d92047a610d17c4cbedb13bf"
+    }
+});
+const PARTY_ART_REFERENCE_DENSITY=Math.min(...Object.values(PARTY_ART_DENSITY).map(record=>record.density));
+function partyPortraitHeight(source){
+    const match=String(source||"").match(/url\(["']?([^"')]+)["']?\)/i);
+    const path=match?match[1].split(/[?#]/)[0].replace(/^https?:\/\/[^/]+\//,"").replace(/^\//,""):"";
+    const record=PARTY_ART_DENSITY[path];
+    return record?String(Math.sqrt(PARTY_ART_REFERENCE_DENSITY/record.density)*100)+"%":"100%";
+}
 function setTextIfChanged(node,value){if(node&&node.textContent!==value)node.textContent=value;}
 function battleArtworkSource(card,kind){
     if(!card)return "";
@@ -8049,6 +8100,10 @@ function syncUnitArtwork(card,kind,selectedRecord){
     let paint=action.querySelector(":scope > .v174-portrait-paint");
     if(record?.generic){if(paint)paint.remove();paint=null;}
     else if(!paint){paint=document.createElement("div");paint.className="v174-portrait-paint";action.appendChild(paint);}
+    if(paint){
+        if(kind==="player"){ paint.style.setProperty("--party-art-height",partyPortraitHeight(source)); }
+        else{ paint.style.removeProperty("--party-art-height"); }
+    }
     // Slot identity gives repeatable, unsynchronised breathing without RNG.
     const phase=Number(String(card.id).replace(/\D/g,""))||0;
     art.style.setProperty("--battle-idle-phase",String(-((phase*613+(kind==="monster"?271:0))%3400))+"ms");
