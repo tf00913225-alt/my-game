@@ -200,11 +200,47 @@ function readProcWindow(file,limit){
     finally{if(fd!==undefined)try{fs.closeSync(fd);}catch{}}
 }
 
+// Passive metadata only, inside the existing page-wait worker/time budget.
+// Current cgroup only: no ancestor scan, triggers, settings or mapped-file reads.
+function readStartupResourceWindow(base,{procRoot='/proc',cgroupRoot='/sys/fs/cgroup'}={}){
+    const started=performance.now(),read=file=>readProcWindow(file,4096);
+    const result={sampleMonotonicMs:started,timeOriginMs:performance.timeOrigin,pressure:{io:read(path.join(procRoot,'pressure/io')),cpu:read(path.join(procRoot,'pressure/cpu'))}};
+    const resolved=path.resolve(base),proc=path.resolve(procRoot);
+    if(path.dirname(resolved)!==proc||!/^\d+$/.test(path.basename(resolved))){
+        return {...result,cgroup:{error:'INVALID_PROCESS_PATH'}};
+    }
+    const binding=read(path.join(resolved,'cgroup'));
+    result.cgroup={binding};
+    if(binding.error||binding.truncated)return result;
+    const unified=binding.text.split('\n').filter(line=>line.startsWith('0::'));
+    if(unified.length!==1){result.cgroup.error='CGROUP_V2_BINDING_UNAVAILABLE';return result;}
+    const relative=unified[0].slice(3);
+    if(!relative.startsWith('/')||relative.includes('\\')||relative.includes('\0')||relative.split('/').some(part=>part==='.'||part==='..')){
+        result.cgroup.error='INVALID_CGROUP_PATH';return result;
+    }
+    try{
+        const root=fs.realpathSync(cgroupRoot),requested=path.resolve(root,'.'+relative),directory=fs.realpathSync(requested);
+        if(directory!==requested){result.cgroup.error='REDIRECTED_CGROUP_DIRECTORY';return result;}
+        if(directory!==root&&!directory.startsWith(root+path.sep)){result.cgroup.error='CGROUP_PATH_OUTSIDE_ROOT';return result;}
+        result.cgroup.path=relative;
+        for(const name of ['io.stat','io.max','io.pressure','cpu.stat']){
+            const file=path.join(directory,name);
+            // Refuse a redirected file as well as a redirected cgroup directory.
+            try{if(fs.realpathSync(file)!==file){result.cgroup[name]={error:'REDIRECTED_CGROUP_FILE'};continue;}}
+            catch(error){result.cgroup[name]={error:error.code||'UNAVAILABLE'};continue;}
+            result.cgroup[name]=read(file);
+        }
+    }catch(error){result.cgroup.error=error.code||'UNAVAILABLE';}
+    result.readDurationMs=Math.round(performance.now()-started);
+    return result;
+}
+
 function observeProcPageWait(base,{timeoutMs=200,workerSource}={}){
     const started=performance.now(),evidence={status:'pending',budgetMs:timeoutMs};
-    const source=workerSource||`const fs=require('node:fs');const {parentPort,workerData}=require('node:worker_threads');
+    const source=workerSource||`const fs=require('node:fs'),path=require('node:path');const {parentPort,workerData}=require('node:worker_threads');
         const readProcWindow=${readProcWindow.toString()};
-        const started=performance.now();const result={syscall:readProcWindow(workerData+'/syscall',4096),maps:readProcWindow(workerData+'/maps',128*1024),stack:readProcWindow(workerData+'/stack',4096)};
+        const readStartupResourceWindow=${readStartupResourceWindow.toString()};
+        const started=performance.now();const result={syscall:readProcWindow(workerData+'/syscall',4096),maps:readProcWindow(workerData+'/maps',128*1024),stack:readProcWindow(workerData+'/stack',4096),resources:readStartupResourceWindow(workerData)};
         parentPort.postMessage({...result,readDurationMs:Math.round(performance.now()-started)});`;
     // A worker shares this parent's process credentials, unlike a sibling
     // strace process. A stuck proc read must never block the launch deadline.
@@ -345,4 +381,4 @@ class Cdp{
 }
 
 
-export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup,readProcWindow,observeProcPageWait};
+export {ASSET_MANIFEST,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE,qaPrelude,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup,readProcWindow,readStartupResourceWindow,observeProcPageWait};
