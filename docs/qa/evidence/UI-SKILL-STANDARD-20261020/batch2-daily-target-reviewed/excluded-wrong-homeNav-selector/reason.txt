@@ -1,0 +1,1 @@
+QA incorrectly requested #homeNav in dungeon context nav; no final report, excluded. Qualified helper uses original aria-label=返回. Product navigation unchanged.

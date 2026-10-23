@@ -9790,7 +9790,26 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "head": "b97730b4d970ec94ce111406f9a083eea3ae6b5d",
+          "status": "部分已實際驗證",
+          "scope": "批2日常分類按鈕原min-height48→52；真點分類與原context返回四尺寸",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/batch2-daily-target-reviewed",
+          "limits": [
+            "本段未改標題間距或分類美術；不批准全UI品質",
+            "QA僅記場景與EFP，未保存完整input trace/同task raw restore；隔離QA profile不是實機",
+            "列表end/其他分類/戰鬥modal穿透/nav全體/實機仍未驗",
+            "Latest Head必要CI未通過，不合併部署"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
