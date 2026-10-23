@@ -9346,7 +9346,9 @@ ensureFunctionalStyles();runRepairs();
             MAX_LANES,
             Math.floor(upwardRoom/LANE_PITCH_PX)+1
         ));
-        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:context.fireSample?1:capacity};
+        const fireActive=Array.from(context.active.values()).some(request=>request.presentationStyle==="fire-sample")||
+            context.queue.some(request=>request.presentationStyle==="fire-sample");
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:fireActive?1:capacity};
     }
     function freeLane(context,metrics){
         const resolved=metrics||laneMetrics(context);
@@ -9418,7 +9420,6 @@ ensureFunctionalStyles();runRepairs();
     function enqueue(request,deferPump){
         if(request.cancelled||request.finished){ return; }
         const context=contextFor(request.side,request.index);
-        if(request.presentationStyle==="fire-sample")context.fireSample=true;
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);

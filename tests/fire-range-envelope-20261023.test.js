@@ -23,3 +23,12 @@ for(const [id,reduced] of [['phoenixCry',false],['flameSlash',false],['explosive
 const late=setup();late.current.firstVisibleFrameAt=late.current.visualStartedAt=100;late.c.addSprite(late.current,0,{});
 assert.equal(late.tracks[0].currentTime,800,'late source catches up without new clock');
 console.log('Fire range sample: one bounded envelope, unchanged clock/anchor, reduced-motion and other-skill exclusions PASS');
+// Larger sample glyphs reserve room only while that request is active/queued.
+const feedback=fs.readFileSync('js/battle-floating-feedback-owner.js','utf8');
+const lanes={MAX_LANES:4,LANE_PITCH_PX:25,LANE_RENDER_HEIGHT_PX:23,LANE_BOTTOM_INSET_PX:6,
+ currentGeometry:()=>({unitRect:{},feedbackSafeRect:{left:0,top:0,width:120,height:180,bottom:180}}),numeric:(n,f)=>Number.isFinite(Number(n))?Number(n):f};
+vm.createContext(lanes);vm.runInContext(feedback.slice(feedback.indexOf('    function laneMetrics('),feedback.indexOf('    function freeLane(')),lanes);
+const context={side:'monster',index:0,active:new Map(),queue:[]};
+assert.equal(lanes.laneMetrics(context).capacity,4);
+context.active.set(1,{presentationStyle:'fire-sample'});assert.equal(lanes.laneMetrics(context).capacity,1);
+context.active.clear();context.queue.push({kind:'status'});assert.equal(lanes.laneMetrics(context).capacity,4,'non-fire capacity restored even with later status queued');
