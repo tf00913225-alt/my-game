@@ -9843,6 +9843,24 @@
             "無完整raw input trace；runtimeRestoreExact=false，隔離QA profile已清除",
             "全UI/一般nav/其他副本狀態及Latest Head必要CI仍未完成"
           ]
+        },
+        {
+          "head": "e4966289d0fdf41580363fb835f301b430d182e3",
+          "status": "部分已實際驗證",
+          "scope": "一般nav原底板沿用技能黑鐵雕飾；四尺寸主城/按下/副本/context返回",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/batch2-nav-frame-reviewed",
+          "limits": [
+            "僅底板，不批准圖示比例已一致/全UI",
+            "desktop mouse/mobile touch；其他context/focus/實機未驗",
+            "無交易或遊戲邏輯改動；runtimeRestoreExact=false",
+            "Latest Head必要CI尚未通過，不合併部署"
+          ]
         }
       ],
       "reviews": {
