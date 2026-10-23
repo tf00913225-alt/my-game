@@ -18,14 +18,17 @@ export function canStand(x,y,data=scene){
   });
 }
 export function move(state,direction,seconds,data=scene){
-  const delta={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[direction];
-  if(!delta)return {...state,moving:false};
-  const next={...state,facing:direction,moving:false};
+  const vector=typeof direction==='object'&&direction?direction:{up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[direction];
+  const length=vector?Math.hypot(...vector):0;
+  if(!Number.isFinite(length)||!length)return {...state,moving:false};
+  const delta=vector.map(n=>n/length);
+  const facing=Math.abs(delta[0])>Math.abs(delta[1])?(delta[0]>0?'right':'left'):(delta[1]>0?'down':'up');
+  const next={...state,facing,moving:false};
   // Small bounded spatial steps prevent tunnelling even after a slow frame.
   let distance=data.speed*Math.max(0,Math.min(seconds,.05));
   while(distance>0){
     const step=Math.min(distance,4),x=next.x+delta[0]*step,y=next.y+delta[1]*step;
-    if(!canStand(x,y,data))break;
+    if(!clearSegment(next,{x,y},data))break;
     next.x=x;next.y=y;next.moving=true;distance-=step;
   }
   return next;
@@ -36,23 +39,42 @@ export function cameraFor(state,data=scene){
 }
 export const nearNpc=state=>Math.hypot(state.x-1060,state.y-1350)<165;
 
-// Bounded four-neighbour grid, only for this corner. Every edge uses the same
-// collision owner as manual movement, including connections to exact endpoints.
+// The bounded grid is planning only. Movement and route smoothing share an exact
+// swept-circle clearance check, so diagonal segments cannot cut solid corners.
+function pointSegmentDistance(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y,length=dx*dx+dy*dy;
+  const t=length?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/length)):0;
+  return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);
+}
+function segmentDistance(a,b,c,d){
+  const cross=(p,q,r)=>(q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x);
+  const overlap=Math.max(Math.min(a.x,b.x),Math.min(c.x,d.x))<=Math.min(Math.max(a.x,b.x),Math.max(c.x,d.x))&&Math.max(Math.min(a.y,b.y),Math.min(c.y,d.y))<=Math.min(Math.max(a.y,b.y),Math.max(c.y,d.y));
+  if(overlap&&cross(a,b,c)*cross(a,b,d)<=0&&cross(c,d,a)*cross(c,d,b)<=0)return 0;
+  return Math.min(pointSegmentDistance(a,c,d),pointSegmentDistance(b,c,d),pointSegmentDistance(c,a,b),pointSegmentDistance(d,a,b));
+}
 function clearSegment(a,b,data){
-  const distance=Math.hypot(b.x-a.x,b.y-a.y),steps=Math.ceil(distance/4);
-  for(let i=0;i<=steps;i++){const t=steps?i/steps:0;if(!canStand(a.x+(b.x-a.x)*t,a.y+(b.y-a.y)*t,data))return false;}
-  return true;
+  if(!canStand(a.x,a.y,data)||!canStand(b.x,b.y,data))return false;
+  return !data.objects.some(({solid:r})=>{
+    const points=[{x:r.x,y:r.y},{x:r.x+r.width,y:r.y},{x:r.x+r.width,y:r.y+r.height},{x:r.x,y:r.y+r.height}];
+    return points.some((p,i)=>segmentDistance(a,b,p,points[(i+1)%4])<data.radius-1e-8);
+  });
 }
 function connect(a,b,data){
-  for(const corner of [{x:b.x,y:a.y},{x:a.x,y:b.y}]){
-    if(clearSegment(a,corner,data)&&clearSegment(corner,b,data))return [corner,b];
+  return clearSegment(a,b,data)?[b]:null;
+}
+function smoothRoute(start,route,data){
+  const result=[];let anchor=start,index=0;
+  while(index<route.length){
+    let next=route.length-1;while(next>index&&!clearSegment(anchor,route[next],data))next--;
+    if(Math.hypot(route[next].x-anchor.x,route[next].y-anchor.y)>.01)result.push(route[next]);
+    anchor=route[next];index=next+1;
   }
-  return null;
+  return result;
 }
 export function findRoute(start,target,data=scene){
   if(!canStand(start.x,start.y,data)||!canStand(target.x,target.y,data))return null;
   const direct=connect(start,target,data);
-  if(direct)return direct.filter((p,i)=>Math.hypot(p.x-(i?direct[i-1]:start).x,p.y-(i?direct[i-1]:start).y)>.01);
+  if(direct)return smoothRoute(start,direct,data);
   const cell=40,cols=Math.floor(data.width/cell),rows=Math.floor(data.height/cell);
   const nodes=Array.from({length:cols*rows},(_,i)=>({x:(i%cols+.5)*cell,y:(Math.floor(i/cols)+.5)*cell}));
   const nearest=point=>nodes.map((p,i)=>({p,i,d:Math.hypot(p.x-point.x,p.y-point.y)})).filter(n=>n.d<=cell*1.5&&canStand(n.p.x,n.p.y,data)).sort((a,b)=>a.d-b.d);
@@ -65,7 +87,7 @@ export function findRoute(start,target,data=scene){
     if(ends.has(id)){
       const chain=[];let key=id;while(parents.get(key)!==null){chain.unshift(nodes[key]);key=parents.get(key);}
       const route=[...links.get(key),...chain,...ends.get(id)];
-      return route.filter((p,i)=>Math.hypot(p.x-(i?route[i-1]:start).x,p.y-(i?route[i-1]:start).y)>.01);
+      return smoothRoute(start,route,data);
     }
     for(const next of [id-cols,id+cols,id%cols? id-1:-1,id%cols<cols-1?id+1:-1]){
       if(next<0||next>=nodes.length||parents.has(next)||!clearSegment(p,nodes[next],data))continue;
@@ -79,9 +101,8 @@ export function followRoute(state,route,seconds,data=scene){
   while(route.length&&remaining>.001){
     const target=route[0],dx=target.x-next.x,dy=target.y-next.y;
     if(Math.hypot(dx,dy)<.01){route.shift();continue;}
-    const direction=Math.abs(dx)>.01?(dx>0?'right':'left'):(dy>0?'down':'up');
-    const distance=Math.min(remaining,Math.abs(dx)>.01?Math.abs(dx):Math.abs(dy));
-    const step=move(next,direction,distance/data.speed,data),actual=Math.hypot(step.x-next.x,step.y-next.y);
+    const distance=Math.min(remaining,Math.hypot(dx,dy));
+    const step=move(next,[dx,dy],distance/data.speed,data),actual=Math.hypot(step.x-next.x,step.y-next.y);
     next=step;moved=moved||actual>0;remaining-=distance;
     if(actual<distance-.01){route.length=0;break;}
     if(Math.hypot(target.x-next.x,target.y-next.y)<.01)route.shift();

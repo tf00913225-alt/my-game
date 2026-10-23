@@ -37,16 +37,32 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   const remount=await read();assert.equal(remount.dialog,false);assert.equal(remount.position,start.position);assert.equal(remount.walking,false);
   await hold('down',200);assert.notEqual((await read()).position,remount.position);
   const tapWorld=async(x,y)=>{
+    const started=Date.now();
     const point=await client.eval(`(()=>{const r=document.querySelector('[data-world]').getBoundingClientRect();return {x:r.left+${x}*r.width/1400,y:r.top+${y}*r.height/2600}})()`);
     if(width<700){await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
     else{await client.send('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});}
+    return Date.now()-started;
   };
   const destination=()=>client.eval(`document.querySelector('.explore-corner').dataset.destination`);
   const arrive=async()=>{const deadline=Date.now()+12000;while(await destination()){if(Date.now()>deadline)throw Error('tap route did not arrive');await new Promise(r=>setTimeout(r,100));}};
+  const diagonalStart=await read();await tapWorld(400,1600);await new Promise(r=>setTimeout(r,160));
+  const diagonal=await read(),[sx,sy]=diagonalStart.position.split(',').map(Number),[dx,dy]=diagonal.position.split(',').map(Number);
+  assert.ok(dx<sx&&dy>sy,'tap movement must visibly advance both axes');await capture('diagonal-moving');await arrive();
+  if(width>=700){
+   await client.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowDown',code:'ArrowDown'});await client.send('Input.dispatchKeyEvent',{type:'keyDown',key:'ArrowRight',code:'ArrowRight'});
+   const before=(await read()).position.split(',').map(Number);await new Promise(r=>setTimeout(r,160));
+   await client.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowDown',code:'ArrowDown'});await client.send('Input.dispatchKeyEvent',{type:'keyUp',key:'ArrowRight',code:'ArrowRight'});
+   const after=(await read()).position.split(',').map(Number);assert.ok(after[0]>before[0]&&after[1]>before[1],'combined keyboard input must be diagonal');
+  }
+  await tapWorld(720,1250);await arrive();
   await tapWorld(720,650);assert.equal(await destination(),'720.00,650.00');await capture('tap-house-route');await arrive();
   const houseRoute=await read();assert.ok(Math.abs(Number(houseRoute.position.split(',')[1])-650)<1);await capture('tap-house-arrived');
   await tapWorld(800,900);assert.equal(await destination(),'');assert.match(await client.eval(`document.querySelector('[data-status]').textContent`),/無法抵達/);
-  await tapWorld(720,1250);await new Promise(r=>setTimeout(r,100));await tapWorld(500,1100);assert.equal(await destination(),'500.00,1100.00');
+  await tapWorld(720,1250);await new Promise(r=>setTimeout(r,100));const retapMs=await tapWorld(500,1100),retarget=(await destination()).split(',').map(Number);
+  // The camera keeps moving between CDP coordinate sampling and pointer release.
+  // Bound that drift by actual elapsed time and world speed; stationary taps below remain exact.
+  assert.equal(retarget.length,2);assert.notEqual(await destination(),'720.00,1250.00');
+  assert.ok(Math.hypot(retarget[0]-500,retarget[1]-1100)<=320*retapMs/1000+1,'retarget must match the release-time camera within its physical travel bound');
   await hold('down',200);assert.equal(await destination(),'');const takeover=await read();await new Promise(r=>setTimeout(r,150));assert.equal((await read()).position,takeover.position);
   await tapWorld(720,1250);await arrive();await tapWorld(1060,1280);assert.notEqual(await destination(),'');assert.equal((await read()).dialog,false);await arrive();
   const npcTap=await read();assert.equal(npcTap.prompt,false);assert.equal(npcTap.dialog,false);await new Promise(r=>setTimeout(r,100));await spriteVisible();await capture('tap-npc-arrived');
@@ -54,7 +70,7 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   await client.send('Emulation.setDeviceMetricsOverride',{width:width<700?360:1440,height:width<700?800:900,deviceScaleFactor:1,mobile:width<700});
   await new Promise(r=>setTimeout(r,150));await tapWorld(800,1500);assert.equal(await destination(),'800.00,1500.00');await arrive();await capture('tap-resized');
   const errors=client.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(errors,[]);
-  results.push({width,height,start,house,near,dialog,stop,depth,remount,houseRoute,npcTap,takeover,errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
+  results.push({width,height,start,house,near,dialog,stop,depth,remount,houseRoute,npcTap,takeover,retap:{elapsedMs:retapMs,target:retarget,error:Math.hypot(retarget[0]-500,retarget[1]-1100)},errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
  }catch(error){results.push({width,height,status:'FAIL',error:String(error.stack)});throw error;}
  finally{client?.close();proc.kill();}
 }}finally{server.closeAllConnections();server.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({output,results}));}

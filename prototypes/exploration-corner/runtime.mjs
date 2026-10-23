@@ -81,7 +81,11 @@ export function mountCorner(root){
     if(disposed)return;
     const seconds=last?(now-last)/1000:0;last=now;
     if(document.hidden||opened){state.moving=false;last=0;}
-    else if(directions.size)state=move(state,[...directions.values()].at(-1),seconds);
+    else if(directions.size){
+      const pointer=[...directions].filter(([key])=>key.startsWith('pointer:')).at(-1);
+      const held=new Set(directions.values());
+      state=move(state,pointer?pointer[1]:[Number(held.has('right'))-Number(held.has('left')),Number(held.has('down'))-Number(held.has('up'))],seconds);
+    }
     else if(route.length){state=followRoute(state,route,seconds);if(!route.length){destination=null;status.textContent=nearNpc(state)?'已走近，按招呼確認':'已抵達；點地面繼續走';}}
     else state={...state,moving:false};
     walkTime=state.moving?walkTime+Math.min(seconds,.05):0;
