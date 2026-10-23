@@ -1,0 +1,125 @@
+{
+  "head": "7dbff7a38971602382031f05cd4219e247517089",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "initialStatus": "",
+  "finalStatus": "",
+  "manifestUnchanged": true,
+  "loaded": [
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.0738ef46f913.js",
+    "/build/app-shell.7bc5e1c99233.css",
+    "/build/app-shell.0738ef46f913.js",
+    "/build/app-shell.7bc5e1c99233.css",
+    "/build/feature-patrol.0ea855f358ab.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.6491048bbb4f.js",
+    "/build/gameplay-core-secondary.bac5d79470d2.js",
+    "/build/feature-patrol.0ea855f358ab.css",
+    "/build/gameplay-core.fb1c53e85193.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.6491048bbb4f.js",
+    "/build/gameplay-core-secondary.bac5d79470d2.js",
+    "/build/gameplay-core.fb1c53e85193.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.0f3635335ca7.js",
+    "/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "scenes": [
+    {
+      "name": "home-before-scroll",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "home-after-scroll",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "after-entry-click",
+      "small": [],
+      "overflow": [],
+      "clippedControls": [
+        {
+          "label": "1. 山前初戰",
+          "width": 46.28571701049805,
+          "height": 46.285736083984375,
+          "overflow": true
+        },
+        {
+          "label": "5. 受困旅人",
+          "width": 46.28570556640625,
+          "height": 46.28570556640625,
+          "overflow": true
+        },
+        {
+          "label": "10. 黑松斥候",
+          "width": 46.28572082519531,
+          "height": 46.28570556640625,
+          "overflow": true
+        },
+        {
+          "label": "12. 石橋伏兵",
+          "width": 46.28572082519531,
+          "height": 46.285736083984375,
+          "overflow": true
+        },
+        {
+          "label": "14. 寨外側門",
+          "width": 46.28570556640625,
+          "height": 46.28572082519531,
+          "overflow": true
+        },
+        {
+          "label": "16. 寨前情報",
+          "width": 46.28572082519531,
+          "height": 46.28572082519531,
+          "overflow": true
+        },
+        {
+          "label": "18. 寨中頭目",
+          "width": 46.28572082519531,
+          "height": 46.28572082519531,
+          "overflow": true
+        },
+        {
+          "label": "20. 黑松寨主",
+          "width": 46.285736083984375,
+          "height": 46.28572082519531,
+          "overflow": true
+        }
+      ]
+    }
+  ],
+  "scope": "After presentation only, independent review pending; original isolated fixture and real production loader; no battle or transaction"
+}
