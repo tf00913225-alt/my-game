@@ -7853,6 +7853,14 @@ body > .v169-rpg-dialog-layer{
     scale:var(--battle-paint-scale);
     pointer-events:none;
 }
+/* Outer slots keep the approved paint size; move only the alpha silhouette
+   inward when its scaled edge would cross the stationary artwork edge. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot:first-child .v174-normalized-portrait .v174-portrait-paint{
+    left:max(calc(50% - var(--portrait-width) * var(--portrait-center)),calc(var(--portrait-width) * ((var(--battle-paint-scale) - 1) / 2 - var(--battle-paint-scale) * var(--portrait-left))));
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-slot:last-child .v174-normalized-portrait .v174-portrait-paint{
+    left:min(calc(50% - var(--portrait-width) * var(--portrait-center)),calc(100% + var(--portrait-width) * ((var(--battle-paint-scale) - 1) / 2 - var(--battle-paint-scale) * var(--portrait-right))));
+}
 #game-stage #battlePage .battle-player > .v174-battle-art .v174-portrait-paint{
     top:auto;
     height:var(--party-art-height,100%);

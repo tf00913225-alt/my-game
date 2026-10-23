@@ -84,7 +84,7 @@ test('only paint breathes, action layer owns motion, fixed depth and shadow keep
     assert.match(css,/\.dodge-back > \.v174-battle-art > \.v174-action-motion\{animation:dodgeBack/);
     assert.match(css,/22%\{transform:translateY\(2px\) scale\(\.99\)/);
     assert.match(css,/translateY\(-1\.5px\) scale\(1\.006\)/);
-    assert.match(css,/\.v174-battle-art\{scale:var\(--battle-art-depth, \.94\)/,"far-row Boss/fallback depth remains the previous policy");
+    assert.match(css,/\.v174-battle-art\{--battle-art-depth:\.94;scale:var\(--battle-art-depth, \.94\)/,"far-row Boss/fallback depth remains the previous policy");
     assert.match(css,/\.v174-battle-art\{scale:var\(--battle-art-depth, 1\)/,"depth stays on the stationary art frame");
     assert.match(css,/prefers-reduced-motion:reduce[\s\S]*\.v174-action-motion[\s\S]*animation:none !important/);
     assert.doesNotMatch(source.slice(source.indexOf('function syncUnitMotion('),source.indexOf('/* One real HUD')),/setTimeout|setInterval|requestAnimationFrame|Math\.random/);
