@@ -71,7 +71,7 @@ test('camera clamps both edges and NPC prompt requires proximity',()=>{
 });
 test('fixture executes canonical display source and sample has no game state writer',()=>{
  assert.match(displaySource(),/window.FourSymbolsDisplay = Object.freeze/);
- const runtime=fs.readFileSync(new URL('./runtime.mjs',import.meta.url),'utf8');
+ const runtime=['runtime.mjs','runtime.js','scene.js'].map(file=>fs.readFileSync(new URL(file,import.meta.url),'utf8')).join('\n');
  assert.doesNotMatch(runtime,/localStorage|sessionStorage|indexedDB|saveGame\(|grantReward|startBattle\(/);
  assert.doesNotMatch(fs.readFileSync(new URL('./style.css',import.meta.url),'utf8'),/!important/);
 });
