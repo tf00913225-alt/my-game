@@ -85,3 +85,24 @@ Physical Chrome on SM-N960F: same three presentation cases, 53/54/58 samples wit
 Local evidence retained under artifacts/fire-sample-desktop and artifacts/fire-sample-usb; native-preview.mp4 / native-decode.json / sequence-frames. Earlier page-attachment/tab-registration/capture interference/recording QA failures and startup-only/incomplete clips are retained separately, excluded from acceptance. Fixes were scratch QA only. No actual Core cast/damage/lunge movie, lethal/shield USB, six-versus-six or all-fire acceptance claimed. Human art direction still pending; no batch extension or merge.
 
 Durable compact evidence: FIRE-VFX-POLISH-20261023-representative.json. Targeted2 Node suites rerun PASS, product unchanged. Head93836101 CI39876607582 attempt1 FAILED: portrait120163938613, Abyss120163938876, Session boot120163939118 all Chrome startup before game; aggregate120173654599 downstream. No rerun used, no timeout/Chrome/product workaround; root-cause Owner remains #976. New evidence Head requires its own CI, old results cannot authorize it. Do not create a dummy commit or rerun to reset quota.
+
+## Incremental Owner / alignment inventory (2026-10-23)
+
+Verified103d8aee remote/local checkpoint clean before diagnostics; product remains4b93e1c8. One bounded desktop412x9156v6 actual Core ordinary explosiveFlurry case supplements, not repeats, the existing3v3 native phone matrix. First diagnostic omitted DOMRect non-enumerable coordinates / used wrong sprite selector; corrected QA only and preserved final raw evidence. No product defect or source patch inferred.
+
+| Responsibility | Existing Owner / current visibility | Incremental boundary |
+| --- | --- | --- |
+| Cast sheet / raster / hit clock | js/39-v143-skill-animation.js, original requestCastTimeline + settleTargetVisual | Retain1450ms shared track and original hit fence; no new timer/hit-stop/settlement change |
+| Caster / dodge / portrait shake | js/54-v173.51-battle-qa.js | Existing phone evidence; cast-stage ring and short lunge only, no new particle system or per-target projectile claimed |
+| Individual flash projection | js/39-v143-skill-animation.js reads artworkProjection | Three actual target flash rects match their own artwork within.2px; no shared center |
+| Slot / DOM scale | js/battlefield-render-geometry-adapter.js and fixed-slot Owner | CSS box projection, no duplicated scaler or Canvas coordinate formula |
+| Feedback | js/battle-floating-feedback-owner.js + own CSS | Per-target feedbackAnchor X73.8933/205.9923/338.0990; three independent indices0/1/2 |
+| Sound | js/34-v141-core-systems.js v141Audio; existing JS39 hit callback | Existing playSkill physical/magic plus element sound; audible sync not verified; no new sound engine |
+| Speed multiplier | No new sample multiplier Owner introduced | x2/x3 remain unverified dependency; do not add independent timers |
+| Modal / fixed UI | #955 owns its UI scope; cross-layer ordering needs coordination | VFX transient stage only; no parallel Modal z-index or fixed-slot edits |
+
+Alignment report: FIRE-VFX-POLISH-20261023-alignment.json. Formal selected IDs0/1/2 each lose218; IDs3/4/5 lose0. Group raster covers legal row, individual flash centers match individual artwork, floating X matches unit feedbackAnchor. At first feedback sample1025.10ms the three flashes and floating numbers coexist. Internal HP was already settled in the first112.80ms sample; that is not proof of prematurely visible HUD. Do not change Core settlement based on this diagnostic. No continuous visual-pixel / audio synchronization claim added.
+
+UI_GUIDELINES.md fixed1080x1920/9:16 applies to all devices; its16:9 rule is dungeon-cover assets, not a second PC battlefield. PC16:9 window should fit the same portrait canvas. Existing source/phone tests remain valid within their stated scope.
+
+Remaining: human art direction; free-running real first-turn flow beyond held isolated Core entry; active6v6 occlusion/readability picture review; Modal layer test/coordination; audible sync; x2/x3 dependent Owner; current Head Required CI. Earlier native phone footage is retained, not relabeled as these missing Gates. No batch element/skill rollout or performance overhaul.
