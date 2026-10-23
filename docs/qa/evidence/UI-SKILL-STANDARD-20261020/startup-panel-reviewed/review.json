@@ -1,0 +1,26 @@
+{
+  "base": "214dd58f9b199c0228d1b4bc3880b4bd7df9e667",
+  "sourceSha256": "e484b8433f84d74e89cb2e8b3f5299a1717e82e7e1f59ed36dd4f74d63cf5067",
+  "reviewers": {
+    "art": "/root/map_review",
+    "input": "/root/map_input_review",
+    "scope": "/root/daily_scope"
+  },
+  "actualScreensViewed": true,
+  "result": "narrow-presentation-accepted",
+  "checks": [
+    "4sizes x3states before/after",
+    "initial singleline; nooverflow; retry148x44",
+    "mobile geometry/fonts unchanged",
+    "PC initial158.05to123.375; ready265.05to172.875",
+    "two bootfocusedtests pass; build --check and diffcheck pass"
+  ],
+  "limitations": [
+    "held DOM/CSS fixture; no real retry/enter/lifecycle",
+    "failure panel overlaps lower logo decoration, not title/actions",
+    "READY animation dim phase retained, not contrast-certified",
+    "v173.20 assettest blocked identify ENOENT locally",
+    "deployedSHA and rejectedcrop version unknown",
+    "latestHead CI pending"
+  ]
+}
