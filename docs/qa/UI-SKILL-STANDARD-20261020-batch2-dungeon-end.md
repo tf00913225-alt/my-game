@@ -9,3 +9,9 @@
 P4 collector7af1b8c僅回覆可行性：原runtime helper blob c7809e9b與補丁父相同，既有battle target lifecycle步驟會走terminal observer。副本新缺陷是原必要更新，不為採證造Head/run；沒有套用collector或改Chrome，不動原39905811946。#976仍唯一取證分析者，identity及其他UI/Abyss/backpack覆蓋未概稱。
 
 本輪無新增/替換runtime點陣資產，WebP轉檔不適用。#983箭頭/技能名/時間與#984故事不碰。一般nav一致性仍待本段後按原04JS/06CSS Owner接續；不並行開元素匣移除/倍率/PWA。全UI與實機未完成。
+
+## c295限定修後驗證
+
+四尺寸360×640、393×873、412×915、1280×800，同一clean source Head/manifest不變，原入口→原日常分類→真正末端988+545=1533→原context返回→重開，四卡ids保持。末卡兩操作最小44.5714px、EFP=true，末卡完整高於底nav。保存20張場景圖、原JSON壓縮及SHA；美術/輸入審核各實看4張末端圖，scope實看2張，均僅本子項PASS。[完整證據與三方審核](evidence/UI-SKILL-STANDARD-20261020/batch2-dungeon-end-reviewed)。
+
+手機捲動touch、桌面wheel；桌面tap helper仍使用touch，故不宣稱完整桌面mouse驗收。未點挑戰/獎勵預覽，不宣稱全部8顆按鈕逐點或交易/空/鎖定/載入/失敗/實機通過。原report沒有complete欄位，保留原始bytes；runtimeRestoreExact=false，profileRemoved=true。build/check已有同source有效證據不重跑；Latest Head必要CI仍待，不合併、不部署。接續一般nav原04JS/06CSS Owner，只修證實缺陷。

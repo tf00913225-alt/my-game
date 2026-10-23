@@ -9825,6 +9825,24 @@
             "列表end/其他分類/戰鬥modal穿透/nav全體/實機仍未驗",
             "Latest Head必要CI未通過，不合併部署"
           ]
+        },
+        {
+          "head": "c295393d76bceb1f5648647f02c115574dec7880",
+          "status": "部分已實際驗證",
+          "scope": "批2四張日常副本卡真末端、原入口/分類/返回/重開；原卡片按鈕38→52",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/batch2-dungeon-end-reviewed",
+          "limits": [
+            "模擬viewport，非實機；不是每顆卡片按鈕逐一點擊",
+            "無挑戰、獎勵預覽、交易或結算；空資料/鎖定/載入/失敗未驗",
+            "無完整raw input trace；runtimeRestoreExact=false，隔離QA profile已清除",
+            "全UI/一般nav/其他副本狀態及Latest Head必要CI仍未完成"
+          ]
         }
       ],
       "reviews": {
