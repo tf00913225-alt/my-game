@@ -49,6 +49,21 @@ const reducedSlash=fixture({id:'flameSlash',category:'physical'});
 reducedSlash.context.window.matchMedia=()=>({matches:true});
 reducedSlash.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
 reducedSlash.timers.forEach(fn=>fn());assert.equal(reducedSlash.motions.length,0);
+for(const side of ['monster','player']){
+    const flurry=fixture({id:'explosiveFlurry',category:'physical'});
+    flurry.context.state.current.targetSide=side;
+    flurry.context.window.v143ResolveBattleFeedbackTiming(side,0,'damage');
+    flurry.timers.forEach(fn=>fn());
+    const recoil=flurry.motions[1];assert.equal(recoil.options.duration,140);
+    assert.equal(recoil.frames[1].translate,side==='monster'?'0px -6px':'0px 6px');
+    assert.equal(recoil.frames[1].rotate,side==='monster'?'-1deg':'1deg');
+    assert.equal(recoil.frames.at(-1).translate,'0px 0px');assert.equal(recoil.frames.at(-1).rotate,'0deg');
+}
+for(const kind of ['miss','shield','heal','status']){
+    const flurry=fixture({id:'explosiveFlurry',category:'physical'});
+    flurry.context.window.v143ResolveBattleFeedbackTiming('monster',0,kind);flurry.timers.forEach(fn=>fn());
+    assert.equal(flurry.motions.length,0);
+}
 const noCast=fixture();noCast.context.state.current=null;noCast.context.window.v143ResolveBattleFeedbackTiming("monster",0,"damage");noCast.timers.forEach(fn=>fn());assert.equal(noCast.motions.length,0);
 const expired=fixture({id:'normal',wait:0});expired.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');assert.equal(expired.sounds.length,0);assert.equal(expired.motions.length,0);expired.timers.forEach(fn=>fn());assert.equal(expired.motions.length,2);
 const repeat=fixture({id:'normal',wait:0});

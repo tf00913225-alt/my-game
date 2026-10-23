@@ -13130,6 +13130,20 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
+        // One range representative: contract inside the fitted source box,
+        // reach authored size at the existing hit, then settle. Never grow
+        // beyond the geometry owner's HUD-safe fit or restart on remeasure.
+        if(current.config?.id==="explosiveFlurry"&&!node.v143MotionAnimation&&
+           !(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+            node.dataset.motion="fire-range-envelope";
+            node.v143MotionAnimation=node.animate([
+                {scale:.90,offset:0},
+                {scale:.94,offset:.25},
+                {scale:1,offset:Number(current.model.hit)||DEFAULT_HIT},
+                {scale:.98,offset:1}
+            ],{duration:current.duration,fill:"both",easing:"linear"});
+            if(current.firstVisibleFrameAt){ node.v143MotionAnimation.currentTime=Math.max(0,Date.now()-current.visualStartedAt); }
+        }
         requestSpriteAspect(sprite,current,node,index,target);
         if(current.config?.id==="normal"){ addNormalProjectile(current,index,target); }
         /* A formal cast Sprite represents the attempted skill, not only a landed hit.
@@ -13566,10 +13580,16 @@
             // First fire sample: a short retreat/lean on the existing motion
             // layer, only after committed direct damage. No slot or hit clock moves.
             const slashSample=current.config.id==="flameSlash";
+            const flurrySample=current.config.id==="explosiveFlurry";
             const recoilFrames=slashSample?[
                 {translate:"0px 0px",rotate:"0deg",scale:1},
                 {translate:"0px "+(distance*2)+"px",rotate:(side==="monster"?-2:2)+"deg",scale:.985,offset:.3},
                 {translate:"0px "+(distance*.4)+"px",rotate:"0deg",scale:1,offset:.7},
+                {translate:"0px 0px",rotate:"0deg",scale:1}
+            ]:flurrySample?[
+                {translate:"0px 0px",rotate:"0deg",scale:1},
+                {translate:"0px "+(distance*1.5)+"px",rotate:(side==="monster"?-1:1)+"deg",scale:.99,offset:.3},
+                {translate:"0px "+(-distance*.2)+"px",rotate:"0deg",scale:1,offset:.7},
                 {translate:"0px 0px",rotate:"0deg",scale:1}
             ]:[
                 {translate:"0px 0px",scale:1},
