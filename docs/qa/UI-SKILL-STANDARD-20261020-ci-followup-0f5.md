@@ -11,3 +11,9 @@ Work ID UI-SKILL-STANDARD-20261020 / PR955。來源 [CI39898619157/a1](https://g
 #983精確8938 delta已整合於其ebba3ee4。已讀並保存 [自然回歸原JSON](evidence/UI-SKILL-STANDARD-20261020/ci-followup-0f5/vfx983-natural-limited.json)：桌面Chrome412×915模擬、隔離6v6、自然首回合→回合2、無QA暫停；設定開隱藏技能字/火效/三浮字，關恢復，限定實圖獨審通過。不再等待同一交叉驗收，不稱實體手機、全部技能或完整矩陣通過。原本線360/1280純浮字呈現證據仍各守範圍。
 
 新Head必要CI仍待，不以0f5失敗或舊綠燈替代；本段只改測試相依/證據，沒有改Modal/浮字/VFX、時間、數值或結算。far-row、未合併#984及Chrome必要Gate仍阻止合併部署；沒有需使用者決策或權限的事項。
+
+## far-row單尺寸直接取證
+
+在0a102556來源（產品仍同0f5，僅上述test-only修正）執行一次原runner的412×915靜態fixture診斷：只限此尺寸，原所有斷言保持、403前額外保存實測JSON；結果原Gate依舊failure，不是PASS。canvasScale0.98095238、farArt.height90.08362screen px，除scale及.94投影後97.69448logical px，確實未達原>99；center160.87619screen、action154.99048screen。原始資料、原圖、診斷來源與log見 [failed geometry evidence](evidence/UI-SKILL-STANDARD-20261020/far-row-0a102556-diagnostic)。
+
+只證明幾何失敗可重現，尚未證實因果來源。不得把它歸Chrome、放寬>99、任意改tracks或縮字；下一步需原座標Owner的單因子證據才能修。沒有修改fixed-slot CSS、manual-turn-arrow、JS54；箭頭/技能名由#983負責，與本far-row調查分開。這是靜態geometry fixture，不是自然戰鬥驗收或最新Head CI通過證據。

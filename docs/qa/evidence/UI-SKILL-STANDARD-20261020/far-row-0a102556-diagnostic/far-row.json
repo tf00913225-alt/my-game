@@ -1,0 +1,52 @@
+{
+  "head": "0a102556cbbef22d597d4b5b55da7246d6201a34",
+  "viewport": {
+    "width": 412,
+    "height": 915
+  },
+  "canvasScale": 0.9809523809523809,
+  "farArt": {
+    "left": -0.9947455525398254,
+    "top": 449.59344482421875,
+    "right": 140.9337517619133,
+    "bottom": 539.6770629882812,
+    "width": 141.92849731445312,
+    "height": 90.0836181640625,
+    "centerX": 69.96950310468674,
+    "centerY": 494.63525390625
+  },
+  "unprojectedHeight": 97.69448365241234,
+  "baseline": {
+    "center": {
+      "left": 0,
+      "top": 299.84954833984375,
+      "right": 412,
+      "bottom": 460.7257385253906,
+      "width": 412,
+      "height": 160.87619018554688,
+      "centerX": 206,
+      "centerY": 380.2876434326172
+    },
+    "action": {
+      "left": 3.92380952835083,
+      "top": 302.79241943359375,
+      "right": 408.0762143135071,
+      "bottom": 457.78289794921875,
+      "width": 404.15240478515625,
+      "height": 154.990478515625,
+      "centerX": 206.00001192092896,
+      "centerY": 380.28765869140625
+    },
+    "command": {
+      "left": 3.92380952835083,
+      "top": 393.0400390625,
+      "right": 408.0762143135071,
+      "bottom": 457.78289794921875,
+      "width": 404.15240478515625,
+      "height": 64.74285888671875,
+      "centerX": 206.00001192092896,
+      "centerY": 425.4114685058594
+    }
+  },
+  "note": "Original gate remains unchanged; single static geometry diagnosis, not gameplay acceptance"
+}
