@@ -26,6 +26,29 @@ for(const kind of ["damage","criticalDamage","miss","heal","sp","shield","status
     assert.deepEqual(f.sounds,sound?[sound]:[]);
 }
 const indirect=fixture({id:"healSpell",category:"heal"});indirect.context.window.v143ResolveBattleFeedbackTiming("monster",0,"damage");indirect.timers.forEach(fn=>fn());assert.equal(indirect.motions.length,0);
+// Fire sample stays on the same committed-hit clock and returns to neutral.
+for(const side of ['monster','player']){
+    const slash=fixture({id:'flameSlash',category:'physical'});
+    slash.context.state.current.targetSide=side;
+    const timing=slash.context.window.v143ResolveBattleFeedbackTiming(side,0,'damage');
+    assert.equal(timing.delayMs,297);assert.equal(slash.motions.length,0);
+    slash.timers.forEach(fn=>fn());
+    const recoil=slash.motions[1];assert.equal(recoil.options.duration,140);
+    assert.equal(recoil.frames[1].translate,side==='monster'?'0px -8px':'0px 8px');
+    assert.equal(recoil.frames[1].rotate,side==='monster'?'-2deg':'2deg');
+    assert.equal(recoil.frames.at(-1).translate,'0px 0px');
+    assert.equal(recoil.frames.at(-1).rotate,'0deg');
+    recoil.onfinish();assert.equal(slash.context.state.current.done,false);
+}
+for(const kind of ['miss','heal','shield','status']){
+    const slash=fixture({id:'flameSlash',category:'physical'});
+    slash.context.window.v143ResolveBattleFeedbackTiming('monster',0,kind);
+    slash.timers.forEach(fn=>fn());assert.equal(slash.motions.length,0);
+}
+const reducedSlash=fixture({id:'flameSlash',category:'physical'});
+reducedSlash.context.window.matchMedia=()=>({matches:true});
+reducedSlash.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');
+reducedSlash.timers.forEach(fn=>fn());assert.equal(reducedSlash.motions.length,0);
 const noCast=fixture();noCast.context.state.current=null;noCast.context.window.v143ResolveBattleFeedbackTiming("monster",0,"damage");noCast.timers.forEach(fn=>fn());assert.equal(noCast.motions.length,0);
 const expired=fixture({id:'normal',wait:0});expired.context.window.v143ResolveBattleFeedbackTiming('monster',0,'damage');assert.equal(expired.sounds.length,0);assert.equal(expired.motions.length,0);expired.timers.forEach(fn=>fn());assert.equal(expired.motions.length,2);
 const repeat=fixture({id:'normal',wait:0});

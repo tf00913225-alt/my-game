@@ -2008,12 +2008,21 @@
             // The one hit callback owns both pulses; no new clock or gate.
             createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
             const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
-            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate([
+            // First fire sample: a short retreat/lean on the existing motion
+            // layer, only after committed direct damage. No slot or hit clock moves.
+            const slashSample=current.config.id==="flameSlash";
+            const recoilFrames=slashSample?[
+                {translate:"0px 0px",rotate:"0deg",scale:1},
+                {translate:"0px "+(distance*2)+"px",rotate:(side==="monster"?-2:2)+"deg",scale:.985,offset:.3},
+                {translate:"0px "+(distance*.4)+"px",rotate:"0deg",scale:1,offset:.7},
+                {translate:"0px 0px",rotate:"0deg",scale:1}
+            ]:[
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
-            ],{duration:140,easing:"ease-out"});
+            ];
+            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate(recoilFrames,{duration:140,easing:"ease-out"});
             const recoil=artwork.v143ImpactRecoil;
             window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; window.FourSymbolsBattlePresentation?.syncMotion?.(card); } };
