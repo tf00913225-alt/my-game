@@ -5,3 +5,14 @@ test('original badge reads actual portrait projection and keeps full long-name t
 test('dense rear-row label moves above blocking formal portrait and HUD, no gameplay clock',()=>{const f=fixture(true);f.c.positionBattleSkillNameBadge(f.badge,'player',3,f.self);assert.equal(f.badge.style.top,'344px');assert.doesNotMatch(block,/setTimeout|setInterval|\.animate\(|battlePhase\s*=|activeBattleCharacterIndex\s*=/);});
 
 test('compact top row stays above its HUD without moving or covering it',()=>{const f=fixture();f.projection.artworkProjection.rect.top=47;f.projection.hudSafeRect.top=17;Object.defineProperty(f.badge,'offsetHeight',{get:()=>f.badge.dataset.compact?14:38});f.c.positionBattleSkillNameBadge(f.badge,'monster',3,f.self);assert.equal(f.badge.dataset.compact,'true');assert.equal(f.badge.style.top,'16px');});
+
+test('visible top announcement uses free PC gutter without changing either owner geometry',()=>{
+ const f=fixture();f.c.window.innerWidth=1280;f.projection.unitRect.left=440;f.projection.artworkProjection.rect={left:450,top:62,width:100,height:75};f.projection.hudSafeRect={left:450,top:17,width:100,height:25};
+ const banner={left:450,top:11,width:375,height:50};
+ f.c.document.querySelectorAll=s=>s.includes('battleTurnIndicator')?[{getBoundingClientRect:()=>banner}]:[f.self];
+ Object.defineProperty(f.badge,'offsetHeight',{get:()=>f.badge.dataset.compact?14:38});
+ f.c.positionBattleSkillNameBadge(f.badge,'monster',3,f.self);
+ const x=parseFloat(f.badge.style.left),y=parseFloat(f.badge.style.top);
+ assert.ok(y-14>=1&&y<62);assert.ok(x+45<=banner.left||x-45>=banner.left+banner.width);
+ assert.deepEqual(banner,{left:450,top:11,width:375,height:50});assert.equal(f.projection.hudSafeRect.top,17);
+});

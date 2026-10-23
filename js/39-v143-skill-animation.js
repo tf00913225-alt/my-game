@@ -1536,7 +1536,8 @@
         // A MISS still travels, but never reveals the confirmed impact sprite.
         node.v143MotionAnimation=node.animate([
             {offset:0,opacity:0,transform:transform(0)},
-            {offset:.08,opacity:.85,transform:transform(.08)},
+            {offset:.30,opacity:0,transform:transform(0)},
+            {offset:.36,opacity:.85,transform:transform(.08)},
             {offset:.90,opacity:.85,transform:transform(.90)},
             {offset:1,opacity:0,transform:transform(1)}
         ],{duration:Math.max(1,targetHitTime(current,index)-(current.visualStartedAt||current.startedAt)),fill:"both",easing:"linear"});
@@ -1624,6 +1625,11 @@
     }
 
     function startNormalProjectiles(current){
+        if(current.config.id==="normal"&&current.characterMotion&&!current.normalMotionStarted){
+            current.normalMotionStarted=true;
+            current.characterMotion.play();
+            current.characterMotion.currentTime=Math.max(0,Date.now()-current.visualStartedAt);
+        }
         current.spriteNodes.forEach(node=>{
             if(node.dataset?.presentationRole!=="normal-projectile"||node.dataset.flightStarted==="true"){ return; }
             node.dataset.flightStarted="true";

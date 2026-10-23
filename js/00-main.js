@@ -24143,7 +24143,7 @@ function positionBattleSkillNameBadge(badge,side,index,element){
     const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
     // Reserve the existing short forward cast motion; never move the Unit/HUD.
     let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
-    const x=portrait.left+portrait.width/2;
+    let x=portrait.left+portrait.width/2;
     badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
     badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
     if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
@@ -24155,7 +24155,7 @@ function positionBattleSkillNameBadge(badge,side,index,element){
         const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
         for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
     });
-    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion").forEach(node=>{
+    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion,#releaseUpdateMarquee").forEach(node=>{
         const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
     });
     // In a dense pair of rows the nearest free band can be above the front row.
@@ -24178,6 +24178,23 @@ function positionBattleSkillNameBadge(badge,side,index,element){
             let moved=false;
             for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
             if(!moved)break;
+        }
+        if(top-height<0){
+            // The PC overlay can occupy the entire band above the top row.
+            // Use available side gutter for this transient label, not a new
+            // battlefield scale or a change to the announcement's lifecycle.
+            const bounds=[...blockers,portrait,...(hud?[hud]:[])];
+            const desiredX=x,desiredTop=Math.min(portrait.top,hud?.top??portrait.top)-1;
+            const xs=[x,...bounds.flatMap(r=>[r.left-width/2-2,r.left+r.width+width/2+2])];
+            const ys=[Math.max(height+1,desiredTop),height+1];
+            let best;
+            for(const cx of xs)for(const cy of ys){
+                if(cx-width/2<1||cx+width/2>window.innerWidth-1||cy-height<1||cy>portrait.top-1)continue;
+                if(bounds.some(r=>cx+width/2>r.left&&cx-width/2<r.left+r.width&&cy>r.top&&cy-height<r.top+r.height))continue;
+                const distance=Math.abs(cx-desiredX)+Math.abs(cy-desiredTop);
+                if(!best||distance<best.distance)best={x:cx,top:cy,distance};
+            }
+            if(best){x=best.x;top=best.top;}
         }
     }
     badge.style.left=x+"px";badge.style.top=top+"px";

@@ -7,7 +7,7 @@ const css=fs.readFileSync('css/fixed-slot-battlefield-rendering-v2.css','utf8');
 function fixture(){
     const classes=new Set(),motions=[];
     const entity={hp:100,alive:true};
-    const action={animate(frames,options){const m={frames,options,cancelled:false,cancel(){this.cancelled=true;}};motions.push(m);return m;}};
+    const action={animate(frames,options){const m={frames,options,cancelled:false,pause(){this.paused=true;},play(){this.played=true;},cancel(){this.cancelled=true;}};motions.push(m);return m;}};
     const art={dataset:{},querySelector:()=>action};
     const card={id:'battleMonster2',classList:{contains:n=>classes.has(n),remove:(...names)=>names.forEach(n=>classes.delete(n))},querySelector:()=>art};
     const context={window:{matchMedia:()=>({matches:false})},monsters:[null,null,entity],document:{querySelectorAll:()=>[card]}};
@@ -35,8 +35,16 @@ test('cast uses existing duration without extending it and stale finish cannot c
     const second=f.context.startCharacterCast(f.card,config,2000);
     assert.ok(first.cancelled);first.onfinish();assert.equal(f.art.v174Cast,second);
     second.onfinish();assert.equal(f.art.v174Cast,null);assert.equal(f.art.dataset.motion,'idle');
-    assert.equal(f.context.startCharacterCast(f.card,{id:'normal'},520),null);
     assert.equal(f.context.startCharacterCast(f.card,{id:'slash',category:'physical'},520),null);
+});
+
+test('normal short lean holds through original hit and returns in520ms with no aura or private clock',()=>{
+ const f=fixture(),motion=f.context.startCharacterCast(f.card,{id:'normal',category:'physical'},520);
+ assert.equal(motion.options.duration,520);assert.equal(motion.paused,true);assert.equal(motion.currentTime,0);
+ assert.equal(motion.frames[1].offset,.17);assert.equal(motion.frames[2].offset,.57);assert.equal(motion.frames[1].transform,motion.frames[2].transform);
+ assert.match(motion.frames[1].transform,/18px/);assert.equal(motion.frames.at(-1).transform,'translateY(0) scale(1)');assert.equal(motion.fireAura,undefined);
+ f.context.endCharacterCast(f.card,motion);assert.ok(motion.cancelled);assert.equal(f.art.v174Cast,null);
+ f.context.window.matchMedia=()=>({matches:true});assert.equal(f.context.startCharacterCast(f.card,{id:'normal'},520),null);
 });
 test('death, dispose and reduced motion cancel or suppress cast without changing resources',()=>{
     const f=fixture();

@@ -143,15 +143,21 @@ function startCharacterCast(card,config,duration){
     const art=card?.querySelector(":scope > .v174-battle-art");
     const action=art?.querySelector(":scope > .v174-action-motion");
     const fireSample=config.id==="explosiveFlurry";
+    const normal=config.id==="normal";
     const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-    if(!art||!action||typeof action.animate!=="function"||config.id==="normal"||config.category==="physical"&&!fireSample||
+    if(!art||!action||typeof action.animate!=="function"||config.category==="physical"&&!fireSample&&!normal||
        art.dataset.motion==="dying"||reduced&&!fireSample)return null;
     if(art.v174Cast)endCharacterCast(card,art.v174Cast);
     // The same declaration previously requested a generic lunge. Cast replaces
     // that presentation only; Core's 450ms removal and skill duration stay put.
     card.classList.remove("attacker-lunge-up","attacker-lunge-down");
     const direction=String(card.id).startsWith("battleMonster")?1:-1;
-    const motion=reduced?{cancel(){}}:action.animate(fireSample?[
+    const motion=reduced?{cancel(){}}:action.animate(normal?[
+        {transform:"translateY(0) scale(1)",offset:0},
+        {transform:"translateY("+(direction*18)+"px) scale(1.035)",offset:.17},
+        {transform:"translateY("+(direction*18)+"px) scale(1.035)",offset:.57},
+        {transform:"translateY(0) scale(1)",offset:1}
+    ]:fireSample?[
         {transform:"translateY(0) scale(1)",offset:0},
         {transform:"translateY("+(-direction*4)+"px) scale(.98)",offset:.18},
         {transform:"translateY("+(direction*26)+"px) scale(1.045)",offset:.38},
@@ -161,7 +167,9 @@ function startCharacterCast(card,config,duration){
         {transform:"translateY(0) scale(1)"},
         {transform:"translateY(-2px) scale(1.012)",offset:.45},
         {transform:"translateY(0) scale(1)"}
-    ],{duration:fireSample?450:Math.max(150,Math.min(350,Number(duration)*.25)),easing:"ease-in-out"});
+    ],{duration:normal?duration:fireSample?450:Math.max(150,Math.min(350,Number(duration)*.25)),easing:"ease-in-out"});
+    // Normal is released by the original projectile/impact paint clock.
+    if(normal){motion.pause();motion.currentTime=0;}
     if(fireSample){
         const node=document.createElement("div");node.className="v174-fire-cast-ring";
         node.setAttribute("aria-hidden","true");
