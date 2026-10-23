@@ -7,6 +7,7 @@ export function mountCorner(root){
   const prompt=root.querySelector('[data-interact]'),dialog=root.querySelector('[data-dialog]');
   const directions=new Map(),abort=new AbortController(),signal=abort.signal;
   let state={...scene.spawn,facing:'up',moving:false},frame=0,last=0,opened=false,disposed=false;
+  dialog.hidden=true; // A remounted sample starts closed, including BFCache return.
   for(const item of scene.objects){
     const el=document.createElement('div');el.className='explore-object';el.dataset.object=item.id;
     Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.y)});

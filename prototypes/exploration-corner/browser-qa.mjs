@@ -31,8 +31,12 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   await hold('left',250);await hold('up',1300);await hold('right',280);await capture('tree-back');
   const depth=await client.eval(`({player:Number(document.querySelector('[data-player]').style.zIndex),tree:Number(document.querySelector('[data-object="tree"]').style.zIndex)})`);assert.ok(depth.player<depth.tree,'actual character is behind tree');
   const stop=await read();await new Promise(r=>setTimeout(r,250));assert.equal((await read()).position,stop.position);assert.equal(stop.walking,false);assert.deepEqual(stop.saveKeys,[]);
+  // Lifecycle-only fixture: simulate restored visible dialog without injecting player state.
+  await client.eval(`window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));document.querySelector('[data-dialog]').hidden=false;window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));true`);
+  const remount=await read();assert.equal(remount.dialog,false);assert.equal(remount.position,start.position);assert.equal(remount.walking,false);
+  await hold('down',200);assert.notEqual((await read()).position,remount.position);
   const errors=client.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(errors,[]);
-  results.push({width,height,start,house,near,dialog,stop,depth,errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
+  results.push({width,height,start,house,near,dialog,stop,depth,remount,errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
  }catch(error){results.push({width,height,status:'FAIL',error:String(error.stack)});throw error;}
  finally{client?.close();proc.kill();}
 }}finally{server.closeAllConnections();server.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({output,results}));}
