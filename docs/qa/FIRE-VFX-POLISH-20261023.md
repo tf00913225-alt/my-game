@@ -1,3 +1,15 @@
+# Current complete fire range representative (2026-10-23)
+
+Same Work ID / branch / Draft #983. Product Head4b93e1c8aaf9fac34de0a75166755ec3651b6f43. User rejected the earlier range art; retained below as history, not current art approval. Actual supplied phone reference was decoded and inspected. Only explosiveFlurry now adds forward-return cast motion, distinct foot aura, ivory ordinary / gold critical bouncing feedback, MISS retreat and one bounded portrait-only critical shake; fixed HUD stays still. Original damage/targets1450ms clock and crit follow-up retained.
+
+Actual Core isolated QA on physical SM-N960F: ordinary218 / critical620 including original follow-up / MISS0 HP per target, SP47 per case; natural cleanup and stable HUD/slots. Native17.078956s720x1280 movie and under8MB before/after review copy are retained in artifacts. Before segment is presentation fixture; after is actual Core with fixed RNG, not identical scenarios. Raw recorder12s label is stale; decoded native duration is authoritative.
+
+Six focused suites /10tests plus official build/check/diffcheck PASS. Independent source/picture review cleared sticky lane flag and found no bounded source/readability blocker. Human art confirmation and latest Head Required CI remain pending; Draft DO NOT MERGE. Do not expand all-fire or rerun high-cost phone verification without a relevant change. No Library upload claimed because no generic Library video upload interface is exposed.
+
+Current compact evidence: [complete report](FIRE-VFX-POLISH-20261023-complete.json). Older entries below are historical snapshots and do not supersede this section.
+
+---
+
 # Fire representative sample — current checkpoint
 
 ## Current range continuation (2026-10-23; supersedes old pending rows)
