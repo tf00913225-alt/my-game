@@ -1,5 +1,21 @@
 # Fire representative sample — current checkpoint
 
+## Current range continuation (2026-10-23; supersedes old pending rows)
+
+User approved flameSlash direction and authorized ONE range representative, with phone recording before any batch expansion. Same Work ID/branch/#983. Product Head27426b4fd3a7b4c2bda6709f5568001e15cdaae6; only explosiveFlurry added. Existing flameSlash frames and all other skills/assets/data/CSS remain unchanged. Live #955 still ba2c451a/open Draft; shared UI boundary preserved.
+
+Existing explosiveFlurry group raster receives one envelope (.90→.94→1 at original hit→.98), translated -50% before scaling to preserve fitted center. Original requestCastTimeline synchronizes its v143MotionAnimation, remeasure does not restart, late nodes catch up, disposal cancels the same track. It never grows outside the original fitted box. Hit recipients use the same140ms action layer: ordinary6px/critical7.5px,1deg/.99 then neutral. MISS/non-target/shield/heal/status exclusions and reduced-motion guard remain. Formal tri targets, one settlement per actual recipient,1450ms/7-of-12 hit and source pixels unchanged. No new procedural renderer/material/screen shake or extra damage.
+
+Five focused suites PASS: new fire-range-envelope, battle-feel-impact, direct-impact-overlay, vfx-cast-clock and cold-clock. Official build/check/diffcheck PASS. Initial missing-config VM seam corrected with the existing optional-config convention, no relaxed assertion. Independent source review: no new blocker; final centering change separately reviewed with actual browser center samples.
+
+Physical Samsung SM-N960F, production Chrome, isolated3v6: four uninterrupted cases player-hit / enemy-hit / player-mixed / player-all-MISS. Formal target resolver selected3 eligible recipients each; non-target enemy row remained unaffected. Recoil recipients observed3/3/2/0, all four original gates naturally completed, fixed unit/HUD before-after and unchanged HP, fitted source center stable within.5px, cleanup true, zero runtime exceptions. Actual sequence8126.6ms, native screenrecord16.014489s720x1280. SHA256 2B8F1D6AD73B4FE570350A5DEDD64D7F091D0A03EBAA2AC13FBC29446B572B0F.22 decoded frames include charge/spread/impact/tail, enemy3-recipient feedback, mixed -1HP/MISS/-1HP, allMISS. Preserve local artifacts/fire-range-usb/native-preview.mp4, native-decode.json, evidence.json, sequence-frames; compact loaded-bundle/source/rows evidence in FIRE-VFX-POLISH-20261023-range.json.
+
+Desktop preliminary6ae snapshot passed same four cases; it is not relabeled final274 proof. Intermediate6ae phone footage retained separately, not final acceptance. Earlier QA primary-index assumption returned only2 legal targets; corrected QA to use original resolver's largest legal set, not product target rules. Host/phone wall clocks differ; native decoded pictures, not direct wall-clock subtraction, establish movie scope. Failed/initial candidates retained.
+
+Limits: presentation director/feedback fixture using actual formal range resolution, not actual Core skill damage/lunge/transaction. -1HP is fixture display, HP does not change. No full-fire/fullCore/shield/lethal/reduced-motion USB acceptance claimed. User range-art direction still pending. Stop at this one representative, no batch expansion/merge. Latest274 CI39890347295 last observed pending; no rerun/cancel/timeout workaround. Evidence-only checkpoint must obtain its own required checks before future merge; Chrome #976 remains sole root-cause Owner.
+
+Independent final source/picture review fire_sample_review actually viewed native frames0004/0010/0015/0020 and row evidence: no source safety or HUD/readability blocker in this subset. It explicitly notes the three white impact silhouettes are strong, and temporary torso occlusion is visible; the user decides that art strength. Mixed/all-MISS text positions are distinct and non-target row remains readable. Review does not constitute human art approval or true Core acceptance.
+
 Work ID: FIRE-VFX-POLISH-20261023
 Branch: feature/fire-vfx-polish-20261023
 Base: bc7efd1c4e66c1cb412fab29d404123f5495ea86
