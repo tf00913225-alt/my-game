@@ -13,16 +13,16 @@
 
     const PORTRAITS={
         female:{
-            fire:"assets/characters/female_fire.jpg",
-            water:"assets/characters/female_water.jpg",
-            wind:"assets/characters/female_wind.jpg",
-            earth:"assets/characters/female_earth.jpg"
+            fire:"assets/characters/player_female_01.webp",
+            water:"assets/characters/player_female_02.webp",
+            wind:"assets/characters/player_female_03.webp",
+            earth:"assets/characters/player_female_04.webp"
         },
         male:{
-            fire:"assets/characters/male_fire.jpg",
-            water:"assets/characters/male_water.jpg",
-            wind:"assets/characters/male_wind.jpg",
-            earth:"assets/characters/male_earth.jpg"
+            fire:"assets/characters/player_male_01.webp",
+            water:"assets/characters/player_male_02.webp",
+            wind:"assets/characters/player_male_03.webp",
+            earth:"assets/characters/player_male_04.webp"
         }
     };
 

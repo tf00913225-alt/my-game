@@ -1,0 +1,184 @@
+{
+  "workId": "PLAYER-PORTRAITS-20261023",
+  "conversion": {
+    "library": "Pillow 12.3.0",
+    "format": "WEBP",
+    "lossless": true,
+    "quality": 100,
+    "method": 6,
+    "exact": true,
+    "resize": false,
+    "crop": false,
+    "rgbaComparison": "source converted RGBA bytes == decoded WebP RGBA bytes"
+  },
+  "assets": [
+    {
+      "name": "player_male_01",
+      "source": "assets/inbox/player-portraits-20261023/player_male_01.png",
+      "runtime": "assets/characters/player_male_01.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "d8d0a9de5ca3b2a1c20d882ee1a0d5403b08af9ba0d1407e36ebaeabb80167e2",
+      "webpSha256": "99578c878c22edc80d79a50e9bf80ef03aa9f73ecfec2d1bf7ef83efb1c9fb3f",
+      "sourceBytes": 2192763,
+      "webpBytes": 1335030,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 925278,
+      "nonzeroAlphaBounds": [
+        0,
+        0,
+        1008,
+        1536
+      ]
+    },
+    {
+      "name": "player_male_02",
+      "source": "assets/inbox/player-portraits-20261023/player_male_02.png",
+      "runtime": "assets/characters/player_male_02.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "4f2f106d5baf58849e042a14508e80ab265ded6c6eac6311ac43cb0f9c9b72bd",
+      "webpSha256": "1f44493a70aee62b153eccff36886e1d7a2c1c3436549d39c4ada691be0b578d",
+      "sourceBytes": 1590915,
+      "webpBytes": 933530,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 1178994,
+      "nonzeroAlphaBounds": [
+        57,
+        21,
+        1010,
+        1504
+      ]
+    },
+    {
+      "name": "player_male_03",
+      "source": "assets/inbox/player-portraits-20261023/player_male_03.png",
+      "runtime": "assets/characters/player_male_03.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "2eb9e635a6db599f242d55de7e8ec36168a65a5d494aec10f411c4d8f2073f60",
+      "webpSha256": "ed7965f76f25ddbb5bd74652d840b31955de26cdba8b03cbf5a8b670c5c34cc9",
+      "sourceBytes": 1854350,
+      "webpBytes": 1108382,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 1002992,
+      "nonzeroAlphaBounds": [
+        21,
+        0,
+        1012,
+        1536
+      ]
+    },
+    {
+      "name": "player_male_04",
+      "source": "assets/inbox/player-portraits-20261023/player_male_04.png",
+      "runtime": "assets/characters/player_male_04.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "c2c72f53cc69123b2932c5f7b52c72bc33c7cbefb018c0576aa195325a205209",
+      "webpSha256": "372ab50d0ae60978c36da7befad8f83c3b1baee58cae456baeba5b1afb1922a6",
+      "sourceBytes": 1970021,
+      "webpBytes": 1163202,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 997805,
+      "nonzeroAlphaBounds": [
+        55,
+        18,
+        952,
+        1510
+      ]
+    },
+    {
+      "name": "player_female_01",
+      "source": "assets/inbox/player-portraits-20261023/player_female_01.png",
+      "runtime": "assets/characters/player_female_01.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "ca6b1e9f756bebe403b41252bb12ae7cbdd90a527ddb23300bab6c01c3ed026c",
+      "webpSha256": "9c94f8d4733834495692febc4919037f543e6843df65dc2fac371b11fa02c9bb",
+      "sourceBytes": 2030081,
+      "webpBytes": 1244400,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 953224,
+      "nonzeroAlphaBounds": [
+        0,
+        0,
+        1010,
+        1536
+      ]
+    },
+    {
+      "name": "player_female_02",
+      "source": "assets/inbox/player-portraits-20261023/player_female_02.png",
+      "runtime": "assets/characters/player_female_02.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "5e5d62bed80e9b69ea30f92eb4050a1a7d92a672396e9aff7c3a1cc6a53fd928",
+      "webpSha256": "2d4ca7757b43d99dc79c114780cbbc086ba4b8d1ea12145b13baa20ca00ec9f4",
+      "sourceBytes": 1573728,
+      "webpBytes": 928604,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 1194662,
+      "nonzeroAlphaBounds": [
+        0,
+        20,
+        1008,
+        1512
+      ]
+    },
+    {
+      "name": "player_female_03",
+      "source": "assets/inbox/player-portraits-20261023/player_female_03.png",
+      "runtime": "assets/characters/player_female_03.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "43eab47e0c94d28899ba1ab9436e5802899381ed00679cfb5e33b2356c6fe078",
+      "webpSha256": "ecd93d4722dd74964df595d053414327da3cd3b02e03fc72094aad4601732bf3",
+      "sourceBytes": 2165548,
+      "webpBytes": 1306022,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 939918,
+      "nonzeroAlphaBounds": [
+        0,
+        14,
+        1012,
+        1536
+      ]
+    },
+    {
+      "name": "player_female_04",
+      "source": "assets/inbox/player-portraits-20261023/player_female_04.png",
+      "runtime": "assets/characters/player_female_04.webp",
+      "width": 1024,
+      "height": 1536,
+      "sourceSha256": "4d1fd1344188155d9d61eb8fe8901d2d3a1ef915314668aaba4eb8c834a95961",
+      "webpSha256": "b0e0332f8b2248408d76fe67abf63b6d7ddaf6e1984c2ae7a28d2fcede5ff070",
+      "sourceBytes": 1787469,
+      "webpBytes": 1044066,
+      "decodedRgbaExact": true,
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixels": 1130924,
+      "nonzeroAlphaBounds": [
+        0,
+        21,
+        1010,
+        1518
+      ]
+    }
+  ]
+}
