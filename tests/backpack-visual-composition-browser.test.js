@@ -30,6 +30,9 @@ async function connectChrome(chrome){
             targets=await waitJson(`http://127.0.0.1:${port}/json/list`,{chromeProcess:child,
                 accept:rows=>Array.isArray(rows)&&rows.some(row=>row.type==="page"&&row.webSocketDebuggerUrl)});
         }catch(error){
+            if(error.code==="CHROME_EXITED"||error.code==="CHROME_SPAWN_FAILED"){
+                throw new Error(`Backpack Chrome launch failed: ${launchError?.message||JSON.stringify(exit||{code:child.exitCode,signal:child.signalCode})}\n${stderr}`,{cause:error});
+            }
             throw new Error(`Chrome DevTools target unavailable: ${JSON.stringify({chrome,pid:child.pid,port,exit:exit||null,launchError:launchError?.message||null})}\n${stderr}`,{cause:error});
         }
         const target=targets.find(row=>row.type==="page"&&row.webSocketDebuggerUrl);
