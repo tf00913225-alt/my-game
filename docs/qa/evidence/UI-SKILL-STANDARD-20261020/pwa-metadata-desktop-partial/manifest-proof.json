@@ -1,0 +1,103 @@
+{
+  "manifestResult": {
+    "url": "http://127.0.0.1:52974/app.webmanifest",
+    "errors": [],
+    "data": "{\n  \"id\": \"./\",\n  \"name\": \"四象江湖傳\",\n  \"short_name\": \"四象江湖\",\n  \"lang\": \"zh-Hant\",\n  \"start_url\": \"./index.html\",\n  \"scope\": \"./\",\n  \"display\": \"standalone\",\n  \"background_color\": \"#0b0907\",\n  \"theme_color\": \"#0b0907\",\n  \"icons\": [\n    {\n      \"src\": \"assets/relics/icons/relic_all_returning_array.webp\",\n      \"sizes\": \"1254x1254\",\n      \"type\": \"image/webp\",\n      \"purpose\": \"any\"\n    }\n  ]\n}\n",
+    "parsed": {
+      "scope": "http://127.0.0.1:52974/"
+    },
+    "manifest": {
+      "backgroundColor": "rgba(11,9,7,1)",
+      "display": "kStandalone",
+      "icons": [
+        {
+          "url": "http://127.0.0.1:52974/assets/relics/icons/relic_all_returning_array.webp",
+          "sizes": "1254x1254",
+          "type": "image/webp"
+        }
+      ],
+      "id": "http://127.0.0.1:52974/",
+      "name": "四象江湖傳",
+      "orientation": "DEFAULT",
+      "preferRelatedApplications": false,
+      "scope": "http://127.0.0.1:52974/",
+      "startUrl": "http://127.0.0.1:52974/index.html",
+      "themeColor": "rgba(11,9,7,1)"
+    }
+  },
+  "decoded": {
+    "width": 1254,
+    "height": 1254,
+    "complete": true
+  },
+  "routes": [
+    {
+      "prefix": "",
+      "manifest": "http://127.0.0.1:52974/app.webmanifest",
+      "start": "http://127.0.0.1:52974/index.html",
+      "scope": "http://127.0.0.1:52974/",
+      "id": "http://127.0.0.1:52974/",
+      "icon": "http://127.0.0.1:52974/assets/relics/icons/relic_all_returning_array.webp",
+      "status": [
+        200,
+        200,
+        200
+      ],
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    },
+    {
+      "prefix": "my-game/",
+      "manifest": "http://127.0.0.1:52974/my-game/app.webmanifest",
+      "start": "http://127.0.0.1:52974/my-game/index.html",
+      "scope": "http://127.0.0.1:52974/my-game/",
+      "id": "http://127.0.0.1:52974/my-game/",
+      "icon": "http://127.0.0.1:52974/my-game/assets/relics/icons/relic_all_returning_array.webp",
+      "status": [
+        200,
+        200,
+        200
+      ],
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    }
+  ],
+  "display": {
+    "viewport": [
+      1280,
+      800
+    ],
+    "stage": {
+      "x": 415,
+      "y": 0,
+      "width": 450,
+      "height": 800,
+      "top": 0,
+      "right": 865,
+      "bottom": 800,
+      "left": 415
+    },
+    "scale": 0.4166666666666667,
+    "dimensions": {
+      "nativeWidth": 1080,
+      "nativeHeight": 1920,
+      "legacyWidth": 420,
+      "legacyHeight": 746.6666666666666
+    },
+    "standalone": false,
+    "serviceWorkers": 0,
+    "startup": "READY"
+  },
+  "installability": {
+    "installabilityErrors": [
+      {
+        "errorId": "manifest-missing-suitable-icon",
+        "errorArguments": [
+          {
+            "name": "minimum-icon-size-in-pixels",
+            "value": "144"
+          }
+        ]
+      }
+    ]
+  },
+  "limits": "Desktop ordinary browser; local manifest headers modeled from _headers. No installed mode, Android, OAuth return/save/update reload acceptance."
+}

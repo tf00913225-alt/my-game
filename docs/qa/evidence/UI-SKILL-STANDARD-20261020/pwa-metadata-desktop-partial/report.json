@@ -1,0 +1,21 @@
+{
+  "head": "9e101df27c6e3d0c746565875172edc7c4fb0efe",
+  "dirty": false,
+  "viewport": [
+    1280,
+    800
+  ],
+  "initialStatus": "",
+  "finalStatus": "",
+  "manifestUnchanged": true,
+  "loaded": [],
+  "scenes": [
+    {
+      "name": "ordinary-browser-ready",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    }
+  ],
+  "scope": "After presentation only, independent review pending; original isolated fixture and real production loader; no battle or transaction"
+}
