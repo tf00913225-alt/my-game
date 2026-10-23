@@ -1,0 +1,4 @@
+{
+  "head": "f4e32d549f2d98cb68e3e8eb93434a41fc92455a",
+  "error": "AssertionError [ERR_ASSERTION]: last-card control below44\n    at file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/dungeon-end.mjs:80:253"
+}
