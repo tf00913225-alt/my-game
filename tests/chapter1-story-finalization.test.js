@@ -75,6 +75,12 @@ function runtime(saved,initialSave=true){
         getPotionCount:id=>potionCounts[id]||0,addPotionToInventory:(id,n)=>{potionCounts[id]=(potionCounts[id]||0)+n;return true;},
         v132LaunchDungeonBattle(enemies,fn,opts){roster=enemies;callback=fn;options=opts;launches++;c.battleActive=true;return true;}};
     c.window=c;vm.createContext(c);
+    const mainSource=fs.readFileSync('js/00-main.js','utf8');
+    for(const name of ['getPartyCharacterKey','getSkillCharacterObject']){
+        const declaration=mainSource.match(new RegExp('function '+name+'\\([^)]*\\)\\{[\\s\\S]*?\\n\\}'));
+        assert.ok(declaration,'canonical character identity Owner exists: '+name);
+        vm.runInContext(declaration[0],c);
+    }
     for(const path of ["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js"])vm.runInContext(fs.readFileSync(path,"utf8"),c);
     return {c,api:c.FourSymbolsAdventure,state:()=>c.player.adventureProgress.chapters.chapter_v1,
         save:value=>{saveMode=value;},stored:()=>structuredClone(stored),roster:()=>roster,options:()=>options,launches:()=>launches,
@@ -83,6 +89,35 @@ function runtime(saved,initialSave=true){
 }
 function finishDialogue(h){let guard=30;while(h.state().dialogue&&guard-->0)assert.equal(h.api.advanceDialogue(),true);assert.ok(guard>0);}
 function at(h,id){h.state().currentNodeId=id;h.state().onboarding={active:true,phase:"story",nodeId:"c1_01"};}
+for(const element of ['fire','water','wind','earth']){
+    test(`primary ${element} tutorial uses the canonical character slot for skill page, readiness and armor`,()=>{
+        const h=runtime();h.c.player.element=element;at(h,'c1_02');
+        h.state().onboarding={active:true,phase:'guidance',nodeId:'c1_02',requiredAction:'skill'};
+        h.c.currentSkillCharacter='player2';h.c.showPage=()=>{};
+        let rendered=0;
+        h.c.renderSkillLoadout=()=>{
+            rendered++;
+            assert.equal(h.c.getSkillCharacterObject(h.c.currentSkillCharacter),h.c.player,'skill page resolves the actual first player');
+        };
+        if(element!=='fire'){
+            h.c.characterSkillLoadouts[element]={skillLevels:{ghost:1},equippedSkills:['ghost']};
+            h.c.characterEquipment[element]={armor:{v141Uid:'lesson-armor'}};
+        }
+        assert.equal(h.api.getView().tutorialProgress.skillReady,false,'element placeholder must not authorize readiness');
+        assert.equal(h.api.getView().tutorialProgress.nativeElement,element);
+        assert.equal(h.api.openTutorialSystem(),true);assert.equal(rendered,1);
+        assert.equal(h.c.currentSkillCharacter,h.c.getPartyCharacterKey(0));
+        h.c.characterSkillLoadouts.fire.skillLevels.lessonSkill=1;
+        assert.equal(h.api.getView().tutorialProgress.skillReady,false,'learning alone is insufficient');
+        h.c.characterSkillLoadouts.fire.equippedSkills.push('lessonSkill');
+        assert.equal(h.api.getView().tutorialProgress.skillReady,true);
+        assert.equal(h.api.getView().tutorialProgress.loadout.skillLevels.lessonSkill,1);
+        h.state().grantedEquipmentUid='lesson-armor';
+        assert.equal(h.api.getView().tutorialProgress.equipmentReady,false,'element placeholder armor is not the player equipment');
+        h.c.characterEquipment.fire.armor={v141Uid:'lesson-armor'};
+        assert.equal(h.api.getView().tutorialProgress.equipmentReady,true);
+    });
+}
 function installCanonicalInventoryFilter(c){
     const source=fs.readFileSync('js/00-main.js','utf8'),start=source.indexOf('function getFilteredInventoryItems('),end=source.indexOf('\nfunction ',start+1);
     const retired=source.match(/const RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*?\]\);/);
@@ -311,6 +346,23 @@ test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',
     h.frame();assert.equal(h.dispatch('click',sp).stopped,false);assert.equal(h.dispatch('click',hp).stopped,true);
     assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
 });
+
+for(const element of ['fire','water','wind','earth']){
+    test(`skill guide requires a real ${element} tab click before learning and equipping`,()=>{
+        const h=guideHarness(),page=h.element(),tab=h.element(),growth=h.element(),equip=h.element(),wrong=h.element();
+        h.c.battleActive=false;h.view.tutorial.requiredAction='skill';h.view.tutorialProgress.nativeElement=element;
+        let selected=false,learned=0,equipped=0;
+        tab.getAttribute=()=>selected?'true':'false';tab.action=()=>{selected=true;};growth.action=()=>{learned++;h.view.tutorialProgress.loadout={skillLevels:{lessonSkill:1}};};equip.action=()=>{equipped++;};
+        h.targets.set('#skillPage.active',[page]);
+        h.targets.set('#skillElementTabs [onclick="selectSkillElementTab(\''+element+'\')"]',[tab]);
+        h.targets.set('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)',[growth]);
+        h.targets.set('.skill-row[data-skill-id="lessonSkill"] [data-skill-action="equip"]',[equip]);
+        h.frame();assert.equal(selected,false);assert.equal(h.dispatch('click',growth).stopped,true);assert.equal(h.dispatch('click',wrong).stopped,true);
+        assert.equal(h.dispatch('click',tab).stopped,false);assert.equal(selected,true);
+        h.frame();assert.equal(h.dispatch('click',growth).stopped,false);assert.equal(learned,1);
+        h.frame();assert.equal(h.dispatch('click',equip).stopped,false);assert.equal(equipped,1);
+    });
+}
 
 test('the default potion shop requires the original equipment tab click before the lesson purchase',()=>{
     const h=guideHarness(),modal=h.element(),tab=h.element(),offer=h.element();let tabs=0,bought=0;
