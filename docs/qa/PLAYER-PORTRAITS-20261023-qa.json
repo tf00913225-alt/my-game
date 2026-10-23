@@ -1,0 +1,55 @@
+{
+  "workId": "PLAYER-PORTRAITS-20261023",
+  "reviewerRole": "independent QA subagent; no asset generation or game integration",
+  "status": "local-art-and-browser-pass",
+  "reviewedBuild": "build/boot-core.bbbaf3175142.js",
+  "artReview": {
+    "method": "Direct visual inspection of all final full-resolution PNG candidates and a final light/dark alpha-composited 192px-high contact sheet; compare faces, hair, pose, silhouette and costume across the set.",
+    "accepted": ["player_male_01", "player_male_02", "player_male_03", "player_male_04", "player_female_01", "player_female_02", "player_female_03", "player_female_04"],
+    "rejectedAndReplaced": ["entire first batch after user art-direction rejection", "reference-generated second-batch male02", "reference-generated second-batch male03", "reference-generated second-batch female02", "reference-generated second-batch female04"],
+    "criteria": {
+      "frontalDominantFullBodyAndFeet": "pass; slight natural torso turns retained, no profile/back views",
+      "protagonistCharismaAndNaturalWeightBearingPose": "pass under revised user direction",
+      "distinctFacesHairSilhouettesAndAccessories": "pass after four same-face/costume candidates were regenerated",
+      "coherentWuxiaHandPaintedArt": "pass; cloth/leather, restrained metal, no magical glow or god armor",
+      "transparentEdgesOnLightAndDark": "pass; apparent RGB halos in uncomposited preview were independently checked as alpha-zero pixels, then cleared by composited inspection",
+      "smallScaleRecognition": "pass at 192px contact-sheet height and actual creation screenshots",
+      "futureDepthBattleComposition": "visually compatible frontal stance only; live battle rendering is not replaced or certified by this task"
+    },
+    "notes": ["Male01/female01 are more ornate than the practical short-coat characters, but materials and brushwork remain coherent.", "Male01 has little top/bottom padding; existing contain rendering was verified without cropping.", "Male02 and male04 both cross arms; different face, hair and short-coat versus long-robe silhouettes make this acceptable."]
+  },
+  "assetVerification": {
+    "perFileReport": "docs/qa/PLAYER-PORTRAITS-20261023-assets.json",
+    "independentSourceAndRuntimeSha256": "all eight pairs independently matched to report using PowerShell Get-FileHash",
+    "decodedPixelComparison": "independently reopened all eight PNG/WebP pairs using bundled Pillow; dimensions are identical 1024x1536 and every decoded RGBA byte is equal",
+    "dimensions": "all eight browser-decoded WebP images are 1024x1536",
+    "runtimeFormat": "WebP; all eight actual HTTP responses were 200 and image.decode succeeded",
+    "alpha": "light/dark compositing verified visually; masters preserved without crop/resize"
+  },
+  "browserVerification": {
+    "environment": "Windows headless Chrome via CDP, actual local production index and hashed bundles; deterministic new-account Firebase Auth/Cloud/Session transport fixture",
+    "initialMatrix": [
+      {"width": 1440, "height": 900, "choicesClicked": 8, "result": "pass"},
+      {"width": 360, "height": 640, "choicesClicked": 8, "result": "pass"},
+      {"width": 390, "height": 844, "choicesClicked": 8, "result": "pass"}
+    ],
+    "finalBootRecheck": {"width": 390, "height": 844, "choicesClicked": 8, "result": "pass", "nextAndBackSteps": "pass", "nameInput": "pass", "reload": "pass"},
+    "assertions": ["real pointer clicks on both gender buttons and all four existing element controls", "expected new WebP src for every choice", "selected gender and element state", "image.decode, naturalWidth and naturalHeight", "computed object-fit contain", "full feet and uncropped silhouette in screenshots", "no new Runtime exception"],
+    "network": {"portraitNonCanceledFailures": 0, "runtimeExceptions": 0, "observations": "A favicon.ico 404 and canceled speculative/repeated requests during selection/reload are recorded separately. All eight portraits have successful HTTP200 responses and successful visible-image decodes; cancellation is not used as success evidence."},
+    "cache": "initial HTML, creation mapping, startup preload and first-play manifest point to new filenames; new hashed boot verified and reload loads new WebP. Local fixture serves no-store, so persistent production cache/service-worker behavior remains deployment acceptance.",
+    "localEvidence": "artifacts/player-portraits-20261023/independent-browser-results.json and creation-<viewport>-<gender>-<index>.png"
+  },
+  "scopeReview": {
+    "strategy": "new filenames plus creation/preload mappings",
+    "oldAssets": "retained; inventory continues using original JPEGs and battle uses its separate battle PNG set",
+    "unrelatedCssCombatSaveStatsReleaseVersion": "no changes found in independent diff review",
+    "buildOutputs": "hashed boot/app-shell and manifests regenerated as required; no new layout owner or wrapper"
+  },
+  "limitations": [
+    "Viewport emulation is not physical Android/iOS testing; physical pinch/long-press/touch behavior was not certified.",
+    "Firebase transport was a local read-only fixture, not a real Firebase Auth/Cloud Save acceptance test; no cloud character or player data was written.",
+    "No deployed SHA is certified by this local report; latest-head required CI and dev deployment acceptance remain the root agent's responsibility.",
+    "Appearance choices remain coupled to existing gender/element controls; no independent portrait persistence or battle asset switch was introduced.",
+    "The quality-first lossless runtime set is approximately 9.1MB; mobile download latency was not measured."
+  ]
+}

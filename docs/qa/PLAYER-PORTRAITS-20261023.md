@@ -3,7 +3,7 @@
 - Target: dev
 - Branch: feature/player-portraits-20261023
 - Base dev: bc7efd1c4e66c1cb412fab29d404123f5495ea86
-- Status: eight replacement portraits generated and integrated; independent final browser report and latest-head CI pending.
+- Status: eight replacement portraits integrated; independent local art/browser QA PASS; latest-head required CI pending in PR #986.
 
 ## Inventory and bounded replacement
 
@@ -33,4 +33,6 @@ Build and build check pass. Seven focused test files pass (10 outer Node tests):
 
 Local `v173.20-startup-loader.test.js` cannot finish because ImageMagick `identify` is absent on this Windows host; this is not recorded as a pass. The normal required CI remains necessary. Initial one-off Windows manifest write failure was resolved by a successful build and build check.
 
-Independent final results, exact commit/CI/deployment and remaining limitations will be recorded after verification. No current claim of deployed acceptance.
+Independent final art, pixel and browser results are recorded by the separate reviewer in `PLAYER-PORTRAITS-20261023-qa.json`. Actual local Chrome at PC 1440×900, 9:16 360×640 and long-screen 390×844 passed 24 real pointer selections. The final boot recheck confirms all eight HTTP200 + decode results, name entry, next/back and reload. No Runtime exception or non-cancelled portrait failure. Existing favicon404 and cancelled speculative/reload requests are separated from successful image evidence. This uses an isolated empty-account transport fixture, not real Firebase writes or physical phones.
+
+PR: https://github.com/tf00913225-alt/my-game/pull/986 . Latest Head, CI and deployment checkpoint live in the PR body. No current claim of deployed acceptance.
