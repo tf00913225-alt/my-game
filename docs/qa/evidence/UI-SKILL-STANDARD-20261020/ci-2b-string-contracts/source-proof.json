@@ -1,0 +1,14 @@
+{
+  "base": "2b96e1c0672b1218800bf8ab3014387cd61cf184",
+  "testsOnly": true,
+  "fullExpectedFilesExact": true,
+  "productJsCssHtmlBuildManifestFunctionsConfigUnchanged": true,
+  "originalSemanticAssertionsRetained": true,
+  "focusedSuites": [
+    "tests/hit-evasion-final-percent-status-formula-20260923.test.js",
+    "tests/reforge-slot-presentation.test.mjs"
+  ],
+  "focusedResult": "2 pass / 0 fail",
+  "scriptSyntax": "PASS",
+  "noBrowserOrTransactionRerun": true
+}

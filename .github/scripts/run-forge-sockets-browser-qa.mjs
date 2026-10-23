@@ -171,7 +171,7 @@ try{
   assert.equal(await c.eval(`document.querySelectorAll('.v17358-affix-lock').length`),4,'only real affixes have lock rows');
   assert.deepEqual(await c.eval(`[...document.querySelectorAll('.v141-smelting-affix>b')].map(n=>n.textContent)`),['攻擊 +40','攻擊 +38','攻擊 +36','攻擊 +35','[可冶煉]'],'each formal slot preserves its value or empty marker');
   const slotView=await c.eval(`(()=>{const item=inventoryItems.find(i=>i.v141Uid==='forge-qa-orange'),before=JSON.stringify(item);v17346AppendReforgeMarkers(item);return {rows:[...document.querySelectorAll('#itemModalStats [data-reforge-slot]')].map(n=>n.textContent),remaining:v17346RemainingReforgeSlots(item),unchanged:JSON.stringify(item)===before};})()`);
-  assert.deepEqual(slotView,{rows:['攻擊 +40','攻擊 +38','攻擊 +36','攻擊 +35','詞條 5：[可冶煉]'],remaining:1,unchanged:true},'backpack and forge share ordered raw slots without writes');
+  assert.deepEqual(slotView,{rows:['詞條 1：攻擊 +40','詞條 2：攻擊 +38','詞條 3：攻擊 +36','詞條 4：攻擊 +35','詞條 5：[可冶煉]'],remaining:1,unchanged:true},'backpack and forge share ordered raw slots without writes');
   await tap('.v141-smelting-affix:first-child .v17358-affix-lock');await tap('.v141-smelting-affix:nth-child(2) .v17358-affix-lock');
   await tap('.v141-smelting-footer .v141-synthesis-primary');
   assert.equal(await c.eval(`document.querySelectorAll('.v141-smelting-affix').length`),5,'the roll fills the fifth formal slot');
