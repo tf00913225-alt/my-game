@@ -7388,8 +7388,9 @@ body > .v169-rpg-dialog-layer{
     --battle-center-region-track:12fr;
     --battle-ally-region-track:45.215fr;
     --battle-turn-row-height:20px;
-    --battle-bottom-safe-gap:24px;
-    --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 6px);
+    --battle-top-name-reserve:72px;
+    --battle-bottom-safe-gap:8px;
+    --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 12px);
     --battle-target-prompt-height:60px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
@@ -7440,17 +7441,19 @@ body > .v169-rpg-dialog-layer{
 #game-stage #battlePage.v-fixed-slot-render-v2 > .battle-wrap{
     position:relative !important;
     height:calc(100% - var(--battle-bottom-safe-gap)) !important;
+    box-sizing:border-box;
+    padding-top:var(--battle-top-name-reserve);
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
-        minmax(var(--battle-center-min-height),var(--battle-center-region-track))
-        minmax(0,var(--battle-ally-region-track)) !important;
+        minmax(0,var(--battle-ally-region-track))
+        minmax(var(--battle-center-min-height),var(--battle-center-region-track)) !important;
     gap:var(--battle-region-gap) !important;
     min-height:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTurnIndicator{
     position:absolute !important;
-    top:8px;
+    top:0;
     left:140px;
     right:82px;
     z-index:2;
@@ -7473,6 +7476,7 @@ body > .v169-rpg-dialog-layer{
     box-sizing:border-box;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-enemy-region{
+    grid-row:1;
     display:grid;
     grid-template-rows:var(--battle-title-height) minmax(0,1fr);
 }
@@ -7490,10 +7494,14 @@ body > .v169-rpg-dialog-layer{
     margin:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region{
+    grid-row:3;
     display:block;
     padding:3px 4px;
     border:0;
     background:none !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
+    grid-row:2;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
     width:100%;
@@ -7504,6 +7512,14 @@ body > .v169-rpg-dialog-layer{
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion{
     height:100%;
     justify-content:flex-end;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleCommandRow{
+    width:calc(100% - 74px);
+    margin-right:74px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTargetPrompt{
+    right:74px;
+    width:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
     position:absolute;

@@ -1,3 +1,14 @@
+# Current user-directed battlefield layout candidate
+
+Same Work ID / branch / PR983. Human chose enemy down, party up, controls/settings below party; this supersedes the old phone-notice product-choice wait. Original fixed-slot stylesheet now orders enemy / ally / footer, reserves72px above and8px below, and separates the original ElementBox/settings entry from five command buttons by74px. No new multiplier implementation, JS/Core/clock/art/accepted-normal change.
+
+21 focused tests, official build-check/diffcheck PASS. Desktop411x717 and360x640 plus1280x720 structural probes complete; physical SM-N960F original normal target/return/settings interaction PASS. Desktop+physical original visible marquee twelve badge cases PASS for viewport/formal actor/HUD/announcement boundaries. Actual phone image reviewed. These are isolated controlled scenes, not natural combat or native motion movies. Source review found no proven blocker; independent actual review of three phone/small/label frames found no proven control collision; static frames do not prove whole dynamic matrix.
+
+Tradeoff disclosed: at411x717 enemy height324.405→291.786 and ally267.750→240.832 (~10.05% smaller available regions); existing bounded paint therefore shrinks. Human layout/art review and latest Head CI remain pending; Draft DO NOT MERGE. Previous NORMAL approval preserved. Earlier phone QA FAIL was a nonexistent settings selector; corrected scratch QA used the original panel, product unchanged. Old evidence retained.
+
+[Bounded layout evidence](FIRE-VFX-POLISH-20261023-layout.json). Older sections below retain snapshot-specific history; old announcement FAIL does not describe this new layout.
+
+---
 # Current Modal cross-Owner integration checkpoint
 
 Base86ca8edb + selected original Owner delta8938e239 (UI evidence0f5fee0a), clean three-way apply of js00/js45 + original reading test only. No whole955 UI branch, VFX/float CSS, action timing or skill art change. Original builder regenerated derived artifacts; restricted policy changed only main source digest, policy semantics asserted equal.

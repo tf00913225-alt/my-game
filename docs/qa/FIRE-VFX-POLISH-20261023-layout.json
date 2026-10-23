@@ -1,0 +1,24 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "baseHead": "71fc2b7b751e9f85e94723b9d3fe7ed0195e6af3",
+  "snapshot": "Uncommitted layout candidate on baseHead; source and generated bundle hashes identify tested bytes. The following checkpoint preserves these bytes.",
+  "scope": "Original fixed-slot CSS: enemy / ally / footer; top72px bottom8px; original settings entry separate74px column. No JS, Core, art, normal motion, clocks or multiplier implementation change.",
+  "cssSha256": "05BFE6DFD847F52B4B42A30967362019D68F817060ACA233AC814D1629CDD23D",
+  "bundleSha256": "A9AA8153DC04FAD36EC38AECDC287F076E20A3735D8D33F02428AE2AE1A22849",
+  "targetedTests": "21 outer tests PASS (fixed-slot, label, normal airshot, character motion, battle integration, UI status, Boss contracts); official build --check and git diff --check PASS",
+  "sourceReview": "Independent existing fire_sample_review source-only: no proven blocker, three actual phone/small/label images independently reviewed with no proven layout blocker; no whole dynamic matrix claim",
+  "phone": "SM-N960F physical; isolated controlled6v6, original manual state. Original normal target selection/return and settings open-close PASS. No native movie or timing/full natural battle claim.",
+  "announcement": "Desktop411x717 and physical phone: original visible marquee + twelve actor badge cases, no formal actor/HUD/marquee collision or viewport clipping; controlled presentation, not full Core matrix.",
+  "tradeoff": "At411x717 enemy region324.405->291.786px (-10.05%); ally267.750->240.832px (-10.05%). Preferred paint rules unchanged but bounded portrait size changes; user visual review pending. No x2/x3 button or timer fabricated.",
+  "evidence": [
+    "artifacts/battle-layout-candidate/evidence.json",
+    "artifacts/battle-layout-small-candidate/evidence.json",
+    "artifacts/battle-layout-pc-candidate/evidence.json",
+    "artifacts/battle-layout-phone-verified/evidence.json",
+    "artifacts/battle-layout-announcement-candidate/evidence.json",
+    "artifacts/battle-layout-announcement-phone/evidence.json"
+  ],
+  "diagnostic": "Earlier phone-candidate FAIL used nonexistent settings overlay selector. Corrected scratch QA to original autoBattleSettingsPanel; no product fix/assertion weakening. Earlier evidence retained, not relabeled PASS.",
+  "pending": "Human layout/fire art review; latest checkpoint required CI; Boss runtime-specific layout not newly claimed; audio/multiplier dependencies unchanged. Draft DO NOT MERGE."
+}
