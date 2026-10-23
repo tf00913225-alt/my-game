@@ -96,7 +96,7 @@ const nodes={
     battleCommandRow:{classList:classList()},
     skillQuickBar:{classList:classList(["show"])},
     itemMenu:{classList:classList(["show"])},
-    battleActionRegion:{classList:classList(["target-selecting"])}
+    battleActionRegion:{dataset:{controlMode:"manual"},classList:classList(["target-selecting","utility-menu-open"])}
 };
 let presentationActive=true;
 const hudContext={
@@ -108,8 +108,11 @@ const hudContext={
     clearBattleTargetSelectionMode(){nodes.battleActionRegion.classList.remove("target-selecting");}
 };
 vm.createContext(hudContext);
+vm.runInContext(extractFunction(core,"setBattleUtilityMenuOpen"),hudContext);
 vm.runInContext(extractFunction(core,"updateActionHudVisibility"),hudContext);
 hudContext.updateActionHudVisibility();
+assert.equal(nodes.battleActionRegion.dataset.controlMode,"utility");
+assert.equal(nodes.battleActionRegion.classList.contains("utility-menu-open"),false,"presentation owner closes the manual utility tray");
 assert.equal(nodes.turnTargetRow.classList.contains("battle-hud-hidden"),true);
 assert.equal(nodes.battleCommandRow.classList.contains("battle-hud-hidden"),true);
 assert.equal(nodes.skillQuickBar.classList.contains("show"),false);
@@ -118,6 +121,7 @@ assert.equal(nodes.battleActionRegion.classList.contains("target-selecting"),fal
 presentationActive=false;
 hudContext.updateActionHudVisibility();
 assert.equal(nodes.battleCommandRow.classList.contains("battle-hud-hidden"),false,"manual HUD returns only after the core presentation lock releases");
+assert.equal(nodes.battleActionRegion.dataset.controlMode,"manual","original owner restores manual utility eligibility after presentation");
 
 assert.match(mainCss,/--battle-command-skill-left:1%/);
 assert.match(mainCss,/--battle-command-run-width:19%/);

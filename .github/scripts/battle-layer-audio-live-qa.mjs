@@ -1044,6 +1044,11 @@ try{
         const center=rectFor(document.querySelector('.battle-center-region'));
         const ally=rectFor(document.querySelector('.battle-ally-region'));
         const action=rectFor(document.getElementById('battleActionRegion'));
+        updateActionHudVisibility();
+        const actionRegion=document.getElementById('battleActionRegion');
+        const utilityWasOpen=actionRegion.classList.contains('utility-menu-open');
+        if(actionRegion.dataset.controlMode==='manual')setBattleUtilityMenuOpen(true);
+        const utilities=Array.from(document.querySelectorAll('#battleUtilityTray .battle-utility-button')).map(node=>{const r=node.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {id:node.id,width:node.offsetWidth,height:node.offsetHeight,rect:rectFor(node),hit:hit===node||node.contains(hit)};});
         const elementBoxNode=document.querySelector('.battle-element-box-button');
         const elementBox=rectFor(elementBoxNode);
         const elementBoxLogical=elementBoxNode?{
@@ -1052,6 +1057,7 @@ try{
             computedWidth:getComputedStyle(elementBoxNode).width,
             computedHeight:getComputedStyle(elementBoxNode).height
         }:null;
+        if(actionRegion.dataset.controlMode==='manual')setBattleUtilityMenuOpen(utilityWasOpen);
         const enemyArea=rectFor(document.getElementById('battleMonsterArea'));
         const allyArea=rectFor(document.getElementById('battlePlayerRow'));
         const enemySlotRects=owner.enemySlots.map(slot=>owner.getSlotRect(slot)).filter(Boolean);
@@ -1072,7 +1078,7 @@ try{
         return {
             viewport:{width:innerWidth,height:innerHeight},
             pageClass:document.getElementById('battlePage')?.className||'',
-            regions:{wrap,enemy,center,ally,action,elementBox,elementBoxLogical,enemyArea,allyArea},
+            regions:{wrap,enemy,center,ally,action,elementBox,elementBoxLogical,enemyArea,allyArea},utilities,
             centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage,
             separation:{
                 enemyBeforeAlly:enemy.bottom<=ally.top+1,
@@ -1100,8 +1106,13 @@ try{
     assert.ok(layout.enemySlots.maxHeight-layout.enemySlots.minHeight<=1,"Enemy slot heights must be equal");
     assert.ok(layout.allySlots.maxWidth-layout.allySlots.minWidth<=1,"Ally slot widths must be equal");
     assert.ok(layout.allySlots.maxHeight-layout.allySlots.minHeight<=1,"Ally slot heights must be equal");
-    assert.equal(layout.regions.elementBoxLogical.width,52,"Element Box button width must be the authorized52px shared utility size");
-    assert.equal(layout.regions.elementBoxLogical.height,52,"Element Box button height must be the authorized52px shared utility size");
+    assert.deepEqual(layout.utilities.map(button=>button.id),['battleAutoToggle','battleElementBoxButton','battleSpeedControl'],'formal AUTO/settings/speed controls must all exist');
+    for(const button of layout.utilities){
+        assert.equal(button.width,52,'shared utility logical width');
+        assert.equal(button.height,52,'shared utility logical height');
+        assert.ok(button.rect.width>=44&&button.rect.height>=44,'shared utility physical touch target');
+        assert.equal(button.hit,true,'each exposed utility center must be reachable');
+    }
     assert.ok(layout.enemySlots.minHeight>92,"Enemy slots must remain visibly larger than the previous compact cards");
     assert.ok(layout.allySlots.minHeight>100,"Ally slots must retain the enlarged portrait layout");
     assert.ok(layout.hud.length>=7,"The real Abyss battle must expose one ally and six enemy card HUDs");
