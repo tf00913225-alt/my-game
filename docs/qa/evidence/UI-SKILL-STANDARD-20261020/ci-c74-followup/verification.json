@@ -1,0 +1,34 @@
+{
+  "base": "c74f1286c5d3b1b9247014d73ed3218b4b539ca3",
+  "scope": "two QA/test files only; product unchanged",
+  "sourceHashes": {
+    ".github/scripts/run-hero-page-browser-qa.mjs": "7c6603233be51120e9551e464b397d4db58a4cd32b62bc42c8825d08ede8a648",
+    "tests/premium-functional-ui-batch4.test.js": "78a7d54c19459d916d69d6ebe0c033d45c56065d52283a81e7b80a9a7adeee7d"
+  },
+  "originalCi": {
+    "run": 39934804387,
+    "attempt": 1,
+    "jobs": {
+      "ui": 120352034340,
+      "core": 120352034391,
+      "adventure": 120352034430
+    }
+  },
+  "shopContract": {
+    "productCommit": "0b408c143114b5407634e6e8071fd0dbe909b4f8",
+    "native132Authored44": true,
+    "productUnchanged": true
+  },
+  "results": {
+    "hero": "original suite exit0;360x640/412x915/1280x800",
+    "shop": "batch4/v173.48/v173.56 tests3pass",
+    "syntax": "pass",
+    "diagnostic": "DIAGNOSTIC_STOP intentional, not suitePASS"
+  },
+  "pending": [
+    "393x873 not separately run in original3sizeHero suite",
+    "latestHeadRequiredCI",
+    "Story formalguide failure #984",
+    "wholeUI/hardware/deployment not accepted"
+  ]
+}

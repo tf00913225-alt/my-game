@@ -1,0 +1,5 @@
+{
+  "scope": {"reviewer":"/root/daily_scope","screensViewed":true,"result":"pass narrowly; two test/QA files, no product/transaction assertions changed; shop tied to existing product commit0b408c14"},
+  "input": {"reviewer":"/root/map_input_review","screensViewed":true,"result":"no new blocker; EFP after scroll and drag coordinate refresh valid; three original sizes passed","limits":"programmatic scrollTop reachability is not touch-scroll acceptance; hardware/keyboard/more heroes/long content not validated"},
+  "art": {"reviewer":"/root/map_review","screensViewed":true,"result":"no new distortion/blur/art occlusion; scrolling exposes candidate without forcing one screen","existingObservation":"header and content both have return buttons; retained, not a regression from tests-only change"}
+}
