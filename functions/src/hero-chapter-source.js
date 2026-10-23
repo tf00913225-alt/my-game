@@ -67,6 +67,36 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
         tx.create(root.collection("ledgerEntries").doc(proof.operationId),{...operation,createdAt:stamp});
         return sha256;
     }
+    function inspectTicket(value,id,envelopeRevision,policySha256,stepCount){
+        const policy=value.policy;
+            if(value.ticketId!==id||value.operationId!=="hero-ticket-"+id||
+               value.serverRevision>envelopeRevision||!Number.isSafeInteger(value.issuedAtMs)||value.issuedAtMs<1||
+               value.expiresAtMs!==value.issuedAtMs+TTL||!policy||policy.schemaVersion!==1||
+               policy.chapterId!==catalog.chapterId||policy.outcomeVerified!==false||
+               !Array.isArray(policy.nodes)||policy.nodes.length>32||
+               !node(policy,policy.startNodeId)||node(policy,policy.endNodeId)?.type!=="finish"||
+               value.policySha256!==digest(policy)||value.policySha256!==policySha256||
+               !Number.isSafeInteger(value.startingStepCount)||value.startingStepCount<0||
+               value.startingStepCount>stepCount){
+                fail("data-loss","Chapter ticket policy, revision or expiry is invalid.");
+            }
+    }
+    function inspectStep(row,operationId,source,policy,cursor,previousHash,previousRevision,envelopeRevision){
+            if(row.operationId!==operationId||operationId!==`hero-node-${row.ticketId}-${row.nodeId}`||
+               row.nodeId!==cursor||row.previousStepSha256!==previousHash||
+               row.policySha256!==source.policySha256||row.outcomeVerified!==false||
+               row.sourceRevision<source.serverRevision||row.sourceRevision<previousRevision||
+               row.serverRevision>envelopeRevision||!Number.isSafeInteger(row.observedAtMs)||
+               row.observedAtMs<source.issuedAtMs||row.observedAtMs>=source.expiresAtMs){
+                fail("data-loss","Chapter steps do not form a legal issued route.");
+            }
+            const next=nextNode(policy,row.nodeId,row.choiceId);
+            if(next===null){
+                if(row.nodeId!==policy.endNodeId||!Number.isSafeInteger(row.allocationSeed)||
+                   row.allocationSeed<1||row.allocationSeed>0xffffffff){fail("data-loss","Chapter end entitlement is invalid.");}
+            }else if(row.allocationSeed!==null){fail("data-loss","Nonterminal chapter step cannot grant a Hero.");}
+        return next;
+    }
     async function read(tx,context){
         const {root,envelope}=context,uid=envelope.data.ownerUid,r=refs(root);
         const [markerSnap,latest,claimSnap]=await Promise.all([
@@ -90,17 +120,7 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
             if(!validId(id)){fail("data-loss","Chapter ticket identity is invalid.");}
             const value=await evidence(tx,root,"heroChapterTickets",id,"hero-chapter-ticket",uid);
             const policy=value.policy;
-            if(value.ticketId!==id||value.operationId!=="hero-ticket-"+id||
-               value.serverRevision>envelope.serverRevision||!Number.isSafeInteger(value.issuedAtMs)||value.issuedAtMs<1||
-               value.expiresAtMs!==value.issuedAtMs+TTL||!policy||policy.schemaVersion!==1||
-               policy.chapterId!==catalog.chapterId||policy.outcomeVerified!==false||
-               !Array.isArray(policy.nodes)||policy.nodes.length>32||
-               !node(policy,policy.startNodeId)||node(policy,policy.endNodeId)?.type!=="finish"||
-               value.policySha256!==digest(policy)||value.policySha256!==marker.policySha256||
-               !Number.isSafeInteger(value.startingStepCount)||value.startingStepCount<0||
-               value.startingStepCount>marker.steps.length){
-                fail("data-loss","Chapter ticket policy, revision or expiry is invalid.");
-            }
+            inspectTicket(value,id,envelope.serverRevision,marker.policySha256,marker.steps.length);
             tickets.set(id,value);return value;
         }
         const current=await ticket(marker.ticketId),policy=current.policy;
@@ -110,19 +130,7 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
             if(typeof operationId!=="string"||operationId.length>128){fail("data-loss","Chapter step identity is invalid.");}
             const row=await evidence(tx,root,"heroChapterSteps",operationId,"hero-chapter-step",uid);
             const source=await ticket(row.ticketId);
-            if(row.operationId!==operationId||operationId!==`hero-node-${row.ticketId}-${row.nodeId}`||
-               row.nodeId!==cursor||row.previousStepSha256!==previousHash||
-               row.policySha256!==source.policySha256||row.outcomeVerified!==false||
-               row.sourceRevision<source.serverRevision||row.sourceRevision<previousRevision||
-               row.serverRevision>envelope.serverRevision||!Number.isSafeInteger(row.observedAtMs)||
-               row.observedAtMs<source.issuedAtMs||row.observedAtMs>=source.expiresAtMs){
-                fail("data-loss","Chapter steps do not form a legal issued route.");
-            }
-            cursor=nextNode(policy,row.nodeId,row.choiceId);
-            if(cursor===null){
-                if(row.nodeId!==policy.endNodeId||!Number.isSafeInteger(row.allocationSeed)||
-                   row.allocationSeed<1||row.allocationSeed>0xffffffff){fail("data-loss","Chapter end entitlement is invalid.");}
-            }else if(row.allocationSeed!==null){fail("data-loss","Nonterminal chapter step cannot grant a Hero.");}
+            cursor=inspectStep(row,operationId,source,policy,cursor,previousHash,previousRevision,envelope.serverRevision);
             previousHash=row.sha256;previousRevision=row.serverRevision;rows.push(row);
         }
         for(const source of tickets.values()){
@@ -143,6 +151,88 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
                 sourceId:end.operationId,grantedRevision:end.serverRevision};
         }else if(claimSnap.exists){fail("data-loss","Orphan chapter Hero claim cannot be reopened.");}
         return {marker,ticket:current,rows,entitlement};
+    }
+    const binding=scope=>({ownerUid:scope.uid,envelopeRevision:scope.envelopeRevision,
+        canonicalRevision:scope.canonicalRevision,...(scope.captureSha256===undefined?{}:{captureSha256:scope.captureSha256})});
+    async function retainedTicket(tx,scope,id){
+        if(!validId(id))fail("data-loss","Chapter ticket identity is invalid.");
+        const value=await evidence(tx,scope.root,"heroChapterTickets",id,"hero-chapter-ticket",scope.uid),policy=value.policy;
+        inspectTicket(value,id,scope.envelopeRevision,value.policySha256,32);
+        if(Object.keys(value).sort().join("|")!=="expiresAtMs|issuedAtMs|kind|operationId|ownerUid|policy|policySha256|schemaVersion|serverRevision|sessionId|sha256|sourceRevision|startingStepCount|startingStepSha256|ticketId"||
+           !acceptsPolicy(policy))
+            fail("data-loss","Retained chapter ticket policy, revision or expiry differs.");
+        return value;
+    }
+    async function verifyRetainedTicket(tx,scope,id){
+        const value=await retainedTicket(tx,scope,id),{policy,sessionId,kind,schemaVersion,ownerUid,...rest}=value;
+        return {...binding(scope),...rest,startNodeId:policy.startNodeId,endNodeId:policy.endNodeId};
+    }
+    async function verifyRetainedStep(tx,scope,id){
+        if(typeof id!=="string"||id.length>128)fail("data-loss","Chapter step identity is invalid.");
+        const row=await evidence(tx,scope.root,"heroChapterSteps",id,"hero-chapter-step",scope.uid);
+        const ticket=await retainedTicket(tx,scope,row.ticketId);
+        if(Object.keys(row).sort().join("|")!=="allocationSeed|choiceId|kind|nodeId|observedAtMs|operationId|outcomeVerified|ownerUid|policySha256|previousStepSha256|schemaVersion|serverRevision|sessionId|sha256|sourceRevision|ticketId")
+            fail("data-loss","Retained chapter step shape differs.");
+        const next=inspectStep(row,id,ticket,ticket.policy,row.nodeId,row.previousStepSha256,ticket.serverRevision,scope.envelopeRevision);
+        const {sessionId,kind,schemaVersion,ownerUid,...rest}=row;
+        return {...binding(scope),...rest,nextNodeId:next};
+    }
+    async function verifyRetainedHead(tx,scope){
+        const r=refs(scope.root),marker=await tx.get(r.marker),latest=await tx.get(r.tickets.orderBy("serverRevision","desc").limit(1)),claim=await tx.get(r.claim);
+        if(!marker.exists){
+            if(latest.size||claim.exists)fail("data-loss","Chapter head is missing.");
+            return {...binding(scope),present:false,marker:null,latestTicketId:null,claim:null};
+        }
+        const value=strip(marker.data());
+        if(Object.keys(value).sort().join("|")!=="completed|nextNodeId|ownerUid|policySha256|schemaVersion|serverRevision|steps|ticketId"||
+           value.schemaVersion!==1||value.ownerUid!==scope.uid||!validId(value.ticketId)||typeof value.completed!=="boolean"||
+           !Array.isArray(value.steps)||value.steps.length>32||new Set(value.steps).size!==value.steps.length||
+           !Number.isSafeInteger(value.serverRevision)||value.serverRevision<1||value.serverRevision>scope.envelopeRevision||
+           !marker.data().updatedAt||latest.size!==1||latest.docs[0].id!==value.ticketId)
+            fail("data-loss","Retained chapter head is invalid.");
+        if(claim.exists&&!claim.data().createdAt)fail("data-loss","Retained chapter claim stamp is missing.");
+        return {...binding(scope),present:true,marker:value,latestTicketId:latest.docs[0].id,claim:claim.exists?strip(claim.data()):null};
+    }
+    function closeRetainedEvidence({head,tickets,steps,inventory}){
+        const same=(actual,expected)=>Array.isArray(actual)&&new Set(actual).size===actual.length&&actual.length===expected.length&&actual.every(id=>expected.includes(id));
+        const ts=new Map(tickets.map(r=>[r.ticketId,r])),ss=new Map(steps.map(r=>[r.operationId,r]));
+        if(ts.size!==tickets.length||ss.size!==steps.length||!same(inventory.heroChapter,head.present?["current"]:[])||
+           !same(inventory.heroChapterTickets,[...ts.keys()])||!same(inventory.heroChapterSteps,[...ss.keys()]))
+            fail("data-loss","Retained chapter inventory contains missing, duplicate or orphan evidence.");
+        for(const row of [...tickets,...steps])if(row.ownerUid!==head.ownerUid||row.envelopeRevision!==head.envelopeRevision||
+            row.canonicalRevision!==head.canonicalRevision||row.captureSha256!==head.captureSha256)
+            fail("data-loss","Retained chapter unit binding differs.");
+        const result={operationIds:[],ledgerIds:[],claimIds:[],entitlements:[],ticketIds:[...ts.keys()],stepIds:[...ss.keys()]};
+        if(!head.present){if(ts.size||ss.size||head.claim)fail("data-loss","Orphan chapter sources lack their head.");return result;}
+        const marker=head.marker,current=ts.get(marker.ticketId),ordered=[...tickets].sort((a,b)=>a.serverRevision-b.serverRevision);
+        if(!current||ordered.at(-1)!==current||head.latestTicketId!==current.ticketId||!same(marker.steps,[...ss.keys()]))
+            fail("data-loss","Retained chapter current/latest or complete route differs.");
+        let cursor=current.startNodeId,previousHash=null,previousRevision=0;
+        const route=marker.steps.map(id=>ss.get(id));
+        for(let i=0;i<ordered.length;i++){
+            const ticket=ordered[i],prefix=route.slice(0,ticket.startingStepCount),prior=ordered[i-1];
+            if(ticket.policySha256!==current.policySha256||ticket.startingStepCount>route.length||
+               ticket.startingStepSha256!==(prefix.at(-1)?.sha256??null)||
+               prefix.some(r=>r.serverRevision>ticket.sourceRevision)||
+               route.filter(r=>r.serverRevision<=ticket.sourceRevision).length!==ticket.startingStepCount||
+               (!prior&&ticket.startingStepCount!==0)||prior&&(ticket.sourceRevision<prior.serverRevision||ticket.issuedAtMs<prior.expiresAtMs)||
+               prefix.at(-1)?.nextNodeId===null)
+                fail("data-loss","Retained chapter renewal prefix is incomplete or inconsistent.");
+        }
+        for(const row of route){
+            const source=ts.get(row.ticketId),active=ordered.filter(t=>t.serverRevision<=row.sourceRevision).at(-1);
+            if(!source||active!==source||row.nodeId!==cursor||row.previousStepSha256!==previousHash||row.sourceRevision<previousRevision)
+                fail("data-loss","Retained chapter route has a missing, branched or reordered edge.");
+            cursor=row.nextNodeId;previousHash=row.sha256;previousRevision=row.serverRevision;
+        }
+        if(marker.policySha256!==current.policySha256||marker.nextNodeId!==cursor||marker.completed!==(cursor===null)||
+           marker.serverRevision!==Math.max(previousRevision,current.serverRevision))fail("data-loss","Retained chapter marker differs from its full route.");
+        if(marker.completed){
+            const end=route.at(-1),claim=makeClaim(head.ownerUid,HERO,end.operationId,end.serverRevision,end.allocationSeed,end.sha256);
+            if(digest(head.claim)!==digest(claim))fail("data-loss","Retained chapter entitlement claim differs.");
+            result.claimIds=[CLAIM];result.entitlements=[{heroId:HERO,claimKey:CLAIM,allocationSeed:end.allocationSeed,sourceId:end.operationId,grantedRevision:end.serverRevision}];
+        }else if(head.claim)fail("data-loss","Orphan chapter claim cannot be reopened.");
+        result.operationIds=[...tickets.map(r=>r.operationId),...steps.map(r=>r.operationId)];result.ledgerIds=[...result.operationIds];return result;
     }
     function view(source){
         return {chapterId:catalog.chapterId,ticketId:source.ticket?.ticketId||null,
@@ -222,6 +312,6 @@ function createHeroChapterSource({fail,nextRevision,FieldValue,makeClaim,
         return {...context,envelope:{...context.envelope,serverRevision:revision},changed:true,
             chapter:{marker,ticket:source.ticket,rows:[...source.rows,{...proof,sha256}],entitlement}};
     }
-    return Object.freeze({read,view,ensure,complete});
+    return Object.freeze({read,view,ensure,complete,verifyRetainedTicket,verifyRetainedStep,verifyRetainedHead,closeRetainedEvidence});
 }
 module.exports={createHeroChapterSource};
