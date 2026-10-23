@@ -2066,6 +2066,10 @@
       <div class="inventory-title-plate" aria-label="背包">
         <h2>背包</h2>
       </div>
+        <div class="inventory-wallet-bar" aria-label="目前持有金幣">
+            <span class="inventory-wallet-label">金幣</span>
+            <b id="inventoryGoldValue" class="inventory-wallet-value">0</b>
+        </div>
         <button
             type="button"
             id="mapInventoryOverlayClose"
@@ -2110,11 +2114,6 @@
 
     <!-- 下方：四大分類固定，只有102格物品區可上下捲動 -->
     <section class="inventory-right-panel">
-
-        <div class="inventory-wallet-bar" aria-label="目前持有金幣">
-            <span class="inventory-wallet-label">金幣</span>
-            <b id="inventoryGoldValue" class="inventory-wallet-value">0</b>
-        </div>
 
         <div
             class="inventory-category-tabs"
