@@ -1,0 +1,11 @@
+{
+  "base": "bd003a9fe5827abf983b499c99129249795b4d8d",
+  "sourceExactExpected": true,
+  "bundleExactExpected": true,
+  "jsFunctionsConfigUnchanged": true,
+  "sourceHashes": {
+    "css/fixed-slot-battlefield-rendering-v2.css": "1bc4796a5b5e5e83d40cf866331605b7ef6ecc9f0792a6b66a8c1d46223efac0",
+    "build/gameplay-core.c25549ab733e.css": "c25549ab733e919467a33ad84638fb1a6396550845c42045b45739310d143969"
+  },
+  "browserInputSnapshot": "Product files were modified but not committed during local full static Gate. Exact source hashes retained; not relabeled clean or latest CI."
+}

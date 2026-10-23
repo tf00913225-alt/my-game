@@ -1,0 +1,78 @@
+[
+  {
+    "viewport": {
+      "width": 412,
+      "height": 915
+    },
+    "farHeight": 92.24169921875,
+    "commandPixels": [
+      {
+        "party": 1,
+        "comparedPixels": 23930,
+        "exact": true
+      },
+      {
+        "party": 6,
+        "comparedPixels": 23930,
+        "exact": true
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 393,
+      "height": 873
+    },
+    "farHeight": 87.98782348632812,
+    "commandPixels": [
+      {
+        "party": 1,
+        "comparedPixels": 22001,
+        "exact": true
+      },
+      {
+        "party": 6,
+        "comparedPixels": 22001,
+        "exact": true
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "farHeight": 87.31619262695312,
+    "commandPixels": [
+      {
+        "party": 1,
+        "comparedPixels": 21470,
+        "exact": true
+      },
+      {
+        "party": 6,
+        "comparedPixels": 21470,
+        "exact": true
+      }
+    ]
+  },
+  {
+    "viewport": {
+      "width": 360,
+      "height": 800
+    },
+    "farHeight": 80.59954833984375,
+    "commandPixels": [
+      {
+        "party": 1,
+        "comparedPixels": 18568,
+        "exact": true
+      },
+      {
+        "party": 6,
+        "comparedPixels": 18568,
+        "exact": true
+      }
+    ]
+  }
+]

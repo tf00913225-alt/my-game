@@ -248,7 +248,8 @@ assert.match(css,/\[data-enemy-battlefield-profile="standard-six"\] \.v-fixed-en
 assert.match(css,/left:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"depth must not expand the horizontal silhouette envelope into adjacent slots");
 assert.match(css,/right:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"width compensation stays symmetric around the canonical slot");
 assert.match(css,/\.battle-player > \.v174-battle-art,\s*[^{}]*\.battle-monster:is\(\[data-portrait-size-class="STANDARD"\],\[data-portrait-size-class="ELITE"\]\) > \.v174-normalized-portrait\{--battle-art-depth:1\.18;\}/,"only players and normalized ordinary/elite monsters receive the near-row enlargement");
-assert.match(css,/\.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*,\s*[^{}]*\.v-fixed-ally-slot-row\[data-slot-row="front"\][^{}]*\{--battle-art-depth:1\.10;\}/,"far rows preserve the camera perspective rather than reversing the party");
+assert.match(css,/\.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*\{--battle-art-depth:1\.10;\}/,"far enemies preserve their original camera depth");
+assert.match(css,/\.v-fixed-ally-slot-row\[data-slot-row="front"\][^{}]*\{--battle-art-depth:1\.10;--battle-art-overhang-top:9px;\}/,"far allies retain camera depth and their artwork minimum with the readable countdown");
 
 assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
 

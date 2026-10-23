@@ -12868,6 +12868,24 @@
             "非空/使用/auto/resolve/波次/expiry/勝敗/結算/實體裝置仍未驗",
             "393/412本Head item/normal未重驗，保留cc224快照界線"
           ]
+        },
+        {
+          "status": "部分已實際驗證",
+          "sourceBase": "bd003a9fe5827abf983b499c99129249795b4d8d",
+          "scope": "far-row原CSS top餘量7→9，原完整static Browser四尺寸與12focused pass；單因子確認64px倒數帶的空間來源，沒有回退可讀性",
+          "devices": [
+            "412x915",
+            "393x873",
+            "390x844",
+            "360x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/far-row-headroom-source",
+          "limits": [
+            "Browser執行時dirty product snapshot，source及bundle SHA完整綁定，不冒稱clean Head run",
+            "static geometry fixture不是自然戰鬥/實機/全部UI品質驗收",
+            "manual-turn-arrow與JS54不改，#983技能名與箭頭獨立",
+            "最新Head必要CI仍待，不能以本機pass跳過其他Gate"
+          ]
         }
       ],
       "reviews": {
