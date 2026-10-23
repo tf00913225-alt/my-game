@@ -99,7 +99,7 @@ proc.on('exit',(code,signal)=>{chromeExit={code,signal};});
 proc.on('error',error=>{chromeSpawnError=String(error.message);});
 const out=path.join(ROOT,'artifacts/browser-qa');fs.mkdirSync(out,{recursive:true});let cdp;
 try{
-    const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(p=>p.type==='page');
+    const page=(await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc})).find(p=>p.type==='page');
     await startup.finish('DevTools ready');
     cdp=new Cdp(page.webSocketDebuggerUrl);await cdp.send('Page.enable');await cdp.send('Runtime.enable');
     await cdp.send('Emulation.setDeviceMetricsOverride',{width:390,height:844,deviceScaleFactor:1,mobile:true});

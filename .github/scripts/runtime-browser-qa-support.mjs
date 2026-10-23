@@ -149,10 +149,18 @@ async function collectDevToolsFailure(url){
     return result;
 }
 
-async function waitJson(url,{timeoutMs=15000}={}){
+async function waitJson(url,{chromeProcess,timeoutMs=chromeProcess?30000:15000}={}){
     const started=Date.now(),controller=new AbortController();
     const timeout=Object.assign(new Error('DevTools startup probe exceeded its '+timeoutMs+'ms deadline'),{code:'ETIMEDOUT'});
     const deadline=setTimeout(()=>controller.abort(timeout),timeoutMs);
+    // Only an explicit startup caller receives the larger budget. Product waits
+    // and callers without a child retain their existing deadline.
+    const exited=(code,signal)=>controller.abort(Object.assign(new Error('Chrome exited before DevTools ready: '+JSON.stringify({code,signal})),{code:'CHROME_EXITED'}));
+    const failed=error=>controller.abort(Object.assign(new Error('Chrome could not start',{cause:error}),{code:'CHROME_SPAWN_FAILED'}));
+    if(chromeProcess){
+        chromeProcess.once('exit',exited);chromeProcess.once('error',failed);
+        if(chromeProcess.exitCode!==null||chromeProcess.signalCode!==null)exited(chromeProcess.exitCode,chromeProcess.signalCode);
+    }
     let attempts=0,lastError;
     try{
         while(!controller.signal.aborted){
@@ -161,20 +169,25 @@ async function waitJson(url,{timeoutMs=15000}={}){
                 // The same deadline covers response headers AND JSON body.
                 const response=await fetch(url,{signal:controller.signal});
                 const data=await response.json();
-                if(controller.signal.aborted){throw timeout;}
-                if(attempts>1){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
+                if(controller.signal.aborted){throw controller.signal.reason;}
+                if(attempts>1||chromeProcess){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
                 return data;
             }catch(error){
                 if(controller.signal.aborted){
-                    if(lastError&&lastError!==timeout){timeout.cause=lastError;}
-                    else if(error!==timeout){timeout.cause=error;}
-                    lastError=timeout;
+                    const reason=controller.signal.reason;
+                    if(lastError&&lastError!==reason){reason.cause??=lastError;}
+                    else if(error!==reason){reason.cause??=error;}
+                    lastError=reason;
                 }else{lastError=error;}
             }
             if(!controller.signal.aborted){await new Promise(resolve=>setTimeout(resolve,Math.min(80,Math.max(0,timeoutMs-(Date.now()-started)))));}
         }
-    }finally{clearTimeout(deadline);}
-    const error=lastError||timeout;
+    }finally{
+        clearTimeout(deadline);
+        chromeProcess?.removeListener('exit',exited);chromeProcess?.removeListener('error',failed);
+    }
+    const reason=controller.signal.reason;
+    const error=reason?.code==='CHROME_EXITED'||reason?.code==='CHROME_SPAWN_FAILED'?reason:lastError||timeout;
     try{
         error.devToolsDiagnostics=await collectDevToolsFailure(url);
         console.error('DevTools connection failure diagnostics: '+JSON.stringify(error.devToolsDiagnostics));
