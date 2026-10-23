@@ -1,0 +1,30 @@
+[
+  {
+    "kind": "qualified",
+    "device": "360x640",
+    "head": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+    "complete": true,
+    "uncompressedReportSha256": "399c07a6d6f2bb4421d10a5d1534135efd89547606078833dfacc5e3b2ebf1d2"
+  },
+  {
+    "kind": "qualified",
+    "device": "1280x800",
+    "head": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+    "complete": true,
+    "uncompressedReportSha256": "3c71e35cee2e9a346ad59b10d23c4a6bcd0ad1daa01596e37aa80f4ae66e2519"
+  },
+  {
+    "kind": "excluded-hidden-legacy-return",
+    "device": "360x640",
+    "head": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+    "complete": false,
+    "uncompressedReportSha256": "f22356715b064bb79110ab4b53d785db25b21fa132501786f5f8717dc6a75e5f"
+  },
+  {
+    "kind": "excluded-hidden-help-class",
+    "device": "360x640",
+    "head": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+    "complete": false,
+    "uncompressedReportSha256": "f59017614201143fc4865c97e9e104994dab221f2b3ed369f1b64085271870cb"
+  }
+]

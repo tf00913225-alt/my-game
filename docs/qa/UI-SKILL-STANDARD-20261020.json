@@ -1174,6 +1174,23 @@
             "回城toggle與其他策略選項未在本段實際切換，既有呈現證據保留",
             "真入口是可見city5；training是否有獨立入口只記availability，未冒稱已驗"
           ]
+        },
+        {
+          "head": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+          "status": "部分已實際驗證",
+          "scope": "既有設定語意接入原閱讀契約；原浮字emit之damage/heal/MISS既有及新生序號隱藏、原返回真點後恢復及自然清理",
+          "devices": [
+            "360x640",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/settings-reading-reviewed",
+          "limits": [
+            "純浮字API呈現fixture，不是真傷害治療或#983自然技能/VFX驗收",
+            "未暫停原倒數或修改任何結算；runtimeRestoreExact=false，僅自有profile移除",
+            "原兩QA hidden selector失敗excluded保留",
+            "未驗393/412、實機、HUD文字完整遮蔽或#983自然火環/三目標",
+            "Latest Head必要CI未取得；GitHub connector get_pr_info兩次Internal error，不冒稱通過"
+          ]
         }
       ],
       "reviews": {
