@@ -128,3 +128,8 @@ Alignment report: FIRE-VFX-POLISH-20261023-alignment.json. Formal selected IDs0/
 UI_GUIDELINES.md fixed1080x1920/9:16 applies to all devices; its16:9 rule is dungeon-cover assets, not a second PC battlefield. PC16:9 window should fit the same portrait canvas. Existing source/phone tests remain valid within their stated scope.
 
 Remaining: human art direction; free-running real first-turn flow beyond held isolated Core entry; active6v6 occlusion/readability picture review; Modal layer test/coordination; audible sync; x2/x3 dependent Owner; current Head Required CI. Earlier native phone footage is retained, not relabeled as these missing Gates. No batch element/skill rollout or performance overhaul.
+
+
+## Tests-only render contract correction after ebba CI
+
+CI39899690956/a1/core_checks120238476915 reached v153-fire-vfx:282 and found historical explosiveFlurry group-node expectation. sprite.placement controls visual raster placement; formal targetType remains tri. Updated only v153 contract test to assert three recipient nodes, unique artworkProjection centers, unchanged1450ms/7of12 tasks, exact once-per-target feedback payloads plus formal damage/SP/follow-up data. No product/assets/Modal/movie change.15 internal fire cases plus Boss/recipient suites PASS; related layout/target-lifecycle/progression53tests PASS; build-check/diffcheck PASS. Independent tests-only review accepted; callback payloads are not relabeled HP settlement. Current [contract evidence](FIRE-VFX-POLISH-20261023-render-contract.json). Latest new Head CI and human art remain pending; no oldHead rerun.
