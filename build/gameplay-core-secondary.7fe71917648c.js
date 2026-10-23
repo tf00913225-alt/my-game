@@ -8145,7 +8145,13 @@ function startCharacterCast(card,config,duration){
     ],{duration:fireSample?450:Math.max(150,Math.min(350,Number(duration)*.25)),easing:"ease-in-out"});
     if(fireSample){
         const node=document.createElement("div");node.className="v174-fire-cast-ring";
-        node.setAttribute("aria-hidden","true");art.insertBefore(node,art.firstChild);
+        node.setAttribute("aria-hidden","true");
+        node.style.setProperty("--fire-cast-duration",Math.max(1,Number(duration))+"ms");
+        if(!reduced)for(let i=0;i<6;i++){
+            const ember=document.createElement("i");ember.className="v174-fire-cast-ember";
+            ember.style.setProperty("--ember-phase",String(i/6));node.appendChild(ember);
+        }
+        art.insertBefore(node,art.firstChild);
         const animation=reduced?null:node.animate([
             {opacity:0,transform:"translate(-50%,-50%) scale(.65)"},
             {opacity:1,transform:"translate(-50%,-50%) scale(1)",offset:.1},

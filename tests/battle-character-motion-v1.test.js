@@ -50,11 +50,11 @@ test('death, dispose and reduced motion cancel or suppress cast without changing
 });
 test('one fire representative owns caster lunge/ring, MISS retreat and bounded paint-only critical shake',()=>{
     const f=fixture(),rings=[];
-    f.context.document.createElement=()=>{const ring={setAttribute(){},remove(){this.removed=true;},animate:()=>({cancel(){this.cancelled=true;}})};rings.push(ring);return ring;};
+    f.context.document.createElement=()=>{const ring={style:{setProperty(){}},children:[],appendChild(node){this.children.push(node);},setAttribute(){},remove(){this.removed=true;},animate:()=>({cancel(){this.cancelled=true;}})};rings.push(ring);return ring;};
     f.art.insertBefore=()=>{};
     const cast=f.context.startCharacterCast(f.card,{id:'explosiveFlurry',category:'physical'},1450);
     assert.equal(cast.options.duration,450);assert.match(cast.frames[2].transform,/26px/);
-    assert.equal(rings.length,1);cast.onfinish();assert.equal(f.art.v174Cast,cast,'ring owned until same cast cleanup');
+    assert.equal(rings.length,7);assert.equal(rings[0].children.length,6,"one bounded six-ember emitter");cast.onfinish();assert.equal(f.art.v174Cast,cast,'ring owned until same cast cleanup');
     f.context.endCharacterCast(f.card,cast);assert.ok(cast.cancelled&&rings[0].removed);
     f.context.fireDodge(f.card);const dodge=f.art.v143ImpactRecoil;
     assert.equal(dodge.options.duration,300);assert.equal(dodge.frames[1].translate,'0px -24px');

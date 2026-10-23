@@ -81,6 +81,17 @@
     box-shadow:0 -3px 10px #ff7e1b,0 0 16px rgba(255,62,9,.85),inset 0 0 8px #ffe194;
     transform:translate(-50%,-50%);
 }
+#battlePage .v174-fire-cast-ring{overflow:hidden;}
+#battlePage .v174-fire-cast-ember{
+    position:absolute;left:0;top:0;width:8%;height:68%;pointer-events:none;
+    offset-path:ellipse(40% 12% at 50% 50%);offset-anchor:50% 50%;offset-rotate:0deg;
+    border-radius:65% 35% 55% 45%;
+    background:radial-gradient(ellipse at 45% 70%,#fff5bd 12%,#ffd13c 35%,#ff7918 62%,rgba(199,32,4,.8) 80%,transparent 96%);
+    clip-path:polygon(50% 0,85% 40%,100% 70%,70% 100%,25% 95%,0 65%,25% 30%);
+    animation:v174FireCastOrbit var(--fire-cast-duration,1450ms) linear calc(var(--ember-phase,0) * var(--fire-cast-duration,1450ms) * -1) infinite;
+}
+@keyframes v174FireCastOrbit{0%{offset-distance:0%;opacity:.75;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}100%{offset-distance:100%;opacity:.75;transform:scale(.85)}}
+
 .v143-skill-stage{
     position:fixed;
     inset:0;

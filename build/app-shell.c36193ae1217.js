@@ -24979,6 +24979,54 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
+function positionBattleSkillNameBadge(badge,side,index,element){
+    const owner=window.FourSymbolsBattlefieldRenderGeometry;
+    const geometry=owner?.getUnitGeometry?.(side,index);
+    const fallback=element.getBoundingClientRect();
+    const portrait=geometry?.artworkProjection?.rect||geometry?.portraitRect||fallback;
+    const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
+    // Reserve the existing short forward cast motion; never move the Unit/HUD.
+    let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
+    const x=portrait.left+portrait.width/2;
+    badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
+    badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
+    if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
+    let width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+    const blockers=[];
+    document.querySelectorAll("#battlePage .battle-player,#battlePage .battle-monster").forEach(card=>{
+        if(card===element)return;
+        const match=String(card.id).match(/^battle(PlayerCard|Monster)(\d+)$/);if(!match)return;
+        const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
+        for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
+    });
+    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion").forEach(node=>{
+        const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
+    });
+    // In a dense pair of rows the nearest free band can be above the front row.
+    // Read only the formal projections; this does not create a second scaler.
+    for(let pass=0;pass<blockers.length;pass++){
+        let moved=false;
+        for(const rect of blockers){
+            if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top+1>rect.top&&top-height<rect.top+rect.height){
+                top=rect.top-6;moved=true;
+            }
+        }
+        if(!moved)break;
+    }
+    if(top-height<0){
+        // A short PC viewport has no space for the normal two-line pop above
+        // the top HUD. Use one compact line without overshoot, never cover HP.
+        badge.dataset.compact="true";width=badge.offsetWidth;height=badge.offsetHeight;
+        top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:1);
+        for(let pass=0;pass<blockers.length;pass++){
+            let moved=false;
+            for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
+            if(!moved)break;
+        }
+    }
+    badge.style.left=x+"px";badge.style.top=top+"px";
+}
+
 function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){
 
     const targetContract=createBattleTargetContract(
@@ -25048,11 +25096,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"player",Number.isInteger(characterIndex)?characterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -25147,11 +25192,8 @@ function showMonsterSkillNameBadge(
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"monster",Number.isInteger(monsterIndex)?monsterIndex:0,element);
 
 
     setTimeout(()=>{

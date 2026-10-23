@@ -608,10 +608,13 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
-    display:none;position:absolute;left:50%;top:-5px;width:0;height:0;
-    border-left:4px solid transparent;border-right:4px solid transparent;
-    border-top:4px solid #ecd190;transform:translateX(-50%);
-    pointer-events:none;z-index:2;
+    display:none;position:absolute;left:50%;top:-5px;width:22px;height:5px;
+    background:#241603;clip-path:polygon(0 0,100% 0,50% 100%);
+    transform:translateX(-50%);pointer-events:none;z-index:2;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow::after{
+    content:"";position:absolute;inset:1px 3px 2px;background:#ffe16c;
+    clip-path:polygon(0 0,100% 0,50% 100%);
 }
 /* Five unscaled pixels fit the existing six-pixel paired-HUD clearance even
    at 1.18 depth. No glow extends the arrow into the information band. */
