@@ -1,3 +1,12 @@
+# Current compact footer correction
+
+Human rejected bc3d's oversized bottom controls because formations were too close. Same PR983: original command/settings52px (was66), settings column60px, button text14px/18px; explicit16px spacer plus two4px gaps separates enemy and party (24px CSS, ~20.57px at360). Original top72px name reserve retained. No JS/Core/clock/art/normal motion change. Exact66px legacy contract expectations in two integration tests updated to authorized52px, not removed; existing fixed-slot budget includes spacer/three gaps and minimum44px physical touch bound.
+
+10 focused tests + build-check/diffcheck PASS. 360 emulation actual six controls44.57px high; physical original target/return/settings interaction PASS for52px geometry before final14px typography change. Final typography/frame separately viewed at411x717 emulation; do not relabel prior phone PNG as final typography. Actual image artifacts/battle-layout-compact-final/frame-0014.png. Independent source/360 image review no proven blocker; not whole dynamic/Boss matrix. Previous oversized layout evidence remains historical. Candidate approval/latest Head necessaryCI still pending; NORMAL approval preserved, no other skills expanded.
+
+Evidence: artifacts/battle-layout-compact-{360,phone,final}/evidence.json; compact-phone/frame-0005.png; tested uncommitted delta onbc3d preserved by following checkpoint. Draft DO NOT MERGE. Next: user layout/fire sample review + latest Head CI.
+
+---
 # Current user-directed battlefield layout candidate
 
 Same Work ID / branch / PR983. Human chose enemy down, party up, controls/settings below party; this supersedes the old phone-notice product-choice wait. Original fixed-slot stylesheet now orders enemy / ally / footer, reserves72px above and8px below, and separates the original ElementBox/settings entry from five command buttons by74px. No new multiplier implementation, JS/Core/clock/art/accepted-normal change.

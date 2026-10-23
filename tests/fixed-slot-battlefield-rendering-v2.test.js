@@ -222,26 +222,29 @@ assert.match(css,/height:calc\(100% - var\(--battle-bottom-safe-gap\)\) !importa
 assert.match(css,/--battle-bottom-safe-gap:8px;/);
 assert.match(css,/--battle-top-name-reserve:72px;/);
 assert.match(css,/padding-top:var\(--battle-top-name-reserve\)/,"name headroom is real layout space");
-assert.match(css,/--battle-center-min-height:calc\(var\(--battle-turn-row-height\) \+ max\(var\(--battle-command-visual-height\), calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\)\) \+ 12px\);/,"bottom operations retain turn/command separation and target selection without shrinking text/buttons");
-assert.match(css,/#battleCommandRow\{\s*width:calc\(100% - 74px\);\s*margin-right:74px;/,"settings touch column cannot cover escape");
+assert.match(css,/--battle-center-min-height:calc\(var\(--battle-turn-row-height\) \+ max\(var\(--battle-command-visual-height\), calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\)\) \+ 12px\);/,"bottom operations retain turn/command separation and target selection with compact safe touch controls");
+assert.match(css,/#battleCommandRow\{\s*width:calc\(100% - 60px\);\s*margin-right:60px;/,"settings touch column cannot cover escape");
 // Quantify the structural budget independently of artwork. USB still verifies
 // actual CSS layout/projection; these checks catch unsafe token combinations.
 const layoutNumber=(name,unit)=>Number(css.match(new RegExp('--'+name+':([0-9.]+)'+unit+';'))?.[1]);
 const enemyWeight=layoutNumber('battle-enemy-region-track','fr'),centerWeight=layoutNumber('battle-center-region-track','fr'),allyWeight=layoutNumber('battle-ally-region-track','fr');
 const bottomReserve=layoutNumber('battle-bottom-safe-gap','px'),topReserve=layoutNumber('battle-top-name-reserve','px'),regionGap=layoutNumber('battle-region-gap','px');
 const commandCss=read('css/00-main.css');
-const commandHeight=Number(commandCss.match(/--battle-command-row-height:(\d+)px;/)[1]);
+const commandHeight=layoutNumber('battle-command-row-height','px');
+assert.ok(commandHeight*360/420>=44,'compact controls retain44px physical height at360px');
+const formationSeparation=layoutNumber('battle-formation-separation','px');
+assert.equal(formationSeparation,16,'reclaimed footer space separates the formations');
 const turnHeight=layoutNumber('battle-turn-row-height','px')||Number(commandCss.match(/--battle-turn-row-height:(\d+)px;/)[1]);
 const centerMinimum=turnHeight+Math.max(commandHeight,layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px'))+12;
 for(const contentHeight of [600,717,840]){
-    const usable=contentHeight-topReserve-bottomReserve-regionGap*2;
+    const usable=contentHeight-topReserve-bottomReserve-regionGap*3-formationSeparation;
     const centerHeight=Math.max(centerMinimum,usable*centerWeight/(enemyWeight+centerWeight+allyWeight));
     const enemyHeight=(usable-centerHeight)*enemyWeight/(enemyWeight+allyWeight);
     const allyHeight=(usable-centerHeight)*allyWeight/(enemyWeight+allyWeight);
     assert.ok(centerHeight>=turnHeight+commandHeight+6&&centerHeight>=turnHeight+layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px')+6,'controls must fit without overlaying each other at '+contentHeight);
     assert.ok(centerHeight<(contentHeight-regionGap*2)*.21,'middle gap must actually decrease at '+contentHeight);
     assert.ok(enemyHeight>0&&allyHeight>0);
-    assert.ok(Math.abs(contentHeight-(enemyHeight+centerHeight+allyHeight+regionGap*2)-topReserve-bottomReserve)<.001,'top name and bottom safety reserves cannot be consumed by fractional tracks');
+    assert.ok(Math.abs(contentHeight-(enemyHeight+centerHeight+allyHeight+regionGap*3+formationSeparation)-topReserve-bottomReserve)<.001,'top name and bottom safety reserves cannot be consumed by fractional tracks');
 }
 
 assert.match(css,/--battle-portrait-visible-height:min\(101\.55px, calc\(var\(--battle-portrait-safe-height\) \/ var\(--battle-art-depth, 1\)\)\);/,"normal art compensates depth before the below-HUD height limit");

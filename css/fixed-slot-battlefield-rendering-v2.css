@@ -7,15 +7,16 @@
 
 #game-stage #battlePage.v-fixed-slot-render-v2{
     --battle-enemy-region-track:54.785fr;
-    /* A shared 66px information band and 66px command row replace the
-       decorative 100px raster command stack. Reclaimed space belongs to allies. */
+    /* Compact footer controls leave real separation between formations. */
     --battle-center-region-track:12fr;
     --battle-ally-region-track:45.215fr;
     --battle-turn-row-height:20px;
+    --battle-command-row-height:52px;
+    --battle-formation-separation:16px;
     --battle-top-name-reserve:72px;
     --battle-bottom-safe-gap:8px;
     --battle-center-min-height:calc(var(--battle-turn-row-height) + max(var(--battle-command-visual-height), calc(var(--battle-target-prompt-height) + var(--battle-target-select-gap))) + 12px);
-    --battle-target-prompt-height:60px;
+    --battle-target-prompt-height:46px;
     --battle-target-select-gap:6px;
     --battle-region-gap:4px;
     --battle-title-height:20px;
@@ -70,6 +71,7 @@
     display:grid !important;
     grid-template-rows:
         minmax(0,var(--battle-enemy-region-track))
+        var(--battle-formation-separation)
         minmax(0,var(--battle-ally-region-track))
         minmax(var(--battle-center-min-height),var(--battle-center-region-track)) !important;
     gap:var(--battle-region-gap) !important;
@@ -118,14 +120,14 @@
     margin:0 !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region{
-    grid-row:3;
+    grid-row:4;
     display:block;
     padding:3px 4px;
     border:0;
     background:none !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-ally-region{
-    grid-row:2;
+    grid-row:3;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-center-region > .battle-middle{
     width:100%;
@@ -138,11 +140,21 @@
     justify-content:flex-end;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleCommandRow{
-    width:calc(100% - 74px);
-    margin-right:74px;
+    width:calc(100% - 60px);
+    margin-right:60px;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu{
+    height:var(--battle-command-row-height) !important;
+    flex-basis:var(--battle-command-row-height) !important;
+    box-sizing:border-box;
+    min-height:var(--battle-command-row-height) !important;
+}
+#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #mainBattleMenu > .menu-button{
+    font-size:14px !important;
+    line-height:18px !important;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleTargetPrompt{
-    right:74px;
+    right:60px;
     width:auto;
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .turn-target-row{
@@ -727,15 +739,14 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     contain:none !important;
 }
 
-/* Initial placement keeps the draggable Element Box beside the center controls.
-   Its original 66px touch target is part of the mobile interaction contract. */
+/* Compact original controls retain at least44px physical touch height at360px. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battleActionRegion > .battle-element-box-button{
     left:auto !important;
     right:8px !important;
     top:0 !important;
     bottom:auto !important;
-    width:66px !important;
-    height:66px !important;
+    width:52px !important;
+    height:52px !important;
 }
 
 /* V143 sizes raster boxes before applying center/travel transforms. Independent
