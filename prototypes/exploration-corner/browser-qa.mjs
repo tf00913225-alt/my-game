@@ -21,7 +21,8 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
    else{const key={up:'ArrowUp',down:'ArrowDown',left:'ArrowLeft',right:'ArrowRight'}[direction];await client.send('Input.dispatchKeyEvent',{type:'keyDown',key,code:key});await new Promise(r=>setTimeout(r,ms));await client.send('Input.dispatchKeyEvent',{type:'keyUp',key,code:key});}
    await new Promise(r=>setTimeout(r,90));
   };
-  const start=await read();assert.ok(start.position);assert.ok(Math.abs(start.stage.width/start.stage.height-9/16)<.001);assert.deepEqual(start.saveKeys,[]);await capture('start');
+  const spriteVisible=async()=>{const box=await client.eval(`(()=>{const b=document.querySelector('[data-player] use').getBBox();return {width:b.width,height:b.height}})()`);assert.ok(box.width>50&&box.height>100,'player SVG geometry must actually load');};
+  const start=await read();assert.ok(start.position);assert.ok(Math.abs(start.stage.width/start.stage.height-9/16)<.001);assert.deepEqual(start.saveKeys,[]);await spriteVisible();await capture('start');
   await hold('up',1600);const house=await read();assert.ok(Number(house.position.split(',')[1])>=1053);await capture('house-collision');
   await hold('down',800);await hold('right',1050);const near=await read();assert.equal(near.prompt,false);await capture('npc-near');
   const tap=async selector=>{const p=await client.eval(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2}})()`);if(width<700){await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...p,id:1}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await client.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});}await new Promise(r=>setTimeout(r,150));};
@@ -35,8 +36,25 @@ try{for(const [width,height] of [[393,873],[1920,1080]]){
   await client.eval(`window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));document.querySelector('[data-dialog]').hidden=false;window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));true`);
   const remount=await read();assert.equal(remount.dialog,false);assert.equal(remount.position,start.position);assert.equal(remount.walking,false);
   await hold('down',200);assert.notEqual((await read()).position,remount.position);
+  const tapWorld=async(x,y)=>{
+    const point=await client.eval(`(()=>{const r=document.querySelector('[data-world]').getBoundingClientRect();return {x:r.left+${x}*r.width/1400,y:r.top+${y}*r.height/2600}})()`);
+    if(width<700){await client.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{...point,id:1}]});await client.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}
+    else{await client.send('Input.dispatchMouseEvent',{type:'mousePressed',...point,button:'left',clickCount:1});await client.send('Input.dispatchMouseEvent',{type:'mouseReleased',...point,button:'left',clickCount:1});}
+  };
+  const destination=()=>client.eval(`document.querySelector('.explore-corner').dataset.destination`);
+  const arrive=async()=>{const deadline=Date.now()+12000;while(await destination()){if(Date.now()>deadline)throw Error('tap route did not arrive');await new Promise(r=>setTimeout(r,100));}};
+  await tapWorld(720,650);assert.equal(await destination(),'720.00,650.00');await capture('tap-house-route');await arrive();
+  const houseRoute=await read();assert.ok(Math.abs(Number(houseRoute.position.split(',')[1])-650)<1);await capture('tap-house-arrived');
+  await tapWorld(800,900);assert.equal(await destination(),'');assert.match(await client.eval(`document.querySelector('[data-status]').textContent`),/無法抵達/);
+  await tapWorld(720,1250);await new Promise(r=>setTimeout(r,100));await tapWorld(500,1100);assert.equal(await destination(),'500.00,1100.00');
+  await hold('down',200);assert.equal(await destination(),'');const takeover=await read();await new Promise(r=>setTimeout(r,150));assert.equal((await read()).position,takeover.position);
+  await tapWorld(720,1250);await arrive();await tapWorld(1060,1280);assert.notEqual(await destination(),'');assert.equal((await read()).dialog,false);await arrive();
+  const npcTap=await read();assert.equal(npcTap.prompt,false);assert.equal(npcTap.dialog,false);await new Promise(r=>setTimeout(r,100));await spriteVisible();await capture('tap-npc-arrived');
+  await tap('[data-interact]');assert.equal((await read()).dialog,true);assert.equal(await destination(),'');await tap('[data-dialog] button');
+  await client.send('Emulation.setDeviceMetricsOverride',{width:width<700?360:1440,height:width<700?800:900,deviceScaleFactor:1,mobile:width<700});
+  await new Promise(r=>setTimeout(r,150));await tapWorld(800,1500);assert.equal(await destination(),'800.00,1500.00');await arrive();await capture('tap-resized');
   const errors=client.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(errors,[]);
-  results.push({width,height,start,house,near,dialog,stop,depth,remount,errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
+  results.push({width,height,start,house,near,dialog,stop,depth,remount,houseRoute,npcTap,takeover,errors,method:width<700?'CDP touch emulation; not physical phone':'CDP keyboard and mouse',status:'PASS'});
  }catch(error){results.push({width,height,status:'FAIL',error:String(error.stack)});throw error;}
  finally{client?.close();proc.kill();}
 }}finally{server.closeAllConnections();server.close();fs.writeFileSync(path.join(output,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify({output,results}));}

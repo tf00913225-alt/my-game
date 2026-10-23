@@ -1,8 +1,22 @@
 import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
-import {scene,move,canStand,cameraFor,nearNpc} from './scene.mjs';import {displaySource} from './serve.mjs';
+import {scene,move,canStand,cameraFor,nearNpc,findRoute,followRoute,npcRoute} from './scene.mjs';import {displaySource} from './serve.mjs';
 test('safe spawn, boundary and solid furniture cannot be entered',()=>{
  assert.ok(canStand(scene.spawn.x,scene.spawn.y));assert.equal(canStand(0,100),false);
  for(const {solid:b} of scene.objects)assert.equal(canStand(b.x+b.width/2,b.y+b.height/2),false);
+});
+test('tap routes go around house and tree using collision-safe cardinal movement',()=>{
+ for(const [start,target] of [[{x:720,y:1250},{x:720,y:650}],[{x:230,y:1430},{x:420,y:1330}]]){
+  const route=findRoute(start,target);assert.ok(route?.length);let state=start,frames=0;
+  while(route.length&&frames++<3000){const before=state;state=followRoute(state,route,.05);assert.ok(canStand(state.x,state.y));assert.ok(Math.abs(state.x-before.x)+Math.abs(state.y-before.y)<=16.001);}
+  assert.ok(frames<3000);assert.ok(Math.hypot(state.x-target.x,state.y-target.y)<.01);
+ }
+});
+test('blocked and disconnected destinations fail, NPC route ends nearby outside its solid',()=>{
+ assert.deepEqual(findRoute(scene.spawn,scene.spawn),[]);
+ assert.equal(findRoute(scene.spawn,{x:800,y:900}),null);
+ const closed={...scene,width:400,height:400,objects:[{solid:{x:190,y:0,width:20,height:400}}]};
+ assert.equal(findRoute({x:80,y:80},{x:300,y:300},closed),null);
+ const route=npcRoute(scene.spawn);assert.ok(route?.length);assert.ok(nearNpc(route.at(-1)));assert.ok(canStand(route.at(-1).x,route.at(-1).y));
 });
 test('held movement cannot tunnel through house and trunk at a delayed frame',()=>{
  let state={x:800,y:1100};for(let i=0;i<100;i++)state=move(state,'up',5);

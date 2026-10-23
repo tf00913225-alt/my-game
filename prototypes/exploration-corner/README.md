@@ -3,7 +3,13 @@
 Work ID: EXPLORATION-CORNER-20261023
 Branch: feature/exploration-corner-20261023
 Base dev: bc7efd1c4e66c1cb412fab29d404123f5495ea86
-Status: IMPLEMENTED SAMPLE, independent review corrections applied; user art/input acceptance pending. DO NOT MERGE OR DEPLOY.
+Status: TAP-MOVE SAMPLE under PR #985, user art/input acceptance pending. DO NOT MERGE OR DEPLOY.
+
+Authorized continuation: point on the scene to choose a destination, point again to replace it, or use keyboard/directional controls to take over. A bounded four-neighbour grid routes around the existing house/trunk/NPC solids; every edge and final movement uses the same canStand/move owner. Unreachable points stop with a message. Clicking the NPC selects a safe approach point but still requires the existing greeting confirmation. UI clicks do not become world destinations. World input uses the existing eventToGamePoint conversion, viewport local offset and current camera.
+
+Original vector art revision: parallel house facade/top-down roof, ground tufts and peach blossom details; traveller.svg has four separately drawn views with neutral and two stride silhouettes per view, generated reproducibly by build-art.mjs. It does not flip/stretch a front view or animate SVG legs. This remains a limited vector visual proposal, not final painted art or user acceptance. No new raster runtime asset, so lossless WebP conversion is not applicable in this batch. Any later raster asset must follow IMAGE_ASSET_SPEC and the user's lossless/alpha/mobile clarity requirement.
+
+Tap verification adds routes around solids, unreachable/disconnected targets, same-point no-op, NPC approach, re-target/manual takeover and resized coordinate checks. The first tap screenshot set revealed invisible player art despite passing movement-state checks: repeated external-use href assignment each frame was corrected to update only when facing/pose changes. A real SVG geometry assertion now complements actual screenshot review. Initial failed visual evidence is preserved separately, not treated as acceptance. This continuation changes the PR Head; old CI run 39895036350 does not validate the new Head and remains failed at Chrome startup in core_checks.
 
 This batch is an additive, opt-in prototype. It is deliberately absent from the production entry, feature manifest and build. No formal player/account, story, reward, battle, inventory or save code is invoked. Greeting copy demonstrates proximity + confirmation only; it is not the later real NPC dialogue integration. Four directions and one touch directional pad are provisional product experiments. All devices retain portrait view.
 
@@ -23,4 +29,4 @@ Independent review inspected five actual v3 images and the bounded source diff. 
 
 External evidence: corner-evidence-v3 contains two-size screenshots/results; corner-recording/recording.html contains 427 real timestamped Chrome touch-emulation frames (14.48 seconds), recorded before the lifecycle/style review corrections. This is not physical-phone footage. No new game behavior was added by those corrections.
 
-Draft PR creation was denied by automatic approval review for lacking explicit PR authorization. No PR exists, no alternate creation path was attempted, and Required CI is pending. Pending: real phone input/continuous animation acceptance and user visual direction. Existing PR Required CI remains required and is not replaced by local tests. No production build changes to verify here. Do not merge/deploy, expand to real NPC/battle/reward/save, complete village/forest, minimap or new engine without the next batch decision.
+Draft PR creation was initially denied; later explicit user authorization allowed one retry and created PR #985. No bypass was used. Pending: latest-head Required CI, physical phone input/continuous animation acceptance, actual BFCache and user visual direction. Existing PR Required CI remains required and is not replaced by local tests. No production build changes to verify here. Do not merge/deploy, expand to real NPC/battle/reward/save, complete village/forest, minimap or new engine without the next batch decision.
