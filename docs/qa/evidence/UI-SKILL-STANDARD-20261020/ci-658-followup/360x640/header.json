@@ -1,0 +1,97 @@
+{
+  "frames": [
+    [
+      16,
+      16,
+      328,
+      608
+    ],
+    [
+      16,
+      16,
+      328,
+      608
+    ],
+    [
+      16,
+      16,
+      328,
+      608
+    ],
+    [
+      16,
+      16,
+      328,
+      608
+    ]
+  ],
+  "chrome": [
+    "http://127.0.0.1:64607/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp",
+    "http://127.0.0.1:64607/assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp"
+  ],
+  "art": [
+    "http://127.0.0.1:64607/assets/characters/male_fire.jpg",
+    "http://127.0.0.1:64607/assets/characters/female_water.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-knife.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-frost-punch.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-ice-spin.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-frost-crush.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-ball.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-flood-beast.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-ice-arrow-rain.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-heal.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-revive.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-freeze.jpg",
+    "http://127.0.0.1:64607/assets/skills/water-purify-mind.webp",
+    "http://127.0.0.1:64607/assets/skills/water-ex.jpg"
+  ],
+  "scroll": {
+    "content": "auto",
+    "page": "visible",
+    "list": "visible"
+  },
+  "selected": "skill",
+  "cleared": true,
+  "header": {
+    "title": {
+      "x": 23,
+      "y": 26,
+      "w": 219.796875,
+      "h": 38
+    },
+    "back": {
+      "x": 268.75,
+      "y": 23,
+      "w": 68.25,
+      "h": 44
+    },
+    "row": {
+      "x": 23,
+      "y": 23,
+      "w": 314,
+      "h": 44
+    },
+    "tracks": [
+      197.812,
+      395.625,
+      65.9375
+    ],
+    "gap": 0,
+    "direction": "ltr",
+    "center": 154.95300269110393,
+    "rangeCenter": 154.87239837646484,
+    "centerError": 0.08060431463908913,
+    "text": {
+      "left": 127.03125,
+      "right": 182.7135467529297,
+      "top": 32.67101416638479,
+      "bottom": 55.684647512363554
+    },
+    "safe": {
+      "left": 91.13703124999999,
+      "right": 198.8375,
+      "top": 29.014772727272728,
+      "bottom": 60.1859659090909
+    }
+  }
+}

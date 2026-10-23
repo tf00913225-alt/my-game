@@ -222,7 +222,8 @@ async function runViewport(chrome,url,width,height,capture){
             openHomeFeature('character');switchCharacterTab('skill');selectedSkillElementTab='water';renderSkillLoadout();
             return {frames,chrome,art,scroll,selected,cleared,header};
         })()`);
-        assert.ok(Math.abs(skin.header.title.h-skin.header.back.h)<.1,'skill title and return must share a height');
+        assert.ok(Math.abs((skin.header.title.y+skin.header.title.h/2)-(skin.header.back.y+skin.header.back.h/2))<.1,'skill plaque and return must share a vertical center');
+        assert.ok(skin.header.back.h>=44&&skin.header.back.w>=44,'skill return must retain its screen touch minimum');
         assert.ok(skin.header.title.w/skin.header.row.w<=.71,'skill plaque must reserve the return action');
         assert.ok(skin.header.title.x+skin.header.title.w<skin.header.back.x,'title overlaps return');
         assert.equal(skin.header.direction,'ltr','plaque writing-area measurement requires its formal left-to-right grid');

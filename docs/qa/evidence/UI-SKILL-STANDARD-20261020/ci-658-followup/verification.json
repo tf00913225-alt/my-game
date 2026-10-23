@@ -1,0 +1,31 @@
+{
+  "base": "658f237c",
+  "scope": "two test/QA files only; product unchanged",
+  "hashes": {
+    ".github/scripts/run-skill-progression-browser-qa.mjs": "acc2aa350523d4fe8484513d4d34c9fb34c059e88a2bb5f9234e12be484b1855",
+    "tests/reforge-eligibility-runtime-browser.test.js": "04466db9ab76e00b311b321a98cbe2a69c22db2c418024407c7e7c3da512d9c3"
+  },
+  "ci": {
+    "run": 40000524568,
+    "attempt": 1,
+    "coreJob": 120575591997,
+    "uiJob": 120575591920
+  },
+  "reforge": {
+    "presentationOwnerCommit": "3e9df4fe",
+    "firstFailure": "detail exact canonical values omitted formal position labels",
+    "followupFailure": "reload exact text also omitted same labels; corrected three same-owner comparisons",
+    "result": "2 tests PASS;12 browser acceptance groups PASS incl cost/locks/rollback/reload"
+  },
+  "skill": {
+    "before": "title38px return44px at360, same vertical center",
+    "after": "QA center match and return44w/h asserted; originalink/safe/tracks/nooverlap/tab/scroll asserts retained",
+    "result": "four sizes exact header assertion block PASS; original fullskillgameplay suite not rerun locally"
+  },
+  "pending": [
+    "latestHead full requiredCI",
+    "hardware",
+    "adventure current failure not reclassified in this segment",
+    "wholeUI/deploy unaccepted"
+  ]
+}
