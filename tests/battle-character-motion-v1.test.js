@@ -48,6 +48,27 @@ test('death, dispose and reduced motion cancel or suppress cast without changing
     f.context.clearCharacterMotions();assert.ok(next.cancelled);assert.equal(f.art.dataset.motion,'stopped');
     f.context.window.matchMedia=()=>({matches:true});assert.equal(f.context.startCharacterCast(f.card,{id:'heal'},1600),null);
 });
+test('one fire representative owns caster lunge/ring, MISS retreat and bounded paint-only critical shake',()=>{
+    const f=fixture(),rings=[];
+    f.context.document.createElement=()=>{const ring={setAttribute(){},remove(){this.removed=true;},animate:()=>({cancel(){this.cancelled=true;}})};rings.push(ring);return ring;};
+    f.art.insertBefore=()=>{};
+    const cast=f.context.startCharacterCast(f.card,{id:'explosiveFlurry',category:'physical'},1450);
+    assert.equal(cast.options.duration,450);assert.match(cast.frames[2].transform,/26px/);
+    assert.equal(rings.length,1);cast.onfinish();assert.equal(f.art.v174Cast,cast,'ring owned until same cast cleanup');
+    f.context.endCharacterCast(f.card,cast);assert.ok(cast.cancelled&&rings[0].removed);
+    f.context.fireDodge(f.card);const dodge=f.art.v143ImpactRecoil;
+    assert.equal(dodge.options.duration,300);assert.equal(dodge.frames[1].translate,'0px -24px');
+    assert.equal(f.art.dataset.motion,'dodging');dodge.onfinish();assert.equal(f.art.v143ImpactRecoil,null);
+    const paints=[];const paint={animate(frames,options){const a={frames,options,cancel(){this.cancelled=true;}};paints.push(a);return a;}};
+    f.context.document.querySelectorAll=selector=>selector.includes('portrait-paint')?[paint]:[f.card];
+    f.context.fireCriticalShake(12);f.context.fireCriticalShake(12);
+    assert.equal(paints.length,1);assert.equal(paints[0].options.duration,160);
+    f.context.clearCharacterMotions();assert.ok(paints[0].cancelled);
+    f.context.window.matchMedia=()=>({matches:true});
+    const reduced=f.context.startCharacterCast(f.card,{id:'explosiveFlurry',category:'physical'},1450);
+    assert.ok(reduced.fireAura);assert.equal(reduced.fireAura.animation,null);
+    f.context.endCharacterCast(f.card,reduced);f.context.fireDodge(f.card);assert.equal(f.art.v143ImpactRecoil,null);
+});
 test('only paint breathes, action layer owns motion, fixed depth and shadow keep their frame',()=>{
     assert.match(css,/\.v174-action-motion\{[^}]*inset:0/);
     assert.match(css,/attacker-lunge-up > \.v174-battle-art > \.v174-action-motion\{animation:v174BattleLungeUp/);

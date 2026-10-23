@@ -70,7 +70,7 @@
         if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         try{
             const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind),options.critical===true)||{};
-            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0),scheduleImpact:typeof timing.scheduleImpact==="function"?timing.scheduleImpact:null};
+            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0),scheduleImpact:typeof timing.scheduleImpact==="function"?timing.scheduleImpact:null,presentationStyle:timing.presentationStyle==="fire-sample"?"fire-sample":null};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
     function impactBatchKey(request){ return unitKey(request.side,request.index)+"|"+String(request.impactId); }
@@ -166,7 +166,7 @@
             MAX_LANES,
             Math.floor(upwardRoom/LANE_PITCH_PX)+1
         ));
-        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:context.fireSample?1:capacity};
     }
     function freeLane(context,metrics){
         const resolved=metrics||laneMetrics(context);
@@ -200,8 +200,14 @@
         node.dataset.feedbackSource=request.source;
         node.dataset.feedbackSequence=String(request.id);
         node.dataset.feedbackPhase=request.phase;
+        if(request.presentationStyle)node.dataset.feedbackStyle=request.presentationStyle;
+        if(request.presentationStyle==="fire-sample"){
+            const digits=String(request.text).replace(/[^0-9]/g,"").length||4;
+            const safeFont=Math.min(critical?32:26,Math.max(16,metrics.safe.width*.86/(digits*.68*1.4)));
+            node.style.setProperty("--fire-feedback-font",safeFont+"px");
+        }
         if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; }
-        node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
+        node.textContent=critical&&request.presentationStyle!=="fire-sample"?formatCritical(request.text):String(request.text==null?"":request.text);
         node.style.setProperty("--battle-feedback-x",anchor.x+"px");
         node.style.setProperty("--battle-feedback-y",laneY+"px");
         node.style.setProperty("--battle-feedback-duration",request.duration+"ms");
@@ -232,6 +238,7 @@
     function enqueue(request,deferPump){
         if(request.cancelled||request.finished){ return; }
         const context=contextFor(request.side,request.index);
+        if(request.presentationStyle==="fire-sample")context.fireSample=true;
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
@@ -248,7 +255,8 @@
             statusType:kind==="status"?String(input.statusType||input.effectType||"default"):null,
             text:String(input.text==null?"":input.text),
             duration:Math.max(500,Math.min(1800,numeric(input.duration,DEFAULT_DURATION))),
-            critical:input.critical===true,source:String(input.source||"battle"),
+            critical:input.critical===true||kind==="criticalDamage",source:String(input.source||"battle"),
+            presentationStyle:timing.presentationStyle||null,
             impactId:input.impactId||timing.impactId||null,impactAt:timing.impactAt||0,
             phase:String(input.phase||(kind==="status"?"status":"impact")),
             phaseOrder:Number.isFinite(Number(input.phaseOrder))?Number(input.phaseOrder):phaseOrder(kind),

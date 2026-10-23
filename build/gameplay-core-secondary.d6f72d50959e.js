@@ -8105,7 +8105,7 @@ function syncUnitMotion(card){
     const defeated=entity?(Number(entity.hp)<=0||entity.alive===false):
         ["dying","dead","down","v146-defeated"].some(name=>card.classList.contains(name));
     if(defeated&&art.v174Cast){endCharacterCast(card,art.v174Cast);}
-    art.dataset.motion=defeated?"dying":card.classList.contains("dodge-back")?"dodging":
+    art.dataset.motion=defeated?"dying":art.v174FireDodge||card.classList.contains("dodge-back")?"dodging":
         art.v143ImpactRecoil?"hit":art.v174Cast?"casting":
         card.classList.contains("attacker-lunge-up")||card.classList.contains("attacker-lunge-down")?"attacking":"idle";
 }
@@ -8113,31 +8113,79 @@ function endCharacterCast(card,motion){
     const art=card?.querySelector(":scope > .v174-battle-art");
     if(!art||!motion||art.v174Cast!==motion)return;
     art.v174Cast=null;
+    fireFieldShakes.forEach(animation=>animation.cancel());fireFieldShakes.clear();
+    motion.fireAura?.animation?.cancel();
+    motion.fireAura?.node?.remove();
     motion.cancel();
     syncUnitMotion(card);
 }
 function startCharacterCast(card,config,duration){
     const art=card?.querySelector(":scope > .v174-battle-art");
     const action=art?.querySelector(":scope > .v174-action-motion");
-    if(!art||!action||typeof action.animate!=="function"||config.id==="normal"||config.category==="physical"||
-       art.dataset.motion==="dying"||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return null;
+    const fireSample=config.id==="explosiveFlurry";
+    const reduced=window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+    if(!art||!action||typeof action.animate!=="function"||config.id==="normal"||config.category==="physical"&&!fireSample||
+       art.dataset.motion==="dying"||reduced&&!fireSample)return null;
     if(art.v174Cast)endCharacterCast(card,art.v174Cast);
     // The same declaration previously requested a generic lunge. Cast replaces
     // that presentation only; Core's 450ms removal and skill duration stay put.
     card.classList.remove("attacker-lunge-up","attacker-lunge-down");
-    const motion=action.animate([
+    const direction=String(card.id).startsWith("battleMonster")?1:-1;
+    const motion=reduced?{cancel(){}}:action.animate(fireSample?[
+        {transform:"translateY(0) scale(1)",offset:0},
+        {transform:"translateY("+(-direction*4)+"px) scale(.98)",offset:.18},
+        {transform:"translateY("+(direction*26)+"px) scale(1.045)",offset:.38},
+        {transform:"translateY("+(direction*10)+"px) scale(1.015)",offset:.68},
+        {transform:"translateY(0) scale(1)",offset:1}
+    ]:[
         {transform:"translateY(0) scale(1)"},
         {transform:"translateY(-2px) scale(1.012)",offset:.45},
         {transform:"translateY(0) scale(1)"}
-    ],{duration:Math.max(150,Math.min(350,Number(duration)*.25)),easing:"ease-in-out"});
+    ],{duration:fireSample?450:Math.max(150,Math.min(350,Number(duration)*.25)),easing:"ease-in-out"});
+    if(fireSample){
+        const node=document.createElement("div");node.className="v174-fire-cast-ring";
+        node.setAttribute("aria-hidden","true");art.insertBefore(node,art.firstChild);
+        const animation=reduced?null:node.animate([
+            {opacity:0,transform:"translate(-50%,-50%) scale(.65)"},
+            {opacity:1,transform:"translate(-50%,-50%) scale(1)",offset:.18},
+            {opacity:.9,transform:"translate(-50%,-50%) scale(1.04)",offset:.58},
+            {opacity:0,transform:"translate(-50%,-50%) scale(1.1)"}
+        ],{duration:duration,easing:"ease-out",fill:"both"});
+        motion.fireAura={node,animation};
+    }
     art.v174Cast=motion;
-    motion.onfinish=()=>{if(art.v174Cast===motion){art.v174Cast=null;syncUnitMotion(card);}};
+    motion.onfinish=()=>{if(art.v174Cast===motion&&!fireSample){art.v174Cast=null;syncUnitMotion(card);}};
     syncUnitMotion(card);
     return motion;
 }
+let lastFireShakeSequence=null;
+const fireFieldShakes=new Map();
+function fireDodge(card){
+    const art=card?.querySelector(":scope > .v174-battle-art"),action=art?.querySelector(":scope > .v174-action-motion");
+    if(!action||art.dataset.motion==="dying"||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+    card.classList.remove("dodge-back");
+    art.v143ImpactRecoil?.cancel();
+    const direction=String(card.id).startsWith("battleMonster")?-1:1;
+    const animation=action.animate([{translate:"0px 0px"},{translate:"0px "+direction*24+"px",offset:.35},{translate:"0px "+direction*18+"px",offset:.6},{translate:"0px 0px"}],{duration:300,easing:"ease-out"});
+    art.v143ImpactRecoil=animation;art.v174FireDodge=true;syncUnitMotion(card);
+    animation.onfinish=()=>{if(art.v143ImpactRecoil===animation){art.v143ImpactRecoil=null;art.v174FireDodge=false;syncUnitMotion(card);}};
+}
+function fireCriticalShake(sequence){
+    if(lastFireShakeSequence===sequence||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+    lastFireShakeSequence=sequence;
+    // Only artwork paints shake; slots, HUD, controls, targets never move.
+    document.querySelectorAll("#battlePage .v174-portrait-paint").forEach(paint=>{
+        fireFieldShakes.get(paint)?.cancel();
+        const animation=paint.animate([{translate:"0px 0px"},{translate:"-3px 1px",offset:.2},{translate:"3px -1px",offset:.4},{translate:"-1px 0px",offset:.65},{translate:"0px 0px"}],{duration:160,easing:"ease-out"});
+        fireFieldShakes.set(paint,animation);
+        animation.onfinish=()=>{if(fireFieldShakes.get(paint)===animation)fireFieldShakes.delete(paint);};
+    });
+}
 function clearCharacterMotions(){
+    fireFieldShakes.forEach(animation=>animation.cancel());fireFieldShakes.clear();lastFireShakeSequence=null;
     document.querySelectorAll("#battlePage .v174-cardless-unit").forEach(card=>{
         const art=card.querySelector(":scope > .v174-battle-art");
+        if(art?.v174FireDodge){art.v143ImpactRecoil?.cancel();art.v143ImpactRecoil=null;art.v174FireDodge=false;}
         if(!art)return;
         if(art.v174Cast)endCharacterCast(card,art.v174Cast);
         card.classList.remove("attacker-lunge-up","attacker-lunge-down","dodge-back");
@@ -8372,6 +8420,8 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     sync:syncBattlePresentation,
     syncMotion:syncUnitMotion,
     startCast:startCharacterCast,
+    fireDodge:fireDodge,
+    fireCriticalShake:fireCriticalShake,
     endCast:endCharacterCast,
     clearMotions:clearCharacterMotions,
     playEscape:playEscapePresentation,
@@ -9200,7 +9250,7 @@ ensureFunctionalStyles();runRepairs();
         if(typeof resolver!=="function"){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
         try{
             const timing=resolver(options.side==="monster"?"monster":"player",Number(options.index)||0,semanticKind(options.kind),options.critical===true)||{};
-            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0),scheduleImpact:typeof timing.scheduleImpact==="function"?timing.scheduleImpact:null};
+            return {delayMs:Math.max(0,numeric(timing.delayMs,0)),critical:timing.critical===true,impactId:timing.impactId||null,impactAt:Number.isFinite(Number(timing.impactAt))?Number(timing.impactAt):0,sequence:numeric(timing.sequence,0),scheduleImpact:typeof timing.scheduleImpact==="function"?timing.scheduleImpact:null,presentationStyle:timing.presentationStyle==="fire-sample"?"fire-sample":null};
         }catch(_){ return {delayMs:0,critical:false,impactId:null,impactAt:0,sequence:0}; }
     }
     function impactBatchKey(request){ return unitKey(request.side,request.index)+"|"+String(request.impactId); }
@@ -9296,7 +9346,7 @@ ensureFunctionalStyles();runRepairs();
             MAX_LANES,
             Math.floor(upwardRoom/LANE_PITCH_PX)+1
         ));
-        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:capacity};
+        return {geometry:geometry,safe:safe,anchor:anchor,baseline:baseline,capacity:context.fireSample?1:capacity};
     }
     function freeLane(context,metrics){
         const resolved=metrics||laneMetrics(context);
@@ -9330,8 +9380,14 @@ ensureFunctionalStyles();runRepairs();
         node.dataset.feedbackSource=request.source;
         node.dataset.feedbackSequence=String(request.id);
         node.dataset.feedbackPhase=request.phase;
+        if(request.presentationStyle)node.dataset.feedbackStyle=request.presentationStyle;
+        if(request.presentationStyle==="fire-sample"){
+            const digits=String(request.text).replace(/[^0-9]/g,"").length||4;
+            const safeFont=Math.min(critical?32:26,Math.max(16,metrics.safe.width*.86/(digits*.68*1.4)));
+            node.style.setProperty("--fire-feedback-font",safeFont+"px");
+        }
         if(request.statusType){ node.dataset.feedbackStatusType=request.statusType; }
-        node.textContent=critical?formatCritical(request.text):String(request.text==null?"":request.text);
+        node.textContent=critical&&request.presentationStyle!=="fire-sample"?formatCritical(request.text):String(request.text==null?"":request.text);
         node.style.setProperty("--battle-feedback-x",anchor.x+"px");
         node.style.setProperty("--battle-feedback-y",laneY+"px");
         node.style.setProperty("--battle-feedback-duration",request.duration+"ms");
@@ -9362,6 +9418,7 @@ ensureFunctionalStyles();runRepairs();
     function enqueue(request,deferPump){
         if(request.cancelled||request.finished){ return; }
         const context=contextFor(request.side,request.index);
+        if(request.presentationStyle==="fire-sample")context.fireSample=true;
         request.context=context;
         context.queue.push(request);
         context.queue.sort(compareRequests);
@@ -9378,7 +9435,8 @@ ensureFunctionalStyles();runRepairs();
             statusType:kind==="status"?String(input.statusType||input.effectType||"default"):null,
             text:String(input.text==null?"":input.text),
             duration:Math.max(500,Math.min(1800,numeric(input.duration,DEFAULT_DURATION))),
-            critical:input.critical===true,source:String(input.source||"battle"),
+            critical:input.critical===true||kind==="criticalDamage",source:String(input.source||"battle"),
+            presentationStyle:timing.presentationStyle||null,
             impactId:input.impactId||timing.impactId||null,impactAt:timing.impactAt||0,
             phase:String(input.phase||(kind==="status"?"status":"impact")),
             phaseOrder:Number.isFinite(Number(input.phaseOrder))?Number(input.phaseOrder):phaseOrder(kind),

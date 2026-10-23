@@ -1803,6 +1803,7 @@
             if(artwork&&artwork.v143ImpactRecoil){
                 artwork.v143ImpactRecoil.cancel();
                 artwork.v143ImpactRecoil=null;
+                artwork.v174FireDodge=false;
                 window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             }
         });
@@ -1984,7 +1985,7 @@
         const damage=kind==="damage"||kind==="criticalDamage";
         const wait=delayFor(side,unitIndex,true,damage||kind==="shield");
         const current=state.current;
-        const critical=isCritical===true||damage&&!!(
+        const critical=isCritical===true||kind==="criticalDamage"||damage&&!!(
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
@@ -2000,6 +2001,10 @@
             !indirectSource.includes(window.__fourSymbolsBattleEffectSource);
         if(damage&&direct&&ownedHit){ hit.scheduled=true; }
         const entity=entityFor(side,unitIndex);
+        const fireSample=current&&!current.done&&current.config.id==="explosiveFlurry"&&current.targetSide===side;
+        if(fireSample&&kind==="miss")queueTargetHit(current,unitIndex,()=>{
+            window.FourSymbolsBattlePresentation?.fireDodge?.(cardFor(side,unitIndex));
+        },"feedback",side);
         const artworkAtSchedule=ownedHit?hit.artwork:cardFor(side,unitIndex)?.querySelector(".v174-battle-art");
         const present=function(){
             const audio=window.v141Audio;
@@ -2021,6 +2026,7 @@
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
             createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
+            if(fireSample&&critical)window.FourSymbolsBattlePresentation?.fireCriticalShake?.(current.sequence);
             const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
             // First fire sample: a short retreat/lean on the existing motion
             // layer, only after committed direct damage. No slot or hit clock moves.
@@ -2056,7 +2062,7 @@
         const scheduleImpact=current&&!current.done&&current.targetSide===side&&current.model&&current.model.sprite&&
             (current.model.sprite.impactOnly||current.emitted?.has(unitIndex))
             ?callback=>queueTargetHit(current,unitIndex,callback,"feedback",side):null;
-        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact});
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact,presentationStyle:fireSample&&(damage||kind==="miss")?"fire-sample":null});
     };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){
