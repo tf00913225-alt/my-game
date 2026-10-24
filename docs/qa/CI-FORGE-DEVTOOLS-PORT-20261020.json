@@ -1,0 +1,43 @@
+{
+  "workId": "CI-FORGE-DEVTOOLS-PORT-20261020",
+  "platform": "win32",
+  "node": "v24.22.0",
+  "chromeLaunched": false,
+  "evidence": [
+    {
+      "port": 10080,
+      "direct": {
+        "status": 200,
+        "body": [
+          {
+            "type": "page"
+          }
+        ]
+      },
+      "fetch": {
+        "error": "fetch failed",
+        "cause": "bad port"
+      }
+    },
+    {
+      "port": 10300,
+      "direct": {
+        "status": 200,
+        "body": [
+          {
+            "type": "page"
+          }
+        ]
+      },
+      "fetch": {
+        "status": 200,
+        "json": [
+          {
+            "type": "page"
+          }
+        ]
+      }
+    }
+  ],
+  "scope": "Node fetch port restriction; independent of unproven Chrome cold-start root cause"
+}

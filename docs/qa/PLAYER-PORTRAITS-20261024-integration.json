@@ -1,0 +1,64 @@
+{
+  "workId": "PLAYER-PORTRAITS-20261023",
+  "stage": "dev-integration-before-PR-head-CI",
+  "originalHead": "89d9e7b2abcdf2316114f454092313806b3feb5b",
+  "mergedDev": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+  "scope": "Original PR986; no dev merge/deploy/phone/schedule action authorized in this segment",
+  "conflictResolution": {
+    "source": "index.html auto-merged; other sources no conflict",
+    "generated": "Two manifests and app-shell rename/rename resolved by unchanged scripts/build-production.mjs; no wholesale ours/theirs source replacement",
+    "appShell": "build/app-shell.23ba84773fc4.js",
+    "boot": "build/boot-core.bbbaf3175142.js"
+  },
+  "verification": {
+    "buildAndCheck": "pass",
+    "targetedFiles": 7,
+    "outerNodeTests": 10,
+    "fail": 0,
+    "sourceAndWebpHashes": "all eight pairs retained original v3 report hashes",
+    "browser": {
+      "executor": "root agent reusing existing QA runner, not independent rerun",
+      "environment": "local Windows headless Chrome; isolated read-only new-account transport fixture; production index/hashed bundles",
+      "viewports": [
+        [
+          1440,
+          900
+        ],
+        [
+          360,
+          640
+        ],
+        [
+          390,
+          844
+        ]
+      ],
+      "choicesPerViewport": 8,
+      "nameNextBackReload": "pass",
+      "nonCancelledPortraitFailures": 0,
+      "runtimeExceptions": 0,
+      "evidence": "artifacts/player-portraits-20261023/integration-browser-results.json"
+    },
+    "independentReview": {
+      "reviewer": "separate QA agent; read-only staged merge audit",
+      "result": "no blocking findings",
+      "checks": [
+        "No unresolved index entries or unstaged changes; cached diff-check pass",
+        "Exact original32file scope relative to merged dev; only original creation JS24/JS52 source changes",
+        "All dev js00/battle/adventure/CSS/functions/story source preserved",
+        "All8 PNG/WebP hash and decodedRGBA independently rechecked",
+        "Both manifests equal and79firstplay entries hash/bytes verified",
+        "Root-run results and360x640female01/1440x900male04 screenshots independently reviewed; not independently rerun"
+      ]
+    }
+  },
+  "pending": [
+    "Latest exact PR Head natural Required CI",
+    "No merge to dev/deploy until coordination explicitly opens next segment",
+    "Actual deployed SHA/manifest/eight assets/creation acceptance",
+    "Physical phone, persistent cache and download latency remain unverified; no shared device used"
+  ],
+  "artRegenerated": false,
+  "codeRefactor": false,
+  "scheduleResumed": false
+}

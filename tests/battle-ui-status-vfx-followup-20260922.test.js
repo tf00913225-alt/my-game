@@ -192,3 +192,24 @@ function losslessWebpInfo(file){
  for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
  throw new Error("Expected lossless VP8L image");
 }
+
+test("battle AUTO ring follows original auto state without replacing children or changing speed",()=>{
+ const vm=require("node:vm"),js=read("js/00-main.js"),html=read("index.html"),css=read("css/fixed-slot-battlefield-rendering-v2.css");
+ const start=js.indexOf("function updateAutoButton(){");let level=0,end=start;for(let i=js.indexOf("{",start);i<js.length;i++){if(js[i]==="{")level++;else if(js[i]==="}"&&--level===0){end=i+1;break;}}
+ const attrs={},classes={};const button={classList:{toggle:(k,v)=>classes[k]=v},setAttribute:(k,v)=>attrs[k]=v};
+ const context={autoBattle:false,$:id=>id==="battleAutoToggle"?button:null};vm.createContext(context);vm.runInContext(js.slice(start,end),context);
+ for(const active of [false,true,false]){context.autoBattle=active;context.updateAutoButton();assert.equal(classes["is-active"],active);assert.equal(attrs["aria-pressed"],String(active));assert.equal(context.autoBattle,active);}
+ assert.match(html,/id="battleAutoToggle"[^>]*onclick="toggleAutoBattle\(\)"/);assert.match(html,/id="battleSpeedControl"[^>]*disabled/);assert.doesNotMatch(html,/assets\/battle\/element-box\.png/);
+ assert.match(css,/#battleAutoToggle\.is-active::before/);assert.match(css,/@media\(prefers-reduced-motion:reduce\)/);
+});
+
+test("more menu opens only in manual selection and cannot survive utility mode",()=>{
+ const vm=require('node:vm'),js=read('js/00-main.js'),html=read('index.html'),bits=new Set(),attrs={};
+ const region={dataset:{controlMode:'manual'},classList:{contains:k=>bits.has(k),toggle:(k,on)=>on?bits.add(k):bits.delete(k)}};
+ const more={setAttribute:(k,v)=>attrs[k]=v};const ctx={$:id=>id==='battleActionRegion'?region:id==='battleMoreButton'?more:null};vm.createContext(ctx);
+ vm.runInContext(js.slice(js.indexOf('function setBattleUtilityMenuOpen('),js.indexOf('function updateAutoButton(){')),ctx);
+ ctx.toggleBattleUtilityMenu();assert.equal(attrs['aria-expanded'],'true');ctx.toggleBattleUtilityMenu();assert.equal(attrs['aria-expanded'],'false');
+ bits.add('target-selecting');ctx.setBattleUtilityMenuOpen(true);assert.equal(attrs['aria-expanded'],'false');bits.delete('target-selecting');region.dataset.controlMode='utility';ctx.setBattleUtilityMenuOpen(true);assert.equal(attrs['aria-expanded'],'false');
+ assert.match(html,/id="battleMoreButton"[^>]*aria-controls="battleUtilityTray"/);
+ const owner=read('js/20-anonymous-20.js');assert.match(owner,/event.key!=="Escape"/);assert.match(owner,/pointerdown/);assert.doesNotMatch(owner,/initBattleElementBoxDrag/);
+});

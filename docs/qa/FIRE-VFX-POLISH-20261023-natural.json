@@ -1,0 +1,353 @@
+{
+  "head": "50fa1c644a7a0616528fdead95b7b86b978ae2d8",
+  "productHead": "4b93e1c8aaf9fac34de0a75166755ec3651b6f43",
+  "scope": "isolated6v6 roster; formal startBattle/Auto/initiative/finish, no QA pause or finish interception; RNG forced ONLY encounter selection then restored before action timers; no real save/reward and aborted before outcome",
+  "passedNaturalFlow": true,
+  "initialRound": 1,
+  "finalRound": 2,
+  "actionEvents": [
+    {
+      "type": "start",
+      "at": 4791.5,
+      "turn": 1,
+      "index": 0,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 3,
+        "agility": 34
+      }
+    },
+    {
+      "type": "finish",
+      "at": 4886.699999988079,
+      "turn": 1,
+      "index": 0,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 3,
+        "agility": 34
+      }
+    },
+    {
+      "type": "start",
+      "at": 6060.299999952316,
+      "turn": 1,
+      "index": 1,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 5,
+        "agility": 34
+      }
+    },
+    {
+      "type": "finish",
+      "at": 6150.899999976158,
+      "turn": 1,
+      "index": 1,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 5,
+        "agility": 34
+      }
+    },
+    {
+      "type": "start",
+      "at": 7323.299999952316,
+      "turn": 1,
+      "index": 2,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 4,
+        "agility": 31
+      }
+    },
+    {
+      "type": "finish",
+      "at": 7406.699999988079,
+      "turn": 1,
+      "index": 2,
+      "entry": {
+        "type": "heroNpc",
+        "characterIndex": 4,
+        "agility": 31
+      }
+    },
+    {
+      "type": "start",
+      "at": 8579.099999964237,
+      "turn": 1,
+      "index": 3,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 1,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 8633.299999952316,
+      "turn": 1,
+      "index": 3,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 1,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 9804.899999976158,
+      "turn": 1,
+      "index": 4,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 0,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 9858.099999964237,
+      "turn": 1,
+      "index": 4,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 0,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 11034,
+      "turn": 1,
+      "index": 5,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 3,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 11156.599999964237,
+      "turn": 1,
+      "index": 5,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 3,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 11826.199999988079,
+      "turn": 1,
+      "index": 6,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 4,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 11936.199999988079,
+      "turn": 1,
+      "index": 6,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 4,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 12597.699999988079,
+      "turn": 1,
+      "index": 7,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 5,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 12655.799999952316,
+      "turn": 1,
+      "index": 7,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 5,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 13835.399999976158,
+      "turn": 1,
+      "index": 8,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 2,
+        "agility": 24
+      }
+    },
+    {
+      "type": "finish",
+      "at": 13931.899999976158,
+      "turn": 1,
+      "index": 8,
+      "entry": {
+        "type": "monster",
+        "monsterIndex": 2,
+        "agility": 24
+      }
+    },
+    {
+      "type": "start",
+      "at": 15109.399999976158,
+      "turn": 1,
+      "index": 9,
+      "entry": {
+        "type": "player",
+        "characterIndex": 0,
+        "agility": 10
+      }
+    },
+    {
+      "type": "finish",
+      "at": 15157.599999964237,
+      "turn": 1,
+      "index": 9,
+      "entry": {
+        "type": "player",
+        "characterIndex": 0,
+        "agility": 10
+      }
+    },
+    {
+      "type": "start",
+      "at": 17273.799999952316,
+      "turn": 1,
+      "index": 10,
+      "entry": {
+        "type": "player",
+        "characterIndex": 2,
+        "agility": 0
+      }
+    },
+    {
+      "type": "finish",
+      "at": 17479.69999998808,
+      "turn": 1,
+      "index": 10,
+      "entry": {
+        "type": "player",
+        "characterIndex": 2,
+        "agility": 0
+      }
+    },
+    {
+      "type": "start",
+      "at": 18461.399999976158,
+      "turn": 1,
+      "index": 11,
+      "entry": {
+        "type": "player",
+        "characterIndex": 1,
+        "agility": 0
+      }
+    },
+    {
+      "type": "finish",
+      "at": 18518.899999976158,
+      "turn": 1,
+      "index": 11,
+      "entry": {
+        "type": "player",
+        "characterIndex": 1,
+        "agility": 0
+      }
+    }
+  ],
+  "pauseSamples": 0,
+  "fireCast": {
+    "at": 15132.399999976158,
+    "type": "cast",
+    "name": "火爆亂擊",
+    "element": "fire"
+  },
+  "fireHitAudio": [
+    {
+      "at": 16049.899999976158,
+      "type": "impact",
+      "args": [
+        "damage",
+        2
+      ]
+    },
+    {
+      "at": 16056.799999952316,
+      "type": "impact",
+      "args": [
+        "damage",
+        2
+      ]
+    },
+    {
+      "at": 16064.5,
+      "type": "impact",
+      "args": [
+        "damage",
+        2
+      ]
+    }
+  ],
+  "audioContext": "running",
+  "audioLimit": "calls/running Context only; acoustic listening not certified",
+  "modal": {
+    "at": 16675.799999952316,
+    "rect": [
+      5.885714054107666,
+      197.22068786621094,
+      400.2285461425781,
+      600.986572265625
+    ],
+    "display": "flex",
+    "zIndex": "98",
+    "probes": [
+      {
+        "text": "-216HP",
+        "x": 73.890625,
+        "y": 213.20358276367188,
+        "overlaps": true,
+        "top": "SPAN#.auto-panel-kicker",
+        "insideModal": true
+      },
+      {
+        "text": "-217HP",
+        "x": 205.984375,
+        "y": 213.20358276367188,
+        "overlaps": true,
+        "top": "SPAN#.auto-panel-kicker",
+        "insideModal": true
+      },
+      {
+        "text": "-208HP",
+        "x": 338.09375,
+        "y": 213.20358276367188,
+        "overlaps": true,
+        "top": "DIV#.auto-premium-status v169-element-box-active",
+        "insideModal": true
+      }
+    ],
+    "status": "FAIL: actual frame0065 shows floating damage above settings despite elementFromPoint insideModal; #955 single repair Owner, no edits here"
+  },
+  "visuals": {
+    "hit": "artifacts/fire-natural-desktop/frame-0063.png",
+    "modal": "artifacts/fire-natural-desktop/frame-0065.png",
+    "return": "artifacts/fire-natural-desktop/frame-0068.png"
+  },
+  "limits": "QA roster; generic sixth portrait in desktop natural capture, not six unique character art. Fixed RNG only encounter selection, restored before actions. No victory/reward/save acceptance. User rejected old fire ring/wide art."
+}

@@ -1,0 +1,79 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "baseHead": "38546acb307d3ee6f5b08b803654a36fe8857e31",
+  "status": "IMPLEMENTED; focused verified; newHead requiredCI and original remainingGates pending; not merged/deployed",
+  "humanAuthorization": "2026-10-24 user allowed position/row-spacing corrections while preserving size/depth",
+  "diagnosis": {
+    "run": 39936357272,
+    "attempt": 1,
+    "coreJob": 120357517797,
+    "portraitJob": 120357517899,
+    "battleJob": 120357517979,
+    "abyssJob": 120357518200,
+    "core": "mandatory shrink assertion obsolete; existing5.8px frame clearance passed",
+    "portrait": "old gate misclassified overflow-visible art frame as clipping; true settled5enemy source found ownHP alpha overlap1.15px and insufficient inter-row room",
+    "rejectedCandidate": "clamp alone shifted overlap into next-row names; preserved diagnostic only, not accepted evidence"
+  },
+  "change": "Original normalized paint top gains metadata-based6px ownHP clearance without resizing; back row moves an additional18logicalpx up (safeTop-26), frontbottom28 unchanged. Paint1.3225/depth1.18/1.10/party reference max and accepted normal520ms unchanged. Existing QA now checks actual clipping ancestors/viewport, negative clipping control, HUD no-overlap and independent transformed height/baseline. Synthetic neutral pose explicitly separate from nativeCore entry.",
+  "verification": {
+    "focusedNodeTests": 28,
+    "buildCheck": "PASS",
+    "independentSourceReview": "no direct blocker; static-pose scope only",
+    "syntheticPortraitMatrix": {
+      "viewports": [
+        [
+          390,
+          844
+        ],
+        [
+          412,
+          915
+        ]
+      ],
+      "measurements": 150,
+      "scope": "first5sources, Wild and4classes, first/redraw/reentry; not full2000matrix",
+      "report": "artifacts/portrait-approved-size-focused/evidence.json"
+    },
+    "productionEntry": {
+      "scope": "controlled isolated6ally/5enemy original startBattle/settled entry; desktop emulation390x844, idle disabled",
+      "actualAncestorClips": 0,
+      "actualHUDIntersections": 0,
+      "report": "artifacts/portrait-visible-bounds-spaced/evidence.json",
+      "image": "artifacts/portrait-visible-bounds-spaced/frame-0018.png"
+    },
+    "nativeBoss": {
+      "viewport": [
+        390,
+        844
+      ],
+      "modes": [
+        "personal",
+        "world",
+        "reinforcement"
+      ],
+      "fallbackMeasurements": 12,
+      "scope": "formal native entry but all returned generic fallback; NOT a native adopted-Boss-art matrix",
+      "report": "artifacts/portrait-approved-size-native-focused/evidence.json"
+    },
+    "sizeProof": "Same411x717 before/clamp alpha heights differ<.001px; subsequent back-row top changes position only; target width/height/scale unchanged",
+    "phone": "DISCONNECTED: no new physical capture or PASS. artifacts/portrait-clearance-owner-phone/evidence.json"
+  },
+  "historicalEvidenceIntegrity": "Disconnected retry accidentally overwrote artifacts/final-layout-owner-phone/evidence.json raw measurements. All9original PNG bytes preserved; reconstructed capture index explicitly marked, original raw rows unavailable. Failure moved to separate directory; no new physicalPASS inferred.",
+  "dependency": {
+    "pr": 987,
+    "head": "89d3dba79cce4f23120bb5e61f4eda1877aa5cfc",
+    "status": "unmerged; original toolOwner reports process-aware30s Chrome still no listener. No local Chrome fix/rerun here; old9d failures historical only."
+  },
+  "pending": [
+    "latestHead requiredCI/full portrait matrix",
+    "physical preview after phone reconnect if needed",
+    "original fire-sample/acoustic/multiplier applicableGates; no all-skill rollout",
+    "dev-only merge/deployedSHA/manifest/own verification and safe cleanup after allgates"
+  ],
+  "sources": {
+    "js/54-v173.51-battle-qa.js": "9a609a99b03d8ec69ea3c393559c555aed58c9814e14e40b48bcaf27e7abf51b",
+    "css/fixed-slot-battlefield-rendering-v2.css": "46463d60fcc936dacd72551ef47285d0bfee4e22f33c90dbae059003072efbac",
+    ".github/scripts/run-monster-portrait-convergence-browser-qa.mjs": "5b3ff1d532559dc9db29e3b3202f67f3aace73da0738273b8386dcf98c3d4678"
+  }
+}

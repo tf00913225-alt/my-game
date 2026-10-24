@@ -1,0 +1,37 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "baseHead": "affa651a7302c53dc99a242e36f277eefd2eb7e9",
+  "identity": "Final uncommitted product delta on baseHead; next source checkpoint captures identical bytes. Raw source LF verified.",
+  "sourceHashes": {
+    "index.html": "0e2e7b47f64bc9348f1d492562e6e8b751a30650593084396f9c7b6895e8ef5e",
+    "js/00-main.js": "c2c147aea9d6153d2c43a4d2c0745631e388af8335d9eb3fe2c203a9c8a5ca55",
+    "js/20-anonymous-20.js": "85511f3b44cf63e7ed4ad8bd47e5a20e1ea1fd89a15fd7d9a3cac48189a46105",
+    "css/fixed-slot-battlefield-rendering-v2.css": "eaf8173c0b07e30daf30ed7780c7fd889d18a49bc6418d3ff924971c868236a7"
+  },
+  "scope": "User-directed single-row mode switch, more popup, one UI family, actual original AUTO/gear, party scale1/no row depth, enemy depth retained, enemy up without visible notice, party down / spacer44.",
+  "tests": "24 focused outer tests (16 layout/interaction/QA plus original motion/normal/settings8) PASS; focused official fixed-slot Browser QA360x800 PASS; official build-check/diff-check PASS. Full viewport matrix left to latest Head requiredCI.",
+  "runtime": [
+    "artifacts/battle-single-row-desktop/evidence.json",
+    "artifacts/battle-single-row-small/evidence.json",
+    "artifacts/battle-single-row-phone-final/evidence.json"
+  ],
+  "phoneImages": {
+    "manual": "artifacts/battle-single-row-phone-final/frame-0006.png",
+    "auto": "artifacts/battle-single-row-phone-final/frame-0008.png"
+  },
+  "phoneScope": "Physical SM-N960F411x717, isolated6v6 disposable account; programmatic original click handlers plus full center hit tests, original target/return/settings, Esc/outside dismissal. Not finger-tap/native movie/natural combat/full Core matrix.",
+  "phoneResult": {
+    "manualBottom": 705.3505668640137,
+    "autoBottom": 705.3505668640137,
+    "haloProgressMs": [
+      33.39999995576193,
+      183.36599995576108
+    ]
+  },
+  "gate": "Original zero-time AUTO refusal observed, not bypassed. Active case uses original v131GrantElementBoxHours(1,32) ONLY inside disposable QA account; not real ad/reward evidence. Restricted generated policy semantics asserted identical except sourceDigests.",
+  "corrections": "Prior text crowding review was insufficient. Fixed actual outer66px flex versus52px inner row and undersized info band; no prior visual PASS carried forward. Fixed uniform party overhang7→0 after existing arrow-vs-SP safety assertion caught party4 collision. No safety assertion weakened. BrowserQA old floating overlap exemption removed; all5 command +more+3utility full centers and>=44px now mandatory.",
+  "tradeoffs": "More is a transient popup and can cover part of back-row HUD while explicitly expanded. Do not call every state overlap-free. Uniform party frame/scale preserves original image aspects; does not claim different silhouettes same pixel width.",
+  "review": "Independent source/contract review + final physical manual0006/AUTO0008 static images reviewed: no direct blocker within stated scope. moreRect gap repaired and under44px rejection regression retained. Popup HUD overlap remains disclosed; not full UI approval.",
+  "pending": "Human candidate/fire-art review; latest Head necessary CI; actual speed implementation delegated to original time Owner and remains disabled. No main release/other skill rollout."
+}

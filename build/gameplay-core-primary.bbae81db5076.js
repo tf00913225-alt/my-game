@@ -9958,9 +9958,6 @@
     /* =====================================================
        Abyss dungeon
     ===================================================== */
-    if(!skillDatabase.stormSpell){
-        skillDatabase.stormSpell=Object.assign({},skillDatabase.windHowlLightning,{id:"stormSpell",name:"暴風術",tier:4,targetType:"all"});
-    }
     function defaultAbyssState(){ return {active:false,floor:1,phase:"boss",x:50,y:84,message:"",clears:0,rewardVersion:1}; }
     function loadAbyssState(){
         try{
@@ -10730,7 +10727,6 @@
         earthShield:[1800,"medium","shield"],rockWall:[1700,"high","shield"],
         barrier:[1900,"high","barrier"],earthEX:[3000,"ultimate","aura"],
 
-        stormSpell:[2450,"high","tempest"],
         yuanXiangGuangMing:[2200,"high","holy-heal"],
         yuanGuangShield:[1950,"high","holy-shield"],
         yuanZuBlessing:[2000,"high","holy-blessing"]
@@ -11626,7 +11622,7 @@
         flameSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/flame-slash-cast-v2.webp","single",{scale:1.85,maxSize:220})},
         fireCritical:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260})},
         fireBurstStrike:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-critical-cast.png?v=165","single",{scale:2.15,maxSize:260,reusedFrom:"fireCritical"})},
-        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        explosiveFlurry:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/explosive-flurry-wide-v2.webp","single",{scale:1.4,minSize:96,maxSize:184,presentation:"per-recipient",recipientSlice:"center-third",cellAspect:2.25})},
         dragonSlash:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/dragon-slash-cast-v2.webp","single",{scale:2.35,maxSize:300})},
         fireRocket:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/fire-rocket-cast.png?v=165","trajectory",{travelToTargets:true,scale:.72,minSize:180,maxSize:280})},
         blazeSpell:{hit:DEFAULT_HIT,sprite:castSheet("assets/vfx/fire/blaze-spell-cast-v2.webp","single",{scale:2.15,maxSize:260})},
@@ -11666,7 +11662,6 @@
         windEX:{hit:.74,noVisual:true,passive:true},
         /* Monster-only legacy derivative: use an existing formal Wind sheet,
            never a generated text/particle fallback. */
-        stormSpell:{hit:.5,sprite:castSheet("assets/vfx/wind/storm-rain-cast.png?v=173.24","battlefield",{scale:1.08,minSize:280,reusedFrom:"stormRain"})},
         windArrow:{hit:.5,sprite:castSheet("assets/vfx/wind/wind-spell-cast.png?v=173.24","targetTrajectory",{travelToTargets:true,scale:1.8,minSize:150,maxSize:230,reusedFrom:"windSpell"})},
 
         stoneSlash:{hit:.5,deferredStatusTypes:["defenseDown"],sprite:castSheet("assets/vfx/earth/stone-slash-cast.png?v=173.39","single",{scale:2.2,maxSize:270})},
@@ -12907,7 +12902,10 @@
             node.style.visibility="hidden";
             return;
         }
-        const fit=Math.min(1,availableWidth/width,availableHeight/height);
+        // The reused wide sheet is clipped to its central authored strike per recipient.
+        // Fit its visible third, not the transparent/clipped neighbor regions.
+        const visibleWidth=current.model.sprite.recipientSlice==="center-third"?width/3:width;
+        const fit=Math.min(1,availableWidth/visibleWidth,availableHeight/height);
         node.style.width=(width*fit)+"px";
         node.style.height=(height*fit)+"px";
         node.dataset.artFit="safe";
@@ -12976,7 +12974,9 @@
             node.dataset.geometrySlot=target.slot;
             node.style.left=center.x+"px";
             node.style.top=center.y+"px";
-            applySpriteBox(node,size,size,sprite);
+            const sliced=sprite.recipientSlice==="center-third";
+            applySpriteBox(node,sliced?size*3:size,sliced?size*3:size,sprite);
+            if(sliced){ node.style.clipPath="inset(0 33.333333%)";node.dataset.recipientSlice="center-third"; }
             fitRangeArt(node,current,target.rect,center);
             return;
         }
@@ -13086,7 +13086,8 @@
         // A MISS still travels, but never reveals the confirmed impact sprite.
         node.v143MotionAnimation=node.animate([
             {offset:0,opacity:0,transform:transform(0)},
-            {offset:.08,opacity:.85,transform:transform(.08)},
+            {offset:.30,opacity:0,transform:transform(0)},
+            {offset:.36,opacity:.85,transform:transform(.08)},
             {offset:.90,opacity:.85,transform:transform(.90)},
             {offset:1,opacity:0,transform:transform(1)}
         ],{duration:Math.max(1,targetHitTime(current,index)-(current.visualStartedAt||current.startedAt)),fill:"both",easing:"linear"});
@@ -13130,6 +13131,20 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
+        // One range representative: contract inside the fitted source box,
+        // reach authored size at the existing hit, then settle. Never grow
+        // beyond the geometry owner's HUD-safe fit or restart on remeasure.
+        if(current.config?.id==="explosiveFlurry"&&typeof node.animate==="function"&&!node.v143MotionAnimation&&
+           !(typeof window.matchMedia==="function"&&window.matchMedia("(prefers-reduced-motion: reduce)").matches)){
+            node.dataset.motion="fire-range-envelope";
+            node.v143MotionAnimation=node.animate([
+                {transform:"translate(-50%,-50%) scale(.90)",offset:0},
+                {transform:"translate(-50%,-50%) scale(.94)",offset:.25},
+                {transform:"translate(-50%,-50%) scale(1)",offset:Number(current.model.hit)||DEFAULT_HIT},
+                {transform:"translate(-50%,-50%) scale(.98)",offset:1}
+            ],{duration:current.duration,fill:"both",easing:"linear"});
+            if(current.firstVisibleFrameAt){ node.v143MotionAnimation.currentTime=Math.max(0,Date.now()-current.visualStartedAt); }
+        }
         requestSpriteAspect(sprite,current,node,index,target);
         if(current.config?.id==="normal"){ addNormalProjectile(current,index,target); }
         /* A formal cast Sprite represents the attempted skill, not only a landed hit.
@@ -13160,6 +13175,11 @@
     }
 
     function startNormalProjectiles(current){
+        if(current.config.id==="normal"&&current.characterMotion&&!current.normalMotionStarted){
+            current.normalMotionStarted=true;
+            current.characterMotion.play();
+            current.characterMotion.currentTime=Math.max(0,Date.now()-current.visualStartedAt);
+        }
         current.spriteNodes.forEach(node=>{
             if(node.dataset?.presentationRole!=="normal-projectile"||node.dataset.flightStarted==="true"){ return; }
             node.dataset.flightStarted="true";
@@ -13344,6 +13364,7 @@
             if(artwork&&artwork.v143ImpactRecoil){
                 artwork.v143ImpactRecoil.cancel();
                 artwork.v143ImpactRecoil=null;
+                artwork.v174FireDodge=false;
                 window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             }
         });
@@ -13525,7 +13546,7 @@
         const damage=kind==="damage"||kind==="criticalDamage";
         const wait=delayFor(side,unitIndex,true,damage||kind==="shield");
         const current=state.current;
-        const critical=isCritical===true||damage&&!!(
+        const critical=isCritical===true||kind==="criticalDamage"||damage&&!!(
             current&&!current.done&&current.config&&current.config.id==="fireCritical"&&
             current.targetSide===side
         );
@@ -13541,6 +13562,10 @@
             !indirectSource.includes(window.__fourSymbolsBattleEffectSource);
         if(damage&&direct&&ownedHit){ hit.scheduled=true; }
         const entity=entityFor(side,unitIndex);
+        const fireSample=current&&!current.done&&current.config.id==="explosiveFlurry"&&current.targetSide===side;
+        if(fireSample&&kind==="miss")queueTargetHit(current,unitIndex,()=>{
+            window.FourSymbolsBattlePresentation?.fireDodge?.(cardFor(side,unitIndex));
+        },"feedback",side);
         const artworkAtSchedule=ownedHit?hit.artwork:cardFor(side,unitIndex)?.querySelector(".v174-battle-art");
         const present=function(){
             const audio=window.v141Audio;
@@ -13562,13 +13587,29 @@
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
             createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
+            if(fireSample&&critical)window.FourSymbolsBattlePresentation?.fireCriticalShake?.(current.sequence);
             const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
-            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate([
+            // First fire sample: a short retreat/lean on the existing motion
+            // layer, only after committed direct damage. No slot or hit clock moves.
+            const slashSample=current.config.id==="flameSlash";
+            const flurrySample=current.config.id==="explosiveFlurry";
+            const recoilFrames=slashSample?[
+                {translate:"0px 0px",rotate:"0deg",scale:1},
+                {translate:"0px "+(distance*2)+"px",rotate:(side==="monster"?-2:2)+"deg",scale:.985,offset:.3},
+                {translate:"0px "+(distance*.4)+"px",rotate:"0deg",scale:1,offset:.7},
+                {translate:"0px 0px",rotate:"0deg",scale:1}
+            ]:flurrySample?[
+                {translate:"0px 0px",rotate:"0deg",scale:1},
+                {translate:"0px "+(distance*1.5)+"px",rotate:(side==="monster"?-1:1)+"deg",scale:.99,offset:.3},
+                {translate:"0px "+(-distance*.2)+"px",rotate:"0deg",scale:1,offset:.7},
+                {translate:"0px 0px",rotate:"0deg",scale:1}
+            ]:[
                 {translate:"0px 0px",scale:1},
                 {translate:"0px "+distance+"px",scale:critical?.975:.98,offset:.3},
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
-            ],{duration:140,easing:"ease-out"});
+            ];
+            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate(recoilFrames,{duration:140,easing:"ease-out"});
             const recoil=artwork.v143ImpactRecoil;
             window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; window.FourSymbolsBattlePresentation?.syncMotion?.(card); } };
@@ -13582,7 +13623,7 @@
         const scheduleImpact=current&&!current.done&&current.targetSide===side&&current.model&&current.model.sprite&&
             (current.model.sprite.impactOnly||current.emitted?.has(unitIndex))
             ?callback=>queueTargetHit(current,unitIndex,callback,"feedback",side):null;
-        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact});
+        return Object.freeze({delayMs:wait,impactAt:Date.now()+wait,impactId:current&&!current.done?("v143:"+String(current.sequence)+":"+side+":"+String(unitIndex)):null,sequence:current&&!current.done?current.sequence:0,critical:critical,scheduleImpact:scheduleImpact,presentationStyle:fireSample&&(damage||kind==="miss")?"fire-sample":null});
     };
 
     if(typeof applySkillDebuffEffectsToPlayer==="function"){

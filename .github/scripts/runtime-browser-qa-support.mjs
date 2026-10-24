@@ -149,7 +149,7 @@ async function collectDevToolsFailure(url){
     return result;
 }
 
-async function waitJson(url,{chromeProcess,timeoutMs=chromeProcess?30000:15000}={}){
+async function waitJson(url,{chromeProcess,accept,timeoutMs=chromeProcess?30000:15000}={}){
     const started=Date.now(),controller=new AbortController();
     const timeout=Object.assign(new Error('DevTools startup probe exceeded its '+timeoutMs+'ms deadline'),{code:'ETIMEDOUT'});
     const deadline=setTimeout(()=>controller.abort(timeout),timeoutMs);
@@ -170,6 +170,7 @@ async function waitJson(url,{chromeProcess,timeoutMs=chromeProcess?30000:15000}=
                 const response=await fetch(url,{signal:controller.signal});
                 const data=await response.json();
                 if(controller.signal.aborted){throw controller.signal.reason;}
+                if(accept&&!accept(data)){throw new Error('DevTools JSON has no acceptable target yet');}
                 if(attempts>1||chromeProcess){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
                 return data;
             }catch(error){

@@ -16,8 +16,10 @@ test('navigation QA retains real child failure evidence before CDP exists',()=>{
   source=source.replace('import {spawn,spawnSync} from "node:child_process";', 'import {spawn as realSpawn,spawnSync} from "node:child_process";let fixtureChild;const spawn=(...args)=>(fixtureChild=realSpawn(...args));');
   const replaceFunction=(start,end,replacement)=>{const a=source.indexOf(start),b=source.indexOf(end,a);assert.ok(a>=0&&b>a);source=source.slice(0,a)+replacement+'\n'+source.slice(b);};
   replaceFunction('function findChrome(){','function mime(', 'function findChrome(){return process.execPath;}');
-  replaceFunction('async function startServer(){','function waitJson(', "async function startServer(){return {url:'http://127.0.0.1/unused',server:{close:done=>done()}};}");
-  replaceFunction('function waitJson(','class Cdp{', "async function waitJson(){if(fixtureChild.exitCode===null||!fixtureChild.stderr.readableEnded)await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('fixture child did not exit')),5000);fixtureChild.once('close',()=>{clearTimeout(timer);resolve();});});throw Error('injected CDP unavailable');}");
+  replaceFunction('async function startServer(){','class Cdp{', "async function startServer(){return {url:'http://127.0.0.1/unused',server:{close:done=>done()}};}");
+  const probeImport='import {waitJson} from "./runtime-browser-qa-support.mjs";';
+  assert.ok(source.includes(probeImport),'fixture must replace the formal probe import');
+  source=source.replace(probeImport, "async function waitJson(){if(fixtureChild.exitCode===null||!fixtureChild.stderr.readableEnded)await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('fixture child did not exit')),5000);fixtureChild.once('close',()=>{clearTimeout(timer);resolve();});});throw Error('injected CDP unavailable');}");
   const script=`try{await import(${JSON.stringify('data:text/javascript;base64,'+Buffer.from(source).toString('base64'))});throw Error('expected failure');}catch(error){if(!error.message.startsWith('Navigation Chrome startup failed:'))throw error;}`;
   const result=spawnSync(process.execPath,['--input-type=module'],{input:script,encoding:'utf8',timeout:10000});
   assert.equal(result.status,0,String(result.error||result.stderr).slice(-2000));
