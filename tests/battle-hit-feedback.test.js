@@ -33,6 +33,29 @@ test("data-driven choreography selects distinct motion archetypes without touchi
  }
 });
 
+test("whole-field Wind routes cover the target region with capped funnels and complementary actor planes",()=>{
+ const a=harness().api,c=a.configFor("stormRain",{category:"magic",element:"wind",targetType:"all"}).fieldScene;
+ assert.equal(c.enabled,true);assert.equal(c.maxFunnels,3);
+ for(let rank=0;rank<3;rank++){
+  const tracks=a.fieldTrack(c,{width:360,height:250},140,140,rank);
+  assert.equal(tracks[0].offset,0);assert.equal(tracks.at(-1).offset,1);assert.equal(tracks.at(-1).opacity,0);
+  const xs=[];for(const f of tracks){const m=f.transform.match(/translate\(calc\(-50% \+ ([-\d.]+)px\),calc\(-50% \+ ([-\d.]+)px\)\) scale\(([-\d.]+)\)/);assert.ok(m);xs.push(+m[1]);
+   assert.ok(Math.abs(+m[1])+140*(+m[3])/2<=180+1e-8);assert.ok(Math.abs(+m[2])+140*(+m[3])/2<=125+1e-8);
+  }assert.ok(Math.max(...xs)-Math.min(...xs)>90,"route leaves the original recipient footprint");
+  const rear=a.occlusionTrack(c,rank,false),front=a.occlusionTrack(c,rank,true);
+  assert.ok(rear.every((f,i)=>f.opacity+front[i].opacity===1));assert.ok(new Set(front.map(f=>f.opacity)).size===2);
+  const force=a.fieldSwayTrack(c,rank);assert.equal(force.at(-1).transform,"translate(0px,0px) rotate(0deg)");
+ }
+ for(const data of [{category:"heal",element:"wind",targetType:"all"},{element:"earth",targetType:"all"},{element:"wind",targetType:"tri"}])
+  assert.equal(a.configFor("future",data).fieldScene.enabled,false);
+});
+
+test("late actor reaction tracks join an already active hit-stop ledger",()=>{
+ const h=harness(),f=h.api.create("stormFlurry");f.hit({key:0,damage:168,roots:[]});
+ const reaction=h.animation();reaction.hitFeedbackDeadline=2500;f.replaceTrack(null,reaction);
+ assert.equal(reaction.playState,"paused");h.advance(50);assert.equal(reaction.playState,"running");f.dispose();
+});
+
 test("choreography changes direction, peaks at the authored hit, fits its box and ends inside the existing lifetime",()=>{
  const a=harness().api,r=a.choreographyFor("stormRain",{element:"wind",targetType:"all"});
  for(const hit of [.36,.5,.75]){

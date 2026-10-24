@@ -134,6 +134,11 @@
     filter:brightness(0) invert(1);
     opacity:0;
 }
+.v143-field-portrait-plane{position:fixed;inset:0;z-index:15999;overflow:hidden;pointer-events:none;}
+.v143-field-portrait-front{z-index:16005;}
+.v143-field-portrait{position:fixed;display:block;pointer-events:none;transform-origin:center bottom;}
+body.v174-battle-reading-open .v143-field-portrait-plane{display:none!important;}
+body.v174-battle-reading-open .v143-field-source-hidden{opacity:1!important;}
 
 .v143-vfx-sprite{
     position:fixed;

@@ -11560,7 +11560,7 @@
     "use strict";
     if(typeof window==="undefined"||window.FourSymbolsHitFeedback){return;}
     // Build embeds the one editable JSON without another runtime request/clock.
-    const CONFIG={"enabled":true,"defaults":{"enabled":false,"stopFrames":3,"fps":60,"shakePx":4,"decay":0.85,"shakeSteps":8,"stepMs":12,"referenceDamage":168,"minDamageScale":0.35,"maxDamageScale":2,"brightness":2.5,"flashMs":80,"hitFrameMultiplier":2,"frameDurations":null,"blendMode":"screen","poolLimit":48,"sweepEnabled":false,"sweepGapMs":100,"hitStrength":[0.72,0.92,1.25],"maxEffectNodes":48,"canvasDpr":1.5,"windCount":10,"leafCount":5,"burstCount":6,"colors":["#80f6d6","#efffff","#43c7bb"],"windMs":900,"windSize":2,"leafSize":7,"windSpread":0.6,"glowPx":3,"glowBrightness":1.18,"particleOpacity":0.76,"trailLength":1.8,"trailWidth":2,"trailMs":460,"burstMs":300,"burstRadius":0.6,"shockwaveMs":380,"shockwaveScale":1.45,"screenFlashOpacity":0.09,"screenFlashMs":90,"weakenMs":420,"weakenDrop":0.5,"criticalScale":1.25,"maxStopMs":75,"supportMs":480,"supportRise":0.5,"shieldOpacity":0.16},"skills":{"stormFlurry":{"enabled":true,"sweepEnabled":true,"choreography":{"enabled":false}},"stormFist":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.007812,0,0.992188,1],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windCrossSlash":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0,0,1,1],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dizzyFist":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.016575,0.008287,0.994475,0.975138],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windSpell":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.013812154696132596,0,0.9640883977900553,0.9806629834254144],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"stormCircle":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.0856353591160221,0.16298342541436464,0.9226519337016574,0.914364640883978],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windHowlLightning":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.013812,0.005525,0.994475,0.98895],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}},"shape":"arc"},"stormRain":{"visibility":{"heightRatio":1.18,"minPaintHeight":48,"paintBounds":[0.127072,0.140884,0.895028,0.914365],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":3,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dodgeSkill":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.088398,0.179558,0.944751,0.845304],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"stealthSkill":{"visibility":{"heightRatio":1.18,"minPaintHeight":48,"paintBounds":[0.035912,0.058011,0.961326,0.977901],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dinghaishenzhen":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.118785,0.129834,0.89779,0.883978],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"flameSlash":{"choreography":{"enabled":false}}},"automatic":{"enabled":true,"rolloutAll":false,"previewSkills":["stormFlurry","flameSlash","healSpell","rockWall","stormFist","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen"],"elementAliases":{"fire":"fire","火":"fire","water":"water","ice":"water","冰":"water","水":"water","wind":"wind","風":"wind","thunder":"thunder","lightning":"thunder","雷":"thunder","earth":"earth","土":"earth","light":"light","光":"light","dark":"dark","暗":"dark"},"elements":{"fire":{"colors":["#ff7733","#fff0b0","#d94322"],"shape":"ember","direction":"up","hints":["火","炎","焰"]},"water":{"colors":["#83dfff","#f0ffff","#579cfa"],"shape":"crystal","direction":"down","hints":["水","冰","霜"]},"wind":{"colors":["#80f6d6","#efffff","#43c7bb"],"shape":"leaf","direction":"sweep","hints":["風"]},"thunder":{"colors":["#fff36b","#ffffef","#eac034"],"shape":"arc","direction":"sweep","hints":["雷","電"]},"earth":{"colors":["#cda35c","#ffe4a2","#89704b"],"shape":"stone","direction":"down","hints":["土","石"]},"light":{"colors":["#ffe990","#fffdef","#ebc756"],"shape":"ray","direction":"up","hints":["聖光","光明"]},"dark":{"colors":["#9665c4","#d3b1ef","#462958"],"shape":"smoke","direction":"in","hints":["暗","幽冥"]},"neutral":{"colors":["#f5f7ff","#ffffff","#b9c3d7"],"shape":"spark","direction":"out"}},"types":{"single":{"sweepEnabled":true,"sweepGapMs":0,"windCount":3,"leafCount":0,"burstCount":7},"multi":{"sweepEnabled":true,"sweepGapMs":100},"all":{"sweepEnabled":true,"sweepGapMs":0,"screenFlashOpacity":0.1},"heal":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":5,"leafCount":0,"colors":["#98f4b8","#fff1bd","#67cda2"],"direction":"up","shape":"spark"},"buff":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":4,"leafCount":0,"colors":["#ffe9a1","#c1f5b2","#e1c15a"],"direction":"up","shape":"spark"},"shield":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":3,"leafCount":0,"colors":["#d8e9ff","#fff5c8","#9cc5ee"],"direction":"up","shape":"spark"}},"status":{"buff":{"colors":["#ffe89c","#a9edaf"],"direction":"up"},"debuff":{"colors":["#ab78d9","#b84e69"],"direction":"down"},"dot":["burn","poison"],"control":["stun","silence","freeze","petrify"],"dotElements":{"burn":"fire","poison":"dark"},"dotParticleCap":8,"dotPerState":2,"dotSizePx":3,"dotDurationMs":1000,"dotRisePx":18}},"depth":{"far":{"size":0.55,"speed":0.65,"blur":1.5,"opacity":0.3,"cap":2},"mid":{"size":1,"speed":1,"blur":0,"opacity":1,"cap":48},"near":{"size":1.8,"speed":1.45,"blur":2,"opacity":0.22,"cap":2},"assignment":{"wind":"mid","leaf":"mid","burst":"mid","trail":"mid","shockwave":"mid","weaken":"mid","heal":"mid","buff":"mid","shield":"mid"}},"performance":{"adaptive":true,"slowFrameMs":28,"slowFrames":4,"minQuality":0.6,"step":0.1,"canvasDpr":1,"spriteShadow":false},"choreography":{"enabled":true,"defaults":{"anticipation":0.18,"settle":0.82,"startScale":0.58,"tailScale":0.86,"travel":0.12,"drift":0.06,"rise":0,"recoilPx":5,"tiltDeg":3,"recoilMs":180},"archetypes":{"strike":{"anticipation":0.12,"startScale":0.7,"travel":0.1,"drift":0,"recoilMs":160},"projectile":{"anticipation":0.16,"startScale":0.48,"travel":0.2},"sweep":{"anticipation":0.15,"travel":0.18,"drift":0.12},"surge":{"travel":0,"rise":0.12},"field":{"startScale":0.65,"travel":0,"drift":0,"recoilPx":7,"recoilMs":220},"vortex":{"startScale":0.62,"travel":0.14,"drift":0.14,"recoilPx":8,"tiltDeg":6,"recoilMs":600},"heal":{"startScale":0.65,"travel":0,"drift":0,"rise":0.15},"buff":{"startScale":0.7,"travel":0,"drift":0,"rise":0.12},"shield":{"startScale":0.6,"travel":0,"drift":0,"rise":0.06}},"elements":{"fire":{"rise":0.1,"recoilPx":6},"water":{"rise":-0.08,"recoilMs":220},"wind":{"tiltDeg":5},"thunder":{"anticipation":0.08,"recoilMs":120},"earth":{"rise":-0.12,"recoilPx":7,"recoilMs":240},"light":{"rise":0.1},"dark":{"startScale":0.9,"tailScale":0.55,"rise":0},"neutral":{}}}};
+    const CONFIG={"enabled":true,"defaults":{"enabled":false,"stopFrames":3,"fps":60,"shakePx":4,"decay":0.85,"shakeSteps":8,"stepMs":12,"referenceDamage":168,"minDamageScale":0.35,"maxDamageScale":2,"brightness":2.5,"flashMs":80,"hitFrameMultiplier":2,"frameDurations":null,"blendMode":"screen","poolLimit":48,"sweepEnabled":false,"sweepGapMs":100,"hitStrength":[0.72,0.92,1.25],"maxEffectNodes":48,"canvasDpr":1.5,"windCount":10,"leafCount":5,"burstCount":6,"colors":["#80f6d6","#efffff","#43c7bb"],"windMs":900,"windSize":2,"leafSize":7,"windSpread":0.6,"glowPx":3,"glowBrightness":1.18,"particleOpacity":0.76,"trailLength":1.8,"trailWidth":2,"trailMs":460,"burstMs":300,"burstRadius":0.6,"shockwaveMs":380,"shockwaveScale":1.45,"screenFlashOpacity":0.09,"screenFlashMs":90,"weakenMs":420,"weakenDrop":0.5,"criticalScale":1.25,"maxStopMs":75,"supportMs":480,"supportRise":0.5,"shieldOpacity":0.16},"skills":{"stormFlurry":{"enabled":true,"sweepEnabled":true,"choreography":{"enabled":false}},"stormFist":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.007812,0,0.992188,1],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windCrossSlash":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0,0,1,1],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dizzyFist":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.016575,0.008287,0.994475,0.975138],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windSpell":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.013812154696132596,0,0.9640883977900553,0.9806629834254144],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"stormCircle":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.0856353591160221,0.16298342541436464,0.9226519337016574,0.914364640883978],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"windHowlLightning":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.013812,0.005525,0.994475,0.98895],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}},"shape":"arc"},"stormRain":{"visibility":{"heightRatio":1.18,"minPaintHeight":48,"paintBounds":[0.127072,0.140884,0.895028,0.914365],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":3,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dodgeSkill":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.088398,0.179558,0.944751,0.845304],"scale":1},"glowBrightness":1.16,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"stealthSkill":{"visibility":{"heightRatio":1.18,"minPaintHeight":48,"paintBounds":[0.035912,0.058011,0.961326,0.977901],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"dinghaishenzhen":{"visibility":{"heightRatio":1.12,"minPaintHeight":48,"paintBounds":[0.118785,0.129834,0.89779,0.883978],"scale":1},"glowBrightness":1.22,"windCount":4,"leafCount":2,"burstCount":4,"depth":{"far":{"cap":1},"near":{"cap":1}}},"flameSlash":{"choreography":{"enabled":false}}},"automatic":{"enabled":true,"rolloutAll":false,"previewSkills":["stormFlurry","flameSlash","healSpell","rockWall","stormFist","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen"],"elementAliases":{"fire":"fire","火":"fire","water":"water","ice":"water","冰":"water","水":"water","wind":"wind","風":"wind","thunder":"thunder","lightning":"thunder","雷":"thunder","earth":"earth","土":"earth","light":"light","光":"light","dark":"dark","暗":"dark"},"elements":{"fire":{"colors":["#ff7733","#fff0b0","#d94322"],"shape":"ember","direction":"up","hints":["火","炎","焰"]},"water":{"colors":["#83dfff","#f0ffff","#579cfa"],"shape":"crystal","direction":"down","hints":["水","冰","霜"]},"wind":{"colors":["#80f6d6","#efffff","#43c7bb"],"shape":"leaf","direction":"sweep","hints":["風"]},"thunder":{"colors":["#fff36b","#ffffef","#eac034"],"shape":"arc","direction":"sweep","hints":["雷","電"]},"earth":{"colors":["#cda35c","#ffe4a2","#89704b"],"shape":"stone","direction":"down","hints":["土","石"]},"light":{"colors":["#ffe990","#fffdef","#ebc756"],"shape":"ray","direction":"up","hints":["聖光","光明"]},"dark":{"colors":["#9665c4","#d3b1ef","#462958"],"shape":"smoke","direction":"in","hints":["暗","幽冥"]},"neutral":{"colors":["#f5f7ff","#ffffff","#b9c3d7"],"shape":"spark","direction":"out"}},"types":{"single":{"sweepEnabled":true,"sweepGapMs":0,"windCount":3,"leafCount":0,"burstCount":7},"multi":{"sweepEnabled":true,"sweepGapMs":100},"all":{"sweepEnabled":true,"sweepGapMs":0,"screenFlashOpacity":0.1},"heal":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":5,"leafCount":0,"colors":["#98f4b8","#fff1bd","#67cda2"],"direction":"up","shape":"spark"},"buff":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":4,"leafCount":0,"colors":["#ffe9a1","#c1f5b2","#e1c15a"],"direction":"up","shape":"spark"},"shield":{"sweepEnabled":true,"sweepGapMs":0,"stopFrames":0,"shakePx":0,"windCount":3,"leafCount":0,"colors":["#d8e9ff","#fff5c8","#9cc5ee"],"direction":"up","shape":"spark"}},"status":{"buff":{"colors":["#ffe89c","#a9edaf"],"direction":"up"},"debuff":{"colors":["#ab78d9","#b84e69"],"direction":"down"},"dot":["burn","poison"],"control":["stun","silence","freeze","petrify"],"dotElements":{"burn":"fire","poison":"dark"},"dotParticleCap":8,"dotPerState":2,"dotSizePx":3,"dotDurationMs":1000,"dotRisePx":18}},"depth":{"far":{"size":0.55,"speed":0.65,"blur":1.5,"opacity":0.3,"cap":2},"mid":{"size":1,"speed":1,"blur":0,"opacity":1,"cap":48},"near":{"size":1.8,"speed":1.45,"blur":2,"opacity":0.22,"cap":2},"assignment":{"wind":"mid","leaf":"mid","burst":"mid","trail":"mid","shockwave":"mid","weaken":"mid","heal":"mid","buff":"mid","shield":"mid"}},"performance":{"adaptive":true,"slowFrameMs":28,"slowFrames":4,"minQuality":0.6,"step":0.1,"canvasDpr":1,"spriteShadow":false},"choreography":{"enabled":true,"defaults":{"anticipation":0.18,"settle":0.82,"startScale":0.58,"tailScale":0.86,"travel":0.12,"drift":0.06,"rise":0,"recoilPx":5,"tiltDeg":3,"recoilMs":180},"archetypes":{"strike":{"anticipation":0.12,"startScale":0.7,"travel":0.1,"drift":0,"recoilMs":160},"projectile":{"anticipation":0.16,"startScale":0.48,"travel":0.2},"sweep":{"anticipation":0.15,"travel":0.18,"drift":0.12},"surge":{"travel":0,"rise":0.12},"field":{"startScale":0.65,"travel":0,"drift":0,"recoilPx":7,"recoilMs":220},"vortex":{"startScale":0.62,"travel":0.14,"drift":0.14,"recoilPx":8,"tiltDeg":6,"recoilMs":600},"heal":{"startScale":0.65,"travel":0,"drift":0,"rise":0.15},"buff":{"startScale":0.7,"travel":0,"drift":0,"rise":0.12},"shield":{"startScale":0.6,"travel":0,"drift":0,"rise":0.06}},"elements":{"fire":{"rise":0.1,"recoilPx":6},"water":{"rise":-0.08,"recoilMs":220},"wind":{"tiltDeg":5},"thunder":{"anticipation":0.08,"recoilMs":120},"earth":{"rise":-0.12,"recoilPx":7,"recoilMs":240},"light":{"rise":0.1},"dark":{"startScale":0.9,"tailScale":0.55,"rise":0},"neutral":{}}},"fieldScene":{"enabled":true,"maxFunnels":3,"sizeRatio":0.46,"maxScale":1.3,"occlusionStep":0.16,"tiltDeg":7,"swayPx":10,"swayCycles":3,"phaseOffsets":[0,0.16,0.34,0.5,0.68,0.86,1],"paths":[[[0.12,0.8],[0.28,0.18],[0.82,0.7],[0.65,0.3],[0.18,0.65],[0.75,0.2],[0.85,0.5]],[[0.5,0.2],[0.82,0.7],[0.2,0.28],[0.35,0.8],[0.82,0.24],[0.3,0.65],[0.15,0.5]],[[0.88,0.75],[0.6,0.3],[0.15,0.8],[0.72,0.2],[0.48,0.7],[0.15,0.3],[0.5,0.5]]],"phaseScales":[0.45,0.85,1,1,1,0.85,0.65]}};
     if(!CONFIG){return;}
     const pools=new Map(),active=new Set(),canvasPool=[],particlePool=[],texturePool=new Map();
     let quality=1,slowFrames=0;
@@ -11614,7 +11614,41 @@
         if(typeof CSS!=="undefined"&&CSS.supports&&!CSS.supports("mix-blend-mode",c.blendMode))c.blendMode="screen";
         c.depth=Object.fromEntries(["far","mid","near","assignment"].map(key=>[key,{...CONFIG.depth?.[key],...c.depth?.[key]}]));
         c.choreography=choreographyFor(skill,data,profile);
+        c.fieldScene={...CONFIG.fieldScene,...CONFIG.skills?.[skill]?.fieldScene};
+        c.fieldScene.enabled=c.enabled&&c.choreography.enabled&&profile.element==="wind"&&profile.kind==="all"&&c.fieldScene.enabled===true;
+        c.fieldScene.maxFunnels=Math.floor(bounded(c.fieldScene.maxFunnels,3,1,3));
+        c.fieldScene.sizeRatio=bounded(c.fieldScene.sizeRatio,.46,.25,.55);
+        c.fieldScene.maxScale=bounded(c.fieldScene.maxScale,1.3,1,1.5);
+        c.fieldScene.occlusionStep=bounded(c.fieldScene.occlusionStep,.16,.1,.3);
+        c.fieldScene.tiltDeg=bounded(c.fieldScene.tiltDeg,7,0,8);c.fieldScene.swayPx=bounded(c.fieldScene.swayPx,10,0,12);
+        c.fieldScene.swayCycles=Math.floor(bounded(c.fieldScene.swayCycles,3,1,4));
         return c;
+    }
+    function fieldTrack(c,region,width,height,rank){
+        const fallback=[[.1,.8],[.3,.2],[.8,.7],[.65,.3],[.2,.7],[.7,.2],[.5,.5]];
+        const path=c.paths?.[rank%c.maxFunnels]||fallback;
+        const supplied=c.phaseOffsets,offsets=Array.isArray(supplied)&&supplied.length===7&&supplied[0]===0&&supplied[6]===1&&
+            supplied.every((v,i)=>Number.isFinite(v)&&(!i||v>supplied[i-1]))?supplied:[0,.16,.34,.5,.68,.86,1];
+        const scales=(c.phaseScales||[.45,.85,1,1,1,.85,.65]).map((s,i)=>bounded(s,1,.3,1)*(i===3?c.maxScale:1));
+        return offsets.map((offset,i)=>{
+            const point=path[i]||fallback[i],scale=scales[i];
+            const x=bounded(point[0],.5,0,1)*Math.max(0,region.width-width*scale)+(width*scale-region.width)/2;
+            const y=bounded(point[1],.5,0,1)*Math.max(0,region.height-height*scale)+(height*scale-region.height)/2;
+            return {offset,opacity:i===0||i===6?0:1,transform:"translate(calc(-50% + "+x+"px),calc(-50% + "+y+"px)) scale("+scale+")",easing:"ease-in-out"};
+        });
+    }
+    function occlusionTrack(c,rank,front){
+        const count=Math.ceil(1/c.occlusionStep),frames=[];
+        for(let i=0;i<count;i++)frames.push({offset:i/count,opacity:(i+rank)%2===(front?1:0)?1:0,easing:"steps(1,end)"});
+        frames.push({offset:1,opacity:frames.at(-1).opacity});return frames;
+    }
+    function fieldSwayTrack(c,rank){
+        const frames=[{offset:0,transform:"translate(0px,0px) rotate(0deg)"}];
+        for(let i=0;i<c.swayCycles*2;i++){
+            const sign=(i+rank)%2?-1:1,fade=1-i/(c.swayCycles*2);
+            frames.push({offset:(i+1)/(c.swayCycles*2+1),transform:"translate("+sign*c.swayPx*fade+"px,"+(-Math.abs(c.swayPx*fade)*.2)+"px) rotate("+sign*c.tiltDeg*fade+"deg)",easing:"ease-in-out"});
+        }
+        frames.push({offset:1,transform:"translate(0px,0px) rotate(0deg)"});return frames;
     }
     // Pure presentation recipe: data -> archetype -> element motion -> override.
     // Fractions live inside the authored lifetime; none schedule damage or gates.
@@ -11973,7 +12007,11 @@
             });return true;
         }
         function replaceTrack(previous,next){
-            if(!previous||!next)return;
+            if(!next)return;
+            if(!previous){
+                if(stop&&next.playState==="running"){stop.tracks.push({animation:next,rate:next.playbackRate});next.pause();}
+                return;
+            }
             next.currentTime=previous.currentTime;next.playbackRate=previous.playbackRate;
             if(previous.hitFeedbackDeadline)next.hitFeedbackDeadline=previous.hitFeedbackDeadline;
             const paused=previous.playState==="paused";
@@ -11986,11 +12024,11 @@
         function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();Array.from(effects).forEach(e=>e.finish());
             if(frame&&typeof cancelAnimationFrame==="function")cancelAnimationFrame(frame);frame=0;
             for(const [node,ctx] of [[canvas,context],[frontCanvas,frontContext]])if(node){ctx.clearRect(0,0,node.width,node.height);node.remove();if(canvasPool.length<2)canvasPool.push(node);}
-            canvas=null;context=null;frontCanvas=null;frontContext=null;active.delete(api);}
+            canvas=null;context=null;frontCanvas=null;frontContext=null;active.delete(api);api.onDispose?.();}
         const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,support,replaceTrack,dispose,effectCount:()=>effects.size,
             snapshot:()=>Array.from(effects,e=>({kind:e.kind,...e.node.dataset,opacity:e.opacity}))};active.add(api);return api;
     }
-    window.FourSymbolsHitFeedback={config:CONFIG,configFor,resolveProfile,choreographyFor,choreographyTrack,projectileTrack,reactionTrack,statusEnabled,decorateStatus,
+    window.FourSymbolsHitFeedback={config:CONFIG,configFor,resolveProfile,choreographyFor,choreographyTrack,projectileTrack,reactionTrack,fieldTrack,occlusionTrack,fieldSwayTrack,statusEnabled,decorateStatus,
         markStatus(entry){if(entry&&typeof entry==="object")approvedStatusEntries.add(entry);},create,frameTrack,acquire,release,
         disposeAll(){Array.from(active).forEach(a=>a.dispose());},
         setEnabled(enabled){CONFIG.enabled=enabled===true;if(!CONFIG.enabled){
@@ -12339,7 +12377,8 @@
     }
     function syncImpactOverlays(){
         const page=document.getElementById("battlePage");
-        if(!impactPageVisible()){ clearImpactOverlays(); return; }
+        if(!impactPageVisible()){ clearFieldScene(state.current);clearImpactOverlays(); return; }
+        syncFieldScene(state.current);
         state.impactFlashes.forEach((entry,artwork)=>{
             const card=cardFor(entry.side,entry.index);
             const entity=entityFor(entry.side,entry.index);
@@ -12347,6 +12386,61 @@
             if(entry.entity!==entity||!artwork.isConnected||!card||card.querySelector(".v174-battle-art")!==artwork||
                !entity||Number(entity.hp)<=0||entity.alive===false){ entry.cancel(); }
         });
+    }
+    // Temporary copies of the SAME formal paint projection provide two battle
+    // planes. They never clone a card/HUD, change Slot geometry or own a turn.
+    function clearFieldScene(current){
+        const scene=current?.fieldScene;if(!scene)return;
+        scene.entries.forEach(entry=>entry.cancel());scene.entries.clear();
+        scene.rear.remove();scene.front.remove();current.fieldScene=null;
+    }
+    function syncFieldScene(current){
+        const scene=current?.fieldScene;if(!scene)return;
+        scene.entries.forEach((entry,index)=>{
+            const card=cardFor(current.targetSide,index),entity=entityFor(current.targetSide,index);
+            if(entity!==entry.entity||!entity||entity.hp<=0||entity.alive===false||!entry.art.isConnected||card?.querySelector(".v174-battle-art")!==entry.art||entry.art.querySelector(".v174-portrait-paint")!==entry.paint){entry.cancel();scene.entries.delete(index);return;}
+            const p=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection;
+            if(!p?.rect||p.genericPortrait||!p.backgroundImage||p.backgroundImage==="none"){entry.cancel();scene.entries.delete(index);return;}
+            for(const node of entry.nodes)Object.assign(node.style,{left:p.rect.left+"px",top:p.rect.top+"px",width:p.rect.width+"px",height:p.rect.height+"px",
+                backgroundImage:p.backgroundImage,backgroundSize:p.backgroundSize,backgroundPosition:p.backgroundPosition,backgroundRepeat:p.backgroundRepeat});
+        });
+    }
+    function startFieldScene(current){
+        const c=current.hitFeedback?.config.fieldScene;
+        if(!c?.enabled||current.fieldScene||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+        const api=window.FourSymbolsHitFeedback,scene={entries:new Map(),rear:document.createElement("div"),front:document.createElement("div")};
+        scene.rear.className="v143-field-portrait-plane";scene.front.className="v143-field-portrait-plane v143-field-portrait-front";
+        for(const plane of [scene.rear,scene.front]){plane.setAttribute("aria-hidden","true");document.body.appendChild(plane);}
+        current.fieldScene=scene;
+        current.targetIndexes.slice(0,6).forEach((index,rank)=>{
+            const card=cardFor(current.targetSide,index),art=card?.querySelector(".v174-battle-art"),paint=art?.querySelector(".v174-portrait-paint");
+            const entity=entityFor(current.targetSide,index),p=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection;
+            if(!paint||!entity||entity.hp<=0||entity.alive===false||!p?.rect||p.genericPortrait||!p.backgroundImage||p.backgroundImage==="none")return;
+            const nodes=[],tracks=[],idles=paint.getAnimations().filter(a=>a.playState==="running");
+            idles.forEach(a=>a.pause());
+            for(const [front,plane] of [[false,scene.rear],[true,scene.front]]){
+                const node=api.acquire("field-portrait");node.className="v143-field-portrait";node.dataset.targetIndex=String(index);node.dataset.sequence=String(current.sequence);
+                Object.assign(node.style,{left:p.rect.left+"px",top:p.rect.top+"px",width:p.rect.width+"px",height:p.rect.height+"px",
+                    backgroundImage:p.backgroundImage,backgroundSize:p.backgroundSize,backgroundPosition:p.backgroundPosition,backgroundRepeat:p.backgroundRepeat});
+                plane.appendChild(node);nodes.push(node);
+                const track=node.animate(api.occlusionTrack(c,rank,front),{duration:current.duration,fill:"both"});track.hitFeedbackDeadline=current.visualStartedAt+current.duration;tracks.push(track);
+            }
+            const hidden=paint.animate([{opacity:0},{opacity:0}],{duration:current.duration,fill:"both"});
+            paint.classList.add("v143-field-source-hidden");
+            const entry={entity,art,paint,nodes,tracks,idles,hidden,reacted:false,cancel(){
+                tracks.forEach(a=>a.cancel());hidden.cancel();paint.classList.remove("v143-field-source-hidden");idles.forEach(a=>{if(a.playState==="paused")a.play();});
+                nodes.forEach(node=>api.release("field-portrait",node,12));
+            }};scene.entries.set(index,entry);
+        });
+    }
+    function reactFieldScene(current,index,damage,critical){
+        const entry=current.fieldScene?.entries.get(index),c=current.hitFeedback?.config.fieldScene;
+        if(!entry||entry.reacted)return;entry.reacted=true;
+        const duration=Math.max(1,current.visualStartedAt+current.duration-Date.now()),rank=current.hitRanks?.get(index)||0;
+        const power=clamp(Number(damage)/current.hitFeedback.config.referenceDamage*(critical?current.hitFeedback.config.criticalScale:1),.6,1.2);
+        const force={...c,swayPx:Math.min(12,c.swayPx*power),tiltDeg:Math.min(8,c.tiltDeg*power)};
+        for(const node of entry.nodes){const animation=node.animate(window.FourSymbolsHitFeedback.fieldSwayTrack(force,rank),{duration,fill:"both"});
+            animation.hitFeedbackDeadline=current.visualStartedAt+current.duration;current.hitFeedback.replaceTrack(null,animation);entry.tracks.push(animation);}
     }
     function createImpactFlash(artwork,side,index,current,impactEpoch,hit){
         const page=document.getElementById("battlePage");
@@ -13628,11 +13722,32 @@
         if(current.firstVisibleFrameAt){ startNormalProjectiles(current); }
     }
 
+    function placeFieldChoreography(current,node,index){
+        const c=current.hitFeedback.config.fieldScene,rank=current.targetIndexes.indexOf(index);
+        if(rank>=c.maxFunnels){node.style.display="none";node.dataset.fieldRepresentative="false";return;}
+        const api=window.FourSymbolsBattlefieldRenderGeometry,overlay=api?.getBattlefieldOverlayGeometry?.()?.rect;
+        const rects=current.targetIndexes.map(i=>api?.getUnitGeometry(current.targetSide,i)?.artworkProjection?.rect).filter(r=>r?.width>0&&r.height>0);
+        if(!overlay||!rects.length)return;
+        const left=Math.max(overlay.left,Math.min(...rects.map(r=>r.left))),top=Math.max(overlay.top,Math.min(...rects.map(r=>r.top)));
+        const right=Math.min(overlay.left+overlay.width,Math.max(...rects.map(r=>r.left+r.width))),bottom=Math.min(overlay.top+overlay.height,Math.max(...rects.map(r=>r.top+r.height)));
+        const region={width:right-left,height:bottom-top};if(region.width<=0||region.height<=0)return;
+        const size=Math.max(1,Math.min(region.width*c.sizeRatio,region.height*.9/c.maxScale));
+        const key=[left,top,right,bottom,size].join(":");
+        Object.assign(node.style,{left:(left+right)/2+"px",top:(top+bottom)/2+"px",width:size+"px",height:size+"px"});
+        if(node.v143ChoreographyGeometryKey===key)return;
+        const previous=node.v143MotionAnimation,elapsed=previous?.currentTime??(current.firstVisibleFrameAt?Math.max(0,Date.now()-current.visualStartedAt):0);
+        node.v143ChoreographyGeometryKey=key;node.dataset.choreography="field-vortex";node.dataset.fieldRepresentative="true";
+        node.dataset.fieldBounds=[left,top,right,bottom].join(",");node.style.transformOrigin="50% 50%";
+        Object.assign(node.style,{left:(left+right)/2+"px",top:(top+bottom)/2+"px",width:size+"px",height:size+"px"});
+        node.v143MotionAnimation=node.animate(window.FourSymbolsHitFeedback.fieldTrack(c,region,size,size,rank),{duration:current.duration,fill:"both"});
+        node.v143MotionAnimation.currentTime=elapsed;current.hitFeedback.replaceTrack(previous,node.v143MotionAnimation);
+    }
     function placeAutomaticChoreography(current,node,index){
         const recipe=current.hitFeedback?.config.enabled&&current.hitFeedback.config.choreography;
         if(!recipe?.enabled||current.model.sprite?.impactOnly||typeof node.animate!=="function"||
            node.v143MotionAnimation&&!node.dataset.choreography||
            window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+        if(current.hitFeedback.config.fieldScene.enabled){placeFieldChoreography(current,node,index);return;}
         const input=current.hitFeedback.config.visibility?.paintBounds;
         const bounds=Array.isArray(input)&&input.length===4&&input.every(Number.isFinite)&&input[0]>=0&&input[1]>=0&&
             input[2]<=1&&input[3]<=1&&input[2]>input[0]&&input[3]>input[1]?input:[0,0,1,1];
@@ -13857,6 +13972,7 @@
         if(!current||current.firstVisibleFrameAt){ return false; }
         current.firstVisibleFrameAt=Date.now();
         current.visualStartedAt=current.firstVisibleFrameAt;
+        startFieldScene(current);
         if(current.gate){ current.gate.visualTimelinePending=false; }
         if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
             current.gate.restartVisualTimeline(current.duration);
@@ -13965,6 +14081,7 @@
             }
         }
         current.done=true;
+        if(current.fieldScene)clearFieldScene(current);
         current.hitFeedback?.dispose();
         current.pendingUpdateKeys?.forEach(key=>state.pendingUpdates?.delete(key));
         if(current.hitCallbacks){ current.hitCallbacks.clear(); }
@@ -14049,6 +14166,7 @@
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
             duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
+        if(current.hitFeedback)current.hitFeedback.onDispose=()=>clearFieldScene(current);
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
         current.supportBefore=new Map(current.targetIndexes.map(index=>{
             const entity=entityFor(targetSide,index);
@@ -14230,12 +14348,13 @@
             const rank=current.hitRanks?.get(unitIndex)||0;
             if(ownedHit){ current.hitFeedback?.hit({key:unitIndex,damage:hit.fact.actualHpLoss,
                 critical,power:current.hitFeedback?.config.sweepEnabled?current.hitFeedback.config.hitStrength[Math.min(rank,2)]:1,
-                roots:[document.getElementById("battlePage"),state.stage,state.hitOverlay,
+                roots:[document.getElementById("battlePage"),state.stage,state.hitOverlay,current.fieldScene?.rear,current.fieldScene?.front,
                     ...document.querySelectorAll(".v174-battle-hud-layer,.battle-floating-feedback")]}); }
             if(ownedHit&&current.hitFeedback?.config.sweepEnabled){
                 const rect=hit.projection?.rect;
                 current.hitFeedback.impact(state.stage,rect,rank,rank===current.targetIndexes.length-1,false,current.visualStartedAt+current.duration,hit.fact.actualHpLoss,critical);
             }
+            if(ownedHit&&current.fieldScene?.entries.has(unitIndex)){reactFieldScene(current,unitIndex,hit.fact.actualHpLoss,critical);playSound();return;}
             if(fireSample&&critical)window.FourSymbolsBattlePresentation?.fireCriticalShake?.(current.sequence);
             const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
             // First fire sample: a short retreat/lean on the existing motion
