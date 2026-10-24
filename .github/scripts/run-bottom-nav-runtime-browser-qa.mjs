@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import {waitJson} from "./runtime-browser-qa-support.mjs";
 import fs from "node:fs";
 import http from "node:http";
 import os from "node:os";
@@ -65,17 +66,6 @@ async function startServer(){
     return {server,url:`http://127.0.0.1:${server.address().port}/index.html`};
 }
 
-function waitJson(url){
-    return new Promise((resolve,reject)=>{
-        const started=Date.now();
-        const poll=()=>fetch(url).then(r=>r.json()).then(resolve).catch(error=>{
-            if(Date.now()-started>15000){ reject(error); }
-            else{ setTimeout(poll,80); }
-        });
-        poll();
-    });
-}
-
 class Cdp{
     constructor(url){
         this.ws=new WebSocket(url);this.id=0;this.pending=new Map();this.events=[];
@@ -133,7 +123,7 @@ async function runViewport(chrome,url,width,height){
  let launchError='',spawnError=null,exit=null;proc.stderr.on('data',chunk=>{launchError=(launchError+chunk).slice(-4000);});proc.on('error',error=>{spawnError=String(error);});proc.once('exit',(code,signal)=>{exit={code,signal};});
  let client;const evidence={viewport:{width,height},rows:[]};
  try{
-  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`).catch(error=>{throw new Error('Navigation Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});})).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
+  const page=(await waitJson(`http://127.0.0.1:${port}/json/list`,{chromeProcess:proc}).catch(error=>{throw new Error('Navigation Chrome startup failed: '+chrome+' exit='+proc.exitCode+' '+launchError,{cause:error});})).find(x=>x.type==='page');client=new Cdp(page.webSocketDebuggerUrl);
   await client.send('Page.enable');await client.send('Runtime.enable');
   await client.send('Emulation.setFocusEmulationEnabled',{enabled:true});
   await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
