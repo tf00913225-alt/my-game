@@ -1,0 +1,62 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "recordedProductHead": "3bedebfe4dbd14572ad33dab3c4c2ffea32e413f",
+  "currentDelta": "Optional envelope typeof node.animate guard only; original boss reliability and7files11tests PASS. Supported Android effect route unchanged, not claiming later Head movie bytes or pixel identity.",
+  "humanStatus": "Old17s4b93/50fa ring+wide art REJECTED. New local recipient sample awaiting human art confirmation; Draft DO NOT MERGE.",
+  "implementation": "ONE explosiveFlurry: existing per-recipient rendering; one shared original bitmap, central-third runtime clip per actual artwork projection. Three original synchronized tracks; same1450ms/7of12/Core targets/damage/follow-up. No new image/skill/timer. Fire ring contrast and hold increased within original cast duration; transient CSS section only.",
+  "phone": {
+    "device": "physical Samsung SM-N960F / Chrome / serial2858d1d9c23f7ece",
+    "head": "3bedebfe4dbd14572ad33dab3c4c2ffea32e413f",
+    "scope": "isolated6v6 roster; formal startBattle/Auto/initiative/finish, no QA pause or finish interception; RNG forced ONLY encounter selection then restored before action timers; no real save/reward and aborted before outcome",
+    "formalRound": [
+      1,
+      2
+    ],
+    "pauseSamples": 0,
+    "startedActions": 12,
+    "finishedActions": 12,
+    "sixthPortrait": "QA sixth capacity identity reuses existing Hero artwork; not six distinct released characters",
+    "rawMovie": {
+      "path": "artifacts/fire-recipient-natural-usb-full/native-preview.mp4",
+      "duration": 59.6368,
+      "width": 720,
+      "height": 1280,
+      "bytes": 3996447,
+      "sha256": "6c5814d6f1d39ce8ca1aae61bc88cb4a690d96f0f405ecd1868e3b2df2e34a5b"
+    },
+    "shortMovie": {
+      "path": "artifacts/fire-recipient-short/new-fire-sample.webm",
+      "duration": 4.510992999999999,
+      "sourceStart": 22.8,
+      "sourceEnd": 27.310993,
+      "bytes": 526439,
+      "sha256": "0bb43be08a68f0319a8e844164dde261b96fc236e20b4bf03dc33fe19d20feaa",
+      "postprocess": "1x canvas encode of same native video; no animation pause, motion smoothing or QA rerender; no audio"
+    },
+    "audio": {
+      "context": "suspended",
+      "status": "UNVERIFIED acoustic output; original v141Audio cast/impact calls recorded, Context suspended on Android"
+    },
+    "modal": {
+      "status": "FAIL preserved; #955 single repair Owner. No modal state/z-index edits in983.",
+      "nativeFrame": "artifacts/fire-recipient-natural-usb-full/sequence-frames/frame-0012.png"
+    },
+    "prior24s": "artifacts/fire-recipient-natural-usb/native-preview.mp4 ended too early; retained/excluded as complete cast acceptance"
+  },
+  "verification": {
+    "desktop": "same new product dirty-build ordinary/critical/MISS Core controlled cases passed; HP/SP checks unchanged. Not relabeled committed SHA capture.",
+    "source": "Independent fire_sample_review: no blocker in bounded per-recipient clip/fit; optional WAAPI guard safe.",
+    "native": "Reviewer actually saw closeup0004/0005/0007 centered three local effects+visible ring,0008 fade,0015 later follow-up after middle recipient defeat. No all-skill or full safety matrix claim.",
+    "ciRootCause": "50fa CI39894665439/a1/core_checks120222763134: node.animate absent; same exception prevented reveal and led to hidden assertion. Reproduced on3bed. Guard missing optional API; no fixture or assertion weakening. Focused boss regression now PASS; no rerun old Head."
+  },
+  "pending": [
+    "Human art confirmation",
+    "Latest Head Required CI",
+    "Modal fix integration/evidence from955",
+    "Audible Android sync",
+    "x2/x3 dependency not implemented/verified",
+    "PC16:9-window picture on latest recipient product (original9:16 canvas retained)"
+  ],
+  "next": "Stop at one sample for user art judgment. No batch rollout, merge, main or Chrome changes."
+}

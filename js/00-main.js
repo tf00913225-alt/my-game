@@ -12080,6 +12080,7 @@ function syncTurnTimerWithBattlePickers(){
 
 
 function toggleSkillQuickBar(){
+    setBattleUtilityMenuOpen(false);
 
     const overlay=
         $("skillQuickBar");
@@ -12464,6 +12465,7 @@ function timeoutTurn(token){
 ===================================================== */
 
 function prepareAction(type){
+    setBattleUtilityMenuOpen(false);
 
     /*
        ★ 修正：
@@ -19810,6 +19812,7 @@ function openItemMenu(){
 
 
 function closeMenus(){
+    setBattleUtilityMenuOpen(false);
 
     const quickBar=
         $("skillQuickBar");
@@ -20486,7 +20489,25 @@ function toggleAutoBattle(){
 }
 
 
+function setBattleUtilityMenuOpen(open){
+    const region=$("battleActionRegion"),more=$("battleMoreButton");
+    const allowed=!!open&&region?.dataset.controlMode==="manual"&&!region.classList.contains("target-selecting");
+    if(region){ region.classList.toggle("utility-menu-open",allowed); }
+    if(more){ more.setAttribute("aria-expanded",allowed?"true":"false"); }
+}
+function toggleBattleUtilityMenu(){
+    const region=$("battleActionRegion");
+    setBattleUtilityMenuOpen(!region?.classList.contains("utility-menu-open"));
+}
+
 function updateAutoButton(){
+    const battleToggle=$("battleAutoToggle");
+    if(battleToggle){
+        battleToggle.classList.toggle("is-active",!!autoBattle);
+        battleToggle.setAttribute("aria-pressed",autoBattle?"true":"false");
+        battleToggle.setAttribute("aria-label",autoBattle?"停止自動戰鬥":"啟用自動戰鬥");
+    }
+
 
     /*
        ★ 修正（依照使用者指定版面）：
@@ -24135,6 +24156,71 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
+function positionBattleSkillNameBadge(badge,side,index,element){
+    const owner=window.FourSymbolsBattlefieldRenderGeometry;
+    const geometry=owner?.getUnitGeometry?.(side,index);
+    const fallback=element.getBoundingClientRect();
+    const portrait=geometry?.artworkProjection?.rect||geometry?.portraitRect||fallback;
+    const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
+    // Reserve the existing short forward cast motion; never move the Unit/HUD.
+    let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
+    let x=portrait.left+portrait.width/2;
+    badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
+    badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
+    if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
+    let width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+    const blockers=[];
+    document.querySelectorAll("#battlePage .battle-player,#battlePage .battle-monster").forEach(card=>{
+        if(card===element)return;
+        const match=String(card.id).match(/^battle(PlayerCard|Monster)(\d+)$/);if(!match)return;
+        const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
+        for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
+    });
+    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion,#releaseUpdateMarquee").forEach(node=>{
+        const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
+    });
+    // In a dense pair of rows the nearest free band can be above the front row.
+    // Read only the formal projections; this does not create a second scaler.
+    for(let pass=0;pass<blockers.length;pass++){
+        let moved=false;
+        for(const rect of blockers){
+            if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top+1>rect.top&&top-height<rect.top+rect.height){
+                top=rect.top-6;moved=true;
+            }
+        }
+        if(!moved)break;
+    }
+    if(top-height<0){
+        // A short PC viewport has no space for the normal two-line pop above
+        // the top HUD. Use one compact line without overshoot, never cover HP.
+        badge.dataset.compact="true";width=badge.offsetWidth;height=badge.offsetHeight;
+        top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:1);
+        for(let pass=0;pass<blockers.length;pass++){
+            let moved=false;
+            for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
+            if(!moved)break;
+        }
+        if(top-height<0){
+            // The PC overlay can occupy the entire band above the top row.
+            // Use available side gutter for this transient label, not a new
+            // battlefield scale or a change to the announcement's lifecycle.
+            const bounds=[...blockers,portrait,...(hud?[hud]:[])];
+            const desiredX=x,desiredTop=Math.min(portrait.top,hud?.top??portrait.top)-1;
+            const xs=[x,...bounds.flatMap(r=>[r.left-width/2-2,r.left+r.width+width/2+2])];
+            const ys=[Math.max(height+1,desiredTop),height+1];
+            let best;
+            for(const cx of xs)for(const cy of ys){
+                if(cx-width/2<1||cx+width/2>window.innerWidth-1||cy-height<1||cy>portrait.top-1)continue;
+                if(bounds.some(r=>cx+width/2>r.left&&cx-width/2<r.left+r.width&&cy>r.top&&cy-height<r.top+r.height))continue;
+                const distance=Math.abs(cx-desiredX)+Math.abs(cy-desiredTop);
+                if(!best||distance<best.distance)best={x:cx,top:cy,distance};
+            }
+            if(best){x=best.x;top=best.top;}
+        }
+    }
+    badge.style.left=x+"px";badge.style.top=top+"px";
+}
+
 function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){
 
     const targetContract=createBattleTargetContract(
@@ -24204,11 +24290,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"player",Number.isInteger(characterIndex)?characterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -24303,11 +24386,8 @@ function showMonsterSkillNameBadge(
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"monster",Number.isInteger(monsterIndex)?monsterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -32143,7 +32223,8 @@ function syncBattleUiPriorityLayer(){
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
-    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer);
+    const settingsOpen=body&&body.classList.contains("v162-element-box-settings-open");
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||settingsOpen);
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
@@ -32233,6 +32314,9 @@ function updateActionHudVisibility(){
 
     const shouldHide=
         activeAuto || battlePhase==="resolve" || battlePresentationActive;
+    const actionRegion=$("battleActionRegion");
+    if(actionRegion){ actionRegion.dataset.controlMode=shouldHide?"utility":"manual"; }
+    if(shouldHide){ setBattleUtilityMenuOpen(false); }
 
 
     /*

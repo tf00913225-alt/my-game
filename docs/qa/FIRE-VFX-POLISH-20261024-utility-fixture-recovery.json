@@ -1,0 +1,10 @@
+{
+ "workId":"FIRE-VFX-POLISH-20261023","pr":983,"parentHead":"1a03f693bca1a8bb6a9c4e6ea6aa6fb690732949",
+ "failedCI":{"run":40010067570,"attempt":1,"coreJob":120609180155,"battleJob":120609180222},
+ "causes":["relic HUD VM lacked DOM dataset and original setBattleUtilityMenuOpen dependency","live QA measured settings gear with legacy elementBox ID while manual utility tray was folded; original HUD projection/exposure was not run before measurement"],
+ "fix":"Tests-only. Load original HUD dependency and assert projection/closure. Live probe calls original HUD projection, opens manual tray through original Owner, checks all AUTO/settings/speed identities,52px logical and44px physical dimensions and center hits, then restores manual tray. No0px acceptance or removed icon restored.",
+ "verification":{"targetedTests":"6 PASS including zero-size/missing-control/blocked-center/43px rejection","browser":"Original live layout probe on isolated390x844 runtime: each of3 utilities logical52x52, physical48.285x48.285,hittrue","syntaxBuildDiff":"PASS","independentReview":"fire_sample_review no necessary defect in three-file diff"},
+ "evidence":"artifacts/utility-contract-focused/evidence.json",
+ "limits":"First synthetic probe before formal HUD projection returned0px and was not accepted. Supplemental probe is not full audio/live battle QA or phone evidence. Product/source/build/assets identical to parent. No Chrome/phone/Core changes.",
+ "next":"Original branch checkpoint, latestHead required CI. OldHead not rerun or cancelled; no merge/deploy before original gates."
+}

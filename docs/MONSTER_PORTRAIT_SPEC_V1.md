@@ -252,7 +252,7 @@ V159 已退休；舊 EARLY_ABYSS_PORTRAITS／FINAL_ABYSS_PORTRAITS 與 temporary
 
 `scripts/measure-monster-portraits.mjs --write` 在 Import／Audit 階段計算完整 nonzero Alpha Bounding Box（含武器、角、翅膀、尾巴及透明特效），寫入像素範圍、canvas dimensions 與 SHA-256。此範圍是完整可見輪廓，不宣稱可以自動區分核心身體與武器。Runtime 不讀像素；以等比例 contain 投影完整畫布，將 Alpha bottom 對齊 baseline。寬型輪廓以完整不裁切優先，按可用寬度縮小，QA 記錄 widthLimited；不得以 crop 或每張 CSS magic number 強制同高。Bounds 不改 Master、Runtime 圖像或 Provenance bytes。
 
-正式 CSS Owner 為 `css/fixed-slot-battlefield-rendering-v2.css`。`--portrait-width` 由 class、Bounds 與容器單位投影，不使用 transform:scale。更換資產後必須更新 metadata；`--check` 重新解碼核對，Registry Audit 與 regression 拒絕 stale hash、缺檔、非法 Bounds、planned 冒充 existing。首次準備、重繪、重入均由原 lifecycle 同步。
+正式 CSS Owner 為 `css/fixed-slot-battlefield-rendering-v2.css`。`--portrait-width` 由 class、Bounds 與容器單位投影；上表是 paint 放大前的正規化預算。2026-10-24 使用者定案的放大保留原 stationary depth，另在 paint 層以獨立 `scale:1.3225` 合成，與原動作 transform 分離。Alpha top 依原 metadata 與同 Owner 的 HP 淨空校準；只在必要時下移，不縮小主體。允許超出 `overflow:visible` 的 art frame，但完整 Alpha 必須通過實際裁切祖先、viewport、名稱／資源條不交疊及合成後高度／baseline 驗證。更換資產後必須更新 metadata；`--check` 重新解碼核對，Registry Audit 與 regression 拒絕 stale hash、缺檔、非法 Bounds、planned 冒充 existing。首次準備、重繪、重入均由原 lifecycle 同步。
 
 ## 8.1 Reusable Shared NPC Portrait Assets
 
