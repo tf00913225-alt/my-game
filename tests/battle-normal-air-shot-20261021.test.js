@@ -26,10 +26,14 @@ for(const side of ["player","monster"])for(const index of [0,2,5]){
  assert.equal(a.paused,true);assert.equal(a.played,undefined);assert.equal(node.dataset.actorIndex,String(index));
  assert.equal(node.style.left,f.anchors[side].x+"px");assert.equal(node.style.top,f.anchors[side].y+"px");
  assert.equal(a.options.duration,296.4);assert.equal(a.frames.at(-1).opacity,0);
+ assert.equal(a.frames[1].offset,.30);assert.equal(a.frames[1].opacity,0,'short preparation stays inside original hit window');
+ c.characterMotion={play(){this.playCount=(this.playCount||0)+1;}};
  assert.match(a.frames.at(-1).transform,new RegExp(String(target.x-f.anchors[side].x)+"px"));
  assert.equal(c.confirmedTargets.size,0,"attempt flight exists before hit or MISS outcome");
  f.context.requestImpactTimeline(c);f.setNow(900);f.microtasks.shift()();
  assert.deepEqual(f.events,["clock"]);assert.equal(c.visualStartedAt,900);assert.equal(a.played,true);assert.equal(a.currentTime,0);
+ assert.equal(c.characterMotion.playCount,1);assert.equal(c.characterMotion.currentTime,0);
+ f.context.startNormalProjectiles(c);assert.equal(c.characterMotion.playCount,1,'shared clock starts actor once');
  assert.equal(f.timers.length,1,"only the existing target hit timer");assert.equal(f.timers[0].t,296.4000000000001);
  f.context.settleTargetVisual(c,index);
  assert.equal(node.style.visibility,"hidden");assert.equal(f.impact.style.visibility,"hidden","MISS never reveals impact");

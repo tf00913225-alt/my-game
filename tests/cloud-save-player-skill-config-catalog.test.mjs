@@ -23,7 +23,8 @@ test('mechanical catalogue exactly matches the actual full-loaded renderer selec
     const catalog=await buildPlayerSkillConfigCatalog(root);
     assert.deepEqual(catalog.skills,JSON.parse(JSON.stringify(expected)));
     assert.equal(catalog.skills.length,48,'current renderer result, not a generator admission limit');
-    assert.equal(Object.keys(db).length,52,'the original full runtime eligibility inventory remains intact');
+    assert.equal(Object.keys(db).length,51,'only the retired non-player skill leaves the full runtime inventory');
+    assert.equal(db.stormSpell,undefined);
     for(const id of Object.keys(db).filter(id=>!selected.includes(id)))assert.equal(Object.hasOwn(db[id],'learnLevel'),false,id);
     assert.deepEqual(catalog,JSON.parse(fs.readFileSync(CATALOG_PATH,'utf8')));
 });

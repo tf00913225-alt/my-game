@@ -6,4 +6,7 @@ body > .skill-name-badge[data-skill-element="water"]{color:#3aaeff;}
 body > .skill-name-badge[data-skill-element="wind"]{color:#39c96b;}
 body > .skill-name-badge[data-skill-element="earth"]{color:#e0b833;}
 body > .skill-name-badge[data-skill-element="normal"]{color:#fff;}
-@keyframes skillBadgePop{0%{opacity:0;transform:translate(-50%,4px) scale(.7)}15%{opacity:1;transform:translate(-50%,-6px) scale(1.15)}30%{transform:translate(-50%,-4px) scale(1)}70%{opacity:1;transform:translate(-50%,-12px) scale(1)}100%{opacity:0;transform:translate(-50%,-22px) scale(1)}}
+@keyframes skillBadgePop{0%{opacity:0;transform:translate(-50%,-100%) scale(.9)}15%{opacity:1;transform:translate(-50%,-100%) scale(1.05)}30%,70%{opacity:1;transform:translate(-50%,-100%) scale(1)}100%{opacity:0;transform:translate(-50%,-100%) scale(1)}}
+body > .skill-name-badge[data-battle-anchor]{max-width:var(--skill-name-max-width);white-space:normal;overflow-wrap:anywhere;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;}
+body > .skill-name-badge[data-compact="true"]{font-size:13px;-webkit-line-clamp:1;animation-name:skillBadgeCompact;}
+@keyframes skillBadgeCompact{0%{opacity:0;transform:translate(-50%,-100%)}15%,70%{opacity:1;transform:translate(-50%,-100%)}100%{opacity:0;transform:translate(-50%,-100%)}}

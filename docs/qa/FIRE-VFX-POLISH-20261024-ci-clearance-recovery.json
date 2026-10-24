@@ -1,0 +1,11 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "parentHead": "6ba7308fc65fcad666f660760d18aab9a86fda84",
+  "scope": "Minimum evidenced CI fixture/depth/actual-clipping recovery; preserve approved size and depth",
+  "causes": ["declaration VM omitted original setBattleUtilityMenuOpen dependency", "fallback enemy back-row scale .94 was not exposed to original clearance formula", "fixed-slot QA confused overflow-visible artwork frame with actual clipping and retained obsolete no-front-row-offset assertion"],
+  "verification": {"targetedNodeTests": "5 PASS", "miniBaseline": "18 measurements PASS", "fixedSlot": "360x800 PASS; one local empty Chrome JSON attempt retained as failure, subsequent bounded retry passed", "buildCheck": "PASS", "diffCheck": "PASS", "independentReview": "fire_sample_review: no direct blocker in minimal diff"},
+  "evidence": ["artifacts/mini-baseline-after/evidence.json", "artifacts/fixed-slot-clearance-focused/fixed-slot-battlefield-rendering-v2.json"],
+  "limits": ["not full portrait matrix", "no phone operation or new phone acceptance", "no new skill, asset or timing changes", "latest Head required CI and original fire art confirmation remain pending"],
+  "next": "Save original branch checkpoint; await latest Head required CI. No old Head rerun or merge before gates."
+}

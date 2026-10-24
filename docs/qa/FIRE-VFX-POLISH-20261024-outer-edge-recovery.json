@@ -1,0 +1,10 @@
+{
+ "workId":"FIRE-VFX-POLISH-20261023","pr":983,"parentHead":"4252ce14922008b99036ced5bad41f8f9c2bbede",
+ "failedCI":{"run":40008031931,"attempt":1,"coreJob":120601495591,"portraitJob":120601495684},
+ "cause":"Exact local five-slot class reproduction matches CI fire02 alpha left -0.21511539816856384px. Approved enlarged bottom-center paint crossed the viewport, not harmless tolerance. Previous motion regex also assumed scale was the first declaration despite unchanged .94 fallback.",
+ "fix":"Original metadata exposes alpha left/right and clears them on fallback. Outer enemy slots clamp only horizontal paint position to stationary art edges; width/height/paint scale/depth/vertical baseline unchanged. Motion assertion requires explicit original .94 declaration and scale.",
+ "verification":{"targetedNodeTests":"11 PASS","fire02":"120 measurements PASS: five slots, four classes, first/redraw/reentry,390x844/412x915","fixedSlot":"360x800 PASS","independentReview":"fire_sample_review no direct blocker; formula reviewed","buildCheck":"PASS","diffCheck":"PASS"},
+ "evidence":["artifacts/fire02-edge-before/evidence.json","artifacts/fire02-edge-after/evidence.json","artifacts/fixed-slot-clearance-focused/fixed-slot-battlefield-rendering-v2.json"],
+ "limits":"Not full matrix or phone acceptance. No phone/Chrome changes, asset/skill/timing changes, CI rerun or deployment. Historical raw JSON gap retained.",
+ "next":"Latest new Head required CI and original fire representative confirmation before integration. Preserve existing scope and stop while pending."
+}

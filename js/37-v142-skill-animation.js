@@ -41,7 +41,6 @@
         earthShield:[1800,"medium","shield"],rockWall:[1700,"high","shield"],
         barrier:[1900,"high","barrier"],earthEX:[3000,"ultimate","aura"],
 
-        stormSpell:[2450,"high","tempest"],
         yuanXiangGuangMing:[2200,"high","holy-heal"],
         yuanGuangShield:[1950,"high","holy-shield"],
         yuanZuBlessing:[2000,"high","holy-blessing"]

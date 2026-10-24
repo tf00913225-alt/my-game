@@ -69,7 +69,7 @@ try{
     browser.stderr.on("data",chunk=>{launchError=(launchError+chunk).slice(-4000);});
     browser.on("error",error=>{launchError=String(error);});
     const collectResult=async()=>{
-        const pages=await waitJson("http://127.0.0.1:"+port+"/json/list");
+        const pages=await waitJson("http://127.0.0.1:"+port+"/json/list",{chromeProcess:browser});
         startupEvidence=await startup.finish('DevTools ready');
         client=new Cdp(pages.find(page=>page.type==="page").webSocketDebuggerUrl);
         await client.send("Page.enable");await client.send("Runtime.enable");

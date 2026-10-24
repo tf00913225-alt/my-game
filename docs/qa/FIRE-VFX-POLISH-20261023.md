@@ -1,0 +1,193 @@
+# Current single-row mode-switch candidate
+
+Same PR983/Work ID. User authorized one-row manual5commands+more, upward utility popup, AUTO/gear/speed on same bottom baseline, party farther down. Original UI sources only; no Core/clock/accepted-normal change. Party scale1/equal frames/no row depth; enemy depth retained;44px default top,72px only original visible notice;44px formation spacer. AUTO original time Gate preserved, speed disabled/pending. Prior text crowding review was insufficient and no blanket PASS carries forward.
+
+Focused production360/411 and physical SM-N960F controlled original handlers/center hits/target/return/settings/Esc/outside PASS. Final phone manual andAUTO bottoms both705.3506; original AUTO halo progresses33.4→183.366ms afteractualready. Original1h grant used only disposable QA account. All controls inclmore>=44px; official focused360 fixed-slot QA caught arrow/SP overlap and uniform party overhang0 fixes it without weakening assertion.24 targeted tests/build-check/diffcheck PASS. More popup transiently covers some back-rowHUD: explicit overlay tradeoff, not all-state no-collision approval. Not natural/fullCore/native movie/acoustic/multiplier acceptance.
+
+[Current bounded evidence](FIRE-VFX-POLISH-20261023-single-row.json). Latest source checkpoint/requiredCI plus human layout/fire review pending; Draft DO NOT MERGE. Old sections below retain rejected/superseded snapshots only. #976 formal tool fix will be normally absorbed at this safe checkpoint; no duplicate Chrome fix or old run retry.
+
+---
+
+# Current compact footer correction
+
+Human rejected bc3d's oversized bottom controls because formations were too close. Same PR983: original command/settings52px (was66), settings column60px, button text14px/18px; explicit16px spacer plus two4px gaps separates enemy and party (24px CSS, ~20.57px at360). Original top72px name reserve retained. No JS/Core/clock/art/normal motion change. Exact66px legacy contract expectations in two integration tests updated to authorized52px, not removed; existing fixed-slot budget includes spacer/three gaps and minimum44px physical touch bound.
+
+10 focused tests + build-check/diffcheck PASS. 360 emulation actual six controls44.57px high; physical original target/return/settings interaction PASS for52px geometry before final14px typography change. Final typography/frame separately viewed at411x717 emulation; do not relabel prior phone PNG as final typography. Actual image artifacts/battle-layout-compact-final/frame-0014.png. Independent source/360 image review no proven blocker; not whole dynamic/Boss matrix. Previous oversized layout evidence remains historical. Candidate approval/latest Head necessaryCI still pending; NORMAL approval preserved, no other skills expanded.
+
+Evidence: artifacts/battle-layout-compact-{360,phone,final}/evidence.json; compact-phone/frame-0005.png; tested uncommitted delta onbc3d preserved by following checkpoint. Draft DO NOT MERGE. Next: user layout/fire sample review + latest Head CI.
+
+---
+# Current user-directed battlefield layout candidate
+
+Same Work ID / branch / PR983. Human chose enemy down, party up, controls/settings below party; this supersedes the old phone-notice product-choice wait. Original fixed-slot stylesheet now orders enemy / ally / footer, reserves72px above and8px below, and separates the original ElementBox/settings entry from five command buttons by74px. No new multiplier implementation, JS/Core/clock/art/accepted-normal change.
+
+21 focused tests, official build-check/diffcheck PASS. Desktop411x717 and360x640 plus1280x720 structural probes complete; physical SM-N960F original normal target/return/settings interaction PASS. Desktop+physical original visible marquee twelve badge cases PASS for viewport/formal actor/HUD/announcement boundaries. Actual phone image reviewed. These are isolated controlled scenes, not natural combat or native motion movies. Source review found no proven blocker; independent actual review of three phone/small/label frames found no proven control collision; static frames do not prove whole dynamic matrix.
+
+Tradeoff disclosed: at411x717 enemy height324.405→291.786 and ally267.750→240.832 (~10.05% smaller available regions); existing bounded paint therefore shrinks. Human layout/art review and latest Head CI remain pending; Draft DO NOT MERGE. Previous NORMAL approval preserved. Earlier phone QA FAIL was a nonexistent settings selector; corrected scratch QA used the original panel, product unchanged. Old evidence retained.
+
+[Bounded layout evidence](FIRE-VFX-POLISH-20261023-layout.json). Older sections below retain snapshot-specific history; old announcement FAIL does not describe this new layout.
+
+---
+# Current Modal cross-Owner integration checkpoint
+
+Base86ca8edb + selected original Owner delta8938e239 (UI evidence0f5fee0a), clean three-way apply of js00/js45 + original reading test only. No whole955 UI branch, VFX/float CSS, action timing or skill art change. Original builder regenerated derived artifacts; restricted policy changed only main source digest, policy semantics asserted equal.
+
+Desktop412x915 isolated natural6v6 first round→round2,0QA pause/finish interception: during actual explosiveFlurry three-target hit, settings opens original reading state; stage, hit overlay, skill label and three damage nodes hidden/opacity0. Closing clears reading state and remaining paint returns. First300ms screenshot missed open state; same-source900ms focused screenshot supplies actual before/modal/after evidence. Independent scope/picture review PASS within this bounded desktop case.
+
+This supersedes Modal FAIL only for the integrated candidate; old unintegrated phone/screenshots remain FAIL for their own snapshots. No new user art movie, no physical Modal/full matrix or acoustic/x2/x3 claim. User art approval and latest integration Head CI pending, Draft DO NOT MERGE. CI86ca backpack/Abyss/tower DevTools startup failures remain Chrome976 evidence, not whole-suite proof of optional animate fix. No rerun/timeout/tool change.
+
+Current [integration evidence](FIRE-VFX-POLISH-20261023-modal-integration.json); recorded3bed new fire art movie retained unchanged. Older reports below are historical snapshot scope.
+
+---
+
+# Current recipient fire sample — human re-review pending
+
+User rejected the old17s4b93/50fa wide art and weak ring. Product3bedebfe uses existing per-recipient path and central-third of unchanged source bitmap, individually centered on actual artwork projection; stronger transient ring remains on original cast clock. No Core/target/damage/timing/skill count change. New natural Android recording and independent actual phone-frame review obtained. Current later delta only guards optional node.animate after reproducing the CI Boss regression;7files11tests/build/check PASS, no fixture or assertion weakening.
+
+New native59.6368s/3996447bytes and4.511s short review copy under8MB; recorded SHA3bedebfe explicitly retained. Formal6v6 first round→round2,0QA pause/finish intercept, natural action RNG; encounter selection only fixed to6. Sixth QA identity reuses real existing Hero art. New source has local targets; ordinary/crit/MISS desktop controlled regression separately documented.
+
+Modal paint FAIL remains with955 sole repair Owner, Android audio Context suspended/acoustic acceptance unverified, x2/x3 dependency unverified. Human art direction and latest Head CI pending; Draft DO NOT MERGE. Old reports below are history, not current art acceptance. Current compact evidence: [recipient report](FIRE-VFX-POLISH-20261023-recipient.json).
+
+---
+
+# Current complete fire range representative (2026-10-23)
+
+Same Work ID / branch / Draft #983. Product Head4b93e1c8aaf9fac34de0a75166755ec3651b6f43. User rejected the earlier range art; retained below as history, not current art approval. Actual supplied phone reference was decoded and inspected. Only explosiveFlurry now adds forward-return cast motion, distinct foot aura, ivory ordinary / gold critical bouncing feedback, MISS retreat and one bounded portrait-only critical shake; fixed HUD stays still. Original damage/targets1450ms clock and crit follow-up retained.
+
+Actual Core isolated QA on physical SM-N960F: ordinary218 / critical620 including original follow-up / MISS0 HP per target, SP47 per case; natural cleanup and stable HUD/slots. Native17.078956s720x1280 movie and under8MB before/after review copy are retained in artifacts. Before segment is presentation fixture; after is actual Core with fixed RNG, not identical scenarios. Raw recorder12s label is stale; decoded native duration is authoritative.
+
+Six focused suites /10tests plus official build/check/diffcheck PASS. Independent source/picture review cleared sticky lane flag and found no bounded source/readability blocker. Human art confirmation and latest Head Required CI remain pending; Draft DO NOT MERGE. Do not expand all-fire or rerun high-cost phone verification without a relevant change. No Library upload claimed because no generic Library video upload interface is exposed.
+
+Current compact evidence: [complete report](FIRE-VFX-POLISH-20261023-complete.json). Older entries below are historical snapshots and do not supersede this section.
+
+---
+
+# Fire representative sample — current checkpoint
+
+## Current range continuation (2026-10-23; supersedes old pending rows)
+
+User approved flameSlash direction and authorized ONE range representative, with phone recording before any batch expansion. Same Work ID/branch/#983. Product Head27426b4fd3a7b4c2bda6709f5568001e15cdaae6; only explosiveFlurry added. Existing flameSlash frames and all other skills/assets/data/CSS remain unchanged. Live #955 still ba2c451a/open Draft; shared UI boundary preserved.
+
+Existing explosiveFlurry group raster receives one envelope (.90→.94→1 at original hit→.98), translated -50% before scaling to preserve fitted center. Original requestCastTimeline synchronizes its v143MotionAnimation, remeasure does not restart, late nodes catch up, disposal cancels the same track. It never grows outside the original fitted box. Hit recipients use the same140ms action layer: ordinary6px/critical7.5px,1deg/.99 then neutral. MISS/non-target/shield/heal/status exclusions and reduced-motion guard remain. Formal tri targets, one settlement per actual recipient,1450ms/7-of-12 hit and source pixels unchanged. No new procedural renderer/material/screen shake or extra damage.
+
+Five focused suites PASS: new fire-range-envelope, battle-feel-impact, direct-impact-overlay, vfx-cast-clock and cold-clock. Official build/check/diffcheck PASS. Initial missing-config VM seam corrected with the existing optional-config convention, no relaxed assertion. Independent source review: no new blocker; final centering change separately reviewed with actual browser center samples.
+
+Physical Samsung SM-N960F, production Chrome, isolated3v6: four uninterrupted cases player-hit / enemy-hit / player-mixed / player-all-MISS. Formal target resolver selected3 eligible recipients each; non-target enemy row remained unaffected. Recoil recipients observed3/3/2/0, all four original gates naturally completed, fixed unit/HUD before-after and unchanged HP, fitted source center stable within.5px, cleanup true, zero runtime exceptions. Actual sequence8126.6ms, native screenrecord16.014489s720x1280. SHA256 2B8F1D6AD73B4FE570350A5DEDD64D7F091D0A03EBAA2AC13FBC29446B572B0F.22 decoded frames include charge/spread/impact/tail, enemy3-recipient feedback, mixed -1HP/MISS/-1HP, allMISS. Preserve local artifacts/fire-range-usb/native-preview.mp4, native-decode.json, evidence.json, sequence-frames; compact loaded-bundle/source/rows evidence in FIRE-VFX-POLISH-20261023-range.json.
+
+Desktop preliminary6ae snapshot passed same four cases; it is not relabeled final274 proof. Intermediate6ae phone footage retained separately, not final acceptance. Earlier QA primary-index assumption returned only2 legal targets; corrected QA to use original resolver's largest legal set, not product target rules. Host/phone wall clocks differ; native decoded pictures, not direct wall-clock subtraction, establish movie scope. Failed/initial candidates retained.
+
+Limits: presentation director/feedback fixture using actual formal range resolution, not actual Core skill damage/lunge/transaction. -1HP is fixture display, HP does not change. No full-fire/fullCore/shield/lethal/reduced-motion USB acceptance claimed. User range-art direction still pending. Stop at this one representative, no batch expansion/merge. Latest274 CI39890347295 last observed pending; no rerun/cancel/timeout workaround. Evidence-only checkpoint must obtain its own required checks before future merge; Chrome #976 remains sole root-cause Owner.
+
+Independent final source/picture review fire_sample_review actually viewed native frames0004/0010/0015/0020 and row evidence: no source safety or HUD/readability blocker in this subset. It explicitly notes the three white impact silhouettes are strong, and temporary torso occlusion is visible; the user decides that art strength. Mixed/all-MISS text positions are distinct and non-target row remains readable. Review does not constitute human art approval or true Core acceptance.
+
+Work ID: FIRE-VFX-POLISH-20261023
+Branch: feature/fire-vfx-polish-20261023
+Base: bc7efd1c4e66c1cb412fab29d404123f5495ea86
+Status: IMPLEMENTED candidate, NOT visual/USB accepted; Draft only.
+
+## Direct ownership and inventory
+
+Final gameplay data: `js/60-v173.64-skill-progression-rebalance.js` FINAL_REBALANCE_DATA and skill definitions. Target authority: `FourSymbolsBattleSkillTargeting` / Fixed Slots, not effect names. Damage is settled in the original Core target loop (`castSecondaryCharacterSkill`, `settleBattleHpDamage`); V143 only presents its committed facts. No data, targeting, settlement or Core edits.
+
+| Formal ID | Formal target | Direct damage per cast/recipient | Existing V142 authored duration |
+|---|---|---|---|
+| flameSlash | single | 1 | 760ms |
+| fireCritical | single | 1 | 1050ms |
+| explosiveFlurry | tri | 1 | 1450ms |
+| dragonSlash | single | 1 | 2800ms |
+| fireRocket | tri | 1; burn separate | 900ms |
+| blazeSpell | single | 1; burn separate | 1150ms |
+| flameTornado | single | 1; burn separate | 2100ms |
+| phoenixCry | all | 1; burn separate | 3200ms |
+| rage | allyTri | 0, buff | 1500ms |
+| fireSoulResonance | self | 0, buff | existing V142 data/fallback, unchanged |
+| bloodBurnArt | self | 0, buff/HP cost, not hostile damage | existing V142 data/fallback, unchanged |
+| fireEX | passive | 0, no cast VFX | no new active cast |
+
+`tri` is up to three eligible formal slot targets, not three hits. `all` uses actual eligible entities, not a fixed count. Boss restrictions remain the original primary-only rule except all/enemyAll. Physical critical/defeat follow-ups are distinct existing casts (max extra casts 1/1/1/2 for flameSlash/fireCritical/explosiveFlurry/dragonSlash), not extra impact frames or invented damage ticks. Burn remains original round/status processing, excluded from direct recoil.
+
+Timing: original V142 duration (including any formal animationDuration override) remains authoritative. V143 fire direct clips use DEFAULT_HIT .5833333333 on the original visual timeline and existing targetHitTime; no extra clock, freeze, hit, delay or action-gate extension. Frame counts/clip duration/target offsets unchanged. No claim that presentation fixture constitutes complete primary/enemy/Core USB verification.
+
+## #955 boundary
+
+Live #955: Draft/open, ba2c451a43bf67f1f7a9371cce5d7051e97d2240, unmerged. Merge-base-to-Head diff confirms no edits in JS39, JS37 or battle-floating-feedback-owner. JS60 has display-copy/element-label changes, retained untouched here. Shared CSS00/CSS40/fixed-slot and other UI files are actively modified there: no CSS/layout/HUD/command/number skin edits in this segment. Generated bundles/manifests must later be regenerated from normally integrated sources, never overwrite another branch's generated output. Do not merge #955 or claim its Gates passed.
+
+## First candidate actually implemented
+
+Only flameSlash confirmed direct-hit recoil differs, on the same `.v174-action-motion` node (existing fallback retained): 140ms, short retreat 8px (critical 10px), lean 2deg with side direction, scale .985, then neutral translate/rotate/scale. Existing committed-hit identity, MISS/Shield/non-direct exclusions, reduced-motion suppression, lethal guard and cancellation remain original Owner. All other skills retain their existing frames/assets. No new asset, fake skeletal animation, damage-number change or battlefield shake yet. Existing newer fire sprites from base are reused unchanged.
+
+## Evidence and limits
+
+- Targeted Node suites: battle-feel-impact-20261008 and battle-direct-impact-overlay-20261011 PASS (2 files). Covers both sides, same delay/duration, neutral final frame, MISS/heal/shield/status exclusions and reduced motion; original overlay/terminal lifecycle suite retained.
+- Official build and build --check PASS. No full local matrix repeated.
+- Independent source reviewer fire_sample_review: no new safety blocker; accurately notes .985 scale, original lethal/cancel ownership retained. Review is source-only, not art/USB approval.
+- USB/ADB stopped per user instruction; user will handle after waking. No reconnect, diagnostic, retry or security setting change in this segment.
+- Browser picture/continuous recording, actual motion-child/lethal pictures, USB and human art-direction approval PENDING. Candidate is not ready to merge. No batch expansion to remaining fire skills.
+
+Next: present/record this bounded candidate using isolated QA data; receive visual direction and physical-device availability before extending to range/multitarget representatives. Need genuine material gaps before generating anything. Latest Head required CI remains necessary but cannot replace art/USB Gates. Chrome #976 remains its existing Owner; no timeout workaround or repeated rerun here. Old #941/#958/#979 remain closed. Stop this segment after durable Draft checkpoint; do not merge pending visual Gates.
+
+## Current continuation — actual desktop and USB evidence
+
+Product remains exactly 938361014a711d3c3d9a0e1bbefc5bd4abb6af89. Evidence-only update; no additional VFX changes. User explicitly resumed physical verification; escalated devices query successfully read serial2858d1d9c23f7ece / Samsung SM-N960F device. This supersedes the earlier environment blocker, not a blanket permission grant.
+
+Desktop Chrome412x915 isolated3v3 presentation fixture: original director + Floating Feedback, damage/criticalDamage/MISS, original760ms gates, stable unit/HUD before-after, HP unchanged, cleanup and zero runtime exceptions PASS. Desktop recording is timestamped sampled CDP screenshots re-encoded WebM, not native/frame-rate evidence.
+
+Physical Chrome on SM-N960F: same three presentation cases, 53/54/58 samples with9/9/0 active recoil observations; all gates naturally v142-v143-visual-complete, same actual motion child, stable unit/HUD and unchanged HP, cleanup true. Native screenrecord12.019811s720x1280, SHA AA1ED5B8F44DAEBAB4C6804B70EC0068DF8A941D074EB5DA07DC780583D7C307. Decoded native frames show the sequence's first enemy slash, ordinary feedback, ally feedback and MISS; no source clock paused. Host/phone wall clocks differ, so their Date.now timestamps must not be directly subtracted to infer coverage. Native decoded pictures are the visual evidence.
+
+Local evidence retained under artifacts/fire-sample-desktop and artifacts/fire-sample-usb; native-preview.mp4 / native-decode.json / sequence-frames. Earlier page-attachment/tab-registration/capture interference/recording QA failures and startup-only/incomplete clips are retained separately, excluded from acceptance. Fixes were scratch QA only. No actual Core cast/damage/lunge movie, lethal/shield USB, six-versus-six or all-fire acceptance claimed. Human art direction still pending; no batch extension or merge.
+
+Durable compact evidence: FIRE-VFX-POLISH-20261023-representative.json. Targeted2 Node suites rerun PASS, product unchanged. Head93836101 CI39876607582 attempt1 FAILED: portrait120163938613, Abyss120163938876, Session boot120163939118 all Chrome startup before game; aggregate120173654599 downstream. No rerun used, no timeout/Chrome/product workaround; root-cause Owner remains #976. New evidence Head requires its own CI, old results cannot authorize it. Do not create a dummy commit or rerun to reset quota.
+
+## Incremental Owner / alignment inventory (2026-10-23)
+
+Verified103d8aee remote/local checkpoint clean before diagnostics; product remains4b93e1c8. One bounded desktop412x9156v6 actual Core ordinary explosiveFlurry case supplements, not repeats, the existing3v3 native phone matrix. First diagnostic omitted DOMRect non-enumerable coordinates / used wrong sprite selector; corrected QA only and preserved final raw evidence. No product defect or source patch inferred.
+
+| Responsibility | Existing Owner / current visibility | Incremental boundary |
+| --- | --- | --- |
+| Cast sheet / raster / hit clock | js/39-v143-skill-animation.js, original requestCastTimeline + settleTargetVisual | Retain1450ms shared track and original hit fence; no new timer/hit-stop/settlement change |
+| Caster / dodge / portrait shake | js/54-v173.51-battle-qa.js | Existing phone evidence; cast-stage ring and short lunge only, no new particle system or per-target projectile claimed |
+| Individual flash projection | js/39-v143-skill-animation.js reads artworkProjection | Three actual target flash rects match their own artwork within.2px; no shared center |
+| Slot / DOM scale | js/battlefield-render-geometry-adapter.js and fixed-slot Owner | CSS box projection, no duplicated scaler or Canvas coordinate formula |
+| Feedback | js/battle-floating-feedback-owner.js + own CSS | Per-target feedbackAnchor X73.8933/205.9923/338.0990; three independent indices0/1/2 |
+| Sound | js/34-v141-core-systems.js v141Audio; existing JS39 hit callback | Existing playSkill physical/magic plus element sound; audible sync not verified; no new sound engine |
+| Speed multiplier | No new sample multiplier Owner introduced | x2/x3 remain unverified dependency; do not add independent timers |
+| Modal / fixed UI | #955 owns its UI scope; cross-layer ordering needs coordination | VFX transient stage only; no parallel Modal z-index or fixed-slot edits |
+
+Alignment report: FIRE-VFX-POLISH-20261023-alignment.json. Formal selected IDs0/1/2 each lose218; IDs3/4/5 lose0. Group raster covers legal row, individual flash centers match individual artwork, floating X matches unit feedbackAnchor. At first feedback sample1025.10ms the three flashes and floating numbers coexist. Internal HP was already settled in the first112.80ms sample; that is not proof of prematurely visible HUD. Do not change Core settlement based on this diagnostic. No continuous visual-pixel / audio synchronization claim added.
+
+UI_GUIDELINES.md fixed1080x1920/9:16 applies to all devices; its16:9 rule is dungeon-cover assets, not a second PC battlefield. PC16:9 window should fit the same portrait canvas. Existing source/phone tests remain valid within their stated scope.
+
+Remaining: human art direction; free-running real first-turn flow beyond held isolated Core entry; active6v6 occlusion/readability picture review; Modal layer test/coordination; audible sync; x2/x3 dependent Owner; current Head Required CI. Earlier native phone footage is retained, not relabeled as these missing Gates. No batch element/skill rollout or performance overhaul.
+
+
+## Tests-only render contract correction after ebba CI
+
+CI39899690956/a1/core_checks120238476915 reached v153-fire-vfx:282 and found historical explosiveFlurry group-node expectation. sprite.placement controls visual raster placement; formal targetType remains tri. Updated only v153 contract test to assert three recipient nodes, unique artworkProjection centers, unchanged1450ms/7of12 tasks, exact once-per-target feedback payloads plus formal damage/SP/follow-up data. No product/assets/Modal/movie change.15 internal fire cases plus Boss/recipient suites PASS; related layout/target-lifecycle/progression53tests PASS; build-check/diffcheck PASS. Independent tests-only review accepted; callback payloads are not relabeled HP settlement. Current [contract evidence](FIRE-VFX-POLISH-20261023-render-contract.json). Latest new Head CI and human art remain pending; no oldHead rerun.
+
+## Current candidate: caster label, manual arrow, fire orbit
+
+Continues FIRE-VFX-POLISH-20261023 / #983 from eb854a41. Product candidate only: original badge Geometry positions text above caster with bounded avoidance; existing manual arrow widened22px while keeping5px height; explosiveFlurry existing transient ring contains6 procedural CSS embers on original cast duration/cleanup (none in reduced motion). No new raster, image conversion N/A. No Core, damage, target, timing, other-element or far-row geometry edits. Normal attack remains unchanged: requested500ms pre-hold conflicts with original520ms total/hit296.4ms and requires a product timing decision.
+
+Focused5files19outer tests (V15315internal cases) PASS; official build/check PASS. Controlled12case labels/arrow tests on PC1280x720 and physical SM-N960F completed with0formal actor/HUD intersections; physical screenshots under artifacts/fire-label-arrow-usb-current. These are dirty candidate source checks, not a committed-SHA natural combat video or complete UI PASS. PC release-banner/top-edge presentation still needs independent picture review; do not infer art approval from geometry. Existing3bed natural phone video remains scoped to its original SHA. Human art review/latest Head CI remain pending. Draft DO NOT MERGE.
+
+## Current label / normal follow-up — product74c9efae
+
+Release marquee is now read by the same label positioning Owner. When compact upward placement has no vertical space, finite nearest free side-gutter search stays within viewport and above original portrait; no Unit/HUD, announcement lifecycle, battlefield scale or far-row change. PC1280x720 and physical SM-N960F12cases each passed explicit actor/HUD/announcement intersections and viewport bounds on committed74c9. This is bounded supported-view evidence, not a claim for arbitrary tiny windows without space.
+
+User accepted shorter clear normal preparation preserving battle speed. Original normal520ms total/hit.57=296.4ms unchanged:18px lean reaches at.17, holds through hit, returns at1. Original projectile becomes visible after.30 of its original296.4ms flight window; actor starts once from the same existing visual clock, no private timer/Core/damage/rage/cooldown/cadence or element ring. Physical formal secondaryCharacterNormalAttack(2,2) observed lean/shared clock, target2 HP1000000→999812 and cleanup; controlled QA pause/finish, not natural full matrix. Only new PNGs, existing fire movie not rerecorded or relabelled as new normal evidence.
+
+Targeted14tests plus cold-clock/direct-impact/raster Owner suites PASS, official build/check PASS. Current evidence [label/normal report](FIRE-VFX-POLISH-20261023-label-normal.json). Product74c9 CI39904422334 in_progress/Session39904422325 pending at check; final evidence-only Head still requires its own checks. Human art review remains pending, Draft DO NOT MERGE.
+
+Same74c9 supplemental PC proof explicitly enables original releaseUpdatePreview=marquee and waits for nonzero marquee rect before12cases. Actual0028 shows visible announcement with long label in free left gutter;0actor/HUD/announcement intersections. Independent source and actual PC/phone/normal picture review found no concrete blocker in these bounded cases. Earlier74c9 PC batch had announcement absent; only this supplemental batch proves visible announcement. Phone evidence remains announcement-absent, no mobile announcement matrix/general tiny-window guarantee.
+
+## Current CI raster fixture correction — from49d19bab
+
+CI39904979452/a1/core_checks120255475749 failed at Node suite19/407: battle-feel-impact-20261008.test.js111 → startNormalProjectiles → current.config.id undefined. Local exact bounded reproduction matched CI. This raster-only VM current omitted mandatory config from real current constructor (JS39 register/current), and its extracted source omitted addNormalProjectile. Corrected only that fixture: config:{id:normal}, load original addNormalProjectile through targetHitTime. Original sprite-only model still intentionally has no projectile; the original function returns normally. No stub, optional guard, changed assertion, production/build/media bytes or Chrome change.
+
+Targeted impact/normal-air/cold-clock/character-motion9outer tests PASS; build-check/diff-check PASS. Latest product74c9 and native49d phone movie remain exact valid source evidence; no re-record or device use. Old49d CI is not rerun; wait new Head necessary checks and human art review. Session39904979445 success remains Session-only.
+
+## Current CI fit fixture correction — fromaf5b2093
+
+CI39907110905/a1/core_checks120262530298 reached401/407 Node suites; three vfx-presentation-safety-20261019 cases failed fitRangeArt current.model.sprite undefined. Exact local7case run reproduced3fails. Formal current constructor supplies model/sprite; four direct arguments in first3legacy unsliced-fit cases omitted that required shape. Added only model:{sprite:{}} at those call sites. No helper default, product guard, wrapper, changed safety assertion, art/build/media or Chrome edits. Targeted safety7cases + V15315internal + impact/normal (10outer) PASS; build-check/diffcheck PASS. Searched direct fitRangeArt VM callers; other cases already supply model.sprite.
+
+Session39907110850 success is Session-only. Abyss120262530337 ECONNREFUSED9851 is separate Chrome evidence/Owner976; not repaired here. Old af5 run not rerun, latest new Head required checks remain pending. Existing exact49d normal phone movie/product74c9 evidence stays valid; no device use/rerecord. Return to human art review after bounded CI repair.

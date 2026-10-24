@@ -57,13 +57,13 @@
 
 ## 六、CI／工具阻塞處理
 
-修正已完成，但遇到 There are no checks for this commit、Workflow（工作流程）未觸發、GitHub Actions 異常、Connector／API（連接器／程式介面）暫時失敗或部署未產生新版本時，立即分類為 Infrastructure Blocker（基礎設施阻塞）。
+修正已完成，但遇到 There are no checks for this commit、Workflow（工作流程）未觸發、GitHub Actions 異常、Connector／API（連接器／程式介面）暫時失敗或部署未產生新版本時，先記錄為待診斷的驗證缺口。核對目前 PR Head／Base 或 dev SHA、預期觸發事件與路由、實際 run／attempt／job 狀態及必要失敗日誌，再依證據區分待完成、政策允許的不適用、程式／測試失敗、基礎設施故障、過時 SHA 拒絕或取代取消；狀態判讀與取代證據依 `AGENTS.md`。只有證實基礎設施故障時才分類為 Infrastructure Blocker（基礎設施阻塞）；必要驗證缺失或未完成仍不得視為通過。
 
 不得因 CI／工具問題反覆修改已驗證正確的程式碼。直接診斷並處理 CI／Workflow／API 阻塞，直到最新 Head 得到有效驗證；只能做解除已確認阻塞必要的安全修改，不得繞過必要檢查或安全閘門。外部服務不可用時保留成果並回報具體阻塞證據。
 
-## 七、施工並行限制
+## 七、施工並行協調
 
-同一時間原則上最多 1 個大型架構工程，最多再加 1 個一般 Bug Fast Path。大型工程若正在大量修改共用 Runtime、CSS、State 或 Owner，與其高度重疊的新工程應延後，避免 dev 持續漂移造成反覆重做。
+施工並行依 `AGENTS.md`「多 Codex 並行施工與統一驗收規範」，本文件不另訂固定工程數量上限。依實際共用 Runtime、CSS、State 或 Owner 的修改重疊與衝突證據協調施工順序，不因其他工程存在就延後互不影響的工作。
 
 ## 八、結案標準
 
@@ -75,7 +75,7 @@
 
 ## 九、規範優先序與適用範圍
 
-本文件是一般 Bug 的預設施工流程、調查範圍、升級條件、自主整合與結案權威來源。與其他文件衝突時，當次使用者明確指令優先；一般 Bug 的上述事項以本文件為準。
+當次使用者明確指令優先。工程治理、讀取路由、分支／生命週期、DEV 整合、並行協作與驗證風險分類由 `AGENTS.md` 唯一控制；本文件控制一般 Bug 的直接調查、證據升級、原症狀驗證與完成判定，完成判定仍須滿足 `AGENTS.md` 的整合與清理條件，不另建自主整合或治理優先序。
 
 - AUTONOMOUS_REPAIR_CONTRACT.md 的 tests-only（純測試）預設限制、正式 Runtime 即硬停止、固定失敗額度與僅草稿 PR 限制，不適用本路徑內已授權的一般 Bug。
 - Owner Convergence Gate 與完整 Lifecycle 審計僅在第四節證據成立、或使用者明確要求架構工程（含「全部／完全收斂」「唯一 Owner」）時啟用；完成判定依 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md` 與 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`，不得只因新 Owner 存在就宣稱全部收斂，也不得恢復所有 Bug 全面稽核。

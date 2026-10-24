@@ -32,7 +32,7 @@ test("range artwork fits the visible target side without changing aspect, target
     const center={x:210,y:130},bounds=rect(10,10,400,240);
     const node={style:{width:"600px",height:"300px",left:"210px",top:"130px"},dataset:{targetIndexes:"0,2,4",geometrySlots:"B1,B2,B3"}};
     const before=JSON.stringify({center,bounds,targets:node.dataset.targetIndexes,slots:node.dataset.geometrySlots});
-    fitRuntime(side,overlay)(node,{targetSide:"monster"},bounds,center);
+    fitRuntime(side,overlay)(node,{targetSide:"monster",model:{sprite:{}}},bounds,center);
     assertInside(node,center,rect(30,20,360,210));
     assert.equal(parseFloat(node.style.width)/parseFloat(node.style.height),2);
     assert.equal(node.style.left,"210px");assert.equal(node.style.top,"130px");
@@ -43,19 +43,19 @@ test("an edge tri anchor retains its center and footprint while fitting proporti
     const safe=rect(0,0,360,300),fit=fitRuntime(safe,safe);
     const center={x:60,y:70},bounds=rect(0,0,360,100);
     const node={style:{width:"360px",height:"180px"},dataset:{}};
-    fit(node,{targetSide:"player"},bounds,center);
+    fit(node,{targetSide:"player",model:{sprite:{}}},bounds,center);
     assertInside(node,center,safe);
     assert.equal(parseFloat(node.style.width)/parseFloat(node.style.height),2);
     assert.equal(node.dataset.semanticWidth,"360");assert.equal(node.dataset.semanticHeight,"100");
     const small={style:{width:"40px",height:"20px"},dataset:{}};
-    fit(small,{targetSide:"player"},bounds,center);
+    fit(small,{targetSide:"player",model:{sprite:{}}},bounds,center);
     assert.equal(small.style.width,"40px");assert.equal(small.style.height,"20px");
 });
 test("low group art cannot expand and relocate below its canonical target center",()=>{
     const safe=rect(0,0,360,300),center={x:180,y:240},bounds=rect(0,180,360,120);
     const node={style:{width:"360px",height:"360px"},dataset:{targetIndexes:"0,1,2"}};
     const semantic=JSON.stringify(bounds);
-    fitRuntime(safe,safe)(node,{targetSide:"monster"},bounds,center);
+    fitRuntime(safe,safe)(node,{targetSide:"monster",model:{sprite:{}}},bounds,center);
     assert.equal(parseFloat(node.style.width),120);
     assert.equal(parseFloat(node.style.height),120);
     assert.equal(center.x,180);assert.equal(center.y,240);
