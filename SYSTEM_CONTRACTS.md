@@ -46,7 +46,7 @@
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
 - 敵方六格 V1 仍由 `js/battlefield-slot-owner.js` 唯一控制。`wild / daily / abyss / tower` 的新遭遇在原始名單不超過六名時使用 `standard-six`：後排 `ENEMY_B1/B2/B3`、前排 `ENEMY_F1/F2/F3`；沿用原 ID 的前後排與欄位語意，不改我方格位。遭遇建立後固定同一份 snapshot，死亡不重排、不把空格納入目標。
 - 超過六名的一般遭遇保留完整 `legacy-ten` 名單及幾何，snapshot／戰場 DOM 明確標記 `pending-wave-migration`。深淵及四象塔正式遭遇由既有 `js/00-main.js::FourSymbolsBattleWaves` 單一波次 Owner 管理兩波，每波最多六名；不得將兩波的完整資料目錄直接送入渲染。個人／世界 Boss、特殊物件、援軍及 Adventure 維持原規則。
-- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；只有 `standard-six` 使用敵方／操作／我方 `48/16/36` 區域比例，其他模式保留 `42/16/42`。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner。
+- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；共用結構由上至下為敵方／我方／底部操作區，權重 `54.785/45.215/12`，操作區另保留原指令與倒數的最小高度。無公告時頂部留44px技能名稱空間，原更新公告可見時才擴至72px；底部保留8px安全距。手動五指令＋更多與AUTO／設定／加速共用一條52px控制列，手動更多向上展開控制浮層；回合／倒數不壓指令。敵我之間留44px結構間隔與相鄰gap，窄手機所有指令／更多／控制實際觸控不得小於44px。我方所有排採相同scale1、同框且無上溢，敵方保留前後排景深。AUTO光圈只投影原有效自動狀態，不繞過時數Gate；倍率尚未實作時明標disabled待開放。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner；可用高度變更的實際視覺差異由同工程畫面證據驗收。
 - `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。
 - Stealth（隱身）只禁止成為 hostile primary target（敵對主要選定目標）：普通攻擊與任何需要指定 primary 的 `single / tri / row / column` 都不得選中隱身單位；但 `tri / row / column / all` 已由其他合法 primary／全體範圍解析出的波及名單仍可包含隱身單位。
 - Boss（頭目）專屬模式內，Boss、援軍、圖騰、戰旗、法器與技能召喚物都是獨立的數字索引 target entity（目標單位）。

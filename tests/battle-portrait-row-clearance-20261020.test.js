@@ -30,7 +30,7 @@ try{
             assert.equal(box.contain,"contain","source proportions remain intact");
             assert.ok(Math.abs(box.bottom-old.bottom)<.1,"portrait feet must stay fixed");
             assert.ok(Math.abs(box.width-old.width)<.1,"horizontal extent must not change");
-            if(index===item.col){assert.ok(box.top>=item.frontBottom+5.8,"same-column rear portrait must leave real foreground HUD/idle clearance");assert.ok(box.height<old.height,"the demonstrated vertical collision must actually be constrained");}
+            if(index===item.col){assert.ok(box.top>=item.frontBottom+5.8,"same-column rear portrait must leave real foreground HUD/idle clearance");assert.equal(box.height,old.height,"approved uniform party size must not shrink when the foreground slot is occupied");}
             else assert.deepEqual(box,old,"other columns, including approved mixed formation, must remain unchanged");
         });
     }

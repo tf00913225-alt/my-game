@@ -332,6 +332,10 @@
         }
         if(visibleGuideTarget('#skillPage.active')){
             if(p.skillReady){return step('#adventureTutorialReturn','技能已裝好，返回故事再挑戰。');}
+            const nativeTab=p.nativeElement&&visibleGuideTarget('#skillElementTabs [onclick="selectSkillElementTab(\''+CSS.escape(p.nativeElement)+'\')"]');
+            if(nativeTab&&nativeTab.getAttribute('aria-selected')!=='true'){
+                return {target:nativeTab,text:'先點本命元素分類，找到自己的招式。'};
+            }
             const learned=Object.keys(p.loadout?.skillLevels||{}).find(id=>p.loadout.skillLevels[id]>0&&visibleGuideTarget('.skill-row[data-skill-id="'+CSS.escape(id)+'"] [data-skill-action="equip"]'));
             if(learned){return step('.skill-row[data-skill-id="'+CSS.escape(learned)+'"] [data-skill-action="equip"]','點「裝備」，把招式放進戰鬥技能欄。');}
             return step('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)','點「學習」，學會第一個招式。');

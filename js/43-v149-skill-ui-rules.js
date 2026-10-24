@@ -19,7 +19,7 @@
         "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
         "fireRocket","blazeSpell","flameTornado","phoenixCry",
         "stormFist","stormFlurry","windCrossSlash","dizzyFist",
-        "windSpell","stormCircle","windHowlLightning","stormRain","stormSpell",
+        "windSpell","stormCircle","windHowlLightning","stormRain",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush",
         "stoneThrow","sandWind","flyingSandStrike","dustStorm"
     ];

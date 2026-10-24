@@ -24,8 +24,12 @@ function original(){
     context.characterSkillLoadouts={fire:context.loadout};context.renderSkillLoadout=()=>{};context.updateUI=()=>{};context.saveGame=()=>{};
     context.window=context;vm.createContext(context);vm.runInContext(Object.values(baseline.sources).join('\n'),context);return context;
 }
-test('loadout extraction preserves600 full-loaded Client domain/save-boundary cases and accepted UI DOM',()=>{
-    assert.deepEqual(loadoutParity(),baseline.fullRuntime);
+test('loadout extraction preserves600 full-loaded cases after retirement of the non-player storm skill',()=>{
+    // Original Head digest stays immutable; the new full-runtime snapshot omits only the retired skill data.
+    assert.deepEqual(loadoutParity(),baseline.retiredStormUiRuntime);
+    // Reverse only the already accepted display literals in recorded DOM fields.
+    // Every domain/save/event byte and the retired-skill baseline remain checked.
+    assert.deepEqual(loadoutParity({displayLiteralReversals:baseline.retiredStormUiProvenance.reversalPairs}),baseline.retiredStormRuntime);
 });
 test('pure equip, first-cross normalization, splice ordering and no-ops match frozen original runtime functions',()=>{
     const old=original(),ids=Object.keys(catalog);let cases=0;

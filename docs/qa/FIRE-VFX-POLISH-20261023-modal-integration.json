@@ -1,0 +1,144 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "testedCombination": {
+    "base": "86ca8edb78e065f0b6c697003c0ae92ef8903c32",
+    "sourceCommit": "8938e239bfbc632175ed8fb4d1c880d017e1ce0e",
+    "uiEvidenceCheckpoint": "0f5fee0a9a0449b1ee8ece74ec62530214518198",
+    "selectedPaths": [
+      "js/00-main.js",
+      "js/45-v154-dev-fixes.js",
+      "tests/battle-reading-layer-contract-20261001.test.js"
+    ],
+    "method": "exact selected commit delta, git apply --3way clean; not whole UI branch or blind file replacement",
+    "policy": "original builder changed source digest only; other policy fields exact unchanged",
+    "unchangedVfxOwners": [
+      "js/39-v143-skill-animation.js",
+      "js/54-v173.51-battle-qa.js",
+      "css/40-v143-combat-dungeon-polish.css",
+      "js/battle-floating-feedback-owner.js",
+      "css/battle-floating-feedback-owner.css"
+    ],
+    "sourceHashes": {
+      "js/00-main.js": "2b836050cab2e0d23489f96be28ddcafb3b632c4dc01b76b5ec2a48097a60594",
+      "js/45-v154-dev-fixes.js": "bbbaa069da0c1abc3b4c80213871ef19e26c2b59b1889e7f8f04c894eec498d6",
+      "js/39-v143-skill-animation.js": "80de472fb75309939bab98b18292286ff5ecd216e542e10a66272d9e05cef9c5",
+      "js/54-v173.51-battle-qa.js": "dab6e0d46e426bb931f4edfb371d98b814914809517c1b20f5da226f368128a0",
+      "css/40-v143-combat-dungeon-polish.css": "a8f67f13ee36a2387fc39d67cab4c4567cf1918ae54509466250ecfa25876dbb",
+      "js/battle-floating-feedback-owner.js": "85a8184bc191c07d1bc2f89529d9d812556d79c3f0262ae290fd601571158ad7",
+      "css/battle-floating-feedback-owner.css": "9cd4841ae87989344f73c51f7ab68fd25e3d1c609c833f5012df625a0c5c39be"
+    }
+  },
+  "natural": {
+    "environment": "desktop Chrome412x915 emulation; isolated QA roster6v6, not physical USB",
+    "conditions": "isolated6v6 roster; formal startBattle/Auto/initiative/finish, no QA pause or finish interception; RNG forced ONLY encounter selection then restored before action timers; no real save/reward and aborted before outcome",
+    "passed": true,
+    "round": [
+      1,
+      2
+    ],
+    "qaPausedSamples": 0,
+    "open": {
+      "reading": true,
+      "paint": [
+        {
+          "class": "skill-name-badge",
+          "visibility": "hidden",
+          "opacity": "0"
+        },
+        {
+          "class": "v143-skill-stage",
+          "visibility": "hidden",
+          "opacity": "0"
+        },
+        {
+          "class": "v143-hit-feedback-overlay",
+          "visibility": "hidden",
+          "opacity": "0"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "visibility": "hidden",
+          "opacity": "0"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "visibility": "hidden",
+          "opacity": "0"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "visibility": "hidden",
+          "opacity": "0"
+        }
+      ]
+    },
+    "close": {
+      "at": 16612.099999964237,
+      "reading": false,
+      "paint": [
+        {
+          "class": "v143-skill-stage",
+          "id": "v143-skill-stage",
+          "text": "",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "class": "v143-hit-feedback-overlay",
+          "id": "",
+          "text": "",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "id": "",
+          "text": "-209HP",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "id": "",
+          "text": "-229HP",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "class": "battle-floating-feedback battle-floating-feedback-damage",
+          "id": "",
+          "text": "-215HP",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ]
+    },
+    "raw": "artifacts/fire-modal-integration-desktop/evidence.json",
+    "screenshotLimit": "300ms open window not caught by asynchronous host screenshots; separate same-source900ms capture supplies actual Modal pictures, no extra user art video"
+  },
+  "pictures": {
+    "raw": "artifacts/fire-modal-paint-capture/evidence.json",
+    "passedFlow": true,
+    "before": "artifacts/fire-modal-paint-capture/frame-0062.png",
+    "modal": [
+      "artifacts/fire-modal-paint-capture/frame-0063.png",
+      "artifacts/fire-modal-paint-capture/frame-0064.png"
+    ],
+    "after": "artifacts/fire-modal-paint-capture/frame-0067.png",
+    "observed": "Actual Modal pictures no fire/skill-name/damage paint over settings; earlier target-centered fire/ring and later damage resumes. Existing update notice above screen is unrelated unchanged UI."
+  },
+  "validation": {
+    "targeted": "reading lifecycle3 + original Boss reliability + fire recipient/envelope =3files5tests PASS; build/check/diffcheck PASS",
+    "independent": "fire_sample_review inspected exact selected-source scope and actual0062/0063/0064/0067 pictures; no source or Modal-paint blocker within bounded desktop case",
+    "ci": "Reported86ca CI39896651065 core_checks120229777261 failed backpack browser DevTools15s target unavailable35627 before Boss. Abyss120229777169/9891 and tower120229777215/9851 also startup failure. NOT whole-suite proof of animate fix. No oldHead rerun/Chrome change; latest integration Head checks pending."
+  },
+  "result": "Bounded integrated desktop natural Modal regression PASS. Original unintegrated86ca phone/desktop FAIL snapshots remain true for those snapshots; not relabeled.",
+  "pending": [
+    "Latest integration Head Required CI",
+    "Human art confirmation",
+    "Physical Modal regression if task requires; no new phone art movie recorded",
+    "Android acoustic sync and x2/x3 remain unverified"
+  ],
+  "next": "Save integrated checkpoint and return to human art confirmation; no visual edits, skill expansion or merge."
+}

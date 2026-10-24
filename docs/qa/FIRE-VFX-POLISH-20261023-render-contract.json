@@ -1,0 +1,44 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "testedBase": "ebba3ee4964bbcd0067fb909d0ce0bdd08b4a12c",
+  "failure": {
+    "run": 39899690956,
+    "attempt": 1,
+    "job": 120238476915,
+    "event": "pull_request",
+    "file": "tests/v153-fire-vfx.test.js:282",
+    "symptom": "explosiveFlurry sprite.placement single vs historical group",
+    "classification": "obsolete presentation contract; not Chrome or missing animate"
+  },
+  "decision": "sprite.placement is raster placement; existing presentation per-recipient selects single nodes while authoritative skill targetType remains tri. Update historical group-node assertion to stronger recipient contract, not product art/settlement.",
+  "changed": "tests/v153-fire-vfx.test.js only plus QA notes; no product/source/assets/build/movie change",
+  "assertions": [
+    "Exact per-recipient presentation and central-third clip",
+    "Formal tri/baseDamage50/damagePerLevel10/SP47/follow-up1",
+    "Three actual target IDs and individual artworkProjection centers deliberately distinct from slot centers",
+    "Original1450ms and7-of-12 target-hit delays",
+    "Three original target hit tasks; registering callbacks adds no timers",
+    "Distinct17/18/19 feedback payloads once per actual recipient, no duplicate payloads"
+  ],
+  "validation": {
+    "fireVfx": "15 file-internal cases PASS",
+    "bossAndRecipient": "original boss reliability + recipient/envelope suites PASS",
+    "otherTargeted": "battle-layout-vfx-runtime + battle-target-lifecycle + skill-progression-rebalance:53 tests PASS",
+    "build": "official build --check and git diff --check PASS",
+    "independent": "fire_sample_review approved exact tests-only diff; no target/timing/settlement-boundary weakening",
+    "limitation": "showMonsterHit payload assertion verifies callback/feedback, not independently true HP settlement; existing natural/controlled Core evidence remains linked in recipient report"
+  },
+  "sourceUnchanged": [
+    "js/00-main.js",
+    "js/39-v143-skill-animation.js",
+    "js/54-v173.51-battle-qa.js",
+    "js/60-v173.64-skill-progression-rebalance.js",
+    "css/40-v143-combat-dungeon-polish.css"
+  ],
+  "pending": [
+    "Latest new Head Required CI",
+    "Human art review; no merge or rollout"
+  ],
+  "next": "Save this actual contract correction and await new Head CI/user art direction; no oldHead rerun or repeat movie."
+}

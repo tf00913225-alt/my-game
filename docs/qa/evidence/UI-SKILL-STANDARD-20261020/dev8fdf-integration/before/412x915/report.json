@@ -1,0 +1,1552 @@
+{
+  "head": "d0053d958bd1b160f9e15fc0dae99269e4ff6969",
+  "viewport": [
+    412,
+    915
+  ],
+  "complete": true,
+  "clean": false,
+  "sourceBefore": {
+    "index.html": "e063142d2b656deefdaaf92c3f963baf5dc54d5c6956969845358b89b902c4cb",
+    "asset-manifest.json": "28a83ed757b6985294ccad191d0a57e3a842e8ae853dc19da0f02302eec07938",
+    "js/00-main.js": "b61c540f80cc4a0a279251111310328e8e259f201e81d12fed9d35e94c784c4d",
+    "build/app-shell.1f08d95019e0.js": "1f08d95019e08863a07a40daf30bd9557d6484577b23e84eefef7783cde760b7",
+    "build/app-shell.7bc5e1c99233.css": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+    "build/boot-core.78385a4c589b.css": "78385a4c589b8510d6927cc47b0efe2d8b726bfab8f864511283f4c5636764f8",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.f812f2d9ad9b.js": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.84bbc0a00468.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "build/feature-adventure-ui.e00b5fff8c35.js": "e00b5fff8c350574547b865510ed79bfcb8db5fb79c66a694e08fe626945a06b",
+    "build/feature-adventure.c82d45eb0990.css": "c82d45eb0990df11547e8c36e9bb258d8934b7c5253d1f6b28b57d4735f75ad6",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.5d80f0302203.js": "5d80f0302203089771562db8104462b5929b6a61d4d8467df141ac19633350ed",
+    "build/gameplay-core-secondary.78a1364f9a34.js": "78a1364f9a343f9da9e85343b5f6066571f9ad468314f7bdf309572536d639ac",
+    "build/gameplay-core.3bab1db451ad.css": "3bab1db451ad884b1142375022444e4ab547025434299645f8c02cc37307b619"
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/app-shell.1f08d95019e0.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/app-shell.7bc5e1c99233.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/app-shell.7bc5e1c99233.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/app-shell.1f08d95019e0.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core-primary.5d80f0302203.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core-secondary.78a1364f9a34.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core.3bab1db451ad.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core.3bab1db451ad.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core-primary.5d80f0302203.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/gameplay-core-secondary.78a1364f9a34.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:54577/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    }
+  ],
+  "inputs": [
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 34.33333349227905,
+      "y": 449.17897033691406,
+      "rect": {
+        "x": 6.866666316986084,
+        "y": 421.7123107910156,
+        "width": 54.93333435058594,
+        "height": 54.933319091796875,
+        "top": 421.7123107910156,
+        "right": 61.80000066757202,
+        "bottom": 476.6456298828125,
+        "left": 6.866666316986084
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#characterTabBtnSkill",
+      "x": 337.67369079589844,
+      "y": 344.2000427246094,
+      "rect": {
+        "x": 289.66961669921875,
+        "y": 314.4444885253906,
+        "width": 96.00814819335938,
+        "height": 59.5111083984375,
+        "top": 314.4444885253906,
+        "right": 385.6777648925781,
+        "bottom": 373.9555969238281,
+        "left": 289.66961669921875
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "kind": "true-skill-owner-scroll",
+      "owner": {
+        "rect": {
+          "x": 26.322221755981445,
+          "y": 380.822265625,
+          "width": 359.35552978515625,
+          "height": 416.5777587890625,
+          "top": 380.822265625,
+          "right": 385.6777515411377,
+          "bottom": 797.4000244140625,
+          "left": 26.322221755981445
+        },
+        "top": 0,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      }
+    },
+    {
+      "selector": "#mainBattleMenu .skill",
+      "x": 45.23875904083252,
+      "y": 785.4395446777344,
+      "rect": {
+        "x": 13.181546211242676,
+        "y": 759.934814453125,
+        "width": 64.11442565917969,
+        "height": 51.00946044921875,
+        "top": 759.934814453125,
+        "right": 77.29597187042236,
+        "bottom": 810.9442749023438,
+        "left": 13.181546211242676
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".skill-quick-close",
+      "x": 353.1428527832031,
+      "y": 604.9443359375,
+      "rect": {
+        "x": 321.75238037109375,
+        "y": 579.4395751953125,
+        "width": 62.78094482421875,
+        "height": 51.009521484375,
+        "top": 579.4395751953125,
+        "right": 384.5333251953125,
+        "bottom": 630.4490966796875,
+        "left": 321.75238037109375
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#mainBattleMenu .skill",
+      "x": 45.23875904083252,
+      "y": 785.4395446777344,
+      "rect": {
+        "x": 13.181546211242676,
+        "y": 759.934814453125,
+        "width": 64.11442565917969,
+        "height": 51.00946044921875,
+        "top": 759.934814453125,
+        "right": 77.29597187042236,
+        "bottom": 810.9442749023438,
+        "left": 13.181546211242676
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".skill-quick-close",
+      "x": 353.1428527832031,
+      "y": 604.9443359375,
+      "rect": {
+        "x": 321.75238037109375,
+        "y": 579.4395751953125,
+        "width": 62.78094482421875,
+        "height": 51.009521484375,
+        "top": 579.4395751953125,
+        "right": 384.5333251953125,
+        "bottom": 630.4490966796875,
+        "left": 321.75238037109375
+      },
+      "hit": true,
+      "disabled": false
+    }
+  ],
+  "checks": [
+    {
+      "phase": "skill-entry",
+      "core": "function",
+      "rules": true,
+      "skill": {
+        "x": 26.322221755981445,
+        "y": 380.822265625,
+        "width": 359.35552978515625,
+        "height": 3182.354248046875,
+        "top": 380.822265625,
+        "right": 385.6777515411377,
+        "bottom": 3563.176513671875,
+        "left": 26.322221755981445
+      },
+      "display": "block",
+      "list": {
+        "x": 26.322221755981445,
+        "y": 722.6654052734375,
+        "width": 359.35552978515625,
+        "height": 2826.77783203125,
+        "top": 722.6654052734375,
+        "right": 385.6777515411377,
+        "bottom": 3549.4432373046875,
+        "left": 26.322221755981445
+      },
+      "count": 12,
+      "title": {
+        "box": {
+          "x": 26.322221755981445,
+          "y": 121.03338623046875,
+          "width": 251.54530334472656,
+          "height": 43.4888916015625,
+          "top": 121.03338623046875,
+          "right": 277.867525100708,
+          "bottom": 164.52227783203125,
+          "left": 26.322221755981445
+        },
+        "ink": {
+          "x": 145.3802032470703,
+          "y": 120.27042388916016,
+          "width": 63.72528076171875,
+          "height": 40.055564880371094,
+          "top": 120.27042388916016,
+          "right": 209.10548400878906,
+          "bottom": 160.32598876953125,
+          "left": 145.3802032470703
+        }
+      },
+      "tabs": [
+        {
+          "text": "經驗池分配",
+          "rect": {
+            "x": 26.322221755981445,
+            "y": 314.4444885253906,
+            "width": 153.60589599609375,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 179.9281177520752,
+            "bottom": 373.9555969238281,
+            "left": 26.322221755981445
+          }
+        },
+        {
+          "text": "能力值",
+          "rect": {
+            "x": 186.79478454589844,
+            "y": 314.4444885253906,
+            "width": 96.00816345214844,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 282.8029479980469,
+            "bottom": 373.9555969238281,
+            "left": 186.79478454589844
+          }
+        },
+        {
+          "text": "技能",
+          "rect": {
+            "x": 289.66961669921875,
+            "y": 314.4444885253906,
+            "width": 96.00814819335938,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 385.6777648925781,
+            "bottom": 373.9555969238281,
+            "left": 289.66961669921875
+          }
+        }
+      ],
+      "owner": {
+        "rect": {
+          "x": 26.322221755981445,
+          "y": 380.822265625,
+          "width": 359.35552978515625,
+          "height": 416.5777587890625,
+          "top": 380.822265625,
+          "right": 385.6777515411377,
+          "bottom": 797.4000244140625,
+          "left": 26.322221755981445
+        },
+        "top": 0,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      },
+      "controls": [
+        {
+          "text": "火元素",
+          "rect": {
+            "x": 26.322221755981445,
+            "y": 380.822265625,
+            "width": 86.40555572509766,
+            "height": 50.355560302734375,
+            "top": 380.822265625,
+            "right": 112.7277774810791,
+            "bottom": 431.1778259277344,
+            "left": 26.322221755981445
+          }
+        },
+        {
+          "text": "水元素",
+          "rect": {
+            "x": 117.30554962158203,
+            "y": 380.822265625,
+            "width": 86.40555572509766,
+            "height": 50.355560302734375,
+            "top": 380.822265625,
+            "right": 203.7111053466797,
+            "bottom": 431.1778259277344,
+            "left": 117.30554962158203
+          }
+        },
+        {
+          "text": "風元素",
+          "rect": {
+            "x": 208.28887939453125,
+            "y": 380.822265625,
+            "width": 86.40554809570312,
+            "height": 50.355560302734375,
+            "top": 380.822265625,
+            "right": 294.6944274902344,
+            "bottom": 431.1778259277344,
+            "left": 208.28887939453125
+          }
+        },
+        {
+          "text": "土元素",
+          "rect": {
+            "x": 299.272216796875,
+            "y": 380.822265625,
+            "width": 86.40554809570312,
+            "height": 50.355560302734375,
+            "top": 380.822265625,
+            "right": 385.6777648925781,
+            "bottom": 431.1778259277344,
+            "left": 299.272216796875
+          }
+        }
+      ]
+    },
+    {
+      "phase": "skill-scrolled",
+      "core": "function",
+      "rules": true,
+      "skill": {
+        "x": 26.322221755981445,
+        "y": 29.096351623535156,
+        "width": 359.35552978515625,
+        "height": 3182.35400390625,
+        "top": 29.096351623535156,
+        "right": 385.6777515411377,
+        "bottom": 3211.450355529785,
+        "left": 26.322221755981445
+      },
+      "display": "block",
+      "list": {
+        "x": 26.322221755981445,
+        "y": 370.93951416015625,
+        "width": 359.35552978515625,
+        "height": 2826.77783203125,
+        "top": 370.93951416015625,
+        "right": 385.6777515411377,
+        "bottom": 3197.7173461914062,
+        "left": 26.322221755981445
+      },
+      "count": 12,
+      "title": {
+        "box": {
+          "x": 26.322221755981445,
+          "y": 121.03338623046875,
+          "width": 251.54530334472656,
+          "height": 43.4888916015625,
+          "top": 121.03338623046875,
+          "right": 277.867525100708,
+          "bottom": 164.52227783203125,
+          "left": 26.322221755981445
+        },
+        "ink": {
+          "x": 145.3802032470703,
+          "y": 120.27042388916016,
+          "width": 63.72528076171875,
+          "height": 40.055564880371094,
+          "top": 120.27042388916016,
+          "right": 209.10548400878906,
+          "bottom": 160.32598876953125,
+          "left": 145.3802032470703
+        }
+      },
+      "tabs": [
+        {
+          "text": "經驗池分配",
+          "rect": {
+            "x": 26.322221755981445,
+            "y": 314.4444885253906,
+            "width": 153.60589599609375,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 179.9281177520752,
+            "bottom": 373.9555969238281,
+            "left": 26.322221755981445
+          }
+        },
+        {
+          "text": "能力值",
+          "rect": {
+            "x": 186.79478454589844,
+            "y": 314.4444885253906,
+            "width": 96.00816345214844,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 282.8029479980469,
+            "bottom": 373.9555969238281,
+            "left": 186.79478454589844
+          }
+        },
+        {
+          "text": "技能",
+          "rect": {
+            "x": 289.66961669921875,
+            "y": 314.4444885253906,
+            "width": 96.00814819335938,
+            "height": 59.5111083984375,
+            "top": 314.4444885253906,
+            "right": 385.6777648925781,
+            "bottom": 373.9555969238281,
+            "left": 289.66961669921875
+          }
+        }
+      ],
+      "owner": {
+        "rect": {
+          "x": 26.322221755981445,
+          "y": 380.822265625,
+          "width": 359.35552978515625,
+          "height": 416.5777587890625,
+          "top": 380.822265625,
+          "right": 385.6777515411377,
+          "bottom": 797.4000244140625,
+          "left": 26.322221755981445
+        },
+        "top": 922,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      },
+      "controls": [
+        {
+          "text": "詳情\n›",
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 516.283935546875,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 516.283935546875,
+            "right": 96.13333129882812,
+            "bottom": 566.6395263671875,
+            "left": 41.19999694824219
+          }
+        },
+        {
+          "text": "學習・4點",
+          "rect": {
+            "x": 265.5111083984375,
+            "y": 516.283935546875,
+            "width": 105.28887939453125,
+            "height": 50.3555908203125,
+            "top": 516.283935546875,
+            "right": 370.79998779296875,
+            "bottom": 566.6395263671875,
+            "left": 265.5111083984375
+          }
+        },
+        {
+          "text": "詳情\n›",
+          "rect": {
+            "x": 41.19999694824219,
+            "y": 738.30615234375,
+            "width": 54.93333435058594,
+            "height": 50.3555908203125,
+            "top": 738.30615234375,
+            "right": 96.13333129882812,
+            "bottom": 788.6617431640625,
+            "left": 41.19999694824219
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Skill entry dependency smoke only. Original PREPARE/isolated QA transport, true character entry and skill TAB, one real scroll; no learn/equip/remove/auto changes or detail matrix. Startup/normalization save side effects retained. Exact restore baseline is immediately before PREPARE actor seed, after startup/skill module initialization; earlier startup private caches not restored. Integrated dev formal24px timer/46px prompt and existing readable skill picker only; synthetic no-reward battle entry, timers stopped for static inspection, no attack/skill/potion/settlement. Full/insufficient SP display fixture only; no natural combat/hardware claim.",
+  "expectedCritical": {
+    "scripts": [
+      "build/boot-core.b447fc7be00c.js"
+    ],
+    "styles": [
+      "build/boot-core.78385a4c589b.css"
+    ],
+    "images": [
+      "assets/ui/startup-logo.4631c0bc3f2b.jpg",
+      "assets/ui/startup-main-city.d43e67af1c1c.jpg"
+    ],
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.f0ce3eda91c9.js"
+  },
+  "battleChecks": [
+    {
+      "name": "battle-formal-layout",
+      "visible": false,
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "cards": []
+    },
+    {
+      "name": "battle-skill-full",
+      "visible": true,
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 321.75238037109375,
+        "y": 579.4395751953125,
+        "width": 62.78094482421875,
+        "height": 51.009521484375,
+        "top": 579.4395751953125,
+        "right": 384.5333251953125,
+        "bottom": 630.4490966796875,
+        "left": 321.75238037109375
+      },
+      "cards": [
+        {
+          "text": "火箭 Lv.1\n消耗 10 SP\n同排中、左、右最多3名",
+          "disabled": false,
+          "box": {
+            "x": 27.466665267944336,
+            "y": 633.3919677734375,
+            "width": 86.32379913330078,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 113.79046440124512,
+            "bottom": 807.0205078125,
+            "left": 27.466665267944336
+          },
+          "parts": [
+            {
+              "text": "火箭 Lv.1",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 697.644287109375,
+                "width": 78.47618865966797,
+                "height": 19.61907958984375,
+                "top": 697.644287109375,
+                "right": 109.86666297912598,
+                "bottom": 717.2633666992188,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 37.30684280395508,
+                "y": 695.6824340820312,
+                "width": 66.64344787597656,
+                "height": 23.5428466796875,
+                "top": 695.6824340820312,
+                "right": 103.95029067993164,
+                "bottom": 719.2252807617188,
+                "left": 37.30684280395508
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 729.0347900390625,
+                "width": 78.47618865966797,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 109.86666297912598,
+                "bottom": 748.6538696289062,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 33.0611572265625,
+                "y": 727.0729370117188,
+                "width": 75.13482666015625,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 108.19598388671875,
+                "bottom": 750.61572265625,
+                "left": 33.0611572265625
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 751.1062622070312,
+                "width": 78.47618865966797,
+                "height": 58.85711669921875,
+                "top": 751.1062622070312,
+                "right": 109.86666297912598,
+                "bottom": 809.96337890625,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 31.390474319458008,
+                "y": 749.144287109375,
+                "width": 78.47618865966797,
+                "height": 62.781005859375,
+                "top": 749.144287109375,
+                "right": 109.86666297912598,
+                "bottom": 811.92529296875,
+                "left": 31.390474319458008
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火焰斬 Lv.1\n消耗 10 SP\n敵方1名",
+          "disabled": false,
+          "box": {
+            "x": 117.71427154541016,
+            "y": 633.3919677734375,
+            "width": 86.32381439208984,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 204.0380859375,
+            "bottom": 807.0205078125,
+            "left": 117.71427154541016
+          },
+          "parts": [
+            {
+              "text": "火焰斬 Lv.1",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 687.8347778320312,
+                "width": 78.47618103027344,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 200.11427307128906,
+                "bottom": 727.0729370117188,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 137.3333282470703,
+                "y": 685.8729248046875,
+                "width": 47.08570861816406,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 184.41903686523438,
+                "bottom": 729.0347900390625,
+                "left": 137.3333282470703
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 729.0347900390625,
+                "width": 78.47618103027344,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 200.11427307128906,
+                "bottom": 748.6538696289062,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 123.30877685546875,
+                "y": 727.0729370117188,
+                "width": 75.13481140136719,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 198.44358825683594,
+                "bottom": 750.61572265625,
+                "left": 123.30877685546875
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方1名",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 770.7252807617188,
+                "width": 78.47618103027344,
+                "height": 19.6190185546875,
+                "top": 770.7252807617188,
+                "right": 200.11427307128906,
+                "bottom": 790.3442993164062,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 132.5511932373047,
+                "y": 768.7633666992188,
+                "width": 56.64997863769531,
+                "height": 23.5428466796875,
+                "top": 768.7633666992188,
+                "right": 189.201171875,
+                "bottom": 792.3062133789062,
+                "left": 132.5511932373047
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火爆亂擊 Lv.1\n消耗 47 SP\n同排中、左、右最多3名",
+          "disabled": false,
+          "box": {
+            "x": 207.96188354492188,
+            "y": 633.3919677734375,
+            "width": 86.32382202148438,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 294.28570556640625,
+            "bottom": 807.0205078125,
+            "left": 207.96188354492188
+          },
+          "parts": [
+            {
+              "text": "火爆亂擊 Lv.1",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 687.8347778320312,
+                "width": 78.47616577148438,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 290.36187744140625,
+                "bottom": 727.0729370117188,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 219.7333221435547,
+                "y": 685.8729248046875,
+                "width": 62.78096008300781,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 282.5142822265625,
+                "bottom": 729.0347900390625,
+                "left": 219.7333221435547
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 47 SP",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 729.0347900390625,
+                "width": 78.47616577148438,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 290.36187744140625,
+                "bottom": 748.6538696289062,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 213.556396484375,
+                "y": 727.0729370117188,
+                "width": 75.13479614257812,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 288.6911926269531,
+                "bottom": 750.61572265625,
+                "left": 213.556396484375
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 751.1062622070312,
+                "width": 78.47616577148438,
+                "height": 58.85711669921875,
+                "top": 751.1062622070312,
+                "right": 290.36187744140625,
+                "bottom": 809.96337890625,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 211.88571166992188,
+                "y": 749.144287109375,
+                "width": 78.47616577148438,
+                "height": 62.781005859375,
+                "top": 749.144287109375,
+                "right": 290.36187744140625,
+                "bottom": 811.92529296875,
+                "left": 211.88571166992188
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火鳳天鳴 Lv.1\n消耗 60 SP\n敵方全體",
+          "disabled": false,
+          "box": {
+            "x": 298.2095031738281,
+            "y": 633.3919677734375,
+            "width": 86.32382202148438,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 384.5333251953125,
+            "bottom": 807.0205078125,
+            "left": 298.2095031738281
+          },
+          "parts": [
+            {
+              "text": "火鳳天鳴 Lv.1",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 687.8347778320312,
+                "width": 78.4761962890625,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 380.6095275878906,
+                "bottom": 727.0729370117188,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 309.9809265136719,
+                "y": 685.8729248046875,
+                "width": 62.78094482421875,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 372.7618713378906,
+                "bottom": 729.0347900390625,
+                "left": 309.9809265136719
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 60 SP",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 729.0347900390625,
+                "width": 78.4761962890625,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 380.6095275878906,
+                "bottom": 748.6538696289062,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 303.80401611328125,
+                "y": 727.0729370117188,
+                "width": 75.13479614257812,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 378.9388122558594,
+                "bottom": 750.61572265625,
+                "left": 303.80401611328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方全體",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 770.7252807617188,
+                "width": 78.4761962890625,
+                "height": 19.6190185546875,
+                "top": 770.7252807617188,
+                "right": 380.6095275878906,
+                "bottom": 790.3442993164062,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 309.9809265136719,
+                "y": 768.7633666992188,
+                "width": 62.78094482421875,
+                "height": 23.5428466796875,
+                "top": 768.7633666992188,
+                "right": 372.7618713378906,
+                "bottom": 792.3062133789062,
+                "left": 309.9809265136719
+              },
+              "font": "16px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "battle-skill-insufficient",
+      "visible": true,
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 321.75238037109375,
+        "y": 579.4395751953125,
+        "width": 62.78094482421875,
+        "height": 51.009521484375,
+        "top": 579.4395751953125,
+        "right": 384.5333251953125,
+        "bottom": 630.4490966796875,
+        "left": 321.75238037109375
+      },
+      "cards": [
+        {
+          "text": "SP不足\n火箭 Lv.1\n消耗 10 SP\n同排中、左、右最多3名",
+          "disabled": true,
+          "box": {
+            "x": 27.466665267944336,
+            "y": 633.3919677734375,
+            "width": 86.32379913330078,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 113.79046440124512,
+            "bottom": 807.0205078125,
+            "left": 27.466665267944336
+          },
+          "parts": [
+            {
+              "text": "火箭 Lv.1",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 697.644287109375,
+                "width": 78.47618865966797,
+                "height": 19.61907958984375,
+                "top": 697.644287109375,
+                "right": 109.86666297912598,
+                "bottom": 717.2633666992188,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 37.30684280395508,
+                "y": 695.6824340820312,
+                "width": 66.64344787597656,
+                "height": 23.5428466796875,
+                "top": 695.6824340820312,
+                "right": 103.95029067993164,
+                "bottom": 719.2252807617188,
+                "left": 37.30684280395508
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 729.0347900390625,
+                "width": 78.47618865966797,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 109.86666297912598,
+                "bottom": 748.6538696289062,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 33.0611572265625,
+                "y": 727.0729370117188,
+                "width": 75.13482666015625,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 108.19598388671875,
+                "bottom": 750.61572265625,
+                "left": 33.0611572265625
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 31.390474319458008,
+                "y": 751.1062622070312,
+                "width": 78.47618865966797,
+                "height": 58.85711669921875,
+                "top": 751.1062622070312,
+                "right": 109.86666297912598,
+                "bottom": 809.96337890625,
+                "left": 31.390474319458008
+              },
+              "ink": {
+                "x": 31.390474319458008,
+                "y": 749.144287109375,
+                "width": 78.47618865966797,
+                "height": 62.781005859375,
+                "top": 749.144287109375,
+                "right": 109.86666297912598,
+                "bottom": 811.92529296875,
+                "left": 31.390474319458008
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火焰斬 Lv.1\n消耗 10 SP\n敵方1名",
+          "disabled": true,
+          "box": {
+            "x": 117.71427154541016,
+            "y": 633.3919677734375,
+            "width": 86.32381439208984,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 204.0380859375,
+            "bottom": 807.0205078125,
+            "left": 117.71427154541016
+          },
+          "parts": [
+            {
+              "text": "火焰斬 Lv.1",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 687.8347778320312,
+                "width": 78.47618103027344,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 200.11427307128906,
+                "bottom": 727.0729370117188,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 137.3333282470703,
+                "y": 685.8729248046875,
+                "width": 47.08570861816406,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 184.41903686523438,
+                "bottom": 729.0347900390625,
+                "left": 137.3333282470703
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 729.0347900390625,
+                "width": 78.47618103027344,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 200.11427307128906,
+                "bottom": 748.6538696289062,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 123.30877685546875,
+                "y": 727.0729370117188,
+                "width": 75.13481140136719,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 198.44358825683594,
+                "bottom": 750.61572265625,
+                "left": 123.30877685546875
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方1名",
+              "box": {
+                "x": 121.63809204101562,
+                "y": 770.7252807617188,
+                "width": 78.47618103027344,
+                "height": 19.6190185546875,
+                "top": 770.7252807617188,
+                "right": 200.11427307128906,
+                "bottom": 790.3442993164062,
+                "left": 121.63809204101562
+              },
+              "ink": {
+                "x": 132.5511932373047,
+                "y": 768.7633666992188,
+                "width": 56.64997863769531,
+                "height": 23.5428466796875,
+                "top": 768.7633666992188,
+                "right": 189.201171875,
+                "bottom": 792.3062133789062,
+                "left": 132.5511932373047
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火爆亂擊 Lv.1\n消耗 47 SP\n同排中、左、右最多3名",
+          "disabled": true,
+          "box": {
+            "x": 207.96188354492188,
+            "y": 633.3919677734375,
+            "width": 86.32382202148438,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 294.28570556640625,
+            "bottom": 807.0205078125,
+            "left": 207.96188354492188
+          },
+          "parts": [
+            {
+              "text": "火爆亂擊 Lv.1",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 687.8347778320312,
+                "width": 78.47616577148438,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 290.36187744140625,
+                "bottom": 727.0729370117188,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 219.7333221435547,
+                "y": 685.8729248046875,
+                "width": 62.78096008300781,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 282.5142822265625,
+                "bottom": 729.0347900390625,
+                "left": 219.7333221435547
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 47 SP",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 729.0347900390625,
+                "width": 78.47616577148438,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 290.36187744140625,
+                "bottom": 748.6538696289062,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 213.556396484375,
+                "y": 727.0729370117188,
+                "width": 75.13479614257812,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 288.6911926269531,
+                "bottom": 750.61572265625,
+                "left": 213.556396484375
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 211.88571166992188,
+                "y": 751.1062622070312,
+                "width": 78.47616577148438,
+                "height": 58.85711669921875,
+                "top": 751.1062622070312,
+                "right": 290.36187744140625,
+                "bottom": 809.96337890625,
+                "left": 211.88571166992188
+              },
+              "ink": {
+                "x": 211.88571166992188,
+                "y": 749.144287109375,
+                "width": 78.47616577148438,
+                "height": 62.781005859375,
+                "top": 749.144287109375,
+                "right": 290.36187744140625,
+                "bottom": 811.92529296875,
+                "left": 211.88571166992188
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火鳳天鳴 Lv.1\n消耗 60 SP\n敵方全體",
+          "disabled": true,
+          "box": {
+            "x": 298.2095031738281,
+            "y": 633.3919677734375,
+            "width": 86.32382202148438,
+            "height": 173.6285400390625,
+            "top": 633.3919677734375,
+            "right": 384.5333251953125,
+            "bottom": 807.0205078125,
+            "left": 298.2095031738281
+          },
+          "parts": [
+            {
+              "text": "火鳳天鳴 Lv.1",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 687.8347778320312,
+                "width": 78.4761962890625,
+                "height": 39.2381591796875,
+                "top": 687.8347778320312,
+                "right": 380.6095275878906,
+                "bottom": 727.0729370117188,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 309.9809265136719,
+                "y": 685.8729248046875,
+                "width": 62.78094482421875,
+                "height": 43.161865234375,
+                "top": 685.8729248046875,
+                "right": 372.7618713378906,
+                "bottom": 729.0347900390625,
+                "left": 309.9809265136719
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 60 SP",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 729.0347900390625,
+                "width": 78.4761962890625,
+                "height": 19.61907958984375,
+                "top": 729.0347900390625,
+                "right": 380.6095275878906,
+                "bottom": 748.6538696289062,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 303.80401611328125,
+                "y": 727.0729370117188,
+                "width": 75.13479614257812,
+                "height": 23.54278564453125,
+                "top": 727.0729370117188,
+                "right": 378.9388122558594,
+                "bottom": 750.61572265625,
+                "left": 303.80401611328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方全體",
+              "box": {
+                "x": 302.1333312988281,
+                "y": 770.7252807617188,
+                "width": 78.4761962890625,
+                "height": 19.6190185546875,
+                "top": 770.7252807617188,
+                "right": 380.6095275878906,
+                "bottom": 790.3442993164062,
+                "left": 302.1333312988281
+              },
+              "ink": {
+                "x": 309.9809265136719,
+                "y": 768.7633666992188,
+                "width": 62.78094482421875,
+                "height": 23.5428466796875,
+                "top": 768.7633666992188,
+                "right": 372.7618713378906,
+                "bottom": 792.3062133789062,
+                "left": 309.9809265136719
+              },
+              "font": "16px"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "loaded": [
+    "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:54577/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:54577/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:54577/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:54577/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:54577/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:54577/build/app-shell.1f08d95019e0.js",
+    "http://127.0.0.1:54577/build/app-shell.7bc5e1c99233.css",
+    "http://127.0.0.1:54577/build/app-shell.1f08d95019e0.js",
+    "http://127.0.0.1:54577/build/app-shell.7bc5e1c99233.css",
+    "http://127.0.0.1:54577/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:54577/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:54577/build/gameplay-core-primary.5d80f0302203.js",
+    "http://127.0.0.1:54577/build/gameplay-core-secondary.78a1364f9a34.js",
+    "http://127.0.0.1:54577/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:54577/build/gameplay-core.3bab1db451ad.css",
+    "http://127.0.0.1:54577/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:54577/build/gameplay-core-primary.5d80f0302203.js",
+    "http://127.0.0.1:54577/build/gameplay-core-secondary.78a1364f9a34.js",
+    "http://127.0.0.1:54577/build/gameplay-core.3bab1db451ad.css",
+    "http://127.0.0.1:54577/build/feature-adventure-entry.f68f5350eccc.css",
+    "http://127.0.0.1:54577/build/feature-adventure-entry.0f3635335ca7.js",
+    "http://127.0.0.1:54577/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "actorsExact": true,
+    "inventoryExact": true,
+    "loadoutsExact": true
+  },
+  "sourceAfter": {
+    "index.html": "e063142d2b656deefdaaf92c3f963baf5dc54d5c6956969845358b89b902c4cb",
+    "asset-manifest.json": "28a83ed757b6985294ccad191d0a57e3a842e8ae853dc19da0f02302eec07938",
+    "js/00-main.js": "b61c540f80cc4a0a279251111310328e8e259f201e81d12fed9d35e94c784c4d",
+    "build/app-shell.1f08d95019e0.js": "1f08d95019e08863a07a40daf30bd9557d6484577b23e84eefef7783cde760b7",
+    "build/app-shell.7bc5e1c99233.css": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+    "build/boot-core.78385a4c589b.css": "78385a4c589b8510d6927cc47b0efe2d8b726bfab8f864511283f4c5636764f8",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.f812f2d9ad9b.js": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.84bbc0a00468.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "build/feature-adventure-ui.e00b5fff8c35.js": "e00b5fff8c350574547b865510ed79bfcb8db5fb79c66a694e08fe626945a06b",
+    "build/feature-adventure.c82d45eb0990.css": "c82d45eb0990df11547e8c36e9bb258d8934b7c5253d1f6b28b57d4735f75ad6",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.5d80f0302203.js": "5d80f0302203089771562db8104462b5929b6a61d4d8467df141ac19633350ed",
+    "build/gameplay-core-secondary.78a1364f9a34.js": "78a1364f9a343f9da9e85343b5f6066571f9ad468314f7bdf309572536d639ac",
+    "build/gameplay-core.3bab1db451ad.css": "3bab1db451ad884b1142375022444e4ab547025434299645f8c02cc37307b619"
+  },
+  "sourceUnchanged": true
+}

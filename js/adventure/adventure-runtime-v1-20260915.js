@@ -628,7 +628,7 @@
 
     function skillLoadout(){
         const owner=playerOwner();
-        return typeof characterSkillLoadouts!=="undefined"&&owner?characterSkillLoadouts[owner.element]:null;
+        return typeof characterSkillLoadouts!=="undefined"&&owner?characterSkillLoadouts[getPartyCharacterKey(0)]:null;
     }
     function hasTutorialAction(action){
         const owner=playerOwner(),state=chapterState();
@@ -638,7 +638,7 @@
             return !!loadout&&Object.entries(loadout.skillLevels||{}).some(([id,level])=>level>0&&loadout.equippedSkills?.includes(id));
         }
         if(action==="equipment"){
-            const gear=typeof characterEquipment!=="undefined"?characterEquipment[owner.element]:null;
+            const gear=typeof characterEquipment!=="undefined"?characterEquipment[getPartyCharacterKey(0)]:null;
             return !!state.grantedEquipmentUid&&!!gear&&Object.values(gear).some(item=>item?.v141Uid===state.grantedEquipmentUid);
         }
         if(action==="recovery"){
@@ -727,7 +727,7 @@
     function openTutorialSystem(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
-            if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=playerOwner().element;}
+            if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=getPartyCharacterKey(0);}
             hideOverlay();showPage("home");openHomeFeature("character");switchCharacterTab("skill");
         }else if(o.requiredAction==="equipment"&&!state.grantedEquipmentUid){
             if(!getEquipmentLessonOfferIntent()){showMessage("請先領取追兵一戰的護具購置金。");return false;}
@@ -1242,6 +1242,7 @@
             dialogue:state&&state.dialogue||null,
             tutorial:state&&state.onboarding||null,
             tutorialProgress:state?.onboarding?.active?{
+                nativeElement:playerOwner()?.element,
                 skillReady:hasTutorialAction("skill"),equipmentReady:hasTutorialAction("equipment"),
                 equipmentAcquired:!!state.grantedEquipmentUid,equipmentNeedsPurchase:!!getEquipmentLessonOfferIntent(),
                 recoveryReady:hasTutorialAction("recovery"),recoveryNeedsPractice:recoveryNeedsPractice(),skillUsed:runtime.tutorialSkillUsed,

@@ -32,7 +32,8 @@ try{
   const manifest=await (await fetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
  }else{server=await startServer();url=server.url;}
  profile=fs.mkdtempSync(path.join(os.tmpdir(),'forge-qa-'));
- const chrome=findChrome(),port=9900+Math.floor(Math.random()*300);
+ // Keep this pool above fetch's blocked 10080 port; Chrome itself can listen there.
+ const chrome=findChrome(),port=10300+Math.floor(Math.random()*300);
  proc=spawn(chrome,[...(chrome.includes('headless-shell')?[]:['--headless=new']),'--no-sandbox','--disable-gpu','--disable-dev-shm-usage',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore'});
  const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');c=new Cdp(target.webSocketDebuggerUrl);
  await c.send('Page.enable');await c.send('Runtime.enable');

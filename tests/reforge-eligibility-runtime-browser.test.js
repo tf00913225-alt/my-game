@@ -22,7 +22,7 @@ const script=s=>"<script>"+s.replace(/<\/script/gi,"<\\/script")+"</script>";
 const fixture=path.resolve(".reforge-eligibility-browser.html");
 const profile=path.resolve(".reforge-browser-profile");
 const setup=`
-var inventoryItems=[],inventorySlots=Array(120).fill(null),characterEquipment={},selectedInventorySlot=null,gold=100000,skillDatabase={stormSpell:{}},saveFails=false,saved=null,alerts=[];
+var inventoryItems=[],inventorySlots=Array(120).fill(null),characterEquipment={},selectedInventorySlot=null,gold=100000,skillDatabase={windHowlLightning:{}},saveFails=false,saved=null,alerts=[];
 let activeUid='fixture';window.FourSymbolsAccountSave={accountKey:k=>'fixture:'+k,readActive:()=>({status:'ready',uid:activeUid,metadata:{ownerUid:activeUid,cloudBaseFingerprint:null,source:'local'}})};
 window.v132GetContentDefinitions=()=>({ores:[{id:'oreWhite',type:'material',name:'白階礦石',tierKey:'white'}],equipmentSetItems:[],equipmentSets:[],talismans:[],blueprints:[],tickets:[]});
 function $(id){return document.getElementById(id)}

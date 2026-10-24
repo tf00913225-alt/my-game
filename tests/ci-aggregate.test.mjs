@@ -224,7 +224,10 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
     close(){this.dispatchEvent(new Event('close'));}
     reply(value){const event=new Event('message');event.data=JSON.stringify({id:this.request.id,result:value});this.dispatchEvent(event);}
   }
-  const connect=vm.runInNewContext(source.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
+  const probeImport='const {waitJson}=await import("../.github/scripts/runtime-browser-qa-support.mjs");';
+  assert.ok(source.includes(probeImport),'fixture must inject the formal startup probe');
+  const fixtureSource=source.replace(probeImport,'const waitJson=fixtureWaitJson;');
+  const connect=vm.runInNewContext(fixtureSource.split('\nconst chrome=findChrome();')[0]+'\nconnectChrome;',{
     require:name=>name==='node:fs'?{mkdtempSync:()=>'/unused-fixture-profile',promises:{rm:async()=>removed++}}:
       name==='node:child_process'?{spawn:()=>({get exitCode(){return launchFailure?1:null;},kill:()=>killed++,
         stderr:{on:(event,read)=>{if(launchFailure)read('fixture Chrome launch diagnostic');}},
@@ -232,7 +235,10 @@ test('backpack Chrome transport rejects stalled commands and cleans up without w
       name==='node:net'?{createServer:()=>({once(){},listen(port,host,ready){ready();},address:()=>({port:12345}),close(done){done();}})}:require(name),
     __dirname:new URL('.',import.meta.url).pathname,
     WebSocket:FakeSocket,AbortSignal,
-    fetch:async()=>({json:async()=>launchFailure?[]:[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}]}),
+    fixtureWaitJson:async(url,{chromeProcess,accept})=>{
+      if(chromeProcess.exitCode!==null)throw Object.assign(new Error('fixture Chrome exited'),{code:'CHROME_EXITED'});
+      const rows=[{type:'page',webSocketDebuggerUrl:'ws://fixture.invalid'}];assert.equal(accept(rows),true);return rows;
+    },
     setTimeout:(fn,ms)=>setTimeout(fn,ms===30000?10:ms),clearTimeout
   });
   const browser=await connect('fixture-chrome');

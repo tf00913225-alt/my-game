@@ -66,12 +66,12 @@ assert.match(vfxSource,/node\.style\.left=bounds\.centerX\+"px";[\s\S]*node\.sty
 assert.doesNotMatch(vfxSource,/activeCards\([^)]*\)\.length\s*\*/,"VFX scale must not multiply by surviving target count");
 
 assert.match(css,/#battleMonsterArea\.v-fixed-enemy-zone\{[\s\S]*position:relative !important;[\s\S]*height:var\(--battle-enemy-zone-height\) !important;/);
-assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/,"battle layout must own three proportional structural tracks");
+assert.match(css,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-ally-region-track\)[\s\S]*var\(--battle-center-region-track\)/,"battle layout owns enemy, ally, then bottom operation tracks");
 assert.doesNotMatch(css,/--battle-info-region-track/,"bottom info drawer must not resize battlefield tracks");
 assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\{[\s\S]*position:absolute !important;/);
 assert.match(css,/#battlePlayerRow\.v-fixed-ally-zone\{[\s\S]*height:var\(--battle-ally-zone-height\) !important;/);
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\{[\s\S]*position:absolute !important;/);
-assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:0 !important;\}/,"ally front row must be nearest the enemy zone");
+assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="front"\]\{top:-24px !important;\}/,"ally front row must be nearest the enemy zone");
 assert.match(css,/#battlePlayerRow > \.v-fixed-ally-slot-row\[data-slot-row="back"\]\{bottom:0 !important;\}/,"ally back row must stay inside its separated row");
 assert.match(css,/--battle-ally-row-gap:8px/);
 assert.doesNotMatch(css,/v-fixed-mechanism-zone|MECH_L|MECH_C|MECH_R/,"retired function-card plane is absent");
@@ -90,7 +90,7 @@ assert.doesNotMatch(css,/@media \(max-width:380px\)/,"fixed Slot geometry must n
 const safeTop=Number(css.match(/--battle-enemy-safe-top:(\d+)px/)?.[1]||0);
 const artOverhang=Number(css.match(/--battle-art-overhang-top:(\d+)px/)?.[1]||0);
 assert.ok(safeTop>=artOverhang+3,"enemy safe-top must cover artwork overhang plus idle lift");
-assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:var\(--battle-enemy-safe-top\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
+assert.match(css,/#battleMonsterArea > \.v-fixed-enemy-row\[data-slot-row="back"\]\{top:calc\(var\(--battle-enemy-safe-top\) - 26px\) !important;\}/,"enemy back row must stay inside the portrait viewport safe region");
 assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[^}]*\}/)?.[0]||"",/\bscale\s*:/,"VFX raster size must not scale its centering or flight translation");
 
 // Execute the production sizing functions. These checks supplement, never
@@ -219,26 +219,35 @@ console.log("Fixed Slot Battlefield Rendering V2 regression contract passed.");
 assert.match(css,/--battle-enemy-region-track:54\.785fr;[\s\S]*?--battle-center-region-track:12fr;[\s\S]*?--battle-ally-region-track:45\.215fr;/,"single-line enemy identity and compact turn information fund foot badges while retaining portraits");
 assert.doesNotMatch(css.match(/\[data-enemy-battlefield-profile="standard-six"\]\{([^}]+)\}/)[1],/--battle-(enemy|center|ally)-region-track/,"six-slot profile shares the structural layout instead of silently restoring the old middle gap");
 assert.match(css,/height:calc\(100% - var\(--battle-bottom-safe-gap\)\) !important;/,"bottom HUD safety is real layout space, not an art translation");
-assert.match(css,/--battle-bottom-safe-gap:24px;/);
-assert.match(css,/--battle-center-min-height:calc\(var\(--battle-turn-row-height\) \+ max\(var\(--battle-command-visual-height\), calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\)\) \+ 6px\);/,"the smaller center still fits both command and target-selection states without shrinking text/buttons");
+assert.match(css,/--battle-bottom-safe-gap:8px;/);
+assert.match(css,/--battle-top-name-reserve:44px;/);
+assert.match(css,/#game-stage:has\(#releaseUpdateMarquee:not\(\[hidden\]\)\)[^{}]*\{--battle-top-name-reserve:72px;\}/);
+assert.match(css,/#battleCommandRow\{[^}]*flex:0 0 var\(--battle-command-row-height\) !important;/,"outer row cannot retain old inline66px budget");
+assert.match(css,/#turnTargetRow \.turn-number\{display:none;\}/,"round is shown once; countdown retains original timer");
+assert.match(css,/padding-top:var\(--battle-top-name-reserve\)/,"name headroom is real layout space");
+assert.match(css,/--battle-center-min-height:calc\(var\(--battle-turn-row-height\) \+ max\(var\(--battle-command-visual-height\), calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\)\) \+ 12px\);/,"bottom operations retain turn/command separation and target selection with compact safe touch controls");
+assert.match(css,/#battleCommandRow\{\s*width:100%;\s*margin-right:0;/,"commands and separate utility row cannot share width");
 // Quantify the structural budget independently of artwork. USB still verifies
 // actual CSS layout/projection; these checks catch unsafe token combinations.
 const layoutNumber=(name,unit)=>Number(css.match(new RegExp('--'+name+':([0-9.]+)'+unit+';'))?.[1]);
 const enemyWeight=layoutNumber('battle-enemy-region-track','fr'),centerWeight=layoutNumber('battle-center-region-track','fr'),allyWeight=layoutNumber('battle-ally-region-track','fr');
-const bottomReserve=layoutNumber('battle-bottom-safe-gap','px'),regionGap=layoutNumber('battle-region-gap','px');
+const bottomReserve=layoutNumber('battle-bottom-safe-gap','px'),topReserve=layoutNumber('battle-top-name-reserve','px'),regionGap=layoutNumber('battle-region-gap','px');
 const commandCss=read('css/00-main.css');
-const commandHeight=Number(commandCss.match(/--battle-command-row-height:(\d+)px;/)[1]);
+const commandHeight=layoutNumber('battle-command-row-height','px');
+assert.ok(commandHeight*360/420>=44,'compact controls retain44px physical height at360px');
+const formationSeparation=layoutNumber('battle-formation-separation','px');
+assert.equal(formationSeparation,44,'single control row returns height to party separation');
 const turnHeight=layoutNumber('battle-turn-row-height','px')||Number(commandCss.match(/--battle-turn-row-height:(\d+)px;/)[1]);
-const centerMinimum=turnHeight+Math.max(commandHeight,layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px'))+6;
+const centerMinimum=turnHeight+Math.max(commandHeight,layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px'))+12;
 for(const contentHeight of [600,717,840]){
-    const usable=contentHeight-bottomReserve-regionGap*2;
+    const usable=contentHeight-topReserve-bottomReserve-regionGap*3-formationSeparation;
     const centerHeight=Math.max(centerMinimum,usable*centerWeight/(enemyWeight+centerWeight+allyWeight));
     const enemyHeight=(usable-centerHeight)*enemyWeight/(enemyWeight+allyWeight);
     const allyHeight=(usable-centerHeight)*allyWeight/(enemyWeight+allyWeight);
     assert.ok(centerHeight>=turnHeight+commandHeight+6&&centerHeight>=turnHeight+layoutNumber('battle-target-prompt-height','px')+layoutNumber('battle-target-select-gap','px')+6,'controls must fit without overlaying each other at '+contentHeight);
-    assert.ok(centerHeight===centerMinimum||centerHeight<(contentHeight-regionGap*2)*.21,'preferred middle gap stays compact; its original animated countdown and readable prompt minimum take precedence at '+contentHeight);
+    assert.ok(centerHeight<(contentHeight-regionGap*2)*.21,'middle gap must actually decrease at '+contentHeight);
     assert.ok(enemyHeight>0&&allyHeight>0);
-    assert.ok(Math.abs(contentHeight-(enemyHeight+centerHeight+allyHeight+regionGap*2)-bottomReserve)<.001,'bottom reserve cannot be consumed by fractional tracks');
+    assert.ok(Math.abs(contentHeight-(enemyHeight+centerHeight+allyHeight+regionGap*3+formationSeparation)-topReserve-bottomReserve)<.001,'top name and bottom safety reserves cannot be consumed by fractional tracks');
 }
 
 assert.match(css,/--battle-portrait-visible-height:min\(101\.55px, calc\(var\(--battle-portrait-safe-height\) \/ var\(--battle-art-depth, 1\)\)\);/,"normal art compensates depth before the below-HUD height limit");
@@ -247,12 +256,13 @@ assert.match(css,/--battle-portrait-safe-height:96cqh;/,"near-row enemy paint le
 assert.match(css,/\[data-enemy-battlefield-profile="standard-six"\] \.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*\{--battle-portrait-safe-height:90cqh;\}/,"height-limited far enemies stay smaller instead of both rows saturating the same height");
 assert.match(css,/left:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"depth must not expand the horizontal silhouette envelope into adjacent slots");
 assert.match(css,/right:calc\(50% - \(50% \+ var\(--battle-art-overhang-x\)\) \/ var\(--battle-art-depth, 1\)\)/,"width compensation stays symmetric around the canonical slot");
-assert.match(css,/\.battle-player > \.v174-battle-art,\s*[^{}]*\.battle-monster:is\(\[data-portrait-size-class="STANDARD"\],\[data-portrait-size-class="ELITE"\]\) > \.v174-normalized-portrait\{--battle-art-depth:1\.18;\}/,"only players and normalized ordinary/elite monsters receive the near-row enlargement");
-assert.match(css,/\.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*\{--battle-art-depth:1\.10;\}/,"far enemies preserve their original camera depth");
-assert.match(css,/\.v-fixed-ally-slot-row\[data-slot-row="front"\][^{}]*\{--battle-art-depth:1\.10;--battle-art-overhang-top:9px;\}/,"far allies retain camera depth and their artwork minimum with the readable countdown");
 
 assert.match(fs.readFileSync("index.html","utf8"), /id="battleActionRegion"[\s\S]*?id="battleElementBoxButton"[\s\S]*?id="turnTargetRow"/,"element box shares the formal operation reserve");
 
+assert.match(css,/\.battle-player > \.v174-battle-art\{--battle-art-depth:1;\}/,"all party rows use the same unit scale");
+assert.doesNotMatch(css,/\.v-fixed-ally-slot-row\[data-slot-row="front"\][^{}]*\{[^}]*--battle-art-depth/,"party front cannot override depth");
+assert.doesNotMatch(css,/#battlePlayerRow:has/,"paired back portraits cannot have a different sizing policy");
+assert.match(css,/\.v-fixed-enemy-row\[data-slot-row="back"\][^{}]*\{--battle-art-depth:1\.10;\}/,"enemy far row retains depth");
 // Ordinary HUD typography is owned by Fixed Slot; historical identity rules
 // remain scoped to the separate Boss card contract.
 assert.doesNotMatch(fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8"), /#battlePage \.battle-monster-name\.v143-monster-identity\{/);

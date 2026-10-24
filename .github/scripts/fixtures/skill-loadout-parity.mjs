@@ -4,9 +4,10 @@ import {loadLegacyRuntime} from '../../../scripts/monster-balance-shadow-matrix.
 
 // Actual fully loaded Client entry points. Save/update observers isolate the
 // affected domain; original renderers and auto-option lifecycle still execute.
-export function loadoutParity(){
+export function loadoutParity({displayLiteralReversals=[]}={}){
     const {context}=loadLegacyRuntime(),digest=crypto.createHash('sha256');let cases=0;
-    const record=value=>{digest.update(JSON.stringify(value)+'\n');cases++;};
+    const display=value=>Array.isArray(value)?value.map(display):typeof value==='string'?displayLiteralReversals.reduce((text,[oldText,acceptedText])=>text.split(acceptedText).join(oldText),value):value;
+    const record=value=>{if(displayLiteralReversals.length)value[5]=display(value[5]);digest.update(JSON.stringify(value)+'\n');cases++;};
     const catalog=vm.runInContext('skillDatabase',context),ids=Object.keys(catalog).sort();
     const nativeCreate=context.document.createElement.bind(context.document),nativeGet=context.document.getElementById.bind(context.document),nodes=new Map();
     function node(){

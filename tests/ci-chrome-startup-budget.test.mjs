@@ -34,3 +34,12 @@ test('spawn failure is distinct from timeout',async()=>{
  const e=await endpoint(()=>{}),child=spawn('missing-chrome-binary-for-startup-regression-976');
  try{await assert.rejects(waitJson(e.url,{chromeProcess:child}),error=>error.code==='CHROME_SPAWN_FAILED'&&error.cause.code==='ENOENT');}finally{await e.close();}
 });
+
+test('startup target predicate keeps polling empty/non-page JSON until a debugger page exists',async()=>{
+ let count=0;const child=alive();const e=await endpoint((req,res)=>res.end(JSON.stringify(++count===1?[]:count===2?[{type:'browser'}]:[{type:'page',webSocketDebuggerUrl:'ws://fixture'}])));
+ try{const data=await waitJson(e.url,{chromeProcess:child,accept:rows=>Array.isArray(rows)&&rows.some(row=>row.type==='page'&&row.webSocketDebuggerUrl)});assert.equal(count,3);assert.equal(data[0].webSocketDebuggerUrl,'ws://fixture');}finally{await e.close();}
+});
+test('never-acceptable JSON cannot escape the finite startup deadline',async()=>{
+ const child=alive(),e=await endpoint((req,res)=>res.end('[]')),started=Date.now();
+ try{await assert.rejects(waitJson(e.url,{chromeProcess:child,timeoutMs:100,accept:rows=>rows.some(row=>row.type==='page')}),error=>(error.message==='DevTools JSON has no acceptable target yet'||error.code==='ETIMEDOUT'&&error.cause?.message==='DevTools JSON has no acceptable target yet')&&error.devToolsDiagnostics.directHttp.status===200);assert.ok(Date.now()-started<1500);assert.equal(child.listenerCount('exit'),0);}finally{await e.close();}
+});

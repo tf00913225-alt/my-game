@@ -789,9 +789,6 @@
     /* =====================================================
        Abyss dungeon
     ===================================================== */
-    if(!skillDatabase.stormSpell){
-        skillDatabase.stormSpell=Object.assign({},skillDatabase.windHowlLightning,{id:"stormSpell",name:"暴風術",tier:4,targetType:"all"});
-    }
     function defaultAbyssState(){ return {active:false,floor:1,phase:"boss",x:50,y:84,message:"",clears:0,rewardVersion:1}; }
     function loadAbyssState(){
         try{

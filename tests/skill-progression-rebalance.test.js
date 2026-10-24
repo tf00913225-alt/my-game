@@ -14,7 +14,7 @@ const names={
     waterKnife:"水刀斬",frostPunch:"冰霜拳",iceSpin:"冰旋一閃",frostCrush:"冰封重擊",waterBall:"水球術",floodBeast:"洪水猛獸",iceArrowRain:"冰霜箭雨",
     healSpell:"治療術",revive:"復活術",freeze:"冰封",purifyMind:"淨心訣",waterEX:"水元素EX",
     stormFist:"暴風拳",stormFlurry:"暴風亂擊",windCrossSlash:"風旋十字斬",dizzyFist:"暈眩猛擊",windSpell:"狂風術",stormCircle:"風焰術",windHowlLightning:"風哮電擊",stormRain:"風起雲湧",dodgeSkill:"閃躲術",stealthSkill:"隱身術",dinghaishenzhen:"氣定神閒",windEX:"風元素EX",
-    stoneSlash:"土石斬",petrifyFist:"石盾拳",stoneBreakSky:"石破天驚",earthquakeCrush:"地裂重拳",stoneThrow:"落石術",sandWind:"滾石術",flyingSandStrike:"飛沙瞬擊",dustStorm:"地牛猛襲",rockWall:"岩石壁壘",earthShield:"萬象土盾",barrier:"結界",earthEX:"土元素EX",stormSpell:"暴風術"
+    stoneSlash:"土石斬",petrifyFist:"石盾拳",stoneBreakSky:"石破天驚",earthquakeCrush:"地裂重拳",stoneThrow:"落石術",sandWind:"滾石術",flyingSandStrike:"飛沙瞬擊",dustStorm:"地牛猛襲",rockWall:"岩石壁壘",earthShield:"萬象土盾",barrier:"結界",earthEX:"土元素EX"
 };
 const elementById=id=>{
     if(/^water|frost|ice|heal|revive|freeze|purify/.test(id)) return "water";
@@ -27,14 +27,14 @@ const categoryById=id=>{
     if(["rage","dodgeSkill","stealthSkill","dinghaishenzhen","rockWall","earthShield","barrier","purifyMind"].includes(id)) return "buff";
     if(id==="healSpell") return "heal";
     if(id==="revive") return "revive";
-    if(["fireRocket","blazeSpell","flameTornado","phoenixCry","waterBall","floodBeast","iceArrowRain","freeze","windSpell","stormCircle","windHowlLightning","stormRain","stoneThrow","sandWind","flyingSandStrike","dustStorm","stormSpell"].includes(id)) return "magic";
+    if(["fireRocket","blazeSpell","flameTornado","phoenixCry","waterBall","floodBeast","iceArrowRain","freeze","windSpell","stormCircle","windHowlLightning","stormRain","stoneThrow","sandWind","flyingSandStrike","dustStorm"].includes(id)) return "magic";
     return "physical";
 };
 
 function makeSkillDatabase(){
     const db={};
     for(const [id,name] of Object.entries(names)){
-        db[id]={id,name,element:elementById(id),category:categoryById(id),learnCost:99,maxLevel:/EX$|freeze|purifyMind|stealthSkill|dinghaishenzhen|barrier|stormSpell/.test(id)?1:5,upgradeCost:1,requires:[],description:"初次學習需99技能點。最高5級，每升1級消耗1技能點。"};
+        db[id]={id,name,element:elementById(id),category:categoryById(id),learnCost:99,maxLevel:/EX$|freeze|purifyMind|stealthSkill|dinghaishenzhen|barrier/.test(id)?1:5,upgradeCost:1,requires:[],description:"初次學習需99技能點。最高5級，每升1級消耗1技能點。"};
     }
     Object.assign(db.fireCritical,{requires:["flameSlash"]});
     Object.assign(db.explosiveFlurry,{requires:["fireCritical"]});
@@ -213,7 +213,7 @@ test("final progression data standardizes Lv10 damage skills, EX and support str
     assert.deepEqual(Array.from(r.skills.rockWall.requires),["petrifyFist","sandWind"]);
     assert.deepEqual(Array.from(r.skills.earthShield.requires),["rockWall"]);
     assert.deepEqual(Array.from(r.skills.barrier.requires),["earthShield"]);
-    assert.equal(r.skills.stormSpell.learnLevel,undefined,"monster-only 暴風術不進玩家 progression");
+    assert.equal(r.skills.stormSpell,undefined,"retired skill must not be synthesized by progression");
 });
 
 test("the formal owner supplies every direct skill base value without V149 data writes",()=>{

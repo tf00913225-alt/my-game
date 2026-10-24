@@ -266,7 +266,7 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
     const expected={
         flameSlash:["flame-slash-cast-v2.webp","single"],
         fireCritical:["fire-critical-cast.png","single"],
-        explosiveFlurry:["explosive-flurry-wide-v2.webp","group"],
+        explosiveFlurry:["explosive-flurry-wide-v2.webp","single"],
         dragonSlash:["dragon-slash-cast-v2.webp","single"],
         fireRocket:["fire-rocket-cast.png","trajectory"],
         blazeSpell:["blaze-spell-cast-v2.webp","single"],
@@ -282,6 +282,9 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
         assert.equal(sprite.placement,placement,id);
         assert.equal(manifest[id].hit,.5833333333,id);
     });
+    assert.equal(manifest.explosiveFlurry.sprite.presentation,"per-recipient","single placement describes each visual recipient, not the combat target mode");
+    assert.equal(manifest.explosiveFlurry.sprite.recipientSlice,"center-third");
+    assert.match(finalRules,/explosiveFlurry:\{[^\n]*baseDamage:50[^\n]*damagePerLevel:10[^\n]*spCost:47[^\n]*targetType:"tri"[^\n]*followUpOnCriticalOrDefeat:true[^\n]*followUpMaxCasts:1/);
     assert.equal(manifest.fireEX.sprite,undefined,"permanent passive must not cast a sheet");
     assert.match(timing,/flameSlash:\[760/);
     assert.match(timing,/fireCritical:\[1050/);
@@ -300,18 +303,37 @@ test("shared metadata binds exact IDs, durations, hit frame and target modes",()
 
 test("tri skills follow valid targets while Phoenix Cry keeps one full-field sheet",()=>{
     const tri=loadRuntime();
-    tri.context.v142SkillAnimationDirector.play(
+    const projections=[0,1,2].map(i=>({left:301+i*100,top:94,width:70,height:98}));
+    tri.context.FourSymbolsBattlefieldRenderGeometry={getUnitGeometry:(_side,index)=>({artworkProjection:{rect:projections[index]}})};
+    const triGate=tri.context.v142SkillAnimationDirector.play(
         castConfig("explosiveFlurry",1450,"tri"),
         {side:"player",actorIndex:0,targetSide:"monster",targetId:1,targetIds:[0,1,2]}
     );
     const triStage=tri.body.children.find(node=>node.id==="v143-skill-stage");
     const triSprites=triStage.children.filter(node=>node.className.includes("v143-vfx-sprite"));
-    assert.equal(triSprites.length,1);
-    assert.equal(triSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(triSprites[0].style.left,"438px");
-    assert.equal(triSprites[0].style.top,"140px");
-    assert.equal(triSprites[0].style.width,"276px","three-target cast keeps the fixed three-slot width");
-    assert.equal(triSprites[0].style.height,"123px","three-target cast keeps native 2.25 frame aspect within raster rounding");
+    assert.equal(triGate.config.targetType,"tri","local sprite placement must not change the combat target mode");
+    assert.equal(triGate.config.duration,1450);
+    assert.equal(triSprites.length,3,"one local visual for each actual recipient, not one shared midpoint sheet");
+    triSprites.forEach((node,index)=>{
+        const projection=projections[index];
+        assert.equal(node.dataset.targetIndexes,String(index));
+        assert.equal(node.dataset.targetIndex,String(index));
+        assert.equal(node.style.left,(projection.left+projection.width/2)+"px","each visual reads its own artwork projection");
+        assert.equal(node.style.top,(projection.top+projection.height/2)+"px");
+        assert.equal(node.dataset.recipientSlice,"center-third");
+        assert.equal(node.style.clipPath,"inset(0 33.333333%)");
+        assert.equal(node.style["--v143-sprite-duration"],"1450ms");
+    });
+    const timersBefore=tri.scheduled.length;
+    [0,1,2].forEach(index=>{
+        const delay=tri.context.v143RunAtTargetHit("monster",index,()=>tri.context.showMonsterHit(index,17+index,"hp",false),true);
+        assert.ok(delay>=820&&delay<=855,"each target keeps the original 7-of-12 hit time");
+    });
+    assert.equal(tri.scheduled.length,timersBefore,"three recipient visuals reuse original hit tasks without extra damage timers");
+    const hits=tri.scheduled.filter(timer=>timer.delay>=820&&timer.delay<=855);
+    assert.equal(hits.length,3,"one original hit task per actual target");
+    hits.forEach(timer=>timer.callback());
+    assert.deepEqual(tri.monsterHits,[[0,17,"hp",false],[1,18,"hp",false],[2,19,"hp",false]],"damage feedback payloads remain exact and once per recipient");
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-flight")),false);
     assert.equal(triStage.children.some(node=>node.className.includes("v143-skill-field")),false);
 

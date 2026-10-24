@@ -1407,14 +1407,11 @@
      戰鬥
 </div>
 <div id="battleTurnIndicator">第 1 回合</div>
-<button
-    id="battleElementBoxButton"
-    class="battle-element-box-button"
-    aria-label="元素匣／自動戰鬥設定"
-    title="元素匣／自動戰鬥設定"
->
-    <img draggable="false" src="assets/battle/element-box.png" alt="元素匣" loading="lazy" decoding="async">
-</button>
+<div id="battleUtilityTray" role="group" aria-label="戰鬥控制">
+<button id="battleAutoToggle" class="battle-utility-button" type="button" aria-label="切換自動戰鬥" aria-pressed="false" onclick="toggleAutoBattle()"><span>AUTO</span></button>
+<button id="battleElementBoxButton" class="battle-element-box-button battle-utility-button" type="button" aria-label="自動戰鬥設定" title="自動戰鬥設定"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 3h4l.7 2.4 2 .9L19 5.5l2 3.5-1.8 1.7v2.6L21 15l-2 3.5-2.3-.8-2 .9L14 21h-4l-.7-2.4-2-.9-2.3.8L3 15l1.8-1.7v-2.6L3 9l2-3.5 2.3.8 2-.9Z"/><circle cx="12" cy="12" r="3"/></svg><span>設定</span></button>
+<button id="battleSpeedControl" class="battle-utility-button" type="button" disabled aria-label="戰鬥加速尚未開放" title="戰鬥加速尚未開放"><span>1×</span><small>待開放</small></button>
+</div>
 
 <div
     id="turnTargetRow"
@@ -1514,6 +1511,7 @@
  aria-label="逃脫" title="逃脫"><span aria-hidden="true">逃脫</span></button>
 
 </div>
+<button id="battleMoreButton" type="button" aria-label="更多戰鬥控制" aria-controls="battleUtilityTray" aria-expanded="false" onclick="toggleBattleUtilityMenu()">⋯</button>
 
 <!--
     ★ 修正（依照使用者要求，改成非常駐顯示）：

@@ -29,7 +29,6 @@
   "additionalRegressionBoundary": [
     "normal",
     "fireBurstStrike reusedFrom fireCritical",
-    "stormSpell reusedFrom stormRain",
     "windArrow reusedFrom windSpell",
     "20 relic_* entries including relic_nine_dragon_fire",
     "yuanXiangGuangMing and yuanGuangShield intentionally missingDedicatedAsset/noVisual",

@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：shared.toast四尺寸呈現/生命週期及秘寶mouse缺口已補；最新Head CI/正常dev相依整合與其餘台帳仍待完成，非全UI完成",
+  "status": "施工中：dev8fdf正常來源整合/四尺寸限定實畫獨審通過；新Head必要CI待自然執行，非全介面完成",
   "devices": [
     {
       "id": "360x640",
@@ -27878,6 +27878,20 @@
         "正常dev相依merge：生成包/戰場/Story/受保護來源衝突需按原Owner收斂，不跨線改邏輯",
         "Latest Head required CI",
         "原台帳未列證動態/硬體/真交易狀態；不重做舊有效證據"
+      ]
+    },
+    {
+      "segment": "dev8fdf-integration",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev8fdf-integration",
+      "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev8fdf-integration/source-proof.json",
+      "uiParent": "d0053d958bd1b160f9e15fc0dae99269e4ff6969",
+      "devParent": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+      "status": "75直接回歸/buildcheck與四尺寸角色技能入口/靜態技能picker獨審通過；最新Head必要CI待確認",
+      "limits": [
+        "不是所有UI/自然戰鬥/硬體/部署驗收",
+        "原完整台帳其他未驗狀態保留",
+        "不吸991/989，不混Chrome/工具/Story新施工",
+        "原初次timer定位讓字不見之探索圖INVALID，不作成功證據"
       ]
     }
   ]
