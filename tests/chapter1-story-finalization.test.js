@@ -118,6 +118,71 @@ for(const element of ['fire','water','wind','earth']){
         assert.equal(h.api.getView().tutorialProgress.equipmentReady,true);
     });
 }
+// Reload model only: learning, purchase and battle outcome use runtime() doubles.
+// Native player flows and the full save codec remain separate acceptance Gates.
+for(const element of ['fire','water','wind','earth']){
+    for(const lesson of ['skill','equipment']){
+        test('saved '+element+' '+lesson+' guidance resumes without reset and retries atomically',()=>{
+            const original=runtime(),nodeId=lesson==='skill'?'c1_02':'c1_04';
+            original.c.player.element=element;at(original,nodeId);
+            original.state().onboarding={active:true,phase:'guidance',nodeId,requiredAction:lesson};
+            original.state().completedNodes.c1_01=true;original.state().rewardClaims.c1_01='claimed';
+            const key=original.c.getPartyCharacterKey(0);
+            if(lesson==='equipment'){
+                original.state().rewardClaims.c1_03='ready';assert.equal(original.api.claimNodeReward('c1_03'),true);
+                const item=original.c.FourSymbolsEquipmentFactory.starter('leatherArmor');
+                const cost=original.c.FourSymbolsEquipmentFactory.prices(item).shop;
+                original.c.gold-=cost;original.c.inventoryItems.push(item);
+                assert.equal(original.api.recordEquipmentLessonPurchase(item,cost,original.api.getEquipmentLessonOfferIntent()),true);
+                original.c.characterEquipment[key].armor=item;
+                if(element!==key)original.c.characterEquipment[element]={armor:{v141Uid:'unrelated-copy'}};
+            }
+            assert.equal(original.c.saveGame(),true);
+            // Synthetic retained checkpoint only: never read or alter a real player save.
+            const h=runtime(original.stored());
+            Object.assign(h.c.player,{element,skillPoints:2,hp:31,sp:9});
+            h.c.gold=original.c.gold;h.c.inventoryItems=structuredClone(original.c.inventoryItems);
+            h.c.characterSkillLoadouts=structuredClone(original.c.characterSkillLoadouts);
+            h.c.characterEquipment=structuredClone(original.c.characterEquipment);
+            h.c.currentSkillCharacter=element;
+            let renderedPlayer;
+            h.c.renderSkillLoadout=()=>{renderedPlayer=h.c.getSkillCharacterObject(h.c.currentSkillCharacter);};
+            const resources=()=>JSON.stringify({gold:h.c.gold,hp:h.c.player.hp,sp:h.c.player.sp,points:h.c.player.skillPoints,inventory:h.c.inventoryItems,potions:h.potions});
+            const beforeResources=resources(),beforeReceipts=JSON.stringify(h.state().rewardClaims);
+            for(let attempt=0;attempt<2;attempt++){
+                assert.equal(h.api.openTutorialSystem(),true);
+                if(lesson==='skill'){
+                    assert.equal(renderedPlayer,h.c.player,'retained non-fire character is not an element placeholder');
+                    assert.equal(renderedPlayer.skillPoints,2);
+                }
+                assert.equal(h.api.returnFromTutorial(),true);
+                assert.equal(h.state().currentNodeId,nodeId);
+                assert.equal(h.state().onboarding.requiredAction,lesson);
+                assert.equal(resources(),beforeResources,'opening and returning cannot grant or reset resources');
+                assert.equal(JSON.stringify(h.state().rewardClaims),beforeReceipts);
+            }
+            if(lesson==='skill'){
+                assert.equal(h.api.continueTutorial(),false,'unprepared saved lesson cannot be skipped');
+                h.c.characterSkillLoadouts[key].skillLevels.lessonSkill=1;
+                assert.equal(h.api.continueTutorial(),false,'learning alone cannot complete the saved lesson');
+                h.c.characterSkillLoadouts[key].equippedSkills.push('lessonSkill');
+            }else{
+                assert.equal(h.api.getView().tutorialProgress.equipmentReady,true,'the exact paid canonical-slot armor remains ready');
+                assert.equal(h.api.claimNodeReward('c1_03'),false,'reopening cannot grant purchase funds twice');
+            }
+            const beforeRetry=JSON.stringify(h.c.player.adventureProgress);
+            h.save(false);assert.equal(h.api.continueTutorial(),false);
+            assert.equal(JSON.stringify(h.c.player.adventureProgress),beforeRetry,'refused retry rolls back its cursor');
+            assert.equal(resources(),beforeResources,'refused retry rolls back its training refill');assert.equal(h.launches(),0);
+            h.save(true);assert.equal(h.api.continueTutorial(),true);assert.equal(h.launches(),1);
+            assert.equal(h.state().currentNodeId,nodeId,'prepared retry stays on the blocked encounter');
+            h.finish('win');assert.ok(h.state().completedNodes[nodeId]);
+            assert.equal(h.state().currentNodeId,lesson==='skill'?'c1_03':'c1_05');
+            assert.equal(h.api.continueTutorial(),false,'completed lesson cannot replay its preparation');
+            assert.equal(h.c.gold,original.c.gold);assert.deepEqual(h.c.inventoryItems,original.c.inventoryItems);
+        });
+    }
+}
 function installCanonicalInventoryFilter(c){
     const source=fs.readFileSync('js/00-main.js','utf8'),start=source.indexOf('function getFilteredInventoryItems('),end=source.indexOf('\nfunction ',start+1);
     const retired=source.match(/const RETIRED_BACKPACK_POTION_IDS=new Set\(\[[\s\S]*?\]\);/);
