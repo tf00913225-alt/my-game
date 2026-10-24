@@ -340,7 +340,7 @@ function prepareUnitHud(card,side){
             event.stopPropagation();card.click();
         });
     }
-    card.querySelectorAll(HUD_SELECTOR).forEach(node=>hud.appendChild(node));
+    card.querySelectorAll(HUD_SELECTOR).forEach(node=>{if(node.parentNode!==hud)hud.appendChild(node);});
     hud.dataset.boss=String(card.classList.contains("gameplay-boss-card"));
     if(side==="monster")hud.dataset.enemyProfile=card.closest('#battlePage')?.dataset.enemyBattlefieldProfile||"";
     if(side==="monster"){
@@ -377,10 +377,17 @@ function syncHud(){
             if(!hud.v174Card?.isConnected){ hud.remove(); }
         });
     }
-    page.querySelectorAll(".battle-monster[id^='battleMonster'],.battle-player[id^='battlePlayerCard']").forEach(card=>{
+    let hudOrder=0;
+    // Prepare semantics first, measure all units together, then project styles.
+    // Interleaving a HUD DOM move with the next unit's geometry read forces
+    // a fresh layout per unit on every hit/resource update.
+    const prepared=Array.from(page.querySelectorAll(".battle-monster[id^='battleMonster'],.battle-player[id^='battlePlayerCard']")).map(card=>{
         const side=card.id.startsWith("battleMonster")?"monster":"player";
         const hud=prepareUnitHud(card,side);
-        const projection=geometry.getUnitGeometry(side,Number(hud.dataset.index))?.hudSurface;
+        return {card,side,hud};
+    });
+    const measured=prepared.map(entry=>({...entry,projection:geometry.getUnitGeometry(entry.side,Number(entry.hud.dataset.index))?.hudSurface}));
+    measured.forEach(({card,hud,projection})=>{
         if(!projection||!projection.rect.width||!projection.rect.height){ hud.style.visibility="hidden"; return; }
         if(!hudLayer){
             hudLayer=document.createElement("div");
@@ -388,7 +395,8 @@ function syncHud(){
             document.body.appendChild(hudLayer);
             window.FourSymbolsGestureArbiter?.registerSurface?.(hudLayer);
         }
-        hudLayer.appendChild(hud);
+        const next=hudLayer.children[hudOrder++];
+        if(next!==hud){hudLayer.insertBefore(hud,next||null);}
         hud.style.visibility="visible";
         hud.style.left=projection.rect.left+"px";
         hud.style.top=projection.rect.top+"px";

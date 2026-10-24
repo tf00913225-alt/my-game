@@ -110,22 +110,14 @@
         fitEnemyBars(card);
     }
 
-    const enemyBarFitCache=new WeakMap();
-    let enemyBarFontEpoch=0;
-    if(typeof document!=="undefined"&&document.fonts?.addEventListener){
-        ["loadingdone","loadingerror"].forEach(event=>document.fonts.addEventListener(event,()=>{enemyBarFontEpoch++;}));
-    }
     function fitEnemyBars(card){
         const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        // Fixed Slot V2 intentionally keeps ordinary exact resource text as
+        // 1px clipped accessibility nodes. Never shrink-to-fit hidden text;
+        // its formal CSS/number Owner already controls this presentation.
+        const fixed=document.getElementById("battlePage")?.classList?.contains("v-fixed-slot-render-v2");
+        if(fixed&&hud!==card&&hud.classList?.contains("v174-unit-hud")&&!card.classList?.contains("gameplay-boss-card")){return;}
         hud.querySelectorAll(".monster-bar-text").forEach(node=>{
-            // Repeated hit/HUD projection must not reset an unchanged fit and
-            // force the same layout loop again. Actual glyph/width/style changes
-            // (including a loaded font) invalidate the snapshot immediately.
-            const signature=()=>[node.textContent,node.clientWidth,node.scrollWidth,
-                node.style.getPropertyValue("font-size"),node.style.getPropertyPriority?.("font-size")||"",
-                node.style.getPropertyValue("transform"),enemyBarFontEpoch];
-            const previous=enemyBarFitCache.get(node),before=signature();
-            if(previous&&before.every((value,i)=>value===previous[i])){return;}
             node.style.removeProperty("transform");
             node.style.setProperty("font-size","13px","important");
             const available=Math.max(1,node.clientWidth||68);
@@ -138,7 +130,6 @@
                 node.style.setProperty("transform","scaleX("+Math.max(.82,available/node.scrollWidth)+")");
             }
             node.dataset.v143FontSize=String(size);
-            enemyBarFitCache.set(node,signature());
         });
     }
 

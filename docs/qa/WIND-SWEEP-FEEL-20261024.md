@@ -61,6 +61,10 @@ Work ID：WIND-FLURRY-SAMPLE-20261024／原 PR #989。只加強暴風亂擊，�
 
 ### 實機效能直接相依
 
-首輪4f實機功能正確，但全段RAF p95約33–67ms，不能稱流暢PASS。去除逐幀DOM量測／錄影後，baseline關閉效果仍約66.8ms，完整與低粒子設定約100.2ms；減粒子沒有解掉瓶頸。CPU取樣主要落在原js38::fitEnemyBars的重複文字縮字排版，原始證據 `artifacts/wind-sweep-phone-cpu-diagnostic/cpu-profile.json`（4f bundle11157）。因此只在原函式加WeakMap跳過相同文字／寬度／字形寬度／inline style的重算，保留原13→11px與最低.82比例算法；文字、容器、外部樣式及FontFaceSet loadingdone/loadingerror世代改變會失效。沒有改字級、版型、數值或其他技能。
+使用者看過直接手機證據後明確允許共用戰鬥效能排查，版型／大小／景深／玩法不變。
 
-新增3個focused測試包括真scrollWidth下限與字體載入後應恢復13px的案例，獨立審核修正原字體失效缺口後通過。一次有界實機cache probe中效果開啟p95約50.2ms（baseline66.9ms），只有改善證據，仍非整場完全無長幀保證。最終手機錄影／完整與播放窗口幀時間以PR body及相鄰raw report為準；保留所有較早結果，不覆寫為PASS。
+- 首輪JS RAF有長幀，baseline關閉效果也約66.8ms p95，降低粒子無法消除。初步CPU取樣落在js38::fitEnemyBars，cache試驗仍未解決；該cache與FontFaceSet事件已移除，不把改善誤稱整場PASS。
+- 更精確的正式CSS證據：Fixed Slot V2 ordinary敵方exact resource文字本來就是1px/clip50%的accessibility相容節點。現在只在獨立正式HUD／FixedSlot頁面／非gameplayBoss時略過舊縮字；可見legacy/Boss保留完整原13→11px／最低.82比例算法。3個focused tests涵蓋zero style writes、負對照與字體變窄仍回13px。
+- 排除建場後的播放CPU取樣 `artifacts/wind-sweep-phone-play-profile/cpu-profile.json` 顯示主要幾何讀取來自syncHud，2.3秒LayoutCount229／Recalc390。原HUD每次都把同父節點重搬，再讀下一個單位位置；同父去重對照降至LayoutCount134、LayoutDuration.126→.050秒。最終再分成準備語意→全部量位置→全部更新，僅在目前DOM順序不同時insertBefore，保留原順序／同節點／事件。原函式測試確認穩態zero moves、量完才搬、重建順序。
+- 取樣與診斷保留：`artifacts/wind-sweep-phone-cpu-diagnostic`、`wind-sweep-phone-ab-diagnostic`、`wind-sweep-phone-fit-cache-probe`、`wind-sweep-phone-hidden-fit-probe`、`wind-sweep-phone-fit-owner-probe`、`wind-sweep-phone-play-profile`、`wind-sweep-phone-hud-dedupe-probe`。這些是不同邊界／來源快照，不能交叉當最新CI或影片證明。
+- JS RAF排程不是compositor呈現FPS。解析Android原片PTS：舊cf5約51.5fps／p95 33.5ms、新4f約47.1fps／35.6ms、7eaf約46.0fps／35.2ms；所有舊結果保留，均有偶發長幀，不宣稱鎖60或整場零卡頓。最終實機原片與兩種量測在PR body／相鄰movie-proof記錄。
