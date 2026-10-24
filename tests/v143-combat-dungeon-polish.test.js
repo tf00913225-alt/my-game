@@ -66,7 +66,7 @@ test("every known battle skill has an explicit raster-owner manifest contract",(
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive","waterEX",
         "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","windEX",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier","earthEX",
-        "stormSpell","yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
+        "yuanXiangGuangMing","yuanGuangShield","yuanZuBlessing","windArrow"
     ];
     const manifest=context.v143SkillAnimationManifest;
     expected.forEach(id=>assert.ok(manifest[id],id+" needs a manifest entry"));

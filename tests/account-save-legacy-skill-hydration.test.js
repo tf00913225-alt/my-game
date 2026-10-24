@@ -62,3 +62,24 @@ assert.match(source,/if\(skillId&&skillDatabase\[skillId\]\)/,
     "skill loadout renderer must tolerate a stale equipped id instead of throwing during account hydration");
 
 console.log("✓ legacy account-save skill hydration compatibility passed");
+
+// Retired storm data is an observation, never a playable loadout or auto action.
+context.skillDatabase.stormSpell={id:'stormSpell'}; // even stale in-memory data must not resurrect it
+context.characterSkillLoadouts.player3={skillLevels:{stormSpell:4,dragonSlash:2},equippedSkills:['stormSpell','dragonSlash']};
+context.autoConfig={skill:'stormSpell',v136ActionIntent:'skill',v136LastSkill:'stormSpell'};
+context.autoConfig2={skill:'defend',v136ActionIntent:'defend',v136LastSkill:'stormSpell'};
+context.autoConfig3={skill:'dragonSlash',v136ActionIntent:'skill',v136LastSkill:'dragonSlash'};
+const valid=JSON.stringify(context.autoConfig3);
+vm.runInContext('normalizeHydratedRetiredSkillReferences();',context);
+assert.equal(context.characterSkillLoadouts.player3.skillLevels.stormSpell,4,'preserve historical level without granting ownership');
+assert.deepEqual(Array.from(context.characterSkillLoadouts.player3.equippedSkills),['dragonSlash']);
+assert.equal(context.autoConfig.skill,'normal');
+assert.equal(context.autoConfig.v136ActionIntent,'normal');
+assert.equal(context.autoConfig.v136LastSkill,undefined);
+assert.equal(context.autoConfig2.skill,'defend');
+assert.equal(context.autoConfig2.v136ActionIntent,'defend');
+assert.equal(context.autoConfig2.v136LastSkill,undefined);
+assert.equal(JSON.stringify(context.autoConfig3),valid);
+const normalized=JSON.stringify([context.characterSkillLoadouts,context.autoConfig,context.autoConfig2,context.autoConfig3]);
+vm.runInContext('normalizeHydratedRetiredSkillReferences();',context);
+assert.equal(JSON.stringify([context.characterSkillLoadouts,context.autoConfig,context.autoConfig2,context.autoConfig3]),normalized,'cleanup is idempotent');

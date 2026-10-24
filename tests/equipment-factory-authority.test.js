@@ -4,7 +4,7 @@ const factory=require("../js/equipment-factory"),reforge=require("../functions/s
 const read=path=>fs.readFileSync(path,"utf8").replace(/\r\n/g,"\n");
 const plain=value=>JSON.parse(JSON.stringify(value));
 function runtime(){
- const store=new Map(),c=vm.createContext({console,skillDatabase:{stormSpell:{}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},setTimeout(){},
+ const store=new Map(),c=vm.createContext({console,skillDatabase:{windHowlLightning:{}},localStorage:{getItem:k=>store.get(k)||null,setItem:(k,v)=>store.set(k,v)},setTimeout(){},
   document:{readyState:"loading",addEventListener(){},getElementById:()=>null,createElement:()=>({}),head:{appendChild(){}}},
   characterEquipment:{fire:{hand:null}},isEquipmentInventoryType:t=>["head","helmet","weapon","armor","shoes","shoulder","ring"].includes(t),
   FourSymbolsAccountSave:{accountKey:k=>"uid:"+k},FourSymbolsEquipmentFactory:factory,FourSymbolsEquipmentReforge:reforge});

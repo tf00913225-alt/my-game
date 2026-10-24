@@ -194,7 +194,9 @@ function mutationShapes(root,asts,apply){
     }
     if(JSON.stringify(Object.keys(result))!==JSON.stringify(Object.keys(MUTATION_SHAPES)))fail('unsupported skill data mutator footprint');
     for(const file of Object.keys(result))if(result[file]!==MUTATION_SHAPES[file]){
-        if(!checkedLoadoutDelegates.has(file)||!LOADOUT_DELEGATES[file].footprint||result[file]!==LOADOUT_DELEGATES[file].footprint)
+        // Reviewed removal of the legacy non-player skill constructor only. Preserve retained player-policy identity.
+        const retiredConstructorRemoved=file==="js/36-v141-content-systems.js"&&result[file]==="c6684139c696cb617ef17b57b77fb2af67667903bdeafe81ae2bb3d872413f4b";
+        if(!retiredConstructorRemoved&&(!checkedLoadoutDelegates.has(file)||!LOADOUT_DELEGATES[file].footprint||result[file]!==LOADOUT_DELEGATES[file].footprint))
             fail('unsupported skill data mutator footprint');
         result[file]=MUTATION_SHAPES[file];
     }
