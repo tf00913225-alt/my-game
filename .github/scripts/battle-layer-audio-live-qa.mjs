@@ -1420,6 +1420,16 @@ try{
         const safeBounds=side&&overlay?{left:Math.max(side.left,overlay.left),right:Math.min(side.right,overlay.right),top:Math.max(side.top,overlay.top),bottom:Math.min(side.bottom,overlay.bottom)}:null;
         return {
             config:{id:config.id,targetType:config.targetType,duration:config.duration},
+            portrait:(()=>{const r=window.FourSymbolsBattlefieldRenderGeometry.getArtworkProjection('monster',targetId)?.rect;return r?{left:r.left,top:r.top,width:r.width,height:r.height}:null;})(),
+            paintBounds:window.FourSymbolsHitFeedback.config.skills.stormCircle.visibility.paintBounds,
+            overlay,
+            hudRects:[...document.querySelectorAll('#battlePage .battle-monster[id^="battleMonster"],#battlePage .battle-player[id^="battlePlayerCard"]')].map(card=>{
+                const side=card.id.startsWith('battleMonster')?'monster':'player',index=Number(card.id.replace(side==='monster'?'battleMonster':'battlePlayerCard',''));
+                return window.FourSymbolsBattlefieldRenderGeometry.getUnitGeometry(side,index)?.hudSafeRect;
+            }).filter(r=>r?.width>0&&r.height>0),
+            clippingRects:(()=>{const rects=[];for(let n=sprite?.parentElement;n;n=n.parentElement){const style=getComputedStyle(n);if(/hidden|clip|scroll|auto/.test(style.overflowX+' '+style.overflowY)||/paint|strict|content/.test(style.contain)||style.clipPath!=='none'){const r=n.getBoundingClientRect();if(r.width>0&&r.height>0)rects.push({left:r.left,right:r.right,top:r.top,bottom:r.bottom,clipPath:style.clipPath});}}return rects;})(),
+            visiblePaintHeight:Number(sprite?.dataset.visiblePaintHeight||0),
+            geometrySlot:sprite?.dataset.geometrySlot||null,
             targetId,primarySlot,
             safeBounds,clipPath:sprite?.style.clipPath||null,
             stageCount:document.querySelectorAll('#v143-skill-stage').length,
@@ -1446,20 +1456,22 @@ try{
     assert.equal(windFlame?.stageSkill,"stormCircle","The deployed V143 stage must render Wind Flame");
     assert.equal(windFlame?.spriteCount,1,"Wind Flame must not render two simultaneous videos");
     assert.equal(windFlame?.globalSpriteCount,1,"No stale V143 sprite may coexist with Wind Flame");
-    assert.equal(windFlame?.placement,"group","Three-target VFX must use fixed group geometry");
-    assert.equal(windFlame?.frameFit,"cover","Three-target VFX must preserve its source-frame aspect");
-    assert.equal(windFlame?.targetIndexes.length,1,"This live check deliberately supplies only one surviving target");
-    assert.equal(windFlame?.geometrySlots.length,3,"Wind Flame must retain a three-slot footprint for a single surviving target");
-    assert.ok(windFlame.safeBounds,"Wind Flame requires formal side safety geometry");
-    const windSafe=windFlame.safeBounds,windBox=windFlame.spriteBox;
-    const windWidth=2*Math.min(windFlame.bounds.centerX-windSafe.left,windSafe.right-windFlame.bounds.centerX);
-    const windHeight=2*Math.min(windFlame.bounds.centerY-windSafe.top,windSafe.bottom-windFlame.bounds.centerY);
-    const authoredHeight=Math.max(Math.round(windFlame.bounds.height),Math.round(windFlame.bounds.width)/windFlame.frameAspect);
-    const expectedWindHeight=Math.min(authoredHeight,windHeight,windWidth/windFlame.frameAspect);
+    assert.equal(windFlame?.placement,"single","Wind Flame uses the approved independent recipient source");
+    assert.equal(windFlame?.frameFit,"contain","Independent source must preserve the complete frame");
+    assert.deepEqual(windFlame.targetIndexes,[String(windFlame.targetId)],"Only the supplied surviving target owns this sprite");
+    assert.equal(windFlame.geometrySlot,windFlame.primarySlot,"Recipient still uses its formal slot Owner");
+    assert.ok(windFlame.portrait?.width>0&&windFlame.portrait?.height>0,"Recipient requires formal artwork projection");
+    const windBox=windFlame.spriteBox,portrait=windFlame.portrait;
     assert.ok(windBox.width>0&&windBox.height>0,"Wind Flame must retain visible artwork");
-    assert.ok(Math.abs(windBox.height-expectedWindHeight)<=2,"Wind Flame must preserve its authored group size with only proportional safe fit");
-    assert.ok(Math.abs(windBox.left-windFlame.bounds.centerX)<=1&&Math.abs(windBox.top-windFlame.bounds.centerY)<=1,"Wind Flame must stay centered on its canonical tri shape");
-    assert.ok(windBox.left-windBox.width/2>=windSafe.left-1&&windBox.left+windBox.width/2<=windSafe.right+1&&windBox.top-windBox.height/2>=windSafe.top-1&&windBox.top+windBox.height/2<=windSafe.bottom+1,"Wind Flame must stay inside target-side safe bounds");
+    const paint=windFlame.paintBounds;
+    const alpha={left:windBox.left+windBox.width*(paint[0]-.5),right:windBox.left+windBox.width*(paint[2]-.5),top:windBox.top+windBox.height*(paint[1]-.5),bottom:windBox.top+windBox.height*(paint[3]-.5)};
+    assert.ok(Math.abs((alpha.left+alpha.right)/2-(portrait.left+portrait.width/2))<=1&&Math.abs((alpha.top+alpha.bottom)/2-(portrait.top+portrait.height/2))<=1,"Visible alpha, not transparent frame padding, centers on the actual recipient");
+    assert.ok(windFlame.clippingRects.every(clip=>clip.clipPath==="none"),"Custom ancestor clip paths require an explicit alpha safety check, not a silent rect assumption");
+    for(const clip of [windFlame.overlay,...windFlame.clippingRects]){
+        assert.ok(clip&&alpha.left>=clip.left-1&&alpha.right<=clip.right+1&&alpha.top>=clip.top-1&&alpha.bottom<=clip.bottom+1,"Visible alpha must stay inside the viewport and actual clipping ancestors");
+    }
+    assert.ok(windFlame.hudRects.every(hud=>alpha.right<=hud.left+1||alpha.left>=hud.right-1||alpha.bottom<=hud.top+1||alpha.top>=hud.bottom-1),"Visible alpha must not overlap any formal HUD information band");
+    assert.ok(windFlame.visiblePaintHeight>=portrait.height*.8&&windFlame.visiblePaintHeight<=Math.max(72,portrait.height*1.5),"Approved visible-alpha footprint remains readable and bounded by portrait size");
     assert.equal(windFlame.clipPath||"none","none","Wind Flame must not crop its source");
     assert.ok(Math.abs(windFlame.spriteBox.width/windFlame.spriteBox.height-windFlame.frameAspect)<=.02,"Wind Flame must not flatten its source frame");
     assert.equal(windFlame.emitted,"true","Wind Flame must emit a visible production sprite");

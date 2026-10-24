@@ -1,0 +1,26 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "humanAcceptance": "2026-10-24 user explicitly accepted final80ceae1a native11 size/Wind/depth occlusion/actor sway and authorized normal dev merge after Gates. No art or performance acceptance question remains.",
+  "approvedProductHead": "80ceae1a5afa68c27a71c28626e849b80580e914",
+  "absorbedDev": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+  "devDiff": "Adventure canonical character tutorial flow and forge QA safe port; no overlapping VFX source. Normal merge, no rebase/force.",
+  "ciFailureEvidence": {
+    "workflow": "CI",
+    "run": 40087086025,
+    "attempt": 1,
+    "event": "pull_request",
+    "head": "80ceae1a5afa68c27a71c28626e849b80580e914",
+    "coreJob": 120852836995,
+    "coreFirst": "battle-hit-flash-hp-trail source slice selected first new module animation then ended before flash Owner, empty slice; ordinary200ms /.4/.6 assertions retained under exact Owner extraction.",
+    "battleJob": 120852837026,
+    "battleFirst": "stormCircle old group/shared-sheet assumption conflicts with accepted independent per-recipient source; use actual alpha centre, exact survivor, formal slot, viewport/overflow/paint-containing ancestors, no unknown clip-path assumption and all formal HUD nonintersection, complete aspect/no crop/readable size/stage lifecycle retained.",
+    "adventureJob": 120852837123,
+    "adventureFirst": "Chrome DevTools startup deadline30000ms, ECONNREFUSED while diagnostics later show listener, folio_wait_bit_common; NOT VFX regression and not PASS. No old-head rerun performed; new Head from genuine test fixes and necessary dev merge, not quota reset."
+  },
+  "relatedRegression": "Primary target fixture now exact per-recipient3 slots/centres with unchanged primary and single-survivor true tri contract; geometry contract regex accommodates status purpose and unchanged returned fields.",
+  "focusedBrowser": "artifacts/989-wind-survivor-focused-desktop-rect-phone/evidence.json actual DESKTOP Chrome6v6, same new live assertion block PASS; historical folder suffix does not mean phone. No actual phone operation this continuation.",
+  "localFullBrowserLimit": "Windows hardcoded Linux /tmp and accidentally appended index.html base URL prevented first two local startup probes, retained. Temp copy with only OS temp path + correct origin then reached unrelated utility-center hit assertion before Wind section; not bypassed or called fullPASS. Original full latestHead CI remains required.",
+  "review": "fire_sample_review reviewed alpha-center/safety replacement; no inappropriate weakening, with base-footprint vs dynamic limit explicit. Existing exact80 phone evidence reused because product source/CSS/assets/config unchanged.",
+  "next": "Latest Head Required CI; diagnose direct failures only, no rerun lottery; after all Gates normal merge dev, own content/postmerge Gate, preserve QA checkout/backups then cleanup."
+}
