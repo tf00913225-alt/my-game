@@ -1,0 +1,107 @@
+{
+  "workId": "PLAYER-PORTRAITS-20261023",
+  "reviewerRole": "independent QA subagent; no asset generation or game integration",
+  "status": "local-v3-art-and-browser-pass",
+  "reviewedBuild": "build/boot-core.bbbaf3175142.js",
+  "artReview": {
+    "method": "Direct visual inspection of every final full-resolution v3 PNG and the v3 final light/dark alpha-composited 192px-high contact sheet; compare face, hair, pose, silhouette and costume. Male01 is human-approved; QA checks its technical usability.",
+    "accepted": [
+      "player_male_01",
+      "player_male_02",
+      "player_male_03",
+      "player_male_04",
+      "player_female_01",
+      "player_female_02",
+      "player_female_03",
+      "player_female_04"
+    ],
+    "rejectedAndReplaced": [
+      "entire first batch: user rejected ordinary/stiff direction",
+      "entire v2 batch: user requested stylized 2D designed protagonist costumes",
+      "first v3 male04: too close to male01 face and crane/diamond costume template; regenerated"
+    ],
+    "criteria": {
+      "frontalDominantFullBodyAndFeet": "pass; slight natural torso turns retained, no profile/back views",
+      "protagonistCharismaAndNaturalWeightBearingPose": "pass under revised user direction",
+      "distinctFacesHairSilhouettesAndAccessories": "pass after four same-face/costume candidates were regenerated",
+      "coherentWuxiaHandPaintedArt": "pass; stylized 2D linework/color planes and designed cloth/leather/metal details; no magical glow",
+      "transparentEdgesOnLightAndDark": "pass; apparent RGB halos in uncomposited preview were independently checked as alpha-zero pixels, then cleared by composited inspection",
+      "smallScaleRecognition": "pass at 192px contact-sheet height and actual creation screenshots",
+      "creationStoryScope": "pass for creation portrait presentation; battle art remains untouched and is not certified"
+    },
+    "notes": [
+      "Male01 was explicitly approved by the human; its art direction was not reversed by QA.",
+      "Male01/female01 form a coherent crane-themed martial-school pair; the other six have distinct costume motifs and silhouettes.",
+      "Most portraits have little top/bottom padding; existing contain rendering and full feet were verified in actual browser screenshots."
+    ]
+  },
+  "assetVerification": {
+    "perFileReport": "docs/qa/PLAYER-PORTRAITS-20261023-assets.json",
+    "independentSourceAndRuntimeSha256": "all eight final v3 source/runtime SHA256 values independently matched to current asset report using hashlib",
+    "decodedPixelComparison": "independently reopened all eight PNG/WebP pairs using bundled Pillow; dimensions are identical 1024x1536 and every decoded RGBA byte is equal",
+    "dimensions": "all eight browser-decoded WebP images are 1024x1536",
+    "runtimeFormat": "WebP; all eight actual HTTP responses were 200 and image.decode succeeded",
+    "alpha": "light/dark compositing verified visually; masters preserved without crop/resize"
+  },
+  "browserVerification": {
+    "environment": "Windows headless Chrome via CDP, actual local production index and hashed bundles; deterministic new-account Firebase Auth/Cloud/Session transport fixture",
+    "initialMatrix": [
+      {
+        "width": 1440,
+        "height": 900,
+        "choicesClicked": 8,
+        "result": "pass"
+      },
+      {
+        "width": 360,
+        "height": 640,
+        "choicesClicked": 8,
+        "result": "pass"
+      },
+      {
+        "width": 390,
+        "height": 844,
+        "choicesClicked": 8,
+        "result": "pass"
+      }
+    ],
+    "finalBootRecheck": {
+      "build": "build/boot-core.bbbaf3175142.js",
+      "allThreeViewports": "pass with final v3 assets",
+      "nextAndBackSteps": "pass at every viewport",
+      "nameInput": "pass at every viewport",
+      "reload": "pass"
+    },
+    "assertions": [
+      "real pointer clicks on both gender buttons and all four existing element controls",
+      "expected new WebP src for every choice",
+      "selected gender and element state",
+      "image.decode, naturalWidth and naturalHeight",
+      "computed object-fit contain",
+      "full feet and uncropped silhouette in screenshots",
+      "no new Runtime exception"
+    ],
+    "network": {
+      "portraitNonCanceledFailures": 0,
+      "runtimeExceptions": 0,
+      "observations": "A favicon.ico 404 and canceled speculative/repeated requests during selection/reload are recorded separately. All eight portraits have successful HTTP200 responses and successful visible-image decodes; cancellation is not used as success evidence."
+    },
+    "cache": "new asset filenames remain wired in initial HTML, creation mapping, startup preload and first-play manifest; regenerated first-play hashes verified by build and actual reload displays v3 WebP. Local fixture serves no-store, so persistent production cache/service-worker behavior remains deployment acceptance.",
+    "localEvidence": "artifacts/player-portraits-20261023/v3-independent-browser-results.json, v3-final-eight-contact-sheet.jpg and final creation-<viewport>-<gender>-<index>.png screenshots"
+  },
+  "scopeReview": {
+    "strategy": "new filenames plus creation/preload mappings",
+    "oldAssets": "retained; inventory continues using original JPEGs and battle uses its separate battle PNG set",
+    "unrelatedCssCombatSaveStatsReleaseVersion": "no changes found in independent diff review",
+    "buildOutputs": "hashed boot/app-shell and manifests regenerated as required; no new layout owner or wrapper"
+  },
+  "limitations": [
+    "Viewport emulation is not physical Android/iOS testing; physical pinch/long-press/touch behavior was not certified.",
+    "Firebase transport was a local read-only fixture, not a real Firebase Auth/Cloud Save acceptance test; no cloud character or player data was written.",
+    "No deployed SHA is certified by this local report; latest-head required CI and dev deployment acceptance remain the root agent's responsibility.",
+    "Appearance choices remain coupled to existing gender/element controls; no independent portrait persistence or battle asset switch was introduced.",
+    "The quality-first lossless v3 runtime set is 9,484,070 bytes; mobile download latency was not measured."
+  ],
+  "artRevision": "v3",
+  "acceptedUserDirection": "Stylized 2D linework and color planes, handsome/beautiful protagonists with distinctive designed shoulders, belts, bracers and hems. Human-approved male01 v3 is the style authority. Scope is creation/story portraits only; battle retains separate assets."
+}
