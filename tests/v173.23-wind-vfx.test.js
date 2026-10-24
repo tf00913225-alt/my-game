@@ -805,3 +805,26 @@ test("Freeze column and tri artwork follows only formal portrait recipients on b
 });
 
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");
+
+test("non-recipient full-field sheets stay locked to the complete enemy area after casualties",()=>{
+    const placements=[];
+    [
+        undefined,
+        [
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
+            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
+            {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
+        ]
+    ].forEach(monsters=>{
+        const runtime=loadRuntime(monsters?{monsters}:{});
+        const targetIds=(monsters||runtime.monsters).map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
+        runtime.context.v142SkillAnimationDirector.play(
+            {id:"flyingSandStrike",name:"flyingSandStrike",element:"earth",category:"magic",targetType:"all",duration:1700,resolveDuration:1700},
+            {side:"player",actorIndex:0,targetId:targetIds[0],targetIds,targetSide:"monster"}
+        );
+        const sprite=stageSprites(runtime).sprites[0];
+        assert.ok(sprite);
+        placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
+    });
+    assert.deepEqual(placements[1],placements[0],"full-field VFX does not follow survivor bounds");
+});
