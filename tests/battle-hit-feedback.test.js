@@ -1,16 +1,17 @@
 "use strict";
 const test=require("node:test"),assert=require("node:assert/strict"),vm=require("node:vm"),fs=require("node:fs");
 function harness(){
-    let now=1000,reduced=false,next=0;const timers=new Map(),created=[];
+    let now=1000,reduced=false,next=0;const timers=new Map(),created=[],frames=new Map(),draws=[];
+    const ctx={drawImage(){},setTransform(){},clearRect(){},save(){},restore(){},translate(){},rotate(){},scale(){},beginPath(){},ellipse(){draws.push("ellipse");},stroke(){},moveTo(){},quadraticCurveTo(){},fill(){draws.push("leaf");},fillRect(){draws.push("rect");}};
     const window={matchMedia:()=>({matches:reduced})};
-    const node=()=>({attributes:[],textContent:"",style:{},dataset:{},setAttribute(name,value){this.attributes.push({name,value});},
+    const node=()=>({attributes:[],textContent:"",style:{},dataset:{},getContext:()=>ctx,setAttribute(name,value){this.attributes.push({name,value});},
         animate(frames,options){const a=animation();a.frames=frames;a.options=options;(this.animations||(this.animations=[])).push(a);return a;},
         remove(){this.detached=true;},removeAttribute(name){this.attributes=this.attributes.filter(a=>a.name!==name);},getAnimations(){return this.animations||[];}});
     const source=fs.readFileSync("js/39-v143-skill-animation.js","utf8").replace("/* @battle-vfx-feedback-config */ null",fs.readFileSync("config/battle-vfx-feedback.json","utf8"));
-    vm.runInNewContext(source.split("/* =====================================================")[0],{window,document:{getElementById(){return {getBoundingClientRect:()=>({left:0,top:0,width:400,height:700})};},createElement(){const n=node();created.push(n);return n;}},Date:{now:()=>now},setTimeout(fn,ms){timers.set(++next,{fn,ms});return next;},clearTimeout(id){timers.delete(id);}});
+    vm.runInNewContext(source.split("/* =====================================================")[0],{window,document:{getElementById(){return {getBoundingClientRect:()=>({left:0,top:0,width:400,height:700})};},createElement(){const n=node();created.push(n);return n;}},requestAnimationFrame(fn){frames.set(++next,fn);return next;},cancelAnimationFrame(id){frames.delete(id);},Date:{now:()=>now},setTimeout(fn,ms){timers.set(++next,{fn,ms});return next;},clearTimeout(id){timers.delete(id);}});
     const animation=(state="running")=>({playState:state,playbackRate:1,currentTime:750,effect:{getTiming:()=>({duration:1500})},pause(){this.playState="paused";},play(){this.playState="running";},cancel(){this.playState="idle";}});
     const root=tracks=>({getAnimations:()=>tracks,animate(frames,options){const a=animation();a.frames=frames;a.options=options;this.shakes=(this.shakes||[]).concat(a);return a;}});
-    return {api:window.FourSymbolsHitFeedback,timers,animation,root,created,setReduced(v){reduced=v;},advance(ms){now+=ms;const pending=Array.from(timers.values());timers.clear();pending.forEach(t=>t.fn());}};
+    return {api:window.FourSymbolsHitFeedback,timers,frames,draws,animation,root,created,setReduced(v){reduced=v;},noPaint(ms){now+=ms;const pending=Array.from(timers.values());timers.clear();pending.forEach(t=>t.fn());},advance(ms){now+=ms;const pending=Array.from(timers.values());timers.clear();pending.forEach(t=>t.fn());const paints=Array.from(frames.values());frames.clear();paints.forEach(fn=>fn(now));}};
 }
 test("opt-in defaults, overrides and disabled/MISS do not schedule effects",()=>{
     const h=harness();assert.equal(h.api.configFor("windSpell").enabled,false);
@@ -49,14 +50,25 @@ test("pool clears attributes, content, animations and motion references before r
     h.api.release("sprite",n,1);assert.equal(a.playState,"idle");assert.equal(n.attributes.length,0);assert.equal(n.textContent,"");assert.equal(n.v143FrameAnimation,undefined);
     const extra=h.api.acquire("flash");h.api.release("sprite",extra,1);assert.equal(h.api.poolSize("sprite"),1);assert.equal(h.api.acquire("sprite"),n);
 });
-test("wind accents stay bounded, use transform/opacity only, trail fades and dispose recycles every node",()=>{
-    const h=harness(),children=[],host={appendChild:n=>children.push(n)},rect={left:0,top:0,width:80,height:100};
+test("one pooled particle canvas stays bounded, renders native shapes and cancels its loop on dispose",()=>{
+    const h=harness(),children=[],host={appendChild:n=>children.push(n),insertBefore:n=>children.push(n)},rect={left:0,top:0,width:80,height:100};
     h.api.config.skills.stormFlurry.maxEffectNodes=5;h.api.config.skills.stormFlurry.windCount=999;
     const f=h.api.create("stormFlurry");f.wind(host,[rect],2500);f.impact(host,rect,2,true,true,2500);
-    assert.equal(f.effectCount(),5);assert.equal(children.length,5);
-    children.forEach(n=>n.animations.forEach(a=>assert.ok(a.frames.every(k=>Object.keys(k).every(p=>["transform","opacity","offset"].includes(p))))));
-    f.dispose();assert.equal(f.effectCount(),0);assert.equal(h.api.poolSize("wind-effect"),5);
+    assert.equal(f.effectCount(),5);assert.equal(children.length,1);h.advance(16);assert.ok(h.draws.length>0);
+    const rasterizations=h.draws.length;h.advance(16);assert.equal(h.draws.length,rasterizations,"moving frames reuse rasterized glow instead of redrawing blurred shapes");
+    f.dispose();assert.equal(f.effectCount(),0);assert.equal(h.api.poolSize("particle"),5);assert.equal(h.frames.size,0);assert.equal(h.api.poolSize("particle-canvas"),1);
     h.api.config.skills.stormFlurry.maxEffectNodes=48;const g=h.api.create("stormFlurry");g.impact(host,rect,2,true,false,2500);
-    assert.ok(children.some(n=>n.dataset.feedbackEffect==="trail"&&n.animations.at(-1).frames.at(-1).opacity===0));
-    assert.ok(children.some(n=>n.dataset.feedbackEffect==="screen-flash"));g.dispose();
+    assert.ok(g.snapshot().some(n=>n.kind==="trail"));assert.ok(g.snapshot().some(n=>n.kind==="screen-flash"));
+    assert.equal(children[1],children[0],"next cast reuses same layer canvas");h.advance(2000);assert.equal(g.effectCount(),0,"all tail particles expire naturally");g.dispose();
+});
+test("particle age freezes during hit stop and resumes without extending the skill deadline",()=>{
+ const h=harness(),host={appendChild(){},insertBefore(){}},f=h.api.create("stormFlurry");f.wind(host,[{left:0,top:0,width:80,height:100}],2500);
+ h.advance(16);const before=f.snapshot()[0].opacity;f.hit({key:0,damage:168,roots:[]});h.advance(32);assert.equal(f.snapshot()[0].opacity,before);
+ h.advance(32);assert.notEqual(f.snapshot()[0].opacity,before);h.advance(1600);assert.equal(f.effectCount(),0);assert.equal(h.frames.size,0);f.dispose();
+});
+test("two hit stops without an intervening particle frame retain both paused intervals",()=>{
+ const host={appendChild(){},insertBefore(){}},rect={left:0,top:0,width:80,height:100},h=harness(),f=h.api.create("stormFlurry");f.wind(host,[rect],2500);h.advance(16);
+ f.hit({key:0,damage:168,roots:[]});h.noPaint(100);f.hit({key:1,damage:168,roots:[]});h.noPaint(50);h.advance(0);
+ const control=harness(),g=control.api.create("stormFlurry");g.wind(host,[rect],2500);control.advance(66);
+ assert.ok(Math.abs(f.snapshot()[0].opacity-g.snapshot()[0].opacity)<1e-9,"166ms wall time minus two50ms stops equals66ms particle age");f.dispose();g.dispose();
 });

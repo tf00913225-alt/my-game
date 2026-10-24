@@ -21,6 +21,7 @@
     "sweepGapMs": 100,
     "hitStrength": [0.72, 0.92, 1.25],
     "maxEffectNodes": 48,
+    "canvasDpr": 1.5,
     "windCount": 10,
     "leafCount": 5,
     "burstCount": 6,

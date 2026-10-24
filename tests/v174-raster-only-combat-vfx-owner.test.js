@@ -106,6 +106,7 @@ test("V142 is timing-only and contains no legacy visual renderer",()=>{
 });
 
 test("V143 casts retain raster-only choreography; named persistent foot auras stay within the same DOM status owner",()=>{
+    const castRuntime=v143.slice(v143.indexOf("(function installV143SkillAnimationRuntime(){"));
     [
         /createElement\(["']canvas["']\)/,
         /getContext\s*\(/,
@@ -117,7 +118,8 @@ test("V143 casts retain raster-only choreography; named persistent foot auras st
         /v143-hit-impact/,
         /v143-hit-particle/,
         /canvas-crop/
-    ].forEach(pattern=>assert.doesNotMatch(v143,pattern));
+    ].forEach(pattern=>assert.doesNotMatch(castRuntime,pattern));
+    assert.match(v143.slice(0,v143.indexOf("(function installV143SkillAnimationRuntime(){")),/document\.createElement\("canvas"\)/,"authorized accent layer remains isolated from cast bodies");
     assert.equal((v143.match(/requestAnimationFrame\(start\)/g)||[]).length,1,"one paint-clock handoff only; frame selection remains CSS raster");
     assert.equal((v143.match(/requestAnimationFrame\(presentHit\)/g)||[]).length,1,"one hit paint-clock handoff callsite");
     assert.equal((v143.match(/requestAnimationFrame\s*\(/g)||[]).length,3,"one start and a bounded two-frame hit fence, no procedural RAF renderer");

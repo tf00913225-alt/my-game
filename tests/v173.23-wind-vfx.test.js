@@ -63,6 +63,7 @@ function makeNode(rect){
             contains(name){ return classes.has(name); }
         },
         appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
+        insertBefore(child,next){child.parentNode=this;const index=next?this.children.indexOf(next):this.children.length;this.children.splice(index,0,child);return child;},
         removeChild(child){
             this.children=this.children.filter(candidate=>candidate!==child);
             child.parentNode=null;
@@ -165,7 +166,7 @@ function loadRuntime(options={}){
             }
             if(tag==="canvas"){
                 const context={
-                    clearRect(){},
+                    clearRect(){},setTransform(){},save(){},restore(){},translate(){},rotate(){},scale(){},beginPath(){},ellipse(){},stroke(){},moveTo(){},quadraticCurveTo(){},fill(){},fillRect(){},
                     drawImage(...args){ drawCalls.push({node,args}); }
                 };
                 node.getContext=()=>context;
@@ -874,8 +875,8 @@ test("sweep weakening rings and icons require actual status success and disappea
  runtime.setClock(100);runtime.context.v142SkillAnimationDirector.play(config("stormFlurry","tri","physical"),{side:"player",targetSide:"monster",targetId:0,targetIds:[0,1,2]});
  runtime.context.applyMonsterDebuff(runtime.monsters[1],"damageDown",2,30);runtime.setClock(100);
  for(const [delay,time] of [[750,850],[850,950],[950,1050]]){runtime.setClock(time);runtime.scheduled.find(s=>s.delay===delay).callback();for(let n=0;n<2;n++)runtime.raf.splice(0).forEach(fn=>fn(time));}
- const rings=runtime.body.children.flatMap(n=>n.children).filter(n=>n.dataset.feedbackEffect==="weaken");
- assert.deepEqual(rings.map(n=>n.dataset.targetIndex),["1"]);assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"));
+ const rings=runtime.context.v143SkillAnimationState.current.hitFeedback.snapshot().filter(n=>n.kind==="weaken");
+ assert.deepEqual(Array.from(rings,n=>n.targetIndex),["1"]);assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"));
  assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),null);
  runtime.monsters[1].statusEffects=[];runtime.context.v143SyncStatusVisualEffects();assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"),null);
  runtime.context.v142SkillAnimationDirector.dispose();

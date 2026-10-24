@@ -32,6 +32,7 @@ Work ID：WIND-FLURRY-SAMPLE-20261024／原 PR #989。只加強暴風亂擊，�
 | `windCount`（10）、`leafCount`（5） | 大：風屑／葉片較密；小：較乾淨，也較省效能 |
 | `burstCount`（6） | 每次命中的青白碎屑數量；大更熱鬧，小更清爽 |
 | `maxEffectNodes`（48） | 同時保留的裝飾節點上限；小較省效能，大容許較密。硬上限48，不會無限增加 |
+| `canvasDpr`（1.5） | 這次特許粒子層的清晰度；大較細緻但較耗能，小較省。只影響粒子，不縮小角色，限制1～2 |
 | `poolLimit`（48） | 可保留重用的節點數；大可減少重建，但用較多記憶體；小少留一些備用節點 |
 | `colors` | 依序青綠、淡白、深青綠；換色會一起影響風屑、碎屑、尾跡與圈，不改其他技能 |
 | `blendMode`（plus-lighter） | 加亮混色；不支援時自動使用screen。兩者都維持透明背景，不增加遮擋 |
@@ -51,11 +52,11 @@ Work ID：WIND-FLURRY-SAMPLE-20261024／原 PR #989。只加強暴風亂擊，�
 
 ## 工程驗證紀錄
 
-- 唯一VFX Owner仍為js39；同一stage承接有界DOM裝飾，沒有Canvas、額外版型／縮放器／傷害管線。
+- 唯一VFX Owner仍為js39。使用者在DOM實機長幀證據後明確允許「這次獨立粒子層例外」：同一stage只有一張可回收Canvas2D畫布，繪製風屑／葉片／burst／圈／trail；短screen flash保留DOM opacity，技能本體、受擊立繪Flash、持續status icon仍走原DOM。沒有額外版型／縮放器／傷害管線，也不為其他技能建立Canvas fallback。
 - config由原builder嵌入原js39唯一marker；正式script順序不變，沒有新增runtime請求或boot等待。
 - 原target timer投影依實際螢幕x排序為750／850／950ms，Core HP／狀態同步結算不變，gate維持1500ms；每個目標有自己的settled狀態，避免第一下提前釋放後兩個回呼。
 - 成功氣流圈必須同時有正式applied-status追蹤及當前真實damageDown；小圖示沿用原status Owner，沒有自建2回合計時器。
-- focused module7／Wind29／原Fire15／raster9及原impact／cold-clock等回歸保留。獨立審核與原始瀏覽器／手機證據在PR body續記，不把舊cf5影片當成本版證明。
+- focused module9／Wind29／原Fire15／raster9及原impact／cold-clock等回歸保留。獨立審核與原始瀏覽器／手機證據在PR body續記，不把舊cf5影片當成本版證明。
 - 初次完整bundle Chrome證據：`artifacts/wind-sweep-candidate-browser/evidence.json`。成功／未成功／混合正式狀態補驗：`artifacts/wind-sweep-status-browser/evidence.json`，隔離QA僅注入判定RNG，仍呼叫原正式判定與Core，未修改產品資料或存檔。
 - 部署與最新Head CI只依原PR即時狀態；合併前仍需必要Gate與此樣板的人類美術確認。
 
@@ -68,3 +69,11 @@ Work ID：WIND-FLURRY-SAMPLE-20261024／原 PR #989。只加強暴風亂擊，�
 - 排除建場後的播放CPU取樣 `artifacts/wind-sweep-phone-play-profile/cpu-profile.json` 顯示主要幾何讀取來自syncHud，2.3秒LayoutCount229／Recalc390。原HUD每次都把同父節點重搬，再讀下一個單位位置；同父去重對照降至LayoutCount134、LayoutDuration.126→.050秒。最終再分成準備語意→全部量位置→全部更新，僅在目前DOM順序不同時insertBefore，保留原順序／同節點／事件。原函式測試確認穩態zero moves、量完才搬、重建順序。
 - 取樣與診斷保留：`artifacts/wind-sweep-phone-cpu-diagnostic`、`wind-sweep-phone-ab-diagnostic`、`wind-sweep-phone-fit-cache-probe`、`wind-sweep-phone-hidden-fit-probe`、`wind-sweep-phone-fit-owner-probe`、`wind-sweep-phone-play-profile`、`wind-sweep-phone-hud-dedupe-probe`。這些是不同邊界／來源快照，不能交叉當最新CI或影片證明。
 - JS RAF排程不是compositor呈現FPS。解析Android原片PTS：舊cf5約51.5fps／p95 33.5ms、新4f約47.1fps／35.6ms、7eaf約46.0fps／35.2ms；所有舊結果保留，均有偶發長幀，不宣稱鎖60或整場零卡頓。最終實機原片與兩種量測在PR body／相鄰movie-proof記錄。
+
+### 單一粒子畫布例外
+
+只取代本樣板新加的DOM裝飾，沒有改原Sprite Sheet或角色動作。最多48個粒子物件與1張畫布，物件／畫布重用；混色使用lighter，外層沿設定plus-lighter／screen。僅有visual RAF，不得推進Core／目標／狀態／回合。Hit Stop同步凍結粒子年齡；若兩次命中間沒有RAF，會先結算上一停頓區間，避免漏扣50ms。screen flash與原80ms立繪Flash保留各自短時長。原1500ms deadline與dispose／hidden／supersede立即清粒子、取消RAF、清畫布像素並detach，不延長Gate。持續小圖示仍由原正式狀態Owner管理。
+
+粒子層只覆蓋橫排及其尾跡淨空；每種尺寸／顏色／光暈先畫成快取圖，再以位移、旋轉、縮放、透明度呈現，避免逐幀模糊。快取最多64項，粒子仍最多48；不引入Worker或改安全政策。
+
+最新USB候選證據：artifacts/wind-sweep-canvas-row-phone/native-preview.mp4 與 evidence.json、video-frame-pacing.json。真Core部分削弱／暴擊／未削弱／MISS與清理PASS。原片16秒753幀，整段平均約47fps、幀間隔p95約35.4ms、最大68.0ms；包含等待段，不宣稱鎖60或完整戰鬥效能PASS。主執行緒RAF仍有長間隔，與錄影呈現FPS分列。相較全屏快取候選41.2fps／最大219ms改善，但不同時間錄製，非精準硬體基準。人類美術／節奏與最新Head CI仍待驗收。

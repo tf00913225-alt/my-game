@@ -11564,9 +11564,9 @@
     "use strict";
     if(typeof window==="undefined"||window.FourSymbolsHitFeedback){return;}
     // Build embeds the one editable JSON without another runtime request/clock.
-    const CONFIG={"enabled":true,"defaults":{"enabled":false,"stopFrames":3,"fps":60,"shakePx":4,"decay":0.85,"shakeSteps":8,"stepMs":12,"referenceDamage":168,"minDamageScale":0.35,"maxDamageScale":2,"brightness":2.5,"flashMs":80,"hitFrameMultiplier":2,"frameDurations":null,"blendMode":"plus-lighter","poolLimit":48,"sweepEnabled":false,"sweepGapMs":100,"hitStrength":[0.72,0.92,1.25],"maxEffectNodes":48,"windCount":10,"leafCount":5,"burstCount":6,"colors":["#80f6d6","#efffff","#43c7bb"],"windMs":900,"windSize":2,"leafSize":7,"windSpread":0.6,"glowPx":3,"glowBrightness":1.18,"particleOpacity":0.76,"trailLength":1.8,"trailWidth":2,"trailMs":460,"burstMs":300,"burstRadius":0.6,"shockwaveMs":380,"shockwaveScale":1.45,"screenFlashOpacity":0.09,"screenFlashMs":90,"weakenMs":420,"weakenDrop":0.5},"skills":{"stormFlurry":{"enabled":true,"sweepEnabled":true}}};
+    const CONFIG={"enabled":true,"defaults":{"enabled":false,"stopFrames":3,"fps":60,"shakePx":4,"decay":0.85,"shakeSteps":8,"stepMs":12,"referenceDamage":168,"minDamageScale":0.35,"maxDamageScale":2,"brightness":2.5,"flashMs":80,"hitFrameMultiplier":2,"frameDurations":null,"blendMode":"plus-lighter","poolLimit":48,"sweepEnabled":false,"sweepGapMs":100,"hitStrength":[0.72,0.92,1.25],"maxEffectNodes":48,"canvasDpr":1.5,"windCount":10,"leafCount":5,"burstCount":6,"colors":["#80f6d6","#efffff","#43c7bb"],"windMs":900,"windSize":2,"leafSize":7,"windSpread":0.6,"glowPx":3,"glowBrightness":1.18,"particleOpacity":0.76,"trailLength":1.8,"trailWidth":2,"trailMs":460,"burstMs":300,"burstRadius":0.6,"shockwaveMs":380,"shockwaveScale":1.45,"screenFlashOpacity":0.09,"screenFlashMs":90,"weakenMs":420,"weakenDrop":0.5},"skills":{"stormFlurry":{"enabled":true,"sweepEnabled":true}}};
     if(!CONFIG){return;}
-    const pools=new Map(),active=new Set();
+    const pools=new Map(),active=new Set(),canvasPool=[],particlePool=[],texturePool=new Map();
     const bounded=(v,f,min,max)=>Number.isFinite(Number(v))?Math.max(min,Math.min(max,Number(v))):f;
     function configFor(skill){
         const c={...CONFIG.defaults,...CONFIG.skills[skill]};
@@ -11580,6 +11580,7 @@
         c.brightness=bounded(c.brightness,2.5,1,4);c.flashMs=bounded(c.flashMs,80,0,500);
         c.hitFrameMultiplier=bounded(c.hitFrameMultiplier,2,1,8);
         c.poolLimit=Math.floor(bounded(c.poolLimit,24,0,64));
+        c.canvasDpr=bounded(c.canvasDpr,1.5,1,2);
         c.sweepGapMs=bounded(c.sweepGapMs,100,0,150);
         const limits={maxEffectNodes:[48,0,48],windCount:[10,0,16],leafCount:[5,0,8],burstCount:[6,0,10],
             windMs:[900,100,1200],windSize:[2,1,6],leafSize:[7,2,12],windSpread:[.6,.1,1],
@@ -11628,6 +11629,8 @@
     }
     function create(skill){
         const c=configFor(skill),seen=new Set(),motions=new Set(),effects=new Set();let stop=null,disposed=false,batch=false;
+        let canvas=null,context=null,frame=0,lastDraw=0,pauseFrom=0,pauseUntil=0,area=null;
+        const request=typeof requestAnimationFrame==="function"?requestAnimationFrame:null;
         const reduced=()=>window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
         function resume(){
             if(!stop)return;clearTimeout(stop.timer);
@@ -11645,24 +11648,97 @@
                 animation.play();
             });stop=null;
         }
+        function ensureCanvas(host){
+            if(canvas)return true;
+            const candidate=canvasPool.pop()||document.createElement("canvas");
+            const ctx=candidate.getContext?.("2d",{alpha:true,desynchronized:true});
+            if(!ctx)return false;
+            canvas=candidate;context=ctx;
+            const width=area?.width||window.innerWidth||document.documentElement?.clientWidth||1,height=area?.height||window.innerHeight||document.documentElement?.clientHeight||1;
+            const dpr=Math.min(c.canvasDpr,window.devicePixelRatio||1);
+            const w=Math.max(1,Math.round(width*dpr)),h=Math.max(1,Math.round(height*dpr));
+            if(canvas.width!==w)canvas.width=w;if(canvas.height!==h)canvas.height=h;
+            canvas.dataset.feedbackLayer="wind-particles";canvas.setAttribute("aria-hidden","true");
+            Object.assign(canvas.style,{position:"fixed",left:(area?.left||0)+"px",top:(area?.top||0)+"px",width:width+"px",height:height+"px",pointerEvents:"none",mixBlendMode:c.blendMode});
+            host.insertBefore(canvas,host.firstChild||null);
+            context.setTransform(dpr,0,0,dpr,0,0);return true;
+        }
+        function queuePaint(){if(!frame&&request)frame=request(paint);}
+        function advanceParticle(entry,now){
+            const overlap=entry.kind==="screen-flash"?0:Math.max(0,Math.min(now,pauseUntil)-Math.max(entry.tick,pauseFrom));
+            entry.elapsed+=Math.max(0,now-entry.tick-overlap);entry.tick=now;
+        }
+        function paint(){
+            frame=0;if(disposed||!context)return;
+            const now=Date.now();
+            if(now-lastDraw<1000/c.fps*.8){queuePaint();return;}lastDraw=now;
+            context.clearRect(0,0,canvas.width,canvas.height);context.globalCompositeOperation="lighter";
+            Array.from(effects).forEach(entry=>{
+                if(entry.dom){if(now>=Math.min(entry.tick+entry.duration,entry.deadline))entry.finish();return;}
+                advanceParticle(entry,now);
+                if(entry.elapsed>=entry.duration||now>=entry.deadline){entry.finish();return;}
+                const progress=1-Math.pow(1-entry.elapsed/entry.duration,3),keys=entry.keys;
+                let index=0;while(index<keys.length-2&&progress>keys[index+1].offset)index++;
+                const a=keys[index],b=keys[index+1],span=b.offset-a.offset,t=span?Math.max(0,Math.min(1,(progress-a.offset)/span)):1;
+                const lerp=k=>a[k]+(b[k]-a[k])*t,box=entry.box;
+                const opacity=lerp("opacity");entry.opacity=opacity;
+                context.save();context.translate(box.x+box.w/2+lerp("x")-(area?.left||0),box.y+box.h/2+lerp("y")-(area?.top||0));context.rotate(lerp("angle")*Math.PI/180);context.scale(lerp("scale"),lerp("scale"));
+                context.globalAlpha=opacity;
+                const texture=entry.texture;
+                context.drawImage(texture.node,-texture.w/2,-texture.h/2,texture.w,texture.h);
+                context.restore();
+            });if(effects.size)queuePaint();
+        }
+        // Cache the glow raster once; moving frames only transform a bitmap.
+        function textureFor(kind,box,color){
+            const key=[kind,box.w,box.h,color,c.glowPx,c.trailWidth].join("|");
+            if(texturePool.has(key))return texturePool.get(key);
+            const pad=Math.ceil(c.glowPx*3+c.trailWidth+2),w=Math.ceil(box.w+pad*2),h=Math.ceil(box.h+pad*2);
+            const node=document.createElement("canvas"),ctx=node.getContext("2d");
+            node.width=w;node.height=h;ctx.translate(w/2,h/2);
+            ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=c.trailWidth;ctx.shadowColor=color;ctx.shadowBlur=c.glowPx;
+            if(kind==="shockwave"||kind==="weaken"||kind==="trail"){
+                ctx.beginPath();ctx.ellipse(0,0,box.w/2,box.h/2,0,kind==="trail"?Math.PI:0,kind==="trail"?Math.PI*1.9:Math.PI*2);ctx.stroke();
+            }else if(kind==="leaf"){
+                ctx.beginPath();ctx.moveTo(-box.w/2,box.h/2);ctx.quadraticCurveTo(-box.w/2,-box.h,box.w/2,-box.h/2);ctx.quadraticCurveTo(box.w/2,box.h,-box.w/2,box.h/2);ctx.fill();
+            }else ctx.fillRect(-box.w/2,-box.h/2,box.w,box.h);
+            const texture={node,w,h};
+            if(texturePool.size>=64)texturePool.delete(texturePool.keys().next().value);
+            texturePool.set(key,texture);return texture;
+        }
         function effect(host,kind,box,frames,duration,deadline,extra){
             if(disposed||!c.enabled||!c.sweepEnabled||reduced()||!host||typeof host.appendChild!=="function"||effects.size>=c.maxEffectNodes)return null;
-            const node=acquire("wind-effect");node.dataset.feedbackEffect=kind;node.setAttribute("aria-hidden","true");
-            const color=c.colors[effects.size%c.colors.length];
-            Object.assign(node.style,{position:"fixed",display:"block",left:box.x+"px",top:box.y+"px",width:box.w+"px",height:box.h+"px",
-                pointerEvents:"none",background:color,borderRadius:"50%",mixBlendMode:c.blendMode,
-                boxShadow:"0 0 "+c.glowPx+"px "+color,opacity:"0",...extra});
-            host.appendChild(node);
-            const a=node.animate(frames,{duration:Math.max(1,Math.min(duration,deadline-Date.now())),easing:"ease-out",fill:"both"});
-            a.hitFeedbackOwnEffect=kind==="screen-flash";
-            const entry={node,animation:a};effects.add(entry);
-            const finish=()=>{if(!effects.delete(entry))return;a.onfinish=null;release("wind-effect",node,c.poolLimit);};
-            a.onfinish=finish;entry.finish=finish;return entry;
+            // The full-screen flash remains a compositor opacity overlay;
+            // it must not inflate the particle bitmap to the entire viewport.
+            if(kind==="screen-flash"){
+                const node=acquire("screen-flash");node.dataset.feedbackEffect=kind;
+                Object.assign(node.style,{position:"fixed",left:box.x+"px",top:box.y+"px",width:box.w+"px",height:box.h+"px",pointerEvents:"none",background:extra.background,opacity:"0",mixBlendMode:c.blendMode});
+                host.appendChild(node);
+                const entry={kind,node,dom:true,elapsed:0,tick:Date.now(),deadline,duration};effects.add(entry);
+                const animation=node.animate(frames,{duration:Math.max(1,Math.min(duration,deadline-Date.now())),fill:"none"});animation.hitFeedbackOwnEffect=true;
+                entry.finish=()=>{if(!effects.delete(entry))return;animation.onfinish=null;animation.cancel();release("screen-flash",node,c.poolLimit);};
+                animation.onfinish=entry.finish;return entry;
+            }
+            if(!ensureCanvas(host))return null;
+            const entry=particlePool.pop()||{};
+            const keys=frames.map((key,i)=>{
+                const text=key.transform||"",move=text.match(/translate\(([-\d.]+)px,\s*([-\d.]+)px\)/),rotate=text.match(/rotate\(([-\d.]+)deg\)/),scale=text.match(/scale\(([-\d.]+)\)/);
+                return {offset:key.offset??i/(frames.length-1),opacity:key.opacity??1,x:move?Number(move[1]):0,y:move?Number(move[2]):0,angle:rotate?Number(rotate[1]):0,scale:scale?Number(scale[1]):1};
+            });
+            Object.assign(entry,{kind,box,keys,color:extra?.background&&extra.background!=="transparent"?extra.background:c.colors[effects.size%c.colors.length],
+                node:{dataset:{feedbackEffect:kind}},elapsed:0,tick:Date.now(),opacity:0,duration:Math.max(1,Math.min(duration,deadline-Date.now())),deadline});effects.add(entry);
+            entry.texture=textureFor(kind,box,entry.color);
+            entry.finish=()=>{if(!effects.delete(entry))return;Object.keys(entry).forEach(k=>delete entry[k]);if(particlePool.length<c.poolLimit)particlePool.push(entry);};
+            queuePaint();return entry;
         }
         function wind(host,rects,deadline){
             if(!rects.length)return;
             const left=Math.min(...rects.map(r=>r.left)),right=Math.max(...rects.map(r=>r.left+r.width));
             const top=Math.min(...rects.map(r=>r.top)),height=Math.max(...rects.map(r=>r.height));
+            const margin=Math.max(...rects.map(r=>r.width))*1.5+c.glowPx*3;
+            const viewportWidth=window.innerWidth||right+margin,viewportHeight=window.innerHeight||top+height*3;
+            const x=Math.max(0,left-margin),y=Math.max(0,top-height*.5-margin*.25);
+            area={left:x,top:y,width:Math.max(1,Math.min(viewportWidth,right+margin)-x),height:Math.max(1,Math.min(viewportHeight,top+height*2)-y)};
             const count=Math.floor(c.windCount+c.leafCount);
             for(let i=0;i<count;i++){
                 const leaf=i>=c.windCount,size=leaf?c.leafSize:c.windSize;
@@ -11720,6 +11796,11 @@
                 stopped.push({animation,rate:animation.playbackRate});animation.pause();
             });
             stop={tracks:stopped,timer:setTimeout(resume,c.stopFrames*1000/c.fps)};
+            const pausedAt=Date.now();
+            // Consume the previous stop before replacing its interval, even
+            // when a slow device painted no particle frame between two hits.
+            Array.from(effects).forEach(entry=>{if(entry.dom)return;advanceParticle(entry,pausedAt);if(entry.elapsed>=entry.duration||pausedAt>=entry.deadline)entry.finish();});
+            pauseFrom=pausedAt;pauseUntil=pausedAt+c.stopFrames*1000/c.fps;
             const strength=c.shakePx*Math.max(c.minDamageScale,Math.min(c.maxDamageScale,damage/c.referenceDamage))*power;
             const frames=[{transform:"translate(0px,0px)"}];
             for(let i=0;i<c.shakeSteps;i++){
@@ -11731,13 +11812,16 @@
                 if(a){motions.add(a);a.onfinish=()=>{motions.delete(a);a.cancel();};}
             });return true;
         }
-        function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();Array.from(effects).forEach(e=>e.finish());active.delete(api);}
-        const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,dispose,effectCount:()=>effects.size};active.add(api);return api;
+        function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();Array.from(effects).forEach(e=>e.finish());
+            if(frame&&typeof cancelAnimationFrame==="function")cancelAnimationFrame(frame);frame=0;
+            if(canvas){context.clearRect(0,0,canvas.width,canvas.height);canvas.remove();if(canvasPool.length<1)canvasPool.push(canvas);canvas=null;context=null;}active.delete(api);}
+        const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,dispose,effectCount:()=>effects.size,
+            snapshot:()=>Array.from(effects,e=>({kind:e.kind,...e.node.dataset,opacity:e.opacity}))};active.add(api);return api;
     }
     window.FourSymbolsHitFeedback={config:CONFIG,configFor,create,frameTrack,acquire,release,
         disposeAll(){Array.from(active).forEach(a=>a.dispose());},
         setEnabled(enabled){CONFIG.enabled=enabled===true;if(!CONFIG.enabled)this.disposeAll();},
-        poolSize(kind){return pools.get(kind)?.length||0;}};
+        poolSize(kind){return kind==="particle"?particlePool.length:kind==="particle-canvas"?canvasPool.length:pools.get(kind)?.length||0;}};
 })();
 
 /* =====================================================
@@ -11746,7 +11830,8 @@
    Fixed Slot geometry owns battle coverage; its formal artwork projection
    anchors explicitly authored recipient effects within that same formation.
    Cast bodies remain Sprite Sheets, with no Canvas/SVG/WebGL fallback.
-   The explicitly enabled wind sample adds bounded DOM wind/leaf/impact accents.
+   Explicit wind-only exception: one pooled Canvas paints bounded accents;
+   it never replaces the cast body, targeting, status or gameplay owners.
    Three persistent named buffs use the same status owner's CSS foot aura.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
