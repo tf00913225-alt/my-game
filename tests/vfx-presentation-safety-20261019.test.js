@@ -122,7 +122,7 @@ test("a single target near the visible edge keeps its hit center and source rati
     assertInside(node,target,safe);
 });
 test("HUD detaches for the whole cast, returns during reading, and restores the original node on cleanup",()=>{
-    function host(){return {children:[],appendChild(node){if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(x=>x!==node);this.children.push(node);node.parentNode=this;},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(x=>x!==this);}};}
+    function host(){return {children:[],insertBefore(node,next){if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(x=>x!==node);const at=next?this.children.indexOf(next):this.children.length;this.children.splice(at,0,node);node.parentNode=this;},appendChild(node){this.insertBefore(node,null);},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(x=>x!==this);}};}
     const body=host();let reading=false,stage=true,hit=false;
     body.classList={contains:()=>reading};
     const card=host();card.id="battleMonster0";card.isConnected=true;card.classList={contains:()=>false};
@@ -132,7 +132,7 @@ test("HUD detaches for the whole cast, returns during reading, and restores the 
     const projection={rect:{left:20,top:30,width:80,height:100},width:80,height:100,scaleX:1,scaleY:1};
     const context={document:{body,getElementById:()=>page,createElement:()=>host(),querySelector(selector){return selector.split(",").some(s=>s===".v143-skill-stage"?stage:s===".v143-hit-feedback-overlay"?hit:false)?{}:null;}},
         window:{FourSymbolsBattlefieldRenderGeometry:{getUnitGeometry:()=>({hudSurface:projection})}},battleActive:true,
-        hudLayer:null,prepareUnitHud:()=>hud,Array,Number};
+        hudLayer:null,hudBatchDepth:0,hudBatchPending:false,prepareUnitHud:()=>hud,Array,Number};
     vm.createContext(context);
     vm.runInContext(functionSource(presentation,"clearUnitHud","syncHud")+functionSource(presentation,"syncHud","syncResourceNumbers"),context);
     context.syncHud();assert.equal(hud.parentNode,context.hudLayer,"cast startup has no hit overlay but HUD must remain readable");

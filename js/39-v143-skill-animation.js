@@ -796,7 +796,7 @@
     function captureImpactTarget(current,side,index){
         const entity=entityFor(side,index),card=cardFor(side,index);
         const artwork=card&&card.querySelector(".v174-battle-art");
-        const projection=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index)?.artworkProjection;
+        const projection=(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(side,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index)?.artworkProjection);
         if(!entity||Number(entity.hp)<=0||entity.alive===false||!artwork||!projection){ return; }
         if(!current.impactTargets){ current.impactTargets=new Map(); }
         if(current.impactEpoch===undefined){ current.impactEpoch=state.impactEpoch; }
@@ -840,32 +840,46 @@
     }
     function syncFieldScene(current){
         const scene=current?.fieldScene;if(!scene)return;
-        scene.entries.forEach((entry,index)=>{
+        const measured=Array.from(scene.entries,([index,entry])=>{
             const card=cardFor(current.targetSide,index),entity=entityFor(current.targetSide,index);
-            if(entity!==entry.entity||!entity||entity.hp<=0||entity.alive===false||!entry.art.isConnected||card?.querySelector(".v174-battle-art")!==entry.art||entry.art.querySelector(".v174-portrait-paint")!==entry.paint){entry.cancel();scene.entries.delete(index);return;}
-            const p=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection;
+            const valid=entity===entry.entity&&entity&&entity.hp>0&&entity.alive!==false&&entry.art.isConnected&&
+                card?.querySelector(".v174-battle-art")===entry.art&&entry.art.querySelector(".v174-portrait-paint")===entry.paint;
+            const p=valid?(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(current.targetSide,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection):null;
+            return {index,entry,p};
+        });
+        // All geometry reads precede projection writes/removal. Never force a
+        // new layout for each next actor in the same six-target hit callback.
+        measured.forEach(({index,entry,p})=>{
             if(!p?.rect||p.genericPortrait||!p.backgroundImage||p.backgroundImage==="none"){entry.cancel();scene.entries.delete(index);return;}
-            for(const node of entry.nodes)Object.assign(node.style,{left:p.rect.left+"px",top:p.rect.top+"px",width:p.rect.width+"px",height:p.rect.height+"px",
-                backgroundImage:p.backgroundImage,backgroundSize:p.backgroundSize,backgroundPosition:p.backgroundPosition,backgroundRepeat:p.backgroundRepeat});
+            entry.nodes.forEach(node=>writeFieldProjection(node,p));
         });
     }
+    function writeFieldProjection(node,p){
+        const styles={left:p.rect.left+"px",top:p.rect.top+"px",width:p.rect.width+"px",height:p.rect.height+"px",
+            backgroundImage:p.backgroundImage,backgroundSize:p.backgroundSize,backgroundPosition:p.backgroundPosition,backgroundRepeat:p.backgroundRepeat};
+        Object.entries(styles).forEach(([key,value])=>{if(node.style[key]!==value)node.style[key]=value;});
+    }
+
     function startFieldScene(current){
         const c=current.hitFeedback?.config.fieldScene;
         if(!c?.enabled||current.fieldScene||window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
         const api=window.FourSymbolsHitFeedback,scene={entries:new Map(),rear:document.createElement("div"),front:document.createElement("div")};
         scene.rear.className="v143-field-portrait-plane";scene.front.className="v143-field-portrait-plane v143-field-portrait-front";
+        const measured=current.targetIndexes.slice(0,6).map((index,rank)=>{
+            const card=cardFor(current.targetSide,index),art=card?.querySelector(".v174-battle-art"),paint=art?.querySelector(".v174-portrait-paint");
+            const entity=entityFor(current.targetSide,index),p=(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(current.targetSide,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection);
+            const idles=paint?paint.getAnimations().filter(a=>a.playState==="running"):[];
+            return {index,rank,art,paint,entity,p,idles};
+        });
         for(const plane of [scene.rear,scene.front]){plane.setAttribute("aria-hidden","true");document.body.appendChild(plane);}
         current.fieldScene=scene;
-        current.targetIndexes.slice(0,6).forEach((index,rank)=>{
-            const card=cardFor(current.targetSide,index),art=card?.querySelector(".v174-battle-art"),paint=art?.querySelector(".v174-portrait-paint");
-            const entity=entityFor(current.targetSide,index),p=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection;
+        measured.forEach(({index,rank,art,paint,entity,p,idles})=>{
             if(!paint||!entity||entity.hp<=0||entity.alive===false||!p?.rect||p.genericPortrait||!p.backgroundImage||p.backgroundImage==="none")return;
-            const nodes=[],tracks=[],idles=paint.getAnimations().filter(a=>a.playState==="running");
+            const nodes=[],tracks=[];
             idles.forEach(a=>a.pause());
             for(const [front,plane] of [[false,scene.rear],[true,scene.front]]){
                 const node=api.acquire("field-portrait");node.className="v143-field-portrait";node.dataset.targetIndex=String(index);node.dataset.sequence=String(current.sequence);
-                Object.assign(node.style,{left:p.rect.left+"px",top:p.rect.top+"px",width:p.rect.width+"px",height:p.rect.height+"px",
-                    backgroundImage:p.backgroundImage,backgroundSize:p.backgroundSize,backgroundPosition:p.backgroundPosition,backgroundRepeat:p.backgroundRepeat});
+                writeFieldProjection(node,p);
                 plane.appendChild(node);nodes.push(node);
                 const track=node.animate(api.occlusionTrack(c,rank,front),{duration:current.duration,fill:"both"});track.hitFeedbackDeadline=current.visualStartedAt+current.duration;tracks.push(track);
             }
@@ -1085,7 +1099,29 @@
         return slot||null;
     }
 
+    function rasterUnitGeometry(current,side,index){
+        const key=side+":"+index,snapshot=current.rasterReadSnapshot;
+        return snapshot?.units.has(key)?snapshot.units.get(key):window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index);
+    }
+    function rasterArtwork(current,side,index){
+        const key=side+":"+index,snapshot=current.rasterReadSnapshot;
+        if(snapshot?.units.has(key))return snapshot.units.get(key)?.artworkProjection;
+        const api=window.FourSymbolsBattlefieldRenderGeometry;
+        return api?.getArtworkProjection?.(side,index)||api?.getUnitGeometry(side,index)?.artworkProjection;
+    }
+    function captureRasterReads(current){
+        const units=new Map(),anchors=new Map(),requests=new Map();
+        activeCards(current.targetSide,current.config).forEach(entry=>requests.set(current.targetSide+":"+entry.index,[current.targetSide,entry.index]));
+        requests.set(current.side+":"+current.actorIndex,[current.side,current.actorIndex]);
+        requests.forEach(([side,index],key)=>{
+            units.set(key,window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(side,index));
+            anchors.set(key,slotAnchor(side,index,cardFor(side,index)));
+        });
+        return {units,anchors};
+    }
     function slotAnchor(side,index,card){
+        const snapshot=state.current?.rasterReadSnapshot,key=side+":"+index;
+        if(snapshot?.anchors.has(key))return snapshot.anchors.get(key);
         const boss=window.FourSymbolsBossBattle;
         if(side==="monster"&&boss&&typeof boss.getTargetGeometry==="function"){
             const targetRect=boss.getTargetGeometry(index);
@@ -1929,7 +1965,7 @@
             authored[0]>=0&&authored[1]>=0&&authored[2]<=1&&authored[3]<=1&&authored[2]>authored[0]&&authored[3]>authored[1]?authored:[0,0,1,1];
         if(visibility){
             const geometries=activeCards(current.targetSide,current.config).map(entry=>({index:entry.index,
-                geometry:window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,entry.index)}));
+                geometry:rasterUnitGeometry(current,current.targetSide,entry.index)}));
             // Approved portraits can overhang their logical faction zone.
             // Do not shrink effects back into the old, smaller Slot rectangle.
             // The existing paint projection and overlay remain the only bounds.
@@ -2027,7 +2063,7 @@
         if(placement==="single"){
             const visibility=current.hitFeedback?.config.enabled?current.hitFeedback.config.visibility:null;
             const portrait=sprite.presentation==="per-recipient"||visibility
-                ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect:null;
+                ?rasterArtwork(current,current.targetSide,index)?.rect:null;
             const hasPortrait=portrait&&Number(portrait.width)>0&&Number(portrait.height)>0;
             const center=hasPortrait?{x:portrait.left+portrait.width/2,y:portrait.top+portrait.height/2}:target;
             const body=hasPortrait?Math.min(portrait.width,portrait.height):0;
@@ -2170,7 +2206,7 @@
         const c=current.hitFeedback.config.fieldScene,rank=current.targetIndexes.indexOf(index);
         if(rank>=c.maxFunnels){node.style.display="none";node.dataset.fieldRepresentative="false";return;}
         const api=window.FourSymbolsBattlefieldRenderGeometry,overlay=api?.getBattlefieldOverlayGeometry?.()?.rect;
-        const rects=current.targetIndexes.map(i=>api?.getUnitGeometry(current.targetSide,i)?.artworkProjection?.rect).filter(r=>r?.width>0&&r.height>0);
+        const rects=current.targetIndexes.map(i=>rasterArtwork(current,current.targetSide,i)?.rect).filter(r=>r?.width>0&&r.height>0);
         if(!overlay||!rects.length)return;
         const left=Math.max(overlay.left,Math.min(...rects.map(r=>r.left))),top=Math.max(overlay.top,Math.min(...rects.map(r=>r.top)));
         const right=Math.min(overlay.left+overlay.width,Math.max(...rects.map(r=>r.left+r.width))),bottom=Math.min(overlay.top+overlay.height,Math.max(...rects.map(r=>r.top+r.height)));
@@ -2195,7 +2231,7 @@
         const input=current.hitFeedback.config.visibility?.paintBounds;
         const bounds=Array.isArray(input)&&input.length===4&&input.every(Number.isFinite)&&input[0]>=0&&input[1]>=0&&
             input[2]<=1&&input[3]<=1&&input[2]>input[0]&&input[3]>input[1]?input:[0,0,1,1];
-        const actor=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.side,current.actorIndex)?.artworkProjection?.rect;
+        const actor=rasterArtwork(current,current.side,current.actorIndex)?.rect;
         const x=actor?actor.left+actor.width/2:null,y=actor?actor.top+actor.height/2:null;
         const cx=(bounds[0]+bounds[2])*.5,cy=(bounds[1]+bounds[3])*.5;
         const endX=parseFloat(node.style.left)+(cx-.5)*parseFloat(node.style.width);
@@ -2416,13 +2452,13 @@
         if(!current||current.firstVisibleFrameAt){ return false; }
         current.firstVisibleFrameAt=Date.now();
         current.visualStartedAt=current.firstVisibleFrameAt;
-        startFieldScene(current);
+        if(current.hitFeedback?.config.fieldScene?.enabled)startFieldScene(current);
         if(current.gate){ current.gate.visualTimelinePending=false; }
         if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
             current.gate.restartVisualTimeline(current.duration);
         }
         if(current.hitFeedback?.config.sweepEnabled){
-            const rects=current.targetIndexes.map(index=>window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect).filter(Boolean);
+            const rects=current.targetIndexes.map(index=>(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(current.targetSide,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection)?.rect).filter(Boolean);
             current.hitFeedback.wind(state.stage,rects,current.visualStartedAt+current.duration);
         }
         current.cleanupTimer=setTimer(
@@ -2433,6 +2469,11 @@
     }
 
     function settleTargetVisual(current,index){
+        const batch=current.hitFeedback?.config.enabled?window.FourSymbolsBattlePresentation?.batchHud:null;
+        if(batch)return batch(()=>settleTargetVisualNow(current,index));
+        return settleTargetVisualNow(current,index);
+    }
+    function settleTargetVisualNow(current,index){
         if(state.current!==current||current.done){ return; }
         if(current.settledTargets?.has(index)){ return; }
         current.settledTargets?.add(index);
@@ -2449,7 +2490,7 @@
             !["heal","buff","shield"].includes(current.hitFeedback.config.profile?.kind)&&
             Array.from(current.deferredStatusTargets).find(([type,targets])=>targets.has(index)&&hasTimedEffect(entityFor(current.targetSide,index),type));
         if(successfulStatus){
-            const rect=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect;
+            const rect=(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(current.targetSide,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection)?.rect;
             const ring=current.hitFeedback.weaken(state.stage,rect,current.visualStartedAt+current.duration);
             if(ring){ring.node.dataset.targetIndex=String(index);ring.node.dataset.targetSide=current.targetSide;ring.node.dataset.statusType=successfulStatus[0];}
         }
@@ -2478,7 +2519,7 @@
             const applied=before?.entity===entity&&Array.from(current.deferredStatusTargets).some(([type,targets])=>
                 targets.has(index)&&hasTimedEffect(entity,type));
             if(profile.kind==="heal"?healed:applied){
-                const rect=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect;
+                const rect=(window.FourSymbolsBattlefieldRenderGeometry?.getArtworkProjection?.(current.targetSide,index)||window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection)?.rect;
                 feedback.support(state.stage,rect,profile.kind,current.visualStartedAt+current.duration);
             }
         }
@@ -2622,7 +2663,7 @@
             current.settledTargets=new Set();
             const ordered=current.targetIndexes.slice().sort((a,b)=>{
                 const vertical=/column/i.test(targetType);
-                const x=i=>window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(targetSide,i)?.artworkProjection?.rect?.[vertical?"top":"left"]??slotAnchor(targetSide,i,cardFor(targetSide,i))?.[vertical?"y":"x"]??i;
+                const x=i=>rasterArtwork(current,targetSide,i)?.rect?.[vertical?"top":"left"]??slotAnchor(targetSide,i,cardFor(targetSide,i))?.[vertical?"y":"x"]??i;
                 return x(a)-x(b)||a-b;
             });
             current.hitRanks=new Map(ordered.map((index,rank)=>[index,rank]));
@@ -2657,7 +2698,11 @@
         if(model.noVisual||!model.sprite){
             if(!model.passive){ state.metrics.missingVisuals++; }
         }else{
-            current.targetIndexes.slice().forEach(index=>emitSprite(current,index));
+            // One synchronous render transaction only. No cache survives this
+            // stack: later hits/statuses/source changes and resize read live data.
+            current.rasterReadSnapshot=current.hitFeedback?.config.enabled&&current.targetIndexes.length>1?captureRasterReads(current):null;
+            try{current.targetIndexes.slice().forEach(index=>emitSprite(current,index));}
+            finally{current.rasterReadSnapshot=null;}
             if(!model.sprite.impactOnly&&current.spriteNodes.size){ requestCastTimeline(current); }
         }
 

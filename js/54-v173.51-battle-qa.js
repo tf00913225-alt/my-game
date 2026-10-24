@@ -366,7 +366,14 @@ function clearUnitHud(side){
         hudLayer.remove();hudLayer=null;
     }
 }
+let hudBatchDepth=0,hudBatchPending=false;
+function batchHud(callback){
+    hudBatchDepth++;
+    try{return callback();}
+    finally{hudBatchDepth--;if(!hudBatchDepth&&hudBatchPending){hudBatchPending=false;syncHud();}}
+}
 function syncHud(){
+    if(hudBatchDepth){hudBatchPending=true;return;}
     const page=document.getElementById("battlePage");
     if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()||document.body.classList.contains("v174-battle-reading-open")||
        !document.querySelector(".v143-hit-feedback-overlay,.v143-skill-stage")){ clearUnitHud(); return; }
@@ -386,7 +393,7 @@ function syncHud(){
         const hud=prepareUnitHud(card,side);
         return {card,side,hud};
     });
-    const measured=prepared.map(entry=>({...entry,projection:geometry.getUnitGeometry(entry.side,Number(entry.hud.dataset.index))?.hudSurface}));
+    const measured=prepared.map(entry=>({...entry,projection:geometry.getHudSurface?geometry.getHudSurface(entry.side,Number(entry.hud.dataset.index)):geometry.getUnitGeometry(entry.side,Number(entry.hud.dataset.index))?.hudSurface}));
     measured.forEach(({card,hud,projection})=>{
         if(!projection||!projection.rect.width||!projection.rect.height){ hud.style.visibility="hidden"; return; }
         if(!hudLayer){
@@ -527,6 +534,7 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     playEscape:playEscapePresentation,
     cleanupEscape:cleanupEscapePresentation,
     getUnitHud:unitHud,
+    batchHud:batchHud,
     syncHud:syncHud,
     clearHud:clearUnitHud
 });

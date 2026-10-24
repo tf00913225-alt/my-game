@@ -8347,7 +8347,14 @@ function clearUnitHud(side){
         hudLayer.remove();hudLayer=null;
     }
 }
+let hudBatchDepth=0,hudBatchPending=false;
+function batchHud(callback){
+    hudBatchDepth++;
+    try{return callback();}
+    finally{hudBatchDepth--;if(!hudBatchDepth&&hudBatchPending){hudBatchPending=false;syncHud();}}
+}
 function syncHud(){
+    if(hudBatchDepth){hudBatchPending=true;return;}
     const page=document.getElementById("battlePage");
     if(!page||!page.classList.contains("active")||typeof battleActive!=="undefined"&&!battleActive&&!window.v143HasTerminalImpactPresentation?.()||document.body.classList.contains("v174-battle-reading-open")||
        !document.querySelector(".v143-hit-feedback-overlay,.v143-skill-stage")){ clearUnitHud(); return; }
@@ -8367,7 +8374,7 @@ function syncHud(){
         const hud=prepareUnitHud(card,side);
         return {card,side,hud};
     });
-    const measured=prepared.map(entry=>({...entry,projection:geometry.getUnitGeometry(entry.side,Number(entry.hud.dataset.index))?.hudSurface}));
+    const measured=prepared.map(entry=>({...entry,projection:geometry.getHudSurface?geometry.getHudSurface(entry.side,Number(entry.hud.dataset.index)):geometry.getUnitGeometry(entry.side,Number(entry.hud.dataset.index))?.hudSurface}));
     measured.forEach(({card,hud,projection})=>{
         if(!projection||!projection.rect.width||!projection.rect.height){ hud.style.visibility="hidden"; return; }
         if(!hudLayer){
@@ -8508,6 +8515,7 @@ window.FourSymbolsBattlePresentation=Object.freeze({
     playEscape:playEscapePresentation,
     cleanupEscape:cleanupEscapePresentation,
     getUnitHud:unitHud,
+    batchHud:batchHud,
     syncHud:syncHud,
     clearHud:clearUnitHud
 });
@@ -9107,6 +9115,42 @@ ensureFunctionalStyles();runRepairs();
         return rect&&rect.width>0&&rect.height>0?{rect:rect,ratio:ratio,shieldRatio:shieldRatio||0}:null;
     }
 
+    function artworkProjectionFor(art,portraitRect){
+        const paint=art&&(art.querySelector(".v174-portrait-paint")||art.querySelector(".v174-action-motion"))||art;
+        const paintRect=paint&&paint!==art?paint.getBoundingClientRect():(portraitRect||art&&art.getBoundingClientRect());
+        let computed=null;const readStyle=(key,fallback)=>String(paint.style&&paint.style[key]||(computed||(computed=window.getComputedStyle(paint)))[key]||fallback);
+        const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:readStyle("backgroundImage",""),backgroundSize:readStyle("backgroundSize","contain"),backgroundPosition:readStyle("backgroundPosition","center"),backgroundRepeat:readStyle("backgroundRepeat","no-repeat")} : null;
+        if(artworkProjection&&art.classList?.contains("v174-generic-portrait")){
+            const style=window.getComputedStyle(art);
+            artworkProjection.genericPortrait=true;
+            artworkProjection.portraitVariables={
+                "--portrait-body-height":style.getPropertyValue("--portrait-body-height"),
+                "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
+            };
+        }
+        return artworkProjection;
+    }
+    function hudSurfaceFor(card,cardRect){
+        const cardStyle=window.getComputedStyle(card);
+        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
+        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
+        return hudWidth>0&&hudHeight>0?{
+            rect:cardRect,width:hudWidth,height:hudHeight,
+            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
+        }:null;
+    }
+    function presentationCard(side,index){
+        const i=Number(index);return Number.isInteger(i)?document.getElementById((side==="monster"?"battleMonster":"battlePlayerCard")+i):null;
+    }
+    function artworkForUnit(side,index){
+        const card=presentationCard(side,index);
+        return card?artworkProjectionFor(card.querySelector(".v174-battle-art,.battle-monster-icon,.battle-player-icon")):null;
+    }
+    function hudForUnit(side,index){
+        const card=presentationCard(side,index),rect=card&&typeof card.getBoundingClientRect==="function"?plainRect(card.getBoundingClientRect()):null;
+        return rect?hudSurfaceFor(card,rect):null;
+    }
+
     function unitGeometry(side,index){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
@@ -9141,17 +9185,7 @@ ensureFunctionalStyles();runRepairs();
         const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
         const hpRect=hpProjection&&hpProjection.rect;
         const spRect=spProjection&&spProjection.rect;
-        const paint=art&&(art.querySelector(".v174-portrait-paint")||art.querySelector(".v174-action-motion"))||art;
-        const paintRect=paint&&paint!==art?paint.getBoundingClientRect():portraitRect;
-        const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:String(paint.style&&paint.style.backgroundImage||window.getComputedStyle(paint).backgroundImage||""),backgroundSize:String(paint.style&&paint.style.backgroundSize||window.getComputedStyle(paint).backgroundSize||"contain"),backgroundPosition:String(paint.style&&paint.style.backgroundPosition||window.getComputedStyle(paint).backgroundPosition||"center"),backgroundRepeat:String(paint.style&&paint.style.backgroundRepeat||window.getComputedStyle(paint).backgroundRepeat||"no-repeat")} : null;
-        if(artworkProjection&&art.classList?.contains("v174-generic-portrait")){
-            const style=window.getComputedStyle(art);
-            artworkProjection.genericPortrait=true;
-            artworkProjection.portraitVariables={
-                "--portrait-body-height":style.getPropertyValue("--portrait-body-height"),
-                "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
-            };
-        }
+        const artworkProjection=artworkProjectionFor(art,portraitRect);
         const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
         const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
         const statusBadgeRect=badgeRect&&badgeRect.width>0&&badgeRect.height>0?badgeRect:null;
@@ -9191,13 +9225,7 @@ ensureFunctionalStyles();runRepairs();
 
         // The existing Unit rect is the only placement source. Display scale
         // comes from its actual CSS box; no Slot/Boss coordinates are duplicated.
-        const cardStyle=window.getComputedStyle(card);
-        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
-        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
-        const hudSurface=hudWidth>0&&hudHeight>0?{
-            rect:cardRect,width:hudWidth,height:hudHeight,
-            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
-        }:null;
+        const hudSurface=hudSurfaceFor(card,cardRect);
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
@@ -9241,6 +9269,8 @@ ensureFunctionalStyles();runRepairs();
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
         getUnitGeometry:unitGeometry,
+        getArtworkProjection:artworkForUnit,
+        getHudSurface:hudForUnit,
         getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,
         neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });

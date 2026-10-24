@@ -38,3 +38,14 @@ test("unavailable or replaced paint fails closed; reduced motion creates no clon
  const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");assert.match(css,/body\.v174-battle-reading-open \.v143-field-portrait-plane\{display:none!important/);
  assert.match(css,/body\.v174-battle-reading-open \.v143-field-source-hidden\{opacity:1!important/);
 });
+
+test("field sync finishes every geometry read before any projection write and skips identical style updates",()=>{
+ const a=setup(),b=setup();a.context.startFieldScene(a.current);b.context.startFieldScene(b.current);
+ const entries=[a.current.fieldScene.entries.get(0),b.current.fieldScene.entries.get(0)],events=[];
+ a.current.fieldScene.entries.set(1,entries[1]);
+ a.context.cardFor=(_s,i)=>[a.card,b.card][i];a.context.entityFor=(_s,i)=>[a.entity,b.entity][i];
+ a.context.window.FourSymbolsBattlefieldRenderGeometry.getUnitGeometry=(_s,i)=>{events.push("read"+i);return {artworkProjection:{...a.getProjection(),rect:{left:30+i,top:40,width:60,height:90}}};};
+ entries.forEach((entry,i)=>entry.nodes.forEach(node=>{node.style=new Proxy({...node.style},{set(target,k,v){events.push("write"+i);target[k]=v;return true;}});}));
+ a.context.syncFieldScene(a.current);assert.deepEqual(events.slice(0,2),["read0","read1"]);assert.ok(events.slice(2).every(e=>e.startsWith("write")));
+ events.length=0;a.context.syncFieldScene(a.current);assert.deepEqual(events,["read0","read1"]);
+});
