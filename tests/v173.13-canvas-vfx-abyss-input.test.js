@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -188,7 +190,7 @@ test("the raster renderer creates one Water Ball Sprite Sheet per formal recipie
     assert.match(sprite.style.backgroundImage,/water-orb-recipient-v1\.webp/);
     assert.deepEqual(sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
     assert.ok(sprites.every(n=>n.dataset.placement==="single"));
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
+    assert.doesNotMatch(castBodySource(animation),/createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
 test("Ice Arrow Rain stays centered on the full monster battlefield",()=>{

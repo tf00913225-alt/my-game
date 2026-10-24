@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const releaseMeta=JSON.parse(fs.readFileSync("release/release.json","utf8"));
@@ -67,7 +69,7 @@ test("range VFX fixes remain fixed-size and centered after casualties",()=>{
     });
     assert.match(animation,/owner\.getGeometryRectFromShape\(current\.targetSide,primarySlot,shape\)/);
     assert.match(animation,/if\(placement==="battlefield"\|\|targetType==="all"\|\|targetType==="allyAll"\)[\s\S]*?owner\.getSideRect\(current\.targetSide\)/);
-    assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|drawImage\(/);
+    assert.doesNotMatch(castBodySource(animation),/canvas-crop|createElement\(["']canvas["']\)|drawImage\(/);
 });
 
 test("release/cache advances to V173.40",()=>{

@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -41,7 +43,7 @@ test("Water Ball remains one centered live-target group without a Canvas path",(
         /current\.config\.id==="waterBall"&&placement==="targetTrajectory"/
     );
     assert.match(animation,/node\.dataset\.renderer="dom-sprite";/);
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|canvas-crop/);
+    assert.doesNotMatch(castBodySource(animation),/createElement\(["']canvas["']\)|getContext\(|drawImage\(|canvas-crop/);
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 

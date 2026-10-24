@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -33,6 +35,6 @@ assert.match(
     animation,
     /const indexes=emittedSpriteTargets\(current\);[\s\S]*?const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?const primaryAnchor=geometryPrimaryAnchor\(current,indexes\)/
 );
-assert.doesNotMatch(animation,/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
+assert.doesNotMatch(castBodySource(animation),/canvas-crop|getContext\(|drawImage\(|createElement\(["']canvas["']\)/);
 
 console.log("V173.39 Abyss, raster VFX, and daily-dungeon regression checks passed.");

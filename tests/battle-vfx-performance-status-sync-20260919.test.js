@@ -4,7 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
-const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
+const vfx=fs.readFileSync("js/39-v143-skill-animation.js","utf8").replace(/\r\n/g,"\n");
 
 let passed=0;
 function test(name,handler){
