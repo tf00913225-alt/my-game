@@ -3729,7 +3729,7 @@
 
 .v143-vfx-sprite.v143-vfx-sprite-active{
     animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 

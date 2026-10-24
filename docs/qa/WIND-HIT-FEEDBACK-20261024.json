@@ -1,0 +1,126 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "parentHead": "b755d842e3ea7d9892f80439f301c478bfc43b87",
+  "scope": "stormFlurry-only hitFeedback; original work line; no Canvas/Core/size/depth changes",
+  "testedBeforeCheckpoint": true,
+  "sourceSha256": {
+    "js/39-v143-skill-animation.js": "7176c55f4cc722709042ab66a5e654c465f9854c50dfcdfc80c5a2a6a1c9d65c",
+    "css/40-v143-combat-dungeon-polish.css": "7bf49205c40dde035f047946217300335b63955aa65b549fdbeb1040c09673c9",
+    "tests/battle-hit-feedback.test.js": "2167aef6faf652741e053f39bc1ee45d35ba11012edb8b6277c162bf11a2de96",
+    "build/gameplay-core-primary.7eacee2ddb19.js": "7eacee2ddb1922c6c78345c1951e2eb774ba9e3bd4a36b51c1e68e8d4b2072a9",
+    "build/gameplay-core.ce00a5646973.css": "ce00a56469735dbd3e24dd61cc820f2f1b0ebb71b3dd8fcfdb3bcdd0c33854fa"
+  },
+  "browserEvidence": [
+    {
+      "path": "C:/Projects/my-game/.vfx-work/wind-flurry-sample/artifacts/wind-hit-feedback-final-browser/evidence.json",
+      "sha256": "d0105560843ddc315bf22506ec7647532dd272e5b1e193008ba23a9a3fe95140",
+      "passed": true,
+      "device": "desktop Chrome, mobile viewport emulation; NOT physical USB",
+      "errors": [],
+      "modes": [
+        {
+          "mode": "普通命中",
+          "loss": [
+            168,
+            168,
+            168,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        },
+        {
+          "mode": "暴擊",
+          "loss": [
+            239,
+            239,
+            239,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        },
+        {
+          "mode": "MISS",
+          "loss": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        },
+        {
+          "mode": "關閉模組",
+          "loss": [
+            168,
+            168,
+            168,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        }
+      ],
+      "cleanup": true
+    },
+    {
+      "path": "C:/Projects/my-game/.vfx-work/wind-flurry-sample/artifacts/wind-hit-feedback-dwell-final-browser/evidence.json",
+      "sha256": "a8076f6f0dc6ca587f4121a661bbcd44cfa05a6ed1b901eea59250cd0feb2534",
+      "passed": true,
+      "device": "desktop Chrome, mobile viewport emulation; NOT physical USB",
+      "errors": [],
+      "modes": [
+        {
+          "mode": "普通命中",
+          "loss": [
+            168,
+            168,
+            168,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        },
+        {
+          "mode": "MISS",
+          "loss": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "spCost": 20
+        }
+      ],
+      "cleanup": true
+    }
+  ],
+  "regression": [
+    "module focused 6 PASS",
+    "Wind 27 PASS",
+    "Fire 15 PASS",
+    "raster owner 9 PASS",
+    "direct impact overlay PASS",
+    "cold clock PASS",
+    "impact PASS",
+    "production build/check PASS",
+    "git diff --check PASS"
+  ],
+  "independentReview": "fire_sample_review source review: no direct blocker; exact 125→250ms and pool/dispose follow-up checked",
+  "limitations": [
+    "Chrome mobile viewport, not a new physical-phone recording",
+    "Prior b755 phone evidence is historical and does not verify new hitFeedback",
+    "Older 4-case browser ordinary scene initially under auth overlay; final focused run waits for natural auth dismissal",
+    "Human art review/latest Head CI pending; Draft, undeployed"
+  ]
+}
