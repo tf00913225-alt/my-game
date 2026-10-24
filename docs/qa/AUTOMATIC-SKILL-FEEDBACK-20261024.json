@@ -6,7 +6,7 @@
   "sources": [
     {
       "path": "js/39-v143-skill-animation.js",
-      "sha256": "746f924a5bafdaeb735cc2e6b5e674bdb54d89b4f506e779ceddcbccd8ebc88f"
+      "sha256": "93772944317c19a6dbf00615e347c3b60209440d1ff7181b9052fa67ab978404"
     },
     {
       "path": "css/40-v143-combat-dungeon-polish.css",
@@ -17,8 +17,8 @@
       "sha256": "b0b7cbe74715febc3af7f4a45ff3c65acb8fd9170c433c34c1f8f9293b821d70"
     },
     {
-      "path": "build/gameplay-core-primary.f2f3af4df416.js",
-      "sha256": "f2f3af4df416361c1df35050ec2a6ac29a015de66f394ebfed9ecb313d3881e8"
+      "path": "build/gameplay-core-primary.74ad86f56850.js",
+      "sha256": "74ad86f568507b6025a2553cebba7c99ea1fd89e7160a5b97afe9d4716154378"
     },
     {
       "path": "build/gameplay-core.ab41bf65204d.css",
@@ -31,7 +31,8 @@
     "Fire15+3 internal",
     "raster9 internal",
     "direct-overlay/cold-clock/impact/cardless6",
-    "build/check/diffcheck"
+    "build/check/diffcheck",
+    "post-merge stormSpell retirement + direct VFX21 top-level regression PASS"
   ],
   "independentReview": "fire_sample_review: all three reported lineage/refresh/decorator cleanup defects resolved and focused tests added; no remaining direct blocker",
   "historicalProbes": {
@@ -47,5 +48,7 @@
     "Depth particle planes surround the original cast body, not a character size/depth rewrite",
     "Poison palette does not create poison gameplay or a new status Owner"
   ],
-  "next": "Save/push original branch, exact Head Wind and four-skill phone clips, latest required CI, human visual/rhythm review; no full-catalog enable before Gates"
+  "next": "Save/push original branch, exact Head Wind and four-skill phone clips, latest required CI, human visual/rhythm review; no full-catalog enable before Gates",
+  "integratedDev": "26bc84d5360027af0df488735bd7d09c9b571831",
+  "integration": "Normal merge; source retained stormSpell retirement and approved startup Owner changes. Only generated manifest/bundle rename conflicts rebuilt by original builder."
 }

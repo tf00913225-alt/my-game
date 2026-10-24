@@ -172,7 +172,7 @@ test("all formal four-element active skills resolve to raster Sprite Sheets",()=
     const active=[
         "flameSlash","fireCritical","fireBurstStrike","explosiveFlurry","dragonSlash","fireRocket","blazeSpell","flameTornado","phoenixCry","rage",
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive",
-        "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","stormSpell","windArrow",
+        "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","windArrow",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier"
     ];
     active.forEach(id=>{

@@ -151,7 +151,7 @@ const FINAL_DAMAGE_SKILL_ROLES={
     waterBall:"tri_damage",floodBeast:"single_normal",iceArrowRain:"aoe_damage",
     stormFist:"single_low",stormFlurry:"tri_damage",windCrossSlash:"single_normal",dizzyFist:"single_normal",
     windSpell:"tri_damage",stormCircle:"tri_damage",windHowlLightning:"single_normal",stormRain:"aoe_damage",
-    stormSpell:"aoe_damage",stoneSlash:"single_low",petrifyFist:"tri_damage",stoneBreakSky:"single_normal",
+    stoneSlash:"single_low",petrifyFist:"tri_damage",stoneBreakSky:"single_normal",
     earthquakeCrush:"tri_control",stoneThrow:"tri_damage",sandWind:"tri_damage",
     flyingSandStrike:"aoe_damage",dustStorm:"single_control"
 };
@@ -1257,7 +1257,8 @@ test("all formal four-element damage skills use one fixed damage-role table",()=
     const profiles=evaluateJson(runtime.context,"v173DamageRoleProfiles");
     const mapping=evaluateJson(runtime.context,"v173FormalDamageSkillRoles");
     assert.deepEqual(mapping,FINAL_DAMAGE_SKILL_ROLES);
-    assert.equal(Object.keys(mapping).length,32);
+    assert.equal(Object.keys(mapping).length,31);
+    assert.equal(runtime.skills.stormSpell,undefined,"complete runtime never recreates the retired skill");
 
     Object.entries(FINAL_DAMAGE_ROLE_PROFILES).forEach(([role,expected])=>{
         const profile=profiles[role];
