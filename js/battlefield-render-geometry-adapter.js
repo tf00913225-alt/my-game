@@ -360,7 +360,7 @@
         return rect?hudSurfaceFor(card,rect):null;
     }
 
-    function unitGeometry(side,index){
+    function unitGeometry(side,index,purpose){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
         if(!Number.isInteger(unitIndex)){ return null; }
@@ -387,13 +387,6 @@
         const hudNodes=Array.from(hud.querySelectorAll(
             ".monster-hp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
-        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
-        const resourceState=resourceStateFor(targetSide,unitIndex);
-        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
-        const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
-        const hpRect=hpProjection&&hpProjection.rect;
-        const spRect=spProjection&&spProjection.rect;
         const artworkProjection=artworkProjectionFor(art,portraitRect);
         const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
         const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
@@ -410,6 +403,18 @@
             width:unitRect.width,height:Math.max(0,Math.min(unitRect.bottom,hudBottom)-safeHudTop)
         };
 
+        // Status bodies consume the same paint/HUD geometry, never HP/SP
+        // ratios or feedback collision lanes. Keep one projection owner.
+        const hudSurface=hudSurfaceFor(card,cardRect);
+        if(purpose==="status")return {owner:"fixed-slot",side:targetSide,index:unitIndex,slot,
+            unitRect,portraitRect,artworkProjection,hudSafeRect,hudSurface};
+        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const resourceState=resourceStateFor(targetSide,unitIndex);
+        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
+        const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
+        const hpRect=hpProjection&&hpProjection.rect;
+        const spRect=spProjection&&spProjection.rect;
         let feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,portraitRect.top+6));
         let feedbackBottom=Math.min(unitRect.bottom-6,safeHudTop-8);
         if(feedbackBottom-feedbackTop<26){
@@ -434,7 +439,6 @@
 
         // The existing Unit rect is the only placement source. Display scale
         // comes from its actual CSS box; no Slot/Boss coordinates are duplicated.
-        const hudSurface=hudSurfaceFor(card,cardRect);
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
@@ -478,6 +482,7 @@
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
         getUnitGeometry:unitGeometry,
+        getStatusGeometry:(side,index)=>unitGeometry(side,index,"status"),
         getArtworkProjection:artworkForUnit,
         getHudSurface:hudForUnit,
         getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,

@@ -13114,7 +13114,9 @@
         const readGeometry=(targetSide,targetIndex)=>{
             const key=targetSide+":"+targetIndex;
             if(geometryByUnit?.has(key)){ return geometryByUnit.get(key); }
-            const result=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry?.(targetSide,targetIndex)||null;
+            const api=window.FourSymbolsBattlefieldRenderGeometry;
+            const narrow=state.current?.hitFeedback?.config.enabled&&state.current.hitFeedback.config.profile?.element==="wind"&&api?.getStatusGeometry;
+            const result=(narrow?api.getStatusGeometry(targetSide,targetIndex):api?.getUnitGeometry?.(targetSide,targetIndex))||null;
             geometryByUnit?.set(key,result);
             return result;
         };

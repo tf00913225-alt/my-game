@@ -1,0 +1,42 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "parentHead": "03e415ed5a68da417acdc51501a10010450dfa50",
+  "scope": "Enabled Wind status presentation only; same formal geometry Owner with status-purpose early return. No art/config/size/depth/layout/gameplay/timing changes.",
+  "directEvidence": "artifacts/wind-perf-03e415ed-longframes-phone CPU: status presentation full geometry includes unused resource and feedback calculations; costly readStatusPresentation220.2ms.",
+  "change": "getStatusGeometry reuses unitGeometry original paint/portrait/HUD safe/surface calculations but returns before HP/SP projections and feedback lanes. Wind readStatusPresentation opts in; full fallback other skills/disabled. No retained/cross-frame cache.",
+  "regression": "narrow/full field equality and resource call0, Wind vs Fire/disabled routing; original status12 including real Chrome three/six actors shell occlusion, performance status6, field4/HUD/normal/clock/Fire envelope/module25/Wind30/raster9 and build/check. Incomplete VM fixtures now supply state/window/icon dataset; line-ending-only source regex normalized LF. Assertions retained.",
+  "independentReview": "fire_sample_review found no direct missing-field/semantic/lifecycle blocker.",
+  "traceComparison": {
+    "readStatusPresentationMs": [
+      220.2,
+      191.0
+    ],
+    "settleTargetVisualMs": [
+      366.4,
+      337.6
+    ],
+    "UpdateLayoutTreeMs": [
+      1499.7,
+      1479.5
+    ],
+    "TimerFireMaxMs": [
+      210,
+      202.8
+    ],
+    "limitation": "Profiling cost alone does not demonstrate display smoothness."
+  },
+  "candidatePhone": {
+    "path": "artifacts/wind11-status-narrow-phone/evidence.json",
+    "all11": "actual Core isolated6v6 fixed-labelled QA RNG, targets/status/sway/cleanup and shadow ownership PASS",
+    "first30sRecordedChangedRate": 48.7446,
+    "p95IntervalMs": 35.5,
+    "maxIntervalMs": 85.2,
+    "intervalsOver100Ms": 0,
+    "reference03Rate": 46.0207,
+    "reference03P95Ms": 39.045,
+    "reference03MaxMs": 136.2,
+    "limitation": "Native changed-frame VFR includes waits/intentional stop, NOT displayFPS or locked60; repeat/device variance exists."
+  },
+  "next": "Exact committed-Head native11 clip, latest required CI and user rhythm/art acceptance. Keep Draft pending task/CI Gates. Preserve all QA videos/backups."
+}

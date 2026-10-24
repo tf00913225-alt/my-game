@@ -14,6 +14,10 @@ test("narrow artwork/HUD reads equal full official projections without measuring
  vm.createContext(context);vm.runInContext(source.slice(source.indexOf("    function plainRect("),source.indexOf("    function battlefieldOverlayGeometry("))+
   source.slice(source.indexOf("    function artworkProjectionFor("),source.indexOf("    function geometryForVfx(")),context);
  const full=context.unitGeometry("monster",0),fullReads=reads;reads=styles=resources=0;
+ const status=context.unitGeometry("monster",0,"status");
+ for(const key of Object.keys(status))assert.equal(JSON.stringify(status[key]),JSON.stringify(full[key]),"same formal status projection "+key);
+ assert.equal(resources,0,"status does not compute HP/SP ratios");assert.equal(status.feedbackSafeRect,undefined);
+ reads=styles=resources=0;
  const artwork=context.artworkForUnit("monster",0);assert.equal(JSON.stringify(artwork),JSON.stringify(full.artworkProjection));
  assert.equal(reads,1);assert.equal(styles,1);assert.equal(resources,0,"artwork never computes resources/HUD");
  reads=styles=0;const surface=context.hudForUnit("monster",0);assert.equal(JSON.stringify(surface),JSON.stringify(full.hudSurface));
