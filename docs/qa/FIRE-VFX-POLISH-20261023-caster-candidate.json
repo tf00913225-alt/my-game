@@ -1,0 +1,96 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "productHead": "7bc0b0c2b4220908149d32fd7e3a88d85b1ea04c",
+  "device": "physical Samsung SM-N960F / Chrome / serial2858d1d9c23f7ece",
+  "scope": "actual original Core cast and HP/SP settlement on isolated account; RNG fixed per labelled scenario; original critical follow-up retained; battle flow held by original QA pause/finish intercept, no save/reward transaction",
+  "duration": 25.997267,
+  "width": 720,
+  "height": 1280,
+  "movie": "artifacts/fire-reference-candidate-usb-7bc0b0c2/native-preview.mp4",
+  "bytes": 3070933,
+  "sha256": "0443a13c9ac5ec2dc127e63ed36d286bfd008528479bf61863de1a4c1f045875",
+  "cases": [
+    {
+      "mode": "普通命中",
+      "entry": "castDamageSkill(explosiveFlurry)",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "hpBefore": [
+        1000000,
+        1000000,
+        1000000
+      ],
+      "hpAfter": [
+        999782,
+        999782,
+        999782
+      ],
+      "loss": [
+        218,
+        218,
+        218
+      ]
+    },
+    {
+      "mode": "暴擊（保留原追擊）",
+      "entry": "castDamageSkill(explosiveFlurry)",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "hpBefore": [
+        1000000,
+        1000000,
+        1000000
+      ],
+      "hpAfter": [
+        999380,
+        999380,
+        999380
+      ],
+      "loss": [
+        620,
+        620,
+        620
+      ]
+    },
+    {
+      "mode": "MISS",
+      "entry": "castDamageSkill(explosiveFlurry)",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "hpBefore": [
+        1000000,
+        1000000,
+        1000000
+      ],
+      "hpAfter": [
+        1000000,
+        1000000,
+        1000000
+      ],
+      "loss": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "cleanup": true,
+  "passed": true,
+  "limitations": [
+    "Controlled QA battle/RNG/pause; not natural full battle acceptance",
+    "Top-row PC release-banner overlap not resolved; full UI PASS withheld",
+    "Human art review/latest necessary CI pending",
+    "Android acoustic sync and x2/x3 not verified",
+    "Normal attack500ms timing decision pending; normal unchanged"
+  ]
+}

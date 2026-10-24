@@ -33,6 +33,38 @@ body > .battle-floating-feedback[data-feedback-kind="status"]{min-height:19px;pa
 body > .battle-floating-feedback.is-critical{font-size:19px;font-weight:950;letter-spacing:.5px;-webkit-text-stroke:1.25px #fff;paint-order:stroke fill;animation-name:battleFloatingFeedbackCritical;}
 @keyframes battleFloatingFeedback{0%{opacity:0;transform:translate(-50%,calc(-100% + 4px)) scale(.88)}12%{opacity:1;transform:translate(-50%,calc(-100% - 3px)) scale(1.08)}72%{opacity:1;transform:translate(-50%,calc(-100% - 10px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 22px)) scale(1)}}
 @keyframes battleFloatingFeedbackCritical{0%{opacity:0;transform:translate(-50%,calc(-100% + 7px)) scale(.62) rotate(-6deg)}16%{opacity:1;transform:translate(-50%,calc(-100% - 6px)) scale(1.24) rotate(5deg)}30%{transform:translate(calc(-50% - 4px),calc(-100% - 11px)) scale(1.06) rotate(-4deg)}42%{transform:translate(calc(-50% + 4px),calc(-100% - 15px)) scale(1.14) rotate(3deg)}56%{transform:translate(-50%,calc(-100% - 18px)) scale(1.04) rotate(0)}78%{opacity:1;transform:translate(-50%,calc(-100% - 25px)) scale(1)}100%{opacity:0;transform:translate(-50%,calc(-100% - 36px)) scale(1) rotate(0)}}
+/* Scoped to the rejected fire representative, not a global typography change. */
+body > .battle-floating-feedback[data-feedback-style="fire-sample"]{
+    font-family:Georgia,"Times New Roman",serif;font-style:italic;
+    font-size:var(--fire-feedback-font,26px);font-weight:900;color:#fff3d7;-webkit-text-stroke:1.3px #572008;
+    text-shadow:0 2px 0 #491505,2px 3px 0 #190904,0 0 4px #ff8c30;
+    animation-name:fireSampleNumber;
+}
+body > .battle-floating-feedback[data-feedback-style="fire-sample"].is-critical{
+    font-size:var(--fire-feedback-font,32px);color:#ffcf48;-webkit-text-stroke:1.5px #64230a;
+    text-shadow:0 3px 0 #6b2005,2px 4px 0 #160600,0 0 6px #ff6b20;
+    animation-name:fireSampleCritical;
+}
+body > .battle-floating-feedback[data-feedback-style="fire-sample"][data-feedback-kind="miss"]{
+    font-size:20px;color:#f6ead8;-webkit-text-stroke:1px #29211b;animation-name:fireSampleNumber;
+}
+@keyframes fireSampleNumber{
+    0%{opacity:0;transform:translate(-50%,-100%) scale(.42)}
+    9%{opacity:1;transform:translate(-50%,calc(-100% - 4px)) scale(1.24)}
+    20%{transform:translate(-50%,calc(-100% - 3px)) scale(.96)}
+    32%{transform:translate(-50%,calc(-100% - 6px)) scale(1)}
+    76%{opacity:1;transform:translate(-50%,calc(-100% - 23px)) scale(1)}
+    100%{opacity:0;transform:translate(-50%,calc(-100% - 36px)) scale(.96)}
+}
+@keyframes fireSampleCritical{
+    0%{opacity:0;transform:translate(-50%,-100%) scale(.35) rotate(-7deg)}
+    9%{opacity:1;transform:translate(-50%,calc(-100% - 12px)) scale(1.4) rotate(3deg)}
+    20%{transform:translate(-50%,calc(-100% - 5px)) scale(.95) rotate(-2deg)}
+    30%{transform:translate(-50%,calc(-100% - 14px)) scale(1.15) rotate(1deg)}
+    44%{transform:translate(-50%,calc(-100% - 17px)) scale(1) rotate(0)}
+    78%{opacity:1;transform:translate(-50%,calc(-100% - 32px)) scale(1)}
+    100%{opacity:0;transform:translate(-50%,calc(-100% - 46px)) scale(.95)}
+}
 .battle-player.battle-escape-presenting{
     will-change:transform,opacity;
     pointer-events:none;
