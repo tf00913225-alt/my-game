@@ -2644,7 +2644,6 @@ const FORMAL_DAMAGE_SKILL_ROLES = Object.freeze({
     stormCircle:"tri_damage",
     windHowlLightning:"single_normal",
     stormRain:"aoe_damage",
-    stormSpell:"aoe_damage",
     stoneSlash:"single_low",
     petrifyFist:"tri_damage",
     stoneBreakSky:"single_normal",
@@ -7337,6 +7336,10 @@ function normalizeHydratedRetiredSkillReferences(){
         "fireBurstStrike"
     ]);
 
+    // Legacy-only ID: preserve learned levels as historical observations; never restore ownership.
+    // Retain until old account saves can no longer carry this retired identifier.
+    const retiredObservationSkillId="stormSpell";
+
     Object.values(characterSkillLoadouts||{}).forEach(loadout=>{
         if(!loadout||typeof loadout!=="object"){ return; }
 
@@ -7346,7 +7349,7 @@ function normalizeHydratedRetiredSkillReferences(){
 
         if(Array.isArray(loadout.equippedSkills)){
             loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
-                if(retiredPlayerSkillIds.has(skillId)){ return false; }
+                if(retiredPlayerSkillIds.has(skillId)||skillId===retiredObservationSkillId){ return false; }
                 const skill=skillDatabase&&skillDatabase[skillId];
                 return !!(skill&&skill.monsterOnly!==true);
             });
@@ -7354,8 +7357,12 @@ function normalizeHydratedRetiredSkillReferences(){
     });
 
     [autoConfig,autoConfig2,autoConfig3].forEach(config=>{
-        if(config&&retiredPlayerSkillIds.has(config.skill)){
+        if(config&&(retiredPlayerSkillIds.has(config.skill)||config.skill===retiredObservationSkillId)){
             config.skill="normal";
+        }
+        if(config&&config.v136LastSkill===retiredObservationSkillId){
+            delete config.v136LastSkill;
+            if(config.v136ActionIntent==="skill"){ config.v136ActionIntent="normal"; }
         }
     });
 }

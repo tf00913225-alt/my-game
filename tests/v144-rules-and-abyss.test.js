@@ -36,7 +36,6 @@ function skillDatabase(extra={}){
         stoneBreakSky:{id:"stoneBreakSky",name:"石破天驚",element:"earth",category:"physical",tier:3,maxLevel:5,spCost:42},
         barrier:{id:"barrier",name:"結界",element:"earth",category:"buff",maxLevel:1,spCost:40},
         stormRain:{id:"stormRain",name:"風起雲湧",element:"wind",category:"magic",tier:4,maxLevel:5,spCost:75},
-        stormSpell:{id:"stormSpell",name:"暴風術",element:"wind",category:"magic",tier:4,maxLevel:5,spCost:55},
         phoenixCry:{id:"phoenixCry",name:"火鳳天鳴",element:"fire",category:"magic",tier:4,maxLevel:5,spCost:62},
         dragonSlash:{id:"dragonSlash",name:"霸龍裂天斬",element:"fire",category:"physical",tier:4,maxLevel:5,spCost:55},
         rage:{id:"rage",name:"怒火",element:"fire",category:"buff",maxLevel:5,spCost:50}

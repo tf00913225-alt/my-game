@@ -329,6 +329,17 @@
         "battle-statistics-result-panel",
         "battle-result-stat-card"
       ]
+    },
+    {
+      "id": "DEP-stormspell-retirement",
+      "description": "Retired storm spell has no runtime definition, damage role or visual mapping; only legacy save identifier handling is retained.",
+      "enabled": true,
+      "forbidden": [
+        "skillDatabase.stormSpell",
+        "stormSpell:",
+        "\"stormSpell\",",
+        "暴風術"
+      ]
     }
   ]
 }

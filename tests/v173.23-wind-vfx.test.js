@@ -348,7 +348,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     });
 });
 
-test("stormRain uses the reviewed lossless twelve-cell candidate while stormSpell retains its original sheet",()=>{
+test("stormRain uses the reviewed lossless twelve-cell candidate",()=>{
     const candidate="assets/vfx/wind/storm-rain-cast-v2.webp";
     const bytes=fs.readFileSync(candidate);
     const info=losslessWebpInfo(bytes);
@@ -359,8 +359,7 @@ test("stormRain uses the reviewed lossless twelve-cell candidate while stormSpel
     const manifest=loadRuntime().context.v143SkillAnimationManifest;
     assert.equal(manifest.stormRain.sprite.src,"assets/vfx/wind/storm-rain-recipient-v1.webp");
     assert.equal(manifest.stormRain.sprite.presentation,"per-recipient");
-    assert.equal(manifest.stormSpell.sprite.src,"assets/vfx/wind/storm-rain-cast.png?v=173.24");
-    assert.equal(manifest.stormSpell.sprite.reusedFrom,"stormRain");
+    assert.equal(manifest.stormSpell,undefined,"retired skill has no animation mapping");
 });
 
 function losslessWebpInfo(file){
@@ -464,28 +463,6 @@ test("three-target wind sheets keep their canonical three-slot artwork center af
     assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
 });
 
-test("non-recipient full-field wind sheets stay locked to the complete enemy area after casualties",()=>{
-    const placements=[];
-    [
-        undefined,
-        [
-            {alive:false,hp:0,statusEffects:[],activeBuffs:[]},
-            {alive:true,hp:100,statusEffects:[],activeBuffs:[]},
-            {alive:false,hp:0,statusEffects:[],activeBuffs:[]}
-        ]
-    ].forEach(monsters=>{
-        const runtime=loadRuntime(monsters?{monsters}:{});
-        const targetIds=(monsters||runtime.monsters).map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
-        runtime.context.v142SkillAnimationDirector.play(
-            {id:"stormSpell",name:"stormSpell",element:"wind",category:"magic",targetType:"all",duration:1700,resolveDuration:1700},
-            {side:"player",actorIndex:0,targetId:targetIds[0],targetIds,targetSide:"monster"}
-        );
-        const sprite=stageSprites(runtime).sprites[0];
-        assert.ok(sprite);
-        placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
-    });
-    assert.deepEqual(placements[1],placements[0],"full-field VFX does not follow survivor bounds");
-});
 
 test("enemy casts use the explicit player target instead of a fixed faction position",()=>{
     const runtime=loadRuntime();
