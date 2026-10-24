@@ -61,7 +61,266 @@
   "skills": {
     "stormFlurry": {
       "enabled": true,
-      "sweepEnabled": true
+      "sweepEnabled": true,
+      "choreography": {
+        "enabled": false
+      }
+    },
+    "stormFist": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.007812,
+          0,
+          0.992188,
+          1
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windCrossSlash": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dizzyFist": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.016575,
+          0.008287,
+          0.994475,
+          0.975138
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windSpell": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.013812154696132596,
+          0.0,
+          0.9640883977900553,
+          0.9806629834254144
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "stormCircle": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.0856353591160221,
+          0.16298342541436464,
+          0.9226519337016574,
+          0.914364640883978
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windHowlLightning": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.013812,
+          0.005525,
+          0.994475,
+          0.98895
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      },
+      "shape": "arc"
+    },
+    "stormRain": {
+      "visibility": {
+        "heightRatio": 1.18,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.127072,
+          0.140884,
+          0.895028,
+          0.914365
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 3,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dodgeSkill": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.088398,
+          0.179558,
+          0.944751,
+          0.845304
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "stealthSkill": {
+      "visibility": {
+        "heightRatio": 1.18,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.035912,
+          0.058011,
+          0.961326,
+          0.977901
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dinghaishenzhen": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.118785,
+          0.129834,
+          0.89779,
+          0.883978
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "flameSlash": {
+      "choreography": {
+        "enabled": false
+      }
     }
   },
   "automatic": {
@@ -71,7 +330,17 @@
       "stormFlurry",
       "flameSlash",
       "healSpell",
-      "rockWall"
+      "rockWall",
+      "stormFist",
+      "windCrossSlash",
+      "dizzyFist",
+      "windSpell",
+      "stormCircle",
+      "windHowlLightning",
+      "stormRain",
+      "dodgeSkill",
+      "stealthSkill",
+      "dinghaishenzhen"
     ],
     "elementAliases": {
       "fire": "fire",
@@ -336,5 +605,107 @@
     "step": 0.1,
     "canvasDpr": 1,
     "spriteShadow": false
+  },
+  "choreography": {
+    "enabled": true,
+    "defaults": {
+      "anticipation": 0.18,
+      "settle": 0.82,
+      "startScale": 0.58,
+      "tailScale": 0.86,
+      "travel": 0.12,
+      "drift": 0.06,
+      "rise": 0,
+      "recoilPx": 5,
+      "tiltDeg": 3,
+      "recoilMs": 180
+    },
+    "archetypes": {
+      "strike": {
+        "anticipation": 0.12,
+        "startScale": 0.7,
+        "travel": 0.1,
+        "drift": 0,
+        "recoilMs": 160
+      },
+      "projectile": {
+        "anticipation": 0.16,
+        "startScale": 0.48,
+        "travel": 0.2
+      },
+      "sweep": {
+        "anticipation": 0.15,
+        "travel": 0.18,
+        "drift": 0.12
+      },
+      "surge": {
+        "travel": 0,
+        "rise": 0.12
+      },
+      "field": {
+        "startScale": 0.65,
+        "travel": 0,
+        "drift": 0,
+        "recoilPx": 7,
+        "recoilMs": 220
+      },
+      "vortex": {
+        "startScale": 0.62,
+        "travel": 0.14,
+        "drift": 0.14,
+        "recoilPx": 8,
+        "tiltDeg": 6,
+        "recoilMs": 600
+      },
+      "heal": {
+        "startScale": 0.65,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.15
+      },
+      "buff": {
+        "startScale": 0.7,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.12
+      },
+      "shield": {
+        "startScale": 0.6,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.06
+      }
+    },
+    "elements": {
+      "fire": {
+        "rise": 0.1,
+        "recoilPx": 6
+      },
+      "water": {
+        "rise": -0.08,
+        "recoilMs": 220
+      },
+      "wind": {
+        "tiltDeg": 5
+      },
+      "thunder": {
+        "anticipation": 0.08,
+        "recoilMs": 120
+      },
+      "earth": {
+        "rise": -0.12,
+        "recoilPx": 7,
+        "recoilMs": 240
+      },
+      "light": {
+        "rise": 0.1
+      },
+      "dark": {
+        "startScale": 0.9,
+        "tailScale": 0.55,
+        "rise": 0
+      },
+      "neutral": {}
+    }
   }
 }

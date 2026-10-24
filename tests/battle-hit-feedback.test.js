@@ -13,8 +13,72 @@ function harness(){
     const root=tracks=>({getAnimations:()=>tracks,animate(frames,options){const a=animation();a.frames=frames;a.options=options;this.shakes=(this.shakes||[]).concat(a);return a;}});
     return {api:window.FourSymbolsHitFeedback,timers,frames,draws,animation,root,created,setReduced(v){reduced=v;},noPaint(ms){now+=ms;const pending=Array.from(timers.values());timers.clear();pending.forEach(t=>t.fn());},advance(ms){now+=ms;const pending=Array.from(timers.values());timers.clear();pending.forEach(t=>t.fn());const paints=Array.from(frames.values());frames.clear();paints.forEach(fn=>fn(now));}};
 }
+
+test("data-driven choreography selects distinct motion archetypes without touching gameplay data",()=>{
+ const a=harness().api;
+ for(const [data,kind] of [[{category:"physical"},"strike"],[{description:"發射火球彈"},"projectile"],
+  [{targetType:"tri",element:"wind"},"sweep"],[{targetType:"all",element:"wind"},"vortex"],
+  [{targetType:"all",element:"fire"},"field"],[{category:"heal"},"heal"],
+  [{category:"buff"},"buff"],[{category:"buff",description:"護盾"},"shield"],[{},"surge"]]){
+  const before=JSON.stringify(data),r=a.choreographyFor("future",data);
+  assert.equal(r.archetype,kind);assert.equal(JSON.stringify(data),before);
+ }
+ assert.equal(a.choreographyFor("normal",{}).enabled,false);
+ assert.equal(a.choreographyFor("stormFlurry",{}).enabled,false,"accepted sample remains authored");
+ assert.equal(a.choreographyFor("future",{category:"passive"}).enabled,false);
+ assert.equal(a.choreographyFor("future",null).archetype,"surge");
+ for(const element of ["fire","water","wind","thunder","earth","light","dark"]){
+  const r=a.choreographyFor("future",{category:"heal",element});
+  assert.equal(r.recoilPx,0);assert.equal(r.tiltDeg,0,"support never inherits element attack force");
+ }
+});
+
+test("choreography changes direction, peaks at the authored hit, fits its box and ends inside the existing lifetime",()=>{
+ const a=harness().api,r=a.choreographyFor("stormRain",{element:"wind",targetType:"all"});
+ for(const hit of [.36,.5,.75]){
+  const frames=a.choreographyTrack(r,hit);
+  assert.equal(frames[0].offset,0);assert.equal(frames.at(-1).offset,1);assert.equal(frames.at(-1).opacity,0);
+  assert.ok(frames.every((f,i)=>!i||f.offset>=frames[i-1].offset));
+  assert.ok(frames.some(f=>f.offset===hit&&f.transform.endsWith("scale(1)")));
+  for(const f of frames){
+   assert.ok(Object.keys(f).every(k=>["transform","opacity","offset","easing"].includes(k)));
+   const m=f.transform.match(/translate\(calc\(-50% \+ ([-\d.]+)%\),calc\(-50% \+ ([-\d.]+)%\)\) scale\(([-\d.]+)\)/);
+   assert.ok(m);assert.ok(Math.abs(+m[1])<=((1-m[3])*50)+1e-8);assert.ok(Math.abs(+m[2])<=((1-m[3])*50)+1e-8);
+  }
+ }
+ const reaction=a.reactionTrack(r,-4,true);assert.ok(reaction.some(f=>f.rotate.startsWith("-")));
+ assert.equal(reaction.at(-1).rotate,"0deg");assert.equal(reaction.at(-1).translate,"0px 0px");
+ a.config.choreography.archetypes.surge.travel=1e9;a.config.choreography.defaults.tiltDeg=1e9;
+ const bounded=a.choreographyFor("future",{});assert.equal(bounded.travel,.2);assert.equal(bounded.tiltDeg,8);
+});
+
+test("visible alpha, rather than sheet padding, bounds recipe drift around the alpha transform origin",()=>{
+ const a=harness().api,r=a.choreographyFor("stormRain",{element:"wind",targetType:"all"});
+ for(const bounds of [[.127,.141,.895,.914],[.3,.05,.7,.65]]){
+  const frames=a.choreographyTrack(r,.5,bounds),spans=[bounds[2]-bounds[0],bounds[3]-bounds[1]];
+  for(const f of frames){
+   const m=f.transform.match(/translate\(calc\(-50% \+ ([-\d.]+)%\),calc\(-50% \+ ([-\d.]+)%\)\) scale\(([-\d.]+)\)/);
+   for(let axis=0;axis<2;axis++)assert.ok(Math.abs(+m[axis+1]/100)+(+m[3])*spans[axis]/2<=spans[axis]/2+1e-9);
+  }
+ }
+ const source=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
+ assert.match(source,/node.style.transformOrigin=\(cx\*100\)/,"scale pivots at the same visible-alpha center used for placement");
+});
+
+test("projectile recipes use formal actor-to-recipient vectors and arrive at the original hit, including three targets",()=>{
+ const a=harness().api,r=a.choreographyFor("windSpell",{element:"wind",category:"magic",targetType:"tri",animationStyle:"projectile"});
+ assert.equal(r.archetype,"projectile");
+ for(const [dx,dy,hit] of [[-120,300,.5],[0,300,.57],[120,-300,.65]]){
+  const f=a.projectileTrack(r,hit,dx,dy);
+  assert.ok(f[0].transform.includes(dx+"px"));assert.ok(f[0].transform.includes(dy+"px"));
+  const impact=f.find(k=>k.offset===hit);assert.equal(impact.transform,"translate(calc(-50% + 0px),calc(-50% + 0px)) scale(1)");
+  assert.equal(f.at(-1).offset,1);assert.equal(f.at(-1).opacity,0);
+ }
+ assert.equal(a.choreographyFor("future",{category:"heal",animationStyle:"projectile"}).archetype,"heal","support wins over projectile hint");
+ assert.equal(a.choreographyFor("future",{targetType:"all",animationStyle:"projectile"}).archetype,"field","whole field is not many invented missiles");
+});
 test("opt-in defaults, overrides and disabled/MISS do not schedule effects",()=>{
-    const h=harness();assert.equal(h.api.configFor("windSpell").enabled,false);
+    const h=harness();assert.equal(h.api.configFor("waterBall").enabled,false);
     h.api.config.skills.stormFlurry.shakePx=8;assert.equal(h.api.configFor("stormFlurry").shakePx,8);
     const f=h.api.create("stormFlurry"),r=h.root([]);assert.equal(f.hit({key:0,damage:0,roots:[r]}),false);
     h.api.setEnabled(false);assert.equal(f.config.enabled,false);assert.equal(f.hit({key:0,damage:100,roots:[r]}),false);assert.equal(h.timers.size,0);
@@ -27,6 +91,17 @@ test("each sweep recipient gets one 50ms stop; existing paused tracks and gate d
     h.advance(50);assert.equal(running.playState,"running");assert.equal(paused.playState,"paused");assert.equal(finished.playState,"finished");
     assert.equal(running.playbackRate,1);assert.equal(cast.playbackRate,750/700);
     h.advance(50);f.hit({key:1,damage:168,roots:[root]});assert.equal(root.shakes.length,2);assert.equal(root.shakes[0].playState,"idle");assert.equal(h.timers.size,1);
+});
+
+test("geometry remeasure transfers paused and catch-up animation tracks without escaping the active stop",()=>{
+ const h=harness(),f=h.api.create("stormFlurry"),old=h.animation();old.hitFeedbackDeadline=1750;
+ f.hit({key:0,damage:168,roots:[h.root([old])]});assert.equal(old.playState,"paused");
+ const replacement=h.animation();f.replaceTrack(old,replacement);
+ assert.equal(old.playState,"idle");assert.equal(replacement.playState,"paused");assert.equal(replacement.hitFeedbackDeadline,1750);
+ h.advance(50);assert.equal(replacement.playState,"running");assert.equal(replacement.playbackRate,750/700);
+ const resized=h.animation();f.replaceTrack(replacement,resized);assert.equal(resized.playbackRate,750/700);assert.equal(resized.hitFeedbackDeadline,1750);
+ const userPaused=h.animation("paused"),preserved=h.animation();f.replaceTrack(userPaused,preserved);h.advance(50);
+ assert.equal(preserved.playState,"paused","pre-existing pause is not added to the stop ledger");f.dispose();
 });
 test("shake uses additive transforms, damage scaling, .85 decay and cancellation",()=>{
     const h=harness(),r=h.root([]),f=h.api.create("stormFlurry");f.hit({key:0,damage:336,roots:[r]});
@@ -117,4 +192,18 @@ test("retained status body drops preview DOT accents when its entry is replaced 
 
 test("zero stop frames disables pause enumeration and timers while retaining optional shake",()=>{
  const h=harness();h.api.config.skills.stormFlurry.stopFrames=0;const f=h.api.create("stormFlurry");const root={getAnimations(){throw Error("zero stop must not enumerate/pause scene");},animate(){return h.animation();}};f.hit({key:0,damage:168,roots:[root]});assert.equal(h.timers.size,0);f.dispose();
+});
+
+
+test("one all-target cast coalesces stop/shake while retaining once-only recipient confirmations",()=>{
+ const h=harness(),f=h.api.create("stormRain",{element:"wind",category:"magic",targetType:"all"}),r=h.root([]);
+ for(let i=0;i<6;i++)assert.equal(f.hit({key:i,damage:168,roots:[r]}),true);
+ assert.equal(r.shakes.length,1);assert.equal(h.timers.size,1);assert.equal(f.hit({key:3,damage:168,roots:[r]}),false);f.dispose();
+});
+
+
+test("six-target critical burst never exceeds the cap and keeps the final readable flash and field wave",()=>{
+ const h=harness(),f=h.api.create("stormRain",{element:"wind",category:"magic",targetType:"all"}),host={appendChild(){},insertBefore(){}};
+ const rects=Array.from({length:6},(_,i)=>({left:10+(i%3)*70,top:30+Math.floor(i/3)*100,width:60,height:90}));f.wind(host,rects,2500);
+ rects.forEach((r,i)=>{f.impact(host,r,i,i===5,false,2500,1000,true);assert.ok(f.effectCount()<=48);});assert.ok(f.snapshot().some(e=>e.kind==="screen-flash"));assert.ok(f.snapshot().some(e=>e.kind==="all-wave"));f.dispose();
 });

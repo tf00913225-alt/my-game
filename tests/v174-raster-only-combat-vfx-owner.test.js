@@ -130,8 +130,8 @@ test("V143 casts retain raster-only choreography; named persistent foot auras st
     const feedback=JSON.parse(fs.readFileSync("config/battle-vfx-feedback.json","utf8"));
     assert.equal(feedback.defaults.enabled,false,"additional wind accents require explicit per-skill authorization");
     assert.deepEqual(Object.keys(feedback.skills).filter(id=>feedback.skills[id].enabled),["stormFlurry"]);
-    assert.deepEqual(feedback.automatic.previewSkills,["stormFlurry","flameSlash","healSpell","rockWall"]);
-    assert.equal(feedback.automatic.rolloutAll,false,"four-skill review must not silently enable the full catalog");
+    assert.deepEqual(feedback.automatic.previewSkills,["stormFlurry","flameSlash","healSpell","rockWall","stormFist","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen"]);
+    assert.equal(feedback.automatic.rolloutAll,false,"authorized Wind batch must not silently enable the full element catalog");
     assert.ok(feedback.defaults.maxEffectNodes<=48,"bounded accents, no blanket emitter");
     assert.match(v143,/node\.dataset\.presentationRole="foot-aura"/);
     assert.match(v143,/rise\.className="v143-status-aura-rise"/);

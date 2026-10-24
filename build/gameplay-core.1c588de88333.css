@@ -3750,6 +3750,12 @@
         v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
 }
 
+/* The recipe owns carrier transform/opacity; sheet selection keeps its own
+   child track. Do not run the historical envelope over the same properties. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-choreography]{
+    animation:var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
+}
+
 .v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"]{
     animation:
         v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,

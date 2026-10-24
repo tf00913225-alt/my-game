@@ -20,8 +20,8 @@ const CASTS={
     stormFlurry:{file:"storm-flurry-cast.png",duration:1500,placement:"single",status:"damageDown",size:[1448,1086],hash:"3a6268f354f4fb4b2542adf4eb716f639bfba754c63bb1c75ab1548a36df41f9"},
     windCrossSlash:{file:"wind-cross-slash-cast.png",duration:1700,placement:"single",status:"damageDown",size:[1448,1086],hash:"b60928d85d758321bc147d0ea68b7f6de89875d83512a6a614063cb4e5e68d0a"},
     dizzyFist:{file:"dizzy-fist-cast.png",duration:1800,placement:"single",status:"stun",size:[1448,1086],hash:"e2e7142956c54b8d8f8e3a1c7b8a2b9a4896b527df42b64cd1923cec6ed8c453"},
-    windSpell:{file:"wind-spell-cast.png",duration:1400,placement:"group",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
-    stormCircle:{file:"storm-circle-cast.png",duration:1600,placement:"group",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
+    windSpell:{file:"wind-spell-cast.png",duration:1400,placement:"single",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
+    stormCircle:{file:"storm-circle-cast.png",duration:1600,placement:"single",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
     windHowlLightning:{file:"wind-howl-lightning-cast.png",duration:1900,placement:"single",status:"damageDown",size:[1448,1086],hash:"6593627d59d8330cd756d2b21123f662fa8e472b08111c37938f49aaa17a7a36"},
     stormRain:{file:"storm-rain-cast.png",duration:2600,placement:"battlefield",status:"stun",size:[1448,1086],hash:"da41b91ae4bdd5540f3b0288240f89aef7ab8791f383318d01c993979d08668c"},
     dodgeSkill:{file:"dodge-skill-cast.png",duration:1600,placement:"group",status:"dodgeSkill",size:[1448,1086],hash:"6bc6caf956b211295901bf17d191f0773117ef34672763df75296edf62549a88"},
@@ -324,7 +324,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-recipient-v1.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-recipient-v1.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-recipient-v1.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-recipient-v3.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-recipient-v3.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-recipient-v1.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -375,16 +375,31 @@ function losslessWebpInfo(file){
  throw new Error("Expected lossless VP8L image");
 }
 
-test("windSpell wide source preserves native frame aspect before and after image metadata arrives",()=>{
+test("independent Wind row sources are exact lossless transparent 4x3 sheets and preserve formal tri/row recipients",()=>{
+ const manifest=loadRuntime().context.v143SkillAnimationManifest;
+ for(const [id,hash] of [["windSpell","d37b924a5b95b21ed29b1b145b8abeea8132bdbf7897e6ab8541d01517c6afc3"],["stormCircle","524849b26cdd396a60c59d366f89dfefded97f9463a2ec2bf8226bc5eec831df"]]){
+  const sprite=manifest[id].sprite,bytes=fs.readFileSync(sprite.src),info=losslessWebpInfo(bytes);
+  assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);
+  assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),hash);
+  assert.equal(sprite.presentation,"per-recipient");assert.equal(sprite.cellAspect,1);
+  assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7]);
+  const runtime=loadRuntime();runtime.context.v142SkillAnimationDirector.play(config(id,id==="windSpell"?"tri":"row","magic"),
+   {side:"player",actorIndex:0,targetId:1,targetIds:[0,1,2],targetSide:"monster"});
+  assert.deepEqual(stageSprites(runtime).sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+ }
+});
+
+test("historical wide source stays exact; new independent source has stable square aspect",()=>{
     const candidate="assets/vfx/wind/wind-spell-wide-v2.webp",bytes=fs.readFileSync(candidate);
     const info=losslessWebpInfo(bytes);
     assert.deepEqual([info.width,info.height],[2172,724]);
     assert.equal(info.alpha,1);
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"73b005cb0199578af99938aa083b10cd6a465f6151b973ce6a57f5c6922df42c");
     const sprite=loadRuntime().context.v143SkillAnimationManifest.windSpell.sprite;
-    assert.equal(sprite.src,candidate);
-    const actualAspect=(info.width/sprite.columns)/(info.height/sprite.rows);
-    assert.equal(actualAspect,2.25);
+    assert.equal(sprite.src,"assets/vfx/wind/wind-spell-recipient-v3.webp");
+    const active=losslessWebpInfo(sprite.src);
+    const actualAspect=(active.width/sprite.columns)/(active.height/sprite.rows);
+    assert.equal(actualAspect,1);
     assert.equal(sprite.cellAspect,actualAspect,'fallback agrees with the actual fractional-height cell');
     const start=animation.indexOf('function frameAspectFor('),end=animation.indexOf('function applySpriteBox(',start);
     assert.ok(start>=0&&end>start);
@@ -413,7 +428,7 @@ test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",
     assert.equal(runtime.drawCalls.length,0,"DOM Sprite renderer must never call Canvas drawImage");
 });
 
-test("single, three-lane and battlefield casts each own one correctly positioned sheet",()=>{
+test("three-target and battlefield casts own independent sheets on explicit recipients",()=>{
     const group=loadRuntime();
     group.context.v142SkillAnimationDirector.play(
         config("windSpell","tri","magic"),
@@ -421,11 +436,11 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     );
     [0,1,2].forEach(index=>group.context.showMonsterHit(index,10,"hp"));
     const groupSprites=stageSprites(group).sprites;
-    assert.equal(groupSprites.length,1,"one three-lane sheet, not nine effects");
-    assert.equal(groupSprites[0].dataset.placement,"group");
-    assert.equal(groupSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(groupSprites[0].style.left,"458px");
-    assert.equal(groupSprites[0].style.top,"140px");
+    assert.equal(groupSprites.length,3,"exactly one independent effect per real target");
+    assert.deepEqual(groupSprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(groupSprites.every(n=>n.dataset.placement==="single"));
+    assert.equal(new Set(groupSprites.map(n=>n.style.left)).size,3,"each effect follows its own recipient");
+    assert.equal(group.context.v143SkillAnimationState.current.targetType,"tri","gameplay range unchanged");
 
     const all=loadRuntime();
     all.context.v142SkillAnimationDirector.play(
@@ -439,7 +454,7 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     assert.equal(all.context.v143SkillAnimationState.current.targetType,"all");
 });
 
-test("three-target wind sheets keep their canonical three-slot artwork center after casualties",()=>{
+test("independent three-target Wind effects keep survivor anchors after casualties",()=>{
     const placements=[];
     [
         [
@@ -459,14 +474,13 @@ test("three-target wind sheets keep their canonical three-slot artwork center af
             config("windSpell","tri","magic"),
             {side:"player",actorIndex:0,targetId:1,targetIds,targetSide:"monster"}
         );
-        const sprite=stageSprites(runtime).sprites[0];
-        assert.ok(sprite);
-        assert.equal(sprite.dataset.placement,"group");
-        assert.equal(sprite.style.left,"458px","artwork remains centered on the canonical three-slot footprint");
-        assert.equal(sprite.style.top,"140px");
+        const sprites=stageSprites(runtime).sprites;
+        assert.deepEqual(sprites.map(n=>+n.dataset.targetIndex),targetIds,"no extra effect on a casualty");
+        const sprite=sprites.find(n=>n.dataset.targetIndex==="1");
+        assert.ok(sprite);assert.equal(sprite.dataset.placement,"single");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
+    assert.deepEqual(placements[1],placements[0],"casualties do not move or resize the surviving target effect");
 });
 
 
@@ -596,7 +610,7 @@ test("wide baseline bytes remain exact and active wide sources retain their nati
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
-        if(!["dodgeSkill"].includes(id)){
+        if(!["dodgeSkill","stormCircle"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");

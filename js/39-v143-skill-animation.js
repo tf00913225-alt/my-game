@@ -57,7 +57,66 @@
         if(c.blendMode!=="plus-lighter"&&c.blendMode!=="screen")c.blendMode="screen";
         if(typeof CSS!=="undefined"&&CSS.supports&&!CSS.supports("mix-blend-mode",c.blendMode))c.blendMode="screen";
         c.depth=Object.fromEntries(["far","mid","near","assignment"].map(key=>[key,{...CONFIG.depth?.[key],...c.depth?.[key]}]));
+        c.choreography=choreographyFor(skill,data,profile);
         return c;
+    }
+    // Pure presentation recipe: data -> archetype -> element motion -> override.
+    // Fractions live inside the authored lifetime; none schedule damage or gates.
+    function choreographyFor(skill,data,profile=resolveProfile(skill,data)){
+        const rules=CONFIG.choreography||{},d=data||{},text=String(d.name||"")+String(d.description||"");
+        const support=["heal","buff","shield"].includes(profile.kind);
+        const projectile=d.animationStyle==="projectile"||/飛|箭|彈|投|射|projectile/i.test(text);
+        const archetype=support?profile.kind:profile.kind==="all"?(profile.element==="wind"?"vortex":"field"):
+            projectile?"projectile":profile.kind==="multi"?"sweep":d.category==="physical"?"strike":"surge";
+        const raw={...rules.defaults,...rules.archetypes?.[archetype],...rules.elements?.[profile.element],...CONFIG.skills?.[skill]?.choreography};
+        const recipe={archetype,enabled:rules.enabled===true&&raw.enabled!==false&&!profile.passive&&skill!=="normal"};
+        const limits={anticipation:[.18,.05,.35],settle:[.82,.7,.95],startScale:[.58,.25,1],tailScale:[.86,.4,1],
+            travel:[.12,0,.2],drift:[.12,0,.2],rise:[0,-.2,.2],recoilPx:[5,0,12],tiltDeg:[3,0,8],recoilMs:[180,80,700]};
+        Object.entries(limits).forEach(([key,[fallback,min,max]])=>{recipe[key]=bounded(raw[key],fallback,min,max);});
+        recipe.recoilPx=support?0:recipe.recoilPx;recipe.tiltDeg=support?0:recipe.tiltDeg;
+        return recipe;
+    }
+    function choreographyTrack(recipe,hitRatio,paintBounds=[0,0,1,1]){
+        const hit=bounded(hitRatio,.5,.36,.75),windup=Math.min(recipe.anticipation,hit*.6);
+        const settle=Math.max(hit+.04,recipe.settle),frames=[];
+        const valid=Array.isArray(paintBounds)&&paintBounds.length===4&&paintBounds.every(Number.isFinite)&&
+            paintBounds[0]>=0&&paintBounds[1]>=0&&paintBounds[2]<=1&&paintBounds[3]<=1&&paintBounds[2]>paintBounds[0]&&paintBounds[3]>paintBounds[1];
+        const spanX=valid?paintBounds[2]-paintBounds[0]:1,spanY=valid?paintBounds[3]-paintBounds[1]:1;
+        // Every translated box remains within its HUD-safe fitted rectangle:
+        // |translation| <= half of unused size. Never enlarge the fit to move it.
+        const push=(offset,scale,x,y,opacity,easing="ease-out")=>{
+            const roomX=(1-scale)*spanX*.5,roomY=(1-scale)*spanY*.5;
+            frames.push({offset,opacity,easing,transform:"translate(calc(-50% + "+Math.max(-roomX,Math.min(roomX,x))*100+"%),calc(-50% + "+Math.max(-roomY,Math.min(roomY,y))*100+"%)) scale("+scale+")"});
+        };
+        push(0,recipe.startScale,-recipe.travel,recipe.rise,0);
+        push(windup,recipe.startScale,-recipe.travel,recipe.rise,.9,"ease-in");
+        if(recipe.archetype==="vortex"){
+            push(hit*.68,.72,recipe.drift,-recipe.drift,1);
+            push(hit,1,0,0,1);
+            push(hit+(settle-hit)*.35,.72,-recipe.drift,recipe.drift,1);
+            push(settle,.78,recipe.drift,-recipe.drift,.6);
+        }else{
+            push(hit,1,0,0,1);
+            push(settle,recipe.tailScale,recipe.drift,-recipe.rise,.55);
+        }
+        push(1,recipe.tailScale,recipe.drift,-recipe.rise,0);
+        return frames;
+    }
+    function reactionTrack(recipe,distance,critical){
+        const strength=Math.min(12,recipe.recoilPx*(critical?1.25:1)),sign=distance<0?-1:1;
+        return [{translate:"0px 0px",rotate:"0deg"},
+            {translate:(recipe.archetype==="vortex"?strength:0)+"px "+sign*strength+"px",rotate:sign*recipe.tiltDeg+"deg",offset:.2},
+            {translate:(recipe.archetype==="vortex"?-strength*.7:0)+"px "+(-sign*strength*.3)+"px",rotate:(-sign*recipe.tiltDeg*.6)+"deg",offset:.55},
+            {translate:"0px 0px",rotate:"0deg"}];
+    }
+    function projectileTrack(recipe,hitRatio,dx,dy){
+        const hit=bounded(hitRatio,.5,.36,.75),launch=Math.min(recipe.anticipation,hit*.6);
+        const transform=(p,s)=>"translate(calc(-50% + "+dx*(1-p)+"px),calc(-50% + "+dy*(1-p)+"px)) scale("+s+")";
+        return [{offset:0,opacity:0,transform:transform(0,.3)},
+            {offset:launch,opacity:.9,transform:transform(0,recipe.startScale),easing:"ease-in"},
+            {offset:hit,opacity:1,transform:transform(1,1),easing:"ease-out"},
+            {offset:Math.max(hit+.04,recipe.settle),opacity:.55,transform:transform(1,recipe.tailScale)},
+            {offset:1,opacity:0,transform:transform(1,recipe.tailScale)}];
     }
     function statusEnabled(type,entry){
         const auto=CONFIG.automatic;
@@ -88,7 +147,7 @@
         node.getAnimations?.({subtree:true}).forEach(a=>a.cancel());node.remove();
         if(node.v143SheetNode){release("sheet",node.v143SheetNode,limit);delete node.v143SheetNode;}
         Array.from(node.attributes||[]).forEach(a=>node.removeAttribute(a.name));
-        node.textContent="";delete node.v143MotionAnimation;delete node.v143FrameAnimation;
+        node.textContent="";delete node.v143MotionAnimation;delete node.v143FrameAnimation;delete node.v143ChoreographyGeometryKey;
         const pool=pools.get(kind)||[];pools.set(kind,pool);
         if(pool.length<limit)pool.push(node);
     }
@@ -288,6 +347,15 @@
         }
         function impact(host,rect,rank,last,weaken,deadline,damage=c.referenceDamage,critical=false){
             if(!rect)return;
+            // Reserve the last hit's readable ring/trail/flash before optional
+            // debris consumes the shared cap. Never sacrifice status truth.
+            if(last){
+                const reserve=c.profile.kind==="all"?4:3;
+                for(const entry of Array.from(effects)){
+                    if(effects.size<=c.maxEffectNodes-reserve)break;
+                    if(["wind","leaf","depth-fleck","burst"].includes(entry.kind))entry.finish();
+                }
+            }
             const x=rect.left+rect.width/2,y=rect.top+rect.height/2,scale=c.hitStrength[Math.min(rank,2)];
             const ring=(kind,ms,drop)=>effect(host,kind,{x:x-rect.width/2,y:y-rect.width/4,w:rect.width,h:rect.width/2},[
                 {transform:"translate(0px,0px) scale(.25)",opacity:c.particleOpacity},
@@ -295,7 +363,8 @@
             ],ms,deadline,{background:"transparent",border:c.trailWidth+"px solid "+c.colors[1%c.colors.length]});
             ring("shockwave",c.shockwaveMs,0);
             if(weaken)ring("weaken",c.weakenMs,rect.height*c.weakenDrop);
-            const count=Math.min(10,Math.floor(c.burstCount*Math.max(1,Math.min(c.maxDamageScale,damage/c.referenceDamage))*(critical?c.criticalScale:1)*quality));
+            const tailBudget=last?(c.profile.kind==="all"?3:2):1;
+            const count=Math.min(10,Math.max(0,c.maxEffectNodes-effects.size-tailBudget),Math.floor(c.burstCount*Math.max(1,Math.min(c.maxDamageScale,damage/c.referenceDamage))*(critical?c.criticalScale:1)*quality));
             for(let i=0;i<count;i++){
                 const angle=(i/Math.max(1,count))*Math.PI*2,reach=rect.width*c.burstRadius*scale;
                 effect(host,"burst",{x,y,w:c.windSize*3,h:c.windSize},[
@@ -321,7 +390,7 @@
         function hit({key,damage,roots,power=1,critical=false}){
             if(disposed||!c.enabled||["heal","buff","shield"].includes(c.profile.kind)||!(damage>0)||seen.has(key)||reduced())return false;
             seen.add(key);
-            if(batch&&!c.sweepEnabled)return true;batch=true;
+            if(batch&&(!c.sweepEnabled||c.profile.kind==="all"))return true;batch=true;
             resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();
             const impactScale=Math.max(1,Math.min(c.maxDamageScale,damage/c.referenceDamage))*(critical?c.criticalScale:1);
             const stopMs=Math.min(c.maxStopMs,c.stopFrames*1000/c.fps*impactScale);
@@ -347,14 +416,25 @@
                 if(a){motions.add(a);a.onfinish=()=>{motions.delete(a);a.cancel();};}
             });return true;
         }
+        function replaceTrack(previous,next){
+            if(!previous||!next)return;
+            next.currentTime=previous.currentTime;next.playbackRate=previous.playbackRate;
+            if(previous.hitFeedbackDeadline)next.hitFeedbackDeadline=previous.hitFeedbackDeadline;
+            const paused=previous.playState==="paused";
+            if(paused)next.pause();
+            // Geometry replacement must transfer the stop ledger, not leave it
+            // pointing at a cancelled track which can no longer be resumed.
+            stop?.tracks.forEach(entry=>{if(entry.animation===previous)entry.animation=next;});
+            previous.cancel();
+        }
         function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();Array.from(effects).forEach(e=>e.finish());
             if(frame&&typeof cancelAnimationFrame==="function")cancelAnimationFrame(frame);frame=0;
             for(const [node,ctx] of [[canvas,context],[frontCanvas,frontContext]])if(node){ctx.clearRect(0,0,node.width,node.height);node.remove();if(canvasPool.length<2)canvasPool.push(node);}
             canvas=null;context=null;frontCanvas=null;frontContext=null;active.delete(api);}
-        const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,support,dispose,effectCount:()=>effects.size,
+        const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,support,replaceTrack,dispose,effectCount:()=>effects.size,
             snapshot:()=>Array.from(effects,e=>({kind:e.kind,...e.node.dataset,opacity:e.opacity}))};active.add(api);return api;
     }
-    window.FourSymbolsHitFeedback={config:CONFIG,configFor,resolveProfile,statusEnabled,decorateStatus,
+    window.FourSymbolsHitFeedback={config:CONFIG,configFor,resolveProfile,choreographyFor,choreographyTrack,projectileTrack,reactionTrack,statusEnabled,decorateStatus,
         markStatus(entry){if(entry&&typeof entry==="object")approvedStatusEntries.add(entry);},create,frameTrack,acquire,release,
         disposeAll(){Array.from(active).forEach(a=>a.dispose());},
         setEnabled(enabled){CONFIG.enabled=enabled===true;if(!CONFIG.enabled){
@@ -469,8 +549,8 @@
         stormFlurry:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-flurry-wide-v3.webp","single",{scale:1.4,minSize:96,maxSize:184,presentation:"per-recipient",recipientSlice:"center-third",cellAspect:2.25})},
         windCrossSlash:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-cross-slash-cast.png?v=173.24","single",{scale:2.25,maxSize:280})},
         dizzyFist:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/dizzy-fist-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
-        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
-        stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-wide-v2.webp","group",{scale:1.08,minSize:190,alignToSlots:true,cellAspect:2.25})},
+        windSpell:{hit:.5,deferredStatusTypes:["agilityDown"],sprite:castSheet("assets/vfx/wind/wind-spell-recipient-v3.webp","single",{scale:1.08,minSize:96,maxSize:184,presentation:"per-recipient",cellAspect:1})},
+        stormCircle:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/storm-circle-recipient-v3.webp","single",{scale:1.08,minSize:96,maxSize:184,presentation:"per-recipient",cellAspect:1})},
         windHowlLightning:{hit:.5,deferredStatusTypes:["damageDown"],sprite:castSheet("assets/vfx/wind/wind-howl-lightning-cast.png?v=173.24","single",{scale:2.35,maxSize:290})},
         stormRain:{hit:.5,deferredStatusTypes:["stun"],sprite:castSheet("assets/vfx/wind/storm-rain-recipient-v1.webp","battlefield",{scale:1.08,minSize:280,presentation:"per-recipient"})},
         dodgeSkill:{hit:.5,deferredStatusTypes:["dodgeSkill"],sprite:castSheet("assets/vfx/wind/dodge-recipient-v1.webp","group",{scale:1.08,minSize:190,alignToSlots:true,presentation:"per-recipient"})},
@@ -1705,8 +1785,10 @@
 
     function applySpriteBox(node,width,height,sprite,fit){
         const placementScale=PLACEMENT_SIZE_SCALE[node.dataset.placement]||1;
-        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
-        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale;
+        const visibility=window.FourSymbolsHitFeedback?.config.enabled?window.FourSymbolsHitFeedback.config.skills[node.dataset.skill]?.visibility:null;
+        const visibleScale=clamp(Number(visibility?.scale)||1,1,1.4);
+        const boxWidth=Math.max(1,Number(width)||1)*SPRITE_SCALE_MULTIPLIER*placementScale*visibleScale;
+        const boxHeight=Math.max(1,Number(height)||1)*SPRITE_SCALE_MULTIPLIER*placementScale*visibleScale;
         const aspect=frameAspectFor(sprite);
         let renderWidth=boxWidth,renderHeight=boxHeight;
         if(fit==="cover"){
@@ -1744,9 +1826,34 @@
         const overlay=window.FourSymbolsBattlefieldRenderGeometry?.getBattlefieldOverlayGeometry?.()?.rect;
         const side=geometryOwner()?.getSideRect?.(current.targetSide);
         if(!overlay||!side){ return; }
-        const left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
-        const top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
+        let left=Math.max(overlay.left,side.left),right=Math.min(overlay.right,side.right);
+        let top=Math.max(overlay.top,side.top),bottom=Math.min(overlay.bottom,side.bottom);
         const width=parseFloat(node.style.width),height=parseFloat(node.style.height);
+        const visibility=current.hitFeedback?.config.enabled?current.hitFeedback.config.visibility:null;
+        const authored=visibility?.paintBounds;
+        const paint=Array.isArray(authored)&&authored.length===4&&authored.every(Number.isFinite)&&
+            authored[0]>=0&&authored[1]>=0&&authored[2]<=1&&authored[3]<=1&&authored[2]>authored[0]&&authored[3]>authored[1]?authored:[0,0,1,1];
+        if(visibility){
+            const geometries=activeCards(current.targetSide,current.config).map(entry=>({index:entry.index,
+                geometry:window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,entry.index)}));
+            // Approved portraits can overhang their logical faction zone.
+            // Do not shrink effects back into the old, smaller Slot rectangle.
+            // The existing paint projection and overlay remain the only bounds.
+            geometries.filter(entry=>current.targetIndexes.includes(entry.index)).forEach(entry=>{
+                const rect=entry.geometry?.artworkProjection?.rect;if(!rect||!(rect.width>0&&rect.height>0))return;
+                left=Math.max(overlay.left,Math.min(left,rect.left));right=Math.min(overlay.right,Math.max(right,rect.left+rect.width));
+                top=Math.max(overlay.top,Math.min(top,rect.top));bottom=Math.min(overlay.bottom,Math.max(bottom,rect.top+rect.height));
+            });
+            // Use the formal HUD geometry, never new Slot coordinates. The
+            // authored visible-alpha footprint cannot cover a nearby HUD strip.
+            const half=width*(paint[2]-paint[0])/2;
+            geometries.forEach(entry=>{
+                const hud=entry.geometry?.hudSafeRect;
+                if(!hud||!(hud.width>0&&hud.height>0)||hud.right<=center.x-half||hud.left>=center.x+half)return;
+                if(hud.bottom<=center.y)top=Math.max(top,hud.bottom+2);
+                else if(hud.top>=center.y)bottom=Math.min(bottom,hud.top-2);
+            });
+        }
         const availableWidth=2*Math.min(center.x-left,right-center.x);
         const availableHeight=2*Math.min(center.y-top,bottom-center.y);
         if(!(width>0&&height>0&&availableWidth>0&&availableHeight>0)){
@@ -1756,10 +1863,19 @@
         }
         // The reused wide sheet is clipped to its central authored strike per recipient.
         // Fit its visible third, not the transparent/clipped neighbor regions.
-        const visibleWidth=current.model.sprite.recipientSlice==="center-third"?width/3:width;
-        const fit=Math.min(1,availableWidth/visibleWidth,availableHeight/height);
+        const visibleWidth=(current.model.sprite.recipientSlice==="center-third"?width/3:width)*(paint[2]-paint[0]);
+        const visibleHeight=height*(paint[3]-paint[1]);
+        const fit=Math.min(1,availableWidth/visibleWidth,availableHeight/visibleHeight);
         node.style.width=(width*fit)+"px";
         node.style.height=(height*fit)+"px";
+        if(visibility){
+            node.style.left=(center.x-width*fit*((paint[0]+paint[2])/2-.5))+"px";
+            node.style.top=(center.y-height*fit*((paint[1]+paint[3])/2-.5))+"px";
+            node.dataset.visiblePaintWidth=String(visibleWidth*fit);
+            node.dataset.visiblePaintHeight=String(visibleHeight*fit);
+            node.dataset.visibilityProfile="wind-readable";
+            node.dataset.visibilitySafeTop=String(top);node.dataset.visibilitySafeBottom=String(bottom);
+        }
         node.dataset.artFit="safe";
         node.dataset.artFitScale=String(fit);
         node.dataset.semanticWidth=String(bounds.width);
@@ -1815,12 +1931,18 @@
         node.dataset.placement=placement;
 
         if(placement==="single"){
-            const portrait=sprite.presentation==="per-recipient"
+            const visibility=current.hitFeedback?.config.enabled?current.hitFeedback.config.visibility:null;
+            const portrait=sprite.presentation==="per-recipient"||visibility
                 ?window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect:null;
             const hasPortrait=portrait&&Number(portrait.width)>0&&Number(portrait.height)>0;
             const center=hasPortrait?{x:portrait.left+portrait.width/2,y:portrait.top+portrait.height/2}:target;
             const body=hasPortrait?Math.min(portrait.width,portrait.height):0;
-            const size=authoredSquareSize(sprite,hasPortrait?{width:body,height:body}:target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
+            let size=authoredSquareSize(sprite,hasPortrait?{width:body,height:body}:target.rect,{scale:1.8,min:96,max:184,minRatio:1.18,maxRatio:1.68});
+            if(visibility&&hasPortrait){
+                const paint=visibility.paintBounds,ratio=Array.isArray(paint)?Math.max(.2,Number(paint[3])-Number(paint[1])):1;
+                const paintHeight=Math.max(clamp(Number(visibility.minPaintHeight)||48,24,72),portrait.height*clamp(Number(visibility.heightRatio)||1.12,.8,1.5));
+                size=paintHeight/ratio*Math.max(1,frameAspectFor(sprite))/(PLACEMENT_SIZE_SCALE.single||1);
+            }
             node.dataset.targetIndex=String(index);
             node.dataset.targetIndexes=String(index);
             node.dataset.geometrySlot=target.slot;
@@ -1830,6 +1952,7 @@
             applySpriteBox(node,sliced?size*3:size,sliced?size*3:size,sprite);
             if(sliced){ node.style.clipPath="inset(0 33.333333%)";node.dataset.recipientSlice="center-third"; }
             fitRangeArt(node,current,target.rect,center);
+            placeAutomaticChoreography(current,node,index);
             return;
         }
 
@@ -1949,6 +2072,35 @@
         if(current.firstVisibleFrameAt){ startNormalProjectiles(current); }
     }
 
+    function placeAutomaticChoreography(current,node,index){
+        const recipe=current.hitFeedback?.config.enabled&&current.hitFeedback.config.choreography;
+        if(!recipe?.enabled||current.model.sprite?.impactOnly||typeof node.animate!=="function"||
+           node.v143MotionAnimation&&!node.dataset.choreography||
+           window.matchMedia?.("(prefers-reduced-motion: reduce)").matches)return;
+        const input=current.hitFeedback.config.visibility?.paintBounds;
+        const bounds=Array.isArray(input)&&input.length===4&&input.every(Number.isFinite)&&input[0]>=0&&input[1]>=0&&
+            input[2]<=1&&input[3]<=1&&input[2]>input[0]&&input[3]>input[1]?input:[0,0,1,1];
+        const actor=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.side,current.actorIndex)?.artworkProjection?.rect;
+        const x=actor?actor.left+actor.width/2:null,y=actor?actor.top+actor.height/2:null;
+        const cx=(bounds[0]+bounds[2])*.5,cy=(bounds[1]+bounds[3])*.5;
+        const endX=parseFloat(node.style.left)+(cx-.5)*parseFloat(node.style.width);
+        const endY=parseFloat(node.style.top)+(cy-.5)*parseFloat(node.style.height);
+        const projectile=recipe.archetype==="projectile"&&Number.isFinite(x)&&Number.isFinite(y)&&Number.isFinite(endX)&&Number.isFinite(endY);
+        const key=[x,y,endX,endY,node.style.width,node.style.height].join(":");
+        if(node.v143ChoreographyGeometryKey===key)return;
+        const previous=node.v143MotionAnimation;
+        const elapsed=previous?.currentTime??(current.firstVisibleFrameAt?Math.max(0,Date.now()-current.visualStartedAt):0);
+        node.v143ChoreographyGeometryKey=key;
+        node.dataset.choreography=projectile?"projectile":recipe.archetype;
+        node.style.transformOrigin=(cx*100)+"% "+(cy*100)+"%";
+        const ratio=(targetHitTime(current,index)-(current.visualStartedAt||current.startedAt))/current.duration;
+        const api=window.FourSymbolsHitFeedback;
+        node.v143MotionAnimation=node.animate(projectile?api.projectileTrack(recipe,ratio,x-endX,y-endY):api.choreographyTrack(recipe,ratio,bounds),
+            {duration:current.duration,fill:"both",easing:"linear"});
+        node.v143MotionAnimation.currentTime=elapsed;
+        current.hitFeedback.replaceTrack(previous,node.v143MotionAnimation);
+    }
+
     function addSprite(current,index,target){
         const sprite=current.model.sprite;
         if(!sprite||!target||!state.stage){ return; }
@@ -1997,6 +2149,7 @@
             current.spriteNodes.set(key,node);
         }
         placeSprite(current,node,index,target);
+        placeAutomaticChoreography(current,node,index);
         // One range representative: contract inside the fitted source box,
         // reach authored size at the existing hit, then settle. Never grow
         // beyond the geometry owner's HUD-safe fit or restart on remeasure.
@@ -2334,7 +2487,7 @@
             targetId:meta.targetId!==undefined?meta.targetId:null,
             targetIds:Array.isArray(meta.targetIds)?meta.targetIds.slice():null,
             targetSide:targetSide,targetType:targetType,targetIndexes:[],emitted:new Set(),validTargets:validTargets,
-            hitFeedback:window.FourSymbolsHitFeedback?.create(config.id,typeof skillDatabase!=="undefined"?skillDatabase[config.id]||config:config),
+            hitFeedback:window.FourSymbolsHitFeedback?.create(config.id,{...(typeof skillDatabase!=="undefined"?skillDatabase[config.id]||config:config),animationStyle:config.style}),
             spriteNodes:new Map(),confirmedTargets:new Set(),deferredStatusTargets:new Map(),statusAtStart:snapshotTimedEffects(model),
             actorCard:cardFor(meta.side||"player",Number.isInteger(meta.actorIndex)?meta.actorIndex:0),
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
@@ -2549,7 +2702,10 @@
                 {translate:"0px "+(-distance*.3)+"px",scale:1,offset:.7},
                 {translate:"0px 0px",scale:1}
             ];
-            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate(recoilFrames,{duration:140,easing:"ease-out"});
+            const reaction=ownedHit&&current.hitFeedback?.config.enabled&&current.hitFeedback.config.choreography;
+            if(artwork.isConnected){ artwork.v143ImpactRecoil=motion.animate(reaction?.enabled?
+                window.FourSymbolsHitFeedback.reactionTrack(reaction,distance,critical):recoilFrames,
+                {duration:reaction?.enabled?Math.min(reaction.recoilMs,Math.max(1,current.visualStartedAt+current.duration-Date.now())):140,easing:"ease-out"});
             const recoil=artwork.v143ImpactRecoil;
             window.FourSymbolsBattlePresentation?.syncMotion?.(card);
             recoil.onfinish=()=>{ if(artwork.v143ImpactRecoil===recoil){ artwork.v143ImpactRecoil=null; window.FourSymbolsBattlePresentation?.syncMotion?.(card); } };
