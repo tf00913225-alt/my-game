@@ -604,6 +604,17 @@
         }
     }
 
+    // A retained declaration has already entered its battle. Presentation may
+    // adopt the new runtime token without replaying startTurn or entry timers.
+    function adoptRestoredBattleEntry(token){
+        if(!battleActive||token!==battleToken||transitionRunning){return false;}
+        const page=document.getElementById("battlePage");
+        if(!page){return false;}
+        startedEntryTokens.add(token);
+        page.classList.remove("v141-preparing-entry","v141-entry-moving","v141-exit-player","v141-exit-monster");
+        return true;
+    }
+    window.v141AdoptRestoredBattleEntry=adoptRestoredBattleEntry;
     window.v141PrepareBattleRender=v141PrepareBattleRender;
     window.v141AfterBattleRender=v141AfterBattleRender;
 

@@ -16,6 +16,10 @@ function harness(){
         skillIds:[],skillChance:0,statusEffects:[],activeBuffs:[],alive:true,vAdventure:true,vAdventureEncounterId:'tutorial_1'};
     let declarations=0;
     const turnIndicator={textContent:'第 1 回合'};
+    const entryClasses=new Set(['v141-preparing-entry']);
+    const battlePage={classList:{add:name=>entryClasses.add(name),remove:(...names)=>names.forEach(name=>entryClasses.delete(name)),contains:name=>entryClasses.has(name)}};
+    const statsUi={classList:{remove(){},toggle(){}},hidden:true};
+    const getElementById=id=>id==='battlePage'?battlePage:['battleMechanismAlert','battleBossMechanismDrawer'].includes(id)?statsUi:null;
     const c={console:{error(){}},player,monsters:[monster],currentZone:'dungeon',currentBattleMonsters:[0],heroBattleCombatants:[],
         battleActive:true,battleToken:7,turn:2,selectedMonster:0,activeBattleCharacterIndex:0,timerId:17,battleAdvanceTimeoutId:null,battleAdvanceScheduled:false,
         battleEscapePendingToken:null,battlePresentationLocks:new Set(),battleInputGuideHolds:new Set(),
@@ -26,12 +30,12 @@ function harness(){
         battleRoundBoundaryKeys:new Set(['7:round_start:1','7:round_end:1','7:round_start:2']),autoBattle:false,
         battleActionFinishObservers:new Set(),battleBeforeCombatantObservers:new Set(),battleRoundStartObservers:new Set(),
         battleRoundEndObservers:new Set(),battleActionFinishInterceptors:[],
-        document:{getElementById:()=>null,body:{classList:{remove(){},toggle(){}}}},
+        document:{getElementById,body:{classList:{remove(){},toggle(){}}}},
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,getPartyBattleStats:()=>({maxHP:130,maxSP:60}),
         getCharacterBattleArtworkPath:()=>'',clearInterval(){},clearTimeout(){},
         clearBattleActionWatchdog(){},clearBattleRoundPrompt(){},clearBattleActionNotice(){},closeMenus(){},
         clearBattleTargetSelectionMode(){},resumeBattleAfterPresentationLocks(){},updateActionHudVisibility(){},
-        renderBattle(){},showPage(){},syncBattleAutoSettings(){},updateAutoButton(){},
+        renderBattle(){c.v141AfterBattleRender();},showPage(){},syncBattleAutoSettings(){},updateAutoButton(){},
         $:id=>id==='battleTurnIndicator'?turnIndicator:null,battleWaveHudText:()=>'',
         beginBattleRoundDeclaration(){declarations++;},startTurn(){throw Error('must not replay round start');},
         FourSymbolsAccountSave:{getActiveUid:()=>identity.uid},FourSymbolsStartupPolicy:{getUid:()=>identity.uid},
@@ -40,12 +44,16 @@ function harness(){
             previousMonsters:world,previousZone:'forest'},
         v132LaunchDungeonBattle(){throw Error('must not launch another battle');}};
     c.window=c;vm.createContext(c);
+    const presentation=fs.readFileSync('js/35-v141-ui-battle.js','utf8');
+    const after=presentation.slice(presentation.indexOf('    function v141AfterBattleRender(){'),presentation.indexOf('    // A retained declaration'));
+    const adopt=presentation.slice(presentation.indexOf('    function adoptRestoredBattleEntry(token){'),presentation.indexOf('    window.v141PrepareBattleRender='));
+    vm.runInContext('const startedEntryTokens=new Set();let transitionRunning=false;function decorateBattleCards(){}\n'+after+'\n'+adopt+'\nwindow.v141AfterBattleRender=v141AfterBattleRender;',c);
     vm.runInContext(fs.readFileSync('js/battle-statistics-system.js','utf8'),c);
     vm.runInContext(readers+'\n'+block,c);
     const owner=c.FourSymbolsBattleStatistics,id=c.buildBattleStatisticsCombatant(0).id;
     owner.begin({battleToken:7,combatants:[c.buildBattleStatisticsCombatant(0)]});
     owner.recordDamage({sourceId:id,amount:18});owner.recordDamage({targetId:id,amount:20});owner.recordCritical({id});
-    return {c,identity,onboarding,world,turnIndicator,flow:c.FourSymbolsBattleFlow,declarations:()=>declarations};
+    return {c,identity,onboarding,world,turnIndicator,entryClasses,getElementById,flow:c.FourSymbolsBattleFlow,declarations:()=>declarations};
 }
 function suspend(h){
     assert.equal(h.flow.checkpointFirstTutorialBattle(h.identity,value=>{h.onboarding.battleCheckpoint=value;return true;},true),true);
@@ -102,6 +110,8 @@ test('JSON reload resumes the same saved enemies/round/resources/statistics with
     assert.equal(h.flow.restoreFirstTutorialBattle(dto,h.identity,()=>finished++),true);
     assert.equal(h.c.monsters[0].hp,9);assert.equal(h.c.monsters[0].level,1);assert.equal(h.c.turn,2);
     assert.equal(h.turnIndicator.textContent,'第2回合','restored HUD projects the retained round without startTurn');
+    assert.equal(h.entryClasses.has('v141-preparing-entry'),false,'restored presentation cannot leave original actors transparent');
+    h.c.v141AfterBattleRender();assert.equal(h.entryClasses.has('v141-preparing-entry'),false,'ordinary redraw retains entered presentation');
     assert.equal(h.c.player.level,2);assert.equal(h.c.player.hp,80);assert.equal(h.c.player.sp,40);
     assert.equal(h.declarations(),1);assert.equal(h.c.battleToken,1);
     assert.deepEqual(Array.from(h.c.battleRoundBoundaryKeys),['1:round_start:1','1:round_end:1','1:round_start:2']);
@@ -152,8 +162,21 @@ test('render, page, declaration or Statistics failure restores the original worl
         assert.equal(c.declaredCharacterIndexes,before.declared);assert.equal(JSON.stringify(owner.getSnapshot()),before.ledger);
         assert.equal(c.battlePresentationLocks.size,0);assert.equal(h.onboarding.battleCheckpoint,dto);
         if(site==='statistics'){c.FourSymbolsBattleStatistics=owner;}
-        else if(site==='statistics-dom'){c.document.getElementById=()=>null;}
+        else if(site==='statistics-dom'){c.document.getElementById=h.getElementById;}
         else{c[site]=original;}
         assert.equal(h.flow.restoreFirstTutorialBattle(dto,h.identity,()=>{}),true,'retained checkpoint remains retryable: '+site);
     }
+});
+test('original presentation adoption refuses inactive, stale or transitioning restore and preserves normal fresh entry',()=>{
+    const h=harness();assert.equal(h.c.v141AdoptRestoredBattleEntry(6),false);
+    h.c.battleActive=false;assert.equal(h.c.v141AdoptRestoredBattleEntry(7),false);h.c.battleActive=true;
+    vm.runInContext('transitionRunning=true',h.c);assert.equal(h.c.v141AdoptRestoredBattleEntry(7),false);
+    assert.equal(h.entryClasses.has('v141-preparing-entry'),true);
+    vm.runInContext('transitionRunning=false',h.c);assert.equal(h.c.v141AdoptRestoredBattleEntry(7),true);
+    assert.equal(h.entryClasses.has('v141-preparing-entry'),false);
+    h.c.battleToken=8;h.c.v141AfterBattleRender();assert.equal(h.entryClasses.has('v141-preparing-entry'),true,'a genuinely new entry still uses its original presentation lifecycle');
+    const refused=harness(),dto=suspend(refused);refused.c.v141AdoptRestoredBattleEntry=()=>false;
+    assert.equal(refused.flow.restoreFirstTutorialBattle(dto,refused.identity,()=>{}),false);
+    assert.equal(refused.c.battleActive,false);assert.equal(refused.c.monsters,refused.world);
+    assert.deepEqual(refused.onboarding.battleCheckpoint,dto,'presentation refusal retains the committed checkpoint');
 });

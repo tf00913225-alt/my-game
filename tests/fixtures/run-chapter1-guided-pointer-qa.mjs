@@ -67,22 +67,30 @@ try{
             const tapGuide=async()=>{
                 const free=await observe();
                 if(free.view.firstLesson?.step==='finish-battle'||(free.view.state.onboarding.flowVersion===3&&free.view.state.onboarding.basicComplete&&['c1_02','c1_03'].includes(free.view.state.currentNodeId))){
+                    const tapUnlocked=async selector=>{
+                        await wait(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e||e.disabled)return false;const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.width>0&&r.height>0&&(hit===e||e.contains(hit));})()`,'released control receives native pointer after original guide cleanup');
+                        await tap(selector);
+                    };
                     await captureStory();
-                    if(free.view.dialogue){await tap('#adventurePage [onclick*="advanceDialogue"]');return true;}
+                    if(free.view.dialogue){await tapUnlocked('#adventurePage [onclick*="advanceDialogue"]');return true;}
                     if(free.battle){
                         await wait('!battleActive||(battlePhase==="declare"&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex))','normal unlocked stage two/three input');
                         const current=await observe();if(!current.battle)return true;
-                        if(current.pending){await tap('#battleMonsterArea [id^="battleMonster"]');}
-                        else{await tap('#mainBattleMenu button[onclick*="normal"]');}
+                        if(current.pending){await tapUnlocked('#battleMonsterArea [id^="battleMonster"]');}
+                        else{await tapUnlocked('#mainBattleMenu button[onclick*="normal"]');}
                         return true;
                     }
-                    if(free.view.panel==='node-reward'){await tap('#adventurePage [onclick*="claimNodeReward"]');return true;}
-                    await tap('.adventure-sheet-actions > .adventure-button.primary');return true;
+                    if(free.view.panel==='node-reward'){await tapUnlocked('#adventurePage [onclick*="claimNodeReward"]');return true;}
+                    await tapUnlocked('.adventure-sheet-actions > .adventure-button.primary');return true;
                 }
                 await wait(`(()=>{if(!FourSymbolsAdventure.getView().tutorial.active||FourSymbolsAdventure.getView().firstLesson?.step==='finish-battle'||FourSymbolsAdventure.getView().state.onboarding.basicComplete&&['c1_02','c1_03'].includes(FourSymbolsAdventure.getView().state.currentNodeId))return true;if(battleActive&&!(battlePhase==='declare'&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)))return false;const g=document.getElementById('adventureInputGuide'),r=g?.querySelector('.adventure-guide-ring');if(!g||g.hidden||!r)return false;const n=g.querySelector('.adventure-guide-next:not([hidden]):not(:disabled)'),box=(n||r).getBoundingClientRect();if(r.hidden&&!n)return false;const hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return !!hit?.closest('button,[role="tab"],[data-item-id],[data-item-uid],[id^="battleMonster"],.ally-targetable');})()`,'formal manual turn and visible guide target, or completed onboarding');
                 const ready=await observe();if(!ready.view.tutorial.active||ready.view.firstLesson?.step==='finish-battle'||ready.view.state.onboarding.basicComplete&&['c1_02','c1_03'].includes(ready.view.state.currentNodeId))return false;
                 await captureStory();
                 if(ready.view.panel==='node-reward'&&ready.view.selectedNodeId==='c1_01'){assert.equal(ready.view.state.currentNodeId,'c1_02');assert.equal(ready.view.state.rewardClaims.c1_01,'ready');await capture('first-victory');}
+                if(ready.view.firstLesson?.step==='cast-intro'){
+                    await wait(`(()=>{const page=document.getElementById('battlePage'),ally=document.getElementById('battlePlayerCard0'),enemy=document.getElementById('battleMonster0');return !!page&&!page.classList.contains('v141-preparing-entry')&&[ally,enemy].every(e=>{if(!e)return false;const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&Number(s.opacity)>=.99&&s.visibility!=='hidden'&&s.display!=='none';});})()`,'original restored actors visible without replaying entry');
+                    await capture('first-battle-resumed');
+                }
                 const target=await guidePoint();
                 if(['技能已裝好，返回故事再挑戰。','技能已裝好，接回剛才的戰鬥。'].some(text=>target?.copy?.startsWith(text)))assert.equal(target.id,'adventureTutorialReturn','visible guide center must hit the original tutorial return button');
                 if(target.handler==="v169SwitchShopPage('equipment')")assert.equal(await client.eval('!!document.querySelector("#homeFeatureModal .v17345-equipment-shop")'),false,'fresh shop starts with the real potion category');
@@ -164,7 +172,6 @@ try{
                 if(before.view.firstLesson?.step==='cast-intro'){
                     assert.equal(before.turn,before.view.state.onboarding.battleCheckpoint.turn,'same retained round resumes');
                     assert.equal(await client.eval('document.getElementById("battleTurnIndicator").textContent'),'第'+before.turn+'回合','visible round agrees with the retained battle');
-                    await capture('first-battle-resumed');
                 }
                 if(before.battle){rounds.push(before);if(!lessonInitial)lessonInitial=before;}
                 if(before.view.panel==='node-reward'&&before.view.selectedNodeId==='c1_01'){

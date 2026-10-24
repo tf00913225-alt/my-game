@@ -5162,6 +5162,7 @@ function restoreFirstTutorialBattle(value,identity,onComplete){
     statisticsRestore=getBattleStatisticsOwner().restoreFirstTutorialSnapshot(restored.statistics,buildBattleStatisticsCombatant(0).id,token);
     if(!statisticsRestore?.rollback){throw new Error('Original statistics Owner refused checkpoint');}
     battleActive=true;autoBattle=false;
+        if(!window.v141AdoptRestoredBattleEntry?.(token)){throw new Error('Original battle presentation Owner refused restore');}
         window.FourSymbolsBattlefieldSlots?.clearActiveEnemySnapshot();renderBattle();showPage('battle');
         syncBattleAutoSettings();updateAutoButton();
         // Already-settled round-start/duration/RNG facts must not run again.
