@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.4899cadea887.js"
+      "build/boot-core.bbbaf3175142.js"
     ],
     "styles": [
       "build/boot-core.3c6f6f5d87d2.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.b12515cb7429.js"
+          "build/app-shell.23ba84773fc4.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -218,9 +218,9 @@
         "decode": false
       },
       {
-        "path": "build/boot-core.4899cadea887.js",
-        "sha256": "4899cadea887",
-        "bytes": 69999,
+        "path": "build/boot-core.bbbaf3175142.js",
+        "sha256": "bbbaf3175142",
+        "bytes": 69855,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -298,65 +298,65 @@
         "decode": false
       },
       {
-        "path": "assets/characters/female_earth.jpg",
-        "sha256": "263cdadc095c",
-        "bytes": 454737,
+        "path": "assets/characters/player_female_01.webp",
+        "sha256": "dc5058974a47",
+        "bytes": 1295046,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_fire.jpg",
-        "sha256": "9bf0580e1c04",
-        "bytes": 506412,
+        "path": "assets/characters/player_female_02.webp",
+        "sha256": "5cb04f00ce72",
+        "bytes": 1092118,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_water.jpg",
-        "sha256": "d1a903b2cbd6",
-        "bytes": 497357,
+        "path": "assets/characters/player_female_03.webp",
+        "sha256": "4cabe19a63af",
+        "bytes": 1250292,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_wind.jpg",
-        "sha256": "6600198db569",
-        "bytes": 414943,
+        "path": "assets/characters/player_female_04.webp",
+        "sha256": "907d2b62a1ba",
+        "bytes": 1284410,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_earth.jpg",
-        "sha256": "3fc06609e539",
-        "bytes": 479971,
+        "path": "assets/characters/player_male_01.webp",
+        "sha256": "d25acae6ab94",
+        "bytes": 1178648,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_fire.jpg",
-        "sha256": "a269c72a396d",
-        "bytes": 549452,
+        "path": "assets/characters/player_male_02.webp",
+        "sha256": "00eb785f7b0b",
+        "bytes": 1086984,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_water.jpg",
-        "sha256": "31696971afef",
-        "bytes": 568385,
+        "path": "assets/characters/player_male_03.webp",
+        "sha256": "2946ba0e51ed",
+        "bytes": 1170932,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_wind.jpg",
-        "sha256": "6f5127957346",
-        "bytes": 486566,
+        "path": "assets/characters/player_male_04.webp",
+        "sha256": "5fa20547517b",
+        "bytes": 1125640,
         "priority": "P1",
         "type": "image",
         "decode": true
@@ -562,19 +562,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.23ba84773fc4.js",
+        "sha256": "23ba84773fc4",
+        "bytes": 1210428,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.801bc1a9895d.css",
         "sha256": "801bc1a9895d",
         "bytes": 90552,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.b12515cb7429.js",
-        "sha256": "b12515cb7429",
-        "bytes": 1210384,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -826,18 +826,18 @@
         "decode": false
       }
     ],
-    "manifestHash": "98e44a8b522a",
-    "totalBytes": 24095724,
+    "manifestHash": "537ed912a1ad",
+    "totalBytes": 29621871,
     "totalResources": 79
   },
   "assets": {
-    "build/boot-core.4899cadea887.js": {
-      "sha256": "4899cadea887",
-      "bytes": 69999
+    "build/boot-core.bbbaf3175142.js": {
+      "sha256": "bbbaf3175142",
+      "bytes": 69855
     },
-    "build/app-shell.b12515cb7429.js": {
-      "sha256": "b12515cb7429",
-      "bytes": 1210384
+    "build/app-shell.23ba84773fc4.js": {
+      "sha256": "23ba84773fc4",
+      "bytes": 1210428
     },
     "build/gameplay-core-primary.bbae81db5076.js": {
       "sha256": "bbae81db5076",
