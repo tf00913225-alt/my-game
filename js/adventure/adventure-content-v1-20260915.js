@@ -1215,7 +1215,8 @@ const rewards={
     ]
   },
   "story_first_growth": {
-    "sharedExp": 15
+    "sharedExp": 15,
+    "firstTutorialSharedExp": 300
   },
   "story_starter_gear": {
     "starterEquipmentFunding": "leatherArmor"
