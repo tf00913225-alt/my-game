@@ -63,6 +63,7 @@ function runtime(saved,initialSave=true){
         setTimeout(){},clearTimeout(){},setInterval(){return 1;},clearInterval(){},addEventListener(){},alert(){},
         saveGame(){if(saveMode==="throw")throw Error("save denied");if(!saveMode)return false;stored=JSON.parse(JSON.stringify(player.adventureProgress));return true;},
         updateUI(){},updateGoldDisplay(){},rebuildInventorySlots(){},showPage(){},
+        openHomeFeature(type){if(type==='character'){c.renderSkillLoadout?.();}},switchCharacterTab(){},closeHomeFeature(){},
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,
         getPartyBattleStats:()=>({maxHP:100,maxSP:40,attack:15,magicAttack:10,defense:5}),
         MonsterBalance:{build:spec=>({...spec,hp:50,maxHP:50,sp:0,maxSP:0})},
@@ -495,8 +496,9 @@ test('the final loaded v141 renderer marks exact item identity and its read-only
     assert.ok(children.every(child=>!child.dataset.itemId));c.setInventoryFilter('item');assert.equal(children[0].dataset.itemId,'hpPotion10');assert.equal(label.textContent,'1 / 5');
 });
 
-test("guide capture requires the real attack then target and releases locks when onboarding ends",()=>{
+for(const flow of ['legacy','first-v3'])test(`guide ${flow} requires the real attack then target and releases locks when onboarding ends`,()=>{
     const h=guideHarness(),attack=h.element(),enemy=h.element(),unrelated=h.element();let attacks=0,selected=0,other=0;
+    if(flow==='first-v3')h.view.firstLesson={step:'attack',battleActive:true,hasCheckpoint:true};
     attack.action=()=>{attacks++;h.c.pendingAction="normal";h.c.actionReady=true;};enemy.action=()=>{selected++;h.c.pendingAction=null;h.c.battlePhase="resolve";};unrelated.action=()=>{other++;};
     h.targets.set('#mainBattleMenu button[onclick*="normal"]',[attack]);h.targets.set('#battleMonsterArea [id^="battleMonster"]',[enemy]);
     h.frame();assert.equal(h.overlay().hidden,false);assert.equal(attacks,0,'guide never executes the highlighted action');
@@ -786,4 +788,117 @@ test("a genuine retained mission objective turns in and claims once after story 
     const committed=JSON.stringify(h.c.player.adventureProgress),goldAfter=h.c.gold;
     assert.equal(h.api.claimNodeReward("n05_commission"),false);assert.equal(h.api.turnInObjective("n05_commission"),false);
     assert.equal(h.c.gold,goldAfter);assert.equal(JSON.stringify(h.c.player.adventureProgress),committed);
+});
+
+// Story transaction boundary uses an explicit Core double. The real Core DTO,
+// ledger and rollback are independently exercised in chapter1-battle-checkpoint.
+function firstLessonHarness(){
+    const h=runtime();h.api.getView();
+    assert.equal(h.state().onboarding.flowVersion,3);
+    assert.equal(h.api.startFreshStory(),true);finishDialogue(h);
+    assert.equal(h.launches(),1);
+    h.c.turn=1;let restores=0,suspends=0;
+    h.c.FourSymbolsBattleFlow={
+        checkpointFirstTutorialBattle(identity,commit,suspend){
+            const dto={version:1,battleId:identity.battleId,sequence:h.c.turn,turn:h.c.turn,startedAt:123};
+            if(!commit(dto))return false;
+            if(suspend){suspends++;h.c.battleActive=false;}return true;
+        },
+        restoreFirstTutorialBattle(dto,identity){
+            assert.equal(dto.battleId,identity.battleId);assert.equal(h.c.battleActive,false);
+            restores++;h.c.battleActive=true;h.c.turn=dto.turn;return true;
+        }
+    };
+    return Object.assign(h,{restores:()=>restores,suspends:()=>suspends});
+}
+function finishNormalPractice(h){
+    assert.equal(h.api.advanceFirstLesson(),false,'no input before initial safe checkpoint');
+    assert.equal(h.api.syncFirstLesson(),true);
+    assert.equal(h.api.advanceFirstLesson(),true);
+    h.c.turn=2;return h.api.syncFirstLesson();
+}
+test('fresh normal practice commits one early EXP receipt before personal upgrade and resumes the same battle',()=>{
+    const h=firstLessonHarness();assert.equal(finishNormalPractice(h),true);
+    assert.equal(h.c.sharedExp,300);assert.equal(h.state().rewardClaims.c1_01,'claimed');
+    assert.equal(h.state().onboarding.firstBattleStep,'city-intro');assert.equal(h.suspends(),1);
+    for(let i=0;i<4;i++)h.api.syncFirstLesson();assert.equal(h.c.sharedExp,300);
+    assert.equal(h.api.advanceFirstLesson(),true);assert.equal(h.api.observeFirstLessonPage('character'),true);
+    assert.equal(h.api.advanceFirstLesson(),true);assert.equal(h.api.observeFirstLessonPage('expPool'),true);
+    assert.equal(h.api.advanceFirstLesson(),true);assert.equal(h.api.syncFirstLesson(),false,'preview cannot authorize upgrade');
+    h.c.player.level=2;h.c.player.attributePoints=5;h.c.player.skillPoints=2;
+    assert.equal(h.api.syncFirstLesson(),true);assert.equal(h.api.observeFirstLessonPage('status'),true);
+    assert.equal(h.api.advanceFirstLesson(),true);assert.equal(h.c.player.attributePoints,5,'attribute intro never spends points');
+    assert.equal(h.api.observeFirstLessonPage('skill'),true);assert.equal(h.api.advanceFirstLesson(),true);
+    h.c.characterSkillLoadouts.fire.skillLevels.lessonSkill=1;assert.equal(h.api.syncFirstLesson(),false);
+    h.c.characterSkillLoadouts.fire.equippedSkills.push('lessonSkill');assert.equal(h.api.syncFirstLesson(),true);
+    assert.equal(h.api.returnFromTutorial(),true);assert.equal(h.restores(),1);assert.equal(h.launches(),1);
+    assert.equal(h.c.sharedExp,300);assert.equal(h.c.player.attributePoints,5);
+});
+for(const failure of [false,'throw'])test(`early EXP/checkpoint save ${failure} rolls back together and leaves live battle`,()=>{
+    const h=firstLessonHarness();h.api.syncFirstLesson();h.api.advanceFirstLesson();
+    const before=JSON.stringify(h.state());h.c.turn=2;h.save(failure);
+    assert.equal(h.api.syncFirstLesson(),false);assert.equal(JSON.stringify(h.state()),before);
+    assert.equal(h.c.sharedExp,0);assert.equal(h.c.battleActive,true);assert.equal(h.suspends(),0);
+    h.save(true);assert.equal(h.api.syncFirstLesson(),true);assert.equal(h.c.sharedExp,300);
+});
+for(const kind of ['claimed','already-levelled'])test(`early teaching EXP does not duplicate ${kind} state`,()=>{
+    const h=firstLessonHarness();if(kind==='claimed')h.state().rewardClaims.c1_01='claimed';else h.c.player.level=2;
+    assert.equal(finishNormalPractice(h),true);assert.equal(h.c.sharedExp,0);
+});
+test('completed first basic lesson releases city navigation on stages two/three while retaining later teaching',()=>{
+    const h=runtime();h.api.getView();const o=h.state().onboarding;o.basicComplete=true;
+    for(const id of ['c1_02','c1_03']){h.state().currentNodeId=id;assert.equal(h.api.closeToCity(),true);}
+    h.state().currentNodeId='c1_04';assert.equal(h.api.closeToCity(),false);
+});
+
+test('fresh creation entry retains the versioned first battle identity and retained page reopen does not launch or reward',()=>{
+    const h=firstLessonHarness();const identity=h.state().onboarding.battleId;
+    assert.equal(finishNormalPractice(h),true);const saved=h.stored(),dto=JSON.stringify(h.state().onboarding.battleCheckpoint);
+    const reloaded=runtime(saved);reloaded.c.sharedExp=300;
+    assert.equal(reloaded.api.open({story:true}),true);
+    assert.equal(reloaded.state().onboarding.battleId,identity);
+    assert.equal(JSON.stringify(reloaded.state().onboarding.battleCheckpoint),dto);
+    assert.equal(reloaded.launches(),0);assert.equal(reloaded.c.sharedExp,300);
+    assert.equal(reloaded.state().rewardClaims.c1_01,'claimed');
+    assert.equal(reloaded.api.startFreshStory(),false,'already consumed creation intent cannot start a second first battle');
+});
+for(const outcome of ['win','lose','escape'])for(const saveMode of [true,false,'throw'])test(`first battle ${outcome} terminal with save ${saveMode} preserves receipt and honest continuation`,()=>{
+    const h=firstLessonHarness();finishNormalPractice(h);
+    h.c.player.level=2;h.c.characterSkillLoadouts.fire={skillLevels:{lessonSkill:1},equippedSkills:['lessonSkill']};
+    h.state().onboarding.firstBattleStep='return';assert.equal(h.api.returnFromTutorial(),true);
+    const durable=h.stored();h.save(saveMode);h.finish(outcome);
+    assert.equal(h.c.sharedExp,300,'terminal cannot award the first teaching source again');
+    assert.equal(h.state().rewardClaims.c1_01,'claimed');
+    if(saveMode!==true){
+        assert.equal(h.state().completedNodes.c1_01,undefined,'refused save never claims completion');
+        assert.deepEqual(h.stored(),durable,'the last accepted checkpoint is the only durable continuation');
+        assert.ok(h.state().onboarding.battleCheckpoint,'refused terminal commit cannot claim checkpoint consumption');
+        return;
+    }
+    assert.equal(h.state().onboarding.battleCheckpoint,undefined,'accepted terminal cannot restore the old live encounter');
+    const reopened=runtime(h.stored());reopened.c.player.level=2;reopened.c.sharedExp=300;
+    assert.equal(reopened.api.open({story:true}),true,'accepted terminal always has an original visible continuation');
+    assert.equal(reopened.launches(),0,'reopen never silently launches another battle');assert.equal(reopened.c.sharedExp,300);
+    if(outcome==='win'){
+        assert.equal(reopened.state().currentNodeId,'c1_02');assert.equal(reopened.state().onboarding.basicComplete,true);
+    }else{
+        assert.equal(reopened.state().currentNodeId,'c1_01');assert.equal(reopened.state().onboarding.phase,'retry');
+        assert.equal(reopened.state().completedNodes.c1_01,undefined);
+    }
+});
+test('guide reveals the same character action again after the EXP Owner restores its earlier viewport',()=>{
+    const h=guideHarness(),confirm=h.element(),scroller=h.element();let reveals=0,clipped=true;
+    h.c.battleActive=false;h.view.firstLesson={step:'upgrade',battleActive:false};
+    scroller.getBoundingClientRect=()=>({top:100,bottom:400,left:0,right:300,width:300,height:300});
+    confirm.closest=selector=>selector==='#characterTabContent'?scroller:null;
+    confirm.getBoundingClientRect=()=>({left:20,right:100,width:80,height:40,top:clipped?440:300,bottom:clipped?480:340});
+    confirm.scrollIntoView=()=>{reveals++;clipped=false;};
+    h.targets.set('#expDistributeList .v131-exp-confirm:not(:disabled)',[confirm]);
+    h.frame();assert.equal(reveals,1);
+    // The original preview Owner's deferred viewport restore changes geometry,
+    // without replacing or disabling the already selected confirm DOM node.
+    clipped=true;h.frame();assert.equal(reveals,2,'same DOM action must become visible again');
+    assert.equal(h.dispatch('click',confirm).stopped,false);
+    h.frame();assert.equal(reveals,2,'stable visible action must not keep scrolling');
+    h.view.tutorial.active=false;clipped=true;h.frame();assert.equal(reveals,2,'completed segment releases reveal ownership');
 });

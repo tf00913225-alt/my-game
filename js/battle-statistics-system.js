@@ -235,6 +235,29 @@
         }
         return null;
     }
+    // Restore the original ledger, never reconstruct totals from HP. This
+    // deliberately admits only the first-character teaching checkpoint.
+    function validateFirstTutorialSnapshot(value,expectedId){
+        const fields=['id','kind','side','battleIndex','name','portrait','damageDealt','healingDone','damageTaken','criticalHits'];
+        const row=value?.combatants?.[0];
+        return !!value&&Object.keys(value).every(key=>['battleToken','active','result','combatants'].includes(key))&&
+            value.active===true&&value.result===null&&
+            Array.isArray(value.combatants)&&value.combatants.length===1&&!!row&&
+            row.id===expectedId&&row.kind==='playerCharacter'&&row.side==='ally'&&row.battleIndex===0&&
+            Object.keys(row).every(key=>fields.includes(key))&&typeof row.name==='string'&&typeof row.portrait==='string'&&
+            ['damageDealt','healingDone','damageTaken','criticalHits'].every(key=>Number.isFinite(row[key])&&row[key]>=0)&&
+            Number.isInteger(row.criticalHits);
+    }
+    function restoreFirstTutorialSnapshot(value,expectedId,battleToken){
+        if(!validateFirstTutorialSnapshot(value,expectedId)){return false;}
+        const previous={session,finalSnapshot,bossMechanisms,openDrawer};
+        const rollback=()=>{({session,finalSnapshot,bossMechanisms,openDrawer}=previous);};
+        try{
+            closeBattleDrawer();bossMechanisms=[];finalSnapshot=null;
+            session={battleToken,active:true,result:null,combatants:new Map(value.combatants.map(row=>[row.id,copy(row)]))};
+            syncBattleEntryVisibility();return Object.freeze({rollback});
+        }catch(error){rollback();throw error;}
+    }
     function setBossMechanisms(cards){
         bossMechanisms=(Array.isArray(cards)?cards:[]).map((item,index)=>({
             id:String(item&&item.id||("mechanism-"+index)),
@@ -263,6 +286,8 @@
         getSnapshot:function(){ const value=currentSnapshot();return value&&copy(value); },
         getFinalSnapshot:function(){ return finalSnapshot&&copy(finalSnapshot); },
         getCombatantIdByBattleIndex:getCombatantIdByBattleIndex,
+        validateFirstTutorialSnapshot:validateFirstTutorialSnapshot,
+        restoreFirstTutorialSnapshot:restoreFirstTutorialSnapshot,
         setBossMechanisms:setBossMechanisms,
         clearBossMechanisms:clearBossMechanisms,
         openBossMechanisms:function(){ return openBattleDrawer("boss"); },

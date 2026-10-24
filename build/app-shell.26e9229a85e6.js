@@ -5042,8 +5042,154 @@ if(typeof window!=="undefined"){
     });
 }
 
+// A UID-local teaching checkpoint, not a general battle replay/Cloud source.
+// Only a fully settled declaration boundary with zero pending intents is
+// admitted. Restoring never calls launch/startTurn or replays a boundary.
+const FIRST_TUTORIAL_MONSTER_FIELDS=[
+    'name','portraitName','monsterKey','portraitKey','level','element','rank','mode','tutorialEncounter',
+    'hp','maxHP','sp','maxSP','attack','magicAttack','defense','agility','speed','accuracy','evasion',
+    'criticalChance','skillIds','skillChance','statusEffects','activeBuffs','alive','vAdventure','vAdventureEncounterId'
+];
+function firstTutorialContext(identity){
+    const uid=window.FourSymbolsAccountSave?.getActiveUid?.();
+    const state=player?.adventureProgress?.chapters?.chapter_v1,onboarding=state?.onboarding;
+    const profile=window.FourSymbolsAdventureContent?.tutorialEncounters?.tutorial_1;
+    if(!profile||!uid||uid!==window.FourSymbolsStartupPolicy?.getUid?.()||identity?.uid!==uid||
+       !onboarding?.active||onboarding.source!=='new-character'||onboarding.flowVersion!==3||
+       state.currentNodeId!=='c1_01'||state.completedNodes.c1_01||
+       typeof identity.battleId!=='string'||identity.battleId.length<8||identity.battleId.length>100||
+       onboarding.battleId!==identity.battleId||getExistingPartyIndexes().length!==1||heroBattleCombatants.length){return null;}
+    return {uid,state,onboarding,sourceProfile:JSON.stringify(profile)};
+}
+function firstTutorialSafeBoundary(identity){
+    const context=firstTutorialContext(identity),run=window.v132ActiveDungeonRun;
+    if(!context||!battleActive||!run||run.mode!=='adventure'||!run.tutorial||run.adventureNodeId!=='c1_01'||
+       battlePhase!=='declare'||actionReady||pendingAction!==null||battleAdvanceScheduled||battleEscapePendingToken!==null||
+       battlePresentationLocks.size||battleAutoActionResume||battleInputResumeToken!==null||battleResolutionResumeToken!==null||
+       activeBattleStatisticsAction||(battleDurationAction&&!battleDurationAction.completed)||
+       resolutionPhaseStarted||turnAdvancePending||Object.keys(queuedPlayerActions).length||
+       initiativeIndex<initiativeQueue.length||currentBattleMonsters.length!==1||currentBattleMonsters[0]!==0||
+       !monsters[0]?.alive||monsters[0].monsterKey!=='tutorial.c1_01'||monsters[0].hp<=0||battleWaveState||player.isDefending!==false){return null;}
+    return context;
+}
+function validateFirstTutorialCheckpoint(value,identity){
+    const context=firstTutorialContext(identity),row=value?.roster?.[0],party=value?.party;
+    const stats=getBattleStatisticsOwner(),combatant=buildBattleStatisticsCombatant(0);
+    const fields=['version','source','sourceProfile','uid','battleId','sequence','turn','startedAt','roster','party','boundaries','statistics'];
+    if(!context||!value||Object.keys(value).some(key=>!fields.includes(key))||value.version!==1||value.source!=='chapter1-first-tutorial'||value.uid!==context.uid||
+       value.sourceProfile!==context.sourceProfile||value.battleId!==identity.battleId||!Number.isSafeInteger(value.sequence)||value.sequence<1||
+       !Number.isSafeInteger(value.turn)||value.turn<1||value.turn>1000||!Number.isFinite(value.startedAt)||value.startedAt<0||
+       !Array.isArray(value.roster)||value.roster.length!==1||!row||
+       Object.keys(row).some(key=>!FIRST_TUTORIAL_MONSTER_FIELDS.includes(key))||
+       row.monsterKey!=='tutorial.c1_01'||row.mode!=='tutorial'||row.tutorialEncounter!==true||row.alive!==true||
+       row.vAdventure!==true||row.vAdventureEncounterId!=='tutorial_1'||row.rank!=='regular'||
+       !['fire','water','wind','earth'].includes(row.element)||!Number.isInteger(row.level)||row.level<1||
+       !['name','portraitName','portraitKey'].every(key=>typeof row[key]==='string')||
+       !['hp','maxHP','sp','maxSP','attack','magicAttack','defense','agility','speed','accuracy','evasion','criticalChance','skillChance','level']
+           .every(key=>Number.isFinite(row[key])&&row[key]>=0)||row.hp<=0||row.hp>row.maxHP||row.sp>row.maxSP||
+       !Array.isArray(row.statusEffects)||row.statusEffects.length||!Array.isArray(row.activeBuffs)||row.activeBuffs.length||
+       !Array.isArray(row.skillIds)||row.skillIds.length||
+       !party||Array.isArray(party)||Object.keys(party).some(key=>!['hp','sp','statusEffects','activeBuffs','isDefending'].includes(key))||
+       !Number.isFinite(party.hp)||party.hp<=0||!Number.isFinite(party.sp)||party.sp<0||
+       !Array.isArray(party.statusEffects)||party.statusEffects.length||!Array.isArray(party.activeBuffs)||party.activeBuffs.length||party.isDefending!==false||
+       !Array.isArray(value.boundaries)||value.boundaries.some(key=>!/^round_(start|end):[1-9][0-9]*$/.test(key))||
+       value.boundaries.length!==2*value.turn-1||new Set(value.boundaries).size!==value.boundaries.length||
+       !Array.from({length:value.turn},(_,index)=>'round_start:'+(index+1)).every(key=>value.boundaries.includes(key))||
+       !Array.from({length:value.turn-1},(_,index)=>'round_end:'+(index+1)).every(key=>value.boundaries.includes(key))||
+       !stats?.validateFirstTutorialSnapshot?.(value.statistics,combatant?.id)){return false;}
+    try{return JSON.stringify(value).length<=32768;}catch(_){return false;}
+}
+function clearFirstTutorialPendingWork(){
+    clearInterval(timerId);timerId=null;
+    if(battleAdvanceTimeoutId){clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;}
+    clearBattleActionWatchdog();clearBattleRoundPrompt();clearBattleActionNotice();
+    battleAdvanceScheduled=false;battleInputResumeToken=null;battleResolutionResumeToken=null;battleAutoActionResume=null;
+    actionReady=false;pendingAction=null;activeBattleStatisticsAction=null;battleDurationAction=null;
+    closeMenus();clearBattleTargetSelectionMode();
+}
+function checkpointFirstTutorialBattle(identity,commit,suspend=false){
+    const context=firstTutorialSafeBoundary(identity);
+    if(!context||typeof commit!=='function'){return false;}
+    const run=window.v132ActiveDungeonRun,stats=getBattleStatisticsOwner();
+    const roster=[Object.fromEntries(FIRST_TUTORIAL_MONSTER_FIELDS.filter(key=>key in monsters[0]).map(key=>[key,monsters[0][key]]))];
+    let snapshot;
+    try{snapshot=JSON.parse(JSON.stringify({version:1,source:'chapter1-first-tutorial',sourceProfile:context.sourceProfile,uid:context.uid,battleId:identity.battleId,
+        sequence:(context.onboarding.battleCheckpoint?.sequence||0)+1,turn,startedAt:run.startedAt,roster,
+        party:{hp:player.hp,sp:player.sp,statusEffects:player.statusEffects,activeBuffs:player.activeBuffs,isDefending:player.isDefending},
+        boundaries:Array.from(battleRoundBoundaryKeys).map(key=>key.split(':').slice(1).join(':')),
+        statistics:stats?.getSnapshot?.()}));}catch(_){return false;}
+    if(!validateFirstTutorialCheckpoint(snapshot,identity)){return false;}
+    const release=window.FourSymbolsBattleFlow.acquirePauseLock('chapter1-checkpoint');
+    let accepted=false;
+    try{accepted=commit(JSON.parse(JSON.stringify(snapshot)))===true;}
+    catch(error){console.error('首關 checkpoint 未保存。',error);}
+    finally{if(!accepted){release();}}
+    if(!accepted){return false;}
+    if(!suspend){release();return true;}
+    // Save acceptance precedes teardown. No victory/loss, reward or new battle
+    // event is emitted; the original statistics ledger remains in the DTO.
+    clearFirstTutorialPendingWork();battleActive=false;battleToken++;
+    battlePresentationLocks.clear();battleInputGuideHolds.clear();battleEscapePendingToken=null;
+    monsters=run.previousMonsters;currentZone=run.previousZone;window.v132ActiveDungeonRun=null;
+    release();return true;
+}
+function restoreFirstTutorialBattle(value,identity,onComplete){
+    if(battleActive||window.v132ActiveDungeonRun||typeof onComplete!=='function'||!validateFirstTutorialCheckpoint(value,identity)){return false;}
+    const context=firstTutorialContext(identity),retained=context.onboarding.battleCheckpoint;
+    // An old, consumed or different-generation DTO cannot revive a battle.
+    if(!retained||JSON.stringify(retained)!==JSON.stringify(value)){return false;}
+    const original={monsters,currentZone,hp:player.hp,sp:player.sp,statusEffects:player.statusEffects,activeBuffs:player.activeBuffs,isDefending:player.isDefending,
+        core:{currentBattleMonsters,selectedMonster,turn,autoBattle,battlePhase,activeBattleCharacterIndex,battleRoundBoundaryKeys,
+            battleWaveState,battleEscapePendingToken,initiativeQueue,initiativeIndex,processedInitiativeIndexes,queuedPlayerActions,
+            resolutionPhaseStarted,turnAdvancePending,declaredCharacterIndexes,battleInputResumeToken,battleResolutionResumeToken,battleAutoActionResume},
+        locks:Array.from(battlePresentationLocks),holds:Array.from(battleInputGuideHolds),
+        page:typeof document!=='undefined'?document.querySelector?.('.page.active')?.id:null};
+    const restored=JSON.parse(JSON.stringify(value)),token=battleToken+1;
+    let statisticsRestore;
+    try{
+    clearFirstTutorialPendingWork();battleToken=token;
+    monsters=restored.roster;currentBattleMonsters=[0];currentZone='dungeon';selectedMonster=0;turn=restored.turn;
+    battleRoundBoundaryKeys=new Set(restored.boundaries.map(key=>token+':'+key));
+    battlePresentationLocks.clear();battleInputGuideHolds.clear();battleEscapePendingToken=null;battleWaveState=null;
+    initiativeQueue=[];initiativeIndex=0;processedInitiativeIndexes=new Set();queuedPlayerActions={};
+    resolutionPhaseStarted=false;turnAdvancePending=false;declaredCharacterIndexes=new Set();
+    const limits=getPartyBattleStats(0);
+    player.hp=Math.min(restored.party.hp,limits.maxHP);player.sp=Math.min(restored.party.sp,limits.maxSP);
+    player.statusEffects=restored.party.statusEffects;player.activeBuffs=restored.party.activeBuffs;player.isDefending=false;
+    window.v132ActiveDungeonRun={identityVersion:1,mode:'adventure',gameplayMode:null,dailyDungeonType:null,
+        previousMonsters:original.monsters,previousZone:original.currentZone,onComplete,normalizeFailureResources:false,
+        tutorial:true,startedAt:restored.startedAt,adventure:true,adventureNodeId:'c1_01'};
+    statisticsRestore=getBattleStatisticsOwner().restoreFirstTutorialSnapshot(restored.statistics,buildBattleStatisticsCombatant(0).id,token);
+    if(!statisticsRestore?.rollback){throw new Error('Original statistics Owner refused checkpoint');}
+    battleActive=true;autoBattle=false;
+        if(!window.v141AdoptRestoredBattleEntry?.(token)){throw new Error('Original battle presentation Owner refused restore');}
+        window.FourSymbolsBattlefieldSlots?.clearActiveEnemySnapshot();renderBattle();showPage('battle');
+        syncBattleAutoSettings();updateAutoButton();
+        // Already-settled round-start/duration/RNG facts must not run again.
+        beginBattleRoundDeclaration(token);
+        const turnIndicator=$("battleTurnIndicator");
+        if(turnIndicator){turnIndicator.textContent="第"+turn+"回合"+battleWaveHudText();}
+        return true;
+    }catch(error){
+        clearFirstTutorialPendingWork();battleActive=false;battleToken++;window.v132ActiveDungeonRun=null;
+        statisticsRestore?.rollback();
+        monsters=original.monsters;currentZone=original.currentZone;
+        ({currentBattleMonsters,selectedMonster,turn,autoBattle,battlePhase,activeBattleCharacterIndex,battleRoundBoundaryKeys,
+            battleWaveState,battleEscapePendingToken,initiativeQueue,initiativeIndex,processedInitiativeIndexes,queuedPlayerActions,
+            resolutionPhaseStarted,turnAdvancePending,declaredCharacterIndexes,battleInputResumeToken,battleResolutionResumeToken,battleAutoActionResume}=original.core);
+        battlePresentationLocks.clear();original.locks.forEach(lock=>battlePresentationLocks.add(lock));
+        battleInputGuideHolds.clear();original.holds.forEach(hold=>battleInputGuideHolds.add(hold));
+        Object.assign(player,{hp:original.hp,sp:original.sp,statusEffects:original.statusEffects,activeBuffs:original.activeBuffs,isDefending:original.isDefending});
+        if(original.page){try{showPage(original.page.replace(/Page$/,''));}catch(_){/* caller retains its recovery view */}}
+        console.error('首關戰鬥續接未完成；保留原 checkpoint。',error);return false;
+    }
+}
+
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
+        checkpointFirstTutorialBattle:checkpointFirstTutorialBattle,
+        restoreFirstTutorialBattle:restoreFirstTutorialBattle,
+        validateFirstTutorialCheckpoint:validateFirstTutorialCheckpoint,
         subscribeActionFinished(observer){
             if(typeof observer!=="function"){ return function(){}; }
             battleActionFinishObservers.add(observer);
@@ -36304,7 +36450,8 @@ window.FourSymbolsItemAcquisitionData={
       ]
     },
     "story_first_growth": {
-      "sharedExp": 15
+      "sharedExp": 15,
+      "firstTutorialSharedExp": 300
     },
     "story_starter_gear": {
       "starterEquipmentFunding": "leatherArmor"

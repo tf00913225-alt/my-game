@@ -18,6 +18,8 @@
     const OBJECTIVE_POLL_MS=750;
     const BATTLE_RESOURCE_POLL_MS=80;
     const PENDING_BATTLE_POLL_MS=200;
+    const FIRST_LESSON_STEPS=['attack-intro','attack','city-intro','city','character-intro','exp-tab','exp-intro','upgrade',
+        'status-tab','status-intro','skill-tab','skill-intro','skill','return','cast-intro','cast','finish-battle','complete'];
     const runtime={
         visible:false,
         activePanel:"map",
@@ -29,7 +31,8 @@
         battleWasActive:false,
         pendingBattleTimer:null,
         dialogue:null,
-        tutorialSkillUsed:false
+        tutorialSkillUsed:false,
+        firstLessonCommitting:false
     };
 
     function numeric(value,fallback=0){
@@ -131,6 +134,17 @@
                 const lines=cursor.phase==="ending"?chapter.ending:cursor.phase==="guidance"?node?.guidance:node?.dialogue;
                 if(!node||!["before","guidance","ending"].includes(cursor.phase)||!Number.isInteger(cursor.lineIndex)||!lines||cursor.lineIndex<0||cursor.lineIndex>=lines.length){throw new Error("Adventure dialogue requires recovery.");}
             }
+            const o=state.onboarding;
+            if(o.flowVersion!==undefined&&(o.flowVersion!==3||o.source!=='new-character'||
+               !FIRST_LESSON_STEPS.includes(o.firstBattleStep)||typeof o.battleId!=='string'||o.battleId.length<8||
+               !Number.isInteger(o.startingLevel)||o.startingLevel<1)){
+                throw new Error('Adventure first lesson requires recovery.');
+            }
+            if(o.flowVersion===3&&o.battleCheckpoint&&
+               (o.battleCheckpoint.version!==1||o.battleCheckpoint.battleId!==o.battleId||
+                !Number.isSafeInteger(o.battleCheckpoint.sequence)||o.battleCheckpoint.sequence<1)){
+                throw new Error('Adventure first battle checkpoint requires recovery.');
+            }
         }
     }
     function ensureState(options){
@@ -156,7 +170,9 @@
             const raw=root.chapters[chapter.id];
             const normalized=normalizeChapterState(raw,chapter);
             root.chapters[chapter.id]=normalized;
-            if(root.pendingStoryOpening===true&&!raw){normalized.onboarding={active:true,phase:"story",nodeId:chapter.startNodeId,source:"new-character"};}
+            if(root.pendingStoryOpening===true&&!raw){normalized.onboarding={active:true,phase:"story",nodeId:chapter.startNodeId,source:"new-character",
+                flowVersion:3,firstBattleStep:'attack-intro',startingLevel:integer(owner.level,1),
+                battleId:'c1-first-'+(window.crypto?.randomUUID?.()||now())};}
             if(!normalized.hidden.rolled){
                 normalized.hidden.rolled=true;
                 normalized.hidden.merchantAppears=Math.random()<clamp(numeric(chapter.merchantAppearanceChance,.25),0,1);
@@ -409,6 +425,10 @@
             state.completedNodes[node.id]={completedAt:now()};
             if(opts.rewardReady!==false){ markRewardReady(state,node); }
             if(node.grantsStoryKey){state.storyKeys[node.grantsStoryKey]={sourceNodeId:node.id};}
+            if(node.id==='c1_01'&&state.onboarding.flowVersion===3){
+                state.onboarding.firstBattleStep='complete';state.onboarding.basicComplete=true;
+                delete state.onboarding.battleCheckpoint;
+            }
         }
         if(!state.chapterCompleted&&state.currentNodeId===node.id&&node.next){ state.currentNodeId=node.next; }
         if(!state.chapterCompleted&&node.type==="branch"&&opts.nextNodeId){ state.currentNodeId=opts.nextNodeId; }
@@ -475,6 +495,11 @@
         const opts=options||{};
         if(opts.chapterId&&CONTENT.chapters[opts.chapterId]){ root.activeChapterId=opts.chapterId; }
         const state=chapterState();
+        if(firstLessonState()&&state.onboarding.battleCheckpoint&&!state.dialogue){return restoreFirstLessonPage();}
+        if(firstLessonState()&&state.onboarding.phase==='battle'&&!state.onboarding.battleCheckpoint&&
+           !(typeof battleActive!=='undefined'&&battleActive)){
+            showMessage('尚無可安全續接的戰鬥紀錄，請保留原存檔。');return false;
+        }
         if(state?.onboarding?.active&&state.onboarding.requiredAction==="recovery"&&state.currentNodeId==="c1_05"&&!state.rewardClaims.c1_05){
             if(!commitChange(()=>{markRewardReady(state,nodeById(chapterDefinition(),"c1_05"));})){return false;}
         }
@@ -504,7 +529,7 @@
 
     function closeToCity(){
         const state=chapterState();
-        if(state?.onboarding?.active){
+        if(state?.onboarding?.active&&!(state.onboarding.flowVersion===3&&state.onboarding.basicComplete&&['c1_02','c1_03'].includes(state.currentNodeId))){
             if(state.onboarding.requiredAction){runtime.activePanel="tutorial";render();}
             else{startStory(state.currentNodeId);}
             return false;
@@ -630,6 +655,99 @@
         const owner=playerOwner();
         return typeof characterSkillLoadouts!=="undefined"&&owner?characterSkillLoadouts[getPartyCharacterKey(0)]:null;
     }
+    function firstLessonState(){
+        const state=chapterState(),o=state?.onboarding;
+        return o?.active&&o.flowVersion===3&&o.phase!=='retry'&&state.currentNodeId==='c1_01'&&o.firstBattleStep!=='complete'?o:null;
+    }
+    function firstLessonIdentity(){
+        const o=firstLessonState();return o?{uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:o.battleId}:null;
+    }
+    function commitFirstLesson(change){
+        if(runtime.firstLessonCommitting||!firstLessonState()){return false;}
+        runtime.firstLessonCommitting=true;
+        try{return commitChange(()=>change(chapterState(),firstLessonState())!==false);}
+        finally{runtime.firstLessonCommitting=false;}
+    }
+    function firstLessonView(){
+        const o=firstLessonState(),owner=playerOwner();
+        return o?{step:o.firstBattleStep,level:owner.level,attributePoints:owner.attributePoints,
+            nativeElement:owner.element,skillReady:hasTutorialAction('skill'),
+            hasCheckpoint:!!o.battleCheckpoint,battleActive:typeof battleActive!=='undefined'&&battleActive}:null;
+    }
+    function advanceFirstLesson(){
+        const o=firstLessonState();if(!o){return false;}
+        if(o.firstBattleStep==='attack-intro'&&!o.battleCheckpoint){return false;}
+        const next={'attack-intro':'attack','city-intro':'city','character-intro':'exp-tab','exp-intro':'upgrade',
+            'status-intro':'skill-tab','skill-intro':'skill','cast-intro':'cast'}[o.firstBattleStep];
+        if(!next){return false;}
+        if(o.firstBattleStep==='cast-intro'&&!(typeof battleActive!=='undefined'&&battleActive)&&!resumeFirstLessonBattle()){return false;}
+        return commitFirstLesson((state,current)=>{current.firstBattleStep=next;});
+    }
+    function observeFirstLessonPage(page){
+        const o=firstLessonState();if(!o){return false;}
+        const next={city:{character:'character-intro'},'exp-tab':{expPool:'exp-intro'},
+            'status-tab':{status:'status-intro'},'skill-tab':{skill:'skill-intro'}}[o.firstBattleStep]?.[page];
+        return next?commitFirstLesson((state,current)=>{current.firstBattleStep=next;}):false;
+    }
+    function restoreFirstLessonPage(){
+        const o=firstLessonState();if(!o){return false;}
+        if(['attack-intro','attack','cast-intro','cast','finish-battle'].includes(o.firstBattleStep)){
+            return resumeFirstLessonBattle();
+        }
+        hideOverlay();showPage('home');
+        if(!['city-intro','city'].includes(o.firstBattleStep)){
+            const tab=['exp-intro','upgrade','status-tab'].includes(o.firstBattleStep)?'expPool':
+                ['status-intro','skill-tab'].includes(o.firstBattleStep)?'status':
+                ['skill-intro','skill','return'].includes(o.firstBattleStep)?'skill':'status';
+            openHomeFeature('character');switchCharacterTab(tab);
+            window.FourSymbolsAdventureUI?.syncTutorialReturn?.(tab);
+        }
+        return true;
+    }
+    function resumeFirstLessonBattle(){
+        const o=firstLessonState();
+        if(!o?.battleCheckpoint||typeof window.FourSymbolsBattleFlow?.restoreFirstTutorialBattle!=='function'){return false;}
+        const identity=firstLessonIdentity(),checkpoint=o.battleCheckpoint;
+        if(!window.FourSymbolsBattleFlow.restoreFirstTutorialBattle(checkpoint,identity,outcome=>finishAdventureBattle('c1_01',outcome))){
+            showMessage('戰鬥進度未能安全續接，請保留原存檔。');return false;
+        }
+        runtime.activeAdventureBattle={chapterId:activeChapterId(),nodeId:'c1_01',replay:false,startedAt:checkpoint.startedAt};
+        runtime.tutorialSkillUsed=o.firstBattleStep==='finish-battle';startBattleResourceMonitor();
+        return true;
+    }
+    function syncFirstLesson(){
+        const o=firstLessonState();if(!o||runtime.firstLessonCommitting){return false;}
+        if(o.firstBattleStep==='upgrade'&&playerOwner().level>=2){
+            return commitFirstLesson((state,current)=>{current.firstBattleStep='status-tab';});
+        }
+        if(o.firstBattleStep==='skill'&&hasTutorialAction('skill')){
+            return commitFirstLesson((state,current)=>{current.firstBattleStep='return';});
+        }
+        if(!(typeof battleActive!=='undefined'&&battleActive)||runtime.activeAdventureBattle?.nodeId!=='c1_01'||
+           !['attack-intro','attack','cast-intro','cast','finish-battle'].includes(o.firstBattleStep)||
+           typeof window.FourSymbolsBattleFlow?.checkpointFirstTutorialBattle!=='function'){return false;}
+        const round=typeof turn==='number'?turn:0;
+        if(o.battleCheckpoint&&round<=o.battleCheckpoint.turn){return false;}
+        const leaving=o.firstBattleStep==='attack'&&!!o.battleCheckpoint&&round>o.battleCheckpoint.turn;
+        const accepted=window.FourSymbolsBattleFlow.checkpointFirstTutorialBattle(firstLessonIdentity(),checkpoint=>
+            commitFirstLesson((state,current)=>{
+                current.battleCheckpoint=checkpoint;
+                if(leaving){
+                    // The existing unique source/receipt commits together with
+                    // the pre-upgrade checkpoint, not after the later cast.
+                    if(!Object.prototype.hasOwnProperty.call(state.rewardClaims,'c1_01')&&
+                       current.startingLevel===1&&playerOwner().level===1){
+                        const reward=CONTENT.rewards.story_first_growth;
+                        if(!Number.isSafeInteger(reward.firstTutorialSharedExp)||reward.firstTutorialSharedExp<=0){return false;}
+                        const granted=grantRewardObject({sharedExp:reward.firstTutorialSharedExp});if(!granted.ok){return false;}
+                        state.rewardClaims.c1_01='claimed';state.lastRewardSummary=granted.summary;
+                    }
+                    current.firstBattleStep='city-intro';current.phase='system';current.requiredAction='skill';
+                }else if(current.firstBattleStep==='cast'&&runtime.tutorialSkillUsed){current.firstBattleStep='finish-battle';}
+            }),leaving);
+        if(accepted&&leaving){stopBattleResourceMonitor();runtime.activeAdventureBattle=null;hideOverlay();showPage('home');}
+        return accepted;
+    }
     function hasTutorialAction(action){
         const owner=playerOwner(),state=chapterState();
         if(!state?.onboarding?.active){return true;}
@@ -657,7 +775,14 @@
     function startFreshStory(){
         const owner=playerOwner();if(!owner||!owner.adventureProgress?.pendingStoryOpening){return false;}
         ensureState({persist:false});const state=chapterState();
-        if(!commitChange(()=>{state.onboarding={active:true,phase:"story",nodeId:"c1_01",source:"new-character"};owner.adventureProgress.pendingStoryOpening=false;})){return false;}
+        if(!commitChange(()=>{
+            if(state.onboarding.flowVersion!==3){
+                state.onboarding={active:true,phase:"story",nodeId:"c1_01",source:"new-character",
+                    flowVersion:3,firstBattleStep:'attack-intro',startingLevel:integer(owner.level,1),
+                    battleId:'c1-first-'+(window.crypto?.randomUUID?.()||now())};
+            }
+            owner.adventureProgress.pendingStoryOpening=false;
+        })){return false;}
         return open({story:true});
     }
     function startStory(nodeId,phase){
@@ -728,7 +853,8 @@
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
             if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=getPartyCharacterKey(0);}
-            hideOverlay();showPage("skill");if(typeof renderSkillLoadout==="function"){renderSkillLoadout();}
+            hideOverlay();showPage("home");openHomeFeature('character');switchCharacterTab('skill');
+            window.FourSymbolsAdventureUI?.syncTutorialReturn?.('skill');
         }else if(o.requiredAction==="equipment"&&!state.grantedEquipmentUid){
             if(!getEquipmentLessonOfferIntent()){showMessage("請先領取追兵一戰的護具購置金。");return false;}
             hideOverlay();showPage("home");openHomeFeature("shop");
@@ -738,7 +864,19 @@
         }
         return true;
     }
-    function returnFromTutorial(){return open({panel:"tutorial"});}
+    function returnFromTutorial(){
+        const o=firstLessonState();
+        if(o&&o.firstBattleStep==='return'){
+            if(!hasTutorialAction('skill')){return false;}
+            if(typeof closeHomeFeature==='function'){closeHomeFeature();}
+            if(typeof document!=='undefined'&&document.getElementById('homeFeatureModal')?.classList.contains('show')){return false;}
+            if(!commitFirstLesson((state,current)=>{current.firstBattleStep='cast-intro';current.phase='battle';})){return false;}
+            return resumeFirstLessonBattle();
+        }
+        if(typeof closeHomeFeature==='function'){closeHomeFeature();}
+        if(typeof document!=='undefined'&&document.getElementById('homeFeatureModal')?.classList.contains('show')){return false;}
+        return open({panel:"tutorial"});
+    }
     function continueTutorial(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction||o.nodeId!==state.currentNodeId||state.completedNodes[o.nodeId]){return false;}
         const practice=recoveryNeedsPractice();
@@ -843,6 +981,7 @@
         const state=chapterState();
         const node=nodeById(chapter,nodeId);
         if(!state||!node||!["battle","elite","boss"].includes(node.type)){ return false; }
+        if(nodeId==='c1_01'&&firstLessonState()?.battleCheckpoint){return restoreFirstLessonPage();}
         const status=nodeStatus(chapter,state,node.id);
         const replay=state.completedNodes[node.id]===true||!!state.completedNodes[node.id];
         if(status==="locked"||(!replay&&!state.chapterCompleted&&node.id!==state.currentNodeId)){ return false; }
@@ -863,7 +1002,23 @@
         hideOverlay();
 
         if(window.FourSymbolsBattlefieldSlots){ window.FourSymbolsBattlefieldSlots.clearActiveEnemySnapshot(); }
-        const started=window.v132LaunchDungeonBattle(roster,function(outcome){
+        const started=window.v132LaunchDungeonBattle(roster,outcome=>finishAdventureBattle(node.id,outcome),
+            {mode:"adventure",normalizeFailureResources:false,tutorial:!!node.tutorialEncounterId&&state.onboarding?.active===true});
+        if(!started){
+            stopBattleResourceMonitor();runtime.activeAdventureBattle=null;runtime.visible=true;
+            if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){ window.FourSymbolsAdventureUI.show(); }
+            return false;
+        }
+        try{
+            if(window.v132ActiveDungeonRun){window.v132ActiveDungeonRun.adventure=true;window.v132ActiveDungeonRun.adventureNodeId=node.id;}
+        }catch(_){ }
+        return true;
+    }
+    // Both the original launch and a retained first-battle checkpoint use this
+    // same settlement callback; restoring never manufactures a second battle.
+    function finishAdventureBattle(nodeId,outcome){
+            const chapter=chapterDefinition(),state=chapterState(),node=nodeById(chapter,nodeId);
+            if(!state||!node){return;}
             const battleInfo=runtime.activeAdventureBattle;
             stopBattleResourceMonitor();
             runtime.activeAdventureBattle=null;
@@ -874,7 +1029,7 @@
                     runtime.visible=true;runtime.selectedNodeId=node.id;runtime.activePanel="tutorial";
                     window.FourSymbolsAdventureUI?.show({focusNodeId:node.id});return;
                 }
-                if(node.stage===3&&state.onboarding.active&&!runtime.tutorialSkillUsed){
+                if(node.stage===3&&state.onboarding.active&&!state.onboarding.basicComplete&&!runtime.tutorialSkillUsed){
                     showMessage("這次請實際使用剛學會的技能，再突破追兵。");
                     runtime.visible=true;runtime.activePanel="map";
                     window.FourSymbolsAdventureUI?.show({focusNodeId:node.id});return;
@@ -883,7 +1038,7 @@
                     if(!completeNode(node.id,{rewardReady:true})){showMessage("進度未能保存，請保留原帳號並重試。");}
                 }else{ persist({render:false}); }
             }else{
-                if(state.onboarding?.active&&[2,4].includes(node.stage)){
+                if(state.onboarding?.active&&[2,4].includes(node.stage)&&!(node.stage===2&&state.onboarding.basicComplete)){
                     const ok=commitChange(()=>{state.onboarding.nodeId=node.id;state.onboarding.requiredAction=node.stage===2?"skill":"equipment";state.onboarding.phase="guidance";state.currentNodeId=node.id;});
                     runtime.visible=true;runtime.activePanel="tutorial";window.FourSymbolsAdventureUI?.show();
                     if(ok){startStory(node.id,"guidance");}return;
@@ -891,6 +1046,17 @@
                 /* v132 generic dungeon failure historically normalizes party resources.
                    Restore the last live combat snapshot so Adventure never grants a free refill. */
                 restoreLastBattleResources();
+                if(node.id==='c1_01'&&state.onboarding.flowVersion===3){
+                    // A terminal loss cannot resurrect a prior live snapshot.
+                    // Return to the original visible retry entry, rather than
+                    // leaving a battle phase without a restorable checkpoint.
+                    if(!commitChange(()=>{
+                        delete state.onboarding.battleCheckpoint;
+                        state.onboarding.phase='retry';state.onboarding.requiredAction=null;
+                        state.onboarding.firstBattleStep=state.rewardClaims.c1_01==='claimed'?'finish-battle':'attack-intro';
+                        state.dialogue=null;
+                    })){showMessage('戰鬥結束進度未能保存，請保留原存檔。');return;}
+                }
                 state.currentNodeId=node.id;
                 persist({render:false});
             }
@@ -904,21 +1070,6 @@
             }
             render();
             if(outcome?.result==="win"&&state.chapterCompleted&&node.id===chapter.endNodeId){startStory(node.id,"ending");}
-        },{mode:"adventure",normalizeFailureResources:false,tutorial:!!node.tutorialEncounterId&&state.onboarding?.active===true});
-        if(!started){
-            stopBattleResourceMonitor();
-            runtime.activeAdventureBattle=null;
-            runtime.visible=true;
-            if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){ window.FourSymbolsAdventureUI.show(); }
-            return false;
-        }
-        try{
-            if(window.v132ActiveDungeonRun){
-                window.v132ActiveDungeonRun.adventure=true;
-                window.v132ActiveDungeonRun.adventureNodeId=node.id;
-            }
-        }catch(_){ }
-        return true;
     }
 
     function unlockedZoneProfiles(){
@@ -1187,6 +1338,7 @@
         const state=chapterState();
         const node=nodeById(chapter,runtime.selectedNodeId);
         if(!state||!node){ return false; }
+        if(node.id==='c1_01'&&firstLessonState()?.battleCheckpoint){return restoreFirstLessonPage();}
         const status=nodeStatus(chapter,state,node.id);
         if(status==="locked"||status==="planned"){
             showMessage(status==="planned"?"此段江湖旅程仍在整備中。":branchLockReason(chapter,state,node)||"這個節點尚未解鎖。");
@@ -1237,6 +1389,7 @@
             selectedNodeId:runtime.selectedNodeId,
             dialogue:state&&state.dialogue||null,
             tutorial:state&&state.onboarding||null,
+            firstLesson:firstLessonView(),
             tutorialProgress:state?.onboarding?.active?{
                 nativeElement:playerOwner()?.element,
                 skillReady:hasTutorialAction("skill"),equipmentReady:hasTutorialAction("equipment"),
@@ -1276,6 +1429,7 @@
     });
 
     window.FourSymbolsAdventure=Object.freeze({
+        syncFirstLesson,advanceFirstLesson,observeFirstLessonPage,
         getEquipmentLessonOfferIntent,recordEquipmentLessonPurchase,
         stateVersion:STATE_VERSION,
         startFreshStory:startFreshStory,startStory:startStory,advanceDialogue:advanceDialogue,
