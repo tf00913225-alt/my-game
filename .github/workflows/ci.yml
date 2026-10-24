@@ -27,7 +27,48 @@ permissions:
   contents: read
 
 jobs:
+  boss_startup_diagnostic:
+    name: Boss startup diagnostic ONLY - not acceptance
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v7
+        timeout-minutes: 2
+        with:
+          fetch-depth: 2
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        timeout-minutes: 1
+        with:
+          node-version: '24.21.0'
+          package-manager-cache: false
+      - name: Observe original first Boss startup once
+        timeout-minutes: 1
+        env:
+          BOSS_MONSTER_BALANCE_QA: '1'
+          BOSS_GATE_MODE: fast
+          BOSS_STARTUP_DIAGNOSTIC_ONCE: boss-89d3dba7-once
+        run: |
+          test "$GITHUB_RUN_ATTEMPT" = 1
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          node .github/scripts/battle-layer-audio-live-qa.mjs
+      - name: Upload capped one-day diagnostic only
+        if: always()
+        timeout-minutes: 1
+        uses: actions/upload-artifact@v7
+        with:
+          name: boss-startup-diagnostic-once
+          path: artifacts/boss-startup-diagnostic/boss-startup.json
+          retention-days: 1
+          compression-level: 0
+          if-no-files-found: warn
+          overwrite: false
+
   classify:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024') }}
     name: CI change classifier
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -102,6 +143,7 @@ jobs:
         run: node .github/scripts/ci-change-classifier.mjs
 
   core_checks:
+    if: ${{ !(github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024') }}
     needs: classify
     name: core_checks
     runs-on: ubuntu-latest
@@ -1113,7 +1155,7 @@ jobs:
 
   health_start:
     name: Mark full regression pending
-    if: inputs.full_regression || github.event_name == 'workflow_dispatch'
+    if: ${{ (inputs.full_regression || github.event_name == 'workflow_dispatch') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -1134,7 +1176,7 @@ jobs:
   health_record:
     name: Full Regression Health
     needs: [classify, verify, health_start]
-    if: always() && (inputs.full_regression || github.event_name == 'workflow_dispatch')
+    if: ${{ always() && (inputs.full_regression || github.event_name == 'workflow_dispatch') && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024') }}
     runs-on: ubuntu-latest
     timeout-minutes: 5
     permissions:
@@ -1167,7 +1209,7 @@ jobs:
 
   verify:
     name: Repository checks
-    if: always()
+    if: ${{ always() && !(github.event_name == 'workflow_dispatch' && github.ref_name == 'chore/ci-boss-startup-probe-20261024') }}
     needs: [classify, core_checks, battle_browser, ui_browser, daily_browser, tower_wild_browser, portrait_browser, adventure_ui_browser, main_browser, abyss_balance, adventure_balance, boss_balance, session_authority, promotion_health]
     runs-on: ubuntu-latest
     timeout-minutes: 5

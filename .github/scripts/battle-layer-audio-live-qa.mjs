@@ -4,7 +4,7 @@ import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
 import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 import os from 'node:os';
-import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
+import {startServer,waitJson,Cdp,findChrome,observeChromeStartup} from './runtime-browser-qa-support.mjs';
 
 // Match the formal portrait QA's authored alpha projection, not the larger
 // depth-scaled carrier. getBoundingClientRect includes the current motion.
@@ -44,7 +44,27 @@ function measureEnemyVisiblePortrait(card){
         motion:art.dataset.motion,actionTransform:getComputedStyle(art.querySelector('.v174-action-motion')).transform};
 }
 
+function encodeBossStartupDiagnostic(payload){
+    const limit=60*1024,raw=JSON.stringify(payload),originalBytes=Buffer.byteLength(raw,'utf8');
+    if(originalBytes<=limit)return raw;
+    let partial=Buffer.from(raw,'utf8').subarray(0,limit/2).toString('utf8'),encoded;
+    do{
+        encoded=JSON.stringify({schemaVersion:1,diagnosticOnly:true,notAcceptance:true,truncated:true,originalBytes,partialJson:partial});
+        if(Buffer.byteLength(encoded,'utf8')<=limit)return encoded;
+        partial=partial.slice(0,-1024);
+    }while(partial.length);
+    throw new Error('Diagnostic serialization limit');
+}
+
 async function runBossBalanceProductionQa(){
+    const diagnostic=process.env.BOSS_STARTUP_DIAGNOSTIC_ONCE==='boss-89d3dba7-once';
+    if(process.env.BOSS_STARTUP_DIAGNOSTIC_ONCE)assert.ok(diagnostic,'Unknown diagnostic token');
+    if(diagnostic){
+        assert.equal(process.env.GITHUB_EVENT_NAME,'workflow_dispatch');
+        assert.equal(process.env.GITHUB_REF,'refs/heads/chore/ci-boss-startup-probe-20261024');
+        assert.equal(process.env.GITHUB_REPOSITORY,'tf00913225-alt/my-game');
+        assert.equal(process.env.GITHUB_RUN_ATTEMPT,'1','Diagnostic retry is not authorized');
+    }
     const mode=process.env.BOSS_GATE_MODE||'full',startedAt=Date.now();
     assert.ok(['fast','full'].includes(mode),'Unknown Boss mode must fail closed');
     const baseUrl=process.env.BOSS_BALANCE_BASE_URL;
@@ -199,13 +219,25 @@ async function runBossBalanceProductionQa(){
     })()`;
     const server=await startServer({baseUrl}),results=[];
     const file=path.resolve('artifacts/browser-qa/boss-balance-production'+(mode==='fast'?'-fast':'')+'.json');fs.mkdirSync(path.dirname(file),{recursive:true});
-    let proc,client,profile;
+    let proc,client,profile,startup,chromeExecutable;
+    const writeDiagnostic=async(outcome,error)=>{
+        const observation=await startup?.finish(outcome);
+        const samples=(observation?.samples||[]).map(sample=>({...sample,processes:sample.processes.filter(p=>p.pid===proc?.pid).map(({files,pageWait,...record})=>({...record,pageWait:pageWait?{status:pageWait.status,budgetMs:pageWait.budgetMs,startedAtMs:pageWait.startedAtMs,syscall:pageWait.syscall,stack:pageWait.stack,resources:pageWait.resources}:undefined}))}));
+        const payload={schemaVersion:1,diagnosticOnly:true,notAcceptance:true,baseSha:"89d3dba79cce4f23120bb5e61f4eda1877aa5cfc",head:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT,node:process.version,imageOS:process.env.ImageOS,imageVersion:process.env.ImageVersion,chromeExecutable,chromeVersion:"not queried: single launch only",outcome,error:error?{code:error.code||null,message:error.message,causeCode:error.cause?.code||null}:null,...observation,samples,trace:{disabled:true}};
+        const encoded=encodeBossStartupDiagnostic(payload),output=path.resolve("artifacts/boss-startup-diagnostic/boss-startup.json");
+        fs.mkdirSync(path.dirname(output),{recursive:true});fs.writeFileSync(output,encoded);
+        console.log("Boss diagnostic only: "+JSON.stringify({outcome,bytes:Buffer.byteLength(encoded),notAcceptance:true}));
+    };
     const close=async()=>{client?.close();if(proc&&proc.exitCode===null){const exited=new Promise(r=>proc.once('exit',r));proc.kill('SIGTERM');await exited;}client=null;proc=null;if(profile){fs.rmSync(profile,{recursive:true,force:true,maxRetries:20,retryDelay:100});profile=null;}};
     try{
       for(const [width,height] of [[390,844],[412,915]]){
         profile=fs.mkdtempSync(path.join(os.tmpdir(),'boss-balance-'));const port=23000+process.pid%10000;
-        proc=spawn(findChrome(),['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:['ignore','ignore','inherit']});
-        const tabs=await waitJson('http://127.0.0.1:'+port+'/json',{chromeProcess:proc});client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
+        chromeExecutable=findChrome();
+        proc=spawn(chromeExecutable,['--headless','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:diagnostic?['ignore','ignore','pipe']:['ignore','ignore','inherit']});
+        if(diagnostic)startup=observeChromeStartup(proc,{port,traceEnabled:false,logEvidence:false});
+        const tabs=await waitJson('http://127.0.0.1:'+port+'/json',{chromeProcess:proc,...(diagnostic?{logEvidence:false}:{})});
+        if(diagnostic){await writeDiagnostic('DevTools ready');return;}
+        client=new Cdp(tabs.find(t=>t.type==='page').webSocketDebuggerUrl);
         await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});await new Promise(r=>setTimeout(r,1000));
         const active=client.eval(reference+'\n'+expression);let done=false;active.finally(()=>{done=true;}).catch(()=>{});const captured=new Set();
         while(!done){await new Promise(r=>setTimeout(r,300));const marker=await client.eval('window.bossBalanceQaCapture||null').catch(()=>null);if(marker&&!captured.has(marker)){captured.add(marker);const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(file.replace('.json','-'+width+'x'+height+'-'+marker+'.png'),Buffer.from(shot.data,'base64'));}}
@@ -216,7 +248,7 @@ async function runBossBalanceProductionQa(){
       const scenes=results.flatMap(r=>r.scenes),summary={mode,elapsedMs:Date.now()-startedAt,scenes:scenes.length,naturalBattles:scenes.filter(s=>['natural-victory','bounded-natural'].includes(s.kind)).length,controlledBattles:scenes.filter(s=>s.controlled).length,viewportInteractions:scenes.filter(s=>s.uiOnly).length,totalRounds:scenes.reduce((n,s)=>n+s.rounds,0),settlementsVerified:scenes.filter(s=>s.settlementVerified).length,skipped:mode==='fast'?'Remaining Full scenarios and duplicate natural playback at 412x915; presentation-only risk. Full remains required for core/unknown/release changes.':'none'};
       fs.writeFileSync(file,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',summary,results},null,2)+'\n');console.log('Boss production Chrome PASS '+JSON.stringify(summary));
       if(process.env.GITHUB_STEP_SUMMARY)fs.appendFileSync(process.env.GITHUB_STEP_SUMMARY,'\nBoss QA: '+JSON.stringify(summary)+'\n');
-    }catch(error){console.error('Boss production QA failure:',error);const partial=await client?.eval('({url:location.href,startup:window.FourSymbolsStartupPolicy?.getState?.(),body:document.body?.innerText?.slice(0,1500),evidence:window.bossBalanceQaEvidence,phase:typeof battlePhase==="undefined"?null:battlePhase,turn:typeof turn==="undefined"?null:turn,battleActive:typeof battleActive==="undefined"?null:battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,mode,elapsedMs:Date.now()-startedAt,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
+    }catch(error){if(diagnostic){await writeDiagnostic('startup failure',error);throw new Error('Boss diagnostic startup failed; see capped one-day artifact');}console.error('Boss production QA failure:',error);const partial=await client?.eval('({url:location.href,startup:window.FourSymbolsStartupPolicy?.getState?.(),body:document.body?.innerText?.slice(0,1500),evidence:window.bossBalanceQaEvidence,phase:typeof battlePhase==="undefined"?null:battlePhase,turn:typeof turn==="undefined"?null:turn,battleActive:typeof battleActive==="undefined"?null:battleActive,modals:[...document.querySelectorAll(".show")].map(x=>x.id)})').catch(()=>null);fs.writeFileSync(file,JSON.stringify({passed:false,mode,elapsedMs:Date.now()-startedAt,error:String(error.stack||error),results,partial,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled'||e.method==='Runtime.exceptionThrown').slice(-15)},null,2)+'\n');throw error;}
     finally{await close();await new Promise(r=>server.server.close(r));}
 }
 

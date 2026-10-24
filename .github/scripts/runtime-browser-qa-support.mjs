@@ -149,7 +149,7 @@ async function collectDevToolsFailure(url){
     return result;
 }
 
-async function waitJson(url,{chromeProcess,accept,timeoutMs=chromeProcess?30000:15000}={}){
+async function waitJson(url,{chromeProcess,accept,logEvidence=true,timeoutMs=chromeProcess?30000:15000}={}){
     const started=Date.now(),controller=new AbortController();
     const timeout=Object.assign(new Error('DevTools startup probe exceeded its '+timeoutMs+'ms deadline'),{code:'ETIMEDOUT'});
     const deadline=setTimeout(()=>controller.abort(timeout),timeoutMs);
@@ -171,7 +171,7 @@ async function waitJson(url,{chromeProcess,accept,timeoutMs=chromeProcess?30000:
                 const data=await response.json();
                 if(controller.signal.aborted){throw controller.signal.reason;}
                 if(accept&&!accept(data)){throw new Error('DevTools JSON has no acceptable target yet');}
-                if(attempts>1||chromeProcess){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
+                if(logEvidence&&(attempts>1||chromeProcess)){const endpoint=new URL(url);console.log('DevTools ready: '+JSON.stringify({endpoint:endpoint.origin+endpoint.pathname,elapsedMs:Date.now()-started,attempts}));}
                 return data;
             }catch(error){
                 if(controller.signal.aborted){
@@ -191,7 +191,7 @@ async function waitJson(url,{chromeProcess,accept,timeoutMs=chromeProcess?30000:
     const error=reason?.code==='CHROME_EXITED'||reason?.code==='CHROME_SPAWN_FAILED'?reason:lastError||timeout;
     try{
         error.devToolsDiagnostics=await collectDevToolsFailure(url);
-        console.error('DevTools connection failure diagnostics: '+JSON.stringify(error.devToolsDiagnostics));
+        if(logEvidence)console.error('DevTools connection failure diagnostics: '+JSON.stringify(error.devToolsDiagnostics));
     }catch{}
     throw error;
 }
@@ -275,7 +275,7 @@ function observeProcPageWait(base,{timeoutMs=200,workerSource}={}){
 }
 
 // Observe the existing first launch only: no warmup, retry or acceptance change.
-function observeChromeStartup(child,{port,output}){
+function observeChromeStartup(child,{port,output,traceEnabled=true,logEvidence=true}){
     const started=performance.now(),timers=[],samples=[],procCollectors=[];
     const evidence={pid:child.pid??null,platform:process.platform,port,samples,firstStderrMs:null,stderrHead:'',stderrTail:'',trace:null};
     let finished=false,exited=false,tracer,traceTimer,traceClosed,traceStopPromise;
@@ -339,7 +339,7 @@ function observeChromeStartup(child,{port,output}){
     function sample(atMs){
         if(finished||exited)return;
         samples.push(snapshot());
-        if(atMs!==5000||process.platform!=='linux')return;
+        if(!traceEnabled||atMs!==5000||process.platform!=='linux')return;
         // Attach once for two seconds; missing tools/ptrace denial are evidence,
         // never reasons to install tools, change kernel policy or retry Chrome.
         const binary=['/usr/bin/strace','/bin/strace'].find(file=>fs.existsSync(file));
@@ -362,7 +362,7 @@ function observeChromeStartup(child,{port,output}){
             samples.push(snapshot());procCollectors.forEach(c=>c.stop('observer-finished'));evidence.outcome=outcome;evidence.finishedAtMs=elapsed();
             await cleanup;
             if(output)try{fs.writeFileSync(output,JSON.stringify(evidence,null,2)+'\n');}catch(error){evidence.artifactError=String(error.message);}
-            try{console.log('Chrome startup observation: '+JSON.stringify(evidence));}catch{}
+            if(logEvidence)try{console.log('Chrome startup observation: '+JSON.stringify(evidence));}catch{}
         }catch(error){evidence.observerError=String(error.message);}
         return evidence;
     }};
