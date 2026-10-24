@@ -657,7 +657,7 @@
     }
     function firstLessonState(){
         const state=chapterState(),o=state?.onboarding;
-        return o?.active&&o.flowVersion===3&&state.currentNodeId==='c1_01'&&o.firstBattleStep!=='complete'?o:null;
+        return o?.active&&o.flowVersion===3&&o.phase!=='retry'&&state.currentNodeId==='c1_01'&&o.firstBattleStep!=='complete'?o:null;
     }
     function firstLessonIdentity(){
         const o=firstLessonState();return o?{uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:o.battleId}:null;
@@ -1048,7 +1048,14 @@
                 restoreLastBattleResources();
                 if(node.id==='c1_01'&&state.onboarding.flowVersion===3){
                     // A terminal loss cannot resurrect a prior live snapshot.
-                    if(!commitChange(()=>{delete state.onboarding.battleCheckpoint;})){return;}
+                    // Return to the original visible retry entry, rather than
+                    // leaving a battle phase without a restorable checkpoint.
+                    if(!commitChange(()=>{
+                        delete state.onboarding.battleCheckpoint;
+                        state.onboarding.phase='retry';state.onboarding.requiredAction=null;
+                        state.onboarding.firstBattleStep=state.rewardClaims.c1_01==='claimed'?'finish-battle':'attack-intro';
+                        state.dialogue=null;
+                    })){showMessage('戰鬥結束進度未能保存，請保留原存檔。');return;}
                 }
                 state.currentNodeId=node.id;
                 persist({render:false});

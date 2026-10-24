@@ -208,8 +208,9 @@ test("retained v1 ticket survives policy replacement, renews its prefix and gran
     }
 });
 
-test("exact retained twenty-node tickets advance and renew across edits while same-graph unknown policies cannot write",async()=>{
-    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+for(const retainedFile of ['hero-chapter-qualification-v2-20261020.json','hero-chapter-qualification-v2-20261023.json'])test(`exact retained twenty-node ${retainedFile} tickets advance and renew across edits while same-graph unknown policies cannot write`,async()=>{
+    const retained=require('../functions/src/generated/'+retainedFile);
+    if(retainedFile.endsWith('20261023.json'))assert.equal(retained.sourceSha256,'f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269');
     assert.equal(retained.nodes.length,20);assert.equal(retained.outcomeVerified,false);
     const h=harness(acquisitionWithPolicy(retained)),issued=await h.ensure();await h.step('c1_01');
     h.replaceFactory(acquisitionWithPolicy(replacementChapterPolicy));await h.step('c1_02');

@@ -2906,8 +2906,8 @@ assert.equal(await rulesRequest(`serverUsers/${storyUid}/heroChapterTickets/${st
 console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, concurrent day/node intents, legal chapter route, permanent stable-seed rights, lost/stale retry, takeover, private rules and corruption rejection; ordinary battle outcomes remain unverified.");
 // Historical issuance uses the original protected writer against actual Firestore;
 // only its server catalog/time dependencies differ. Never manufacture ticket proofs.
-{
-    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-20261020.json');
+for(const retainedDate of ['20261020','20261023']){
+    const retained=require('../functions/src/generated/hero-chapter-qualification-v2-'+retainedDate+'.json');
     function historicalFactory(policy){
         const load=(relative,overrides={})=>{const url=new URL(relative,import.meta.url),local=createRequire(url),module={exports:{}};
             vm.runInThisContext('(function(module,exports,require){\n'+readFileSync(url,'utf8')+'\n})',{filename:url.pathname})(module,module.exports,id=>Object.hasOwn(overrides,id)?overrides[id]:local(id));return module.exports;};
@@ -2923,7 +2923,7 @@ console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, co
         const capture=async()=>{const rows=[];for(const collection of await root.listCollections())for(const doc of (await collection.get()).docs)rows.push([doc.ref.path,doc.data()]);rows.push([envelope.path,(await envelope.get()).data()]);return rows.sort((a,b)=>a[0].localeCompare(b[0]));};
         return {user,uid,data,root,envelope,owner,current,request,capture};
     }
-    const clock={value:Date.now()-8*86400000},a=await actor('twenty',retained,clock);
+    const clock={value:Date.now()-8*86400000},a=await actor('twenty-'+retainedDate,retained,clock);
     let proof=await a.owner.ensureChapterTicket(a.request({expectedRevision:1}));const originalId=proof.chapter.ticketId;
     proof=await a.owner.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_01',choiceId:null}));
     proof=await a.current.completeChapterNode(a.request({expectedRevision:proof.serverRevision,ticketId:originalId,nodeId:'c1_02',choiceId:null}));
@@ -2947,7 +2947,7 @@ console.log("PASS Hero acquisition protected Firestore/HTTP: cumulative days, co
     assert.equal((await a.root.collection('operations').get()).size,22);assert.equal((await a.root.collection('ledgerEntries').get()).size,22);
     const completed=await a.capture();assert.equal((await invoke('completeHeroChapterNode',a.user.idToken,{...a.data,expectedRevision:1,ticketId:renewedId,nodeId:'c1_20',choiceId:null})).unchanged,true);assert.equal((await invoke('ensureHeroChapterTicket',a.user.idToken,{...a.data,expectedRevision:1})).unchanged,true);assert.deepEqual(await a.capture(),completed);
     assert.equal(await rulesRequest(`serverUsers/${a.uid}/heroChapterTickets/${originalId}`,a.user.idToken,'PATCH'),403);
-    const badClock={value:Date.now()},bad=await actor('unknown',{...retained,sourceSha256:'f'.repeat(64)},badClock);
+    const badClock={value:Date.now()},bad=await actor('unknown-'+retainedDate,{...retained,sourceSha256:'f'.repeat(64)},badClock);
     const badProof=await bad.owner.ensureChapterTicket(bad.request({expectedRevision:1})),sealed=await bad.capture();
     assert.equal((await invoke('readHeroAcquisition',bad.user.idToken,bad.data)).chapter.nextNodeId,'c1_01');
     await rejected('completeHeroChapterNode',bad.user.idToken,{...bad.data,expectedRevision:badProof.serverRevision,ticketId:badProof.chapter.ticketId,nodeId:'c1_01',choiceId:null},'FAILED_PRECONDITION');

@@ -862,3 +862,27 @@ test('fresh creation entry retains the versioned first battle identity and retai
     assert.equal(reloaded.state().rewardClaims.c1_01,'claimed');
     assert.equal(reloaded.api.startFreshStory(),false,'already consumed creation intent cannot start a second first battle');
 });
+for(const outcome of ['win','lose','escape'])for(const saveMode of [true,false,'throw'])test(`first battle ${outcome} terminal with save ${saveMode} preserves receipt and honest continuation`,()=>{
+    const h=firstLessonHarness();finishNormalPractice(h);
+    h.c.player.level=2;h.c.characterSkillLoadouts.fire={skillLevels:{lessonSkill:1},equippedSkills:['lessonSkill']};
+    h.state().onboarding.firstBattleStep='return';assert.equal(h.api.returnFromTutorial(),true);
+    const durable=h.stored();h.save(saveMode);h.finish(outcome);
+    assert.equal(h.c.sharedExp,300,'terminal cannot award the first teaching source again');
+    assert.equal(h.state().rewardClaims.c1_01,'claimed');
+    if(saveMode!==true){
+        assert.equal(h.state().completedNodes.c1_01,undefined,'refused save never claims completion');
+        assert.deepEqual(h.stored(),durable,'the last accepted checkpoint is the only durable continuation');
+        assert.ok(h.state().onboarding.battleCheckpoint,'refused terminal commit cannot claim checkpoint consumption');
+        return;
+    }
+    assert.equal(h.state().onboarding.battleCheckpoint,undefined,'accepted terminal cannot restore the old live encounter');
+    const reopened=runtime(h.stored());reopened.c.player.level=2;reopened.c.sharedExp=300;
+    assert.equal(reopened.api.open({story:true}),true,'accepted terminal always has an original visible continuation');
+    assert.equal(reopened.launches(),0,'reopen never silently launches another battle');assert.equal(reopened.c.sharedExp,300);
+    if(outcome==='win'){
+        assert.equal(reopened.state().currentNodeId,'c1_02');assert.equal(reopened.state().onboarding.basicComplete,true);
+    }else{
+        assert.equal(reopened.state().currentNodeId,'c1_01');assert.equal(reopened.state().onboarding.phase,'retry');
+        assert.equal(reopened.state().completedNodes.c1_01,undefined);
+    }
+});
