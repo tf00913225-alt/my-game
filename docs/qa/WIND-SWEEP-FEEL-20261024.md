@@ -58,3 +58,9 @@ Work ID：WIND-FLURRY-SAMPLE-20261024／原 PR #989。只加強暴風亂擊，�
 - focused module7／Wind29／原Fire15／raster9及原impact／cold-clock等回歸保留。獨立審核與原始瀏覽器／手機證據在PR body續記，不把舊cf5影片當成本版證明。
 - 初次完整bundle Chrome證據：`artifacts/wind-sweep-candidate-browser/evidence.json`。成功／未成功／混合正式狀態補驗：`artifacts/wind-sweep-status-browser/evidence.json`，隔離QA僅注入判定RNG，仍呼叫原正式判定與Core，未修改產品資料或存檔。
 - 部署與最新Head CI只依原PR即時狀態；合併前仍需必要Gate與此樣板的人類美術確認。
+
+### 實機效能直接相依
+
+首輪4f實機功能正確，但全段RAF p95約33–67ms，不能稱流暢PASS。去除逐幀DOM量測／錄影後，baseline關閉效果仍約66.8ms，完整與低粒子設定約100.2ms；減粒子沒有解掉瓶頸。CPU取樣主要落在原js38::fitEnemyBars的重複文字縮字排版，原始證據 `artifacts/wind-sweep-phone-cpu-diagnostic/cpu-profile.json`（4f bundle11157）。因此只在原函式加WeakMap跳過相同文字／寬度／字形寬度／inline style的重算，保留原13→11px與最低.82比例算法；文字、容器、外部樣式及FontFaceSet loadingdone/loadingerror世代改變會失效。沒有改字級、版型、數值或其他技能。
+
+新增3個focused測試包括真scrollWidth下限與字體載入後應恢復13px的案例，獨立審核修正原字體失效缺口後通過。一次有界實機cache probe中效果開啟p95約50.2ms（baseline66.9ms），只有改善證據，仍非整場完全無長幀保證。最終手機錄影／完整與播放窗口幀時間以PR body及相鄰raw report為準；保留所有較早結果，不覆寫為PASS。

@@ -11153,9 +11153,22 @@
         fitEnemyBars(card);
     }
 
+    const enemyBarFitCache=new WeakMap();
+    let enemyBarFontEpoch=0;
+    if(typeof document!=="undefined"&&document.fonts?.addEventListener){
+        ["loadingdone","loadingerror"].forEach(event=>document.fonts.addEventListener(event,()=>{enemyBarFontEpoch++;}));
+    }
     function fitEnemyBars(card){
         const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
         hud.querySelectorAll(".monster-bar-text").forEach(node=>{
+            // Repeated hit/HUD projection must not reset an unchanged fit and
+            // force the same layout loop again. Actual glyph/width/style changes
+            // (including a loaded font) invalidate the snapshot immediately.
+            const signature=()=>[node.textContent,node.clientWidth,node.scrollWidth,
+                node.style.getPropertyValue("font-size"),node.style.getPropertyPriority?.("font-size")||"",
+                node.style.getPropertyValue("transform"),enemyBarFontEpoch];
+            const previous=enemyBarFitCache.get(node),before=signature();
+            if(previous&&before.every((value,i)=>value===previous[i])){return;}
             node.style.removeProperty("transform");
             node.style.setProperty("font-size","13px","important");
             const available=Math.max(1,node.clientWidth||68);
@@ -11168,6 +11181,7 @@
                 node.style.setProperty("transform","scaleX("+Math.max(.82,available/node.scrollWidth)+")");
             }
             node.dataset.v143FontSize=String(size);
+            enemyBarFitCache.set(node,signature());
         });
     }
 
