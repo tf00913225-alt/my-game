@@ -1,0 +1,647 @@
+{
+  "id": "healSpell",
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "tool": "built-in imagegen",
+  "reviewHead": "ade43a48ce618330055f9add290abb175ef9470d",
+  "formalShape": "allyTri",
+  "originalSource": "assets/vfx/water/water-heal-vfx.png",
+  "selectedMother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-f27d9025-19db-4566-8487-844241942fcf.png",
+  "attempts": [
+    {
+      "number": 1,
+      "prompt": "Edit source reference into one transparent fantasy game VFX sprite sheet, not a scene. Exact sheet layout FOUR columns by THREE rows, twelve frames in row-major order. Overall image aspect 3:1, each individual cell native wide 2.25:1 (for example overall2160x720, cells540x240). Each cell contains EXACTLY THREE separate small effects horizontally centered at x18%,50%,82%, one per target, with transparent gaps. Keep the three centers and shared floor baseline y80% fixed throughout all twelve frames, no baseline hopping on row transitions. Leave transparent safe margins on every cell, no intercell lines or labels. Frames1-3 gather,4-7 build,FRAME8 strongest impact/activation,9-12 progressively dissipate in place to nearly invisible. Original pixel proportions, crisp small-screen silhouettes, no broad fog blanket, no full-height opaque wall, no character, no text, no background. Genuine alpha transparency. Preserve healing identity, no damage explosion: three separate gentle cyan-blue shallow water rune rings with a small mint-green lotus-like healing glyph at each center. Fine blue water ribbons and sparse rising green leaves, generous clear center space, no thick column. Frame8 green-blue healing glyph and ring are brightest at all three centers; frames9-12 light and droplets fade smoothly in place.",
+      "mother": "C:/Users/User/.codex/generated_images/01a1547a-204f-7812-b59e-d8c10e15a5d6/exec-f27d9025-19db-4566-8487-844241942fcf.png"
+    }
+  ],
+  "candidateOnly": true,
+  "independentReview": "pending",
+  "phonePass": false,
+  "commercialPass": false,
+  "selfReview": {
+    "status": "candidate-for-independent-review",
+    "identity": "Three blue water-rune rings with mint-green lotus-like healing cores; frame8 brightest activation.",
+    "risks": [
+      "Substantial cyan glow and vertical ribbons remain; ensure small rendered characters remain visible.",
+      "Frame8 to9 bottom contracts about12 source pixels during fading.",
+      "Some healing glows nearly join at peak despite three distinct centers."
+    ]
+  },
+  "runtimeCandidate": "tools/vfx-commercial-sample/assets/full/healSpell-wide-v1.webp",
+  "size": [
+    2172,
+    724
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cellSize": [
+    543.0,
+    241.33333333333334
+  ],
+  "cellAspect": 2.25,
+  "lossless": true,
+  "exactRGBAEqualToMother": true,
+  "sha256": "b47b8dd089cc093a15506a50645562cab5afb4e0d7329d084038c6e1dc6b34d3",
+  "bytes": 1461596,
+  "frameMetrics": [
+    {
+      "frame": 1,
+      "alpha": {
+        "8": {
+          "bounds": [
+            58,
+            79,
+            492,
+            223
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            62,
+            82,
+            488,
+            218
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 116.64,
+          "alphaWeight": 945561
+        },
+        {
+          "centerX": 275.85,
+          "alphaWeight": 851575
+        },
+        {
+          "centerX": 433.06,
+          "alphaWeight": 833240
+        }
+      ]
+    },
+    {
+      "frame": 2,
+      "alpha": {
+        "8": {
+          "bounds": [
+            40,
+            53,
+            505,
+            225
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            44,
+            58,
+            503,
+            223
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 108.0,
+          "alphaWeight": 1629748
+        },
+        {
+          "centerX": 269.56,
+          "alphaWeight": 1543171
+        },
+        {
+          "centerX": 437.37,
+          "alphaWeight": 1751181
+        }
+      ]
+    },
+    {
+      "frame": 3,
+      "alpha": {
+        "8": {
+          "bounds": [
+            39,
+            61,
+            502,
+            225
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            41,
+            65,
+            499,
+            224
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 107.16,
+          "alphaWeight": 2189541
+        },
+        {
+          "centerX": 272.23,
+          "alphaWeight": 2459245
+        },
+        {
+          "centerX": 434.3,
+          "alphaWeight": 2132970
+        }
+      ]
+    },
+    {
+      "frame": 4,
+      "alpha": {
+        "8": {
+          "bounds": [
+            32,
+            32,
+            510,
+            225
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            37,
+            35,
+            506,
+            224
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 104.27,
+          "alphaWeight": 2745512
+        },
+        {
+          "centerX": 271.16,
+          "alphaWeight": 2561302
+        },
+        {
+          "centerX": 437.18,
+          "alphaWeight": 2510232
+        }
+      ]
+    },
+    {
+      "frame": 5,
+      "alpha": {
+        "8": {
+          "bounds": [
+            33,
+            34,
+            515,
+            221
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            35,
+            46,
+            512,
+            218
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 108.86,
+          "alphaWeight": 3382125
+        },
+        {
+          "centerX": 274.43,
+          "alphaWeight": 3269516
+        },
+        {
+          "centerX": 440.59,
+          "alphaWeight": 3055630
+        }
+      ]
+    },
+    {
+      "frame": 6,
+      "alpha": {
+        "8": {
+          "bounds": [
+            29,
+            30,
+            516,
+            222
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            34,
+            39,
+            511,
+            220
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 109.04,
+          "alphaWeight": 3830282
+        },
+        {
+          "centerX": 272.48,
+          "alphaWeight": 4012831
+        },
+        {
+          "centerX": 436.05,
+          "alphaWeight": 3726053
+        }
+      ]
+    },
+    {
+      "frame": 7,
+      "alpha": {
+        "8": {
+          "bounds": [
+            24,
+            29,
+            522,
+            224
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            29,
+            37,
+            518,
+            222
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 110.56,
+          "alphaWeight": 4370846
+        },
+        {
+          "centerX": 272.98,
+          "alphaWeight": 5086963
+        },
+        {
+          "centerX": 437.41,
+          "alphaWeight": 4281361
+        }
+      ]
+    },
+    {
+      "frame": 8,
+      "alpha": {
+        "8": {
+          "bounds": [
+            15,
+            28,
+            524,
+            223
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            18,
+            32,
+            520,
+            221
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 106.45,
+          "alphaWeight": 5208205
+        },
+        {
+          "centerX": 268.58,
+          "alphaWeight": 4853168
+        },
+        {
+          "centerX": 438.13,
+          "alphaWeight": 4380983
+        }
+      ]
+    },
+    {
+      "frame": 9,
+      "alpha": {
+        "8": {
+          "bounds": [
+            41,
+            47,
+            503,
+            211
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            45,
+            57,
+            499,
+            209
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 111.2,
+          "alphaWeight": 2093850
+        },
+        {
+          "centerX": 277.41,
+          "alphaWeight": 2428064
+        },
+        {
+          "centerX": 437.82,
+          "alphaWeight": 1840547
+        }
+      ]
+    },
+    {
+      "frame": 10,
+      "alpha": {
+        "8": {
+          "bounds": [
+            51,
+            59,
+            497,
+            210
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            53,
+            64,
+            493,
+            208
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 111.1,
+          "alphaWeight": 1587648
+        },
+        {
+          "centerX": 274.87,
+          "alphaWeight": 1649989
+        },
+        {
+          "centerX": 435.32,
+          "alphaWeight": 1293436
+        }
+      ]
+    },
+    {
+      "frame": 11,
+      "alpha": {
+        "8": {
+          "bounds": [
+            56,
+            65,
+            489,
+            207
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            59,
+            69,
+            486,
+            203
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 114.02,
+          "alphaWeight": 997049
+        },
+        {
+          "centerX": 273.92,
+          "alphaWeight": 964921
+        },
+        {
+          "centerX": 434.01,
+          "alphaWeight": 864720
+        }
+      ]
+    },
+    {
+      "frame": 12,
+      "alpha": {
+        "8": {
+          "bounds": [
+            60,
+            93,
+            487,
+            205
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        },
+        "64": {
+          "bounds": [
+            62,
+            96,
+            483,
+            202
+          ],
+          "edgesTopBottomLeftRight": [
+            0,
+            0,
+            0,
+            0
+          ]
+        }
+      },
+      "thirdAlphaCenters": [
+        {
+          "centerX": 108.55,
+          "alphaWeight": 642908
+        },
+        {
+          "centerX": 272.4,
+          "alphaWeight": 654066
+        },
+        {
+          "centerX": 437.42,
+          "alphaWeight": 543966
+        }
+      ]
+    }
+  ],
+  "seamRows": [
+    {
+      "y": 240,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 241,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 242,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 481,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 482,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    },
+    {
+      "y": 483,
+      "maxAlpha": 1,
+      "alpha64Count": 0
+    }
+  ],
+  "strongEdgeTouchFrames": [],
+  "alpha8EdgeTouchFrames": []
+}

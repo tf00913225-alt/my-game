@@ -46,7 +46,7 @@
 - 一般戰鬥維持 `single / tri / row / column / all` 的 Fixed Slot（固定格位）規則。
 - 敵方六格 V1 仍由 `js/battlefield-slot-owner.js` 唯一控制。`wild / daily / abyss / tower` 的新遭遇在原始名單不超過六名時使用 `standard-six`：後排 `ENEMY_B1/B2/B3`、前排 `ENEMY_F1/F2/F3`；沿用原 ID 的前後排與欄位語意，不改我方格位。遭遇建立後固定同一份 snapshot，死亡不重排、不把空格納入目標。
 - 超過六名的一般遭遇保留完整 `legacy-ten` 名單及幾何，snapshot／戰場 DOM 明確標記 `pending-wave-migration`。深淵及四象塔正式遭遇由既有 `js/00-main.js::FourSymbolsBattleWaves` 單一波次 Owner 管理兩波，每波最多六名；不得將兩波的完整資料目錄直接送入渲染。個人／世界 Boss、特殊物件、援軍及 Adventure 維持原規則。
-- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；只有 `standard-six` 使用敵方／操作／我方 `48/16/36` 區域比例，其他模式保留 `42/16/42`。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner。
+- 六格 DOM、技能範圍與 VFX 共用上述 snapshot。正式 `css/fixed-slot-battlefield-rendering-v2.css` 依格位來源投影每排欄數；共用結構由上至下為敵方／我方／底部操作區，權重 `54.785/45.215/12`，操作區另保留原指令與倒數的最小高度。無公告時頂部留44px技能名稱空間，原更新公告可見時才擴至72px；底部保留8px安全距。手動五指令＋更多與AUTO／設定／加速共用一條52px控制列，手動更多向上展開控制浮層；回合／倒數不壓指令。敵我之間留44px結構間隔與相鄰gap，窄手機所有指令／更多／控制實際觸控不得小於44px。我方所有排採相同scale1、同框且無上溢，敵方保留前後排景深。AUTO光圈只投影原有效自動狀態，不繞過時數Gate；倍率尚未實作時明標disabled待開放。立繪沿用 V174 與 Registry Alpha Bounds（透明輪廓範圍）的等比例、不裁切投影，不新增座標或圖片縮放 Owner；可用高度變更的實際視覺差異由同工程畫面證據驗收。
 - `FourSymbolsBattleSkillTargeting` 是技能 Target Shape（目標形狀）與 hostile primary eligibility（敵對主要目標可選性）的唯一協調入口；玩家→敵方、敵方→玩家、手動、自動與支援技能都必須使用同一份正式 Skill Data／effective target type，再交由 `FourSymbolsBattlefieldSlots` 解析幾何。禁止同一 Skill ID 因施放方不同而硬寫第二份目標人數或範圍。
 - Stealth（隱身）只禁止成為 hostile primary target（敵對主要選定目標）：普通攻擊與任何需要指定 primary 的 `single / tri / row / column` 都不得選中隱身單位；但 `tri / row / column / all` 已由其他合法 primary／全體範圍解析出的波及名單仍可包含隱身單位。
 - Boss（頭目）專屬模式內，Boss、援軍、圖騰、戰旗、法器與技能召喚物都是獨立的數字索引 target entity（目標單位）。
@@ -67,7 +67,7 @@
 - Direct Damage Impact Presentation 由 V143 Hit Frame 同步投影 artwork-only Impact Recoil（僅 `.v174-battle-art`，140ms），同一V143 Owner於命中時在唯一 Hit Feedback Overlay（16010）投影正式 Render Geometry 的 artworkProjection，位於技能 VFX（16000）之上、同一 Presentation Owner 暫時移出的原節點 Unit HUD（16015）、技能名稱（16020）及 Floating Feedback 之下；以非互動角色剪影反白兩次（每次80ms，中間40ms恢復原色，總長200ms，不延長Gameplay gate）、Floating Feedback、Impact SFX 與已結算 HP／Shield。HP紅條立即投影正式值；V143依正式HP減少量與最終HUD分母畫260ms暖色傷害殘留段，Boss護盾改變分母不視為失血，回血／重建身份／dispose清理舊殘留。`.red-hit`、root card shake、`v174-hit-shake` 永久 RETIRED；Heal／SP／Shield Gain／Status-only／DOT 不使用直接傷害recoil／反白，MISS 使用既有 dodge。Gameplay settlement 維持同步。致死直接命中僅由 V143 保存該次 committed hp_damage、角色物件身分、cast／battle generation 與正式 artworkProjection 快照，完成同一 80/40/80 Overlay；死亡後的新回饋及已消耗／失效回呼不得取得此資格。Core 傷害與死亡同步結算，V143 不延後 killMonster；最後行動由 00-main.js 的同一受管理推進計時器等待 V142 演出生命週期及既有 650ms 行動後等待，再啟動勝利退場，既有勝負離場動畫秒數不變；battle_end 後僅在原戰鬥頁仍可見時保留該次致死呈現，自然動畫結束即清理。相同戰鬥死亡重建 DOM 使用同一正式快照；dispose／supersede／換頁／hidden／pagehide／新戰鬥仍立即取消，不新增命中或延後清理 timer。
 - 玩家與普通敵方共用資源條高度與 HUD 錨點；Boss 可使用自己的大型 HP／Shield HUD。
 - Target Reticle（目標準星）由 Fixed Slot V2 唯一投影；敵方、我方、Boss、援軍與可破壞 Boss object 共用同一金色準星。歷史 `::after` 準星不得與正式 `::before` 準星並存。
-- Status Icon（狀態圖示）HUD 必須位於 HP／SP 資源條之上，正式 24px Icon 不得被塞入低於自身高度的容器或被資源條 z-index 蓋住。
+- 我方 Status Icon（狀態圖示）HUD 位於 HP／SP 資源條之上；敵方狀態圖示位於立繪腳下的獨立資訊帶。正式 24px Icon 不得裁切、縮進低於自身高度的容器或遮住相鄰單位資訊。Render Geometry Owner 分別輸出敵方上方資源資訊的 hudSafeRect 與下方 statusBadgeRect，瞬時回饋避開兩帶。
 - Stealth（隱身）有效期間只將 combatant artwork（戰鬥立繪本體）投影為 `opacity: 0.35`；HP／SP、名稱、Status Icon、Target/VFX 錨點不得一起變透明。狀態解除或死亡後必須在正式狀態同步時移除半透明呈現。
 - 戰鬥資訊抽屜、巡怪與深淵戰鬥紀錄 UI 已退場；不得重建入口、視窗或鏡像 DOM。回合標籤由正式戰場獨立顯示，內部戰鬥事件及其 observer（觀察者）仍保留。
 - 巡怪頁底部導覽與副本／Gameplay 共用 `js/04-stage-v11-native-bottom-nav-runtime.js::FourSymbolsBottomNav.syncContext()` 的 app-shell context navigation owner；順序固定為「角色／背包／秘寶／元素匣／返回」，冷進野怪區不得等待或預載 gameplay-core 才取得正確情境。`js/42-v148-combat-dungeon-fixes.js::syncContextNavigation()` 只保留深淵頂部返回控制與相容轉呼叫，不得重新持有底部情境選擇。巡怪頁不得再建立右上角第二顆返回鈕或自行硬寫另一套底部按鈕 markup。
@@ -80,7 +80,11 @@
 - V142 只擁有視覺生命週期與剩餘時間；V143 只擁有 raster VFX（點陣視覺特效）渲染與幾何。
 - `00-main.js` 是 `finishPlayerAction()` 與 `processNextCombatant()` 唯一 owner。功能模組不得替換這兩個函式，也不得以 Promise（非同步承諾）阻塞回合佇列。
 - 功能模組需要觀察或暫時攔截完成通知時，只能使用 `FourSymbolsBattleFlow` 的訂閱／攔截 API（應用程式介面），並確保攔截器可解除。
-- single 的中心是實際目標格；tri 即使只剩一個單位也保留三人格視覺尺寸；all 永遠保留完整目標側範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- single 的中心是實際目標格；tri 的整張群體圖即使只剩一個單位也保留三人格基準尺寸；all 永遠保留完整目標側基準範圍；projectile（飛行技能）從施放者中心飛向正式主要目標中心。
+- 上述範圍是目標集合與基準幾何，不依存活數縮減。點陣素材保持原比例，在既有 Geometry Owner 的目標側與畫面交集內等比安全 fit；只限制藝術框，不改命中錨點或目標範圍。群體範圍由正式素材構圖與各實際目標的命中回饋共同表達，不以拉伸、裁切主體或新增範圍 Owner 填滿。
+- group／tri／row 的整張群體圖對齊正式形狀 bounds 中心，在原中心內等比安全 fit，不為填滿範圍而放大或搬移到角色腳下。primary 與各目標命中回饋仍對齊實際目標，飛行技能終點仍使用正式主要目標。
+- 明確標記 `presentation:"per-recipient"` 的單人構圖依正式 `targetIds` 快照逐人呈現，沿用立繪 Geometry、同一施放時鐘與清理；不改技能 targetType、命中或結算，也不得因非目標的遲到回饋增加節點。未標記的整張群體圖仍依前述固定形狀規則。
+- 持續狀態 body 由 V143 依既有 Render Geometry 的人物立繪範圍定位，區分頭頂、身側與腳邊呈現，不以含 HUD 的整張卡片放大。冰封／石化保留硬控包覆身份；點陣來源維持 contain 比例，HUD、兩秒輪播與狀態生命週期仍沿原 Owner。岩壁／土盾依使用者指定呈現外包覆、中央留透的護體感；怒火（爆擊）、風行（閃避）、氣定神閒（異常抗性）的小樣使用同一 V143 狀態節點的紅／綠／藍腳下光圈與約兩秒一次稀疏上升細線，不新增發射計時器、Canvas 或第二狀態 Owner；減少動態時停用上升，狀態 Icon 維持靜態。
 - DOM 例外、MISS（未命中）、Buff（增益）、Heal、Shield、Debuff（減益）與 VFX 清理都不得讓同一 initiative（行動序）永久等待。
 
 ## 持續效果回合生命週期契約
@@ -115,7 +119,9 @@
 - 玩家四元素「主要效果包含直接傷害」技能的正式傷害曲線唯一 owner 為 `js/00-main.js::getSkillDamageAtLevel()`。Lv1 使用 `baseDamage`；Lv2～4 依 `damagePerLevel` 線性增加；Lv5 = Lv4 × 1.5；Lv6～9 再依固定成長增加；Lv10 = Lv9 × 1.5。突破與最終傷害取整統一使用正式戰鬥 `Math.round` 語意。
 - 玩家直接傷害技能正式上限為 Lv10；純 Buff／Heal／Revive／Control／Support／EX 不得因本規則被誤升 Lv10。既有玩家已學等級必須原值保留，Max Lv 提升不得重置、退點、自動補滿或重複扣點。
 - 所有可升級技能 Lv2～Max 每次固定消耗 1 技能點。初次學習成本仍由正式技能階級／資料 owner 決定，不得拿升級成本覆蓋學習成本。
-- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／Progression／玩家說明 projection owner，並隨 `gameplay-core` 固定載入；V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- `js/60-v173.64-skill-progression-rebalance.js` 是正式玩家技能 Final Data／玩家說明與技能變更 lifecycle owner，並隨 `gameplay-core` 固定載入；學習／升級資格、門檻與成本委派app-shell 在原 main 前唯一載入的純規則 `functions/src/skill-progression-core.js`，不複製公式。共用規則不建立技能所有權、伺服器 writer 或戰鬥執行。V144／V169 等舊層不得再各自覆寫技能詳細文字或另算下一級傷害。
+- 原技能裝備／移除、保留第一招跨修及 v136 明選／恢復決策委派同一純 core 的獨立 retained loadout v1；原 Client entry 保留 render／save lifecycle，原 learning v1 seal 不變。共用決策不授予技能所有權或 Cloud loadout authority；canonical v2 與 protected writer／Recovery 仍依原高風險 Gate。
+- `scripts/lib/player-skill-config-catalog.mjs` 在既有 production build／check 中，僅從原始技能資料、四元素 renderer predicate 與 Final Data 機械投影 `functions/src/generated/player-skill-config-catalog.json`。目錄只含玩家設定欄位與原傷害 ID 集合的分類標記，缺省 `requires` 保留缺省；不包含 SP／傷害／戰鬥 runtime，不授予學習、升級、技能點或雲端權利。來源不明、動態 selected field、歧義或未審核覆寫必須拒絕產物；既有全部 runtime 技能與純資格規則不因目錄投影被縮減。
 - 技能列表、詳細頁、Lv1～Max 明細與下一級傷害必須由正式 Skill Data 與 `getSkillDamageAtLevel()` 投影。禁止在 UI 寫第二份 10 級傷害表、舊「最高5級」或用「每級+X」假裝完整描述 Lv5/Lv10 突破。
 - Battle Quick Bar（戰鬥技能快捷列）必須驗證每格的 canonical structure（正式結構），並由正式 Skill Data／`FourSymbolsSkillSpec` 投影技能名稱、SP、目標範圍與效果說明；只檢查「有四顆按鈕」不得視為結構有效，缺少內部節點時必須重建正式結構。
 - 輔助技能 Runtime 必須讀正式 `...ByLevel`／duration／target 欄位；不得在施放前暫時 mutation `skill.xxx` 再還原作為等級縮放。敵方／深淵同名支援技能也必須讀同一份正式數值與 Targeting owner。
@@ -201,10 +207,10 @@
 - Floating feedback remains the sole transient-text owner. Critical format is `💥 N`; status capsules are black with white text and retain `statusType` only as semantic metadata.
 - A live V143 impact is scheduled as one target-plus-`impactId` batch. Its requests register before the batch flushes and sort Shield → Damage/Critical/MISS/Resist → Status. Synthetic feedback without an `impactId` stays on the normal queue; clear cancels every pending batch.
 - Persistent state Gate returns a reason. `sameNameDuplicate` is a silent reject before hit rolling or mutation; `exclusiveConflict` (Freeze/Petrify) emits formal status MISS; resistance remains distinct.
-- 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動，Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消。
+- 普通攻擊名稱顯示 700ms，動畫仍為 520ms，名稱不取得流程鎖；其他技能名稱維持 duration × 2/3。唯一 Core Queue resolve delay 為 visualRemaining + 650ms；技能秒數與 Hit Frame 不變。普通 Impact 的視覺時鐘於同步 settlement／DOM task 完成後由 V143 啟動；同一 Owner 的小型中性空氣彈從正式攻擊者錨點飛向實際目標，於既有 Hit Frame 結束。MISS 仍有出手飛行，但不揭示命中 Impact。Hit task 先投影正式資源／狀態，再揭示 Impact 與同批浮字／recoil／SFX。初始化待完成時 V142 remaining 保留 authored duration；cold hit 的既有 140ms recoil 不得被到期清理截斷，dispose／supersede 仍立即取消，並清理空氣彈。
 - 深淵／四象塔換波沿用同一 Core Queue 的 visualRemaining + 650ms，不另疊等待、不建立新 Session、不發布第二次 battle_start。第一波全滅進入 WAVE_TRANSITION，正式 Action／追擊／秘寶及呈現鎖釋放後才換敵人；第二波全滅才 BATTLE_COMPLETE 並走原有單次結算。玩家 HP、SP、怒氣、狀態、秘寶計數及統計保留；換波不額外遞減持續時間或新增回合。舊敵人及目標引用釋放，第二波用不重用的實體索引與既有 Fixed Slot 快照。
 - 深淵前置關為六普通→三精英三普通；帝王關為六精英→一帝王五精英；Lv.40 最終戰第一波沿用水、土、火、風四種精英配置循環為水／土／火／風／水／土（保留舊前五名，不因循環五人格位名單而追加第三補師），第二波為東、天、極、北、南五位天尊（第六格空位）。天尊沿用正式固定技能；等級、MonsterBalance 數值 Owner、獎勵及地圖通關流程不變。
-- 戰場怪物 identity 僅名稱，等級讀正式 entity.level 於 Battle Status Detail 顯示；玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接，不改 Slot／artwork geometry。
+- 戰場怪物 identity 使用單行名稱／等級，等級讀正式 entity.level；完整名稱與等級保留於 Battle Status Detail。玩家 ID／SP／HP HUD 共用名稱列與資源條 tokens 連續相接；敵方腳下狀態圖示列由同一戰場幾何 Owner 預留空間。
 - Skill-name presentation derives color from `skill.element` through `data-skill-element`; character element must not participate. It is a document-level fixed viewport surface and shares the ordinary floating-feedback visual font size.
 
 ## Battle Reading Layer Contract (2026-10-01)

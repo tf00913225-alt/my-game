@@ -9,9 +9,7 @@
     if(typeof window==="undefined"||window.__v17364SkillProgressionInstalled){ return; }
     window.__v17364SkillProgressionInstalled=true;
 
-    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=Object.freeze({
-        2:1,3:1,4:1,5:1,6:1,7:1,8:1,9:1,10:1
-    });
+    const SKILL_UPGRADE_COST_BY_TARGET_LEVEL=window.FourSymbolsSkillProgressionCore.upgradeCosts;
     const PLAYER_DAMAGE_SKILL_IDS=Object.freeze([
         "flameSlash","fireCritical","explosiveFlurry","dragonSlash",
         "fireRocket","blazeSpell","flameTornado","phoenixCry",
@@ -23,6 +21,8 @@
         "stoneThrow","sandWind","flyingSandStrike","dustStorm"
     ]);
     const PLAYER_DAMAGE_SKILL_ID_SET=new Set(PLAYER_DAMAGE_SKILL_IDS);
+    const progression=window.FourSymbolsSkillProgressionCore.createRules(skillDatabase,PLAYER_DAMAGE_SKILL_IDS);
+    const loadoutRules=window.FourSymbolsSkillProgressionCore.getLoadoutRulesForVersion("v1",skillDatabase);
     const FIRE_MOMENTUM_BY_LEVEL=Object.freeze([12,15,18,21,25]);
     const BLOOD_BURN_HP_COST_BY_LEVEL=Object.freeze([20,25,30,35,40]);
     const BLOOD_BURN_BY_LEVEL=Object.freeze([20,25,30,35,50]);
@@ -47,11 +47,7 @@
         const number=Number(value);
         return Number.isFinite(number)?number:(fallback===undefined?0:fallback);
     }
-    window.v173GetInitialLearnCost=function(character,skill){
-        const base=Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
-        const cross=!!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-        return base*(cross?2:1);
-    };
+    window.v173GetInitialLearnCost=progression.getInitialLearnCost;
     function clampLevel(value,maxLevel){
         return Math.max(1,Math.min(Math.max(1,numeric(maxLevel,1)),Math.floor(numeric(value,1))));
     }
@@ -624,44 +620,9 @@
         return true;
     }
 
-    function getRequiredCharacterLevelForSkillLevel(skill,targetSkillLevel){
-        const learnLevel=Math.max(1,Math.floor(numeric(skill&&skill.learnLevel,1)));
-        const target=Math.max(1,Math.floor(numeric(targetSkillLevel,1)));
-        if(target<=1){ return learnLevel; }
-        /* Absolute character-level gates; never offset by learnLevel. */
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
-        if(maxLevel<=1){ return Infinity; }
-        if(PLAYER_DAMAGE_SKILL_ID_SET.has(skill&&skill.id)){
-            return Math.min(90,Math.max(10,(target-1)*10));
-        }
-        return Math.min(80,Math.max(20,(target-1)*20));
-    }
-    function getUpgradeCostForTargetLevel(skill,targetSkillLevel){
-        if(!skill||numeric(skill.maxLevel,1)<=1){ return 0; }
-        return numeric(SKILL_UPGRADE_COST_BY_TARGET_LEVEL[Math.floor(numeric(targetSkillLevel))],0);
-    }
-    function getSkillUpgradeEligibility(character,skill,currentSkillLevel){
-        const current=Math.max(0,Math.floor(numeric(currentSkillLevel)));
-        const maxLevel=Math.max(1,Math.floor(numeric(skill&&skill.maxLevel,1)));
-        const target=current+1;
-        const requiredLevel=target<=maxLevel
-            ?getRequiredCharacterLevelForSkillLevel(skill,target):Infinity;
-        const characterLevel=Math.max(1,Math.floor(numeric(character&&character.level,1)));
-        const cost=target<=maxLevel?getUpgradeCostForTargetLevel(skill,target):0;
-        const points=Math.max(0,Math.floor(numeric(character&&character.skillPoints)));
-        const learned=current>0;
-        const atMax=learned&&current>=maxLevel;
-        const levelOk=learned&&!atMax&&characterLevel>=requiredLevel;
-        const pointsOk=learned&&!atMax&&points>=cost;
-        let reason="";
-        if(!skill){ reason="技能資料不存在"; }
-        else if(!learned){ reason="請先學會此技能"; }
-        else if(atMax){ reason="已達最高技能等級"; }
-        else if(!levelOk){ reason="需要角色 Lv"+requiredLevel; }
-        else if(!pointsOk){ reason="技能點不足，需要"+cost+"點"; }
-        return Object.freeze({allowed:!!(skill&&levelOk&&pointsOk),currentLevel:current,
-            targetLevel:target,maxLevel,requiredLevel,levelOk,pointsOk,cost,reason});
-    }
+    const getRequiredCharacterLevelForSkillLevel=progression.getRequiredCharacterLevelForSkillLevel;
+    const getUpgradeCostForTargetLevel=progression.getUpgradeCostForTargetLevel;
+    const getSkillUpgradeEligibility=progression.getSkillUpgradeEligibility;
     function getSkillContext(characterKey){
         const key=characterKey!==undefined&&characterKey!==null?characterKey:
             (typeof currentSkillCharacter!=="undefined"?currentSkillCharacter:null);
@@ -679,39 +640,13 @@
     function learnedLevel(context,skillId){
         return Math.max(0,Math.floor(numeric(context&&context.loadout&&context.loadout.skillLevels&&context.loadout.skillLevels[skillId])));
     }
-    function isCrossElementSkill(character,skill){
-        return !!(character&&skill&&character.element&&skill.element&&character.element!==skill.element);
-    }
-    function hasLearnedNativeSkill(context){
-        const levels=context&&context.loadout&&context.loadout.skillLevels||{};
-        return Object.keys(levels).some(id=>numeric(levels[id])>0&&skillById(id)&&skillById(id).element===context.character.element);
-    }
-    function crossLearnGate(context,skill){
-        if(!isCrossElementSkill(context.character,skill)){ return {ok:true,cross:false}; }
-        if(/EX$/.test(String(skill.id||""))||skill.category==="passive"){
-            return {ok:false,cross:true,reason:"本命元素限定"};
-        }
-        if(!hasLearnedNativeSkill(context)){
-            return {ok:false,cross:true,reason:"需先學會至少 1 招本命元素技能"};
-        }
-        return {ok:true,cross:true};
-    }
-    function initialLearnCost(context,skill){
-        if(typeof window.v173GetInitialLearnCost==="function"){
-            return Math.max(0,Math.floor(numeric(window.v173GetInitialLearnCost(context&&context.character,skill))));
-        }
-        return Math.max(0,Math.floor(numeric(skill&&skill.learnCost)));
-    }
+    const isCrossElementSkill=progression.isCrossElementSkill;
+    const initialLearnCost=progression.initialLearnCost;
     function normalizeCrossElementEquip(loadout,character){
         if(!loadout||!character||!Array.isArray(loadout.equippedSkills)){ return false; }
-        let seen=false,changed=false;
-        loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
-            const skill=skillById(skillId);
-            if(!skill||!isCrossElementSkill(character,skill)){ return true; }
-            if(!seen){ seen=true; return true; }
-            changed=true; return false;
-        }).slice(0,4);
-        return changed;
+        const result=loadoutRules.normalizeCrossElementEquip(loadout.equippedSkills,character);
+        loadout.equippedSkills=result.equippedSkills;
+        return result.changed;
     }
     function normalizeAllCrossElementEquips(){
         if(typeof characterSkillLoadouts==="undefined"||!characterSkillLoadouts){ return false; }
@@ -724,57 +659,14 @@
         return changed;
     }
     window.v173NormalizeCrossElementEquips=normalizeAllCrossElementEquips;
-    function prerequisiteMet(levels,skill){
-        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
-        if(!required.length){ return true; }
-        return required.some(skillId=>numeric(levels&&levels[skillId])>0);
-    }
-    function prerequisiteLabel(skill){
-        const required=Array.isArray(skill&&skill.requires)?skill.requires.filter(Boolean):[];
-        if(!required.length){ return "無"; }
-        return required.map(skillLabel).join(" 或 ");
-    }
+    const prerequisiteLabel=progression.prerequisiteLabel;
 
     /*
        Canonical Skill Learn Eligibility（技能學習資格唯一來源）.
        Renderer、指引紅點、詳細頁與 learnSkill() 必須讀同一份結果；
        不再由各 UI 自己重算跨元素、前置與成本。
     */
-    function getSkillLearnEligibility(character,skill,levels){
-        const safeCharacter=character||null;
-        const safeSkill=skill||null;
-        const safeLevels=levels||{};
-        const cross=isCrossElementSkill(safeCharacter,safeSkill);
-        const native=!cross;
-        const crossGate=crossLearnGate({character:safeCharacter,loadout:{skillLevels:safeLevels}},safeSkill);
-        const levelOk=!!(safeCharacter&&safeSkill&&
-            Math.max(1,Math.floor(numeric(safeCharacter.level,1)))>=
-            getRequiredCharacterLevelForSkillLevel(safeSkill,1));
-        const prerequisiteRequired=!cross;
-        const prerequisiteOk=!prerequisiteRequired||prerequisiteMet(safeLevels,safeSkill);
-        const learnCost=initialLearnCost({character:safeCharacter},safeSkill);
-        const points=Math.max(0,Math.floor(numeric(safeCharacter&&safeCharacter.skillPoints)));
-        const pointsOk=points>=learnCost;
-        const allowed=!!(safeSkill&&levelOk&&crossGate.ok&&prerequisiteOk&&pointsOk);
-        let reason="";
-        if(!safeSkill){ reason="技能資料不存在"; }
-        else if(!levelOk){ reason="Lv"+safeSkill.learnLevel+" 解鎖"; }
-        else if(!crossGate.ok){ reason=crossGate.reason; }
-        else if(!prerequisiteOk){ reason="需先學習："+prerequisiteLabel(safeSkill); }
-        else if(!pointsOk){ reason="需要"+learnCost+"點"; }
-        return Object.freeze({
-            isCrossElement:cross,
-            isNativeElement:native,
-            allowed,
-            levelOk,
-            prerequisiteRequired,
-            prerequisiteOk,
-            learnCost,
-            pointsOk,
-            crossGateOk:!!crossGate.ok,
-            reason
-        });
-    }
+    const getSkillLearnEligibility=progression.getSkillLearnEligibility;
     window.v173GetSkillLearnEligibility=getSkillLearnEligibility;
     function finalizeSkillMutation(){
         if(typeof saveGame==="function"){ saveGame(); }
@@ -845,16 +737,12 @@
 
     if(typeof equipSkill==="function"){
         equipSkill=function(skillId){
-            const skill=skillById(skillId),context=getSkillContext();
-            if(!skill||!context.character||!context.loadout||learnedLevel(context,skillId)<=0){ return false; }
-            normalizeCrossElementEquip(context.loadout,context.character);
-            const equipped=context.loadout.equippedSkills=context.loadout.equippedSkills||[];
-            if(equipped.includes(skillId)){ return true; }
-            if(isCrossElementSkill(context.character,skill)&&equipped.some(id=>{
-                const equippedSkill=skillById(id); return equippedSkill&&isCrossElementSkill(context.character,equippedSkill);
-            })){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
-            if(equipped.length>=4){ return notify("每個角色最多只能攜帶4個技能。"); }
-            equipped.push(skillId);
+            const context=getSkillContext(),result=loadoutRules.equipSkill(context.character,context.loadout,skillId);
+            if(result.status==="invalid"){ return false; }
+            context.loadout.equippedSkills=result.equippedSkills;
+            if(result.status==="already-equipped"){ return true; }
+            if(result.status==="cross-limit"){ return notify("每名角色最多攜帶 1 招跨元素技能。"); }
+            if(result.status==="full"){ return notify("每個角色最多只能攜帶4個技能。"); }
             if(typeof populateAutoSkillOptions==="function"){ populateAutoSkillOptions(); }
             if(typeof populateAutoSkillOptions2==="function"){ populateAutoSkillOptions2(); }
             finalizeSkillMutation();

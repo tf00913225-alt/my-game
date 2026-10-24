@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import {inflateSync} from "node:zlib";
 import {spawnSync} from "node:child_process";
 
 const ROOT=process.cwd();
@@ -9,6 +10,24 @@ const ARTIFACT_DIR=path.join(ROOT,"artifacts/browser-qa");
 const FIXTURE=path.join(ROOT,".fixed-slot-battlefield-rendering-v2-qa.html");
 const VIEWPORTS=[[412,915],[393,873],[390,844],[360,800]];
 const read=file=>fs.readFileSync(path.join(ROOT,file),"utf8");
+
+function assertFloatingCommandReachability(evidence){
+ assert.equal(evidence.before.length,5);assert.equal(evidence.after.length,5);
+ evidence.before.concat(evidence.after).forEach(button=>assert.equal(button.hit,true,'every complete command center must remain reachable without dragging'));
+ assert.equal(evidence.moreHit,true,'more button center must be reachable');
+ assert.ok(evidence.moreRect.width>=44&&evidence.moreRect.height>=44,'more physical touch target');
+ assert.equal(evidence.utility.length,3);evidence.utility.forEach(button=>{assert.equal(button.hit,true,'expanded utility center reachable');assert.ok(button.rect.width>=44&&button.rect.height>=44,'utility physical touch target');});
+ assert.equal(evidence.folded,true,'utility tray folds after inspection');
+}
+function exerciseFloatingCommandReachability(){
+ const buttons=[...document.querySelectorAll('#mainBattleMenu > .menu-button')],more=document.getElementById('battleMoreButton');
+ const probe=button=>{const r=button.getBoundingClientRect(),hit=document.elementFromPoint(r.left+r.width/2,r.top+r.height/2);return {text:button.textContent,rect:r.toJSON(),hit:hit===button||!!hit&&button.contains(hit)};};
+ const before=buttons.map(probe),moreHit=probe(more).hit;
+ setBattleUtilityMenuOpen(true);
+ const utility=[...document.querySelectorAll('#battleUtilityTray button')].map(probe),after=buttons.map(probe);
+ setBattleUtilityMenuOpen(false);
+ return {before,after,moreHit,moreRect:more.getBoundingClientRect().toJSON(),utility,folded:getComputedStyle(document.getElementById('battleUtilityTray')).display==='none'};
+}
 
 function findChrome(){
     const configured=String(process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH||"").trim();
@@ -60,10 +79,17 @@ const geometryCss=read("css/fixed-slot-battlefield-rendering-v2.css").replace(/<
 const bossCss=read("css/gameplay-boss-tower.css").replace(/<\/style/gi,"<\\/style");
 
 const presentationSource=read("js/54-v173.51-battle-qa.js");
-const portraitSource=presentationSource.slice(presentationSource.indexOf("function numericValue("),presentationSource.indexOf("function battleArtworkSource("))+presentationSource.slice(presentationSource.indexOf("function syncUnitArtwork("),presentationSource.indexOf("function clearUnitHud("));
+const portraitSource=presentationSource.slice(presentationSource.indexOf("function numericValue("),presentationSource.indexOf("function syncUnitArtwork("))+presentationSource.slice(presentationSource.indexOf("function syncUnitArtwork("),presentationSource.indexOf("function clearUnitHud("));
 const portraitRegistry=JSON.parse(read("config/monster-portrait-registry.json")).presentation;
+const utilityProjectionSource=mainSource.slice(mainSource.indexOf('function setBattleUtilityMenuOpen('),mainSource.indexOf('function updateAutoButton(){'));
+const elementBoxSource=read('js/20-anonymous-20.js');
+const elementBoxDragSource=elementBoxSource.slice(elementBoxSource.indexOf('(function initBattleUtilityControls(){')).replace(/<\/script/gi,'<\\/script');
+assert.ok(elementBoxDragSource.startsWith('(function initBattleUtilityControls(){'),'fixture must load the original utility interaction Owner');
 const portraitSamples=Object.keys(portraitRegistry.assets).filter(p=>p.startsWith("assets/monsters/wild/zone-01/")).slice(0,6);
+const allyPortraitSamples=[...read("js/26-v131-patrol-appearance.js").matchAll(/front:"(assets\/characters\/patrol\/[^" ]+)"/g)].map(match=>({path:match[1],data:"data:image/webp;base64,"+fs.readFileSync(path.join(ROOT,match[1])).toString("base64")}));
+assert.equal(allyPortraitSamples.length,8,"formal patrol front portrait coverage");
 
+let allyPortraitProbeMetadata=null;
 function fixtureHtml(width,height){
     return `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <style>
@@ -82,7 +108,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#120e09;col
 <style>${commandGeometryCss}</style><style>${identityCss}</style><style>${v154Css}</style><style>${geometryCss}</style><style>${bossCss}</style><style>${feedbackCss}</style></head><body>
 <div id="game-stage"><div id="app"><div id="game-content"><section id="battlePage" class="v-fixed-slot-render-v2"><div class="battle-wrap">
 <section class="battle-enemy-region"><div id="battleMonsterArea" class="battle-monsters v131-formation"></div></section>
-<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><button id="battleElementBoxButton" class="battle-element-box-button" type="button">元素匣</button><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1"><button class="menu-button skill">技能</button><button class="menu-button">普通攻擊</button><button class="menu-button defend">防禦</button><button class="menu-button item">背包</button><button class="menu-button run">逃脫</button></div></div></div></div></section>
+<section class="battle-center-region"><div class="battle-middle"><div id="battleActionRegion" data-control-mode="manual" class="v-fixed-action-zone" style="position:relative;display:flex;flex-direction:column;gap:4px"><div class="battle-title">戰鬥</div><div id="battleTurnIndicator">第 1 回合</div><div id="battleUtilityTray"><button id="battleAutoToggle" class="battle-utility-button">AUTO</button><button id="battleElementBoxButton" class="battle-element-box-button battle-utility-button" type="button">設定</button><button id="battleSpeedControl" class="battle-utility-button" disabled>1×</button></div><div id="turnTargetRow" class="turn-target-row">第 1 回合</div><div id="battleTargetPrompt" class="battle-target-prompt"><div class="battle-target-prompt-copy"><div class="battle-target-prompt-action">選擇［怒火］的我方目標</div><div class="battle-target-prompt-hint">選擇目標</div></div><button class="battle-target-back">返回</button></div><div id="battleCommandRow" style="display:flex;gap:5px;flex:0 0 66px;position:relative"><div id="mainBattleMenu" class="battle-menu" style="flex:1"><button class="menu-button skill">技能</button><button class="menu-button">普通攻擊</button><button class="menu-button defend">防禦</button><button class="menu-button item">背包</button><button class="menu-button run">逃脫</button></div><button id="battleMoreButton" type="button">⋯</button></div></div></div></section>
 <section class="battle-ally-region"><div id="battlePlayerRow" class="battle-player-row"></div></section>
 </div></section></div></div></div><pre id="result" hidden></pre>
 <script>
@@ -99,13 +125,31 @@ window.FourSymbolsBattlePresentation={getUnitHud:function(card){return card.v174
 window.showDamagePopup=function(element,text,type,isCrit){var p=document.createElement('div');p.className='damage-popup hp-popup'+(isCrit?' crit':'');p.textContent=text||'-100';element.appendChild(p);return p;};
 window.showMissEffect=function(isPlayerTarget,index,label){var el=document.getElementById((isPlayerTarget?'battlePlayerCard':'battleMonster')+index);if(!el)return;var p=document.createElement('div');p.className='damage-popup miss-popup';p.textContent=label||'MISS';el.appendChild(p);};
 </script><script>${ownerSource}</script><script>${v131FormationSource}</script><script>${v131EnemyApplySource}</script><script>${adapterSource}</script><script>${feedbackSource}</script><script>${mainRenderHookSource}</script><script>${mainRenderSource}</script>
-<script>
-(function(){
+<script>${utilityProjectionSource}</script><script>${elementBoxDragSource}</script><script>
+(async function(){
+ if(document.readyState==='loading')await new Promise(resolve=>document.addEventListener('DOMContentLoaded',resolve,{once:true}));
+ const exerciseFloatingCommandReachability=${exerciseFloatingCommandReachability.toString()};
+ let commandDrag=null;
 ${portraitSource}
  const portraitMetadata=${JSON.stringify(portraitRegistry)},portraitPaths=${JSON.stringify(portraitSamples)};
  window.v154GetPortraitPresentation=function(path){return portraitMetadata.assets[path];};
  window.v154GetPortraitScaleContract=function(){return portraitMetadata.classes;};
  const owner=window.FourSymbolsBattlefieldSlots,adapter=window.FourSymbolsBattlefieldRenderGeometry;
+ const allyPortraits=${JSON.stringify(allyPortraitProbeMetadata)}||await Promise.all(${JSON.stringify(allyPortraitSamples)}.map(async function(sample){
+  const image=new Image();image.src=sample.data;await image.decode();
+  const canvas=document.createElement('canvas');canvas.width=image.naturalWidth;canvas.height=image.naturalHeight;
+  const context=canvas.getContext('2d');context.drawImage(image,0,0);const rgba=context.getImageData(0,0,canvas.width,canvas.height).data;
+  let left=canvas.width,top=canvas.height,right=0,bottom=0;
+  for(let y=0;y<canvas.height;y++)for(let x=0;x<canvas.width;x++)if(rgba[(y*canvas.width+x)*4+3]>0){left=Math.min(left,x);top=Math.min(top,y);right=Math.max(right,x+1);bottom=Math.max(bottom,y+1);}
+  return {...sample,width:canvas.width,height:canvas.height,alpha:[left,top,right,bottom]};
+ }));
+ function allyVisiblePortraits(){return Array.from(document.querySelectorAll('#battlePlayerRow .battle-player')).map(function(card,index){
+  const source=allyPortraits[index%allyPortraits.length];card.dataset.v174BattleArtwork='url("'+source.data+'")';syncUnitArtwork(card,'player');
+  card.querySelector('.v174-battle-art').getAnimations({subtree:true}).forEach(a=>a.cancel());
+  const r=card.querySelector('.v174-portrait-paint').getBoundingClientRect(),scale=Math.min(r.width/source.width,r.height/source.height),left=r.left+(r.width-source.width*scale)/2,top=r.bottom-source.height*scale,b=source.alpha;
+  return {id:card.id,path:source.path,visible:{left:left+b[0]*scale,top:top+b[1]*scale,right:left+b[2]*scale,bottom:top+b[3]*scale}};
+ });}
+
  function enemyCard(index){var c=document.createElement('div');c.id='battleMonster'+index;c.className='battle-monster '+(index===4?'abyss-unit':'');c.dataset.rank=window.monsters[index].rank;c.innerHTML='<div class="v174-battle-art"><div class="v174-action-motion"><div class="v174-portrait-paint"></div></div></div><div class="battle-monster-name v143-monster-identity">怪物'+index+'</div><div class="monster-status-badges"></div><div class="monster-hp"></div><div class="monster-sp"></div>';return c;}
  function allyCard(index){var c=document.createElement('div');c.id='battlePlayerCard'+index;c.className='battle-player';c.innerHTML='<div class="v174-battle-art"><div class="v174-action-motion"><div class="v174-portrait-paint"></div></div></div><div class="battle-player-id">角色'+index+'</div><div class="monster-status-badges"></div><div class="hp-bar"></div><div class="sp-bar"></div>';return c;}
  function addCards(enemyCount,allyCount,split){
@@ -117,7 +161,7 @@ ${portraitSource}
  }
  function rect(sel){var node=document.querySelector(sel),r=node.getBoundingClientRect();return {left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height,centerX:r.left+r.width/2,centerY:r.top+r.height/2};}
  function commandVisualTop(){var menu=document.getElementById('mainBattleMenu'),r=menu.getBoundingClientRect(),style=getComputedStyle(menu,'::before'),scaleY=menu.offsetHeight?r.height/menu.offsetHeight:1,top=parseFloat(style.top)||0;return r.top+top*scaleY;}
- function lower(){return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),commandButtons:Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).map(n=>({rect:n.getBoundingClientRect().toJSON(),font:getComputedStyle(n).fontSize,hit:document.elementFromPoint(n.getBoundingClientRect().x+n.getBoundingClientRect().width/2,n.getBoundingClientRect().y+n.getBoundingClientRect().height/2)===n})),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
+ function lower(){if(!commandDrag)commandDrag=exerciseFloatingCommandReachability();return {enemy:rect('.battle-enemy-region'),center:rect('.battle-center-region'),allyRegion:rect('.battle-ally-region'),stageScale:document.getElementById('game-stage').getBoundingClientRect().width/document.getElementById('game-stage').offsetWidth,ally:rect('#battlePlayerRow'),middle:rect('.battle-middle'),action:rect('#battleActionRegion'),turn:rect('#turnTargetRow'),command:rect('#mainBattleMenu'),commandVisualTop:commandVisualTop(),elementBox:rect('.battle-element-box-button'),elementBoxHit:(function(){var n=document.querySelector('.battle-element-box-button'),r=n.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return n===hit||n.contains(hit);})(),commandButtons:Array.from(document.querySelectorAll('#mainBattleMenu > .menu-button')).map(n=>({rect:n.getBoundingClientRect().toJSON(),radii:(function(){const r=n.getBoundingClientRect(),style=getComputedStyle(n),sx=r.width/n.offsetWidth,sy=r.height/n.offsetHeight;return ['borderTopLeftRadius','borderTopRightRadius','borderBottomRightRadius','borderBottomLeftRadius'].map(key=>{const parts=style[key].split(/\s+/),x=parts[0],y=parts[1]||x;return {x:x.endsWith('%')?parseFloat(x)*r.width/100:parseFloat(x)*sx,y:y.endsWith('%')?parseFloat(y)*r.height/100:parseFloat(y)*sy};});})(),font:getComputedStyle(n).fontSize,hit:document.elementFromPoint(n.getBoundingClientRect().x+n.getBoundingClientRect().width/2,n.getBoundingClientRect().y+n.getBoundingClientRect().height/2)===n})),centerBackground:getComputedStyle(document.querySelector('.battle-center-region')).backgroundImage};}
  function unitRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(node){return rect('#'+node.children[0].id);});}
  function hudRects(selector){return Array.from(document.querySelectorAll(selector)).filter(function(node){return node.children.length;}).map(function(slot){var card=slot.children[0],art=card.querySelector('.v174-battle-art'),hp=card.querySelector('.monster-hp,.hp-bar'),sp=card.querySelector('.monster-sp,.sp-bar'),name=card.querySelector('.battle-monster-name,.battle-player-id');return {id:card.id,art:rect('#'+card.id+' .v174-battle-art'),hp:rect('#'+card.id+' .monster-hp,#'+card.id+' .hp-bar'),sp:rect('#'+card.id+' .monster-sp,#'+card.id+' .sp-bar'),name:rect('#'+card.id+' .battle-monster-name,#'+card.id+' .battle-player-id'),logicalHp:hp.offsetHeight,logicalSp:sp.offsetHeight};});}
  function clipChain(node){var result=[];for(var p=node.parentElement;p&&p.id!=='game-stage';p=p.parentElement){var cs=getComputedStyle(p);result.push({tag:p.id||p.className,overflow:cs.overflow,overflowX:cs.overflowX,overflowY:cs.overflowY,contain:cs.contain});}return result;}
@@ -126,13 +170,22 @@ ${portraitSource}
  var scenarios={};
  [1,3,5,6,8,10].forEach(function(count){addCards(count,3,false);var snap=owner.getActiveEnemySnapshot(),assigned=Object.assign({},snap.monsterIndexToSlot),primary=assigned[0];var single=adapter.getVfxGeometry('monster',primary,'single'),tri=adapter.getVfxGeometry('monster',primary,'tri'),row=adapter.getVfxGeometry('monster',primary,'row'),column=adapter.getVfxGeometry('monster',primary,'column'),all=adapter.getVfxGeometry('monster',primary,'all');scenarios[count]={lower:lower(),assigned:assigned,single:geoEvidence(single),tri:geoEvidence(tri),row:geoEvidence(row),column:geoEvidence(column),all:geoEvidence(all),unitRects:unitRects('.v-fixed-enemy-slot'),slots:document.querySelectorAll('.v-fixed-enemy-slot').length};});
  var allyScenarios={};
- [1,2,3,4,5,6].forEach(function(count){addCards(5,count,false);allyScenarios[count]={lower:lower(),unitRects:unitRects('.v-fixed-ally-slot'),hudRects:hudRects('.v-fixed-ally-slot'),slots:document.querySelectorAll('.v-fixed-ally-slot').length,assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};});
+ [1,2,3,4,5,6].forEach(function(count){addCards(5,count,false);var visiblePortraits=allyVisiblePortraits();var arrowProbes=Array.from(document.querySelectorAll('#battlePlayerRow .battle-player')).map(function(card){card.classList.add('active-turn');const n=card.querySelector('.v174-manual-turn-arrow'),r=n.getBoundingClientRect(),art=card.querySelector('.v174-battle-art').getBoundingClientRect(),e={id:card.id,count:card.querySelectorAll('.v174-manual-turn-arrow').length,hidden:n.getAttribute('aria-hidden'),display:getComputedStyle(n).display,rect:r.toJSON(),art:art.toJSON()};card.classList.remove('active-turn');return e;});allyScenarios[count]={arrowProbes:arrowProbes,visiblePortraits:visiblePortraits,lower:lower(),unitRects:unitRects('.v-fixed-ally-slot'),hudRects:hudRects('.v-fixed-ally-slot'),slots:document.querySelectorAll('.v-fixed-ally-slot').length,assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};});
  addCards(5,3,true);var splitAlly={lower:lower(),assigned:Object.assign({},owner.ensureAllyFormation(window.__allyIndexes).characterIndexToSlot)};var artwork={player:artEvidence('#battlePlayerCard0'),regular:artEvidence('#battleMonster0'),elite:artEvidence('#battleMonster1'),boss:artEvidence('#battleMonster2'),abyss:artEvidence('#battleMonster4')};
  addCards(3,3,true);var beforeDeath={e1:rect('#battleMonster1'),e2:rect('#battleMonster2')};document.getElementById('battleMonster1').remove();var afterDeath={e2:rect('#battleMonster2')};var targetSlot=owner.getEnemySlotForMonster(owner.getActiveEnemySnapshot(),2),targetRect=owner.getSlotRect(targetSlot);
  /* Restore the formal three-enemy DOM after the death-stability probe. Floating
     feedback must never target a Unit that no longer exists in the battlefield. */
  addCards(3,3,true);
- function activeFrame(index){var card=document.getElementById('battlePlayerCard'+index),style=getComputedStyle(card,'::after');return {index:index,content:style.content,border:style.borderTopWidth,borderColor:style.borderTopColor,shadow:style.boxShadow,animationName:style.animationName,animationDuration:style.animationDuration};}
+ function activeFrame(index){
+  const card=document.getElementById('battlePlayerCard'+index),art=card.querySelector('.v174-battle-art'),paint=art.querySelector('.v174-portrait-paint'),style=getComputedStyle(art,'::before'),a=art.getBoundingClientRect();
+  const evidence={index:index,content:style.content,border:style.borderTopWidth,borderColor:style.borderTopColor,shadow:style.boxShadow,animationName:style.animationName,animationDuration:style.animationDuration,zIndex:style.zIndex,insets:[style.top,style.right,style.bottom,style.left],width:parseFloat(style.width),height:parseFloat(style.height),artWidth:art.clientWidth,artHeight:art.clientHeight,transform:style.transform,arrow:(function(){const n=art.querySelector(':scope > .v174-manual-turn-arrow'),r=n.getBoundingClientRect();return {count:art.querySelectorAll(':scope > .v174-manual-turn-arrow').length,hidden:n.getAttribute('aria-hidden'),display:getComputedStyle(n).display,rect:r.toJSON(),art:a.toJSON()};})(),rootAnimation:getComputedStyle(card,'::after').animationName,rootContent:getComputedStyle(card,'::after').content,footShadow:{content:getComputedStyle(art,'::after').content,background:getComputedStyle(art,'::after').backgroundImage,opacity:getComputedStyle(art,'::after').opacity}};
+  if(card.classList.contains('active-turn')){
+   const probe=document.createElement('style');probe.textContent='#battlePlayerCard'+index+' > .v174-battle-art::before{pointer-events:auto !important}';document.head.appendChild(probe);
+   const old=paint.style.pointerEvents;paint.style.pointerEvents='auto';const hit=document.elementFromPoint(a.left+a.width/2,a.top+a.height/2);evidence.behindPaint=hit===paint||paint.contains(hit);paint.style.pointerEvents=old;probe.remove();
+  }
+  return evidence;
+ }
+ allyVisiblePortraits();
  function setManualActive(index){document.querySelectorAll('#battlePlayerRow .battle-player').forEach(function(card){card.classList.toggle('active-turn',card.id==='battlePlayerCard'+index);});return {active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(index)};}
  var manualControl={character0:setManualActive(0),character1:setManualActive(1),character2:setManualActive(2)};
  var targetSelectingPlayer=document.getElementById('battlePlayerCard1');setManualActive(1);targetSelectingPlayer.classList.add('ally-targetable');manualControl.targetSelection={active:Array.from(document.querySelectorAll('#battlePlayerRow .battle-player.active-turn')).map(function(card){return card.id;}),frame:activeFrame(1),reticleAnimation:getComputedStyle(targetSelectingPlayer,'::before').animationName};targetSelectingPlayer.classList.remove('ally-targetable');
@@ -201,7 +254,7 @@ ${portraitSource}
  var bossLifecycle={initial:bossLifecycleEvidence()};
  window.monsters[3].alive=false;window.monsters[3].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,3);window.renderBattle();bossLifecycle.afterF1=bossLifecycleEvidence();
  window.monsters[4].alive=false;window.monsters[4].hp=0;owner.removeMonsterFromEnemySlot(bossSnapshot,4);window.renderBattle();window.renderBattle();bossLifecycle.afterF5=bossLifecycleEvidence();
- setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,logRetirement:logRetirement,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
+ setTimeout(function(){var legacyStyle=document.getElementById('v174-cardless-battle-style');var result={allyPortraitMetadata:allyPortraits.map(({data,...sample})=>sample),viewport:{width:${width},height:${height}},scenarios:scenarios,allyScenarios:allyScenarios,splitAlly:splitAlly,manualControl:manualControl,logRetirement:logRetirement,turnUi:turnUi,artwork:artwork,beforeDeath:beforeDeath,afterDeath:afterDeath,targetSlot:targetSlot,targetRect:targetRect,boss:bossEvidence,bossLifecycle:bossLifecycle,legacyStyle:{owner:legacyStyle&&legacyStyle.dataset.geometryOwner,textLength:legacyStyle?legacyStyle.textContent.length:-1},feedback:{
 	   monster0:monster0Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster1:monster1Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
 	   monster2:monster2Feedback.map(function(node){var r=node.getBoundingClientRect(),s=getComputedStyle(node);return {kind:node.dataset.feedbackKind,statusType:node.dataset.feedbackStatusType||null,source:node.dataset.feedbackSource,lane:Number(node.dataset.feedbackLane),rect:{left:r.left,top:r.top,right:r.right,bottom:r.bottom,width:r.width,height:r.height},color:s.color,stroke:s.webkitTextStroke,textShadow:s.textShadow,background:s.backgroundColor};}),
@@ -221,15 +274,25 @@ ${portraitSource}
    card.querySelector('.v174-battle-art').getAnimations({subtree:true}).filter(a=>a.animationName==='v174BattleIdle').forEach(a=>a.cancel());
    const art=card.querySelector('.v174-battle-art'),paint=art.querySelector('.v174-portrait-paint'),r=paint.getBoundingClientRect(),a=art.getBoundingClientRect(),m=portraitMetadata.assets[path],b=m.alphaBounds;
    const visible={left:r.left+r.width*b[0]/m.width,top:r.top+r.height*b[1]/m.height,right:r.left+r.width*b[2]/m.width,bottom:r.top+r.height*b[3]/m.height,width:r.width*(b[2]-b[0])/m.width,height:r.height*(b[3]-b[1])/m.height};
-   return {path:path,visible:visible,art:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},slot:card.dataset.slot,hudTop:card.v174UnitHud.querySelector('.monster-hp').getBoundingClientRect().top};
+   const clipping=[];for(let node=paint.parentElement;node;node=node.parentElement){const cs=getComputedStyle(node),box=node.getBoundingClientRect();clipping.push({rect:box.toJSON(),x:cs.overflowX,y:cs.overflowY,contain:cs.contain,clipPath:cs.clipPath});}
+   const hudBoxes=[];for(const node of document.querySelectorAll('.v174-unit-hud .battle-monster-name,.v174-unit-hud .monster-hp,.v174-unit-hud .battle-player-id,.v174-unit-hud .hp-bar,.v174-unit-hud .sp-bar')){const q=node.getBoundingClientRect(),cs=getComputedStyle(node);if(q.width&&q.height&&cs.visibility!=='hidden'&&cs.display!=='none')hudBoxes.push({cls:node.className,rect:q.toJSON()});}
+   return {path:path,visible:visible,art:{left:a.left,top:a.top,right:a.right,bottom:a.bottom},slot:card.dataset.slot,hudTop:card.v174UnitHud.querySelector('.monster-hp').getBoundingClientRect().top,clipping:clipping,hudBoxes:hudBoxes,viewport:{width:innerWidth,height:innerHeight},alphaAspect:(b[2]-b[0])/(b[3]-b[1])};
   });
  }
- result.portraits={legacy:portraitProbe('adventure'),six:portraitProbe('wild')};
+ result.commandDrag=commandDrag;result.portraits={legacy:portraitProbe('adventure'),six:portraitProbe('wild')};
  result.sixProfile=document.getElementById('battleMonsterArea').dataset.battlefieldProfile;
  result.sixRows=Array.from(document.querySelectorAll('.v-fixed-enemy-row')).map(row=>Array.from(row.children).map(slot=>slot.dataset.slot));
-document.getElementById('result').textContent=JSON.stringify(result);},40);
+const proofParty=Number(new URLSearchParams(location.search).get('proofParty'));if(proofParty){addCards(5,proofParty,false);allyVisiblePortraits();if(new URLSearchParams(location.search).has('hidePortrait'))document.querySelectorAll('#battlePlayerRow .v174-battle-art').forEach(n=>n.style.visibility='hidden');}document.getElementById('result').textContent=JSON.stringify(result);},40);
 })();
 </script></body></html>`;
+}
+
+function readChromePng(file){
+    const png=fs.readFileSync(file),chunks=[];let width,height,channels;
+    for(let at=8;at<png.length;){const length=png.readUInt32BE(at),type=png.toString("ascii",at+4,at+8),bytes=png.subarray(at+8,at+8+length);if(type==="IHDR"){width=bytes.readUInt32BE(0);height=bytes.readUInt32BE(4);assert.equal(bytes[8],8);channels=bytes[9]===2?3:bytes[9]===6?4:0;assert.ok(channels);assert.equal(bytes[12],0);}if(type==="IDAT")chunks.push(bytes);at+=length+12;}
+    const raw=inflateSync(Buffer.concat(chunks)),stride=width*channels,pixels=Buffer.alloc(stride*height),rgb=Buffer.alloc(width*height*3);
+    for(let y=0;y<height;y++){const filter=raw[y*(stride+1)];for(let x=0;x<stride;x++){const a=x>=channels?pixels[y*stride+x-channels]:0,b=y?pixels[(y-1)*stride+x]:0,c=y&&x>=channels?pixels[(y-1)*stride+x-channels]:0,p=a+b-c,pa=Math.abs(p-a),pb=Math.abs(p-b),pc=Math.abs(p-c);assert.ok(filter<=4);const predictor=[0,a,b,Math.floor((a+b)/2),pa<=pb&&pa<=pc?a:pb<=pc?b:c][filter];pixels[y*stride+x]=(raw[y*(stride+1)+1+x]+predictor)&255;}}
+    for(let i=0;i<width*height;i++)pixels.copy(rgb,i*3,i*channels,i*channels+3);return {width,height,rgb};
 }
 
 function close(a,b,label,tolerance=.5){assert.ok(Math.abs(a-b)<=tolerance,`${label}: ${a} != ${b}`);}
@@ -240,24 +303,52 @@ function runViewport(chrome,width,height){
     const result=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:24*1024*1024});
     assert.equal(result.status,0,result.stderr||String(result.error||`browser fixture failed ${width}x${height}`));
     const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));assert.ok(!data.fixtureError,data.fixtureError);
+    allyPortraitProbeMetadata=data.allyPortraitMetadata.map(sample=>({...sample,data:allyPortraitSamples.find(p=>p.path===sample.path).data}));
+    fs.writeFileSync(FIXTURE,fixtureHtml(width,height),"utf8");
     if(width===412&&height===915){
         const screenshot=path.join(ARTIFACT_DIR,"enemy-six-slots-412x915.png");
         const shot=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200",`--screenshot=${screenshot}`,fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
         assert.equal(shot.status,0,shot.stderr||"Boss mobile screenshot failed");
         assert.ok(fs.existsSync(screenshot),"Boss mobile screenshot evidence missing");
     }
+    data.commandPortraitPaint=[];
+    for(const party of ["1","6"]){
+        const scenario=data.allyScenarios[party];
+        if(!scenario.visiblePortraits.some(p=>scenario.lower.commandButtons.some(({rect:b})=>p.visible.right>b.left&&p.visible.left<b.right&&p.visible.bottom>b.top&&p.visible.top<b.bottom)))continue;
+        const shots=[];
+        for(const hidden of [false,true]){
+            const output=path.join(ARTIFACT_DIR,`command-portrait-${width}x${height}-party${party}-${hidden?"hidden":"visible"}.png`);
+            const shot=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=20000",`--screenshot=${output}`,fileUrl+`?proofParty=${party}`+(hidden?"&hidePortrait=1":"")],{encoding:"utf8",timeout:30000,maxBuffer:8*1024*1024});
+            assert.equal(shot.status,0,shot.stderr);shots.push(readChromePng(output));
+        }
+        let compared=0;
+        scenario.lower.commandButtons.forEach(({rect:r,radii})=>{
+            // Use the formal computed elliptical corners and actual transformed
+            // dimensions; exclude only pixel centers outside that paint path.
+            assert.equal(radii.length,4);radii.forEach(c=>assert.ok(Number.isFinite(c.x)&&Number.isFinite(c.y)&&c.x>=0&&c.y>=0));
+            const factor=Math.min(1,r.width/(radii[0].x+radii[1].x||1),r.width/(radii[3].x+radii[2].x||1),r.height/(radii[0].y+radii[3].y||1),r.height/(radii[1].y+radii[2].y||1));
+            const corners=radii.map((c,i)=>({x:c.x*factor,y:c.y*factor,right:i===1||i===2,bottom:i>=2}));
+            for(let y=Math.ceil(r.top);y<Math.floor(r.bottom);y++)for(let x=Math.ceil(r.left);x<Math.floor(r.right);x++){
+                const px=x+.5,py=y+.5;
+                if(corners.some(c=>{if(!c.x||!c.y)return false;const dx=c.right?px-(r.right-c.x):(r.left+c.x)-px,dy=c.bottom?py-(r.bottom-c.y):(r.top+c.y)-py;return dx>0&&dy>0&&(dx/c.x)**2+(dy/c.y)**2>1;}))continue;
+                const offset=(y*shots[0].width+x)*3;
+                assert.deepEqual(shots[0].rgb.subarray(offset,offset+3),shots[1].rgb.subarray(offset,offset+3),`portrait changes command interior ${width}x${height} party ${party} pixel ${x},${y}`);compared++;
+            }
+        });
+        assert.ok(compared>0);data.commandPortraitPaint.push({party:Number(party),comparedPixels:compared,exact:true});
+    }
     const canvasScale=Math.min(width/420,height/746.667);
     assert.equal(data.enemySlots,10);assert.equal(data.allySlots,6);
     assert.equal(data.legacyStyle.owner,null);assert.equal(data.legacyStyle.textLength,-1,"legacy runtime geometry style must be removed rather than kept as an override");
     assert.doesNotMatch(data.legacyClasses.enemy,/battle-monsters|v131-formation|v141-fixed-formation/);assert.doesNotMatch(data.legacyClasses.ally,/battle-player-row/);
     const baseline=data.scenarios[1].lower;
-    assert.ok(baseline.enemy.bottom<=baseline.center.top+.5,"enemy region must end before the center operation region");
-    assert.ok(baseline.center.bottom<=baseline.allyRegion.top+.5,"center operation region must end before the ally region");
+    assert.ok(baseline.enemy.bottom<=baseline.allyRegion.top+.5,"enemy region must end before the separated party");
+    assert.ok(baseline.allyRegion.bottom<=baseline.center.top+.5,"party must end before bottom operation region");
     assert.ok(baseline.action.top>=baseline.center.top-.5&&baseline.action.bottom<=baseline.center.bottom+.5,"action controls stay inside the center region");
     assert.equal(baseline.centerBackground,"none","center controls must not own a black translucent background");
     assert.equal(data.logRetirement.absent,true,"retired battle log DOM must be absent");
     assert.equal(data.logRetirement.turnOpacity,"1","current round remains visible");
-    assert.ok(data.logRetirement.turn.height>0&&data.logRetirement.turn.bottom<=baseline.allyRegion.bottom+.5,"current round stays in the battlefield");
+    assert.ok(data.logRetirement.turn.height>0&&data.logRetirement.turn.bottom<=baseline.center.bottom+.5,"current round stays in the battlefield");
     assert.equal(data.turnUi.normal.opacity,"1");
     assert.equal(data.turnUi.normal.pointerEvents,"none","turn timer must never block target selection");
     assert.equal(data.turnUi.skillPicker.opacity,"1");
@@ -268,24 +359,37 @@ function runViewport(chrome,width,height){
         const state=data.manualControl[key];
         assert.deepEqual(state.active,[`battlePlayerCard${index}`],`${key} must be the only manual active character`);
         assert.equal(state.frame.content,'""');
-        assert.equal(state.frame.border,"3px");
-        assert.equal(state.frame.borderColor,"rgb(255, 210, 31)");
+        assert.equal(state.frame.border,"1px");
+        assert.equal(state.frame.borderColor,"rgba(241, 210, 137, 0.72)");
         assert.notEqual(state.frame.shadow,"none");
-        assert.equal(state.frame.animationName,"v174ManualActiveTurnFrameFlash");
-        assert.equal(state.frame.animationDuration,"0.3s");
+        assert.equal(state.frame.animationName,"v174ManualTurnFootBreath");
+        assert.equal(state.frame.animationDuration,"2s");
+        assert.equal(state.frame.zIndex,"-1","manual frame stays behind the portrait paint");
+        assert.equal(state.frame.insets[2],"-2px","foot ring stays at artwork baseline");
+        close(state.frame.width,state.frame.artWidth*.66,"manual ellipse artwork width",1);
+        close(state.frame.height,10,"manual ellipse stays low");
+        assert.equal(state.frame.arrow.count,1);assert.equal(state.frame.arrow.hidden,"true");assert.equal(state.frame.arrow.display,"block");
+        assert.ok(state.frame.arrow.rect.bottom<=state.frame.arrow.art.top+.5,"arrow stays above portrait carrier");
+        assert.equal(state.frame.behindPaint,true,"actual frame pseudo-element must paint behind portrait, even when made hit-testable");
+        assert.notEqual(state.frame.rootAnimation,"v174ManualActiveTurnFrameFlash","old Unit pseudo must not retain a second frame");
+        assert.equal(state.frame.rootContent,"none");
+        assert.equal(state.frame.footShadow.content,'""');
+        assert.match(state.frame.footShadow.background,/radial-gradient/);
+        assert.equal(state.frame.footShadow.opacity,"0.72");
     }
     assert.deepEqual(data.manualControl.auto.active,[],"auto control must expose no manual active character");
-    data.manualControl.auto.frames.forEach(frame=>assert.equal(frame.animationName,"none","inactive/auto cards must not run the manual flash"));
+    data.manualControl.auto.frames.forEach(frame=>{assert.equal(frame.arrow.display,"none","auto/inactive arrow must be hidden");assert.equal(frame.animationName,"none","inactive/auto cards must not run manual breathing");assert.ok(frame.content==="none"||frame.content==="normal","inactive artwork has no frame");assert.equal(frame.footShadow.content,'""');assert.match(frame.footShadow.background,/radial-gradient/);});
     assert.deepEqual(data.manualControl.targetSelection.active,["battlePlayerCard1"]);
-    assert.equal(data.manualControl.targetSelection.frame.animationName,"v174ManualActiveTurnFrameFlash","ally target selection must not suppress the manual active frame");
+    assert.equal(data.manualControl.targetSelection.frame.animationName,"v174ManualTurnFootBreath","ally target selection must not suppress the manual active frame");
     assert.equal(data.manualControl.targetSelection.reticleAnimation,"none","multi-target reticles remain static");
+    assert.equal(data.manualControl.targetSelection.frame.behindPaint,true,"target selection retains the behind-art frame plane");
     close(data.turnUi.normal.rect.top,baseline.action.top,"turn timer occupies the shared information band",.8);
-    assert.ok(baseline.command.height/canvasScale>=66-.1,"command touch row retains 66 logical pixels");
-    assert.ok(baseline.elementBox.height/canvasScale>=66-.1,"Element Box retains 66 logical pixels");
-    assert.ok(baseline.elementBox.bottom<=baseline.commandVisualTop+.8,"Element Box must not overlap command controls");
+    assert.ok(baseline.command.height>=44,"command touch row retains44 physical pixels");
+    assert.equal(baseline.elementBoxHit,false,"folded utilities cannot intercept manual commands");
+    assertFloatingCommandReachability(data.commandDrag);
     assert.equal(baseline.commandButtons.length,5);
-    baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height/canvasScale>=66-.1);assert.ok(button.rect.width/canvasScale>=70);assert.equal(button.font,"16px");assert.equal(button.hit,true,"visible command center must hit its own control");});
-    assert.ok(data.allyScenarios[6].hudRects[0].art.height/canvasScale/.94>99,"far-row depth preserves the original artwork box before its 6% paint projection");
+    baseline.commandButtons.forEach(button=>{assert.ok(button.rect.height>=44);assert.ok(button.rect.width>=44);assert.equal(button.font,"14px");assert.equal(button.hit,true,"visible command center must hit its own control");});
+    const partyFrames=data.allyScenarios[6].hudRects.map(row=>row.art.height);assert.ok(partyFrames.every(h=>h>0));assert.ok(Math.max(...partyFrames)-Math.min(...partyFrames)<1,"all party rows share the same artwork frame");
     assert.ok(data.turnUi.normal.rect.bottom<=baseline.commandVisualTop+.8,"turn timer must not overlap command art");
     assert.ok(data.turnUi.targetSelecting.rect.top>=baseline.center.top-.5,"target-selecting turn timer stays inside center region");
     assert.ok(
@@ -294,7 +398,7 @@ function runViewport(chrome,width,height){
         JSON.stringify({turn:data.turnUi.targetSelecting.rect,prompt:data.turnUi.targetSelecting.promptRect,center:baseline.center})
     );
     assert.ok(data.turnUi.targetSelecting.promptRect.bottom<=baseline.center.bottom+.5,"target prompt stays inside center region");
-    close(baseline.elementBox.width,66*canvasScale,"element box width");close(baseline.elementBox.height,66*canvasScale,"element box height");
+
     for(const count of [1,3,5,6,8,10]){const scenario=data.scenarios[count],profileBaseline=data.scenarios[count<=6?1:8].lower;assert.equal(scenario.slots,count<=6?6:10);close(scenario.lower.enemy.height,profileBaseline.enemy.height,`enemy region height count ${count}`);close(scenario.lower.center.height,profileBaseline.center.height,`center region height count ${count}`);close(scenario.lower.ally.top,profileBaseline.ally.top,`ally top count ${count}`);close(scenario.lower.middle.top,profileBaseline.middle.top,`middle top count ${count}`);close(scenario.lower.action.top,profileBaseline.action.top,`action top count ${count}`);scenario.unitRects.forEach(function(rect){close(rect.width,scenario.unitRects[0].width,`enemy card width count ${count}`);close(rect.height,scenario.unitRects[0].height,`enemy card height count ${count}`);assert.ok(rect.bottom<=scenario.lower.enemy.bottom+.5,`enemy card stays above center count ${count}`);});for(const shape of ["single","tri","row","column","all"]){close(scenario[shape].width,data.scenarios[count<=6?1:8][shape].width,`${shape} width count ${count}`);close(scenario[shape].height,data.scenarios[count<=6?1:8][shape].height,`${shape} height count ${count}`);close(scenario[shape].centerX,(scenario[shape].left+scenario[shape].right)/2,`${shape} centerX count ${count}`);close(scenario[shape].centerY,(scenario[shape].top+scenario[shape].bottom)/2,`${shape} centerY count ${count}`);}}
     fs.writeFileSync(path.join(ARTIFACT_DIR,"six-slot-portrait-probe.json"),JSON.stringify(data.portraits,null,2));
     assert.equal(data.sixProfile,"standard-six");
@@ -302,11 +406,15 @@ function runViewport(chrome,width,height){
     data.portraits.six.forEach((sample,index)=>{
         const old=data.portraits.legacy[index];
         assert.ok(sample.visible.width>=old.visible.width-.5,"portrait must not shrink");
-        assert.ok(sample.visible.left>=sample.art.left-.5&&sample.visible.right<=sample.art.right+.5,"complete alpha bounds stay in artwork width");
-        assert.ok(sample.visible.top>=sample.art.top-.5&&sample.visible.bottom<=sample.art.bottom+.5,"portrait stays in its paint box below the top HUD: "+JSON.stringify(sample));
+        const b=sample.visible;
+        assert.ok([b.left,b.top,b.right,b.bottom].every(Number.isFinite),'finite alpha projection');
+        assert.ok(Math.abs(b.width/b.height-sample.alphaAspect)<.01,'full source proportions retained');
+        assert.ok(b.left>=-.5&&b.top>=-.5&&b.right<=sample.viewport.width+.5&&b.bottom<=sample.viewport.height+.5,'full alpha stays inside viewport');
+        for(const c of sample.clipping){const paintContain=/paint|strict|content/.test(c.contain);assert.equal(c.clipPath,'none','unknown clipping shape must not silently pass');if(paintContain||/hidden|clip|auto|scroll/.test(c.x))assert.ok(b.left>=c.rect.left-.5&&b.right<=c.rect.right+.5,'real horizontal clipping ancestor');if(paintContain||/hidden|clip|auto|scroll/.test(c.y))assert.ok(b.top>=c.rect.top-.5&&b.bottom<=c.rect.bottom+.5,'real vertical clipping ancestor');}
+        for(const h of sample.hudBoxes){const q=h.rect;assert.ok(b.right<=q.left+.5||b.left>=q.right-.5||b.bottom<=q.top+.5||b.top>=q.bottom-.5,'alpha must not overlap actual HUD '+h.cls+': '+JSON.stringify(sample));}
     });
     assert.ok(data.portraits.six.some((sample,index)=>sample.visible.height>data.portraits.legacy[index].visible.height*1.1),"three columns materially enlarge width-limited portraits");
-    const allyBaseline=data.allyScenarios[1].lower;for(const count of [1,2,3,4,5,6]){const scenario=data.allyScenarios[count];assert.equal(scenario.slots,6);close(scenario.lower.ally.height,allyBaseline.ally.height,`ally zone height party ${count}`);close(scenario.lower.action.top,allyBaseline.action.top,`action top party ${count}`);scenario.unitRects.forEach(function(rect,index){close(rect.width,scenario.unitRects[0].width,`ally card width party ${count}`);close(rect.height,scenario.unitRects[0].height,`ally card height party ${count}`);assert.ok(rect.top>=scenario.lower.allyRegion.top-.5,`ally card stays below center party ${count}`);assert.ok(rect.bottom<=scenario.lower.allyRegion.bottom+.5,`ally card stays inside ally region party ${count}`);scenario.unitRects.slice(index+1).forEach(other=>assert.ok(rect.right<=other.left+.5||other.right<=rect.left+.5||rect.bottom<=other.top+.5||other.bottom<=rect.top+.5,`ally cards overlap party ${count}`));});scenario.hudRects.forEach(function(hud){assert.ok(hud.art.top>=scenario.lower.action.bottom-.5,`ally art must stay below command region party ${count}`);scenario.hudRects.forEach(function(other){if(other===hud)return;assert.ok(hud.art.right<=other.name.left+.5||hud.art.left>=other.name.right-.5||hud.art.bottom<=other.name.top+.5||hud.art.top>=other.name.bottom-.5,`ally art must not overlap another HUD name party ${count}`);});assert.ok(hud.art.bottom<=hud.hp.top+.5,`ally art/HP overlap party ${count}`);assert.ok(hud.hp.bottom<=hud.sp.top+.5,`ally HP/SP overlap party ${count}`);assert.ok(hud.name.bottom<=hud.hp.top+.5,`ally name/HP overlap party ${count}`);assert.equal(hud.logicalHp,6);assert.equal(hud.logicalSp,6);});}assert.equal(data.splitAlly.assigned[1],"ALLY_B2");close(data.splitAlly.lower.ally.height,allyBaseline.ally.height,"split front/back ally zone height");
+    const allyBaseline=data.allyScenarios[1].lower;for(const count of [1,2,3,4,5,6]){const scenario=data.allyScenarios[count];scenario.arrowProbes.forEach(arrow=>{assert.equal(arrow.count,1);assert.equal(arrow.hidden,"true");assert.equal(arrow.display,"block");assert.ok(arrow.rect.bottom<=arrow.art.top+.5,"arrow above formal art");scenario.hudRects.forEach(hud=>{for(const part of ["name","hp","sp"]){const a=arrow.rect,b=hud[part];assert.ok(a.right<=b.left+.5||a.left>=b.right-.5||a.bottom<=b.top+.5||a.top>=b.bottom-.5,`manual arrow overlaps ${hud.id} ${part} party ${count}: `+JSON.stringify({arrow,band:b}));}});});assert.equal(scenario.slots,6);close(scenario.lower.ally.height,allyBaseline.ally.height,`ally zone height party ${count}`);close(scenario.lower.action.top,allyBaseline.action.top,`action top party ${count}`);scenario.unitRects.forEach(function(rect,index){close(rect.width,scenario.unitRects[0].width,`ally card width party ${count}`);close(rect.height,scenario.unitRects[0].height,`ally card height party ${count}`);assert.ok(rect.top>=scenario.lower.allyRegion.top-24*scenario.lower.stageScale-.5,`ally card respects approved 24px front-row offset party ${count}`);assert.ok(rect.bottom<=scenario.lower.allyRegion.bottom+.5,`ally card stays inside ally region party ${count}`);scenario.unitRects.slice(index+1).forEach(other=>assert.ok(rect.right<=other.left+.5||other.right<=rect.left+.5||rect.bottom<=other.top+.5||other.bottom<=rect.top+.5,`ally cards overlap party ${count}`));});scenario.hudRects.forEach(function(hud){const portrait=scenario.visiblePortraits.find(p=>p.id===hud.id);assert.ok(portrait,"formal alpha projection exists for "+hud.id);scenario.lower.commandButtons.forEach(button=>{const a=portrait.visible,b=button.rect;assert.ok([a.left,a.top,a.right,a.bottom,b.left,b.top,b.right,b.bottom].every(Number.isFinite),"formal portrait and command paint geometry must be finite");});scenario.hudRects.forEach(function(other){if(other===hud)return;assert.ok(hud.art.right<=other.name.left+.5||hud.art.left>=other.name.right-.5||hud.art.bottom<=other.name.top+.5||hud.art.top>=other.name.bottom-.5,`ally art must not overlap another HUD name party ${count}`);});assert.ok(hud.art.bottom<=hud.hp.top+.5,`ally art/HP overlap party ${count}`);assert.ok(hud.hp.bottom<=hud.sp.top+.5,`ally HP/SP overlap party ${count}`);assert.ok(hud.name.bottom<=hud.hp.top+.5,`ally name/HP overlap party ${count}`);assert.equal(hud.logicalHp,6);assert.equal(hud.logicalSp,6);});}assert.equal(data.splitAlly.assigned[1],"ALLY_B2");close(data.splitAlly.lower.ally.height,allyBaseline.ally.height,"split front/back ally zone height");
     assert.ok(data.scenarios[3].unitRects[0].height>100,"enemy cards are visibly taller than the previous 92px owner");
     assert.ok(data.allyScenarios[3].unitRects[0].height>116*canvasScale,"ally cards are visibly taller than the previous 86px owner");
     close(data.beforeDeath.e2.left,data.afterDeath.e2.left,"death must not move right unit");close(data.beforeDeath.e2.top,data.afterDeath.e2.top,"death must not move right unit vertically");

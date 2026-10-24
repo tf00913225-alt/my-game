@@ -130,8 +130,26 @@ test('formal reference party and damage/action owners satisfy Wild TTK across 40
 
 test('Phase2F migrates Boss; Tower and Adventure coverage is preserved',()=>{
  const baseline=JSON.parse(fs.readFileSync('tests/fixtures/monster-balance-p2a-extra-non-wild.json','utf8'));
- const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,123);
+ const actual=collectNonWildOutputs(loadLegacyRuntime);assert.equal(actual.length,130);
  assert.equal(actual.filter(row=>['personal','world'].includes(row.mode)).length,48);
+ const legacy={window:null};legacy.window=legacy;vm.createContext(legacy);
+ vm.runInContext(fs.readFileSync('tests/fixtures/adventure-legacy-branch-content.js','utf8'),legacy);
+ const current={window:null};current.window=current;vm.createContext(current);
+ vm.runInContext(fs.readFileSync('js/adventure/adventure-content-v1-20260915.js','utf8'),current);
+ const adventure=actual.filter(row=>row.mode==='adventure'),retained=legacy.FourSymbolsAdventureContent.encounters;
+ const liveIds=current.FourSymbolsAdventureContent.chapters.chapter_v1.nodes.filter(node=>node.encounterId).map(node=>node.encounterId);
+ assert.equal(Object.keys(retained).length,3);assert.equal(liveIds.length,7);
+ assert.deepEqual(adventure.map(row=>row.id).sort(),[...Object.keys(retained),...liveIds].sort());
+ for(const row of adventure){
+  const spec=current.FourSymbolsAdventureContent.encounters[row.id];assert.equal(row.value.length,spec.enemies.length);
+  for(const [index,m] of row.value.entries()){
+   const identity=spec.enemies[index],prior=retained[row.id]?.enemies[index];
+   if(prior)for(const field of ['name','level','element','rank','archetype'])assert.equal(identity[field],prior[field],'retained '+row.id+' '+field);
+   for(const field of ['name','level','element','rank'])assert.equal(m[field],identity[field]);
+   const projection=MonsterBalance.preview({...identity,mode:'adventure',chapterId:'chapter_v1',encounterId:row.id,context:'adventure/chapter_v1/'+row.id});
+   for(const [field,value] of Object.entries({maxHP:projection.final.maxHP,maxSP:projection.final.maxSP,attack:projection.final.physicalAttack,magicAttack:projection.final.magicAttack,defense:projection.final.defense,agility:projection.final.speed}))assert.equal(m[field],value,row.id+' '+field);
+  }
+ }
  const tower=actual.filter(row=>row.mode==='tower'||row.mode==='towerBoss');
  assert.equal(tower.length,72);
  for(const row of tower){

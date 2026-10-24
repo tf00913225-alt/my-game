@@ -325,6 +325,7 @@ test("auto battle keeps a valid selected skill instead of silently queuing norma
     });
     context.window=context;
 
+    vm.runInContext(fs.readFileSync("functions/src/skill-progression-core.js","utf8"),context);
     vm.runInContext(v136Source,context);
     vm.runInContext("autoActionForCharacter(0,5)",context);
 

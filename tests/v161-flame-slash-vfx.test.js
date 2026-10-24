@@ -4,7 +4,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 
-const asset=fs.readFileSync("assets/vfx/fire/flame-slash-cast.png");
+const asset=fs.readFileSync("assets/vfx/fire/flame-slash-cast-v2.webp");
 const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
 const timing=fs.readFileSync("js/37-v142-skill-animation.js","utf8");
 const wordRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
@@ -33,18 +33,14 @@ function loadManifest(){
     return context.v143SkillAnimationManifest;
 }
 
-test("the supplied Fire Slash asset is a real RGBA PNG with twelve 384px cells",()=>{
-    assert.equal(asset.subarray(0,8).toString("hex"),"89504e470d0a1a0a");
-    assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
-    assert.equal(asset[24],8);
-    assert.equal(asset[25],6);
-    assert.deepEqual([1536/4,1152/3],[384,384]);
+test("Fire Slash is lossless alpha WebP with twelve square cells",()=>{
+ const info=losslessWebpInfo(asset);assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);assert.equal(info.width/4,info.height/3);assert.equal(info.width%4,0);assert.equal(info.height%3,0);
 });
 
 test("flameSlash uses the exact one-shot 4 by 3 raster Sprite metadata",()=>{
     const model=loadManifest().flameSlash;
     assert.ok(model&&model.sprite);
-    assert.equal(model.sprite.src,"assets/vfx/fire/flame-slash-cast.png");
+    assert.equal(model.sprite.src,"assets/vfx/fire/flame-slash-cast-v2.webp");
     assert.equal(model.sprite.renderer,"dom-sprite");
     assert.deepEqual(
         Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -72,3 +68,11 @@ test("the current cache version publishes the corrected source asset and metadat
 });
 
 console.log("\nV161 Fire Slash VFX suite: "+passed+" tests passed.");
+
+
+function losslessWebpInfo(file){
+ const b=Buffer.isBuffer(file)?file:fs.readFileSync(file);
+ assert.equal(b.toString("ascii",0,4),"RIFF");assert.equal(b.toString("ascii",8,12),"WEBP");
+ for(let o=12;o+8<=b.length;){const type=b.toString("ascii",o,o+4),size=b.readUInt32LE(o+4),p=o+8;assert.ok(p+size<=b.length,"complete WebP chunk");if(type==="VP8L"){assert.equal(b[p],0x2f);const bits=b.readUInt32LE(p+1);return {width:1+(bits&16383),height:1+((bits>>>14)&16383),alpha:(bits>>>28)&1};}o=p+size+(size%2);}
+ throw new Error("Expected lossless VP8L image");
+}

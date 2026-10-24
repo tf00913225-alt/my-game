@@ -154,46 +154,29 @@ const V_ASSET_VERSION="173.73";
     }
 })();
 
-(function initBattleElementBoxDrag(){
+(function initBattleUtilityControls(){
     function bind(){
         const button=document.getElementById("battleElementBoxButton");
-        const page=document.getElementById("battlePage");
-        if(!button||!page||button.dataset.dragReady==="1"){ return; }
-        button.dataset.dragReady="1";
-        let drag=null; let suppressClick=false; const threshold=5;
-        function logicalScale(){
-            const host=button.offsetParent||page;
-            const rect=host.getBoundingClientRect();
-            return {rect,host,sx:rect.width?host.clientWidth/rect.width:1,sy:rect.height?host.clientHeight/rect.height:1};
-        }
-        button.addEventListener("pointerdown",event=>{
-            if(event.pointerType==="mouse"&&event.button!==0){ return; }
-            const scale=logicalScale(); const bounds=button.getBoundingClientRect();
-            drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:(bounds.left-scale.rect.left)*scale.sx,top:(bounds.top-scale.rect.top)*scale.sy,sx:scale.sx,sy:scale.sy,moved:false};
-            suppressClick=false; button.classList.add("dragging");
-            try{ button.setPointerCapture(event.pointerId); }catch(_){ }
-            event.preventDefault();
-        });
-        button.addEventListener("pointermove",event=>{
-            if(!drag||event.pointerId!==drag.pointerId){ return; }
-            const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
-            if(!drag.moved&&Math.hypot(dx,dy)>=threshold){ drag.moved=true; }
-            if(!drag.moved){ return; }
-            const left=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientWidth-button.offsetWidth),drag.left+dx*drag.sx));
-            const top=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientHeight-button.offsetHeight),drag.top+dy*drag.sy));
-            button.style.setProperty("left",left+"px","important"); button.style.setProperty("top",top+"px","important");
-            button.style.setProperty("bottom","auto","important"); event.preventDefault();
-        });
-        function finish(event){
-            if(!drag||event.pointerId!==drag.pointerId){ return; }
-            suppressClick=drag.moved; drag=null; button.classList.remove("dragging"); event.preventDefault();
-        }
-        button.addEventListener("pointerup",finish); button.addEventListener("pointercancel",finish);
-        button.addEventListener("click",event=>{
-            if(suppressClick){ suppressClick=false; event.preventDefault(); event.stopPropagation(); return; }
+        if(!button||button.dataset.utilityReady==="1"){ return; }
+        button.dataset.utilityReady="1";
+        button.addEventListener("click",()=>{
+            if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
             if(typeof openHomeFeature==="function"){ openHomeFeature("autoBattleSettings"); }
         });
-        button.addEventListener("dragstart",event=>event.preventDefault());
+        document.addEventListener("pointerdown",event=>{
+            const region=document.getElementById("battleActionRegion");
+            if(region?.classList.contains("utility-menu-open")&&!event.target.closest("#battleUtilityTray,#battleMoreButton")){
+                if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
+            }
+        });
+        document.addEventListener("keydown",event=>{
+            if(event.key!=="Escape"){ return; }
+            const region=document.getElementById("battleActionRegion");
+            if(region?.classList.contains("utility-menu-open")){
+                if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
+                document.getElementById("battleMoreButton")?.focus();
+            }
+        });
     }
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",bind,{once:true}); }else{ bind(); }
 })();

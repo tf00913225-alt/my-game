@@ -89,11 +89,22 @@
             return Promise.resolve(null);
         }
         monsterPortraitRegistryState="pending";
-        monsterPortraitRegistryPromise=fetch(MONSTER_PORTRAIT_REGISTRY_URL,{cache:"no-cache"})
+        const controller=typeof AbortController==="function"?new AbortController():null;
+        let timeout;
+        const expired=new Promise((_,reject)=>{
+            timeout=setTimeout(()=>{
+                reject(new Error("Monster portrait registry request timed out."));
+                if(controller){controller.abort();}
+            },8000);
+        });
+        const loading=Promise.resolve().then(()=>fetch(MONSTER_PORTRAIT_REGISTRY_URL,{
+            cache:"no-cache",...(controller?{signal:controller.signal}:{})
+        }))
             .then(response=>{
                 if(!response||!response.ok){ throw new Error("HTTP "+(response&&response.status)); }
                 return response.json();
-            })
+            });
+        monsterPortraitRegistryPromise=Promise.race([loading,expired])
             .then(installMonsterPortraitRegistry)
             .catch(error=>{
                 monsterPortraitRegistryState="failed";
@@ -101,7 +112,7 @@
                 monsterPortraitRegistryPromise=null;
                 console.warn("[monster-portrait] registry load failed; retry is available on the next dungeon entry.",error);
                 return null;
-            });
+            }).finally(()=>clearTimeout(timeout));
         return monsterPortraitRegistryPromise;
     }
     window.v154RequestMonsterPortraitRegistry=requestMonsterPortraitRegistry;
@@ -537,6 +548,7 @@
     function setElementBoxSettingsLayer(active){
         if(typeof document==="undefined"||!document.body||!document.body.classList){ return; }
         document.body.classList.toggle("v162-element-box-settings-open",!!active);
+        if(typeof window.syncBattleUiPriorityLayer==="function"){ window.syncBattleUiPriorityLayer(); }
     }
 
     if(typeof openHomeFeature==="function"){

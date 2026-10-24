@@ -644,16 +644,18 @@ function candidateQueryDb(db){
     return {collection:name=>query(db.collection(name)),doc:path=>reference(db.doc(path))};
 }
 
-function privateRawInspector(f,which='inspectCompleteRawCapture'){
+function privateRawInspector(f,which='inspectCompleteRawCapture',artifactHelper,bufferApi,sourceOverride){
     const filename=require.resolve('../functions/src/canonical-current-recovery'),compiled=new Module(filename);
     compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
-    const original=readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
+    const native=compiled.require.bind(compiled);if(artifactHelper||bufferApi)compiled.require=name=>name==='./recovery-audit-artifact'&&artifactHelper?artifactHelper:name==='node:buffer'&&bufferApi?{Buffer:bufferApi}:native(name);
+    const original=sourceOverride??readFileSync(filename,'utf8'),needle='return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact';
     assert.equal(original.split(needle).length,2);
     // Test-only lexical access to the private pure kernel. Production exports,
     // factory methods and SDK entry points remain unchanged.
-    compiled._compile(original.replace(needle,'return Object.freeze({inspectCompleteRawCapture,verifyCandidateStrict,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
+    compiled._compile((bufferApi?"const Buffer=require('node:buffer').Buffer;\n":'')+original.replace(needle,'return Object.freeze({segmentedRawView,segmentedScopes,inspectCompleteRawCapture,verifyCandidateStrict,verifySegmentedRawRecoveryProof,restoreCurrent,verifyRecoveryAuditArtifact'),filename);
     assert.equal(Object.hasOwn(f.recovery,'inspectCompleteRawCapture'),false);
-    return compiled.exports.createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)})[which];
+    const owner=compiled.exports.createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+    return Array.isArray(which)?Object.fromEntries(which.map(key=>[key,owner[key]])):owner[which];
 }
 async function completeRawMaterial(f,{id=auditId,epoch=1}={}){
     const total=inventoryOrder(f).length;let ordinal=0,sequence=1;
@@ -669,6 +671,40 @@ async function completeRawMaterial(f,{id=auditId,epoch=1}={}){
         rawState:copy(f.h.data.get(f.root+'/proofState/current')),rawReceipts:rows('patrolProofPages'),rawChunks:rows('proofPayloadChunks')};
 }
 const assembledRawBaselines=new Map();
+test('two genuine Forest wins recover but three exceed oneshot proof budget without losing earned sources; raw candidate stays non-authoritative',async t=>{
+    for(const battles of [2,3]){
+        const f=await fixture({battles,three:false,normal:true,currentLoss:false}),revision=f.h.revision;
+        const retained=()=>copy([...f.h.data].filter(([path])=>
+            !path.startsWith(f.h.root+'/recoveryAuditRuns/')&&!path.startsWith(f.h.root+'/recoveryAuditFence/')));
+        const original=retained();
+        assert.equal(f.tickets.length,battles);
+        assert.equal(original.filter(([path,row])=>path.startsWith(f.h.root+'/modeTimeEvents/')&&row.schemaVersion===2).length,battles*2);
+        assert.equal(original.filter(([path])=>path.startsWith(f.h.root+'/ledgerEntries/')).length,battles*2);
+        if(battles===3){
+            const material=await completeRawMaterial(f),writes=f.h.writes;
+            const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+            const candidate=await owner.verifyRawRecoveryAuditCandidate(material);
+            assert.equal(candidate.candidateProofValid,true);
+            for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(candidate[flag],false);
+            assert.equal(f.h.writes,writes);assert.deepEqual(retained(),original);
+        }
+        // Cancellation is an intended maintenance metadata update, not an
+        // earning/source mutation and not evidence of failed preservation.
+        await f.recovery.cancelAudit(f.request(),{auditId,expectedEpoch:1,operationId:'long-bound-cancel-000001'});
+        assert.deepEqual(retained(),original);
+        const before=copy([...f.h.data]),writes=f.h.writes;
+        const restore=()=>f.recovery.restoreCurrent(f.request(),{operationId:approvalId,expectedRevision:revision});
+        if(battles===2){
+            assert.equal((await restore()).restoredRevision,revision+1);
+        }else{
+            await assert.rejects(restore(),{code:'failed-precondition',message:'Recovery claim evidence exceeds the transaction budget.'});
+            assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.deepEqual(retained(),original);
+        }
+        t.diagnostic(JSON.stringify({battles,sourceRevision:revision,originalDocuments:original.length,
+            originalJsonBytes:Buffer.byteLength(JSON.stringify(original)),oneshot:battles===2?'restored':'proof-budget-refused'}));
+    }
+});
+
 async function longRawAssemblyFixture(currentLoss){
     if(!assembledRawBaselines.has(currentLoss))assembledRawBaselines.set(currentLoss,(async()=>{
         const f=await fixture({three:false,adStatus:'abandoned',currentLoss});return {f,material:await completeRawMaterial(f)};
@@ -834,6 +870,85 @@ test('actual twenty-battle active and current-loss raw captures assemble through
         assert(!Object.values(result).some(value=>Buffer.isBuffer(value)));assert(Object.isFrozen(result));
         assert.deepEqual(material,input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(f.traces.length,traces);
         t.diagnostic(JSON.stringify({currentLoss,...result.assemblyUsage}));
+    }
+});
+
+test('genuine twenty-battle skill learn/upgrade and secondary learn survive full raw current-loss candidate without source replacement',async()=>{
+    const {createCanonicalSkillLearning}=require('../functions/src/canonical-skill-learning');
+    const {createCanonicalSkillLoadout}=require('../functions/src/canonical-skill-loadout');
+    let primaryId,secondaryId,learnIntent,learnResult;
+    const make=async fault=>fixture({three:false,currentLoss:false,beforeAudit:async(h,{deps,request})=>{
+        const writer=createCanonicalSkillLearning(deps),slots=h.data.get(h.root+'/account/current').slots;
+        [primaryId,secondaryId]=slots;
+        assert.equal(h.data.get(h.root+'/characters/'+primaryId).state.level,10);
+        const before=copy(h.data.get(h.root+'/characters/'+secondaryId));
+        learnIntent={operationId:'skill-earned-primary-learn-01',expectedRevision:h.revision,characterId:primaryId,action:'learn',skillId:'flameSlash'};
+        learnResult=await writer.learnOrUpgrade(request(),learnIntent);
+        const upgrade=await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-primary-upgrade1',expectedRevision:h.revision,action:'upgrade'});
+        assert.equal(upgrade.levelAfter,2);
+        const untouched=h.data.get(h.root+'/characters/'+secondaryId);
+        assert.deepEqual(untouched.state,before.state);assert.deepEqual(untouched.skillLoadout,before.skillLoadout);
+        const primary=copy(h.data.get(h.root+'/characters/'+primaryId));
+        await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-secondary-learn1',expectedRevision:h.revision,characterId:secondaryId});
+        assert.deepEqual(h.data.get(h.root+'/characters/'+primaryId).state,primary.state);
+        assert.deepEqual(h.data.get(h.root+'/characters/'+primaryId).skillLoadout,primary.skillLoadout);
+        const complete=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+        assert(complete.characters.every(row=>row.serverRevision===h.revision));
+        assert.equal(complete.characters[0].skillLoadout.skillLevels.flameSlash,2);
+        assert.equal(complete.characters[1].skillLoadout.skillLevels.flameSlash,1);
+        assert.equal(complete.characters[1].state.skillPoints,0);
+        const writes=h.writes;
+        assert.deepEqual(await writer.learnOrUpgrade(request(),learnIntent),{...learnResult,unchanged:true});assert.equal(h.writes,writes);
+        const loadout=createCanonicalSkillLoadout(deps),mutate=(id,characterId,action,skillId)=>loadout.mutateLoadout(request(),{
+            operationId:id,expectedRevision:h.revision,characterId,action,skillId});
+        const states=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.characters.map(row=>copy(row.state));
+        await mutate('skill-earned-primary-equip-01',primaryId,'equip','flameSlash');
+        await mutate('skill-earned-primary-select01',primaryId,'select-auto-action','flameSlash');
+        await mutate('skill-earned-secondary-equip1',secondaryId,'equip','flameSlash');
+        await mutate('skill-earned-secondary-select',secondaryId,'select-auto-action','flameSlash');
+        await mutate('skill-earned-secondary-remove',secondaryId,'remove','flameSlash');
+        const final=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+        assert.deepEqual(final.characters.map(row=>row.state),states);
+        assert(final.characters.every(row=>row.serverRevision===h.revision));
+        assert.deepEqual(final.characters[0].skillLoadout.equippedSkills,['flameSlash']);
+        assert.deepEqual(final.characters[1].skillLoadout.equippedSkills,[]);
+        assert.equal(final.progress.playableState.preferencesVersion,2);
+        // The actual formal DOM lacks the legacy secondary select; its stale
+        // explicit preference survives removal, without granting that skill.
+        assert.equal(final.progress.playableState.autoConfig2.skill,'flameSlash');
+        assert.equal(final.progress.playableState.autoConfig2.v136LastSkill,'flameSlash');
+        assert.equal(Object.hasOwn(final.progress.playableState.autoConfig3,'v136ActionIntent'),false);
+        const head=copy(final.progress.playableState.loadoutSource);
+        await writer.learnOrUpgrade(request(),{...learnIntent,operationId:'skill-earned-later-learn-001',
+            expectedRevision:h.revision,skillId:'fireCritical'});
+        assert.deepEqual(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords.progress.playableState.loadoutSource,head);
+        assert(head.resultRevision<h.revision,'another actual writer preserves the older exact head revision');
+        if(fault)fault(h,learnIntent.operationId);
+        for(const path of [...h.data.keys()])if(['account','characters','economy','inventory','equipment','relics','relicLoadout','progress','claimRecords','claimCheckpoints']
+            .some(name=>path.startsWith(h.root+'/'+name+'/')))h.data.delete(path);
+    }});
+    const f=await make(),material=await completeRawMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
+    const owner=createCanonicalCurrentRecovery({...f.deps,db:candidateQueryDb(f.h.dependencies.db)});
+    const result=await owner.verifyRawRecoveryAuditCandidate(material);
+    assert.equal(result.candidateProofValid,true);
+    for(const flag of ['authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.equal(f.h.data.has(f.h.root+'/characters/'+primaryId),false);
+    assert.equal(f.h.data.has(f.h.root+'/characters/'+secondaryId),false);
+    const input=JSON.stringify(material),segmented=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
+    assert.equal(segmented.segmentedProofValid,true);
+    for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(segmented[flag],false);
+    assert.equal(Object.hasOwn(f.recovery,'verifySegmentedRawRecoveryProof'),false);
+    assert.equal(JSON.stringify(material),input);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    for(const fault of [
+        (h,id)=>{h.data.get(h.root+'/ledgerEntries/'+id).amount--;},
+        (h,id)=>{for(const collection of ['operations','ledgerEntries'])h.data.get(h.root+'/'+collection+'/'+id).policySha256='f'.repeat(64);},
+        h=>{h.data.get(h.root+'/operations/skill-earned-secondary-remove').policySha256='f'.repeat(64);},
+        h=>{h.data.set(h.root+'/ledgerEntries/skill-earned-secondary-remove',{schemaVersion:1,kind:'skill-loadout',ownerUid:h.uid,operationId:'skill-earned-secondary-remove'});},
+        h=>{h.data.delete(h.root+'/operations/skill-earned-secondary-remove');}
+    ]){
+        const corrupt=await make(fault),sealed=await completeRawMaterial(corrupt);
+        await unchanged(corrupt,()=>privateRawInspector(corrupt,'verifySegmentedRawRecoveryProof')(sealed),error=>error.code==='data-loss');
     }
 });
 
@@ -1134,4 +1249,269 @@ test('raw capture requires exact SDK source versions and typed bytes, never a mi
             }},session))});
         await unchanged(f,()=>bad.captureRawInventory(f.request(),input),error=>error.code==='data-loss');
     }
+});
+
+
+test('segmented strict proof streams sealed raw capsules through original complete ticket units without candidate authority',async t=>{
+    for(const options of [{battles:2,three:true},{battles:20,three:false,adStatus:'abandoned'}]){
+        const f=await fixture(options),material=await completeRawMaterial(f),before=copy([...f.h.data]),input=JSON.stringify(material),writes=f.h.writes;
+        assert.equal(Object.hasOwn(f.recovery,'verifySegmentedRawRecoveryProof'),false);
+        const result=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
+        assert.equal(result.segmentedProofValid,true);assert.equal(result.documentCount,inventoryOrder(f).length);
+        for(const flag of ['candidateProofValid','authoritativeStateReady','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[flag],false);
+        assert(result.residentUsage.maxResidentCapsuleBytes<=2*1024*1024);assert(result.residentUsage.maxUnitReads<=60);
+        assert(result.residentUsage.maxUnitTypedBytes<=2*1024*1024);assert.equal(result.assemblyUsage.reservedBytes,0);
+        assert.equal(result.residentUsage.units,result.residentUsage.executedProofUnits);
+        assert.equal(result.residentUsage.executedProofUnits+result.residentUsage.settlementReuseHits,options.battles===20?77:15,
+            'historical duplicate unit count is now explicit: each settlement has an original complete ticket proof plus exact-row reuse');
+        assert.equal(result.residentUsage.enumeratedSettlementRows,result.residentUsage.settlementReuseHits);
+        assert.equal(f.h.writes,writes);assert.deepEqual([...f.h.data],before);assert.equal(JSON.stringify(material),input);
+        t.diagnostic(JSON.stringify({battles:options.battles,...result.residentUsage,...result.assemblyUsage}));
+    }
+});
+
+test('segmented settlement reuse preserves original complete proofs and raw coverage with lower duplicate work',async t=>{
+    const filename=require.resolve('../functions/src/canonical-current-recovery'),source=readFileSync(filename,'utf8');
+    const needle='if(scope)scope.completeTicket(unit,proof);';assert.equal(source.split(needle).length,2);
+    // Test-only old execution path: every enumerated settlement invokes the
+    // original full verifier, as before reuse. No alternate source rules.
+    const withoutReuse=source.replace(needle,'');
+    for(const status of ['terminal','pending','abandoned']){
+        const f=await fixture({battles:2,three:true,beforeAudit:status==='terminal'?null:async(h,{deps,request})=>{
+            const forest=createCanonicalPatrolSettlement({...deps,randomBytes:size=>Buffer.alloc(size,255)}),ticketId='reuse-extra-three-ticket';
+            await forest.issueTicket(request(),{operationId:ticketId,expectedRevision:h.revision,triggerEntryId:'forest:0',availableEntryIds:['forest:0','forest:1','forest:2']});
+            for(const memberIndex of [2,0])await forest.settleMember(request(),{operationId:'reuse-extra-member-'+memberIndex,expectedRevision:h.revision,ticketId,memberIndex});
+            if(status==='abandoned')await forest.abandonTicket(request(),{operationId:'reuse-extra-abandon-operation',expectedRevision:h.revision,ticketId});
+        }}),material=await completeRawMaterial(f),input=JSON.stringify(material),before=copy([...f.h.data]),writes=f.h.writes;
+        const old=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',undefined,undefined,withoutReuse)(material);
+        const current=await privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material);
+        const semantic=({residentUsage,assemblyUsage,...value})=>value;
+        assert.deepEqual(semantic(current),semantic(old));
+        assert.equal(current.residentUsage.enumeratedSettlementRows,status==='terminal'?8:10);
+        assert.equal(current.residentUsage.enumeratedSettlementRows,old.residentUsage.enumeratedSettlementRows);
+        assert.equal(old.residentUsage.settlementReuseHits,0);
+        assert.equal(current.residentUsage.settlementReuseHits,current.residentUsage.enumeratedSettlementRows);
+        assert.equal(current.residentUsage.executedProofUnits+current.residentUsage.settlementReuseHits,old.residentUsage.executedProofUnits);
+        for(const key of ['bytes','nodes','operations'])assert(current.assemblyUsage[key]<old.assemblyUsage[key]);
+        for(const key of ['rowDecodes','rowSpanHashBytes'])assert(current.residentUsage[key]<old.residentUsage[key]);
+        assert.equal(current.assemblyUsage.passes,1);assert.equal(current.assemblyUsage.reservedBytes,0);
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);assert.equal(JSON.stringify(material),input);
+        t.diagnostic(JSON.stringify({status,before:{...old.residentUsage,...old.assemblyUsage},after:{...current.residentUsage,...current.assemblyUsage}}));
+    }
+});
+
+test('segmented reuse cannot hide corrupt ticket-chain economics, missing originals or unknown orphan rows',async()=>{
+    const source=readFileSync(require.resolve('../functions/src/canonical-current-recovery'),'utf8'),oldSource=source.replace('if(scope)scope.completeTicket(unit,proof);','');
+    for(const fault of ['ledger','archive','orphan']){
+        const f=await fixture({battles:2,three:true,beforeAudit:async h=>{
+            const path=[...h.data.keys()].find(path=>path.startsWith(h.root+'/patrolSettlements/')),settlement=h.data.get(path);
+            if(fault==='ledger')h.data.get(h.root+'/ledgerEntries/'+settlement.operationId).kind='shop-purchase';
+            if(fault==='archive')h.data.delete(h.root+'/recoveryArchives/'+settlement.resultRevision);
+            if(fault==='orphan')h.data.set(h.root+'/patrolSettlements/unindexed-orphan-settlement',copy(settlement));
+        }}),material=await completeRawMaterial(f),before=copy([...f.h.data]),writes=f.h.writes;
+        let prior;try{await privateRawInspector(f,'verifySegmentedRawRecoveryProof',undefined,undefined,oldSource)(material);assert.fail('old verifier must reject');}catch(error){prior=error;}
+        const verify=privateRawInspector(f,'verifySegmentedRawRecoveryProof');
+        for(let repeat=0;repeat<2;repeat++)await assert.rejects(()=>verify(material),error=>error.code===prior.code&&error.message===prior.message);
+        assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    }
+});
+
+test('segmented settlement witnesses require successful same-capture qualified reads and never bless a failed unit',async()=>{
+    const f=await fixture({battles:2,three:true}),material=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
+    const privateOwner=privateRawInspector(f,['inspectCompleteRawCapture','segmentedRawView','segmentedScopes']);
+    const make=()=>{const budget=helper.createRecoveryAuditAssemblyBudget(),capture=privateOwner.inspectCompleteRawCapture(material,budget,true);
+        const view=privateOwner.segmentedRawView(capture,budget,f.h.uid);return {budget,view,scope:privateOwner.segmentedScopes.get(view.tx)};};
+    const a=make(),b=make(),path=[...f.h.data.keys()].find(path=>path.startsWith(f.h.root+'/patrolSettlements/')),
+        doc=await a.view.tx.get(f.deps.db.doc(path));
+    // No completed original ticket proof: even an actual qualified read is insufficient.
+    const kernel=a.scope.unit();await kernel.get(f.deps.db.doc(doc.ref.path));
+    assert.equal(a.scope.reuseSettlement(doc),false);
+    // The private completion call is reached only after the real awaited
+    // verifier in production. IDs not actually read by this unit cannot mint.
+    a.scope.completeTicket(kernel,{verifiedOperationIds:['unread-settlement-operation']});
+    assert.equal(a.scope.reuseSettlement(doc),false);
+    const qualified=a.scope.unit();await qualified.get(f.deps.db.doc(doc.ref.path));
+    a.scope.completeTicket(qualified,{verifiedOperationIds:[doc.id]});
+    const fresh=await a.view.tx.get(f.deps.db.doc(doc.ref.path));assert.equal(a.scope.reuseSettlement(fresh),true);
+    assert.throws(()=>{fresh.data().sha256='f'.repeat(64);},TypeError,'original decoded row data remains immutable');
+    assert.equal(a.scope.reuseSettlement({...fresh}),false,'unqualified reconstructed row cannot reuse a witness');
+    assert.equal(b.scope.reuseSettlement(fresh),false,'another capture has no witness');
+    const foreignKernel=b.scope.unit();await foreignKernel.get(f.deps.db.doc(doc.ref.path));
+    a.scope.completeTicket(foreignKernel,{verifiedOperationIds:[doc.id]});
+    const foreign=await b.view.tx.get(f.deps.db.doc(doc.ref.path));assert.equal(a.scope.reuseSettlement(foreign),false);
+    assert.throws(()=>helper.chargeRecoveryAuditAssembly(a.budget,'operations',16385),/operations budget exceeded/);
+    await assert.rejects(()=>a.view.tx.get(f.deps.db.doc(doc.ref.path)),/operations budget exceeded/);
+    await assert.rejects(()=>a.view.close(),/operations budget exceeded/);await b.view.close();
+});
+
+
+test('sole raw typed codec derives exact row spans through Unicode, escaped framing and nested same-name values',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact');
+    const documents=[{path:'serverUsers/中文😀/operations/a',exists:true,updateTime:{seconds:1700000000,nanoseconds:999999999},
+        data:{documents:[{documents:'["documents",["array",['}],unicode:'中é😀𐐷',escape:'quote" slash\\ tab\t newline\n',same:'["object",['}},
+        {path:'serverUsers/中文😀/operations/b',exists:true,updateTime:{seconds:0,nanoseconds:1},data:{value:-0,nested:[null,false,'文']}}];
+    const payload={before:'["documents",["array",[',documents,schemaVersion:3,zzz:{documents:documents[0]}};
+    const bytes=helper.encodeProofPayload(payload),saved=Buffer.from(bytes),budget=helper.createRecoveryAuditAssemblyBudget();
+    const indexed=helper.indexRawProofPayload(bytes,budget);assert.deepEqual(helper.encodeProofPayload(indexed.payload),bytes);
+    assert.equal(indexed.spans.length,documents.length);let previous=0;
+    for(const [i,span] of indexed.spans.entries()){
+        assert(span.start>=previous);previous=span.start+span.length;
+        const raw=bytes.subarray(span.start,previous);assert.deepEqual(raw,helper.encodeProofPayload(documents[i]));
+        assert.deepEqual(helper.encodeProofPayload(helper.decodeProofPayload(raw)),raw);
+        assert.equal(require('node:crypto').createHash('sha256').update(raw).digest('hex'),span.sha256);
+    }
+    assert.deepEqual(bytes,saved);assert(helper.recoveryAuditAssemblyUsage(budget).bytes>bytes.length);
+    for(const invalid of [Buffer.concat([bytes,Buffer.from(' ')]),Buffer.from(bytes.toString().replace('中文','\\u4e2d文')),
+        helper.encodeProofPayload({...payload,schemaVersion:2})])assert.throws(()=>helper.indexRawProofPayload(invalid),/encoding|span shape/);
+});
+
+test('segmented private proof rejects semantic orphans, lost economic pairs and contradictory absences across sealed capsules',async()=>{
+    const faults=[
+        h=>h.data.set(h.root+'/operations/unknown-segmented-op001',{schemaVersion:1,ownerUid:h.uid,operationId:'unknown-segmented-op001',kind:'future-unknown-kind'}),
+        h=>h.data.set(h.root+'/recoveryAudits/unknown-segmented-row',{kind:'unclassified-retained-data',ownerUid:h.uid}),
+        h=>{const path=[...h.data.keys()].find(path=>path.startsWith(h.root+'/patrolSettlements/'));const id=path.split('/').at(-1);
+            h.data.delete(h.root+'/operations/'+id);h.data.delete(h.root+'/ledgerEntries/'+id);},
+        h=>{const id=[...h.data.keys()].find(path=>path.startsWith(h.root+'/patrolSettlements/')).split('/').at(-1);
+            h.data.set(h.root+'/grantOperations/'+id,{schemaVersion:1,ownerUid:h.uid});}
+    ];
+    for(const beforeAudit of faults){const f=await fixture({battles:2,three:false,beforeAudit}),material=await completeRawMaterial(f);
+        await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material));}
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f);
+    for(const mutate of [m=>{m.rawChunks.shift();},m=>{m.rawReceipts[1].row.previousReceiptSha256='f'.repeat(64);},
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].path=p.documents.at(-1).path;}),
+        m=>replaceLastRawPayload(m,p=>{p.documents[0].updateTime.nanoseconds++;})]){
+        const m=copy(base);mutate(m);await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(m));
+    }
+});
+
+test('segmented private chunk copies isolate external mutation and charge one sticky whole-lifecycle budget',async()=>{
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
+    let builds=0,token,metadataChecks=0,qualifiedReads=0;const tokens=new Set(),initialMembershipChecks=new Map(),reuseMetadataChecks=new Map();
+    const wrapped={...helper,createRecoveryAuditAssemblyBudget:()=>{builds++;return token=helper.createRecoveryAuditAssemblyBudget();},
+        inventoryDocumentMetadata:(...args)=>{metadataChecks++;assert.equal(args[2],token);
+            // Complete raw membership precedes every indexed point read. Later
+            // metadata work is the fresh exact-row check on a reuse candidate.
+            const checks=qualifiedReads===0?initialMembershipChecks:reuseMetadataChecks,path=args[0].ref.path;
+            checks.set(path,(checks.get(path)??0)+1);return helper.inventoryDocumentMetadata(...args);},
+        decodeIndexedRawProofRow:(...args)=>{qualifiedReads++;return helper.decodeIndexedRawProofRow(...args);},
+        chargeRecoveryAuditAssembly:(budget,...args)=>{tokens.add(budget);return helper.chargeRecoveryAuditAssembly(budget,...args);}};
+    const expected=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',wrapped)(copy(base));assert.equal(builds,1);assert.deepEqual([...tokens],[token]);
+    const inventoryPaths=inventoryOrder(f).map(row=>row.path),settlementPaths=inventoryPaths.filter(path=>path.startsWith(f.h.root+'/patrolSettlements/'));
+    assert.deepEqual([...initialMembershipChecks.keys()].sort(),inventoryPaths.slice().sort());
+    assert([...initialMembershipChecks.values()].every(count=>count===1),'each initial raw row reaches original membership validation exactly once');
+    assert.deepEqual([...reuseMetadataChecks.keys()].sort(),settlementPaths.slice().sort());
+    assert([...reuseMetadataChecks.values()].every(count=>count===1),'each reused settlement freshly rechecks its exact raw metadata once');
+    assert.equal(reuseMetadataChecks.size,expected.residentUsage.settlementReuseHits);
+    assert.equal(metadataChecks,initialMembershipChecks.size+reuseMetadataChecks.size);
+    assert.equal(qualifiedReads,expected.residentUsage.rowDecodes);assert(qualifiedReads>metadataChecks);
+    const privateBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
+    assert.equal(expected.residentUsage.privateChunkBytes,privateBytes);assert.equal(expected.residentUsage.copyChargedBytes,privateBytes);
+    assert.equal(expected.residentUsage.initialHashCheckedBytes,2*privateBytes);assert(expected.residentUsage.rowSpanHashBytes>0);
+    const material=copy(base);let scheduled=false;
+    const mutation={...helper,indexRawProofPayload:(...args)=>{const result=helper.indexRawProofPayload(...args);
+        if(!scheduled){scheduled=true;queueMicrotask(()=>{material.rawChunks[0].row.payloadBytes[100]^=1;});}return result;}};
+    const original=copy([...f.h.data]),writes=f.h.writes;
+    const actual=await privateRawInspector(f,'verifySegmentedRawRecoveryProof',mutation)(material);
+    const stable=result=>({...result,assemblyUsage:{...result.assemblyUsage,elapsedMs:0}});
+    assert.deepEqual(stable(actual),stable(expected),'copy-after caller mutation cannot replace this sealed snapshot');
+    assert.notDeepEqual(material.rawChunks[0].row.payloadBytes,base.rawChunks[0].row.payloadBytes);
+    assert.deepEqual([...f.h.data],original);assert.equal(f.h.writes,writes);
+    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof')(material),/chunk differs/);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const source=readFileSync(filename,'utf8');assert(source.includes('nodes:16000000'));
+    compiled._compile(source.replace('nodes:16000000','nodes:200000'),filename);
+    await unchanged(f,()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports)(copy(base)),/nodes budget exceeded/);
+});
+
+
+test('segmented chunk shape and aggregate copy admission reject before private allocation',async()=>{
+    const f=await fixture({battles:2,three:true}),base=await completeRawMaterial(f),helper=require('../functions/src/recovery-audit-artifact');
+    let copies=0;const buffers=new Proxy(Buffer,{get:(target,key)=>key==='from'?((...args)=>{copies++;return Buffer.from(...args);}):Reflect.get(target,key)});
+    const before=copy([...f.h.data]),writes=f.h.writes;
+    for(const mutate of [m=>{m.rawChunks[0].unknown='original-shape-must-reject';},
+        m=>{m.rawChunks[0].row.payloadBytes=Buffer.alloc(PATROL_PROOF_LIMITS.chunkBytes+1);},
+        m=>{m.rawChunks[0].row.payloadBytes=null;},m=>{m.rawChunks[0].extra={nested:true};}]){
+        const material=copy(base);mutate(material);copies=0;
+        await assert.rejects(()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',helper,buffers)(material));
+        assert.equal(copies,0,'strict shape and per-chunk bounds precede every copy');
+    }
+    const reserved=[...base.inventoryPages,...base.rawChunks].reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0),
+        copyBytes=base.rawChunks.reduce((sum,entry)=>sum+entry.row.payloadBytes.length,0);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);
+    compiled.filename=filename;compiled.paths=Module._nodeModulePaths(dirname(filename));
+    const source=readFileSync(filename,'utf8');assert(source.includes('bytes:256*1024*1024'));
+    compiled._compile(source.replace('bytes:256*1024*1024','bytes:'+(reserved+copyBytes-1)),filename);copies=0;
+    await assert.rejects(()=>privateRawInspector(f,'verifySegmentedRawRecoveryProof',compiled.exports,buffers)(copy(base)),/bytes budget exceeded/);
+    assert.equal(copies,0,'aggregate admission includes reserved input plus fresh copies before any allocation');
+    assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+});
+
+
+test('indexed raw row qualifications bind one canonical span and original sticky assembly budget without authority',()=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),budget=helper.createRecoveryAuditAssemblyBudget();
+    const documents=['a','b'].map(id=>({path:'serverUsers/qualification/operations/'+id,exists:true,
+        updateTime:{seconds:1700000000,nanoseconds:123},data:{text:'中文😀',minusZero:-0}}));
+    const bytes=helper.encodeProofPayload({schemaVersion:3,documents}),indexed=helper.indexRawProofPayload(bytes,budget),
+        raw=indexed.spans.map(span=>bytes.subarray(span.start,span.start+span.length));
+    assert.equal(raw[0].length,raw[1].length);const first=indexed.spans[0],before=helper.recoveryAuditAssemblyUsage(budget);
+    const decoded=helper.decodeIndexedRawProofRow(raw[0],first.qualification,budget),after=helper.recoveryAuditAssemblyUsage(budget);
+    assert.deepEqual(helper.encodeProofPayload(decoded),helper.encodeProofPayload(documents[0]));
+    assert.equal(after.bytes-before.bytes,raw[0].length,'only actual decode work is charged; canonical re-encoding is not executed');
+    assert(after.nodes>before.nodes);assert.equal(Object.keys(first.qualification).length,0);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],{},budget),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[1],first.qualification,budget),/bytes differ/);
+    const changed=Buffer.from(raw[0]);changed[changed.length-2]^=1;
+    const beforeBad=helper.recoveryAuditAssemblyUsage(budget).bytes;
+    assert.throws(()=>helper.decodeIndexedRawProofRow(changed,first.qualification,budget),/bytes differ/);
+    assert.equal(helper.recoveryAuditAssemblyUsage(budget).bytes-beforeBad,changed.length,'a failed hash still charges the real attempted row read');
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0].subarray(1),first.qualification,budget),/qualification/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,{}),/unknown assembly budget/);
+    helper.reserveRecoveryAuditRawInputs(budget,[]);
+    assert.throws(()=>helper.chargeRecoveryAuditAssembly(budget,'operations',16385),/operations budget exceeded/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],first.qualification,budget),/operations budget exceeded/);
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);compiled.filename=filename;
+    compiled.paths=Module._nodeModulePaths(dirname(filename));let clock=0;const native=compiled.require.bind(compiled);
+    compiled.require=name=>name==='node:perf_hooks'?{performance:{now:()=>clock}}:native(name);compiled._compile(readFileSync(filename,'utf8'),filename);
+    const timed=compiled.exports,timedBudget=timed.createRecoveryAuditAssemblyBudget(),timedIndex=timed.indexRawProofPayload(bytes,timedBudget);
+    clock=30001;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
+    clock=0;assert.throws(()=>timed.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,timedBudget),/deadline exceeded/);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw[0],timedIndex.spans[0].qualification,helper.createRecoveryAuditAssemblyBudget()),/qualification/);
+});
+
+
+test('indexed row byte exhaustion refuses before hashing or parsing the qualified bytes',()=>{
+    const filename=require.resolve('../functions/src/recovery-audit-artifact'),compiled=new Module(filename);compiled.filename=filename;
+    compiled.paths=Module._nodeModulePaths(dirname(filename));const native=compiled.require.bind(compiled);let hashes=0,parses=0;
+    const crypto=native('node:crypto');compiled.require=name=>name==='node:crypto'?{...crypto,createHash:(...args)=>{hashes++;return crypto.createHash(...args);}}:
+        name==='test-only-indexed-row-json'?{stringify:JSON.stringify,parse:(...args)=>{parses++;return JSON.parse(...args);}}:native(name);
+    const source=readFileSync(filename,'utf8');compiled._compile(source.replace('"use strict";','"use strict";const JSON=require("test-only-indexed-row-json");'),filename);
+    const helper=compiled.exports,budget=helper.createRecoveryAuditAssemblyBudget(),bytes=helper.encodeProofPayload({schemaVersion:3,documents:[{path:'serverUsers/row-budget/operations/a',exists:true,data:{value:1}}]}),
+        indexed=helper.indexRawProofPayload(bytes,budget),span=indexed.spans[0],raw=bytes.subarray(span.start,span.start+span.length);
+    const usage=helper.recoveryAuditAssemblyUsage(budget);helper.chargeRecoveryAuditAssembly(budget,'bytes',256*1024*1024-usage.bytes);
+    hashes=0;parses=0;
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
+    assert.equal(hashes,0);assert.equal(parses,0);
+    assert.throws(()=>helper.decodeIndexedRawProofRow(raw,span.qualification,budget),/bytes budget exceeded/);
+    assert.equal(hashes,0);assert.equal(parses,0);
+});
+
+test('versioned raw archive syntax roundtrips genuine two-battle capture bytes without source authority or old-reader acceptance',async t=>{
+    const helper=require('../functions/src/recovery-audit-artifact'),f=await fixture({battles:2,three:true}),material=await completeRawMaterial(f);
+    const before=copy([...f.h.data]),original=JSON.stringify(material),writes=f.h.writes,budget=helper.createRecoveryAuditAssemblyBudget();
+    const bytes=helper.encodeRawRecoveryArchive(material,budget),decoded=helper.decodeRawRecoveryArchive(bytes,budget);
+    for(const name of ['binding','run','inventoryState','rawState'])assert.deepEqual(helper.encodeProofPayload(decoded[name]),helper.encodeProofPayload(material[name]));
+    for(const name of ['inventoryPages','rawReceipts','rawChunks']){
+        assert.deepEqual(decoded[name].map(row=>row.id),material[name].map(row=>row.id));
+        for(let i=0;i<decoded[name].length;i++){
+            const {payloadBytes:a,...left}=decoded[name][i].row,{payloadBytes:b,...right}=material[name][i].row;
+            assert.deepEqual(helper.encodeProofPayload(left),helper.encodeProofPayload(right));if(a)assert.deepEqual(a,b);
+        }
+    }
+    assert.deepEqual(helper.encodeRawRecoveryArchive(decoded,budget),bytes);
+    assert.throws(()=>helper.decodeRecoveryAuditArtifact(bytes,{uid:f.h.uid,expectedRevision:f.h.revision,db:candidateQueryDb(f.h.dependencies.db)}));
+    assert.equal(JSON.stringify(material),original);assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
+    assert.deepEqual(Object.keys(decoded).sort(),Object.keys(material).sort());
+    t.diagnostic(JSON.stringify({archiveBytes:bytes.length,...helper.recoveryAuditAssemblyUsage(budget)}));
 });

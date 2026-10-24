@@ -1400,6 +1400,39 @@ window.FourSymbolsItemAcquisitionData={
           "count": 1
         }
       ]
+    },
+    "story_first_growth": {
+      "sharedExp": 15
+    },
+    "story_starter_gear": {
+      "starterEquipmentFunding": "leatherArmor"
+    },
+    "story_supplies": {
+      "potions": [
+        {
+          "id": "hpPotion10",
+          "count": 2
+        },
+        {
+          "id": "spPotion10",
+          "count": 2
+        }
+      ]
+    },
+    "story_road_chest": {
+      "gold": 420,
+      "potions": [
+        {
+          "id": "hpPotion30",
+          "count": 1
+        }
+      ],
+      "materials": [
+        {
+          "id": "oreLow",
+          "count": 1
+        }
+      ]
     }
   },
   "adventureMerchants": [

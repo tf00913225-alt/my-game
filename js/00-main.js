@@ -4079,6 +4079,10 @@ const battleRoundEndObservers=new Set();
 const battleActionFinishInterceptors=[];
 let battleRoundBoundaryKeys=new Set();
 const battlePresentationLocks=new Set();
+const battleInputGuideHolds=new Set();
+function isBattleInputGuideHeld(token){
+    return Array.from(battleInputGuideHolds).some(hold=>hold.token===token);
+}
 let battleInputResumeToken=null;
 let battleResolutionResumeToken=null;
 let battleAutoActionResume=null;
@@ -4237,6 +4241,17 @@ if(typeof window!=="undefined"){
             return window.FourSymbolsBattleFlow.acquirePresentationLock("pause:"+String(owner||"battle-flow"));
         },
         isPaused(){ return battlePresentationLocks.size>0; },
+        acquireInputGuideHold(owner){
+            if(!battleActive){ return function(){}; }
+            const hold={owner:String(owner||"input-guide"),token:battleToken};
+            battleInputGuideHolds.add(hold);
+            let active=true;
+            return function(){
+                if(!active){ return; }
+                active=false;
+                battleInputGuideHolds.delete(hold);
+            };
+        },
         isAutoBattle(){ return !!autoBattle; },
         isBattleActive(){ return !!battleActive; },
         interceptActionFinish(interceptor){
@@ -4996,10 +5011,9 @@ function getPartyCharacterKey(index){
 
 
 function getPartyAutoConfig(index){
-    if(index>=3&&index<6){ return {...HERO_BASIC_ATTACK_CONFIG}; }
-    if(index===1){ return autoConfig2; }
-    if(index===2){ return autoConfig3; }
-    return autoConfig;
+    const config=index>=3&&index<6?HERO_BASIC_ATTACK_CONFIG:index===1?autoConfig2:index===2?autoConfig3:autoConfig;
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){ return {...config,enabled:false}; }
+    return index>=3&&index<6?{...config}:config;
 }
 
 
@@ -6993,6 +7007,7 @@ async function createCharacter(){
     }
 
 
+    player.adventureProgress={schemaVersion:3,activeChapterId:"chapter_v1",chapters:{},pendingStoryOpening:true};
     if(saveGame()!==true){
         Object.keys(player).forEach(key=>delete player[key]);
         Object.assign(player,previousPlayer);
@@ -7005,12 +7020,19 @@ async function createCharacter(){
 
     initialCharacterCreationPending=false;
     updateInitialCharacterCreationFeedback();
+    // Only a committed fresh character enters onboarding. Feature loading
+    // remains lazy; failed loading retains the persisted resumable intent.
+    try{await window.FourSymbolsFeatures.ensure("adventure","character-story-opening");}
+    catch(error){console.error("[adventure] story load pending retry",error);}
+    if(accountSave.getActiveUid()!==uid||window.FourSymbolsStartupPolicy.getUid()!==uid||
+       player.id!==id||!window.FourSymbolsStartupPolicy.canCreateCharacter()){return false;}
     window.FourSymbolsStartupPolicy.notifyCharacterCreated();
     $("creationPage").style.display="none";
     $("gameInterface").style.display="block";
     if(typeof window.syncCreationTouchMode==="function"){
         window.syncCreationTouchMode();
     }
+    window.FourSymbolsAdventure?.startFreshStory();
     return true;
 
 }
@@ -8379,6 +8401,7 @@ function showPage(page,options={}){
     target.classList.add(
         "active"
     );
+    window.FourSymbolsAdventureUI?.syncTutorialReturn(page);
     if(page!=="battle"){
         window.v143ClearImpactOverlays?.();
         window.FourSymbolsBattlePresentation?.clearHud?.();
@@ -11007,6 +11030,7 @@ function startBattle(triggerIndex){
     clearTransientBattlePresentation();
     battleRoundBoundaryKeys=new Set();
     battlePresentationLocks.clear();
+    battleInputGuideHolds.clear();
     battleInputResumeToken=null;
     battleResolutionResumeToken=null;
     battleAutoActionResume=null;
@@ -11715,6 +11739,9 @@ function beginCharacterTurn(token){
             }
 
 
+            // Guide the real declaration controls without hiding their HUD
+            // or suspending action resolution through a presentation lock.
+            if(isBattleInputGuideHeld(token)){ return; }
             timer--;
 
             updateTimer();
@@ -12053,6 +12080,7 @@ function syncTurnTimerWithBattlePickers(){
 
 
 function toggleSkillQuickBar(){
+    setBattleUtilityMenuOpen(false);
 
     const overlay=
         $("skillQuickBar");
@@ -12437,6 +12465,7 @@ function timeoutTurn(token){
 ===================================================== */
 
 function prepareAction(type){
+    setBattleUtilityMenuOpen(false);
 
     /*
        ★ 修正：
@@ -13019,6 +13048,7 @@ function getTowerStatusAccuracyBonus(caster){
         ?Number(caster.vTowerStatusAccuracyPercent)||0:0;
 }
 function getMonsterCriticalChance(monster,targetAntiCrit=0){
+    if(monster?.tutorialEncounter===true){return Math.max(0,Number(monster.criticalChance)||0);}
     const rage=getActiveRageCriticalBonuses(monster);
     const towerBonus=monster&&monster.vGameplayTower===true?Number(monster.vTowerCriticalBonusPercent)||0:0;
     const baseChance=10+rage.chance+towerBonus;
@@ -19782,6 +19812,7 @@ function openItemMenu(){
 
 
 function closeMenus(){
+    setBattleUtilityMenuOpen(false);
 
     const quickBar=
         $("skillQuickBar");
@@ -20181,6 +20212,7 @@ function applyPotionEffect(potionId,characterIndex,targetAlly){
 ===================================================== */
 
 function toggleAutoBattle(){
+    if(typeof window!=="undefined"&&window.v132ActiveDungeonRun?.tutorial){return;}
 
     /*
        ★ 修正（依照使用者要求，讓巡邏頁面的
@@ -20457,7 +20489,25 @@ function toggleAutoBattle(){
 }
 
 
+function setBattleUtilityMenuOpen(open){
+    const region=$("battleActionRegion"),more=$("battleMoreButton");
+    const allowed=!!open&&region?.dataset.controlMode==="manual"&&!region.classList.contains("target-selecting");
+    if(region){ region.classList.toggle("utility-menu-open",allowed); }
+    if(more){ more.setAttribute("aria-expanded",allowed?"true":"false"); }
+}
+function toggleBattleUtilityMenu(){
+    const region=$("battleActionRegion");
+    setBattleUtilityMenuOpen(!region?.classList.contains("utility-menu-open"));
+}
+
 function updateAutoButton(){
+    const battleToggle=$("battleAutoToggle");
+    if(battleToggle){
+        battleToggle.classList.toggle("is-active",!!autoBattle);
+        battleToggle.setAttribute("aria-pressed",autoBattle?"true":"false");
+        battleToggle.setAttribute("aria-label",autoBattle?"停止自動戰鬥":"啟用自動戰鬥");
+    }
+
 
     /*
        ★ 修正（依照使用者指定版面）：
@@ -22697,12 +22747,14 @@ function ensureBattleStatusDetailModal(){
         '<div class="battle-status-detail-panel" role="dialog" aria-modal="true" aria-labelledby="battleStatusDetailTitle">'+
             '<button type="button" class="battle-status-detail-close" aria-label="關閉">×</button>'+
             '<h3 id="battleStatusDetailTitle">戰鬥狀態</h3>'+
+            '<div class="battle-status-detail-portrait" role="img"></div>'+
             '<div class="battle-status-detail-core">'+
                 '<span data-field="element"></span>'+
                 '<span data-field="name"></span>'+
                 '<span data-field="level"></span>'+
                 '<span data-field="hp"></span>'+
                 '<span data-field="sp"></span>'+
+                '<span data-field="agility"></span>'+
             '</div>'+
             '<section><h4>增益狀態：</h4><div data-list="buffs" class="battle-status-detail-list"></div></section>'+
             '<section><h4>負面狀態：</h4><div data-list="debuffs" class="battle-status-detail-list"></div></section>'+
@@ -22768,6 +22820,14 @@ function openBattleStatusDetailModal(side,index){
 
     const modal=ensureBattleStatusDetailModal();
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
+    const portrait=modal.querySelector('.battle-status-detail-portrait');
+    const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
+    const artwork=card&&card.querySelector('.v174-battle-art');
+    const source=artwork&&artwork.style.backgroundImage;
+    portrait.style.backgroundImage=source&&source!=='none'?source:'none';
+    portrait.textContent=source&&source!=='none'?'':'◇';
+    portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
+    const agility=isMonster?getMonsterAgility(entity):stats?Number(stats.agility):NaN;
     const maxHP=isMonster?entity.maxHP:
         Number(stats&&stats.maxHP)||Number(entity.maxHP)||Math.max(1,Number(entity.hp)||1);
     const maxSP=isMonster?entity.maxSP:
@@ -22780,7 +22840,8 @@ function openBattleStatusDetailModal(side,index){
         name:"名稱："+String(entity.name||entity.id||"角色"),
         level:"等級：Lv."+String(entity.level),
         hp:"HP："+(isMonster?projectEnemyResource(entity.hp,maxHP).text:Math.max(0,Number(entity.hp)||0)+" / "+maxHP),
-        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP)
+        sp:"SP："+(isMonster?projectEnemyResource(entity.sp,maxSP).text:Math.max(0,Number(entity.sp)||0)+" / "+maxSP),
+        agility:"敏捷："+(Number.isFinite(agility)?Math.round(agility*100)/100:'—')
     };
     Object.keys(fields).forEach(key=>{
         const node=modal.querySelector('[data-field="'+key+'"]');
@@ -22790,6 +22851,7 @@ function openBattleStatusDetailModal(side,index){
     renderBattleStatusDetailList(modal.querySelector('[data-list="debuffs"]'),summary.debuffs);
     modal.hidden=false;
     modal.setAttribute("aria-hidden","false");
+    modal.querySelector('.battle-status-detail-panel').scrollTop=0;
     syncBattleUiPriorityLayer();
     return true;
 }
@@ -24094,6 +24156,71 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
+function positionBattleSkillNameBadge(badge,side,index,element){
+    const owner=window.FourSymbolsBattlefieldRenderGeometry;
+    const geometry=owner?.getUnitGeometry?.(side,index);
+    const fallback=element.getBoundingClientRect();
+    const portrait=geometry?.artworkProjection?.rect||geometry?.portraitRect||fallback;
+    const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
+    // Reserve the existing short forward cast motion; never move the Unit/HUD.
+    let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
+    let x=portrait.left+portrait.width/2;
+    badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
+    badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
+    if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
+    let width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+    const blockers=[];
+    document.querySelectorAll("#battlePage .battle-player,#battlePage .battle-monster").forEach(card=>{
+        if(card===element)return;
+        const match=String(card.id).match(/^battle(PlayerCard|Monster)(\d+)$/);if(!match)return;
+        const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
+        for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
+    });
+    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion,#releaseUpdateMarquee").forEach(node=>{
+        const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
+    });
+    // In a dense pair of rows the nearest free band can be above the front row.
+    // Read only the formal projections; this does not create a second scaler.
+    for(let pass=0;pass<blockers.length;pass++){
+        let moved=false;
+        for(const rect of blockers){
+            if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top+1>rect.top&&top-height<rect.top+rect.height){
+                top=rect.top-6;moved=true;
+            }
+        }
+        if(!moved)break;
+    }
+    if(top-height<0){
+        // A short PC viewport has no space for the normal two-line pop above
+        // the top HUD. Use one compact line without overshoot, never cover HP.
+        badge.dataset.compact="true";width=badge.offsetWidth;height=badge.offsetHeight;
+        top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:1);
+        for(let pass=0;pass<blockers.length;pass++){
+            let moved=false;
+            for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
+            if(!moved)break;
+        }
+        if(top-height<0){
+            // The PC overlay can occupy the entire band above the top row.
+            // Use available side gutter for this transient label, not a new
+            // battlefield scale or a change to the announcement's lifecycle.
+            const bounds=[...blockers,portrait,...(hud?[hud]:[])];
+            const desiredX=x,desiredTop=Math.min(portrait.top,hud?.top??portrait.top)-1;
+            const xs=[x,...bounds.flatMap(r=>[r.left-width/2-2,r.left+r.width+width/2+2])];
+            const ys=[Math.max(height+1,desiredTop),height+1];
+            let best;
+            for(const cx of xs)for(const cy of ys){
+                if(cx-width/2<1||cx+width/2>window.innerWidth-1||cy-height<1||cy>portrait.top-1)continue;
+                if(bounds.some(r=>cx+width/2>r.left&&cx-width/2<r.left+r.width&&cy>r.top&&cy-height<r.top+r.height))continue;
+                const distance=Math.abs(cx-desiredX)+Math.abs(cy-desiredTop);
+                if(!best||distance<best.distance)best={x:cx,top:cy,distance};
+            }
+            if(best){x=best.x;top=best.top;}
+        }
+    }
+    badge.style.left=x+"px";badge.style.top=top+"px";
+}
+
 function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){
 
     const targetContract=createBattleTargetContract(
@@ -24163,11 +24290,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"player",Number.isInteger(characterIndex)?characterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -24262,11 +24386,8 @@ function showMonsterSkillNameBadge(
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"monster",Number.isInteger(monsterIndex)?monsterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -30253,11 +30374,10 @@ function removeEquippedSkill(index){
     }
 
 
-    character.equippedSkills
-        .splice(
-            index,
-            1
-        );
+    const nextEquippedSkills=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .removeEquippedSkill(character.equippedSkills,index);
+    character.equippedSkills.splice(0,character.equippedSkills.length,...nextEquippedSkills);
 
 
     renderSkillLoadout();
@@ -31799,20 +31919,9 @@ function populateAutoSkillOptions(){
        修正：把"defend"也視為合法值。
     */
 
-    const stillValid =
-        previousValue==="normal"||
-        previousValue==="defend"||
-        character.equippedSkills.includes(
-            previousValue
-        );
-
-
-    if(!stillValid){
-
-        autoConfig.skill=
-            "normal";
-
-    }
+    autoConfig.skill=window.FourSymbolsSkillProgressionCore
+        .getLoadoutRulesForVersion("v1",skillDatabase)
+        .syncPrimaryAction(autoConfig,character).skill;
 
 
     if(homeSelect){
@@ -32114,7 +32223,8 @@ function syncBattleUiPriorityLayer(){
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
-    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer);
+    const settingsOpen=body&&body.classList.contains("v162-element-box-settings-open");
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||settingsOpen);
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
@@ -32204,6 +32314,9 @@ function updateActionHudVisibility(){
 
     const shouldHide=
         activeAuto || battlePhase==="resolve" || battlePresentationActive;
+    const actionRegion=$("battleActionRegion");
+    if(actionRegion){ actionRegion.dataset.controlMode=shouldHide?"utility":"manual"; }
+    if(shouldHide){ setBattleUtilityMenuOpen(false); }
 
 
     /*

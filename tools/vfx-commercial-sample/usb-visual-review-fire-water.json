@@ -1,0 +1,364 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "head": "d6f181c4523d80522e5c36d498587c3460a4c0c5",
+  "device": "SM-N960F Android 10 physical USB Chrome",
+  "reviewer": "timing_review",
+  "scope": "22 fire/water active-skill screenshots",
+  "method": "Every listed full phone screenshot viewed individually with view_image; timing evidence read from artifacts/vfx-full/evidence.json",
+  "qualityClaim": "Single-frame composition review only, no commercial-readiness, motion continuity or sustained performance acceptance.",
+  "timingFinding": "Many sampled logical hits have cssTime 5–47ms before authored expectedTime and background-position remains frame7; equal cssStart/clock confirms assigned origin only. Need distinguish browser timeline sampling quantization from feedback presentation before claiming hit-frame8 sync.",
+  "rows": [
+    {
+      "id": "flameSlash",
+      "screenshot": "artifacts/vfx-full/skill-flameSlash.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Bright crescent identity is clear, but the visible slash crosses the left stage edge and the target artwork disappears completely. HUD remains legible above it; constrain source/placement without erasing the crescent."
+      ],
+      "timingEvidence": {
+        "duration": 760,
+        "sampleCssTime": 438.199999988079,
+        "expectedHitTime": 443.333333308,
+        "deltaMs": -5.133333319921007,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 66.90000000000146
+      }
+    },
+    {
+      "id": "fireCritical",
+      "screenshot": "artifacts/vfx-full/skill-fireCritical.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Narrow red sword column stays centered on target and leaves neighboring units clear; HUD remains readable. Target is partly visible at sides. No scale blocker in this sampled frame."
+      ],
+      "timingEvidence": {
+        "duration": 1050,
+        "sampleCssTime": 591.5999999880786,
+        "expectedHitTime": 612.499999965,
+        "deltaMs": -20.899999976921436,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 100.20000000000073
+      }
+    },
+    {
+      "id": "explosiveFlurry",
+      "screenshot": "artifacts/vfx-full/skill-explosiveFlurry.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Crossed slashes are readable and compact around the selected target; feet remain visible and neighbors are clear. Screenshot shows one targeted entity, so it cannot establish three-target coverage."
+      ],
+      "timingEvidence": {
+        "duration": 1450,
+        "sampleCssTime": 828.5999999910593,
+        "expectedHitTime": 845.8333332850001,
+        "deltaMs": -17.233333293940746,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.60000000000036
+      }
+    },
+    {
+      "id": "dragonSlash",
+      "screenshot": "artifacts/vfx-full/skill-dragonSlash.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Large fire pillar hides entire target; a straight horizontal cutoff appears at the pillar top near enemy label. Dragon identity is absent in this sample; inspect authored clip and sampled phase before deciding source or placement fix."
+      ],
+      "timingEvidence": {
+        "duration": 2800,
+        "sampleCssTime": 1625.1999999880802,
+        "expectedHitTime": 1633.33333324,
+        "deltaMs": -8.133333251919794,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.70000000000073
+      }
+    },
+    {
+      "id": "fireRocket",
+      "screenshot": "artifacts/vfx-full/skill-fireRocket.png",
+      "reviewState": "insufficient-hit-frame",
+      "notes": [
+        "Three arrows remain crisp and neighbors/HUD clear, but sprite is midway between teams. This image cannot verify target arrival or impact placement."
+      ],
+      "timingEvidence": {
+        "duration": 900,
+        "sampleCssTime": 484.7999999999999,
+        "expectedHitTime": 524.99999997,
+        "deltaMs": -40.19999997000008,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 167.10000000000218
+      }
+    },
+    {
+      "id": "blazeSpell",
+      "screenshot": "artifacts/vfx-full/skill-blazeSpell.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Tall fire pillar fully hides target and has a conspicuous flat top near the name row; footprint reaches left stage edge. Distinguish from dragonSlash/flameTornado using magic-circle identity."
+      ],
+      "timingEvidence": {
+        "duration": 1150,
+        "sampleCssTime": 637.7999999970178,
+        "expectedHitTime": 670.833333295,
+        "deltaMs": -33.03333329798215,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 117
+      }
+    },
+    {
+      "id": "flameTornado",
+      "screenshot": "artifacts/vfx-full/skill-flameTornado.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Fire rings establish tornado identity but the bright column fully hides target and the bottom is visibly rectangular/flat. Needs clip-shape and concentrated-contact review rather than blanket scale reduction."
+      ],
+      "timingEvidence": {
+        "duration": 2100,
+        "sampleCssTime": 1211.699999994039,
+        "expectedHitTime": 1224.99999993,
+        "deltaMs": -13.299999935961068,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.70000000000073
+      }
+    },
+    {
+      "id": "phoenixCry",
+      "screenshot": "artifacts/vfx-full/skill-phoenixCry.png",
+      "reviewState": "sample-reviewed-with-caveat",
+      "notes": [
+        "Phoenix silhouette is clearly readable, centered within enemy side and entirely inside viewport. Large blast hides central target, appropriate to a climax only if brief; duration/overlap cannot be certified from one image."
+      ],
+      "timingEvidence": {
+        "duration": 3200,
+        "sampleCssTime": 1848.3999999910593,
+        "expectedHitTime": 1866.66666656,
+        "deltaMs": -18.266666568940764,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 117
+      }
+    },
+    {
+      "id": "rage",
+      "screenshot": "artifacts/vfx-full/skill-rage.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Three upward arrows communicate buff, centered on caster, neighbors clear and bars remain readable. Aura overlaps own name region behind HUD but does not cover its text."
+      ],
+      "timingEvidence": {
+        "duration": 1500,
+        "sampleCssTime": 869.5999999970212,
+        "expectedHitTime": 874.9999999500001,
+        "deltaMs": -5.399999952978874,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.70000000000437
+      }
+    },
+    {
+      "id": "fireSoulResonance",
+      "screenshot": "artifacts/vfx-full/skill-fireSoulResonance.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Sharp core and surrounding thin arcs remain recognizable, actor head/hair still visible and neighbors clear. Runtime compositing is much cleaner than raw-sheet viewer; no broad opaque orange disk is visible here."
+      ],
+      "timingEvidence": {
+        "duration": 1400,
+        "sampleCssTime": 793.3000000000163,
+        "expectedHitTime": 816.66666662,
+        "deltaMs": -23.366666619983675,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 167
+      }
+    },
+    {
+      "id": "bloodBurnArt",
+      "screenshot": "artifacts/vfx-full/skill-bloodBurnArt.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Distinct dark red tendrils but the tall central flame hides nearly all actor artwork and has a flat cutoff at its top. Neighbors and HUD remain clear. Check that whole clip retains blood-burn rather than generic pillar identity."
+      ],
+      "timingEvidence": {
+        "duration": 1400,
+        "sampleCssTime": 804.3999999999869,
+        "expectedHitTime": 816.66666662,
+        "deltaMs": -12.266666620013098,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.79999999998836
+      }
+    },
+    {
+      "id": "waterKnife",
+      "screenshot": "artifacts/vfx-full/skill-waterKnife.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Thin blue cut/star concentrated on target upper body; feet and neighboring units remain visible, no stage clipping observed."
+      ],
+      "timingEvidence": {
+        "duration": 800,
+        "sampleCssTime": 447.499999999998,
+        "expectedHitTime": 466.66666664,
+        "deltaMs": -19.166666640002006,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 183.90000000000146
+      }
+    },
+    {
+      "id": "frostPunch",
+      "screenshot": "artifacts/vfx-full/skill-frostPunch.png",
+      "reviewState": "sample-reviewed-with-caveat",
+      "notes": [
+        "Fist silhouette is unmistakable and isolated to one target. It hides target head/torso at this phase but neighbors and HUD stay clear; assess occlusion duration in motion."
+      ],
+      "timingEvidence": {
+        "duration": 900,
+        "sampleCssTime": 513.2999999880851,
+        "expectedHitTime": 524.99999997,
+        "deltaMs": -11.699999981914857,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 116.90000000000146
+      }
+    },
+    {
+      "id": "iceSpin",
+      "screenshot": "artifacts/vfx-full/skill-iceSpin.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Three narrow swords leave much of target artwork visible and have good negative space. No stage or HUD clipping observed."
+      ],
+      "timingEvidence": {
+        "duration": 1000,
+        "sampleCssTime": 584.199999991057,
+        "expectedHitTime": 583.3333333,
+        "deltaMs": 0.8666666910569347,
+        "backgroundPosition": "100% 50%",
+        "maximumRafMs": 150.5
+      }
+    },
+    {
+      "id": "frostCrush",
+      "screenshot": "artifacts/vfx-full/skill-frostCrush.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Broad white/blue burst hides target entirely with a conspicuous straight bottom/right rectangular boundary. Keep crystal identity and soften/bound secondary glow rather than reducing everything uniformly."
+      ],
+      "timingEvidence": {
+        "duration": 1150,
+        "sampleCssTime": 624.0999999999985,
+        "expectedHitTime": 670.833333295,
+        "deltaMs": -46.733333295001444,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 100.59999999999854
+      }
+    },
+    {
+      "id": "waterBall",
+      "screenshot": "artifacts/vfx-full/skill-waterBall.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Three blue orbs remain separated around target and allow target silhouette to remain visible. No crowding of adjacent units or labels observed."
+      ],
+      "timingEvidence": {
+        "duration": 1400,
+        "sampleCssTime": 800.6999999880833,
+        "expectedHitTime": 816.66666662,
+        "deltaMs": -15.966666631916723,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 134.09999999999854
+      }
+    },
+    {
+      "id": "floodBeast",
+      "screenshot": "artifacts/vfx-full/skill-floodBeast.png",
+      "reviewState": "insufficient-hit-frame",
+      "notes": [
+        "Beast head is readable but placed low between teams and partially crosses round label at this sample. Need actual contact-frame image/video before concluding landing misalignment."
+      ],
+      "timingEvidence": {
+        "duration": 1350,
+        "sampleCssTime": 780.6999999910573,
+        "expectedHitTime": 787.499999955,
+        "deltaMs": -6.799999963942696,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.70000000000437
+      }
+    },
+    {
+      "id": "iceArrowRain",
+      "screenshot": "artifacts/vfx-full/skill-iceArrowRain.png",
+      "reviewState": "sample-reviewed-with-caveat",
+      "notes": [
+        "Plural ice contacts remain readable across enemy center; HUD stays above effects and left/right targets remain visible. Center target is hidden by broad burst, requiring temporal/overlap review."
+      ],
+      "timingEvidence": {
+        "duration": 1600,
+        "sampleCssTime": 922.9999999970175,
+        "expectedHitTime": 933.33333328,
+        "deltaMs": -10.333333282982494,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 100.26800000000367
+      }
+    },
+    {
+      "id": "freeze",
+      "screenshot": "artifacts/vfx-full/skill-freeze.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Ice shard enclosure is readable and target silhouette remains faintly visible between shards; narrow enough for one slot, HUD and neighbors clear. This sample alone cannot inspect later prison hold."
+      ],
+      "timingEvidence": {
+        "duration": 950,
+        "sampleCssTime": 531.299999991063,
+        "expectedHitTime": 554.1666666350001,
+        "deltaMs": -22.866666643937037,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 117
+      }
+    },
+    {
+      "id": "healSpell",
+      "screenshot": "artifacts/vfx-full/skill-healSpell.png",
+      "reviewState": "sample-reviewed",
+      "notes": [
+        "Lotus and green-tinted core provide clear healing identity, sized to caster and clear of neighbors; upper actor remains visible and bars readable."
+      ],
+      "timingEvidence": {
+        "duration": 1250,
+        "sampleCssTime": 706.5999999970245,
+        "expectedHitTime": 729.1666666250001,
+        "deltaMs": -22.566666627975565,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 117
+      }
+    },
+    {
+      "id": "revive",
+      "screenshot": "artifacts/vfx-full/skill-revive.png",
+      "reviewState": "sample-reviewed-with-caveat",
+      "notes": [
+        "Lotus and gold/blue upward wisps are distinct and moderately sized. Both actor and own HUD are translucent in this frame; verify this is intended revival state, not a VFX-layer HUD fade."
+      ],
+      "timingEvidence": {
+        "duration": 1800,
+        "sampleCssTime": 1036.8999999970185,
+        "expectedHitTime": 1049.99999994,
+        "deltaMs": -13.099999942981412,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 50.099999999998545
+      }
+    },
+    {
+      "id": "purifyMind",
+      "screenshot": "artifacts/vfx-full/skill-purifyMind.png",
+      "reviewState": "needs-followup",
+      "notes": [
+        "Three bright washes join almost continuously across full team width, obscuring all three actors and creating a horizontal white band. HUD stays readable. Retain three cleansing spirals while reducing secondary glow overlap."
+      ],
+      "timingEvidence": {
+        "duration": 1400,
+        "sampleCssTime": 805.2999999940482,
+        "expectedHitTime": 816.66666662,
+        "deltaMs": -11.36666662595178,
+        "backgroundPosition": "66.6667% 50%",
+        "maximumRafMs": 133.70000000001164
+      }
+    }
+  ]
+}

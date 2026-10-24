@@ -1,0 +1,381 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "baselineHead": "b767d31e3a830d1c650aa42482b45ab2f1f3fb01",
+  "device": "Samsung SM-N960F / Android 10 / Chrome / physical USB ADB",
+  "fixture": "existing read-only skill-runtime-browser-qa; real 3-vs-3 battle owners; no production player origin changes",
+  "candidate": "normal production build and build:check in detached validation snapshot; integrity checks retained",
+  "technicalMatrixPassed": true,
+  "visualAcceptance": "NOT PASSED",
+  "results": [
+    {
+      "mode": "before",
+      "fixture": {
+        "startup": "READY",
+        "uid": "skill-runtime-browser-qa",
+        "viewport": [
+          411,
+          717
+        ],
+        "roster": [
+          3,
+          3
+        ],
+        "relicPreview": "function"
+      },
+      "exceptions": 0,
+      "casts": [
+        {
+          "skill": "flameSlash",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            999682,
+            1000000,
+            1000000
+          ],
+          "renderedRafSamples": 22,
+          "contactSprite": {
+            "width": 194,
+            "height": 194,
+            "x": -20.785715103149414,
+            "y": 122.38690948486328,
+            "bg": "url(\"http://127.0.0.1:49245/assets/vfx/fire/flame-slash-cast.png\")",
+            "size": "400% 300%",
+            "position": "66.6667% 0px",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 1,
+            "completed": 1,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 1,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.75,
+            "p95": 50.1,
+            "max": 467.8,
+            "over50ms": 4,
+            "samples": 22
+          }
+        },
+        {
+          "skill": "iceArrowRain",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            999795,
+            999795,
+            999795
+          ],
+          "renderedRafSamples": 75,
+          "contactSprite": {
+            "width": 385,
+            "height": 385,
+            "x": 13.214285850524902,
+            "y": -42.125,
+            "bg": "url(\"http://127.0.0.1:49245/assets/vfx/water/frost-arrow-rain-vfx.png?v=173.19\")",
+            "size": "400% 300%",
+            "position": "66.6667% 50%",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 3,
+            "completed": 3,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 4,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.7,
+            "p95": 50.2,
+            "max": 384.4,
+            "over50ms": 6,
+            "samples": 75
+          }
+        },
+        {
+          "skill": "relic_nine_dragon_fire",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "renderedRafSamples": 134,
+          "contactSprite": {
+            "width": 385,
+            "height": 385,
+            "x": 13.214285850524902,
+            "y": -42.125,
+            "bg": "url(\"http://127.0.0.1:49245/assets/vfx/relic/relic_nine_dragon_fire.webp\")",
+            "size": "400% 300%",
+            "position": "66.6667% 50%",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 5,
+            "completed": 5,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 4,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.7,
+            "p95": 33.4,
+            "max": 334.2,
+            "over50ms": 4,
+            "samples": 301
+          }
+        }
+      ]
+    },
+    {
+      "mode": "after",
+      "fixture": {
+        "startup": "READY",
+        "uid": "skill-runtime-browser-qa",
+        "viewport": [
+          411,
+          717
+        ],
+        "roster": [
+          3,
+          3
+        ],
+        "relicPreview": "function"
+      },
+      "exceptions": 0,
+      "casts": [
+        {
+          "skill": "flameSlash",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            999682,
+            1000000,
+            1000000
+          ],
+          "renderedRafSamples": 23,
+          "contactSprite": {
+            "width": 145,
+            "height": 145,
+            "x": 3.7142858505249023,
+            "y": 146.88690185546875,
+            "bg": "url(\"http://127.0.0.1:49932/tools/vfx-commercial-sample/assets/flame-slash.webp\")",
+            "size": "400% 300%",
+            "position": "66.6667% 0px",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 1,
+            "completed": 1,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 1,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.7,
+            "p95": 66.9,
+            "max": 451.2,
+            "over50ms": 5,
+            "samples": 23
+          }
+        },
+        {
+          "skill": "iceArrowRain",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            999795,
+            999795,
+            999795
+          ],
+          "renderedRafSamples": 71,
+          "contactSprite": {
+            "width": 302,
+            "height": 302,
+            "x": 54.71428680419922,
+            "y": -0.625,
+            "bg": "url(\"http://127.0.0.1:49932/tools/vfx-commercial-sample/assets/ice-arrow-rain.webp\")",
+            "size": "400% 300%",
+            "position": "66.6667% 50%",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 3,
+            "completed": 3,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 4,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.7,
+            "p95": 50.1,
+            "max": 350.9,
+            "over50ms": 5,
+            "samples": 71
+          }
+        },
+        {
+          "skill": "relic_nine_dragon_fire",
+          "beforeHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "afterHp": [
+            1000000,
+            1000000,
+            1000000
+          ],
+          "renderedRafSamples": 137,
+          "contactSprite": {
+            "width": 370,
+            "height": 370,
+            "x": 20.71428680419922,
+            "y": -34.625,
+            "bg": "url(\"http://127.0.0.1:49932/tools/vfx-commercial-sample/assets/nine-dragon-fire-v3.webp\")",
+            "size": "400% 300%",
+            "position": "66.6667% 50%",
+            "opacity": "1"
+          },
+          "remainingNodes": 0,
+          "diagnostics": {
+            "started": 5,
+            "completed": 5,
+            "missingVisuals": 0,
+            "legacyNodesPurged": 0,
+            "delayedNumbers": 4,
+            "delayedDeaths": 0,
+            "version": "174-slot-geometry-owner",
+            "active": false,
+            "activeSkill": null,
+            "activeSide": null,
+            "targetSide": null,
+            "blockedManifestWrites": 0,
+            "blockedDirectorOverrides": 0,
+            "blockedCardEffectOverrides": 2,
+            "failedAssets": [],
+            "renderer": "dom-sprite-only",
+            "statusRenderer": "dom-status-visual",
+            "geometryOwner": "fixed-slot",
+            "stageNodes": 0
+          },
+          "rafMs": {
+            "median": 16.7,
+            "p95": 16.8,
+            "max": 317.5,
+            "over50ms": 4,
+            "samples": 312
+          }
+        }
+      ]
+    }
+  ],
+  "findings": [
+    "Flame Slash box reduced approximately 25%; Ice Arrow Rain approximately 22%; portraits more legible.",
+    "Nine Dragon Fire still covers enemy HUD and reaches above viewport in actual all-target geometry despite keeping 96% size; needs geometry/placement review.",
+    "First observed logical hit sample is ahead of authored frame-eight image in both baseline and candidate. One-shot sample is evidence of a timing mismatch, not a completed root-cause diagnosis.",
+    "No missing assets, runtime exceptions or leftover VFX nodes in the six measured casts.",
+    "RAF median is about 16.7ms but action-start long frames occur in both builds; no sustained 60fps or performance certification claimed.",
+    "Relic used existing DEV presentation preview, so no relic damage/reward/once-only settlement verification is claimed.",
+    "Raw first/last RAF timestamps relative to evaluation start can be negative after synchronous work; they are excluded from this summary."
+  ],
+  "next": "Fix real all-target relic framing and investigate logical-hit/CSS-animation alignment before integration.",
+  "candidateSourceSha256": {
+    "js/39-v143-skill-animation.js": "db0508e11566a48e91a70a2eb0eeff395e9b92fc9949caf6469a772aa361b934",
+    "css/40-v143-combat-dungeon-polish.css": "9e5295a384f5af557cabc471340f1a3486c846273f7af121fa6459c95d0bae37"
+  }
+}

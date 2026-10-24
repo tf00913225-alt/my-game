@@ -1,6 +1,7 @@
 /* =====================================================
    V143 — combat readability, raster-only battle VFX and dungeon polish
-   V174 cleanup: formal PNG Sprite Sheets/status loops are the only VFX.
+   V174 cleanup: cast VFX uses formal raster sheets; persistent status paint
+   includes the three explicitly named CSS foot-aura samples below.
 ===================================================== */
 
 /* 1. Enemy identity and resource numbers use the existing card width. */
@@ -71,6 +72,26 @@
     box-shadow:none !important;
 }/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
    Do not use strict/paint containment here: it creates an additional paint clip. */
+/* One fire representative: caster ground ring, behind its action paint. */
+#battlePage .v174-battle-art > .v174-fire-cast-ring{
+    position:absolute;left:50%;top:var(--battle-portrait-baseline,100%);
+    width:104%;height:18%;z-index:1;pointer-events:none;
+    border:3px solid #ffd578;border-radius:50%;
+    background:radial-gradient(ellipse,transparent 32%,rgba(255,85,12,.35) 48%,#ffdb63 58%,#ff791b 66%,rgba(226,39,7,.85) 73%,transparent 80%);
+    box-shadow:0 -3px 10px #ff7e1b,0 0 16px rgba(255,62,9,.85),inset 0 0 8px #ffe194;
+    transform:translate(-50%,-50%);
+}
+#battlePage .v174-fire-cast-ring{overflow:hidden;}
+#battlePage .v174-fire-cast-ember{
+    position:absolute;left:0;top:0;width:8%;height:68%;pointer-events:none;
+    offset-path:ellipse(40% 12% at 50% 50%);offset-anchor:50% 50%;offset-rotate:0deg;
+    border-radius:65% 35% 55% 45%;
+    background:radial-gradient(ellipse at 45% 70%,#fff5bd 12%,#ffd13c 35%,#ff7918 62%,rgba(199,32,4,.8) 80%,transparent 96%);
+    clip-path:polygon(50% 0,85% 40%,100% 70%,70% 100%,25% 95%,0 65%,25% 30%);
+    animation:v174FireCastOrbit var(--fire-cast-duration,1450ms) linear calc(var(--ember-phase,0) * var(--fire-cast-duration,1450ms) * -1) infinite;
+}
+@keyframes v174FireCastOrbit{0%{offset-distance:0%;opacity:.75;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}100%{offset-distance:100%;opacity:.75;transform:scale(.85)}}
+
 .v143-skill-stage{
     position:fixed;
     inset:0;
@@ -132,20 +153,21 @@
 }
 @keyframes v143RasterCastOpacity{
     0%,100%{opacity:0}
-    2%,97%{opacity:1}
+    2%,66.666667%{opacity:1}
+    83.333333%{opacity:.4}
 }
 
 .v143-skill-stage[data-element="fire"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(255,87,25,.9));
+    filter:drop-shadow(0 0 4px rgba(255,87,25,.55));
 }
 .v143-skill-stage[data-element="water"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(76,205,255,.9));
+    filter:drop-shadow(0 0 4px rgba(76,205,255,.5));
 }
 .v143-skill-stage[data-element="wind"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 12px rgba(83,241,184,.92));
+    filter:drop-shadow(0 0 4px rgba(83,241,184,.5));
 }
 .v143-skill-stage[data-element="earth"] .v143-vfx-sprite{
-    filter:drop-shadow(0 0 11px rgba(214,166,77,.9));
+    filter:drop-shadow(0 0 4px rgba(214,166,77,.5));
 }
 .v143-skill-stage[data-element="light"] .v143-vfx-sprite{
     filter:drop-shadow(0 0 12px rgba(255,230,116,.94));
@@ -168,7 +190,8 @@
 
 @keyframes v143RasterCastEnvelope{
     0%{opacity:0;transform:translate(-50%,-50%) scale(.98)}
-    2%,97%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    2%,66.666667%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+    83.333333%{opacity:.4;transform:translate(-50%,-50%) scale(1)}
     100%{opacity:0;transform:translate(-50%,-50%) scale(1)}
 }
 
@@ -202,6 +225,7 @@
    Hard-control body covers are fixed below the rotating body-status plane.
    HUD status icons remain above both body planes with the resource HUD. */
 #game-stage #battlePage{
+    --v143-status-layer-outer-shell:0;
     --v143-status-layer-hard-control-base:4;
     --v143-status-layer-rotating:5;
     --v143-status-layer-hud:34;
@@ -217,7 +241,7 @@
     background-position:0 0;
     background-repeat:no-repeat;
     image-rendering:auto;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
     pointer-events:none;
     transform:translate(-50%,-50%);
     transform-origin:center;
@@ -229,7 +253,7 @@
 
 #game-stage #battlePage .v143-status-visual--static{
     animation:none;
-    opacity:.9;
+    opacity:var(--v143-status-opacity-max,.64);
 }
 
 #game-stage #battlePage .v143-status-visual--layer-hard-control-base{
@@ -238,8 +262,13 @@
 #game-stage #battlePage .v143-status-visual--layer-rotating{
     z-index:var(--v143-status-layer-rotating);
 }
+/* The existing square shell surrounds the portrait from behind. Its authored
+   front ribbons must not paint across the character; portrait art owns plane 1. */
+#game-stage #battlePage .v143-status-visual[data-presentation-role="outer-shell"]{
+    z-index:var(--v143-status-layer-outer-shell);
+}
 
-#game-stage #battlePage .v143-status-icon{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon{
     display:inline-block;
     width:24px;
     height:24px;
@@ -257,46 +286,50 @@
     pointer-events:none;
     transform:none;
 }
-#game-stage #battlePage .v143-status-icon--layer-hud{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--layer-hud{
     position:relative;
-    z-index:var(--v143-status-layer-hud);
+    z-index:var(--v143-status-layer-hud,34);
 }
 
-#game-stage #battlePage .v143-status-icon--pulse{
+:is(#game-stage #battlePage,.v174-battle-hud-layer) .v143-status-icon--pulse{
     animation:none !important;
     opacity:1 !important;
     transform:none !important;
 }
 
+:is(#game-stage #battlePage,.v174-battle-hud-layer) :is(.v143-status-icon-agilityDown,.v143-status-icon-defenseDown){
+    filter:drop-shadow(0 0 1px rgba(229,246,255,.95));
+}
+
 #game-stage #battlePage .v143-status-visual-burn{
-    filter:drop-shadow(0 0 7px rgba(255,79,23,.82));
+    filter:drop-shadow(0 0 2px rgba(255,79,23,.5));
 }
 #game-stage #battlePage .v143-status-visual-rage{
-    filter:drop-shadow(0 0 8px rgba(255,35,20,.9));
+    filter:drop-shadow(0 0 2px rgba(255,35,20,.5));
 }
 #game-stage #battlePage .v143-status-visual-freeze{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 10px rgba(178,238,255,.96));
+    opacity:var(--v143-status-opacity-max,.68);
+    filter:drop-shadow(0 0 2px rgba(178,238,255,.5));
 }
 #game-stage #battlePage .v143-status-visual-dodgeSkill,
 #game-stage #battlePage .v143-status-visual-stealthSkill,
 #game-stage #battlePage .v143-status-visual-dinghaishenzhen{
-    filter:drop-shadow(0 0 9px rgba(127,255,205,.92));
+    filter:drop-shadow(0 0 2px rgba(127,255,205,.5));
 }
 #game-stage #battlePage .v143-status-visual-shield,
 #game-stage #battlePage .v143-status-visual-earthShield,
 #game-stage #battlePage .v143-status-visual-rockWall,
 #game-stage #battlePage .v143-status-visual-barrier{
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-petrify{
     animation:none;
-    opacity:.94;
-    filter:drop-shadow(0 0 9px rgba(222,178,90,.92));
+    opacity:var(--v143-status-opacity-max,.72);
+    filter:drop-shadow(0 0 2px rgba(222,178,90,.5));
 }
 #game-stage #battlePage .v143-status-visual-yuanZuBlessing{
-    filter:drop-shadow(0 0 10px rgba(255,232,135,.94));
+    filter:drop-shadow(0 0 2px rgba(255,232,135,.5));
 }
 
 #game-stage #battlePage .battle-monster.v152-abyss-portrait > .v143-status-visual{
@@ -311,8 +344,43 @@
 }
 
 @keyframes v143StatusImageBreath{
-    0%,100%{opacity:0}
-    50%{opacity:1}
+    0%,100%{opacity:var(--v143-status-opacity-min,.42)}
+    50%{opacity:var(--v143-status-opacity-max,.64)}
+}
+
+/* Named persistent buff sample, owned by the same rotating status node.
+   Cast sheets and static HUD icons retain their existing raster paths. */
+#game-stage #battlePage .v143-status-visual[data-presentation-role="foot-aura"]{
+    filter:none;
+    overflow:visible;
+    color:var(--v143-aura-color);
+}
+#game-stage #battlePage .v143-status-visual[data-aura-color="red"]{--v143-aura-color:rgba(255,92,65,.85);}
+#game-stage #battlePage .v143-status-visual[data-aura-color="green"]{--v143-aura-color:rgba(105,236,159,.85);}
+#game-stage #battlePage .v143-status-visual[data-aura-color="blue"]{--v143-aura-color:rgba(102,185,255,.85);}
+#game-stage #battlePage .v143-status-visual[data-presentation-role="foot-aura"]::before{
+    content:"";position:absolute;inset:0;border:1px solid currentColor;border-radius:50%;
+    background:radial-gradient(ellipse,transparent 38%,currentColor 72%,transparent 76%);
+    box-shadow:0 0 4px currentColor;opacity:.65;pointer-events:none;
+}
+#game-stage #battlePage .v143-status-aura-rise{position:absolute;left:0;bottom:45%;width:100%;height:300%;pointer-events:none;}
+#game-stage #battlePage .v143-status-aura-rise::before,
+#game-stage #battlePage .v143-status-aura-rise::after{
+    content:"";position:absolute;bottom:0;left:10%;width:3px;height:60%;
+    background:radial-gradient(circle at 50% 2px,currentColor 1px,transparent 1.7px),linear-gradient(transparent,currentColor);
+    background-size:3px 100%,1px 100%;background-position:center;background-repeat:no-repeat;
+    opacity:0;pointer-events:none;
+    animation:v143StatusAuraRise 2s ease-out infinite;
+}
+#game-stage #battlePage .v143-status-aura-rise::after{left:90%;height:45%;animation-delay:-.7s;}
+@keyframes v143StatusAuraRise{
+    0%,52%,100%{opacity:0;transform:translateY(0)}
+    12%{opacity:.85;transform:translateY(-15%)}
+    45%{opacity:0;transform:translateY(-100%)}
+}
+@media(prefers-reduced-motion:reduce){
+    #game-stage #battlePage .v143-status-aura-rise::before,
+    #game-stage #battlePage .v143-status-aura-rise::after{animation:none !important;opacity:0;}
 }
 
 @keyframes v143StatusIconBreath{
@@ -419,9 +487,21 @@
     font-size:20px;
     line-height:28px;
 }
+#game-stage #battlePage .battle-status-detail-portrait{
+    height:160px;
+    margin:0 auto 10px;
+    background-size:contain;
+    background-position:center bottom;
+    background-repeat:no-repeat;
+    display:grid;
+    place-items:center;
+    color:var(--ui-gold,#c89a48);
+    font-size:64px;
+    pointer-events:none;
+}
 #game-stage #battlePage .battle-status-detail-core{
     display:grid;
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(2,minmax(0,1fr));
     gap:6px 10px;
     padding:9px 10px;
     border:1px solid rgba(188,145,75,.45);
@@ -430,6 +510,7 @@
     font-size:13px;
     line-height:1.35;
 }
+#game-stage #battlePage .battle-status-detail-core > span{min-width:0;overflow-wrap:anywhere;}
 #game-stage #battlePage .battle-status-detail-panel section{margin-top:12px;}
 #game-stage #battlePage .battle-status-detail-panel h4{
     margin:0 0 6px;

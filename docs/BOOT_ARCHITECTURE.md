@@ -4,6 +4,8 @@
 
 ## 唯一 owner
 
+成功受保護創角與 UID 本機保存後，第一角色以既有 Adventure entry／lazy feature 開啟第一章故事；等待模組後重驗 UID 與原創角 context。`pendingStoryOpening`／onboarding 狀態隨既有 UID main-save 恢復，載入失敗可重試，舊角色不以缺少狀態啟動新手教學。這不增加 Critical bundle，也不變更 Auth／Save 判定。一般登入公告待新手引導結束再呈現；強制更新仍遵守原安全 Gate。
+
 | 責任 | 正式 owner |
 | --- | --- |
 | 狀態與合法轉移 | `js/startup/startup-contract.js` |
@@ -109,6 +111,8 @@ Gameplay payload 保留既有 schema；ownership 不塞入戰鬥或數值欄位�
 7. Cloud 已有角色且 local 沒有相同的已驗證 cloud-base fingerprint 時進 blocked conflict，不自動選邊、不覆寫；同 UID local 只有在 cloud 基底未變時才可作為該 snapshot 的本機後代續玩。
 
 正式 cloud write 仍只允許 trusted backend。瀏覽器不得直接 create/update/delete Firestore authoritative progression。
+
+`OFFLINE_READY` 或曾收到同 UID offline 事件的 `READY` 在回線時，只由 Startup Owner 單 flight、每次網路週期一次向伺服器重讀雲端（15 秒背景 deadline，不阻塞 Boot）。Firestore 必須明確非 cache、無 pending writes；UID、Auth generation、Session、啟動 token 與本機資料在 await 前後仍一致才可顯示確認讀取訊息。此流程不 hydrate、不寫本機 payload／metadata／sidecars、不建立 Session、不上傳或選擇衝突勝方，也不改啟動狀態；未確認或衝突沿既有帳號 UI 顯示並保留 Back。`OFFLINE_READY` 的重試沿同唯讀流程，帳號管理保留最近同 UID 結果。確認讀取不等於完整 Cloud Save 或後端進度授權。
 
 ## Critical Boot manifest
 

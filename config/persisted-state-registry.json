@@ -26,6 +26,16 @@
     {
       "key": "four_symbols_save:<UID>",
       "extensions": {
+        "player.adventureProgress": {
+          "schemaVersion": "root 3 / story 2",
+          "ownerModule": "js/adventure/adventure-runtime-v1-20260915.js",
+          "restoreOwner": "js/00-main.js::loadGame + Adventure normalizeChapterState",
+          "contract": "docs/PERSISTED_STATE_REGISTRY.md",
+          "missingDataBehavior": "existing character has no forced onboarding; fresh protected creation alone records opening intent",
+          "corruptionBehavior": "block affected story; preserve original progress and receipts",
+          "authorityTier": "B",
+          "authoritativeSource": "provisional UID local story/key/reward state; no Cloud entitlement"
+        },
         "heroAccount": {
           "schemaVersion": 1,
           "ownerModule": "functions/src/hero-core.js",

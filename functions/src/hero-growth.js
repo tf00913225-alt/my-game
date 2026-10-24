@@ -223,28 +223,48 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             }
             if(ledger.exists||action==="unlock"&&claim.exists){fail("data-loss","Orphan growth evidence cannot be recreated.");}
             if(c.envelope.serverRevision!==expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
+            return commit(tx,c,{revision:nextRevision(c.envelope),randomSeed,action,heroId,
+                kind:"hero-growth",intent,opRef,ledgerRef,claimRef});
+        });
+    }
+
+    // One retained transition Owner for both the existing writer and historical
+    // proof. Inputs are the original before records/account and pinned intent;
+    // this projector has no clock, randomness, current reads or writes.
+    function projectResources(c,{revision,randomSeed,action,heroId,intent}){
             const before=c.account.heroes[heroId],pills=pillCount(c.records);
-            const allocationSeed=randomSeed===before.allocationSeed?(randomSeed===0xffffffff?1:randomSeed+1):randomSeed;
             let nextAccount;
-            try{
-                const d=domain(c.account);
-                nextAccount=action==="unlock"?d.unlockHero(heroId,allocationSeed):
-                    action==="starUp"?d.starUpHero(heroId):d.rerollHeroAllocation(heroId,allocationSeed,pills);
-            }catch(_){fail("failed-precondition","Hero/resource eligibility failed.");}
-            const revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
-            const removed=new Set();
+            if(["unlock","starUp","reroll"].includes(action)){
+                const allocationSeed=randomSeed===before.allocationSeed?(randomSeed===0xffffffff?1:randomSeed+1):randomSeed;
+                try{
+                    const d=domain(c.account);
+                    nextAccount=action==="unlock"?d.unlockHero(heroId,allocationSeed):
+                        action==="starUp"?d.starUpHero(heroId):d.rerollHeroAllocation(heroId,allocationSeed,pills);
+                }catch(_){fail("failed-precondition","Hero/resource eligibility failed.");}
+            }else if(action==="loginReward"){
+                const policy=loginPolicies.find(row=>row.day===intent.milestoneDay);
+                try{nextAccount=domain(c.account).addSpecificFragments(heroId,policy.fragments);}
+                catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
+            }else if(action==="dailySupply"){
+                nextAccount=c.account;
+                try{for(const [id,amount] of Object.entries(dailyFragments)){nextAccount=domain(nextAccount).addSpecificFragments(id,amount);}}
+                catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
+            }else{fail("data-loss","Unknown retained Hero transition.");}
+            const owned=advanceOwnedRecords(c.records,revision),removed=new Set();
             if(action==="reroll"){
                 const item=owned.inventory.filter(i=>i.location==="bag"&&i.state.id===Core.contract.rerollItem.id)
                     .sort((a,b)=>a.ownedItemId.localeCompare(b.ownedItemId,"en"))[0];
                 if(item.state.count===1){removed.add(item.ownedItemId);owned.inventory=owned.inventory.filter(i=>i!==item);}
                 else{item.state={...item.state,count:item.state.count-1};}
+            }else if(action==="loginReward"||action==="dailySupply"){
+                const count=action==="loginReward"?loginPolicies.find(row=>row.day===intent.milestoneDay).marrowPills:1;
+                addRewardPill(c,owned,revision,intent.operationId,pills,count);
             }
-            return commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,
-                kind:"hero-growth",intent,opRef,ledgerRef,claimRef});
-        });
+            return {before,pills,nextAccount,owned,removed};
     }
-
-    async function commit(tx,c,{nextAccount,owned,removed,revision,before,pills,action,heroId,kind,intent,opRef,ledgerRef,claimRef,dailyEvidence}){
+    function projectTransition(c,input,resources=projectResources(c,input)){
+            const {revision,action,heroId,kind,intent,dailyEvidence}=input;
+            const {before,pills,nextAccount,owned,removed}=resources;
             const records={...c.records,...owned,
                 account:{...c.records.account,serverRevision:revision},
                 characters:c.records.characters.map(row=>({...row,serverRevision:revision})),
@@ -266,6 +286,11 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 ...(action==="dailySupply"?{dailyEvidence,fragmentDeltas:dailyFragments,
                     dailyBeforeResources:dailyBalances(c.records),dailyAfterResources:dailyBalances(records)}:{}),
                 ...(action==="loginReward"?{loginEvidence:c.loginEvidence}:{})};
+            return {records,bundle,archive,receipt,owned,removed,nextAccount};
+    }
+    async function commit(tx,c,input,resources){
+            const {revision,action,intent,opRef,ledgerRef,claimRef}=input;
+            const {records,bundle,archive,receipt,owned,removed,nextAccount}=projectTransition(c,input,resources);
             const stamp=FieldValue.serverTimestamp();
             for(const [key,ref] of Object.entries(c.refs)){
                 const row=key==="claimCheckpoints"?records.claimCheckpoint:records[key];
@@ -308,14 +333,9 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             }
             if(!state.eligible){fail("failed-precondition","Recorded server login milestone not reached.");}
             if(c.envelope.serverRevision!==data.expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
-            const heroId=policy.heroId,before=c.account.heroes[heroId],pills=pillCount(c.records);
-            let nextAccount;
-            try{nextAccount=domain(c.account).addSpecificFragments(heroId,policy.fragments);}
-            catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
-            const revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
-            addRewardPill(c,owned,revision,data.operationId,pills,policy.marrowPills);
+            const heroId=policy.heroId,revision=nextRevision(c.envelope);
             const intent={operationId:data.operationId,expectedRevision:data.expectedRevision,milestoneDay:policy.day};
-            return commit(tx,c,{nextAccount,owned,removed:new Set(),revision,before,pills,action:"loginReward",heroId,
+            return commit(tx,c,{revision,action:"loginReward",heroId,
                 kind:"hero-login-reward",intent,opRef,ledgerRef,claimRef});
         });
     }
@@ -330,21 +350,121 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
             if(receipt)return {...view(c),receipt};
             if(data.periodDate!==day||taipeiDay(now())!==day){fail("failed-precondition","Daily supply date expired; no catch-up.");}
             if(c.envelope.serverRevision!==data.expectedRevision){fail("aborted","CLOUD_REVISION_CONFLICT");}
-            let nextAccount=c.account;
-            try{for(const [id,amount] of Object.entries(dailyFragments)){nextAccount=domain(nextAccount).addSpecificFragments(id,amount);}}
-            catch(_){fail("failed-precondition","Hero fragment capacity exceeded.");}
-            const pills=pillCount(c.records),revision=nextRevision(c.envelope),owned=advanceOwnedRecords(c.records,revision);
-            addRewardPill(c,owned,revision,data.operationId,pills,1);
-            // No external effects inside the transaction; retries cannot roll into a new day.
-            if(taipeiDay(now())!==day){fail("failed-precondition","Daily supply date expired; synchronize again.");}
+            const revision=nextRevision(c.envelope);
             const intent={operationId:data.operationId,expectedRevision:data.expectedRevision,periodDate:day};
-            return commit(tx,c,{nextAccount,owned,removed:new Set(),revision,before:c.account.heroes.divineDogHongbao,
-                pills,action:"dailySupply",heroId:"divineDogHongbao",kind:"hero-daily-supply",intent,
+            const input={revision,action:"dailySupply",heroId:"divineDogHongbao",kind:"hero-daily-supply",intent,
                 dailyEvidence:{periodDate:day,observedAtMs},
                 opRef:c.root.collection("operations").doc(data.operationId),
                 ledgerRef:c.root.collection("ledgerEntries").doc(data.operationId),
-                claimRef:c.root.collection("uniqueClaims").doc(data.operationId)});
+                claimRef:c.root.collection("uniqueClaims").doc(data.operationId)};
+            const resources=projectResources(c,input);
+            // Preserve the original final clock check after resource projection
+            // and before any transaction writes.
+            if(taipeiDay(now())!==day){fail("failed-precondition","Daily supply date expired; synchronize again.");}
+            return commit(tx,c,input,resources);
         });
+    }
+    async function verifyRetainedOperation(tx,scope,operationId){
+        try{
+            if(!scope||typeof scope.uid!=="string"||!scope.uid||scope.root?.path!=="serverUsers/"+scope.uid||
+               !Number.isSafeInteger(scope.envelopeRevision)||!Number.isSafeInteger(scope.canonicalRevision)||
+               scope.canonicalRevision<1||scope.envelopeRevision<scope.canonicalRevision||
+               !/^[a-f0-9]{64}$/.test(scope.captureSha256||"")||!Array.isArray(scope.entitlements)||
+               !/^[A-Za-z0-9_-]{16,64}$/.test(operationId||"")){throw Error("scope");}
+            const grants=scope.entitlements,heroes=new Set();
+            for(const grant of grants){
+                if(keys(grant)!=="allocationSeed|claimKey|grantedRevision|heroId|sourceId"||
+                   !Core.listHeroDefinitions().some(row=>row.heroId===grant.heroId)||heroes.has(grant.heroId)||
+                   grant.claimKey!=="hero-v1-"+grant.heroId||typeof grant.sourceId!=="string"||
+                   !/^[A-Za-z0-9_-]{1,128}$/.test(grant.sourceId)||
+                   !Number.isSafeInteger(grant.allocationSeed)||grant.allocationSeed<1||grant.allocationSeed>0xffffffff||
+                   !Number.isSafeInteger(grant.grantedRevision)||grant.grantedRevision<1||
+                   grant.grantedRevision>scope.envelopeRevision){throw Error("grant");}
+                heroes.add(grant.heroId);
+            }
+            const root=scope.root,uid=scope.uid;
+            const [op,ledger]=await Promise.all(["operations","ledgerEntries"].map(name=>tx.get(root.collection(name).doc(operationId))));
+            if(!op.exists||!ledger.exists||!op.data().createdAt||!ledger.data().createdAt){throw Error("operation");}
+            const r=audit(op.data()),intent=r.intent;
+            if(r.schemaVersion!==1||r.ownerUid!==uid||!intent||intent.operationId!==operationId||
+               !Number.isSafeInteger(intent.expectedRevision)||intent.expectedRevision<1||
+               !Number.isSafeInteger(r.sourceRevision)||r.sourceRevision<1||r.sourceRevision>intent.expectedRevision||
+               r.serverRevision!==intent.expectedRevision+1||r.serverRevision>scope.canonicalRevision||
+               digest(audit(ledger.data()))!==digest(r)){throw Error("receipt");}
+            let action,heroId,claimId=null,policy;
+            if(r.kind==="hero-growth"){
+                if(keys(intent)!=="action|expectedRevision|heroId|operationId"||
+                   !["unlock","starUp","reroll"].includes(intent.action)||
+                   !Core.listHeroDefinitions().some(row=>row.heroId===intent.heroId)){throw Error("intent");}
+                action=intent.action;heroId=intent.heroId;
+                if(action==="unlock")claimId="hero-fragment-v1-"+heroId;
+            }else if(r.kind==="hero-login-reward"){
+                policy=loginPolicies.find(row=>row.day===intent.milestoneDay);
+                if(keys(intent)!=="expectedRevision|milestoneDay|operationId"||!policy||operationId!==rewardId(policy.day)||
+                   keys(r.loginEvidence)!=="loginCount|serverRevision|sha256"||
+                   !Number.isSafeInteger(r.loginEvidence.serverRevision)||r.loginEvidence.serverRevision<1||
+                   r.loginEvidence.serverRevision>intent.expectedRevision||
+                   !Number.isSafeInteger(r.loginEvidence.loginCount)||r.loginEvidence.loginCount<policy.day||
+                   r.loginEvidence.loginCount>7||!/^[a-f0-9]{64}$/.test(r.loginEvidence.sha256||"")){throw Error("login");}
+                action="loginReward";heroId=policy.heroId;claimId=operationId;
+            }else if(r.kind==="hero-daily-supply"){
+                if(keys(intent)!=="expectedRevision|operationId|periodDate"||!validDay(intent.periodDate)||
+                   operationId!==dailyId(intent.periodDate)||keys(r.dailyEvidence)!=="observedAtMs|periodDate"||
+                   !Number.isSafeInteger(r.dailyEvidence.observedAtMs)||
+                   taipeiDay(r.dailyEvidence.observedAtMs)!==intent.periodDate||
+                   r.dailyEvidence.periodDate!==intent.periodDate){throw Error("daily");}
+                action="dailySupply";heroId="divineDogHongbao";claimId=operationId;
+            }else{throw Error("kind");}
+            // Always read the original unlock claim slot, including its absence
+            // for a not-yet-unlocked before account. A later claim is not a grant.
+            const claimPath=claimId||"hero-fragment-v1-"+heroId;
+            const [claim,prior,priorArchive,next,nextArchive]=await Promise.all([
+                tx.get(root.collection("uniqueClaims").doc(claimPath)),
+                tx.get(root.collection("playableSnapshots").doc(String(r.sourceRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(r.sourceRevision))),
+                tx.get(root.collection("playableSnapshots").doc(String(r.serverRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(r.serverRevision)))]);
+            if(!prior.exists||!priorArchive.exists||!next.exists||!nextArchive.exists||
+               prior.data().sha256!==r.sourceSnapshotSha256||next.data().sha256!==r.snapshotSha256||
+               claimId&&(!claim.exists||!claim.data().createdAt||digest(audit(claim.data()))!==digest(r))){throw Error("originals");}
+            const before=inspectRecoveryArchive(priorArchive.data(),uid,r.sourceRevision,prior.data());
+            const after=inspectRecoveryArchive(nextArchive.data(),uid,r.serverRevision,next.data());
+            let account=Core.normalizeAccountState(before.progress.playableState.heroAccount);
+            if(digest(account)!==digest(before.progress.playableState.heroAccount)){throw Error("account");}
+            const cut=grants.filter(grant=>grant.grantedRevision<=intent.expectedRevision)
+                .sort((a,b)=>a.heroId.localeCompare(b.heroId,"en"));
+            for(const grant of cut){if(!account.heroes[grant.heroId].unlocked)account=domain(account).unlockHeroDirect(grant.heroId,grant.allocationSeed);}
+            let loginSourceId=null;
+            if(policy){
+                const history=await tx.get(root.collection("heroAcquisitionHistory").doc(String(r.loginEvidence.serverRevision)));
+                if(!history.exists||!history.data().createdAt){throw Error("history");}
+                const {sha256,...row}=audit(history.data());
+                if(sha256!==r.loginEvidence.sha256||digest(row)!==sha256||row.schemaVersion!==1||row.ownerUid!==uid||
+                   row.serverRevision!==r.loginEvidence.serverRevision||row.loginCount!==r.loginEvidence.loginCount||
+                   row.operationId!=="hero-login-"+row.day){throw Error("history binding");}
+                loginSourceId=row.operationId;
+            }
+            const c={uid,root,records:before,account,sourceSnapshotSha256:r.sourceSnapshotSha256,
+                loginEvidence:r.loginEvidence,owned:{refs:{length:["inventory","equipment","relics","claimRecords"]
+                    .reduce((sum,name)=>sum+before[name].length,0)}}};
+            const projected=projectTransition(c,{revision:r.serverRevision,
+                randomSeed:after.progress.playableState.heroAccount.heroes[heroId].allocationSeed,
+                action,heroId,kind:r.kind,intent,dailyEvidence:r.dailyEvidence});
+            if(digest(projected.records)!==digest(after)||digest(projected.bundle)!==digest(audit(next.data()))||
+               digest(projected.archive)!==digest(audit(nextArchive.data()))||digest(projected.receipt)!==digest(r)){
+                throw Error("complete transition");
+            }
+            return {ownerUid:uid,operationId,kind:r.kind,sourceRevision:r.sourceRevision,serverRevision:r.serverRevision,
+                beforeEnvelopeRevision:intent.expectedRevision,sourceSnapshotSha256:r.sourceSnapshotSha256,snapshotSha256:r.snapshotSha256,
+                operationSha256:digest(r),ledgerSha256:digest(audit(ledger.data())),claimId,
+                claimSha256:claimId?digest(audit(claim.data())):null,captureSha256:scope.captureSha256,
+                operationIds:[operationId],ledgerIds:[operationId],claimIds:claimId?[claimId]:[],
+                loginEvidence:policy?{...r.loginEvidence,sourceId:loginSourceId}:null,
+                entitlementObligations:cut.map(grant=>({...grant,beforeEnvelopeRevision:intent.expectedRevision}))};
+        }catch(error){
+            if(error?.code==="resource-exhausted")throw error;
+            fail("data-loss","Original retained Hero transition is incomplete or inconsistent.");
+        }
     }
     function addRewardPill(c,owned,revision,operationId,pills,count){
         if(!Number.isSafeInteger(pills+count)){fail("failed-precondition","Marrow resource capacity exceeded.");}
@@ -359,6 +479,6 @@ function createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExisting
                 ownedItemId,location:"bag",state:{id:Core.contract.rerollItem.id,type:"material",count}});
         }
     }
-    return Object.freeze({read,mutate,claimLoginReward,claimDailySupply,readInTransaction:context});
+    return Object.freeze({read,mutate,claimLoginReward,claimDailySupply,readInTransaction:context,verifyRetainedOperation});
 }
 module.exports={createHeroGrowth};

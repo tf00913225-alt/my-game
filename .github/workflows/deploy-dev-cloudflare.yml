@@ -164,11 +164,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify deployed Responsive Item production runtime
         id: responsive_item_live
@@ -231,11 +227,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Run deployed battle layout and VFX live QA
         run: |
@@ -291,11 +283,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify deployed Tower MonsterBalance production runtime
         id: tower_balance_live
@@ -342,11 +330,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify deployed Abyss MonsterBalance runtime
         id: abyss_balance_live
@@ -393,11 +377,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify deployed Adventure MonsterBalance runtime
         id: adventure_balance_live
@@ -445,11 +425,7 @@ jobs:
           node .github/scripts/release-gate.mjs verify-deployed
 
       - name: Ensure CJK font support for player-text browser QA
-        run: |
-          if ! fc-list :lang=zh | rg -q .; then
-            sudo apt-get update
-            sudo apt-get install --yes --no-install-recommends fonts-noto-cjk
-          fi
+        run: bash .github/scripts/ensure-cjk-fonts.sh
 
       - name: Verify deployed Personal and World Boss MonsterBalance runtime
         id: boss_balance_live

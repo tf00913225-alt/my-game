@@ -60,6 +60,68 @@ function sources(count=1){
 }
 const assemble=records=>assembleCanonicalPlayableProjection("uid-a",7,records);
 
+test("canonical preference v1 retains original343 snapshot/projection bytes and strict errors",()=>{
+    // Independently compiled original343 canonical reader produced these values
+    // using this unchanged original fixture; v2 does not rewrite the v1 path.
+    const r=sources(),bundle=assemble(r);
+    assert.equal(assembleCanonicalSnapshot("uid-a",7,r).sha256,"f894593e082ed1b88c7bce12c35e55b7391a1054474a1739293f4720f3ee932f");
+    assert.equal(bundle.sha256,"8d54c9734c1d40063eeaa24260ed6ad14cce145c61607a22322d47a6a3153795");
+    assert.equal(bundle.byteLength,6691);
+    for(const field of ["v136ActionIntent","v136LastSkill"]){
+        const changed=sources();changed.playableState.autoConfig[field]="skill";
+        const before=JSON.stringify(changed);
+        assert.throws(()=>assemble(changed),error=>error.message==="autoConfig has invalid preference fields."&&error.code==="invalid-argument");
+        assert.equal(JSON.stringify(changed),before);
+    }
+});
+
+test("canonical v2 independently preserves each v136 presence through projection and archive",()=>{
+    const {createRecoveryArchive,inspectRecoveryArchive}=require("../functions/src/canonical-recovery-archive.js");
+    const {normalizePreferences}=require("../functions/src/cloud-preferences.js");
+    for(const optional of [{},{v136ActionIntent:"normal"},{v136ActionIntent:"defend"},
+        {v136ActionIntent:"skill"},{v136LastSkill:"waterSlash"},
+        {v136ActionIntent:"normal",v136LastSkill:"waterSlash"}]){
+        const r=sources(),{schemaVersion,ownerUid,serverRevision,provenance,...fields}=r.playableState;
+        r.progress.playableState={...fields,preferencesVersion:2};delete r.playableState;
+        Object.assign(r.progress.playableState.autoConfig,optional);
+        const before=JSON.stringify(r),bundle=assemble(r),expected={...fields.autoConfig};
+        assert.deepEqual(bundle.projection.gameSave.autoConfig,expected);
+        for(const field of ["v136ActionIntent","v136LastSkill"])
+            assert.equal(Object.hasOwn(bundle.projection.gameSave.autoConfig,field),Object.hasOwn(optional,field));
+        const snapshot=assembleCanonicalSnapshot("uid-a",7,r);
+        const archive=createRecoveryArchive("uid-a",7,r,snapshot),restored=inspectRecoveryArchive(archive,"uid-a",7,snapshot);
+        assert.deepEqual(restored,r);assert.deepEqual(assemble(restored),bundle);
+        assert.equal(bundle.readyForPublication,false);assert.equal(bundle.projection.authoritativeStateReady,false);
+        assert.equal(JSON.stringify(r),before);
+        if(Object.keys(optional).length)assert.throws(()=>normalizePreferences({characterIds:["char-a",null,null],
+            ...Object.fromEntries(["autoConfig","autoConfig2","autoConfig3"].map(key=>[key,r.progress.playableState[key]]))}));
+    }
+});
+
+test("canonical preferences reject unknown version, malformed presence and unknown fields without mutation",()=>{
+    for(const change of [r=>r.preferencesVersion=1,r=>r.preferencesVersion="2",r=>r.preferencesVersion=3,
+        r=>r.autoConfig.v136ActionIntent="unknown",r=>r.autoConfig.v136ActionIntent=null,
+        r=>r.autoConfig.v136LastSkill=null,r=>r.autoConfig.v136LastSkill="waterSlash\n",
+        r=>r.autoConfig.v136LastSkill=1,r=>r.autoConfig.extra=true,r=>r.extra=true,
+        r=>delete r.autoConfig.hp]){
+        const r=sources();r.playableState.preferencesVersion=2;change(r.playableState);
+        const before=JSON.stringify(r);assert.throws(()=>assemble(r));assert.equal(JSON.stringify(r),before);
+    }
+});
+
+test("canonical v2 source binding is exact and survives later canonical revisions without rewriting the original head",()=>{
+    const r=sources();r.playableState.preferencesVersion=2;
+    const head={operationId:'loadout_projection_0001',resultRevision:3,policySha256:'a'.repeat(64)};
+    r.playableState.loadoutSource=head;
+    assert.equal(assemble(r).readyForPublication,false);assert.deepEqual(r.playableState.loadoutSource,head);
+    for(const value of [null,{}, {...head,extra:1},{...head,resultRevision:8},{...head,resultRevision:'3'},
+        {...head,operationId:'loadout_projection_0001\n'},{...head,policySha256:'a'.repeat(64)+'\n'}]){
+        const changed=structuredClone(r);changed.playableState.loadoutSource=value;const before=JSON.stringify(changed);
+        assert.throws(()=>assemble(changed));assert.equal(JSON.stringify(changed),before);
+    }
+    delete r.playableState.preferencesVersion;assert.throws(()=>assemble(r));
+});
+
 // Actual server-created source evidence; no test-only period completion.
 function newAccountSources(){
     const {makeInitialCharacterSources}=require("../functions/src/initial-character-sources.js");

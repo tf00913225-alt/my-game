@@ -67,11 +67,11 @@ assert.doesNotMatch(presentation,/v174-hit-shake|shakeArtForPopup/);
 
 assert.match(fixedCss,/\.v174-unit-hud :is\(\.monster-hp,\.hp-bar\)\{bottom:8px !important/);
 assert.match(fixedCss,/--battle-resource-bar-height:6px/);
-assert.match(fixedCss,/--battle-enemy-region-track:42fr[\s\S]*?--battle-center-region-track:21fr[\s\S]*?--battle-ally-region-track:37fr/);
+assert.match(fixedCss,/--battle-enemy-region-track:54\.785fr[\s\S]*?--battle-center-region-track:12fr[\s\S]*?--battle-ally-region-track:45\.215fr/);
 assert.match(fixedCss,/\.battle-center-region\{[\s\S]*?border:0/);
 assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
 assert.doesNotMatch(fixedCss,/battleInfoToggle/,"retired battle log UI must stay absent");
-assert.match(fixedCss,/\.battle-element-box-button\{[\s\S]*?width:66px !important;[\s\S]*?height:66px !important/);
+assert.match(fixedCss,/\.battle-utility-button\{[\s\S]*?width:52px !important;[\s\S]*?height:52px !important/);
 
 assert.match(home,/openSharedFormation\(\\'home\\'\)/);
 assert.match(formation,/window\.vFixedRenderAllyFormationContent=renderAllyFormationContent/);

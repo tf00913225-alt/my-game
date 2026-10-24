@@ -1,0 +1,140 @@
+{
+  "source": "C:/Users/User/.codex/generated_images/01a15425-277b-7140-b0e5-d3891f17519d/exec-2ef8c2f4-dcca-4b07-8553-2fc74a265d47.png",
+  "output": "C:/Projects/my-game/.vfx-work/sample/tools/vfx-commercial-sample/assets/full/fire-soul-resonance-v3.webp",
+  "dimensions": [
+    1448,
+    1086
+  ],
+  "grid": [
+    4,
+    3
+  ],
+  "cell": [
+    362,
+    362
+  ],
+  "losslessRgbaEqual": true,
+  "sha256": "5f0017df5b96a7d70e0c2a77ee98ac3ae96128a5389b6f1c5ca65f826c3fc964",
+  "frames": [
+    {
+      "frame": 1,
+      "alpha64Bounds": [
+        187,
+        222,
+        212,
+        249
+      ],
+      "minPaddingFraction": 0.31215469613259667
+    },
+    {
+      "frame": 2,
+      "alpha64Bounds": [
+        79,
+        132,
+        284,
+        327
+      ],
+      "minPaddingFraction": 0.09668508287292818
+    },
+    {
+      "frame": 3,
+      "alpha64Bounds": [
+        63,
+        129,
+        282,
+        333
+      ],
+      "minPaddingFraction": 0.08011049723756906
+    },
+    {
+      "frame": 4,
+      "alpha64Bounds": [
+        46,
+        123,
+        270,
+        336
+      ],
+      "minPaddingFraction": 0.0718232044198895
+    },
+    {
+      "frame": 5,
+      "alpha64Bounds": [
+        82,
+        91,
+        307,
+        290
+      ],
+      "minPaddingFraction": 0.15193370165745856
+    },
+    {
+      "frame": 6,
+      "alpha64Bounds": [
+        72,
+        84,
+        292,
+        296
+      ],
+      "minPaddingFraction": 0.18232044198895028
+    },
+    {
+      "frame": 7,
+      "alpha64Bounds": [
+        57,
+        80,
+        309,
+        300
+      ],
+      "minPaddingFraction": 0.1464088397790055
+    },
+    {
+      "frame": 8,
+      "alpha64Bounds": [
+        61,
+        82,
+        295,
+        297
+      ],
+      "minPaddingFraction": 0.1685082872928177
+    },
+    {
+      "frame": 9,
+      "alpha64Bounds": [
+        89,
+        58,
+        307,
+        250
+      ],
+      "minPaddingFraction": 0.15193370165745856
+    },
+    {
+      "frame": 10,
+      "alpha64Bounds": [
+        95,
+        57,
+        269,
+        258
+      ],
+      "minPaddingFraction": 0.1574585635359116
+    },
+    {
+      "frame": 11,
+      "alpha64Bounds": [
+        109,
+        93,
+        246,
+        229
+      ],
+      "minPaddingFraction": 0.2569060773480663
+    },
+    {
+      "frame": 12,
+      "alpha64Bounds": [
+        156,
+        148,
+        177,
+        169
+      ],
+      "minPaddingFraction": 0.4088397790055249
+    }
+  ]
+}

@@ -55,7 +55,7 @@ function element(){
     return node;
 }
 
-function loadRuntime(monsterRows){
+function loadRuntime(monsterRows,overrides={}){
     const cards=Array.from({length:12},()=>element());
     const body=element();
     const head=element();
@@ -86,6 +86,7 @@ function loadRuntime(monsterRows){
         openHomeFeature(){},closeHomeFeature(){},applyPostBattleAutoRecovery(){},
         confirmAutoBattleSettings(){},toggleAutoBattle(){}
     };
+    Object.assign(context,{setTimeout,clearTimeout},overrides);
     context.window=context;
     vm.createContext(context);
     vm.runInContext(source,context);
@@ -188,8 +189,14 @@ const sharedEntries=realSharedRegistry.assetPool.entries.filter(e=>e.assetClass=
     const runtime=loadRuntime([]);
     runtime.context.v154InstallMonsterPortraitRegistry(realSharedRegistry);
     for(const entry of sharedEntries){
-        for(const monster of [{portraitKey:entry.assetId,name:'天兵天將',element:'fire'}, {name:entry.displayName,element:'fire'}, {name:'未指定人物',element:'water'}]){
-            assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,null,entry.assetId+' reserved/name/element cannot resolve shared art');
+        const explicit={portraitKey:entry.assetId,name:'主線內容角色',element:'water',rank:'elite'};
+        assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(explicit).path,entry.status==='adopted'?entry.runtimePath:null,entry.assetId+' explicit adoption controls shared art');
+        if(entry.status==='adopted'){
+            runtime.context.v154BindMonsterPortraitIdentity(explicit);
+            assert.equal(explicit.name,'主線內容角色');assert.equal(explicit.element,'water');assert.equal(explicit.rank,'elite');
+        }
+        for(const monster of [{name:entry.displayName,element:'fire'}, {name:'未指定人物',element:'water'}]){
+            assert.equal(runtime.context.v154ResolveMonsterPortraitRecord(monster).path,null,entry.assetId+' name/element cannot resolve shared art');
         }
     }
     const adopted=structuredClone(realSharedRegistry);
@@ -252,3 +259,33 @@ console.log('Shared portrait reserved / explicit-only / Content identity isolati
 })().catch(error=>{console.error(error);process.exitCode=1;});
 
 assert.match(battlefieldCss,/\.v174-portrait-paint\{[^}]*background-size:contain/,"The single inner image paint preserves source aspect ratio");
+
+(async()=>{
+    for(const phase of ["fetch","json"]){
+        const timers=new Map();let nextTimer=0,resolveLate,signal;
+        const late=new Promise(resolve=>{resolveLate=resolve;});
+        const runtime=loadRuntime([],{
+            AbortController:phase==="json"?AbortController:undefined,
+            setTimeout(fn,ms){if(ms!==8000)return setTimeout(fn,ms);timers.set(++nextTimer,fn);return nextTimer;},
+            clearTimeout(id){if(!timers.delete(id))clearTimeout(id);},
+            fetch(_url,options){signal=options.signal;return phase==="fetch"?late:Promise.resolve({ok:true,json:()=>late});}
+        });
+        const pending=runtime.context.v154RequestMonsterPortraitRegistry();
+        await new Promise(resolve=>setImmediate(resolve));
+        assert.equal(timers.size,1,"fetch and JSON share one bounded deadline");
+        [...timers.values()][0]();
+        assert.equal(await pending,null);assert.equal(timers.size,0);
+        assert.equal(runtime.context.v154GetMonsterPortraitRegistryState(),"failed");
+        if(signal)assert.equal(signal.aborted,true);
+        const fresh=JSON.parse(JSON.stringify(registry));fresh.groups.wild[0][5]="assets/monsters/fresh-retry.webp";
+        runtime.context.fetch=async()=>({ok:true,json:async()=>fresh});
+        assert.equal(await runtime.context.v154RequestMonsterPortraitRegistry(),fresh);
+        assert.equal(timers.size,0,"successful retry clears its deadline");
+        resolveLate(phase==="fetch"?{ok:true,json:async()=>registry}:registry);
+        await new Promise(resolve=>setImmediate(resolve));
+        assert.equal(runtime.context.v154GetMonsterPortraitRegistryState(),"ready");
+        assert.equal(runtime.context.v154ResolveMonsterPortraitRecord({portraitKey:"wild.zone-01.fire-01"}).path,
+            "assets/monsters/fresh-retry.webp","late timed-out data cannot install over the successful retry");
+    }
+    console.log("Portrait registry fetch/JSON timeout, retry, stale-response isolation and deadline cleanup PASS.");
+})().catch(error=>{console.error(error);process.exitCode=1;});

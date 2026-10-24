@@ -18,6 +18,19 @@ const expression=String.raw`(async()=>{
  const targets=Object.values(registry.groups).flat().map(row=>Object.fromEntries(registry.tupleSchema.map((k,i)=>[k,row[i]])));
  const pool=registry.assetPool.entries.filter(e=>e.status==='adopted').map(e=>({portraitKey:e.assetId,name:e.displayName,element:e.element,rank:e.tier==='elite'?'elite':e.tier==='miniboss'?'smallBoss':'regular',status:'existing'}));
  const evidence={geometry:[],fallbacks:[],reentry:[],nativeRosters:[]};
+ function alphaIsClipped(paint,box){
+  if(box.left<0||box.top<0||box.right>innerWidth||box.bottom>innerHeight)return true;
+  for(let node=paint.parentElement;node;node=node.parentElement){
+   const cs=getComputedStyle(node),r=node.getBoundingClientRect(),paintContain=/paint|strict|content/.test(cs.contain);
+   if((paintContain||/hidden|clip|auto|scroll/.test(cs.overflowX))&&(box.left<r.left-1||box.right>r.right+1))return true;
+   if((paintContain||/hidden|clip|auto|scroll/.test(cs.overflowY))&&(box.top<r.top-1||box.bottom>r.bottom+1))return true;
+   check(cs.clipPath==='none','unsupported ancestor clip-path '+node.id);
+  }
+  return false;
+ }
+ // Negative control: overflow outside a real clipping ancestor must still fail.
+ const clipProbe=document.createElement('div'),clipPaint=document.createElement('span');clipProbe.style.cssText='position:fixed;left:100px;top:100px;width:10px;height:10px;overflow:hidden';clipPaint.style.cssText='display:block;width:20px;height:20px';clipProbe.appendChild(clipPaint);document.body.appendChild(clipProbe);
+ check(alphaIsClipped(clipPaint,{left:100,top:100,right:120,bottom:120}),'real overflow clipping negative control');clipProbe.style.overflow='visible';check(!alphaIsClipped(clipPaint,{left:100,top:100,right:120,bottom:120}),'visible overhang is not clipping');clipProbe.remove();
  const measure=(m,i,label)=>{
   const card=document.getElementById('battleMonster'+i),art=card?.querySelector('.v174-battle-art'),paint=art?.querySelector('.v174-portrait-paint');
   const record=v154ResolveMonsterPortraitRecord(m);check(card&&art,'missing final presentation '+label);
@@ -37,16 +50,39 @@ const expression=String.raw`(async()=>{
   const [l,t,r,b]=meta.alphaBounds,top=p.top+p.height*t/meta.height,bottom=p.top+p.height*b/meta.height,left=p.left+p.width*l/meta.width,right=p.left+p.width*r/meta.width;
   const cls=card.dataset.portraitSizeClass;
   const fixedSix=document.getElementById('battlePage').dataset.enemyBattlefieldProfile==='standard-six'&&['STANDARD','ELITE'].includes(cls)&&!card.classList.contains('gameplay-boss-card');
-  const projection=a.height/parseFloat(getComputedStyle(art).height);
-  const baseline=a.top+a.height*(fixedSix?1:.96),clipped=top<a.top-1||bottom>a.bottom+1||left<a.left-1||right>a.right+1;
+  const baseBaseline=a.top+a.height*(fixedSix?1:.96),clipped=alphaIsClipped(paint,{top,bottom,left,right});
   check(a.height>0&&p.height>0,'zero presentation geometry '+record.portraitKey);
   check(!clipped,'clipped alpha silhouette '+record.portraitKey+' '+JSON.stringify({a:a.toJSON(),p:p.toJSON(),top,bottom,left,right}));
-  check(Math.abs(bottom-baseline)<1,'bottom baseline drift '+record.portraitKey);
+
   const target=registry.presentation.classes[cls].bodyHeight;
-  const targetHeight=fixedSix?Math.min((cls==='ELITE'?105.27:101.55)*projection,a.height*(cls==='ELITE'?.96:.92)):target*a.height;
-  const expected=Math.min(targetHeight,a.width/(r-l)*(b-t));
+  // Resolve the formal CSS height expression inside the same size container.
+  // This independent neutral probe does not read the actual paint height or
+  // duplicate preferred-pixel, safe-height and depth constants in the gate.
+  const artStyle=getComputedStyle(art),heightProbe=document.createElement('span');
+  heightProbe.style.cssText='position:absolute;left:0;top:0;width:0;height:var(--battle-portrait-visible-height, '+target*100+'cqh);visibility:hidden;pointer-events:none;';
+  art.appendChild(heightProbe);
+  let targetHeight;
+  try{targetHeight=heightProbe.getBoundingClientRect().height;}finally{heightProbe.remove();}
+  check(Number.isFinite(targetHeight)&&targetHeight>0&&targetHeight<=a.height+1,'invalid formal CSS body-height budget '+record.portraitKey);
+  const paintScale=parseFloat(getComputedStyle(paint).scale)||1;
+  const neutralHeight=Math.min(targetHeight,a.width/(r-l)*(b-t)),expected=neutralHeight*paintScale;
+  const depth=a.height/parseFloat(artStyle.height),offset=parseFloat(artStyle.getPropertyValue('--battle-paint-offset-y'))||0;
+  const unscaledCanvas=neutralHeight/((b-t)/meta.height);
+  const authoredBaseline=baseBaseline+offset*depth-(paintScale-1)*unscaledCanvas*(1-b/meta.height);
+  const ownHud=FourSymbolsBattlePresentation.getUnitHud(card),hp=ownHud.querySelector('.monster-hp'),hpRect=hp.getBoundingClientRect(),hudScale=hpRect.height/parseFloat(getComputedStyle(hp).height);
+  const clearance=parseFloat(artStyle.getPropertyValue('--battle-portrait-hud-clearance'))*hudScale;
+  const baseline=Math.max(authoredBaseline,hpRect.bottom+clearance+expected);
+  check(Math.abs(bottom-baseline)<1.1,'authored/enlarged HUD-safe bottom baseline drift '+record.portraitKey);
+  for(const other of document.querySelectorAll('.battle-monster,.battle-player')){
+   if(getComputedStyle(other).opacity==='0')continue;
+   const hud=FourSymbolsBattlePresentation.getUnitHud(other);if(!hud)continue;
+   for(const node of hud.querySelectorAll('.battle-monster-name,.monster-hp,.battle-player-id,.hp-bar,.sp-bar')){
+    const q=node.getBoundingClientRect(),cs=getComputedStyle(node);if(!q.width||!q.height||cs.display==='none'||cs.visibility==='hidden')continue;
+    check(Math.min(right,q.right)-Math.max(left,q.left)<=.5||Math.min(bottom,q.bottom)-Math.max(top,q.top)<=.5,'alpha intersects actual HUD '+record.portraitKey+' / '+other.id+' / '+node.className);
+   }
+  }
   check(Math.abs((bottom-top)-expected)<1.1,'body-height contract drift '+record.portraitKey);
-  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1});
+  evidence.geometry.push({label,portraitKey:record.portraitKey,sizeClass:cls,slotHeight:a.height,visualBodyTop:top,visualBodyBottom:bottom,visualBodyHeight:bottom-top,baseline,clipped,overflow:false,widthLimited:expected<targetHeight-1,targetHeight,visibleHeight:artStyle.getPropertyValue('--battle-portrait-visible-height'),safeHeight:artStyle.getPropertyValue('--battle-portrait-safe-height'),depth:artStyle.getPropertyValue('--battle-art-depth')});
  };
  async function scene(roster,label,encounterMode="legacy-dungeon"){
   monsters=roster;currentBattleMonsters=roster.map((m,i)=>i);battleActive=false;
@@ -54,10 +90,15 @@ const expression=String.raw`(async()=>{
   const prepared=await v154PreparePortraitsForEncounter(roster);check(prepared.state==='ready','portrait preparation '+label);
   FourSymbolsBattlefieldSlots.setActiveEnemySnapshot(FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(currentBattleMonsters,{encounterMode,originalFormationType:roster.length}));
   showPage('battle');renderBattle();
+  // This synthetic roster matrix measures authored neutral geometry, not Core
+  // entry motion. The native Boss branch below still uses its formal entry.
+  const neutral=document.createElement('style');neutral.textContent='#battlePage.v141-preparing-entry .battle-monster{transform:none!important;opacity:1!important}';document.head.appendChild(neutral);
+  try{
   roster.forEach((m,i)=>measure(m,i,label+'/first'));
   renderBattle();roster.forEach((m,i)=>measure(m,i,label+'/redraw'));
   showPage('home');showPage('battle');renderBattle();roster.forEach((m,i)=>measure(m,i,label+'/reentry'));
   evidence.reentry.push(label);
+  }finally{neutral.remove();}
  }
  const wild=targets.filter(t=>t.portraitKey.startsWith('wild.')).slice(0,5).map(t=>({...t}));await scene(wild,'Wild');
  for(const type of ['exp','material','gold']){const waves=v148BuildDailyDungeonWaves(type).waves;for(let i=0;i<waves.length;i++){await scene(waves[i],'Daily/'+type+'/'+i);evidence.nativeRosters.push('Daily/'+type+'/'+i);}}

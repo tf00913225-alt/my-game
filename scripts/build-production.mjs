@@ -1,11 +1,14 @@
 #!/usr/bin/env node
 import crypto from "node:crypto";
+import {compactBootJavaScript} from "./lib/boot-javascript-compact.mjs";
 import {syncItemAcquisitionProjection,syncPatrolItemCatalog} from "./lib/item-acquisition-projection.mjs";
 import {syncMonsterBalanceRuntime} from "./lib/monster-balance-runtime-source.mjs";
 import {syncBattleEncounterCatalog} from "./lib/cloud-battle-encounter-catalog.mjs";
 import {syncPatrolSourceCatalog} from "./lib/cloud-patrol-source-catalog.mjs";
 import {syncPatrolProgressPolicy} from "./lib/cloud-patrol-progress-policy.mjs";
 import {syncCharacterExpThresholds} from "./lib/character-exp-thresholds.mjs";
+import {syncPlayerSkillConfigCatalog} from "./lib/player-skill-config-catalog.mjs";
+import {verifySkillLearningPolicy,verifySkillLoadoutPolicy} from "./lib/skill-learning-policy.mjs";
 import {syncPlainPlayerNormalAttackRules} from "./lib/cloud-battle-normal-attack-rules.mjs";
 import {syncForestOpeningRoundRules} from "./lib/cloud-battle-opening-round-rules.mjs";
 import {syncHeroChapterQualification} from "./lib/hero-chapter-qualification.mjs";
@@ -23,6 +26,9 @@ await syncPatrolSourceCatalog(ROOT,checkOnly);
 syncPatrolItemCatalog(ROOT,checkOnly);
 syncPatrolProgressPolicy(ROOT,checkOnly);
 await syncCharacterExpThresholds(ROOT,checkOnly);
+await syncPlayerSkillConfigCatalog(ROOT,checkOnly);
+verifySkillLearningPolicy(ROOT);
+verifySkillLoadoutPolicy(ROOT);
 syncPlainPlayerNormalAttackRules(ROOT,checkOnly);
 syncForestOpeningRoundRules(ROOT,checkOnly);
 syncHeroChapterQualification(ROOT,checkOnly);
@@ -55,6 +61,7 @@ const appScripts=[
     "functions/src/account-mode-time-policy.js",
     "functions/src/exp-pool-catch-up-policy.js",
     "functions/src/inventory-stack-policy.js",
+    "functions/src/skill-progression-core.js",
     "js/00-main.js",
     "functions/src/team-formation-policy.js",
     "js/hero-acquisition-client.js",
@@ -207,22 +214,12 @@ const adventureStyles=["css/adventure-v1-20260915.css"];
 function combineScripts(files,prefix=""){
     return prefix+files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
-function compactBootJavaScript(content){
-    // Critical Boot keeps the source owners readable in js/, while the shipped
-    // boot artifact removes comments/indentation so the signed-out byte budget
-    // cannot be consumed by formatting. This only removes lexical whitespace;
-    // line breaks and string contents remain intact.
-    return content
-        .replace(/\/\*[\s\S]*?\*\//g,"")
-        .replace(/^[ \t]+|[ \t]+$/gm,"")
-        .replace(/[ \t]{2,}/g," ")
-        .replace(/\n{2,}/g,"\n")
-        .trim()+"\n";
-}
 function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
 }
 function target(name,extension,content){
+    // Git text normalization must not change bytes after the filename is hashed.
+    content=content.replace(/\r\n?/g,"\n");
     const digest=hash(content); return {content,digest,path:`build/${name}.${digest}.${extension}`};
 }
 function writeTarget(output){

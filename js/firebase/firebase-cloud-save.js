@@ -10,6 +10,7 @@
 import {
     doc,
     getDoc,
+    getDocFromServer,
     getFirestore
 } from "https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore.js";
 import {CLOUD_FUNCTIONS_REGION,callProtectedFunction} from "./firebase-session.js";
@@ -78,21 +79,24 @@ export async function screenLegacyMigrationCandidate(candidateRevision,expectedR
     return callTrustedFunction("screenLegacyMigrationCandidate",{candidateRevision,expectedRevision});
 }
 
-export async function readCurrentCloudSave(){
+export async function readCurrentCloudSave({serverOnly=false}={}){
     const db = await ensureFirestore();
     const uid = requireSignedInUid();
     const reference = doc(db, "users", uid, CURRENT_SAVE_SUBCOLLECTION, CURRENT_SAVE_DOCUMENT);
-    const snapshot = await getDoc(reference);
+    const snapshot = await (serverOnly?getDocFromServer(reference):getDoc(reference));
+    if(serverOnly&&(snapshot.metadata?.fromCache!==false||snapshot.metadata?.hasPendingWrites!==false)){
+        throw Object.assign(new Error("Cloud save has not been confirmed by the server."),{code:"cloud-server-unconfirmed"});
+    }
 
     if(!snapshot.exists()){
-        return Object.freeze({ exists: false, uid, path: reference.path, data: null });
+        return Object.freeze({ exists: false, uid, path: reference.path, data: null,...(serverOnly?{serverConfirmed:true}:{}) });
     }
 
     return Object.freeze({
         exists: true,
         uid,
         path: reference.path,
-        data: snapshot.data()
+        data: snapshot.data(),...(serverOnly?{serverConfirmed:true}:{})
     });
 }
 
@@ -126,6 +130,14 @@ export async function completeHeroChapterNode({ticketId,nodeId,choiceId=null,exp
 }
 
 /* Explicit account intents retain the caller's operation ID for receipt retry. */
+export async function mutateCanonicalSkillLoadout({operationId,expectedRevision,characterId,action,skillId}={}){
+    return callTrustedFunction("mutateCanonicalSkillLoadout",{operationId,expectedRevision,characterId,action,skillId});
+}
+// Configuration only. The caller decides what to display; this never hydrates
+// a save, caches a result or promotes a partial response to playable authority.
+export async function readCanonicalSkillLoadout({expectedRevision}={}){
+    return callTrustedFunction("readCanonicalSkillLoadout",{expectedRevision});
+}
 export async function createAdditionalCanonicalCharacter({operationId,expectedRevision,slotIndex,selection}={}){
     return callTrustedFunction("createAdditionalCanonicalCharacter",{operationId,expectedRevision,slotIndex,selection});
 }

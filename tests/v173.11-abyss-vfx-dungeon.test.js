@@ -22,7 +22,7 @@ assert.match(dungeon,/if\(!DUNGEON_DAILY_LIMIT_ENABLED\)\{ return false; \}/);
 
 assert.match(
     animation,
-    /waterBall:\{[\s\S]*?castSheet\("assets\/vfx\/water\/water-orb-vfx\.png\?v=173\.19","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)/
+    /waterBall:\{[\s\S]*?castSheet\("assets\/vfx\/water\/water-orb-recipient-v1\.webp","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)/
 );
 assert.match(
     animation,

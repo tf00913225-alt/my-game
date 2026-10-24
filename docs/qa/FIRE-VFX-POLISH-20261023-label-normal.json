@@ -1,0 +1,414 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "productHead": "74c9efaedce3dd19b5e006f53bb8ad809b997aa2",
+  "scope": "Existing label Owner reads release marquee and finite free gutter only when vertical band unavailable; normal short lean on unchanged520ms duration/.57hit. No Core or other skill/geometry edits.",
+  "paths": {
+    "pc": "artifacts/fire-label-announcement-pc-74c9/evidence.json",
+    "phone": "artifacts/fire-label-announcement-usb-74c9/evidence.json",
+    "normal": "artifacts/normal-short-lean-usb-74c9/evidence.json"
+  },
+  "labels": {
+    "pc": {
+      "head": "74c9efaedce3dd19b5e006f53bb8ad809b997aa2",
+      "passed": true,
+      "cases": 12,
+      "collisions": 0,
+      "minTop": 0.78125,
+      "controlled": true,
+      "viewport": "1280x720"
+    },
+    "phone": {
+      "head": "74c9efaedce3dd19b5e006f53bb8ad809b997aa2",
+      "passed": true,
+      "cases": 12,
+      "collisions": 0,
+      "minTop": 0,
+      "controlled": true,
+      "viewport": "physical SM-N960F original viewport"
+    }
+  },
+  "normal": {
+    "head": "74c9efaedce3dd19b5e006f53bb8ad809b997aa2",
+    "passed": true,
+    "scope": "Physical USB controlled original secondary actor2 Core normal attack against target2; short lean/shared flight clock/HP settlement/cleanup. No new video, natural full battle, save or reward claim.",
+    "rows": [
+      {
+        "plan": {
+          "allies": 3,
+          "enemies": 3,
+          "baseline": false
+        },
+        "entry": "secondaryCharacterNormalAttack(2,2)",
+        "actualActorIndex": 2,
+        "actualTargetIndex": 2,
+        "hpBefore": 1000000,
+        "hpAfter": 999812,
+        "outcome": "confirmed damage",
+        "gateReason": "v142-v143-visual-complete",
+        "samples": [
+          {
+            "at": 210.9000000357628,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 457.8333435058594,
+              "width": 64,
+              "height": 64,
+              "top": 457.8333435058594,
+              "right": 367.2083435058594,
+              "bottom": 521.8333435058594,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "paused",
+            "flightTime": 0,
+            "actorTransform": "matrix(1, 0, 0, 1, 0, 0)",
+            "actorTime": 0,
+            "aura": false
+          },
+          {
+            "at": 249.80000001192093,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 457.8333435058594,
+              "width": 64,
+              "height": 64,
+              "top": 457.8333435058594,
+              "right": 367.2083435058594,
+              "bottom": 521.8333435058594,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 1,
+            "actorTransform": "matrix(1, 0, 0, 1, 0, -0.000740581)",
+            "actorTime": 1,
+            "aura": false
+          },
+          {
+            "at": 310.5,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 457.8333435058594,
+              "width": 64,
+              "height": 64,
+              "top": 457.8333435058594,
+              "right": 367.2083435058594,
+              "bottom": 521.8333435058594,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 1,
+            "actorTransform": "matrix(1, 0, 0, 1, 0, -0.000740581)",
+            "actorTime": 1,
+            "aura": false
+          },
+          {
+            "at": 348.80000001192093,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 457.8333435058594,
+              "width": 64,
+              "height": 64,
+              "top": 457.8333435058594,
+              "right": 367.2083435058594,
+              "bottom": 521.8333435058594,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 34.47200004533002,
+            "actorTransform": "matrix(1.00176, 0, 0, 1.00176, 0, -0.90519)",
+            "actorTime": 34.47200004533002,
+            "aura": false
+          },
+          {
+            "at": 385.5,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 457.8333435058594,
+              "width": 64,
+              "height": 64,
+              "top": 457.8333435058594,
+              "right": 367.2083435058594,
+              "bottom": 521.8333435058594,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 84.5380000453293,
+            "actorTransform": "matrix(1.01098, 0, 0, 1.01098, 0, -5.64724)",
+            "actorTime": 84.5380000453293,
+            "aura": false
+          },
+          {
+            "at": 424.9000000357628,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 425.0325622558594,
+              "width": 64,
+              "height": 64,
+              "top": 425.0325622558594,
+              "right": 367.2083435058594,
+              "bottom": 489.0325622558594,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 117.97200004532993,
+            "actorTransform": "matrix(1.02179, 0, 0, 1.02179, 0, -11.2047)",
+            "actorTime": 117.97200004532993,
+            "aura": false
+          },
+          {
+            "at": 460.5,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 384.1585998535156,
+              "width": 64,
+              "height": 63.999977111816406,
+              "top": 384.1585998535156,
+              "right": 367.2083435058594,
+              "bottom": 448.15857696533203,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 151.47200004533002,
+            "actorTransform": "matrix(1.035, 0, 0, 1.035, 0, -18)",
+            "actorTime": 151.47200004533002,
+            "aura": false
+          },
+          {
+            "at": 496.2000000476837,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 343.2846374511719,
+              "width": 64,
+              "height": 64,
+              "top": 343.2846374511719,
+              "right": 367.2083435058594,
+              "bottom": 407.2846374511719,
+              "left": 303.2083435058594
+            },
+            "visibility": "visible",
+            "playState": "running",
+            "flightTime": 184.9720000453301,
+            "actorTransform": "matrix(1.035, 0, 0, 1.035, 0, -18)",
+            "actorTime": 184.9720000453301,
+            "aura": false
+          },
+          {
+            "at": 566,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 261.9856872558594,
+              "width": 64,
+              "height": 64,
+              "top": 261.9856872558594,
+              "right": 367.2083435058594,
+              "bottom": 325.9856872558594,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "running",
+            "flightTime": 251.60400004533034,
+            "actorTransform": "matrix(1.035, 0, 0, 1.035, 0, -18)",
+            "actorTime": 251.60400004533034,
+            "aura": false
+          },
+          {
+            "at": 602.1000000238419,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 219.67816162109375,
+              "width": 64,
+              "height": 64,
+              "top": 219.67816162109375,
+              "right": 367.2083435058594,
+              "bottom": 283.67816162109375,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "finished",
+            "flightTime": 301.9380000453298,
+            "actorTransform": "matrix(1.02956, 0, 0, 1.02956, 0, -15.2046)",
+            "actorTime": 301.9380000453298,
+            "aura": false
+          },
+          {
+            "at": 639.2000000476837,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 219.67816162109375,
+              "width": 64,
+              "height": 64,
+              "top": 219.67816162109375,
+              "right": 367.2083435058594,
+              "bottom": 283.67816162109375,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "finished",
+            "flightTime": 296.39990234375,
+            "actorTransform": "matrix(1.0214, 0, 0, 1.0214, 0, -11.0076)",
+            "actorTime": 335.3380000453301,
+            "aura": false
+          },
+          {
+            "at": 676.2000000476837,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 219.67816162109375,
+              "width": 64,
+              "height": 64,
+              "top": 219.67816162109375,
+              "right": 367.2083435058594,
+              "bottom": 283.67816162109375,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "finished",
+            "flightTime": 296.39990234375,
+            "actorTransform": "matrix(1.01432, 0, 0, 1.01432, 0, -7.36472)",
+            "actorTime": 368.77200004532983,
+            "aura": false
+          },
+          {
+            "at": 711.8000000119209,
+            "actor": "2",
+            "target": "2",
+            "side": "player",
+            "targetSide": "monster",
+            "width": "64px",
+            "rect": {
+              "x": 303.2083435058594,
+              "y": 219.67816162109375,
+              "width": 64,
+              "height": 64,
+              "top": 219.67816162109375,
+              "right": 367.2083435058594,
+              "bottom": 283.67816162109375,
+              "left": 303.2083435058594
+            },
+            "visibility": "hidden",
+            "playState": "finished",
+            "flightTime": 296.39990234375,
+            "actorTransform": "matrix(1.00859, 0, 0, 1.00859, 0, -4.41865)",
+            "actorTime": 402.17200004533015,
+            "aura": false
+          }
+        ],
+        "cleanup": true
+      }
+    ],
+    "screenshots": [
+      {
+        "file": "normal-core-short-lean.png",
+        "label": "normal-core-short-lean",
+        "plan": {
+          "allies": 3,
+          "enemies": 3,
+          "baseline": false
+        },
+        "shotHostStart": 1792732421345,
+        "shotHostEnd": 1792732423563,
+        "browserAt": 7863.300000011921,
+        "recordingElapsedMs": 3547,
+        "recordingActiveAtRequest": true
+      },
+      {
+        "file": "core-secondary2-complete.png",
+        "label": "core-secondary2-complete",
+        "plan": {
+          "allies": 3,
+          "enemies": 3,
+          "baseline": false
+        },
+        "shotHostStart": 1792732423685,
+        "shotHostEnd": 1792732425768,
+        "browserAt": 10134.699999988079,
+        "recordingElapsedMs": 5887,
+        "recordingActiveAtRequest": true
+      }
+    ]
+  },
+  "limits": [
+    "Controlled isolated QA pause/finish; not natural complete battle",
+    "PC gutter fallback validated1280x720; no claim for arbitrary too-small viewport with no free band",
+    "Phone Core proof only secondary actor2 targeting enemy2; both-side motion source/unit tested",
+    "No new movie; previous7bc fire film not claimed new normal evidence",
+    "Human art review/latest necessary CI pending; Draft DO NOT MERGE",
+    "Earlier74c9 PC batch had marquee absent; visible-announcement proof is the separate original-Owner preview batch. Phone marquee-visible matrix not claimed."
+  ],
+  "visibleAnnouncement": {
+    "head": "74c9efaedce3dd19b5e006f53bb8ad809b997aa2",
+    "path": "artifacts/fire-label-visible-announcement-pc-74c9/evidence.json",
+    "passed": true,
+    "mode": "Original releaseUpdatePreview=marquee plus original checkForUpdate; wait for nonzero marquee rect before12cases",
+    "cases": 12,
+    "collisions": 0,
+    "actualFrame": "artifacts/fire-label-visible-announcement-pc-74c9/frame-0028.png"
+  }
+}

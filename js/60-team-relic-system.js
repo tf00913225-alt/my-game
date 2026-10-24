@@ -323,6 +323,9 @@
         return typeof document!=="undefined"&&typeof document.getElementById==="function"&&!!document.getElementById("battlePage");
     }
     function clearRelicTargetFocus(){
+        if(typeof document!=="undefined"&&typeof document.querySelectorAll==="function"){
+            document.querySelectorAll('.v174-unit-hud[data-relic-target-focus="true"]').forEach(hud=>{delete hud.dataset.relicTargetFocus;});
+        }
         const presentation=typeof document!=="undefined"?document.getElementById("teamRelicBattlePresentation"):null;
         const layer=presentation&&presentation.querySelector(".team-relic-target-projection-layer");
         if(layer){ layer.replaceChildren(); }
@@ -387,7 +390,15 @@
         clearRelicTargetFocus();
         if(!relicCutinNode||!target||!Array.isArray(target.targetIds)){ return waitMs(RELIC_TARGET_REVEAL_MS); }
         const overlayRect=syncRelicPresentationGeometry(relicCutinNode)||relicCutinNode.__relicOverlayRect, layer=relicCutinNode.querySelector(".team-relic-target-projection-layer"), owner=relicGeometryOwner();
-        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{const geometry=owner.getUnitGeometry(target.targetSide,index);if(geometry&&(geometry.artworkProjection||geometry.hpProjection||geometry.spProjection)){appendRelicProjection(layer,geometry,overlayRect);}});}
+        if(layer&&overlayRect&&owner&&typeof owner.getUnitGeometry==="function"){target.targetIds.forEach(index=>{
+            const geometry=owner.getUnitGeometry(target.targetSide,index);
+            if(geometry&&(geometry.artworkProjection||geometry.hpProjection||geometry.spProjection)){
+                appendRelicProjection(layer,geometry,overlayRect);
+                const card=document.getElementById((target.targetSide==="monster"?"battleMonster":"battlePlayerCard")+index);
+                const hud=card&&(window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card.querySelector?.(".v174-unit-hud"));
+                if(hud&&hud.dataset.side===target.targetSide&&Number(hud.dataset.index)===index){hud.dataset.relicTargetFocus="true";}
+            }
+        });}
         const show=()=>{if(relicCutinNode){relicCutinNode.classList.add("targets-visible");}};
         if(typeof requestAnimationFrame==="function"){requestAnimationFrame(show);}else{show();}
         return waitMs(RELIC_TARGET_REVEAL_MS);

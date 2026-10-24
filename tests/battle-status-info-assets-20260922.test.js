@@ -2,17 +2,50 @@ const test=require("node:test");
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const path=require("node:path");
+const vm=require("node:vm");
 
 const ROOT=path.resolve(__dirname,"..");
 const read=relative=>fs.readFileSync(path.join(ROOT,relative),"utf8");
 
+test("inspection portrait and agility follow the selected combatant without stale content",()=>{
+  const source=read('js/00-main.js');
+  const fn=source.slice(source.indexOf('function openBattleStatusDetailModal(side,index){'),source.indexOf('\nif(typeof window!=="undefined"){',source.indexOf('function openBattleStatusDetailModal(side,index){')));
+  const nodes=new Map();
+  const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{style:{},textContent:'',setAttribute(k,v){this[k]=v;}});return nodes.get(selector);};
+  const modal={querySelector:node,setAttribute(){}};
+  let blocked=false;
+  const context={isBattleStatusInspectionBlocked:()=>blocked,monsters:[{name:'敵甲',level:9,hp:10,maxHP:20,sp:0,maxSP:0,agility:99},{name:'敵乙',level:3,hp:5,maxHP:5,sp:0,maxSP:0,agility:40}],
+    getPartyCharacterByIndex:()=>({name:'隊友',level:4,hp:20,sp:5}),getPartyBattleStats:()=>({maxHP:30,maxSP:10,agility:72.5}),
+    getMonsterAgility:m=>m.agility/2,ensureBattleStatusDetailModal:()=>modal,
+    document:{getElementById:id=>({querySelector:()=>({style:{backgroundImage:id==='battleMonster1'?'none':'url("'+id+'.webp")'}})})},
+    projectEnemyResource:(v,max)=>({text:v+' / '+max}),battleStatusElementLabel:()=> '火',window:{},renderBattleStatusDetailList(){},syncBattleUiPriorityLayer(){}};
+  vm.createContext(context);vm.runInContext(fn,context);
+  assert.equal(context.openBattleStatusDetailModal('monster',0),true);
+  node('.battle-status-detail-panel').scrollTop=999;
+  assert.equal(node('[data-field="agility"]').textContent,'敏捷：49.5');
+  assert.match(node('.battle-status-detail-portrait').style.backgroundImage,/battleMonster0/);
+  context.openBattleStatusDetailModal('player',0);
+  assert.equal(node('.battle-status-detail-panel').scrollTop,0);
+  assert.equal(node('[data-field="agility"]').textContent,'敏捷：72.5');
+  assert.match(node('.battle-status-detail-portrait').style.backgroundImage,/battlePlayerCard0/);
+  context.openBattleStatusDetailModal('monster',1);
+  assert.equal(node('.battle-status-detail-portrait').style.backgroundImage,'none');
+  assert.equal(node('.battle-status-detail-portrait').textContent,'◇');
+  assert.equal(node('.battle-status-detail-portrait')['aria-label'],'敵乙立繪');
+  blocked=true;assert.equal(context.openBattleStatusDetailModal('player',0),false);
+  assert.equal(node('[data-field="agility"]').textContent,'敏捷：20');
+  blocked=false;context.getPartyBattleStats=()=>null;
+  context.openBattleStatusDetailModal('player',0);
+  assert.equal(node('[data-field="agility"]').textContent,'敏捷：—');
+});
+
 const STATUS_ASSETS=[
-  "burn.webp","rage.webp","rage-icon.webp","frostbite-icon.webp","freeze.webp",
+  "burn.webp","rage-aura-v2.webp","rage-icon.webp","frostbite-icon.webp","freeze.webp",
   "gravity-icon.webp","damage-down-icon.webp","stun-icon.webp","windwalk.webp",
   "stealth.webp","calm-mind.webp","defense-down-icon.webp","shield.webp",
   "petrify.webp","earth-shield.webp","rock-wall.webp","barrier.webp",
   "yuan-zu-blessing.webp","fire-momentum-icon.webp","phoenix-might-icon.webp",
-  "fire-soul-resonance.webp","blood-burn.webp","stun.webp"
+  "fire-soul-resonance.webp","blood-burn.webp","stun-stars-v2.webp"
 ];
 
 test("persistent status icons are static while body states stay pulse/static",()=>{
@@ -27,15 +60,14 @@ test("persistent status icons are static while body states stay pulse/static",()
   assert.match(css,/\.v143-status-visual--pulse\{[\s\S]*?v143StatusImageBreath/);
 });
 
-test("status body art can reach card edges and remains larger than the old footprint",()=>{
+test("status body art uses the projected character and per-status presentation owner",()=>{
   const js=read("js/39-v143-skill-animation.js");
-  assert.match(js,/regularEnemy=side==="monster"&&!isBossIndexForVfx\(index\)/);
-  assert.match(js,/const widthScale=\(regularEnemy\?1\.45:1\.40\)\*\(shellStatus\?1\.08:1\)/);
-  assert.match(js,/const heightScale=\(regularEnemy\?1\.36:1\.34\)\*\(shellStatus\?1\.08:1\)/);
-  assert.match(js,/anchor\.rect\.width\*widthScale/);
-  assert.match(js,/cardRect\.width\*widthScale/);
-  assert.match(js,/anchor\.rect\.height\*heightScale/);
-  assert.match(js,/cardRect\.height\*heightScale/);
+  assert.match(js,/function placeStatusBodyVisual\(/);
+  assert.match(js,/STATUS_BODY_PRESENTATION\[type\]/);
+  assert.match(js,/geometry\?\.artworkProjection\?\.rect/);
+  assert.match(js,/geometry\?\.portraitRect/);
+  assert.match(js,/geometry\?\.hudSurface\?\.scaleX/);
+  assert.match(js,/placeStatusBodyVisual\(node,side,index,type,card,anchor,presentationGeometry,presentationSnapshot\.cardRect,presentationSnapshot\.pairedFrontHudRect\)/);
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 

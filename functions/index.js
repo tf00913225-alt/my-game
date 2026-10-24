@@ -14,12 +14,13 @@ const {createHeroGrowth}=require("./src/hero-growth");
 const {createTeamFormation}=require("./src/team-formation");
 const {createLegacyCandidateScreening}=require("./src/legacy-candidate-screening");
 const {createCanonicalRecoveryApproval}=require("./src/canonical-recovery-approval");
-const {createCanonicalCurrentRecovery}=require("./src/canonical-current-recovery");
+const {createCanonicalCurrentRecovery,createCanonicalRecoveryMaintenance}=require("./src/canonical-current-recovery");
 const {createCanonicalSourceWriter}=require("./src/canonical-source-writer");
 const {createCanonicalShopPurchase}=require("./src/canonical-shop-purchase");
 const {createCanonicalExpAllocation}=require("./src/canonical-exp-allocation");
 const {createCanonicalAttributeAllocation}=require("./src/canonical-attribute-allocation");
 const {createCanonicalPatrolSettlement}=require("./src/canonical-patrol-settlement");
+const {createCanonicalSkillLoadout}=require("./src/canonical-skill-loadout");
 const {CloudPreferencesError,PREFERENCES_SCHEMA_VERSION,normalizePreferences}=require("./src/cloud-preferences");
 const {
     CLOUD_SAVE_ENVELOPE_SCHEMA_VERSION,
@@ -67,6 +68,11 @@ const currentRecovery=createCanonicalCurrentRecovery({
     runRecoveryAuditMaintenance:sessions.runRecoveryAuditMaintenance,
     inspectExistingEnvelope,nextRevision
 });
+const recoveryMaintenance=createCanonicalRecoveryMaintenance({
+    db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
+    runRecoveryAuditMaintenance:sessions.runRecoveryAuditMaintenance,
+    inspectExistingEnvelope,nextRevision
+});
 const initialCharacterWriter=createCanonicalSourceWriter({
     db:getFirestore(),FieldValue,HttpsError,runProtected:sessions.runProtected,
     inspectExistingEnvelope,nextRevision
@@ -82,6 +88,8 @@ const canonicalExpAllocation=createCanonicalExpAllocation({
 const canonicalAttributeAllocation=createCanonicalAttributeAllocation({db:getFirestore(),FieldValue,HttpsError,
     runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
 const canonicalPatrol=createCanonicalPatrolSettlement({db:getFirestore(),FieldValue,HttpsError,
+    runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
+const canonicalSkillLoadout=createCanonicalSkillLoadout({db:getFirestore(),FieldValue,HttpsError,
     runProtected:sessions.runProtected,inspectExistingEnvelope,nextRevision});
 // Existing UIDs may hold an original-phone save that was never submitted.
 // Only Auth accounts minted after this rollout may use the fresh-start path.
@@ -203,6 +211,16 @@ exports.restoreCanonicalCurrent=onCall(CALLABLE_OPTIONS,async request=>{
         });
     }catch(error){ throw asHttpsError(error); }
 });
+// Staged server maintenance only. The explicit deployment allowlist excludes
+// this name until its dedicated identity and real-provider actions are authorized.
+exports.maintainCanonicalRecoveryAudit=onCall({
+    ...CALLABLE_OPTIONS,region:REGION,memory:"1GiB",timeoutSeconds:180,
+    maxInstances:1,concurrency:1,
+    serviceAccount:"cloud-save-recovery@four-symbols-jianghu.iam.gserviceaccount.com"
+},async request=>{
+    try{return await recoveryMaintenance.maintain(await verifyGameIdentity(request));}
+    catch(error){throw asHttpsError(error);}
+});
 exports.createInitialCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
     request=await verifyGameIdentity(request);
     try{
@@ -239,6 +257,16 @@ function canonicalPatrolIntent(request,required,optional=[]){
 exports.createAdditionalCanonicalCharacter=onCall(CALLABLE_OPTIONS,async request=>{
     try{request=await verifyGameIdentity(request);return await initialCharacterWriter.commitAdditionalCharacter(request,
         canonicalPatrolIntent(request,["operationId","expectedRevision","slotIndex","selection"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.mutateCanonicalSkillLoadout=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalSkillLoadout.mutateLoadout(request,
+        canonicalPatrolIntent(request,["operationId","expectedRevision","characterId","action","skillId"]));}
+    catch(error){throw asHttpsError(error);}
+});
+exports.readCanonicalSkillLoadout=onCall(CALLABLE_OPTIONS,async request=>{
+    try{request=await verifyGameIdentity(request);return await canonicalSkillLoadout.readLoadout(request,
+        canonicalPatrolIntent(request,["expectedRevision"]));}
     catch(error){throw asHttpsError(error);}
 });
 exports.allocateCanonicalAttributePoint=onCall(CALLABLE_OPTIONS,async request=>{

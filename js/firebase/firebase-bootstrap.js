@@ -5,7 +5,7 @@ import {
     installFirebaseSessionHooks
 } from "./firebase-auth.js";
 import {
-    bootstrapTrustedCloudSave,createInitialCanonicalCharacter,createAdditionalCanonicalCharacter,allocateCanonicalSharedExp,allocateCanonicalAttributePoint,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
+    bootstrapTrustedCloudSave,createInitialCanonicalCharacter,createAdditionalCanonicalCharacter,allocateCanonicalSharedExp,allocateCanonicalAttributePoint,mutateCanonicalSkillLoadout,readCanonicalSkillLoadout,CLOUD_FUNCTIONS_REGION,CLOUD_SAVE_WRITE_POLICY,readCurrentCloudSave,saveLocalAutoBattlePreferences,createLocalMigrationBackup,
     submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,readHeroAcquisition,observeHeroLogin,
     ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation,
     observeCanonicalAccountMode,beginCanonicalElementBoxAd,completeCanonicalElementBoxAd,abandonCanonicalElementBoxAd,
@@ -71,11 +71,14 @@ async function initializeLifecycle(){
     catch(error){ lifecyclePromise=null; throw error; }
 }
 async function resolveIdentity(){ await initializeLifecycle(); return identityPromise(); }
-async function resolveCloudSave(user){
+async function resolveCloudSave(user,options){
     const expectedUid=String(user&&user.uid||"");
     if(!expectedUid){ const error=new Error("Firebase identity is required before save resolution."); error.code="firebase/auth-required"; throw error; }
     const token=generation;
-    const result=await readCurrentCloudSave();
+    if(getSignedInUser()?.uid!==expectedUid){
+        const error=new Error("Firebase account changed before cloud-save resolution."); error.code="firebase/account-changed"; throw error;
+    }
+    const result=await readCurrentCloudSave(options);
     const latest=getSignedInUser();
     if(!latest||latest.uid!==expectedUid||token!==generation){
         const error=new Error("Firebase account changed during cloud-save resolution."); error.code="firebase/account-changed"; throw error;
@@ -86,7 +89,7 @@ async function resolveCloudSave(user){
 const api=Object.freeze({
     initialize:initializeLifecycle,resolveIdentity,resolveCloudSave,getUser:getSignedInUser,
     signInWithGoogle,signInWithFacebook,signInWithEmail,createAccountWithEmail,signInAsAnonymous,signOut:signOutFirebase,
-    bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,createAdditionalCanonicalCharacter,allocateCanonicalSharedExp,allocateCanonicalAttributePoint,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
+    bootstrapCloudSave:bootstrapTrustedCloudSave,createInitialCanonicalCharacter,createAdditionalCanonicalCharacter,allocateCanonicalSharedExp,allocateCanonicalAttributePoint,mutateCanonicalSkillLoadout,readCanonicalSkillLoadout,submitLegacyMigrationCandidate,screenLegacyMigrationCandidate,saveLocalAutoBattlePreferences,createLocalMigrationBackup,protectedTest,getGameSessionState,
     readHeroAcquisition,observeHeroLogin,ensureHeroChapterTicket,completeHeroChapterNode,readHeroGrowth,mutateHeroGrowth,claimHeroLoginReward,claimHeroDailySupply,readTeamFormation,saveTeamFormation,
     observeCanonicalAccountMode,beginCanonicalElementBoxAd,completeCanonicalElementBoxAd,abandonCanonicalElementBoxAd,
     issueCanonicalPatrolTicket,settleCanonicalPatrolMember,settleCanonicalPatrolTerminal,abandonCanonicalPatrolTicket,

@@ -1,0 +1,1076 @@
+{
+  "workId": "VFX-COMMERCIAL-SAMPLE-20261019",
+  "sourceHead": "05ada0906a6b7ade6789108bffa2901ebc9643c7",
+  "reviewScope": "All21 formal status entries:14 body,5 HUD-only,2 intentional none. Also review distinct rage/stun HUD images.",
+  "counts": {
+    "entries": 21,
+    "bodyEntries": 14,
+    "hudOnlyEntries": 5,
+    "intentionalNone": 2,
+    "uniqueImages": 21
+  },
+  "method": "view_image observation for every image plus Pillow decode, alpha bounds and opaque-edge measurements. This is source-art review, not device state QA.",
+  "viewerCaution": "Some displayed raw transparent images expose coloured RGB patches in near-transparent regions. Do not classify these as opaque corruption from view_image alone; alpha measurements and actual compositing/runtime evidence are required.",
+  "candidateContext": "Parent reports pulse minimum0.58, body footprint approximately1.2 and detached24px HUD with34px fallback; these settings have not been verified by this reviewer.",
+  "sharedRuntimeChecks": [
+    "Only one rotating body visible at a time, 2000ms rotation",
+    "Freeze/petrify fixed hard-control layer remains independent and mutually exclusive by gameplay owner",
+    "HUD remains above HP/SP, no clipping at24px, no stale effect after expiration/cleanse/death/dispose",
+    "Source-edge contact is distinct from runtime viewport clipping; preserve art aspect ratio",
+    "Actual battlefield composite and state activation evidence required before pass"
+  ],
+  "outOfScope": "Legacy/relic-owned states remain under existing owners; no new body assets or remapping.",
+  "rows": [
+    {
+      "id": "burn",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/burn.webp",
+      "iconSource": "assets/vfx/status/burn.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Detailed orange flame U-frame; open centre preserves a character silhouette.",
+      "sourceEdgeAndDetail": "Thin outer flame fringe; source has near-edge light.",
+      "runtimeFollowup": "No full redraw justified; check body1.2 footprint and minimum pulse visibility on device.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/burn.webp"
+      ]
+    },
+    {
+      "id": "rage",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/rage.webp",
+      "iconSource": "assets/vfx/status/rage-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Strong readable angry fire face, largely filled rather than an open U-frame.",
+      "sourceEdgeAndDetail": "Tall portrait-style source, 2:3 rather than most square statuses.",
+      "runtimeFollowup": "Highest rotating-body occlusion risk: verify face does not replace the actor portrait visually; retain aspect and reduce footprint/intensity before redrawing.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/rage.webp",
+        "assets/vfx/status/rage-icon.webp"
+      ]
+    },
+    {
+      "id": "frostbite",
+      "visualIntent": "hud-icon-only",
+      "bodySource": null,
+      "iconSource": "assets/vfx/status/frostbite-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Broken blue snowflake clearly conveys cold impairment; distinct from solid frozen prism.",
+      "sourceEdgeAndDetail": "Bright silver facets and internal cracks may merge at 24px.",
+      "runtimeFollowup": "Check actual 24px HUD recognition and contrast; do not add a body loop for this intentional HUD-only status.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/frostbite-icon.webp"
+      ]
+    },
+    {
+      "id": "freeze",
+      "visualIntent": "fixed-hard-control-base",
+      "bodySource": "assets/vfx/status/freeze.webp",
+      "iconSource": "assets/vfx/status/freeze.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Sharp faceted ice prism clearly signals hard control; deliberately solid centre.",
+      "sourceEdgeAndDetail": "Central spike contacts source top edge.",
+      "runtimeFollowup": "Keep static hard-control base; verify full spike projects without added viewport clipping and HUD remains readable.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/freeze.webp"
+      ]
+    },
+    {
+      "id": "agilityDown",
+      "visualIntent": "hud-icon-only",
+      "bodySource": null,
+      "iconSource": "assets/vfx/status/gravity-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Boot plus red downward arrow has clear movement-down metaphor.",
+      "sourceEdgeAndDetail": "Dark boot may lose internal texture against dark combat background.",
+      "runtimeFollowup": "Inspect at 24px; red arrow must remain distinguishable from damageDown/defenseDown. No body required.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/gravity-icon.webp"
+      ]
+    },
+    {
+      "id": "damageDown",
+      "visualIntent": "hud-icon-only",
+      "bodySource": null,
+      "iconSource": "assets/vfx/status/damage-down-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Cracked teal wind blade plus red down arrow has a distinct contour.",
+      "sourceEdgeAndDetail": "Small cracks will disappear at HUD size; symbol recognition must rely on silhouette.",
+      "runtimeFollowup": "Verify 24px differences versus boot and shield, rather than reworking high-resolution texture.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/damage-down-icon.webp"
+      ]
+    },
+    {
+      "id": "stun",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/stun.webp",
+      "iconSource": "assets/vfx/status/stun-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Gold orbiting stars and spirals are immediately recognisable as dizzy/stun.",
+      "sourceEdgeAndDetail": "Wide gold swirls occupy much of body source.",
+      "runtimeFollowup": "Verify star halo does not hide head/HP; HUD has a dedicated clearer star icon. Keep rotation independent of fixed hard control.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/stun.webp",
+        "assets/vfx/status/stun-icon.webp"
+      ]
+    },
+    {
+      "id": "dodgeSkill",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/windwalk.webp",
+      "iconSource": "assets/vfx/status/windwalk.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Green flowing U-frame with leaves conveys wind and mobility; centre remains open.",
+      "sourceEdgeAndDetail": "Fine leaf/white wind bands may blend with light backgrounds.",
+      "runtimeFollowup": "Shared body footprint/intensity first; no evidence of insufficient source resolution.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/windwalk.webp"
+      ]
+    },
+    {
+      "id": "stealthSkill",
+      "visualIntent": "intentional-no-body-no-hud",
+      "bodySource": null,
+      "iconSource": null,
+      "sourceReviewState": "intentional-none-verified",
+      "recognition": "Intentional no body and no HUD sprite.",
+      "sourceEdgeAndDetail": "No source image by contract.",
+      "runtimeFollowup": "Existing artwork-only opacity0.35 is the indication; HP/name/target anchors stay opaque.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": []
+    },
+    {
+      "id": "dinghaishenzhen",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/calm-mind.webp",
+      "iconSource": "assets/vfx/status/calm-mind.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Soft blue U-frame with gold cloud motifs distinguishes calm support from green mobility.",
+      "sourceEdgeAndDetail": "Pale blue/white bands have lower contrast than fire/earth effects.",
+      "runtimeFollowup": "Verify minimum pulse.58 is still legible without turning glow into a white frame; preserve open centre.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/calm-mind.webp"
+      ]
+    },
+    {
+      "id": "defenseDown",
+      "visualIntent": "hud-icon-only",
+      "bodySource": null,
+      "iconSource": "assets/vfx/status/defense-down-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Cracked bronze shield plus red down arrow conveys defense loss.",
+      "sourceEdgeAndDetail": "Dense small shield ornament may collapse at 24px.",
+      "runtimeFollowup": "Check silhouette and arrow at real HUD size; no full redraw needed based on source detail.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/defense-down-icon.webp"
+      ]
+    },
+    {
+      "id": "shield",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/shield.webp",
+      "iconSource": "assets/vfx/status/shield.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Pale/gold faceted U-shaped protective shell; open centre.",
+      "sourceEdgeAndDetail": "Very bright outer edges and white facets.",
+      "runtimeFollowup": "First verify footprint/intensity over character; no full redraw justified.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/shield.webp"
+      ]
+    },
+    {
+      "id": "petrify",
+      "visualIntent": "fixed-hard-control-base",
+      "bodySource": "assets/vfx/status/petrify.webp",
+      "iconSource": "assets/vfx/status/petrify.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Solid tan rock and sand prism clearly parallels freeze as hard control.",
+      "sourceEdgeAndDetail": "Top shard reaches source edge; dense dust and rock fill centre.",
+      "runtimeFollowup": "Keep static hard-control semantics; avoid lowering opacity solely to hide intended petrification. Check top projection and HUD.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/petrify.webp"
+      ]
+    },
+    {
+      "id": "earthShield",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/earth-shield.webp",
+      "iconSource": "assets/vfx/status/earth-shield.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Rock ring with fire/water/wind/earth marks and open centre; distinctive multielement defense.",
+      "sourceEdgeAndDetail": "Ring has wide peripheral width and top/bottom points near source boundaries.",
+      "runtimeFollowup": "Check body1.2 footprint around adjacent actors and resource bars; preserve element seals rather than removing them.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/earth-shield.webp"
+      ]
+    },
+    {
+      "id": "rockWall",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/rock-wall.webp",
+      "iconSource": "assets/vfx/status/rock-wall.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Two dark runed stone pillars and a ground ring form an open protective U-frame.",
+      "sourceEdgeAndDetail": "Heavy side rock columns occupy more body area than soft wind effects.",
+      "runtimeFollowup": "Check adjacent-slot overlap; adjust shared bounds before any asset redraw.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/rock-wall.webp"
+      ]
+    },
+    {
+      "id": "barrier",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/barrier.webp",
+      "iconSource": "assets/vfx/status/barrier.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Tall paired golden rune panels with an open centre clearly signal magical barrier.",
+      "sourceEdgeAndDetail": "Dense fine runes are decorative, not required readable text; bright vertical borders.",
+      "runtimeFollowup": "Keep aspect and inspect against HP/HUD; source detail itself is sufficient.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/barrier.webp"
+      ]
+    },
+    {
+      "id": "yuanZuBlessing",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/yuan-zu-blessing.webp",
+      "iconSource": "assets/vfx/status/yuan-zu-blessing.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Gold white supportive U-frame, ribbons and star sigils convey blessing.",
+      "sourceEdgeAndDetail": "Pale intense luminous sides resemble barrier at small body size.",
+      "runtimeFollowup": "Verify blessing versus barrier silhouette in play and .58 pulse visibility; no automatic redraw.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/yuan-zu-blessing.webp"
+      ]
+    },
+    {
+      "id": "fireMomentum",
+      "visualIntent": "intentional-no-body-no-hud",
+      "bodySource": null,
+      "iconSource": null,
+      "sourceReviewState": "intentional-none-verified",
+      "recognition": "Intentional no body and no HUD sprite.",
+      "sourceEdgeAndDetail": "No source image by contract.",
+      "runtimeFollowup": "Do not invent extra aura/icon; preserve state detail projection from formal owner.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": []
+    },
+    {
+      "id": "phoenixMight",
+      "visualIntent": "hud-icon-only",
+      "bodySource": null,
+      "iconSource": "assets/vfx/status/phoenix-might-icon.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Red gold phoenix emblem has a strong unique bird silhouette.",
+      "sourceEdgeAndDetail": "Fine feather lines will merge at24px but outline remains key.",
+      "runtimeFollowup": "Inspect HUD outline contrast; do not add body visual to this HUD-only state.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/phoenix-might-icon.webp"
+      ]
+    },
+    {
+      "id": "fireSoulResonance",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/fire-soul-resonance.webp",
+      "iconSource": "assets/vfx/status/fire-soul-resonance.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Full oval fire wreath plus central flame sigil; visually distinct from U-shaped burn.",
+      "sourceEdgeAndDetail": "Top centre crest and outer wreath approach canvas edges.",
+      "runtimeFollowup": "Inspect wreath centre icon on actor face and side overlap; refine projection before erasing core fire identity.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/fire-soul-resonance.webp"
+      ]
+    },
+    {
+      "id": "bloodBurn",
+      "visualIntent": "one-body-at-a-time-2000ms-carousel",
+      "bodySource": "assets/vfx/status/blood-burn.webp",
+      "iconSource": "assets/vfx/status/blood-burn.webp",
+      "sourceReviewState": "source-reviewed-runtime-pending",
+      "recognition": "Dark crimson angular U-frame with bright diagonal red streaks distinguishes blood from orange burn.",
+      "sourceEdgeAndDetail": "Sharp upper tips contact top edge; dark red may be weak on dark backdrop.",
+      "runtimeFollowup": "Verify body minimum pulse readability and thin red streaks on device; no full redraw based solely on source.",
+      "runtimeQaState": "not-reviewed",
+      "redrawDecision": "not-required-by-source-evidence",
+      "sourceEvidence": [
+        "assets/vfx/status/blood-burn.webp"
+      ]
+    }
+  ],
+  "sources": [
+    {
+      "source": "assets/vfx/status/burn.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "b6d2fbdc17dc7ab1feb551a6c0b8c1b2efe3d8d9e9d1e197a4d30f581591941c",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.46899,
+      "alphaAtLeast128Bounds": [
+        30,
+        73,
+        1237,
+        1206
+      ],
+      "alphaAtLeast240Bounds": [
+        35,
+        79,
+        1220,
+        1199
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/rage.webp",
+      "width": 1024,
+      "height": 1536,
+      "sha256": "97199e55ad0733a7cda2f290b0b56b4d0ad67f4f3ecc8b04fc9f94e22ce2786d",
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixelFraction": 0.45624,
+      "alphaAtLeast128Bounds": [
+        16,
+        36,
+        1011,
+        1461
+      ],
+      "alphaAtLeast240Bounds": [
+        17,
+        36,
+        1010,
+        1460
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/rage-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "24839924003cb6c3cb0b49298f37a704ba59894173d97bca5e8b0d43e4e9bb99",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.44226,
+      "alphaAtLeast128Bounds": [
+        73,
+        6,
+        1216,
+        1241
+      ],
+      "alphaAtLeast240Bounds": [
+        74,
+        7,
+        1215,
+        1240
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/frostbite-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "57148d4a236e267abdc32f7a36a3f9c8644bb408fb46fcaefe778fdf29f53ea5",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.60743,
+      "alphaAtLeast128Bounds": [
+        80,
+        27,
+        1172,
+        1218
+      ],
+      "alphaAtLeast240Bounds": [
+        81,
+        28,
+        1171,
+        1217
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/freeze.webp",
+      "width": 1187,
+      "height": 1326,
+      "sha256": "25aa03203335112d8028ad8b7174dc6c4b01c79bcaf8e4cc40a3528a9b08b96c",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.24267,
+      "alphaAtLeast128Bounds": [
+        3,
+        2,
+        1185,
+        1326
+      ],
+      "alphaAtLeast240Bounds": [
+        4,
+        5,
+        1184,
+        1322
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 1,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/gravity-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "e65f636a847b220faf231fa9bdda545fc54a256ec8e6c3aa4bccb8a31283b100",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.58987,
+      "alphaAtLeast128Bounds": [
+        70,
+        87,
+        1189,
+        1152
+      ],
+      "alphaAtLeast240Bounds": [
+        71,
+        88,
+        1188,
+        1151
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/damage-down-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "d6f8723212ad75a7a8c835f98c7f67fcd8f1713c5faed3a0fd7d3b6bfe9d14c2",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.685,
+      "alphaAtLeast128Bounds": [
+        160,
+        126,
+        1140,
+        1118
+      ],
+      "alphaAtLeast240Bounds": [
+        161,
+        127,
+        1140,
+        1117
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/stun.webp",
+      "width": 1232,
+      "height": 1277,
+      "sha256": "c55a6b6f0e80dcc75aa42b3423386a64934181a6aabab698a0835b4e8a2bf476",
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixelFraction": 0.39601,
+      "alphaAtLeast128Bounds": [
+        80,
+        37,
+        1175,
+        1228
+      ],
+      "alphaAtLeast240Bounds": [
+        86,
+        41,
+        1172,
+        1226
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/stun-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "0999864c49332e37ec4886eed754111df5d8639d9fe307558524d0b4001086af",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.62201,
+      "alphaAtLeast128Bounds": [
+        90,
+        157,
+        1185,
+        1093
+      ],
+      "alphaAtLeast240Bounds": [
+        91,
+        158,
+        1184,
+        1093
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/windwalk.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "9ddbbe4ae7cd57ab4eaf8e551a22273b8ee7386e9d711d12604820dcb025b54f",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.56017,
+      "alphaAtLeast128Bounds": [
+        26,
+        51,
+        1243,
+        1218
+      ],
+      "alphaAtLeast240Bounds": [
+        28,
+        53,
+        1238,
+        1216
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/calm-mind.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "dd0ca3d46880a28f130f41a1a6a34a6cadbaa82c4df004278d1d7c1677e51311",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.48208,
+      "alphaAtLeast128Bounds": [
+        20,
+        51,
+        1230,
+        1227
+      ],
+      "alphaAtLeast240Bounds": [
+        48,
+        69,
+        1227,
+        1223
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/defense-down-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "dc508998111dd97df7edc1ce3ea9ce0143ebde34e1fa6dc26f78a4d6f5c32f67",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.50904,
+      "alphaAtLeast128Bounds": [
+        124,
+        42,
+        1154,
+        1184
+      ],
+      "alphaAtLeast240Bounds": [
+        124,
+        43,
+        1153,
+        1184
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/shield.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "2bf9266a041bb1b3944e81a5567e7f237a4720eeab628cc85f9421f104166848",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.43155,
+      "alphaAtLeast128Bounds": [
+        34,
+        117,
+        1218,
+        1211
+      ],
+      "alphaAtLeast240Bounds": [
+        59,
+        130,
+        1197,
+        1187
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/petrify.webp",
+      "width": 1187,
+      "height": 1326,
+      "sha256": "0409c6937359a2eb0ab7d73661d33e6e97ac302f8e8a6d24689ecadfffecccfe",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.28965,
+      "alphaAtLeast128Bounds": [
+        14,
+        5,
+        1178,
+        1320
+      ],
+      "alphaAtLeast240Bounds": [
+        15,
+        7,
+        1177,
+        1319
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/earth-shield.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "a7b3b0be86cd76124573ddfa85c76563f2935792d0de5a7793c016b276ec4899",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.41241,
+      "alphaAtLeast128Bounds": [
+        14,
+        16,
+        1234,
+        1240
+      ],
+      "alphaAtLeast240Bounds": [
+        16,
+        31,
+        1232,
+        1239
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/rock-wall.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "d8585409b4955ae84ff7a50231cf109725ae48eadb41c2dd5d51ec05b00df151",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.44327,
+      "alphaAtLeast128Bounds": [
+        8,
+        94,
+        1245,
+        1202
+      ],
+      "alphaAtLeast240Bounds": [
+        9,
+        95,
+        1244,
+        1201
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/barrier.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "0f868f280938e1be958836b7a1d2a17732111589a2b46927d92aec249c1c30be",
+      "alphaMin": 0,
+      "alphaMax": 254,
+      "transparentPixelFraction": 0.38204,
+      "alphaAtLeast128Bounds": [
+        6,
+        77,
+        1245,
+        1228
+      ],
+      "alphaAtLeast240Bounds": [
+        11,
+        80,
+        1238,
+        1206
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/yuan-zu-blessing.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "e02169ca08a6c60e14695b0aa2af9d3a1b5bf3081a004de33a2119d352dcfe9d",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.43503,
+      "alphaAtLeast128Bounds": [
+        25,
+        23,
+        1244,
+        1240
+      ],
+      "alphaAtLeast240Bounds": [
+        33,
+        45,
+        1243,
+        1234
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/phoenix-might-icon.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "3db3b99203aa91e254f7737be69e9670611a53f71d506acfb6da568442f6b1d8",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.51773,
+      "alphaAtLeast128Bounds": [
+        43,
+        57,
+        1211,
+        1201
+      ],
+      "alphaAtLeast240Bounds": [
+        44,
+        58,
+        1210,
+        1199
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/fire-soul-resonance.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "a7b9c30a3b42ec2745bd5967d03f911273d25fbac87fde680ab12f15f5480907",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.31761,
+      "alphaAtLeast128Bounds": [
+        9,
+        23,
+        1246,
+        1220
+      ],
+      "alphaAtLeast240Bounds": [
+        14,
+        60,
+        1239,
+        1196
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    },
+    {
+      "source": "assets/vfx/status/blood-burn.webp",
+      "width": 1254,
+      "height": 1254,
+      "sha256": "6aa2e6f075c0e17af5f1ad245c1169bcc53d178ef3b357a7c6edaa093974b9e3",
+      "alphaMin": 0,
+      "alphaMax": 255,
+      "transparentPixelFraction": 0.46962,
+      "alphaAtLeast128Bounds": [
+        15,
+        10,
+        1242,
+        1241
+      ],
+      "alphaAtLeast240Bounds": [
+        16,
+        25,
+        1241,
+        1238
+      ],
+      "edgePixelsAlphaAtLeast128": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "edgePixelsAlphaAtLeast240": {
+        "top": 0,
+        "bottom": 0,
+        "left": 0,
+        "right": 0
+      },
+      "decode": "passed-pillow",
+      "sourceVisualReview": "view_image-observed"
+    }
+  ],
+  "alphaSummary": "All21 unique files decode with alpha spanning transparent to near/full opaque. No source has alpha>=240 pixels on its outermost canvas edge. Only freeze has one bottom-edge pixel alpha>=128. Visually near-edge tips therefore are not evidence of a hard opaque crop by themselves."
+}

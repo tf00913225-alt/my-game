@@ -9,12 +9,18 @@ const {readDailyCheckinEvidence}=require("./daily-checkin-event-evidence");
 const {verifyShopPurchaseEvidence}=require("./canonical-shop-purchase");
 const {verifyExpAllocationEvidence}=require("./canonical-exp-allocation");
 const {verifyAttributeAllocationEvidence}=require("./canonical-attribute-allocation");
+const {verifySkillLearningEvidence,skillLearningEvidenceReadBudget}=require("./canonical-skill-learning");
+const {verifySkillLoadoutEvidence,skillLoadoutEvidenceReadBudget}=require("./canonical-skill-loadout");
+const {classifyRetainedCanonicalOperation}=require("./canonical-operation-classifier");
 const {createCanonicalSourceWriter}=require("./canonical-source-writer");
 const {createCanonicalPatrolSettlement}=require("./canonical-patrol-settlement");
-const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,
-    prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
-    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
+const {createHeroAcquisition}=require("./hero-acquisition");
+const {createHeroGrowth}=require("./hero-growth");
+const {createRecoveryAuditAssemblyBudget,reserveRecoveryAuditRawInputs,finishRecoveryAuditRawInputs,recoveryAuditAssemblyUsage,chargeRecoveryAuditAssembly,admitRecoveryAuditAssemblyBytes,recoveryAuditQueryShapes,
+    encodeRawRecoveryArchive,decodeRawRecoveryArchive,prepareRecoveryAuditCandidateEncoding,decodeRecoveryAuditArtifact,drainAndCloseRecoveryAuditLookups,recoveryAuditNamespaces,encodeInventoryPayload,decodeInventoryPayload,
+    inventoryDocumentMetadata,INVENTORY_LIMITS,encodeProofPayload,decodeProofPayload,indexRawProofPayload,decodeIndexedRawProofRow,PATROL_PROOF_LIMITS}=require("./recovery-audit-artifact");
 const {createHash}=require("node:crypto");
+const {createRecoveryCandidateStorage}=require("./recovery-candidate-storage");
 
 const OPERATION_ID=/^[A-Za-z0-9_-]{16,64}$/;
 const SETS={
@@ -36,8 +42,11 @@ function inspectRecoveryAuditFence(value,uid,fail){
     if(value===undefined)return null;
     const keys=["schemaVersion","kind","ownerUid","auditId","epoch","status","sessionId","sessionRevision",
         "sourceRevision","sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256",
-        "cancelOperationId","cancelIntentSha256","cancelledBySessionId","cancelledBySessionRevision","createdAt","updatedAt"];
-    if(!value||Object.keys(value).sort().join("|")!==keys.sort().join("|")||value.schemaVersion!==1||
+        "cancelOperationId","cancelIntentSha256","cancelledBySessionId","cancelledBySessionRevision","createdAt","updatedAt",
+        ...(value?.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])];
+    if(!value||Object.keys(value).sort().join("|")!==keys.sort().join("|")||![1,2].includes(value.schemaVersion)||
+       (value.schemaVersion===2&&(value.namespaceVersion!==3||!Number.isSafeInteger(value.canonicalRevision)||
+           value.canonicalRevision<2||value.canonicalRevision>value.sourceRevision))||
        value.kind!=="canonical-recovery-audit-fence"||value.ownerUid!==uid||!OPERATION_ID.test(value.auditId||"")||
        !Number.isSafeInteger(value.epoch)||value.epoch<1||!SESSION_ID.test(value.sessionId||"")||
        !Number.isSafeInteger(value.sessionRevision)||value.sessionRevision<1||
@@ -76,18 +85,24 @@ function restoredRecords(records,revision){
 // No earlier revision or later claim/receipt can be rolled back. Approval must
 // be written through a separately authorized server operator path, never by a
 // browser. There is deliberately no callable or player recovery UI.
-function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
-    runRecoveryAuditMaintenance,inspectExistingEnvelope,nextRevision,now=Date.now}){
+function createCanonicalCurrentRecovery(deps){
+    return buildRecoveryOwner(deps,null,false);
+}
+function createCanonicalRecoveryMaintenance(deps){
+    return buildRecoveryOwner(deps,createRecoveryCandidateStorage(),true);
+}
+function buildRecoveryOwner({db,FieldValue,HttpsError,runProtected,
+    runRecoveryAuditMaintenance,inspectExistingEnvelope,nextRevision,now=Date.now},immutableCandidateIO,maintenanceMode){
     const fail=(code,message)=>{throw new HttpsError(code,message);};
     const sourceEvidence=createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const patrolEvidence=createCanonicalPatrolSettlement({db,FieldValue,HttpsError,runProtected,
         inspectExistingEnvelope,nextRevision,now});
     const modeEvidence=patrolEvidence.modeOwner;
-    // Publication preparation is deliberately unreachable from the factory and has no
-    // production IO adapter. Tests may inspect these lexical functions only.
-    const immutableCandidateIO=null;
+    // The original factory remains disabled. Only the maintenance constructor
+    // binds the sole production Storage Owner; no request/dependency can select IO.
     const publicationPins=new WeakMap(),publicationMaterials=new WeakMap(),publicationArtifacts=new WeakMap(),publicationPreparations=new WeakMap();
+    const privateReadbackOwnership=new WeakMap(); // Memory ownership only, never proof or restore authority.
     const publicationReadProofs=new WeakMap();
     function requirePublicationPreparation(){
         if(immutableCandidateIO===null)fail("failed-precondition","Immutable candidate publication is unavailable.");
@@ -153,19 +168,31 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     }
     function auditApprovalBinding(approval,sourceRevision){
         return {schemaVersion:approval.schemaVersion,kind:approval.kind,ownerUid:approval.ownerUid,operationId:approval.operationId,
-            sourceRevision,sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
+            sourceRevision,...(approval.schemaVersion===2?{canonicalRevision:approval.canonicalRevision,namespaceVersion:approval.namespaceVersion}:{}),
+            sourceSha256:approval.sourceSha256,snapshotSha256:approval.snapshotSha256,
             approvedBy:approval.approvedBy,status:approval.status,issuedAt:timestampPair(approval.issuedAt),expiresAt:timestampPair(approval.expiresAt)};
     }
     async function verifyAuditApproval(tx,root,uid,sourceRevision,approvalOperationId,recordedAt){
-        const [envelopeSnap,archiveSnap,snapshotSnap,approvalSnap]=await Promise.all([
+        const approvalSnap=await tx.get(root.collection("recoveryApprovals").doc(approvalOperationId));
+        const approval=approvalSnap.data(),heroVersion=approval?.schemaVersion===2;
+        if(!approvalSnap.exists||![1,2].includes(approval.schemaVersion)||
+           (heroVersion&&(approval.namespaceVersion!==3||!Number.isSafeInteger(approval.canonicalRevision)||
+               approval.canonicalRevision<2||approval.canonicalRevision>sourceRevision))||
+           (!heroVersion&&(Object.hasOwn(approval,"canonicalRevision")||Object.hasOwn(approval,"namespaceVersion")))){
+            fail("permission-denied","A current server operator approval is required for recovery audit.");
+        }
+        const canonicalRevision=heroVersion?approval.canonicalRevision:sourceRevision;
+        const [envelopeSnap,archiveSnap,snapshotSnap,accountPointer]=await Promise.all([
             db.collection("users").doc(uid).collection("saves").doc("current"),
-            root.collection("recoveryArchives").doc(String(sourceRevision)),
-            root.collection("playableSnapshots").doc(String(sourceRevision)),
-            root.collection("recoveryApprovals").doc(approvalOperationId)].map(ref=>tx.get(ref)));
-        const {envelope}=inspectCurrentRecoverySource(uid,sourceRevision,{envelopeSnap,archiveSnap,snapshotSnap});
+            root.collection("recoveryArchives").doc(String(canonicalRevision)),
+            root.collection("playableSnapshots").doc(String(canonicalRevision)),
+            ...(heroVersion?[root.collection("account").doc("current")]:[])].map(ref=>tx.get(ref)));
+        const {envelope}=inspectCurrentRecoverySource(uid,canonicalRevision,{envelopeSnap,archiveSnap,snapshotSnap});
         if(envelope.serverRevision!==sourceRevision)fail("aborted","CLOUD_REVISION_CONFLICT");
-        const approval=approvalSnap.data();
-        if(!approvalSnap.exists||approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||
+        if(heroVersion&&(!accountPointer?.exists||accountPointer.get("ownerUid")!==uid||
+           accountPointer.get("serverRevision")!==canonicalRevision||accountPointer.get("snapshotSha256")!==snapshotSnap.get("sha256")))
+            fail("data-loss","Recovery canonical pointer changed.");
+        if(approval.kind!=="canonical-current-recovery-approval"||
            approval.ownerUid!==uid||approval.operationId!==approvalOperationId||approval.status!=="approved"||
            approval.sourceRevision!==sourceRevision||approval.sourceSha256!==archiveSnap.get("sourceSha256")||
            approval.snapshotSha256!==snapshotSnap.get("sha256")||typeof approval.approvedBy!=="string"||!approval.approvedBy.trim()||
@@ -178,7 +205,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(compare(binding.issuedAt,binding.expiresAt)>=0||compare(binding.issuedAt,observed)>0||compare(observed,binding.expiresAt)>=0)
                 fail("data-loss","Candidate recorded time lies outside its approval interval.");
         }
-        return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding)};
+        return {sourceSha256:binding.sourceSha256,snapshotSha256:binding.snapshotSha256,approvalBindingSha256:snapshotDigest(binding),
+            ...(heroVersion?{canonicalRevision,namespaceVersion:3}:{})};
     }
     async function verifyCandidateAuditControl(tx,root,uid,sourceRevision,control){
         const [fenceSnap,runSnap]=await Promise.all([
@@ -190,30 +218,34 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            run.sessionId!==control.sessionId||run.sessionRevision!==control.sessionRevision)
             fail("data-loss","Candidate audit control binding differs.");
         const binding=await verifyAuditApproval(tx,root,uid,sourceRevision,run.approvalOperationId,control.recordedAt);
-        if(binding.sourceSha256!==run.sourceSha256||binding.snapshotSha256!==run.snapshotSha256||
-           binding.approvalBindingSha256!==run.approvalBindingSha256)fail("data-loss","Candidate audit approval binding differs.");
+        if(Object.keys(binding).some(key=>binding[key]!==run[key]))fail("data-loss","Candidate audit approval binding differs.");
     }
     async function verifyRetainedAuditControls(view,uid,expectedRevision,operations,verifiedRecoveryIDs){
-        const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=new Map(operations.docs.map(doc=>[doc.id,doc.data()]));
+        const {tx,root,auditControl:control}=view,verified=new Set(verifiedRecoveryIDs),receipts=await recoveryIndex(operations,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{kind:row.kind,ownerUid:row.ownerUid,operationId:row.operationId,sourceRevision:row.sourceRevision,sourceSha256:row.sourceSha256,approvedBy:row.approvedBy,restoredRevision:row.restoredRevision,createdAt:row.createdAt}:row;});
         const approvals=new Map(),compare=(a,b)=>a.seconds-b.seconds||a.nanoseconds-b.nanoseconds;
-        for(const doc of view.rows("recoveryApprovals").docs){
+        for await(const doc of recoveryRows(view.rows("recoveryApprovals"))){
             const approval=doc.data(),used=approval?.status==="used";
             inventoryExact(approval,["schemaVersion","kind","ownerUid","operationId","sourceRevision","sourceSha256","snapshotSha256",
-                "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[])],"retained approval");
-            if(approval.schemaVersion!==1||approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
+                "approvedBy","status","issuedAt","expiresAt",...(used?["usedRevision","usedAt"]:[]),
+                ...(approval.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])],"retained approval");
+            if(![1,2].includes(approval.schemaVersion)||
+               (approval.schemaVersion===2&&(approval.namespaceVersion!==3||used||!Number.isSafeInteger(approval.canonicalRevision)||
+                   approval.canonicalRevision<2||approval.canonicalRevision>approval.sourceRevision))||
+               approval.kind!=="canonical-current-recovery-approval"||approval.ownerUid!==uid||
                approval.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!["approved","used"].includes(approval.status)||
                !Number.isSafeInteger(approval.sourceRevision)||approval.sourceRevision<2||approval.sourceRevision>expectedRevision||
                !HEX.test(approval.sourceSha256||"")||!HEX.test(approval.snapshotSha256||"")||
                typeof approval.approvedBy!=="string"||!approval.approvedBy.trim())fail("data-loss","Retained audit approval identity differs.");
             const binding=auditApprovalBinding(approval,approval.sourceRevision);
             if(compare(binding.issuedAt,binding.expiresAt)>=0)fail("data-loss","Retained audit approval interval differs.");
+            const canonicalRevision=approval.schemaVersion===2?approval.canonicalRevision:approval.sourceRevision;
             const [snapshot,archive]=await Promise.all([
-                tx.get(root.collection("playableSnapshots").doc(String(approval.sourceRevision))),
-                tx.get(root.collection("recoveryArchives").doc(String(approval.sourceRevision)))]);
+                tx.get(root.collection("playableSnapshots").doc(String(canonicalRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(canonicalRevision)))]);
             try{
                 if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==approval.snapshotSha256||
                    archive.get("sourceSha256")!==approval.sourceSha256)throw Error("Missing original approval source");
-                const original=inspectRecoveryArchive(archive.data(),uid,approval.sourceRevision,snapshot.data());
+                const original=inspectRecoveryArchive(archive.data(),uid,canonicalRevision,snapshot.data());
                 if(original.account.provenance!=="server-created")throw Error("Approval provenance differs");
             }catch(_){fail("data-loss","Retained audit approval source differs.");}
             if(used){
@@ -228,17 +260,20 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // it cannot authorize reuse of a used or expired approval.
             approvals.set(doc.id,{approval,binding:{...binding,status:"approved"}});
         }
-        const runs=view.rows(RECOVERY_AUDIT_RUN_COLLECTION).docs.map(doc=>{
+        const runs=[];
+        for await(const doc of recoveryRows(view.rows(RECOVERY_AUDIT_RUN_COLLECTION))){
             const run=inspectAuditRun(doc.data(),uid,doc.id);
-            if(doc.id!==run.auditId)fail("data-loss","Retained audit run ID differs.");
-            return run;
-        }).sort((a,b)=>a.epoch-b.epoch);
+            if(doc.id!==run.auditId)fail("data-loss","Retained audit run ID differs.");runs.push(run);
+        }
+        runs.sort((a,b)=>a.epoch-b.epoch);
         if(runs.length!==control.epoch)fail("data-loss","Retained audit epoch inventory differs.");
         let previous;
         for(let index=0;index<runs.length;index++){
             const run=runs[index],last=index===runs.length-1,source=approvals.get(run.approvalOperationId);
             if(run.epoch!==index+1||(last?(run.auditId!==control.auditId||run.status!=="active"):run.status!=="cancelled")||
                run.sourceRevision>expectedRevision||!source||run.sourceRevision!==source.approval.sourceRevision||
+               run.schemaVersion!==source.approval.schemaVersion||
+               (run.schemaVersion===2&&(run.canonicalRevision!==source.approval.canonicalRevision||run.namespaceVersion!==source.approval.namespaceVersion))||
                run.sourceSha256!==source.approval.sourceSha256||run.snapshotSha256!==source.approval.snapshotSha256||
                run.approvalBindingSha256!==snapshotDigest(source.binding))fail("data-loss","Retained audit run source or epoch differs.");
             const created=timestampPair(run.createdAt),updated=timestampPair(run.updatedAt);
@@ -249,7 +284,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             // than expiry. Neither commit timestamp is a new expiry gate.
             previous=run;
         }
-        const fences=view.rows(RECOVERY_AUDIT_FENCE_COLLECTION).docs;
+        const fences=[];for await(const doc of recoveryRows(view.rows(RECOVERY_AUDIT_FENCE_COLLECTION)))fences.push(doc);
         if(fences.length!==1||fences[0].id!=="current")fail("data-loss","Retained audit fence inventory differs.");
         matchingAuditFence(inspectRecoveryAuditFence(fences[0].data(),uid,fail),runs.at(-1));
     }
@@ -274,7 +309,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const binding=await verifyAuditApproval(tx,root,session.uid,args.expectedRevision,args.approvalOperationId);
             const epoch=(fence?.epoch??0)+1;
             if(!Number.isSafeInteger(epoch))fail("failed-precondition","Recovery audit epoch is exhausted.");
-            const stamp=FieldValue.serverTimestamp(),next={schemaVersion:1,kind:"canonical-recovery-audit-fence",ownerUid:session.uid,
+            const stamp=FieldValue.serverTimestamp(),next={schemaVersion:binding.namespaceVersion===3?2:1,kind:"canonical-recovery-audit-fence",ownerUid:session.uid,
                 auditId:args.operationId,epoch,status:"active",sessionId:session.sessionId,sessionRevision:session.revision,
                 sourceRevision:args.expectedRevision,...binding,approvalOperationId:args.approvalOperationId,
                 cancelOperationId:null,cancelIntentSha256:null,cancelledBySessionId:null,cancelledBySessionRevision:null,createdAt:stamp,updatedAt:stamp};
@@ -326,14 +361,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     const inventoryCompare=(a,b)=>Buffer.compare(Buffer.from(a,"utf8"),Buffer.from(b,"utf8"));
     const inventoryId=id=>typeof id==="string"&&id.length>0&&!id.includes("/")&&Buffer.from(id,"utf8").toString("utf8")===id;
     const inventoryBinding=run=>Object.fromEntries(["ownerUid","auditId","epoch","sessionId","sessionRevision","sourceRevision",
-        "sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256"].map(key=>[key,run[key]]));
+        "sourceSha256","snapshotSha256","approvalOperationId","approvalBindingSha256",
+        ...(run.schemaVersion===2?["canonicalRevision","namespaceVersion"]:[])].map(key=>[key,run[key]]));
     function inventoryStateHash(row){const {stateSha256,createdAt,updatedAt,...payload}=row;return snapshotDigest(payload);}
     function inspectInventoryState(row,run,namespaces){
         const binding=inventoryBinding(run);
         inventoryExact(row,["schemaVersion","kind",...Object.keys(binding),"prepareOperationId","prepareIntentSha256","namespaceListSha256",
             "phase","namespaceIndex","afterDocumentId","nextSequence","capturedCount","lastPageOperationId","lastPageSha256",
             "inventoryExhausted","stateSha256","createdAt","updatedAt"],"state");
-        if(row.schemaVersion!==1||row.kind!=="canonical-recovery-inventory-state"||
+        if(row.schemaVersion!==(run.schemaVersion===2?2:1)||row.kind!=="canonical-recovery-inventory-state"||
            Object.keys(binding).some(key=>row[key]!==binding[key])||!OPERATION_ID.test(row.prepareOperationId||"")||
            row.prepareIntentSha256!==snapshotDigest({action:"prepare-inventory",auditId:run.auditId,expectedEpoch:run.epoch,operationId:row.prepareOperationId})||
            row.namespaceListSha256!==snapshotDigest(namespaces)||!["preparing","inventory","blocked"].includes(row.phase)||
@@ -363,7 +399,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         const binding=await verifyAuditApproval(tx,root,session.uid,run.sourceRevision,run.approvalOperationId);
         if(Object.keys(binding).some(key=>binding[key]!==run[key]))fail("data-loss","Inventory approval binding changed.");
         const runRef=root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId);
-        return {run,namespaces:recoveryAuditNamespaces(session.uid,2),stateRef:runRef.collection(RECOVERY_INVENTORY_STATE_COLLECTION).doc("current"),runRef};
+        return {run,namespaces:recoveryAuditNamespaces(session.uid,run.namespaceVersion??2),stateRef:runRef.collection(RECOVERY_INVENTORY_STATE_COLLECTION).doc("current"),runRef};
     }
     async function prepareInventory(request,args){
         auditIntent("prepare inventory",args,["auditId","expectedEpoch","operationId"]);
@@ -375,7 +411,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(state.prepareIntentSha256!==intentSha256)fail("already-exists","Inventory preparation has another intent.");
                 return {...inventoryFlags,auditId:run.auditId,epoch:run.epoch,prepareSha256:intentSha256,nextSequence:1,phase:"preparing",unchanged:true};
             }
-            const stamp=FieldValue.serverTimestamp(),state={schemaVersion:1,kind:"canonical-recovery-inventory-state",...inventoryBinding(run),
+            const stamp=FieldValue.serverTimestamp(),state={schemaVersion:run.schemaVersion===2?2:1,kind:"canonical-recovery-inventory-state",...inventoryBinding(run),
                 prepareOperationId:args.operationId,prepareIntentSha256:intentSha256,namespaceListSha256:snapshotDigest(namespaces),
                 phase:"preparing",namespaceIndex:0,afterDocumentId:null,nextSequence:1,capturedCount:0,lastPageOperationId:null,
                 lastPageSha256:null,inventoryExhausted:false,createdAt:stamp,updatedAt:stamp};
@@ -472,7 +508,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     }
     // Bounded proof components. These seals never certify the complete recovery closure.
     function admitProofInventory(state,namespaces){
-        if(namespaces.length!==31||state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
+        if(namespaces.length!==(state.schemaVersion===2&&state.namespaceVersion===3?36:31)||
+           state.phase!=="inventory"||!state.inventoryExhausted||state.capturedCount>PATROL_PROOF_LIMITS.inventoryDocuments)
             fail("failed-precondition","Forest proof inventory admission failed.");
     }
     async function completeInventory(tx,run,state,namespaces,runRef){
@@ -566,7 +603,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(component==="forest-ticket"){
             patrolEvidence.beginEvidenceAttempt(kernel);
             const ticket=await seed.get(root.collection("patrolTickets").doc(sourceId));
-            await patrolEvidence.verifyRetainedTicket(kernel,root,uid,records.account,ticket,revision);
+            return patrolEvidence.verifyRetainedTicket(kernel,root,uid,records.account,ticket,revision);
         }else if(component==="exp-allocation"){
             const operation=await kernel.get(root.collection("operations").doc(sourceId));
             if(!operation.exists||operation.id!==sourceId||operation.get("operationId")!==sourceId||operation.get("kind")!=="exp-allocation")
@@ -676,20 +713,25 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     // Structural review of already-materialized schema3 bytes only. No SDK
     // reads, semantic Owner dispatch, candidate approval or restore capability.
     // Decode one bounded capsule at a time; do not concatenate the full capture.
-    function inspectCompleteRawCapture(input,assemblyBudget){
+    function inspectCompleteRawCapture(input,assemblyBudget,segmented=false,ownership){
+        if(ownership&&(!segmented||ownership.input!==input||ownership.budget!==assemblyBudget))
+            fail("data-loss","Private raw readback ownership differs.");
         inventoryExact(input,["binding","run","inventoryState","inventoryPages","rawState","rawReceipts","rawChunks"],"complete raw capture");
         const {binding}=input;
-        inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256"],"raw capture binding");
+        inventoryExact(binding,["ownerUid","auditId","epoch","sourceRevision","inventoryStateSha256",
+            ...(binding.namespaceVersion===3?["canonicalRevision","namespaceVersion"]:[])],"raw capture binding");
         if(typeof binding.ownerUid!=="string"||!binding.ownerUid||binding.ownerUid.includes("/")||
            !OPERATION_ID.test(binding.auditId||"")||!Number.isSafeInteger(binding.epoch)||binding.epoch<1||
            !Number.isSafeInteger(binding.sourceRevision)||binding.sourceRevision<2||!HEX.test(binding.inventoryStateSha256||""))
             fail("data-loss","Complete raw capture binding differs.");
-        const run=inspectAuditRun(input.run,binding.ownerUid,binding.auditId),namespaces=recoveryAuditNamespaces(binding.ownerUid,2);
-        if(run.epoch!==binding.epoch||run.sourceRevision!==binding.sourceRevision)fail("data-loss","Complete raw capture run differs.");
+        const run=inspectAuditRun(input.run,binding.ownerUid,binding.auditId),namespaces=recoveryAuditNamespaces(binding.ownerUid,binding.namespaceVersion??2);
+        if(run.epoch!==binding.epoch||run.sourceRevision!==binding.sourceRevision||
+           run.namespaceVersion!==binding.namespaceVersion||run.canonicalRevision!==binding.canonicalRevision)
+            fail("data-loss","Complete raw capture run differs.");
         const inventory=inspectInventoryState(input.inventoryState,run,namespaces);
         admitProofInventory(inventory,namespaces);
         if(inventory.stateSha256!==binding.inventoryStateSha256)fail("data-loss","Complete raw capture inventory binding differs.");
-        const {inventoryPages,rawReceipts,rawChunks}=input;
+        const {inventoryPages,rawReceipts}=input;let rawChunks=input.rawChunks;
         if(!Array.isArray(inventoryPages)||inventoryPages.length>317||!Array.isArray(rawReceipts)||
            rawReceipts.length<1||rawReceipts.length>inventory.capturedCount||!Array.isArray(rawChunks)||
            rawChunks.length>rawReceipts.length*PATROL_PROOF_LIMITS.chunks)
@@ -697,6 +739,21 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         for(const entry of inventoryPages)inventoryExact(entry,["id","row"],"raw inventory page entry");
         if(assemblyBudget)reserveRecoveryAuditRawInputs(assemblyBudget,[...inventoryPages.map(entry=>entry.row?.payloadBytes),
             ...rawChunks.map(entry=>entry?.row?.payloadBytes)]);
+        let privateChunkBytes=0;
+        if(segmented){
+            for(const entry of rawChunks){
+                inventoryExact(entry,["id","row"],"raw chunk entry");
+                const bytes=entry?.row?.payloadBytes;
+                if(!Buffer.isBuffer(bytes)||!bytes.length||bytes.length>PATROL_PROOF_LIMITS.chunkBytes)
+                    fail("data-loss","Segmented raw chunk bounds differ.");
+                privateChunkBytes+=bytes.length;
+            }
+            admitRecoveryAuditAssemblyBytes(assemblyBudget,ownership?0:privateChunkBytes);
+            rawChunks=rawChunks.map(entry=>{
+                if(!ownership)chargeRecoveryAuditAssembly(assemblyBudget,"bytes",entry.row.payloadBytes.length);
+                return {id:entry.id,row:{...entry.row,payloadBytes:ownership?entry.row.payloadBytes:Buffer.from(entry.row.payloadBytes)}};
+            });
+        }
         const index=inspectInventoryPages(inventoryPages,run,inventory,namespaces,assemblyBudget);
         const state=inspectProofState(input.rawState,run,inventory);
         if(state.schemaVersion!==3||rawReceipts.length!==state.nextSequence-1)fail("data-loss","Complete raw capture state differs.");
@@ -712,7 +769,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             if(entry.id!==row.operationId||receipts.has(entry.id))fail("data-loss","Complete raw capture receipt IDs differ.");
             receipts.set(entry.id,row);
         }
-        const ordered=[...receipts.values()].sort((a,b)=>a.sequence-b.sequence),documents=[],paths=new Set();
+        const ordered=[...receipts.values()].sort((a,b)=>a.sequence-b.sequence),documents=[],paths=new Set(),locators=new Map(),capsules=new Map();
         let sequence=1,offset=0,previous=null,last;
         for(const receipt of ordered){
             if(receipt.sequence!==sequence++||receipt.startOrdinal!==offset||receipt.previousReceiptSha256!==previous)
@@ -726,13 +783,18 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const bytes=Buffer.concat(parts);
             if(bytes.length!==receipt.payloadByteLength||inventoryHash(bytes)!==receipt.payloadSha256)
                 fail("data-loss","Forest proof complete payload differs.");
-            const payload=decodeProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined);
+            const indexed=segmented?indexRawProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined):null;
+            const payload=indexed?indexed.payload:decodeProofPayload(bytes,assemblyBudget,assemblyBudget!==undefined);
             checkRawCapsule(payload,run,inventory,index,namespaces,3,undefined,undefined,receipt,assemblyBudget);
             for(const row of payload.documents){
                 if(paths.has(row.path))fail("data-loss","Complete raw capture has duplicate documents.");
                 if(assemblyBudget)recoveryAuditAssemblyUsage(assemblyBudget);
-                paths.add(row.path);documents.push(row);
+                paths.add(row.path);
+                if(segmented)locators.set(row.path,Object.freeze({operationId:receipt.operationId,
+                    ...indexed.spans[locators.size-receipt.startOrdinal],metadata:index.get(row.path)}));
+                else documents.push(row);
             }
+            if(segmented)capsules.set(receipt.operationId,Object.freeze({...receipt,chunkSha256s:Object.freeze(receipt.chunkSha256s.slice())}));
             offset=receipt.endOrdinal;previous=rawReceiptHash(receipt);last=receipt;
         }
         if(chunks.size||offset!==inventory.capturedCount||paths.size!==index.size||
@@ -740,10 +802,42 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
            state.lastReceiptSha256!==previous||state.lastStartOrdinal!==last.startOrdinal||state.lastCount!==last.count)
             fail("data-loss","Complete raw capture terminal or retained inventory differs.");
         if(assemblyBudget)finishRecoveryAuditRawInputs(assemblyBudget);
-        return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),
-            namespaces:Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
-                ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
-                    .map(key=>key.slice(key.lastIndexOf("/")+1)))})))});
+        const sealedNamespaces=Object.freeze(namespaces.map(path=>Object.freeze({path,terminalEmpty:true,
+            ids:Object.freeze([...index.keys()].filter(key=>key.slice(0,key.lastIndexOf("/"))===path)
+                .map(key=>key.slice(key.lastIndexOf("/")+1)))})));
+        if(!segmented)return Object.freeze({...inventoryFlags,documents:Object.freeze(documents),namespaces:sealedNamespaces});
+        // One private sealed-capture reader. Keep only metadata locations after
+        // validating the entire original chain; never expose this capability.
+        const chunkRows=new Map(rawChunks.map(entry=>[entry.id,entry.row]));
+        const metrics={capsuleDecodes:ordered.length,rowDecodes:0,privateChunkBytes,copyChargedBytes:ownership?0:privateChunkBytes,
+            initialHashCheckedBytes:2*privateChunkBytes,rowSpanHashBytes:0,
+            maxResidentCapsuleBytes:Math.max(...ordered.map(row=>row.payloadByteLength))};
+        const release=()=>{}; // No decoded row/capsule is retained by this locator.
+        const read=path=>{
+            const location=locators.get(path);if(!location)return null;
+            const receipt=capsules.get(location.operationId),parts=[];
+            for(let number=0;number<receipt.chunkSha256s.length;number++){
+                const bytes=chunkRows.get(receipt.operationId+"_"+String(number).padStart(2,"0")).payloadBytes;
+                const start=Math.max(0,location.start-number*PATROL_PROOF_LIMITS.chunkBytes),
+                    end=Math.min(bytes.length,location.start+location.length-number*PATROL_PROOF_LIMITS.chunkBytes);
+                if(end>start)parts.push(bytes.subarray(start,end));
+            }
+            chargeRecoveryAuditAssembly(assemblyBudget,"bytes",location.length);
+            const bytes=Buffer.concat(parts);
+            if(bytes.length!==location.length)fail("data-loss","Segmented raw row span differs.");
+            metrics.rowSpanHashBytes+=bytes.length;
+            const row=decodeIndexedRawProofRow(bytes,location.qualification,assemblyBudget);metrics.rowDecodes++;
+            const metadata=index.get(path);
+            if(row?.path!==path||row.exists!==true||metadata!==location.metadata||
+               metadata.id!==path.slice(path.lastIndexOf("/")+1)||
+               row.updateTime?.seconds!==metadata.updateTime.seconds||row.updateTime?.nanoseconds!==metadata.updateTime.nanoseconds)
+                fail("data-loss","Segmented raw locator or validated membership differs.");
+            // Full canonical row and exact membership were verified before the
+            // locator was installed. The opaque same-budget row qualification
+            // and immutable private bytes prove that exact data is unchanged.
+            return row;
+        };
+        return {index,namespaces:sealedNamespaces,read,release,metrics};
     }
     async function captureRawInventory(request,args){
         auditIntent("capture raw inventory",args,["auditId","expectedEpoch","operationId","expectedSequence","startOrdinal","count"]);
@@ -879,8 +973,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         const operation=await tx.get(root.collection("operations").doc(doc.id));
         const debit=operation.data();
         if(receipt||!operation.exists||debit.schemaVersion!==1||debit.ownerUid!==uid||
-           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation"].includes(debit.kind)){
+           debit.operationId!==doc.id||!["shop-purchase","exp-allocation","attribute-allocation","skill-learning"].includes(debit.kind)){
             fail("data-loss","An unmatched ledger entry blocks recovery.");
+        }
+        if(debit.kind==="skill-learning"){
+            if(!records.account.slots.includes(debit.characterId))fail("data-loss","Skill learning character is no longer owned.");
+            await verifySkillLearningEvidence({tx,root,uid,operationId:doc.id,currentRevision:expectedRevision,
+                receipt:debit,ledger,grantExists:false,fail});
+            return;
         }
         const debitRevision=debit.kind==="shop-purchase"?debit.purchasedRevision:debit.allocatedRevision;
         if(!Number.isSafeInteger(debitRevision)||debitRevision<2||debitRevision>expectedRevision){
@@ -1014,87 +1114,141 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         return {restoredRevision:receipt.restoredRevision,unchanged:true,
             authoritativeStateReady:false};
     }
+    const segmentedScopes=new WeakMap(),segmentedRowSets=new WeakMap();
+    const recoveryRows=query=>segmentedRowSets.get(query)?.iterate()??query.docs;
+    const recoveryCount=query=>segmentedRowSets.get(query)?.count??query.docs.length;
+    function recoveryUnit(tx){return segmentedScopes.get(tx)?.unit()??tx;}
+    async function recoveryIndex(query,project){
+        const result=new Map();for await(const doc of recoveryRows(query))result.set(doc.id,project(doc));return result;
+    }
+    async function verifyHeroRecoveryEvidence(view,uid,envelopeRevision,canonicalRevision,binding,budget){
+        const {tx,root}=view,acquisition=createHeroAcquisition({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,now});
+        const growth=createHeroGrowth({db,FieldValue,HttpsError,runProtected,inspectExistingEnvelope,nextRevision,acquisition,now});
+        encodeProofPayload(binding,budget);
+        const scope={root,uid,envelopeRevision,canonicalRevision,captureSha256:snapshotDigest(binding)};
+        const retained=value=>{encodeProofPayload(value,budget);return value;};
+        const inventory={};
+        for(const name of ["heroAcquisition","heroAcquisitionHistory","heroChapter","heroChapterTickets","heroChapterSteps"]){
+            const ids=[];for await(const doc of recoveryRows(view.rows(name)))ids.push(doc.id);
+            inventory[name]=retained(ids);
+        }
+        const login=retained(await acquisition.verifyRetainedLogin(recoveryUnit(tx),scope));
+        const head=retained(await acquisition.verifyRetainedChapterHead(recoveryUnit(tx),scope)),tickets=[],steps=[];
+        for(const id of inventory.heroChapterTickets)tickets.push(retained(await acquisition.verifyRetainedChapterTicket(recoveryUnit(tx),scope,id)));
+        for(const id of inventory.heroChapterSteps)steps.push(retained(await acquisition.verifyRetainedChapterStep(recoveryUnit(tx),scope,id)));
+        const closed=retained(acquisition.closeRetainedEvidence({login,head,tickets,steps,inventory}));
+        const operationIds=new Set(),ledgerIds=new Set(),claimIds=new Set();
+        const add=(set,ids)=>{for(const id of ids){chargeRecoveryAuditAssembly(budget,"operations",2);
+            chargeRecoveryAuditAssembly(budget,"nodes",1);if(set.has(id))fail("data-loss","Overlapping Hero evidence blocks recovery.");set.add(id);}};
+        add(operationIds,closed.operationIds);add(ledgerIds,closed.ledgerIds);add(claimIds,closed.claimIds);
+        for await(const doc of recoveryRows(view.rows("operations"))){
+            if(!["hero-growth","hero-login-reward","hero-daily-supply"].includes(doc.get("kind")))continue;
+            const proof=retained(await growth.verifyRetainedOperation(recoveryUnit(tx),{...scope,entitlements:closed.entitlements},doc.id));
+            const expected=closed.entitlements.filter(row=>row.grantedRevision<=proof.beforeEnvelopeRevision)
+                .sort((a,b)=>a.heroId.localeCompare(b.heroId,"en"))
+                .map(row=>({...row,beforeEnvelopeRevision:proof.beforeEnvelopeRevision}));
+            retained(expected);
+            if(proof.ownerUid!==uid||proof.operationId!==doc.id||proof.captureSha256!==scope.captureSha256||
+               snapshotDigest(proof.entitlementObligations)!==snapshotDigest(expected))
+                fail("data-loss","Hero historical entitlement obligations differ.");
+            if(proof.loginEvidence){
+                const original=closed.loginHistory.find(row=>row.operationId===proof.loginEvidence.sourceId);
+                if(!original||original.serverRevision!==proof.loginEvidence.serverRevision||original.sha256!==proof.loginEvidence.sha256||
+                   original.loginCount!==proof.loginEvidence.loginCount||original.serverRevision>proof.beforeEnvelopeRevision)
+                    fail("data-loss","Hero login reward lacks its original complete history.");
+            }
+            add(operationIds,proof.operationIds);add(ledgerIds,proof.ledgerIds);add(claimIds,proof.claimIds);
+        }
+        return {operationIds,ledgerIds,claimIds};
+    }
     async function verifyRecoveryRights(tx,root,uid,expectedRevision,records,{
         claims,receipts,ledgers,grants,events,operations,modeSources,modeEvents,
         patrolTickets,patrolStates,patrolSettlements,patrolClosures,patrolModeEvents,
-        patrolOwnedModeEvents,patrolOperationIds}){
+        patrolOwnedModeEvents,patrolOperationIds,heroProof=null}){
         const verifiedRecoveryIDs=new Set();
         const archivedClaims=new Map(records.claimRecords.map(record=>[record.claimKey,record]));
-        if(claims.docs.length!==archivedClaims.size){
+        if([...heroProof?.claimIds??[]].some(id=>archivedClaims.has(id))||
+           recoveryCount(claims)!==archivedClaims.size+(heroProof?.claimIds.size??0)){
             fail("data-loss","Independent claims differ from the recovery archive.");
         }
         // A lost claim/receipt index cannot hide a retained economic delta.
         // Reuse the original credit/debit Owners; never infer a missing
         // receipt from a balance or regenerate an operation during repair.
-        const receiptById=new Map(receipts.docs.map(doc=>[doc.id,doc.data()]));
+        const receiptById=await recoveryIndex(receipts,doc=>{const row=doc.data();return segmentedScopes.has(tx)?{grantId:row.grantId,operationId:row.operationId,creditedToCharacter:row.creditedToCharacter}:row;});
         const verifiedPatrolOperations=new Set(),ticketProofs=new Map();
-        for(const doc of patrolTickets.docs){
-            const proof=await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
-            ticketProofs.set(doc.id,proof);
+        for await(const doc of recoveryRows(patrolTickets)){
+            const scope=segmentedScopes.get(tx),unit=recoveryUnit(tx);
+            const proof=scope?await verifyProofUnit(tx,unit,root,uid,records,expectedRevision,"forest-ticket",doc.id):
+                await patrolEvidence.verifyRetainedTicket(tx,root,uid,records.account,doc,expectedRevision);
+            if(scope)scope.completeTicket(unit,proof);
+            ticketProofs.set(doc.id,{stateSha256:snapshotDigest(proof.state),status:proof.state.status,terminalOperationId:proof.state.terminalOperationId});
             for(const operationId of proof.verifiedOperationIds)verifiedPatrolOperations.add(operationId);
         }
-        if(patrolStates.docs.length!==ticketProofs.size){
+        if(recoveryCount(patrolStates)!==ticketProofs.size){
             fail("data-loss","Patrol ticket checkpoint inventory differs from retained sources.");
         }
-        for(const doc of patrolStates.docs){
+        for await(const doc of recoveryRows(patrolStates)){
             const {createdAt,updatedAt,...state}=doc.data();
-            if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==snapshotDigest(ticketProofs.get(doc.id).state)){
+            if(!ticketProofs.has(doc.id)||snapshotDigest(state)!==ticketProofs.get(doc.id).stateSha256){
                 fail("data-loss","An orphaned Patrol checkpoint blocks recovery.");
             }
         }
-        for(const doc of patrolSettlements.docs){
+        for await(const doc of recoveryRows(patrolSettlements)){
             if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An unindexed Patrol earning blocks recovery.");
-            await patrolEvidence.verifyRetainedSettlement(tx,root,uid,records.account,doc,expectedRevision);
+            if(!segmentedScopes.get(tx)?.reuseSettlement(doc))
+                await patrolEvidence.verifyRetainedSettlement(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
-        for(const doc of patrolClosures.docs){
+        for await(const doc of recoveryRows(patrolClosures)){
             const proof=ticketProofs.get(doc.get("ticketId"));
-            if(!proof||proof.state.status!=="abandoned"||proof.state.terminalOperationId!==doc.id){
+            if(!proof||proof.status!=="abandoned"||proof.terminalOperationId!==doc.id){
                 fail("data-loss","An orphaned Patrol closure blocks recovery.");
             }
-            await patrolEvidence.verifyRetainedClosure(tx,root,uid,records.account,doc,expectedRevision);
+            await patrolEvidence.verifyRetainedClosure(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
         }
-        for(const doc of [...patrolModeEvents.docs,...patrolOwnedModeEvents.docs]){
+        for await(const doc of (async function*(){yield* recoveryRows(patrolModeEvents);yield* recoveryRows(patrolOwnedModeEvents);})()){
             if(doc.get("schemaVersion")!==2||doc.get("resultOwner")!=="forest-patrol-settlement"||
                !verifiedPatrolOperations.has(doc.id)||!patrolOperationIds.has(doc.id)){
                 fail("data-loss","A Forest mode component lacks its original earning source.");
             }
         }
-        await patrolEvidence.verifyCurrentEvidence(tx,root,uid,records.account,expectedRevision);
-        await modeEvidence.verifyCurrentEvidence(tx,root,uid,records.account,records,expectedRevision);
-        for(const doc of modeSources.docs){
-            await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
+        await patrolEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,expectedRevision);
+        await modeEvidence.verifyCurrentEvidence(recoveryUnit(tx),root,uid,records.account,records,expectedRevision);
+        for await(const doc of recoveryRows(modeSources)){
+            if(segmentedScopes.has(tx))await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"simulated-ad-source",doc.id);
+            else await modeEvidence.verifyRetainedSource(tx,root,uid,records.account,doc,expectedRevision);
         }
         const verifiedModeOperations=new Set();
-        for(const doc of modeEvents.docs){
+        for await(const doc of recoveryRows(modeEvents)){
             if(doc.get("schemaVersion")===2){
                 if(!verifiedPatrolOperations.has(doc.id))fail("data-loss","An orphaned Forest value event blocks recovery.");
                 continue; // Full source-specific proof already checked this exact component.
             }
-            await modeEvidence.verifyRetainedEvent(tx,root,uid,records.account,doc,expectedRevision);
+            await modeEvidence.verifyRetainedEvent(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
             verifiedModeOperations.add(doc.id);
         }
         // Debit receipts survive independently of their ledger. Every known
         // purchase/allocation must reach the original full debit proof below,
         // even when its ledger was lost with the current canonical sources.
-        const ledgerIds=new Set(ledgers.docs.map(doc=>doc.id));
-        for(const doc of operations.docs){
+        const ledgerIds=new Set((await recoveryIndex(ledgers,()=>true)).keys()),loadoutEdges=new Map();
+        for await(const doc of recoveryRows(operations)){
             const value=doc.data();
-            if(value.schemaVersion!==1||value.ownerUid!==uid){
-                fail("data-loss","Operation inventory identity blocks recovery.");
-            }
-            if(value.kind==="forest-patrol-settlement"){
+            const category=classifyRetainedCanonicalOperation(value,doc.id,uid,expectedRevision,fail);
+            if(category==="hero"){
+                if(!heroProof?.operationIds.has(doc.id)||!heroProof.ledgerIds.has(doc.id)||receiptById.has(doc.id))
+                    fail("data-loss","Hero operation lacks complete versioned retained proof.");
+            }else if(category==="patrol"){
                 if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)||!verifiedPatrolOperations.has(doc.id)){
                     fail("data-loss","A Patrol operation lacks its original source and signed ledger.");
                 }
-            }else if(value.kind==="account-mode-time"){
+            }else if(category==="mode"){
                 if(receiptById.has(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A mode operation lacks its original signed ledger or overlaps a grant.");
                 }
                 if(!verifiedModeOperations.has(doc.id)){
-                    await modeEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc,expectedRevision);
+                    await modeEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc,expectedRevision);
                 }
                 verifiedModeOperations.add(doc.id);
-            }else if(["shop-purchase","exp-allocation","attribute-allocation"].includes(value.kind)){
+            }else if(category==="debit"){
                 if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||!ledgerIds.has(doc.id)){
                     fail("data-loss","A debit receipt without its original ledger blocks recovery.");
                 }
@@ -1102,7 +1256,16 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 if(receiptById.has(doc.id)||ledgerIds.has(doc.id)){
                     fail("data-loss","A source operation overlaps economic evidence.");
                 }
-                if(value.kind==="canonical-current-recovery"){
+                if(category==="loadout"){
+                    if(!records.account.slots.includes(value.characterId))fail("data-loss","Retained skill loadout target is not owned.");
+                    const edge=await verifySkillLoadoutEvidence({tx:recoveryUnit(tx),root,uid,operationId:doc.id,currentRevision:expectedRevision,receipt:value,fail});
+                    const scope=segmentedScopes.get(tx);
+                    if(scope){
+                        chargeRecoveryAuditAssembly(scope.budget,"operations",1);
+                        encodeProofPayload(edge,scope.budget);
+                    }
+                    loadoutEdges.set(doc.id,edge);
+                }else if(category==="recovery"){
                     if(value.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                        !Number.isSafeInteger(value.sourceRevision)||value.sourceRevision<2||
                        !Number.isSafeInteger(value.restoredRevision)||
@@ -1132,15 +1295,40 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                         {archiveSnap,snapshotSnap,approvalSnap,operationSnap:doc,auditSnap,grantSnap,ledgerSnap},original);
                     verifiedRecoveryIDs.add(doc.id);
                 }else{
-                    await sourceEvidence.verifyRetainedOperation(tx,root,uid,records.account,doc);
+                    if(segmentedScopes.has(tx)&&value.kind==="additional-character-sources")
+                        await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"additional-character-sources",doc.id);
+                    else await sourceEvidence.verifyRetainedOperation(recoveryUnit(tx),root,uid,records.account,doc);
                 }
             }
         }
+        // Every retained non-economic loadout operation must belong to the
+        // unique original-marker chain ending at today's preserved head.
+        // Each unit was fully proved above; closure never recursively re-proves.
+        const head=records.progress.playableState?.loadoutSource;
+        if(!head){if(loadoutEdges.size)fail("data-loss","Skill loadout history lacks its current source binding.");}
+        else{
+            const visited=new Set(),revisions=new Set();
+            let id=head.operationId,resultRevision=head.resultRevision,policySha256=head.policySha256;
+            while(id!==null){
+                const scope=segmentedScopes.get(tx);
+                if(scope){chargeRecoveryAuditAssembly(scope.budget,"operations",5);chargeRecoveryAuditAssembly(scope.budget,"nodes",2);}
+                const edge=loadoutEdges.get(id);
+                if(!edge||visited.has(id)||revisions.has(edge.resultRevision)||
+                   edge.resultRevision!==resultRevision||edge.policySha256!==policySha256)
+                    fail("data-loss","Skill loadout history has a missing, cyclic or mismatched edge.");
+                visited.add(id);revisions.add(edge.resultRevision);
+                if(edge.previousOperationId!==null){
+                    if(edge.previousResultRevision>=edge.resultRevision)fail("data-loss","Skill loadout predecessor revision is inconsistent.");
+                }
+                id=edge.previousOperationId;resultRevision=edge.previousResultRevision;policySha256=edge.previousPolicySha256;
+            }
+            if(visited.size!==loadoutEdges.size)fail("data-loss","An orphaned or branched skill loadout operation blocks recovery.");
+        }
         // Events survive independently of grants. Losing a grant must not
         // hide an original reward observation or authorize recreating it.
-        const grantById=new Map(grants.docs.map(doc=>[doc.id,doc.data()]));
-        for(const doc of events.docs){
-            const grant=grantById.get(doc.id);
+        const grantById=await recoveryIndex(grants,doc=>segmentedScopes.has(tx)?true:doc.data());
+        for await(const doc of recoveryRows(events)){
+            const grant=segmentedScopes.has(tx)?(grantById.has(doc.id)?(await tx.get(root.collection("pendingGrants").doc(doc.id))).data():undefined):grantById.get(doc.id);
             if(!grant){fail("data-loss","An orphaned reward event blocks recovery.");}
             const proof=await readDailyCheckinEvidence({tx,root,uid,grantId:doc.id,grant,fail});
             if(!proof||proof.event.sourceRevision>expectedRevision||
@@ -1151,8 +1339,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         // Retained consumed grants need their original receipt too. Pending
         // rights need an independently versioned event; never use an old
         // balance, creation time or absent receipt as evidence of eligibility.
-        const receiptsByGrant=new Set(receipts.docs.map(doc=>doc.get("grantId")));
-        for(const doc of grants.docs){
+        const receiptsByGrant=new Set((await recoveryIndex(receipts,doc=>doc.get("grantId"))).values());
+        for await(const doc of recoveryRows(grants)){
             const grant=doc.data();
             if(grant.status==="pending"){
                 verifyServerIssuedGrant({uid,grant,fail});
@@ -1177,8 +1365,12 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             }
         }
         let creditLedgerCount=0;
-        for(const doc of ledgers.docs){
+        for await(const doc of recoveryRows(ledgers)){
             const ledger=doc.data(),receipt=receiptById.get(doc.id);
+            if(heroProof?.ledgerIds.has(doc.id)){
+                if(receipt||!heroProof.operationIds.has(doc.id))fail("data-loss","Hero ledger overlaps other economic evidence.");
+                continue; // The original complete Hero source/transition proof checked this exact immutable row.
+            }
             if(ledger.operationId!==doc.id||!OPERATION_ID.test(doc.id)||
                ledger.schemaVersion!==1||ledger.ownerUid!==uid){
                 fail("data-loss","An unmatched ledger entry blocks recovery.");
@@ -1200,13 +1392,15 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
                 creditLedgerCount++;
                 continue; // Full credit proof is checked below.
             }
-            await verifyDebitRecoveryEvidence(tx,root,uid,expectedRevision,records,doc,ledger,receipt);
+            if(segmentedScopes.has(tx)&&ledger.kind==="exp-allocation")
+                await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,expectedRevision,"exp-allocation",doc.id);
+            else await verifyDebitRecoveryEvidence(recoveryUnit(tx),root,uid,expectedRevision,records,doc,ledger,receipt);
         }
         if(creditLedgerCount!==archivedClaims.size){
             fail("data-loss","Credit ledger inventory differs from the recovery archive.");
         }
         let creditedCount=0;
-        for(const doc of receipts.docs){
+        for await(const doc of recoveryRows(receipts)){
             const receipt=doc.data();
             if(receipt.operationId!==doc.id||!OPERATION_ID.test(doc.id)){
                 fail("data-loss","Grant receipt identity blocks recovery.");
@@ -1232,7 +1426,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(creditedCount!==archivedClaims.size){
             fail("data-loss","Credited receipt inventory differs from the recovery archive.");
         }
-        for(const doc of claims.docs){
+        for await(const doc of recoveryRows(claims)){
+            if(heroProof?.claimIds.has(doc.id))continue; // Disjoint original Hero closure, never an archived credit claim.
             const record=archivedClaims.get(doc.id),claim=doc.data();
             if(!record||record.grantId!==doc.id||!OPERATION_ID.test(record.operationId||"")){
                 fail("data-loss","Unsupported or unmatched recovery claim.");
@@ -1363,13 +1558,14 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             const reservedCount=receipts.docs.filter(doc=>doc.get("creditedToCharacter")===false).length;
             const pendingCount=grants.docs.filter(doc=>doc.get("status")==="pending").length;
             const operationProofReads=operations.docs.reduce((sum,doc)=>sum+
-                (doc.get("kind")==="canonical-current-recovery"?8:
+                (doc.get("kind")==="skill-loadout"?skillLoadoutEvidenceReadBudget():doc.get("kind")==="canonical-current-recovery"?8:
                     doc.get("kind")==="forest-patrol-settlement"?0:
                     doc.get("kind")==="account-mode-time"?
                         modeEvidence.retainedOperationReadBudget(doc.get("kind")):
                         sourceEvidence.retainedOperationReadBudget(doc.get("kind"))),0);
             if(queries.reduce((sum,query)=>sum+query.size,0)+claims.docs.length*12+
-               receipts.docs.length+ledgers.docs.length*5+reservedCount*6+
+               receipts.docs.length+ledgers.docs.length*5+
+               ledgers.docs.filter(doc=>doc.get("kind")==="skill-learning").length*(1+skillLearningEvidenceReadBudget()-5)+reservedCount*6+
                grants.docs.length+pendingCount*3+events.docs.length*4+
                operations.docs.length+operationProofReads+
                modeSources.docs.length*(1+modeEvidence.retainedSourceReadBudget())+
@@ -1490,6 +1686,198 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             fail("data-loss",error.message);
         }
     }
+    // Private verification view over this Owner's already sealed raw capture.
+    // It is not a provider, live SDK transaction, publication candidate or
+    // caller-configurable loader. Only original exact query shapes are valid.
+    function segmentedRawView(capture,budget,uid,namespaceVersion=2){
+        const root=db.collection("serverUsers").doc(uid),namespaces=new Map(capture.namespaces.map(row=>[row.path,row.ids]));
+        const used=new Set(),absences=new Set(),shapes=recoveryAuditQueryShapes(root,namespaceVersion),pending=new Set();
+        const field=(row,key)=>key.split(".").reduce((v,k)=>v?.[k],row);
+        const metrics={units:0,executedProofUnits:0,settlementReuseHits:0,enumeratedSettlementRows:0,
+            witnessLookupOperations:0,witnessMetadataNodes:0,maxUnitReads:0,maxUnitTypedBytes:0};
+        chargeRecoveryAuditAssembly(budget,"nodes",3);metrics.witnessMetadataNodes+=3;
+        const qualifiedRows=new WeakMap(),unitSettlements=new WeakMap(),settlementWitnesses=new Map();
+        const witnessLookup=()=>{chargeRecoveryAuditAssembly(budget,"operations",1);metrics.witnessLookupOperations++;};
+        const descriptor=path=>{
+            chargeRecoveryAuditAssembly(budget,"nodes",8);metrics.witnessMetadataNodes+=8;
+            witnessLookup();const row=capture.index.get(path);
+            return Object.freeze({capture,path,seconds:row.updateTime.seconds,nanoseconds:row.updateTime.nanoseconds,
+                typedDataSha256:row.typedDataSha256,typedDataByteLength:row.typedDataByteLength});
+        };
+        const sameDescriptor=(a,b)=>a&&b&&a.capture===b.capture&&a.path===b.path&&a.seconds===b.seconds&&
+            a.nanoseconds===b.nanoseconds&&a.typedDataSha256===b.typedDataSha256&&a.typedDataByteLength===b.typedDataByteLength;
+        const snapshot=path=>{
+            chargeRecoveryAuditAssembly(budget,"operations",1);
+            const slash=path.lastIndexOf("/"),ids=namespaces.get(path.slice(0,slash));
+            if(!ids)fail("data-loss","Segmented dependency namespace is unsupported.");
+            const row=capture.read(path);
+            if(!row){
+                if(ids.includes(path.slice(slash+1)))fail("data-loss","Segmented present dependency is missing.");
+                if(capture.index.size+absences.size>=4096&&!absences.has(path))fail("resource-exhausted","Segmented dependency limit exceeded.");
+                absences.add(path);used.add(path);return proofSnapshot(path,{exists:false});
+            }
+            used.add(path);const doc=proofSnapshot(path,row);
+            if(path.slice(0,path.lastIndexOf("/"))===root.path+"/patrolSettlements"){
+                const identity=descriptor(path);witnessLookup();qualifiedRows.set(doc,identity);
+            }
+            return doc;
+        };
+        const result=docs=>Object.freeze({docs:Object.freeze(docs),size:docs.length,empty:docs.length===0});
+        const lookup=async reference=>{
+            if(reference&&typeof reference.collection==="function"&&typeof reference.path==="string"){
+                if(!db.doc(reference.path).isEqual?.(reference)&&typeof reference.isEqual==="function")
+                    fail("data-loss","Segmented document reference differs.");
+                return snapshot(reference.path);
+            }
+            const matches=shapes.filter(entry=>typeof reference?.isEqual==="function"&&reference.isEqual(entry.query));
+            if(matches.length!==1)fail("data-loss","Segmented query is unknown or ambiguous.");
+            chargeRecoveryAuditAssembly(budget,"operations",1);
+            const shape=matches[0],selected=[];
+            for(const id of namespaces.get(root.path+"/"+shape.name)){
+                const path=root.path+"/"+shape.name+"/"+id,doc=snapshot(path);
+                if(shape.filter(doc.data())){
+                    if(shape.order&&!Number.isSafeInteger(doc.get(shape.order)))fail("data-loss","Segmented query sequence is invalid.");
+                    selected.push(doc);
+                    if(shape.order){selected.sort((a,b)=>b.get(shape.order)-a.get(shape.order)||Buffer.compare(Buffer.from(b.id),Buffer.from(a.id)));
+                        if(selected.length>shape.maximum)selected.pop();}
+                }
+                if(!shape.order&&selected.length===shape.maximum)break;
+            }
+            if(shape.order){
+                if(selected.some(doc=>!Number.isSafeInteger(doc.get(shape.order))))fail("data-loss","Segmented query sequence is invalid.");
+                selected.sort((a,b)=>b.get(shape.order)-a.get(shape.order)||Buffer.compare(Buffer.from(b.id),Buffer.from(a.id)));
+            }
+            return result(selected.slice(0,shape.maximum));
+        };
+        const tracked=reference=>{
+            const promise=lookup(reference);pending.add(promise);
+            void promise.then(()=>pending.delete(promise),()=>pending.delete(promise));return promise;
+        };
+        const tx=Object.freeze({get:tracked});
+        const unit=()=>{
+            chargeRecoveryAuditAssembly(budget,"nodes",2);metrics.witnessMetadataNodes+=2;
+            capture.release();let reads=0,typedBytes=0;const paths=new Set(),settlements=new Map();
+            metrics.units++;metrics.executedProofUnits++;
+            // A new readonly identity gives original Owners a unit-local cache.
+            // It never calls beginEvidenceAttempt on an existing live attempt.
+            const kernel=Object.freeze({get:async reference=>{
+                if(++reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
+                const row=await tracked(reference),docs=row.docs??[row];
+                if(row.docs)reads+=Math.max(1,row.size)-1;
+                if(reads>PATROL_PROOF_LIMITS.kernelReads)fail("resource-exhausted","Segmented original proof read budget exceeded.");
+                for(const doc of docs)if(doc.exists&&!paths.has(doc.ref.path)){
+                    paths.add(doc.ref.path);typedBytes+=capture.index.get(doc.ref.path).typedDataByteLength;
+                    if(typedBytes>PATROL_PROOF_LIMITS.bytes)fail("resource-exhausted","Segmented proof resident data exceeds2MiB.");
+                    if(doc.ref.path.slice(0,doc.ref.path.lastIndexOf("/"))===root.path+"/patrolSettlements")
+                        {witnessLookup();const identity=qualifiedRows.get(doc);witnessLookup();settlements.set(doc.id,identity);}
+                }
+                metrics.maxUnitReads=Math.max(metrics.maxUnitReads,reads);metrics.maxUnitTypedBytes=Math.max(metrics.maxUnitTypedBytes,typedBytes);
+                return row;
+            }});witnessLookup();unitSettlements.set(kernel,settlements);return kernel;
+        };
+        const completeTicket=(kernel,proof)=>{
+            // Read/inflight rows are not proof. Only a successfully completed
+            // original ticket proof can qualify its verified settlement rows.
+            witnessLookup();const reads=unitSettlements.get(kernel);
+            for(const id of proof.verifiedOperationIds){witnessLookup();const row=reads?.get(id);if(row){
+                chargeRecoveryAuditAssembly(budget,"nodes",1);metrics.witnessMetadataNodes++;
+                witnessLookup();settlementWitnesses.set(row.path,row);}}
+            witnessLookup();unitSettlements.delete(kernel);
+        };
+        const reuseSettlement=doc=>{
+            metrics.enumeratedSettlementRows++;
+            // Enumeration still decodes/charges the exact sealed row and runs
+            // the original global classification and coverage checks.
+            witnessLookup();const witness=settlementWitnesses.get(doc.ref.path);
+            witnessLookup();const identity=qualifiedRows.get(doc);
+            if(!sameDescriptor(witness,identity))return false;
+            const actual=inventoryDocumentMetadata(doc,root.path+"/patrolSettlements",budget);
+            if(actual.id!==doc.id||actual.updateTime.seconds!==witness.seconds||actual.updateTime.nanoseconds!==witness.nanoseconds||
+               actual.typedDataSha256!==witness.typedDataSha256||actual.typedDataByteLength!==witness.typedDataByteLength)return false;
+            metrics.settlementReuseHits++;return true;
+        };
+        segmentedScopes.set(tx,{unit,completeTicket,reuseSettlement,budget});
+        const rows=(name,filter=null)=>{
+            const path=root.path+"/"+name,ids=namespaces.get(path);
+            if(!ids)fail("data-loss","Segmented inventory namespace differs.");
+            const query=Object.freeze({});segmentedRowSets.set(query,{count:filter?undefined:ids.length,
+                iterate:async function*(){for(const id of ids){const doc=snapshot(path+"/"+id);if(!filter||filter(doc))yield doc;}}});return query;
+        };
+        const finish=()=>{
+            const unused=[...capture.index.keys()].find(path=>!used.has(path));
+            if(unused)fail("data-loss","Segmented unused dependency "+unused);
+            capture.release();return {documentCount:capture.index.size,absenceCount:absences.size,dependencyCount:used.size,
+                residentUsage:Object.freeze({...metrics,...capture.metrics})};
+        };
+        return {root,save:db.doc("users/"+uid+"/saves/current"),tx,rows,finish,
+            close:async()=>{await Promise.allSettled([...pending]);capture.release();recoveryAuditAssemblyUsage(budget);}};
+    }
+    function registerPrivateReadbackOwnership(input,budget){
+        // This call is followed synchronously by the verifier's get/delete.
+        // Prepay exactly those three Map operations and the one private record.
+        chargeRecoveryAuditAssembly(budget,"nodes",1);
+        chargeRecoveryAuditAssembly(budget,"operations",3);
+        privateReadbackOwnership.set(input,Object.freeze({input,budget}));
+    }
+    async function verifySegmentedRawRecoveryProof(input,budget=createRecoveryAuditAssemblyBudget()){
+        // Consume before any budget check/await can throw. A retry must either
+        // decode anew or use the ordinary copying path; no finally re-delete.
+        const ownership=privateReadbackOwnership.get(input);
+        if(ownership)privateReadbackOwnership.delete(input);
+        let view;
+        try{
+            if(ownership&&ownership.budget!==budget)fail("data-loss","Private raw readback ownership differs.");
+            if(!ownership)chargeRecoveryAuditAssembly(budget,"operations",1);
+            chargeRecoveryAuditAssembly(budget,"passes",1);
+            const capture=inspectCompleteRawCapture(input,budget,true,ownership),{ownerUid:uid,sourceRevision:revision,auditId}=input.binding;
+            const namespaceVersion=input.binding.namespaceVersion??2,canonicalRevision=input.binding.canonicalRevision??revision;
+            view=segmentedRawView(capture,budget,uid,namespaceVersion);const {tx,root}=view;
+            const selected=await tx.get(root.collection(RECOVERY_AUDIT_RUN_COLLECTION).doc(auditId));
+            if(!selected.exists||!encodeProofPayload(selected.data(),budget).equals(encodeProofPayload(input.run,budget)))
+                fail("data-loss","Segmented selected run differs.");
+            const run=selected.data();
+            view.auditControl={auditId,epoch:run.epoch,sessionId:run.sessionId,sessionRevision:run.sessionRevision,
+                recordedAt:run.createdAt};
+            const envelopeSnap=await tx.get(view.save),archiveSnap=await tx.get(root.collection("recoveryArchives").doc(String(canonicalRevision))),
+                snapshotSnap=await tx.get(root.collection("playableSnapshots").doc(String(canonicalRevision)));
+            const {envelope,records}=inspectCurrentRecoverySource(uid,canonicalRevision,{envelopeSnap,archiveSnap,snapshotSnap});
+            if(envelope.serverRevision!==revision)fail("aborted","CLOUD_REVISION_CONFLICT");
+            await verifyCandidateAuditControl(tx,root,uid,revision,view.auditControl);
+            for(const name of Object.keys(SINGLES)){
+                const doc=await tx.get(root.collection(name==="claimCheckpoint"?"claimCheckpoints":name).doc(SINGLES[name]));
+                if(doc.exists&&(!Number.isSafeInteger(doc.get("serverRevision"))||doc.get("serverRevision")<1||doc.get("serverRevision")>revision))
+                    fail("data-loss","Surviving source revision blocks segmented proof.");
+            }
+            for(const name of Object.keys(SETS)){
+                const keys=new Set(records[name].map(SETS[name]));
+                for await(const doc of recoveryRows(view.rows(name)))if(!keys.has(doc.id)||!Number.isSafeInteger(doc.get("serverRevision"))||
+                    doc.get("serverRevision")<1||doc.get("serverRevision")>revision)fail("data-loss","Unexpected current source blocks segmented proof.");
+            }
+            const collections={};for(const [key,name] of Object.entries({claims:"uniqueClaims",receipts:"grantOperations",ledgers:"ledgerEntries",
+                grants:"pendingGrants",events:"rewardEvents",operations:"operations",modeSources:"simulatedAdSources",patrolTickets:"patrolTickets",
+                patrolStates:"patrolTicketStates",patrolSettlements:"patrolSettlements",patrolClosures:"patrolClosures"}))collections[key]=view.rows(name);
+            const modeEvents=view.rows("modeTimeEvents",doc=>doc.get("modeChanged")===true),
+                patrolModeEvents=view.rows("modeTimeEvents",doc=>doc.get("schemaVersion")===2),
+                patrolOwnedModeEvents=view.rows("modeTimeEvents",doc=>doc.get("resultOwner")==="forest-patrol-settlement"),
+                patrolOperationIds=new Set((await recoveryIndex(collections.patrolSettlements,()=>true)).keys());
+            const heroProof=namespaceVersion===3?await verifyHeroRecoveryEvidence(view,uid,revision,canonicalRevision,input.binding,budget):null;
+            const verified=await verifyRecoveryRights(tx,root,uid,revision,records,{...collections,modeEvents,patrolModeEvents,patrolOwnedModeEvents,patrolOperationIds,heroProof});
+            for await(const doc of recoveryRows(view.rows("modeTimeEvents"))){
+                if(doc.get("schemaVersion")===1&&doc.get("modeChanged")===false)
+                    await verifyProofUnit(tx,recoveryUnit(tx),root,uid,records,revision,"mode-nonvalue-event",doc.id);
+                else if(!(doc.get("schemaVersion")===1&&doc.get("modeChanged")===true)&&
+                    !(doc.get("schemaVersion")===2&&doc.get("resultOwner")==="forest-patrol-settlement"))
+                    fail("data-loss","An unclassified private mode event blocks segmented proof.");
+            }
+            await verifyRetainedAuditControls(view,uid,revision,collections.operations,verified);
+            const summary=view.finish();
+            if(namespaceVersion===3)chargeRecoveryAuditAssembly(budget,"nodes",2);
+            return Object.freeze({...inventoryFlags,segmentedProofValid:true,ownerUid:uid,sourceRevision:revision,...summary,
+                ...(namespaceVersion===3?{canonicalRevision,namespaceVersion}:{}),
+                assemblyUsage:recoveryAuditAssemblyUsage(budget)});
+        }catch(error){if(error instanceof HttpsError)throw error;fail("data-loss",error.message);}
+        finally{if(view)await view.close();}
+    }
     async function verifyRawRecoveryAuditCandidate(input){
         return (await assembleRawCandidate(input)).summary;
     }
@@ -1501,7 +1889,8 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(!value)fail("permission-denied","An original private candidate identity is required.");
         return value;
     }
-    // Thirteen point reads including the original Session runner's three.
+    // Legacy thirteen point reads including the original Session runner's three;
+    // Hero captures additionally recheck the current canonical pointer.
     // This does not include the separately bounded outside-transaction scan.
     async function publicationContext(tx,session,args){
         const context=await inventoryContext(tx,session,args.auditId,args.expectedEpoch);
@@ -1519,6 +1908,7 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         const reference=runRef.collection("candidatePublications").doc(args.operationId),existing=await tx.get(reference);
         const tuple={ownerUid:session.uid,auditId:run.auditId,epoch:run.epoch,operationId:args.operationId,
             sessionId:session.sessionId,sessionRevision:session.revision,sourceRevision:run.sourceRevision,
+            ...(run.namespaceVersion===3?{canonicalRevision:run.canonicalRevision,namespaceVersion:3}:{}),
             sourceSha256:run.sourceSha256,snapshotSha256:run.snapshotSha256,approvalOperationId:run.approvalOperationId,
             approvalBindingSha256:run.approvalBindingSha256,inventoryStateSha256:inventory.stateSha256,
             rawStateSha256:rawState.stateSha256,rawLastReceiptSha256:rawState.lastReceiptSha256};
@@ -1526,20 +1916,28 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
     }
     async function pinCandidatePublication(request,args){
         requirePublicationPreparation();
+        return pinRawCapture(request,args);
+    }
+    async function pinRawCapture(request,args){
         auditIntent("pin publication",args,["auditId","expectedEpoch","operationId"]);
         // A failed/retried callback never mints an identity. Only its committed
         // result is retained in the private map after run resolves.
         const pinned=await runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
             const value=await publicationContext(tx,session,args);
-            return {args:{...args},tuple:value.tuple,run:value.run,inventory:value.inventory,rawState:value.rawState,runRef:value.runRef};
+            return {args:{...args},tuple:value.tuple,run:value.run,inventory:value.inventory,rawState:value.rawState,runRef:value.runRef,
+                encodingVersion:value.existing.exists?publicationEncoding(value.existing.data()):(value.run.namespaceVersion===3?4:3)};
         },args.operationId);
         return publicationIdentity(publicationPins,pinned);
     }
     async function loadPinnedRawCapture(pin){
         requirePublicationPreparation();
+        return loadPinnedRawMaterial(pin);
+    }
+    async function loadPinnedRawMaterial(pin){
         const pinned=publicationValue(publicationPins,pin),budget=createRecoveryAuditAssemblyBudget();
         const input={binding:{ownerUid:pinned.tuple.ownerUid,auditId:pinned.tuple.auditId,epoch:pinned.tuple.epoch,
-            sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256},
+            sourceRevision:pinned.tuple.sourceRevision,inventoryStateSha256:pinned.tuple.inventoryStateSha256,
+            ...(pinned.tuple.namespaceVersion===3?{canonicalRevision:pinned.tuple.canonicalRevision,namespaceVersion:3}:{})},
             run:pinned.run,inventoryState:pinned.inventory,rawState:pinned.rawState};
         let wireBytes=0,scanReads=0;
         // Immutable capture paths only. SDK materialization is separately
@@ -1585,6 +1983,22 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         recoveryAuditAssemblyUsage(budget);
         return publicationIdentity(publicationMaterials,{pin,input,budget,scanReads,wireBytes});
     }
+    // Private process-local proof only. No artifact, durable point or authority is issued.
+    async function verifyPinnedSegmentedProof(request,pin,material){
+        const pinned=publicationValue(publicationPins,pin),value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        publicationMaterials.delete(material);
+        recoveryAuditAssemblyUsage(value.budget);
+        const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
+        recoveryAuditAssemblyUsage(value.budget);
+        await runRecoveryAuditMaintenance(request,pinned.args.auditId,async(tx,session)=>{
+            recoveryAuditAssemblyUsage(value.budget);
+            const current=await publicationContext(tx,session,pinned.args);
+            recoveryAuditAssemblyUsage(value.budget);
+            if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Pinned proof capture binding changed.");
+        },pinned.args.operationId);
+        return Object.freeze({...summary,assemblyUsage:recoveryAuditAssemblyUsage(value.budget)});
+    }
     async function assemblePinnedCandidate(pin,material){
         requirePublicationPreparation();
         publicationValue(publicationPins,pin);
@@ -1592,7 +2006,28 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
         const artifact=await assembleRawCandidate(value.input,value.budget);
         publicationMaterials.delete(material);
-        return publicationIdentity(publicationArtifacts,{pin,bytes:artifact.bytes,summary:artifact.summary});
+        return publicationIdentity(publicationArtifacts,{pin,bytes:artifact.bytes,summary:artifact.summary,encodingVersion:2});
+    }
+    function publicationEncoding(row){
+        if(row?.schemaVersion===1&&row.kind==="canonical-recovery-candidate-publication"&&row.candidateEncodingVersion===2&&
+           !Object.hasOwn(row,"canonicalRevision")&&!Object.hasOwn(row,"namespaceVersion"))return 2;
+        if(row?.schemaVersion===2&&row.kind==="canonical-recovery-raw-publication"&&row.candidateEncodingVersion===3&&
+           row.artifactKind==="canonical-recovery-raw-archive"&&row.proofKind==="segmented-original-rights-v1"&&
+           !Object.hasOwn(row,"canonicalRevision")&&!Object.hasOwn(row,"namespaceVersion"))return 3;
+        if(row?.schemaVersion===3&&row.kind==="canonical-recovery-raw-publication"&&row.candidateEncodingVersion===4&&
+           row.artifactKind==="canonical-recovery-raw-archive"&&row.proofKind==="segmented-original-rights-v2"&&row.namespaceVersion===3&&
+           Number.isSafeInteger(row.canonicalRevision)&&row.canonicalRevision>=2&&row.canonicalRevision<=row.sourceRevision)return 4;
+        fail("data-loss","Unsupported original publication encoding or proof kind.");
+    }
+    async function assemblePinnedRawArchive(pin,material){
+        requirePublicationPreparation();publicationValue(publicationPins,pin);
+        const value=publicationValue(publicationMaterials,material);
+        if(value.pin!==pin)fail("permission-denied","Candidate material belongs to another pin.");
+        publicationMaterials.delete(material);
+        const summary=await verifySegmentedRawRecoveryProof(value.input,value.budget);
+        const bytes=encodeRawRecoveryArchive(value.input,value.budget);
+        recoveryAuditAssemblyUsage(value.budget);
+        return publicationIdentity(publicationArtifacts,{pin,bytes,summary,encodingVersion:value.input.binding.namespaceVersion===3?4:3,budget:value.budget});
     }
     async function prepareCandidatePublication(request,pin,artifactIdentity){
         requirePublicationPreparation();
@@ -1600,24 +2035,38 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         if(artifact.pin!==pin)fail("permission-denied","Candidate artifact belongs to another pin.");
         const {args}=pinned;
         const value=await runRecoveryAuditMaintenance(request,args.auditId,async(tx,session)=>{
+            if(artifact.budget)recoveryAuditAssemblyUsage(artifact.budget);
             const current=await publicationContext(tx,session,args);
+            if(artifact.budget)recoveryAuditAssemblyUsage(artifact.budget);
             if(snapshotDigest(current.tuple)!==snapshotDigest(pinned.tuple))fail("aborted","Publication capture binding changed.");
+            if(artifact.budget){
+                chargeRecoveryAuditAssembly(artifact.budget,"nodes",artifact.encodingVersion===4?28:26);
+                chargeRecoveryAuditAssembly(artifact.budget,"bytes",artifact.bytes.length);
+            }
             const tuple={schemaVersion:1,kind:"canonical-recovery-candidate-publication",...pinned.tuple,
                 intentSha256:snapshotDigest({action:"prepare-candidate-publication",...pinned.tuple}),
-                candidateEncodingVersion:2,bucketName:immutableCandidateIO.bucketName,
+                candidateEncodingVersion:artifact.encodingVersion,bucketName:immutableCandidateIO.bucketName,
                 objectName:`private/recovery-candidates/v1/${session.uid}/${args.auditId}/${args.expectedEpoch}/${args.operationId}.csra`,
                 artifactSha256:inventoryHash(artifact.bytes),artifactByteLength:artifact.bytes.length,status:"prepared",...inventoryFlags};
+            if([3,4].includes(artifact.encodingVersion)){
+                tuple.schemaVersion=artifact.encodingVersion===4?3:2;tuple.kind="canonical-recovery-raw-publication";
+                tuple.artifactKind="canonical-recovery-raw-archive";
+                tuple.proofKind=artifact.encodingVersion===4?"segmented-original-rights-v2":"segmented-original-rights-v1";
+            }
+            publicationEncoding(tuple);
             if(typeof tuple.bucketName!=="string"||!tuple.bucketName)fail("failed-precondition","A private publication destination is unavailable.");
             if(current.existing.exists){
                 inspectPublicationManifest(current.existing.data(),tuple);
             }else tx.create(current.reference,{...tuple,createdAt:FieldValue.serverTimestamp()});
             return tuple;
         },args.operationId);
+        if(artifact.budget)recoveryAuditAssemblyUsage(artifact.budget);
         return publicationIdentity(publicationPreparations,{pin,artifactIdentity,tuple:value});
     }
     const publicationGeneration=value=>typeof value==="string"&&/^[1-9][0-9]{0,19}$/.test(value);
     function inspectPublicationManifest(row,tuple){
         if(!row)fail("data-loss","Original candidate publication manifest is missing.");
+        if(publicationEncoding(row)!==publicationEncoding(tuple))fail("data-loss","Original publication version differs.");
         const {createdAt,...value}=row;
         if(typeof createdAt?.toMillis!=="function"||!Number.isSafeInteger(createdAt.toMillis()))
             fail("data-loss","Original candidate publication timestamp differs.");
@@ -1657,39 +2106,72 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         // This protected read finishes before any external side effect. There
         // is no Firestore/Storage distributed transaction: ACK rechecks again.
         const {prepared,artifact,manifest}=await livePreparedPublication(request,identity),tuple=prepared.tuple;
-        const name={bucketName:tuple.bucketName,objectName:tuple.objectName};
+        const name={bucketName:tuple.bucketName,objectName:tuple.objectName},encodingVersion=publicationEncoding(tuple);
+        const readBudget=encodingVersion!==2?createRecoveryAuditAssemblyBudget():null;
         let metadata;
         if(manifest.status==="acknowledged")metadata={...name,generation:manifest.generation,size:manifest.objectSize};
         else{
             metadata=await immutableCandidateIO.lookupMetadata({...name});
+            if(readBudget)recoveryAuditAssemblyUsage(readBudget);
             if(metadata===null){
                 let created;
                 try{
+                    // The fixed transport snapshots raw bytes synchronously before
+                    // its first await; the original private artifact has no caller.
                     created=publicationMetadata(await immutableCandidateIO.createOnly({...name,
-                        bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
+                        bytes:encodingVersion!==2?artifact.bytes:Buffer.from(artifact.bytes),ifGenerationMatch:"0"}),tuple);
                 }catch(error){
                     if(!["ALREADY_EXISTS","UNKNOWN_COMMIT"].includes(error.code))throw error;
                 }
+                if(readBudget)recoveryAuditAssemblyUsage(readBudget);
                 metadata=await immutableCandidateIO.lookupMetadata({...name});
+                if(readBudget)recoveryAuditAssemblyUsage(readBudget);
                 if(metadata===null)fail("unavailable","Original immutable candidate object is not available.");
                 if(created&&metadata.generation!==created.generation)fail("data-loss","Created candidate generation changed.");
             }
         }
         publicationMetadata(metadata,tuple);
+        if(readBudget)recoveryAuditAssemblyUsage(readBudget);
         const response=await immutableCandidateIO.readExact({...name,generation:metadata.generation});
+        if(readBudget)recoveryAuditAssemblyUsage(readBudget);
         inventoryExact(response,["metadata","bytes"],"publication exact read");
         const observed=publicationMetadata(response.metadata,tuple);
+        if(readBudget){
+            chargeRecoveryAuditAssembly(readBudget,"nodes",6);
+            chargeRecoveryAuditAssembly(readBudget,"bytes",Buffer.byteLength(observed.bucketName)+Buffer.byteLength(observed.objectName)+observed.generation.length);
+        }
         if(observed.generation!==metadata.generation||!Buffer.isBuffer(response.bytes)||response.bytes.length!==tuple.artifactByteLength)
             fail("data-loss","Exact candidate generation or bytes differ.");
-        const generation=observed.generation,bytes=Buffer.from(response.bytes);
-        if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
-        const result=await verifyRecoveryAuditArtifact({uid:tuple.ownerUid,expectedRevision:tuple.sourceRevision,artifactBytes:bytes});
-        if(result.candidateProofValid!==true||result.trustedCaptureVerified!==false||result.restoreAuthorized!==false||
-           result.authoritativeStateReady!==false||result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
-           result.sourceSha256!==tuple.sourceSha256||result.snapshotSha256!==tuple.snapshotSha256)
-            fail("data-loss","Immutable candidate original proof differs.");
+        const generation=observed.generation;
+        if(encodingVersion===2){
+            const bytes=Buffer.from(response.bytes);
+            if(inventoryHash(bytes)!==tuple.artifactSha256)fail("data-loss","Immutable candidate bytes differ from the original manifest.");
+            const result=await verifyRecoveryAuditArtifact({uid:tuple.ownerUid,expectedRevision:tuple.sourceRevision,artifactBytes:bytes});
+            if(result.candidateProofValid!==true||result.trustedCaptureVerified!==false||result.restoreAuthorized!==false||
+               result.authoritativeStateReady!==false||result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
+               result.sourceSha256!==tuple.sourceSha256||result.snapshotSha256!==tuple.snapshotSha256)
+                fail("data-loss","Immutable candidate original proof differs.");
+        }else{
+            const input=decodeRawRecoveryArchive(response.bytes,readBudget,tuple.artifactSha256);
+            if(input.binding.ownerUid!==tuple.ownerUid||input.binding.auditId!==tuple.auditId||input.binding.epoch!==tuple.epoch||
+               input.binding.sourceRevision!==tuple.sourceRevision||input.binding.inventoryStateSha256!==tuple.inventoryStateSha256||
+               input.binding.namespaceVersion!==tuple.namespaceVersion||input.binding.canonicalRevision!==tuple.canonicalRevision||
+               input.run.sourceSha256!==tuple.sourceSha256||input.run.snapshotSha256!==tuple.snapshotSha256||
+               input.run.approvalOperationId!==tuple.approvalOperationId||input.run.sessionId!==tuple.sessionId||
+               input.run.sessionRevision!==tuple.sessionRevision||input.run.approvalBindingSha256!==tuple.approvalBindingSha256||
+               input.rawState.stateSha256!==tuple.rawStateSha256||
+               input.rawState.lastReceiptSha256!==tuple.rawLastReceiptSha256)
+                fail("data-loss","Raw archive original publication binding differs.");
+            registerPrivateReadbackOwnership(input,readBudget);
+            const result=await verifySegmentedRawRecoveryProof(input,readBudget);
+            if(result.segmentedProofValid!==true||Object.keys(inventoryFlags).some(key=>result[key]!==false)||
+               result.ownerUid!==tuple.ownerUid||result.sourceRevision!==tuple.sourceRevision||
+               result.namespaceVersion!==tuple.namespaceVersion||result.canonicalRevision!==tuple.canonicalRevision)
+                fail("data-loss","Immutable raw archive original proof differs.");
+            recoveryAuditAssemblyUsage(readBudget);
+        }
         return publicationIdentity(publicationReadProofs,{identity,tupleSha256:snapshotDigest(tuple),
-            generation,size:bytes.length,sha256:inventoryHash(bytes),consumed:false,unusable:false});
+            generation,size:tuple.artifactByteLength,sha256:tuple.artifactSha256,consumed:false,unusable:false});
     }
     async function ackCandidatePublication(request,identity,readIdentity){
         requirePublicationPreparation();
@@ -1719,13 +2201,13 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
         // Only successful transaction resolution consumes a usable proof.
         proof.consumed=true;return result;
     }
-    // Keep every private identity inside one server invocation. The production
-    // binding remains unavailable and this function is not a factory/API exit.
+    // Keep every private identity inside one server invocation.
     async function publishCapturedCandidate(request,args){
         requirePublicationPreparation();
         const pin=await pinCandidatePublication(request,args);
         const material=await loadPinnedRawCapture(pin);
-        const artifact=await assemblePinnedCandidate(pin,material);
+        const artifact=publicationValue(publicationPins,pin).encodingVersion===2?
+            await assemblePinnedCandidate(pin,material):await assemblePinnedRawArchive(pin,material);
         const prepared=await prepareCandidatePublication(request,pin,artifact);
         const readProof=await publishPreparedCandidate(request,prepared);
         return ackCandidatePublication(request,prepared,readProof);
@@ -1749,8 +2231,33 @@ function createCanonicalCurrentRecovery({db,FieldValue,HttpsError,runProtected,
             await drainAndCloseRecoveryAuditLookups(view);
         }
     }
+    async function maintain(request){
+        const data=request?.data;
+        if(!data||typeof data!=="object"||Array.isArray(data)||
+           Object.keys(data).sort().join("|")!=="action|intent|session|uid"||
+           typeof data.uid!=="string"||!data.uid||data.uid.includes("/")||
+           !data.session||typeof data.session!=="object"||Array.isArray(data.session)||
+           typeof data.action!=="string"||!data.intent||typeof data.intent!=="object"||Array.isArray(data.intent))
+            fail("invalid-argument","An exact recovery maintenance action is required.");
+        for(const [key,value] of Object.entries(data.intent)){
+            if(["expectedRevision","expectedEpoch","expectedSequence","startOrdinal","count"].includes(key)?
+                !Number.isSafeInteger(value):typeof value!=="string")
+                fail("invalid-argument","Recovery maintenance intent fields have invalid types.");
+        }
+        switch(data.action){
+        case "begin":return beginAudit(request,data.intent);
+        case "resume":return resumeAudit(request,data.intent);
+        case "cancel":return cancelAudit(request,data.intent);
+        case "prepareInventory":return prepareInventory(request,data.intent);
+        case "captureInventoryPage":return captureInventoryPage(request,data.intent);
+        case "captureRawInventory":return captureRawInventory(request,data.intent);
+        case "publish":return publishCapturedCandidate(request,data.intent);
+        default:fail("invalid-argument","Unsupported recovery maintenance action.");
+        }
+    }
+    if(maintenanceMode)return Object.freeze({maintain});
     return Object.freeze({restoreCurrent,verifyRecoveryAuditArtifact,verifyRawRecoveryAuditCandidate,beginAudit,resumeAudit,cancelAudit,prepareInventory,captureInventoryPage,captureProof,captureRawInventory});
 }
 
-module.exports={createCanonicalCurrentRecovery,inspectRecoveryAuditFence,
+module.exports={createCanonicalCurrentRecovery,createCanonicalRecoveryMaintenance,inspectRecoveryAuditFence,
     RECOVERY_AUDIT_FENCE_COLLECTION,RECOVERY_AUDIT_RUN_COLLECTION,RECOVERY_INVENTORY_STATE_COLLECTION,RECOVERY_INVENTORY_PAGE_COLLECTION};

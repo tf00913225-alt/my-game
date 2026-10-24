@@ -26,5 +26,15 @@ assert.ok(auditSharedPortraits(removed,registry).some(e=>e.includes('removed his
 const reused=structuredClone(removed);reused.assetPool.entries.push({...entries[0],assetId:'NPC_SHARED_000'});
 assert.ok(auditSharedPortraits(reused,registry).some(e=>e.includes('reused historical')));
 const manifest=fs.readFileSync('asset-manifest.json','utf8');
-for(const e of initial){assert.doesNotMatch(manifest,new RegExp(e.assetId));assert.equal(e.status,'reserved');assert.equal(e.runtimePath,undefined);}
+const storyAdoptions=['NPC_SHARED_021','NPC_SHARED_029','NPC_SHARED_034','NPC_SHARED_040','NPC_SHARED_044'];
+assert.deepEqual(entries.filter(e=>e.status==='adopted').map(e=>e.assetId),storyAdoptions);
+for(const e of initial){
+ const derivative='assets/monsters/shared/npc-shared-'+e.assetId.slice(-3)+'.webp';
+ if(storyAdoptions.includes(e.assetId)){
+  assert.equal(e.status,'adopted');assert.equal(e.runtimePath,derivative);assert.equal(fs.existsSync(derivative),true);
+ }else{
+  assert.doesNotMatch(manifest,new RegExp(e.assetId));
+  assert.equal(e.status,'reserved');assert.equal(e.runtimePath,undefined);assert.equal(manifest.includes(derivative),false);
+ }
+}
 console.log('Shared asset ID / provenance / immutable mapping / audit rejection / Runtime manifest isolation passed.');
