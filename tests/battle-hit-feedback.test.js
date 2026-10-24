@@ -113,3 +113,8 @@ test("retained status body drops preview DOT accents when its entry is replaced 
  const approved={type:"burn",turnsLeft:2};h.api.markStatus(approved);h.api.decorateStatus(host,"burn",approved);assert.equal(children.length,2);
  h.api.decorateStatus(host,"burn",{type:"burn",turnsLeft:2});assert.ok(children.every(n=>n.detached));
 });
+
+
+test("zero stop frames disables pause enumeration and timers while retaining optional shake",()=>{
+ const h=harness();h.api.config.skills.stormFlurry.stopFrames=0;const f=h.api.create("stormFlurry");const root={getAnimations(){throw Error("zero stop must not enumerate/pause scene");},animate(){return h.animation();}};f.hit({key:0,damage:168,roots:[root]});assert.equal(h.timers.size,0);f.dispose();
+});

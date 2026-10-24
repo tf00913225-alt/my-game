@@ -15,7 +15,7 @@
     "flashMs": 80,
     "hitFrameMultiplier": 2,
     "frameDurations": null,
-    "blendMode": "plus-lighter",
+    "blendMode": "screen",
     "poolLimit": 48,
     "sweepEnabled": false,
     "sweepGapMs": 100,

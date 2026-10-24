@@ -58,6 +58,7 @@
 | `automatic.elements.*.hints` | 資料缺漏時可辨識的名稱／敘述詞；不改遊戲屬性 |
 | `automatic.elements.*.shape/direction` | 粒子樣式與上升／下落／橫掃／內吸方向 |
 | `automatic.types.*` | 各技能類型可覆蓋下列表內相同數字，例如治療停頓與震動固定為0 |
+| `blendMode`（screen） | screen保留加亮風感；plus-lighter可選。手機對照screen長停頓較少，但不代表已達60fps |
 | `criticalScale`（1.25） | 大：暴擊停頓／碎屑更強；小：與普通命中差別較小 |
 | `maxStopMs`（75） | 大：高傷害最多停得更久；小：更俐落，硬上限100毫秒 |
 | `supportMs`（480） | 大：治療／增益柔光收得較慢；小：較快 |

@@ -323,14 +323,14 @@
             seen.add(key);
             if(batch&&!c.sweepEnabled)return true;batch=true;
             resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();
-            const tracks=new Set();roots.filter(Boolean).forEach(root=>root.getAnimations?.({subtree:true}).forEach(a=>tracks.add(a)));
+            const impactScale=Math.max(1,Math.min(c.maxDamageScale,damage/c.referenceDamage))*(critical?c.criticalScale:1);
+            const stopMs=Math.min(c.maxStopMs,c.stopFrames*1000/c.fps*impactScale);
+            const tracks=new Set();if(stopMs>0)roots.filter(Boolean).forEach(root=>root.getAnimations?.({subtree:true}).forEach(a=>tracks.add(a)));
             const stopped=[];tracks.forEach(animation=>{
                 if(animation.hitFeedbackOwnEffect||animation.playState!=="running")return;
                 stopped.push({animation,rate:animation.playbackRate});animation.pause();
             });
-            const impactScale=Math.max(1,Math.min(c.maxDamageScale,damage/c.referenceDamage))*(critical?c.criticalScale:1);
-            const stopMs=Math.min(c.maxStopMs,c.stopFrames*1000/c.fps*impactScale);
-            stop={tracks:stopped,timer:setTimeout(resume,stopMs)};
+            stop=stopMs>0?{tracks:stopped,timer:setTimeout(resume,stopMs)}:null;
             const pausedAt=Date.now();
             // Consume the previous stop before replacing its interval, even
             // when a slow device painted no particle frame between two hits.

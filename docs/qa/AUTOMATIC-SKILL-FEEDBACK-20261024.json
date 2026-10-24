@@ -6,7 +6,7 @@
   "sources": [
     {
       "path": "js/39-v143-skill-animation.js",
-      "sha256": "93772944317c19a6dbf00615e347c3b60209440d1ff7181b9052fa67ab978404"
+      "sha256": "8f6e1927e31042269db59308d23f863baf74ffde7feb2521ce18017c855a3ff1"
     },
     {
       "path": "css/40-v143-combat-dungeon-polish.css",
@@ -14,11 +14,11 @@
     },
     {
       "path": "config/battle-vfx-feedback.json",
-      "sha256": "b0b7cbe74715febc3af7f4a45ff3c65acb8fd9170c433c34c1f8f9293b821d70"
+      "sha256": "abc79ebfaacd508ba6c8e1379ae2151c81304e3d0a13881788f2ea982cc12811"
     },
     {
-      "path": "build/gameplay-core-primary.74ad86f56850.js",
-      "sha256": "74ad86f568507b6025a2553cebba7c99ea1fd89e7160a5b97afe9d4716154378"
+      "path": "build/gameplay-core-primary.811f7681f3f3.js",
+      "sha256": "811f7681f3f3d5abab66ba7970943b391225092397055fc8b3667522426ce66a"
     },
     {
       "path": "build/gameplay-core.ab41bf65204d.css",
@@ -26,7 +26,7 @@
     }
   ],
   "validation": [
-    "module15 tests",
+    "module16 tests, including zero stop truly disables pause/timer",
     "Wind30 internal including expected-entry buff blocked/unrelated/identical refresh",
     "Fire15+3 internal",
     "raster9 internal",
@@ -40,7 +40,8 @@
     "fourSkillPhone": "artifacts/automatic-vfx-four-usb-phone/evidence.json (pre-final lineage cleanup; not latest Head proof)",
     "cpu": "artifacts/automatic-vfx-play-profile/cpu-profile.json",
     "density": "artifacts/wind-sweep-phone-density-ab/evidence.json",
-    "spriteShadow": "artifacts/wind-sweep-sprite-glow-ab-phone/evidence.json"
+    "spriteShadow": "artifacts/wind-sweep-sprite-glow-ab-phone/evidence.json",
+    "blend": "artifacts/wind-blend-compositor-ab-phone/evidence.json (QA config A/B; not source snapshot proof)"
   },
   "limits": [
     "No stable60fps claim; latest exact checkpoint video/metrics pending",
@@ -50,5 +51,6 @@
   ],
   "next": "Save/push original branch, exact Head Wind and four-skill phone clips, latest required CI, human visual/rhythm review; no full-catalog enable before Gates",
   "integratedDev": "26bc84d5360027af0df488735bd7d09c9b571831",
-  "integration": "Normal merge; source retained stormSpell retirement and approved startup Owner changes. Only generated manifest/bundle rename conflicts rebuilt by original builder."
+  "integration": "Normal merge; source retained stormSpell retirement and approved startup Owner changes. Only generated manifest/bundle rename conflicts rebuilt by original builder.",
+  "performanceNote": "screen chosen after same-load A/B; no locked60fps claim; exact new-Head movie next"
 }
