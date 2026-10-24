@@ -157,6 +157,15 @@ try{
             for(let step=0;step<240;step++){
                 const before=await observe();if(process.argv.includes('--first-lesson-only')&&before.view.state.onboarding.basicComplete)break;if(!before.view.tutorial.active)break;
                 await captureStory();
+                if(before.view.firstLesson?.step==='status-intro'){
+                    assert.equal(before.view.firstLesson.level,2);assert.equal(before.sharedExp,0);
+                    assert.equal(before.view.firstLesson.attributePoints,5,'personal upgrade retains all optional attribute points');
+                }
+                if(before.view.firstLesson?.step==='cast-intro'){
+                    assert.equal(before.turn,before.view.state.onboarding.battleCheckpoint.turn,'same retained round resumes');
+                    assert.equal(await client.eval('document.getElementById("battleTurnIndicator").textContent'),'第'+before.turn+'回合','visible round agrees with the retained battle');
+                    await capture('first-battle-resumed');
+                }
                 if(before.battle){rounds.push(before);if(!lessonInitial)lessonInitial=before;}
                 if(before.view.panel==='node-reward'&&before.view.selectedNodeId==='c1_01'){
                     assert.equal(before.view.state.currentNodeId,'c1_02');await capture('first-victory');
