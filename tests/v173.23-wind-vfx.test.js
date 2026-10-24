@@ -158,6 +158,11 @@ function loadRuntime(options={}){
         body,
         createElement(tag){
             const node=makeNode();
+            if(options.feedback){
+                const animations=[];node.getAnimations=()=>animations;
+                node.animate=(frames,timing)=>{const a={playState:"running",playbackRate:1,currentTime:0,
+                    effect:{getTiming:()=>timing,getKeyframes:()=>frames},pause(){this.playState="paused";},play(){this.playState="running";},cancel(){this.playState="idle";}};animations.push(a);return a;};
+            }
             if(tag==="canvas"){
                 const context={
                     clearRect(){},
@@ -254,7 +259,7 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
-    vm.runInContext(animation,context);
+    vm.runInContext(options.feedback?animation.replace("/* @battle-vfx-feedback-config */ null",fs.readFileSync("config/battle-vfx-feedback.json","utf8")):animation,context);
     return {
         context,body,cards,monsters,party,scheduled,raf,drawCalls,monsterHits,playerHits,cardEffects,
         setClock(value){
@@ -848,5 +853,31 @@ test("stormFlurry casualties and effective Boss-single only paint explicit livin
   const gate=runtime.context.v142SkillAnimationDirector.play(config('stormFlurry',type,'physical'),{side:'player',actorIndex:0,targetSide:'monster',targetId:2,targetIds:targets});
   assert.equal(gate.config.targetType,type);assert.deepEqual(stageSprites(runtime).sprites.map(n=>Number(n.dataset.targetIndex)),targets);runtime.context.v142SkillAnimationDirector.dispose();
  }
+});
+
+test("production config sweeps by screen position on both sides; callbacks remain target-local and gate unchanged",()=>{
+ for(const side of ["monster","player"]){
+  const rects=[300,100,200].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+  const runtime=loadRuntime({feedback:true,playerRects:rects,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+  runtime.setClock(100);const gate=runtime.context.v142SkillAnimationDirector.play(config("stormFlurry","tri","physical"),{side:side==="monster"?"player":"monster",targetSide:side,targetId:0,targetIds:[0,1,2]});runtime.setClock(100);
+  const seen=[];[1,2,0].forEach((i,rank)=>assert.equal(runtime.context.v143RunAtTargetHit(side,i,()=>seen.push(i),true),750+rank*100));
+  const fire=(delay,time)=>{runtime.setClock(time);runtime.scheduled.find(s=>s.delay===delay).callback();for(let n=0;n<2;n++)runtime.raf.splice(0).forEach(fn=>fn(time));};
+  fire(750,850);assert.deepEqual(seen,[1]);runtime.context.v143RunAtTargetHit(side,2,()=>seen.push("late2"),true);assert.deepEqual(seen,[1]);
+  fire(850,950);assert.deepEqual(seen,[1,2,"late2"]);fire(950,1050);assert.deepEqual(seen,[1,2,"late2",0]);
+  assert.equal(gate.config.duration,1500);assert.equal(gate.done,false);runtime.context.v142SkillAnimationDirector.dispose();assert.equal(runtime.body.querySelectorAll("#v143-skill-stage").length,0);
+ }
+});
+
+test("sweep weakening rings and icons require actual status success and disappear with the authoritative ledger",()=>{
+ const rects=[100,200,300].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+ const runtime=loadRuntime({feedback:true,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+ runtime.setClock(100);runtime.context.v142SkillAnimationDirector.play(config("stormFlurry","tri","physical"),{side:"player",targetSide:"monster",targetId:0,targetIds:[0,1,2]});
+ runtime.context.applyMonsterDebuff(runtime.monsters[1],"damageDown",2,30);runtime.setClock(100);
+ for(const [delay,time] of [[750,850],[850,950],[950,1050]]){runtime.setClock(time);runtime.scheduled.find(s=>s.delay===delay).callback();for(let n=0;n<2;n++)runtime.raf.splice(0).forEach(fn=>fn(time));}
+ const rings=runtime.body.children.flatMap(n=>n.children).filter(n=>n.dataset.feedbackEffect==="weaken");
+ assert.deepEqual(rings.map(n=>n.dataset.targetIndex),["1"]);assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"));
+ assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),null);
+ runtime.monsters[1].statusEffects=[];runtime.context.v143SyncStatusVisualEffects();assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"),null);
+ runtime.context.v142SkillAnimationDirector.dispose();
 });
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

@@ -124,7 +124,11 @@ test("V143 casts retain raster-only choreography; named persistent foot auras st
     assert.match(v143,/requestAnimationFrame\(\(\)=>requestAnimationFrame\(presentHit\)\)/);
     assert.match(v143,/const presentHit=\(\)=>settleTargetVisual\(current,index\);/);
     assert.match(v143,/renderer:"dom-sprite"/);
-    assert.match(v143,/Casts have no Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
+    assert.match(v143,/Cast bodies remain Sprite Sheets, with no Canvas\/SVG\/WebGL fallback/);
+    const feedback=JSON.parse(fs.readFileSync("config/battle-vfx-feedback.json","utf8"));
+    assert.equal(feedback.defaults.enabled,false,"additional wind accents require explicit per-skill authorization");
+    assert.deepEqual(Object.keys(feedback.skills).filter(id=>feedback.skills[id].enabled),["stormFlurry"]);
+    assert.ok(feedback.defaults.maxEffectNodes<=48,"bounded accents, no blanket emitter");
     assert.match(v143,/node\.dataset\.presentationRole="foot-aura"/);
     assert.match(v143,/rise\.className="v143-status-aura-rise"/);
     assert.doesNotMatch(v143.slice(v143.indexOf('function createBodyStatusVisual('),v143.indexOf('function createStatusIcon(')),/setInterval|setTimeout|requestAnimationFrame|canvas|createElementNS/,'status aura uses one existing-node child, never an emitter clock/engine');

@@ -11558,11 +11558,9 @@
 (function installHitFeedback(){
     "use strict";
     if(typeof window==="undefined"||window.FourSymbolsHitFeedback){return;}
-    const CONFIG={enabled:true,defaults:{enabled:false,stopFrames:3,fps:60,
-        shakePx:6,decay:.85,shakeSteps:12,stepMs:16,referenceDamage:168,
-        minDamageScale:.35,maxDamageScale:2,brightness:2.5,flashMs:80,
-        hitFrameMultiplier:2,frameDurations:null,blendMode:"screen",poolLimit:24},
-        skills:{stormFlurry:{enabled:true}}};
+    // Build embeds the one editable JSON without another runtime request/clock.
+    const CONFIG={"enabled":true,"defaults":{"enabled":false,"stopFrames":3,"fps":60,"shakePx":4,"decay":0.85,"shakeSteps":8,"stepMs":12,"referenceDamage":168,"minDamageScale":0.35,"maxDamageScale":2,"brightness":2.5,"flashMs":80,"hitFrameMultiplier":2,"frameDurations":null,"blendMode":"plus-lighter","poolLimit":48,"sweepEnabled":false,"sweepGapMs":100,"hitStrength":[0.72,0.92,1.25],"maxEffectNodes":48,"windCount":10,"leafCount":5,"burstCount":6,"colors":["#80f6d6","#efffff","#43c7bb"],"windMs":900,"windSize":2,"leafSize":7,"windSpread":0.6,"glowPx":3,"glowBrightness":1.18,"particleOpacity":0.76,"trailLength":1.8,"trailWidth":2,"trailMs":460,"burstMs":300,"burstRadius":0.6,"shockwaveMs":380,"shockwaveScale":1.45,"screenFlashOpacity":0.09,"screenFlashMs":90,"weakenMs":420,"weakenDrop":0.5},"skills":{"stormFlurry":{"enabled":true,"sweepEnabled":true}}};
+    if(!CONFIG){return;}
     const pools=new Map(),active=new Set();
     const bounded=(v,f,min,max)=>Number.isFinite(Number(v))?Math.max(min,Math.min(max,Number(v))):f;
     function configFor(skill){
@@ -11577,6 +11575,19 @@
         c.brightness=bounded(c.brightness,2.5,1,4);c.flashMs=bounded(c.flashMs,80,0,500);
         c.hitFrameMultiplier=bounded(c.hitFrameMultiplier,2,1,8);
         c.poolLimit=Math.floor(bounded(c.poolLimit,24,0,64));
+        c.sweepGapMs=bounded(c.sweepGapMs,100,0,150);
+        const limits={maxEffectNodes:[48,0,48],windCount:[10,0,16],leafCount:[5,0,8],burstCount:[6,0,10],
+            windMs:[900,100,1200],windSize:[2,1,6],leafSize:[7,2,12],windSpread:[.6,.1,1],
+            glowPx:[3,0,6],glowBrightness:[1.18,1,2],particleOpacity:[.76,0,1],
+            trailLength:[1.8,.2,3],trailWidth:[2,1,4],trailMs:[460,80,500],burstMs:[300,80,400],
+            burstRadius:[.6,.1,1],shockwaveMs:[380,80,450],shockwaveScale:[1.45,.5,2],
+            screenFlashOpacity:[.09,0,.15],screenFlashMs:[90,30,120],weakenMs:[420,80,450],weakenDrop:[.5,.1,.8]};
+        Object.entries(limits).forEach(([key,[fallback,min,max]])=>{c[key]=bounded(c[key],fallback,min,max);});
+        c.hitStrength=Array.from({length:3},(_,i)=>bounded(c.hitStrength?.[i],1,.1,1.5));
+        c.colors=Array.isArray(c.colors)&&c.colors.length?c.colors.filter(color=>/^#[0-9a-f]{6}$/i.test(color)):[];
+        if(!c.colors.length)c.colors=["#80f6d6","#efffff","#43c7bb"];
+        if(c.blendMode!=="plus-lighter"&&c.blendMode!=="screen")c.blendMode="screen";
+        if(typeof CSS!=="undefined"&&CSS.supports&&!CSS.supports("mix-blend-mode",c.blendMode))c.blendMode="screen";
         return c;
     }
     function acquire(kind){
@@ -11611,7 +11622,7 @@
         frames.push({...frames[count-1],offset:1});return frames;
     }
     function create(skill){
-        const c=configFor(skill),seen=new Set(),motions=new Set();let stop=null,disposed=false,batch=false;
+        const c=configFor(skill),seen=new Set(),motions=new Set(),effects=new Set();let stop=null,disposed=false,batch=false;
         const reduced=()=>window.matchMedia?.("(prefers-reduced-motion: reduce)").matches===true;
         function resume(){
             if(!stop)return;clearTimeout(stop.timer);
@@ -11629,17 +11640,82 @@
                 animation.play();
             });stop=null;
         }
-        function hit({key,damage,roots}){
+        function effect(host,kind,box,frames,duration,deadline,extra){
+            if(disposed||!c.enabled||!c.sweepEnabled||reduced()||!host||typeof host.appendChild!=="function"||effects.size>=c.maxEffectNodes)return null;
+            const node=acquire("wind-effect");node.dataset.feedbackEffect=kind;node.setAttribute("aria-hidden","true");
+            const color=c.colors[effects.size%c.colors.length];
+            Object.assign(node.style,{position:"fixed",display:"block",left:box.x+"px",top:box.y+"px",width:box.w+"px",height:box.h+"px",
+                pointerEvents:"none",background:color,borderRadius:"50%",mixBlendMode:c.blendMode,
+                boxShadow:"0 0 "+c.glowPx+"px "+color,opacity:"0",...extra});
+            host.appendChild(node);
+            const a=node.animate(frames,{duration:Math.max(1,Math.min(duration,deadline-Date.now())),easing:"ease-out",fill:"both"});
+            a.hitFeedbackOwnEffect=kind==="screen-flash";
+            const entry={node,animation:a};effects.add(entry);
+            const finish=()=>{if(!effects.delete(entry))return;a.onfinish=null;release("wind-effect",node,c.poolLimit);};
+            a.onfinish=finish;entry.finish=finish;return entry;
+        }
+        function wind(host,rects,deadline){
+            if(!rects.length)return;
+            const left=Math.min(...rects.map(r=>r.left)),right=Math.max(...rects.map(r=>r.left+r.width));
+            const top=Math.min(...rects.map(r=>r.top)),height=Math.max(...rects.map(r=>r.height));
+            const count=Math.floor(c.windCount+c.leafCount);
+            for(let i=0;i<count;i++){
+                const leaf=i>=c.windCount,size=leaf?c.leafSize:c.windSize;
+                const y=top+height*(.5+((i%5)/4-.5)*c.windSpread);
+                effect(host,leaf?"leaf":"wind",{x:left+(i/Math.max(1,count))*(right-left)*.2,y,w:leaf?size:size*5,h:size},[
+                    {transform:"translate(0px,0px) rotate(0deg)",opacity:0},
+                    {transform:"translate("+((right-left)*.25)+"px,"+(-size)+"px) rotate(35deg)",opacity:c.particleOpacity,offset:.2},
+                    {transform:"translate("+(right-left)+"px,"+(size*2)+"px) rotate("+(leaf?220:10)+"deg)",opacity:0}
+                ],c.windMs,deadline,leaf?{borderRadius:"0 85% 0 85%"}:null);
+            }
+        }
+        function weaken(host,rect,deadline){
+            if(!rect)return;
+            return effect(host,"weaken",{x:rect.left,y:rect.top+rect.height*.3,w:rect.width,h:rect.width/2},[
+                {transform:"translate(0px,0px) scale(.7)",opacity:c.particleOpacity},
+                {transform:"translate(0px,"+(rect.height*c.weakenDrop)+"px) scale(1)",opacity:0}
+            ],c.weakenMs,deadline,{background:"transparent",border:c.trailWidth+"px solid "+c.colors[0]});
+        }
+        function impact(host,rect,rank,last,weaken,deadline){
+            if(!rect)return;
+            const x=rect.left+rect.width/2,y=rect.top+rect.height/2,scale=c.hitStrength[Math.min(rank,2)];
+            const ring=(kind,ms,drop)=>effect(host,kind,{x:x-rect.width/2,y:y-rect.width/4,w:rect.width,h:rect.width/2},[
+                {transform:"translate(0px,0px) scale(.25)",opacity:c.particleOpacity},
+                {transform:"translate(0px,"+drop+"px) scale("+c.shockwaveScale+")",opacity:0}
+            ],ms,deadline,{background:"transparent",border:c.trailWidth+"px solid "+c.colors[1%c.colors.length]});
+            ring("shockwave",c.shockwaveMs,0);
+            if(weaken)ring("weaken",c.weakenMs,rect.height*c.weakenDrop);
+            for(let i=0;i<c.burstCount;i++){
+                const angle=(i/Math.max(1,c.burstCount))*Math.PI*2,reach=rect.width*c.burstRadius*scale;
+                effect(host,"burst",{x,y,w:c.windSize*3,h:c.windSize},[
+                    {transform:"translate(0px,0px) rotate("+(angle*180/Math.PI)+"deg)",opacity:c.particleOpacity},
+                    {transform:"translate("+(Math.cos(angle)*reach)+"px,"+(Math.sin(angle)*reach)+"px) rotate("+(angle*180/Math.PI+80)+"deg)",opacity:0}
+                ],c.burstMs,deadline);
+            }
+            effect(host,"trail",{x:x-rect.width*c.trailLength/2,y:y-rect.height/4,w:rect.width*c.trailLength,h:rect.height/2},[
+                {transform:"translate("+(-rect.width*.25)+"px,0px) rotate(-12deg)",opacity:0},
+                {transform:"translate(0px,0px) rotate(0deg)",opacity:c.particleOpacity,offset:.15},
+                {transform:"translate("+(rect.width*.3)+"px,0px) rotate(8deg)",opacity:0}
+            ],c.trailMs,deadline,{background:"transparent",borderTop:c.trailWidth+"px solid "+c.colors[0],borderRadius:"50%"});
+            if(last){
+                const page=document.getElementById("battlePage"),b=page?.getBoundingClientRect();
+                if(b)effect(host,"screen-flash",{x:b.left,y:b.top,w:b.width,h:b.height},[
+                    {transform:"translate(0px,0px)",opacity:c.screenFlashOpacity},{transform:"translate(0px,0px)",opacity:0}
+                ],c.screenFlashMs,deadline,{background:c.colors[1%c.colors.length],borderRadius:"0",boxShadow:"none"});
+            }
+        }
+        function hit({key,damage,roots,power=1}){
             if(disposed||!c.enabled||!(damage>0)||seen.has(key)||reduced())return false;
             seen.add(key);
-            if(batch)return true;batch=true;
+            if(batch&&!c.sweepEnabled)return true;batch=true;
+            resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();
             const tracks=new Set();roots.filter(Boolean).forEach(root=>root.getAnimations?.({subtree:true}).forEach(a=>tracks.add(a)));
             const stopped=[];tracks.forEach(animation=>{
                 if(animation.hitFeedbackOwnEffect||animation.playState!=="running")return;
                 stopped.push({animation,rate:animation.playbackRate});animation.pause();
             });
             stop={tracks:stopped,timer:setTimeout(resume,c.stopFrames*1000/c.fps)};
-            const strength=c.shakePx*Math.max(c.minDamageScale,Math.min(c.maxDamageScale,damage/c.referenceDamage));
+            const strength=c.shakePx*Math.max(c.minDamageScale,Math.min(c.maxDamageScale,damage/c.referenceDamage))*power;
             const frames=[{transform:"translate(0px,0px)"}];
             for(let i=0;i<c.shakeSteps;i++){
                 const d=strength*Math.pow(c.decay,i);frames.push({transform:"translate("+(i%2?-d:d)+"px,"+(i%4<2?d:-d)*.5+"px)"});
@@ -11650,8 +11726,8 @@
                 if(a){motions.add(a);a.onfinish=()=>{motions.delete(a);a.cancel();};}
             });return true;
         }
-        function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();active.delete(api);}
-        const api={config:c,pooling:c.enabled,hit,dispose};active.add(api);return api;
+        function dispose(){disposed=true;c.enabled=false;resume();motions.forEach(a=>{a.onfinish=null;a.cancel();});motions.clear();Array.from(effects).forEach(e=>e.finish());active.delete(api);}
+        const api={config:c,pooling:c.enabled,hit,wind,impact,weaken,dispose,effectCount:()=>effects.size};active.add(api);return api;
     }
     window.FourSymbolsHitFeedback={config:CONFIG,configFor,create,frameTrack,acquire,release,
         disposeAll(){Array.from(active).forEach(a=>a.dispose());},
@@ -11664,7 +11740,8 @@
    V174 cleanup: official PNG Sprite Sheets/status loops only.
    Fixed Slot geometry owns battle coverage; its formal artwork projection
    anchors explicitly authored recipient effects within that same formation.
-   Casts have no Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback.
+   Cast bodies remain Sprite Sheets, with no Canvas/SVG/WebGL fallback.
+   The explicitly enabled wind sample adds bounded DOM wind/leaf/impact accents.
    Three persistent named buffs use the same status owner's CSS foot aura.
 ===================================================== */
 (function installV143SkillAnimationRuntime(){
@@ -12393,6 +12470,7 @@
             hasTimedEffect(entityFor(side,index),type)
         ){ return true; }
         if(current.targetSide!==side){ return false; }
+        if(current.settledTargets?.has(index)){ return false; }
         if(type==="rage"&&current.config.id==="rage"){
             const card=cardFor(side,index);
             if(card&&card.classList&&card.classList.contains("v143-effects-pending")){ return true; }
@@ -12961,7 +13039,10 @@
         node.dataset.confirmedHit="false";
         node.dataset.geometryOwner="fixed-slot";
         node.style.visibility="hidden";
-        if(feedback){ node.style.mixBlendMode=feedback.config.blendMode; }
+        if(feedback){
+            node.style.mixBlendMode=feedback.config.blendMode;
+            node.style.filter="brightness("+feedback.config.glowBrightness+") drop-shadow(0 0 "+feedback.config.glowPx+"px "+feedback.config.colors[0]+")";
+        }
         state.stage.appendChild(node);
         return node;
     }
@@ -13259,7 +13340,10 @@
                 Object.assign(sheet.style,{position:"absolute",left:"0",top:"0",width:(sprite.columns*100)+"%",height:(sprite.rows*100)+"%",
                     backgroundImage:node.style.backgroundImage,backgroundSize:"100% 100%",backgroundRepeat:"no-repeat",pointerEvents:"none"});
                 node.style.backgroundImage="none";node.style.overflow="hidden";node.appendChild(sheet);
-                node.v143FrameAnimation=sheet.animate(window.FourSymbolsHitFeedback.frameTrack(sprite,current.hitFeedback.config,Number(current.model.hit)||DEFAULT_HIT),
+                const hitRatio=(targetHitTime(current,index)-(current.visualStartedAt||current.startedAt))/current.duration;
+                const timing=current.hitFeedback.config,rank=current.hitRanks?.get(index)||0;
+                const dwell=timing.sweepEnabled?{...timing,hitFrameMultiplier:timing.hitFrameMultiplier*timing.hitStrength[Math.min(rank,2)]}:timing;
+                node.v143FrameAnimation=sheet.animate(window.FourSymbolsHitFeedback.frameTrack(sprite,dwell,hitRatio),
                     {duration:current.duration,fill:"both",easing:"linear"});
             }
             current.spriteNodes.set(key,node);
@@ -13300,7 +13384,7 @@
         if(side&&current.targetSide!==side){ return false; }
         if(!current.model.sprite.impactOnly&&!current.emitted?.has(index)){ return false; }
         if(current.done){ return true; }
-        if(current.hitReached){ callback(); return true; }
+        if(current.settledTargets?current.settledTargets.has(index):current.hitReached){ callback(); return true; }
         if(!current.hitCallbacks){ current.hitCallbacks=new Map(); }
         const callbacks=current.hitCallbacks.get(index)||[];
         callbacks.push({callback:callback,phase:phase||"feedback"});
@@ -13404,9 +13488,11 @@
 
     function targetHitTime(current,index){
         const visualStartedAt=current.visualStartedAt||current.startedAt;
+        const stagger=current.hitFeedback?.config.enabled&&current.hitFeedback.config.sweepEnabled
+            ?(current.hitRanks?.get(index)||0)*current.hitFeedback.config.sweepGapMs:0;
         return Math.min(
             visualStartedAt+current.duration-120,
-            visualStartedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)
+            visualStartedAt+current.duration*(Number(current.model.hit)||DEFAULT_HIT)+stagger
         );
     }
 
@@ -13418,6 +13504,10 @@
         if(current.gate&&typeof current.gate.restartVisualTimeline==="function"){
             current.gate.restartVisualTimeline(current.duration);
         }
+        if(current.hitFeedback?.config.sweepEnabled){
+            const rects=current.targetIndexes.map(index=>window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect).filter(Boolean);
+            current.hitFeedback.wind(state.stage,rects,current.visualStartedAt+current.duration);
+        }
         current.cleanupTimer=setTimer(
             ()=>cleanupCurrent(current,"v143-raster-complete"),
             current.duration
@@ -13427,6 +13517,8 @@
 
     function settleTargetVisual(current,index){
         if(state.current!==current||current.done){ return; }
+        if(current.settledTargets?.has(index)){ return; }
+        current.settledTargets?.add(index);
         const card=cardFor(current.targetSide,index);
         if(card&&card.classList){ card.classList.remove("v143-effects-pending"); }
         current.hitReached=true;
@@ -13436,6 +13528,12 @@
         if(current.hitCallbacks){ current.hitCallbacks.delete(index); }
         callbacks.filter(entry=>entry.phase==="projection").forEach(entry=>entry.callback());
         syncStatusVisualsForUnit(current.targetSide,index);
+        if(current.hitFeedback?.config.sweepEnabled&&current.deferredStatusTargets.get("damageDown")?.has(index)&&
+           hasTimedEffect(entityFor(current.targetSide,index),"damageDown")){
+            const rect=window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(current.targetSide,index)?.artworkProjection?.rect;
+            const ring=current.hitFeedback.weaken(state.stage,rect,current.visualStartedAt+current.duration);
+            if(ring){ring.node.dataset.targetIndex=String(index);ring.node.dataset.targetSide=current.targetSide;}
+        }
         if(current.model.sprite&&current.model.sprite.impactOnly&&current.confirmedTargets.has(index)){
             const node=current.spriteNodes.get(String(index));
             if(node){ node.style.visibility="visible"; node.style.animationPlayState="running"; }
@@ -13570,6 +13668,14 @@
             duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
+        if(current.hitFeedback?.config.enabled&&current.hitFeedback.config.sweepEnabled){
+            current.settledTargets=new Set();
+            const ordered=current.targetIndexes.slice().sort((a,b)=>{
+                const x=i=>window.FourSymbolsBattlefieldRenderGeometry?.getUnitGeometry(targetSide,i)?.artworkProjection?.rect?.left??slotAnchor(targetSide,i,cardFor(targetSide,i))?.x??i;
+                return x(a)-x(b)||a-b;
+            });
+            current.hitRanks=new Map(ordered.map((index,rank)=>[index,rank]));
+        }
         if(model.sprite&&model.sprite.presentation==="per-recipient"){
             current.recipientTargets=new Set(current.targetIndexes);
         }
@@ -13729,9 +13835,15 @@
             const distance=(critical?5:4)*(side==="monster"?-1:1);
             // The one hit callback owns both pulses; no new clock or gate.
             createImpactFlash(artwork,side,unitIndex,current,impactEpoch,ownedHit?hit:null);
+            const rank=current.hitRanks?.get(unitIndex)||0;
             if(ownedHit){ current.hitFeedback?.hit({key:unitIndex,damage:hit.fact.actualHpLoss,
+                power:current.hitFeedback?.config.sweepEnabled?current.hitFeedback.config.hitStrength[Math.min(rank,2)]:1,
                 roots:[document.getElementById("battlePage"),state.stage,state.hitOverlay,
                     ...document.querySelectorAll(".v174-battle-hud-layer,.battle-floating-feedback")]}); }
+            if(ownedHit&&current.hitFeedback?.config.sweepEnabled){
+                const rect=hit.projection?.rect;
+                current.hitFeedback.impact(state.stage,rect,rank,rank===current.targetIndexes.length-1,false,current.visualStartedAt+current.duration);
+            }
             if(fireSample&&critical)window.FourSymbolsBattlePresentation?.fireCriticalShake?.(current.sequence);
             const motion=artwork.querySelector?.(":scope > .v174-action-motion")||artwork;
             // First fire sample: a short retreat/lean on the existing motion
@@ -13821,7 +13933,7 @@
         const wait=existingTargetDelay(side,index);
         const current=state.current;
         const awaitingImpact=current&&!current.done&&current.targetSide===side&&
-            current.emitted.has(index)&&!current.hitReached;
+            current.emitted.has(index)&&!(current.settledTargets?current.settledTargets.has(index):current.hitReached);
         if(wait>8||awaitingImpact){
             const key=keyPrefix+":"+index;
             if(!state.pendingUpdates.has(key)){

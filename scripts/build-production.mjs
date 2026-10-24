@@ -212,7 +212,15 @@ const adventureEntryStyles=["css/adventure-entry-v1-20260915.css"];
 const adventureStyles=["css/adventure-v1-20260915.css"];
 
 function combineScripts(files,prefix=""){
-    return prefix+files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
+    return prefix+files.map(file=>{
+        let source=read(file).trim();
+        if(file==="js/39-v143-skill-animation.js"){
+            const marker="/* @battle-vfx-feedback-config */ null";
+            if(source.split(marker).length!==2){ throw new Error("Battle VFX config marker must occur once"); }
+            source=source.replace(marker,JSON.stringify(JSON.parse(read("config/battle-vfx-feedback.json"))));
+        }
+        return `\n/* bundled source: ${file} */\n${source}\n`;
+    }).join("\n");
 }
 function combineStyles(files){
     return files.map(file=>`\n/* bundled source: ${file} */\n${read(file).trim()}\n`).join("\n");
