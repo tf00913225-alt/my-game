@@ -1,0 +1,17 @@
+{
+  "sourceHead": "877abcac",
+  "status": "desktop-metadata-criteria-pass-installed-device-pending",
+  "reviewers": {
+    "art": "/root/map_review",
+    "input": "/root/map_input_review",
+    "scope": "/root/daily_scope"
+  },
+  "actualScreensViewed": true,
+  "findings": [
+    "source unchanged; dedicated192/512 variants authorized",
+    "CDP installabilityErrors empty",
+    "no SW/scaler/gameplay/Auth/Save changes",
+    "initial512 preview mistakenly magnified192; helper-only corrected to genuine512 and allImages.decode awaited",
+    "no installed/Android/systembar/OAuth/save/update acceptance"
+  ]
+}

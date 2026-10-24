@@ -1,0 +1,7 @@
+#35E source-only pre-review
+
+Relative522d20d1, completeindex differs only twoaria-hidden captions plusbuildercriticalCSS href. Each originalbutton ID/onclick/aria andfour PNGsrc/alt remain exact. CSS00 only adds adjacentcaption/off/on rules andmargin0auto inside originalimage rule. Independent inverse removal of exactcaptions andgeneratedhref normalization yields originalindex; removeexactcaptionblock/image margin yields completeoldCSS. CompletebootCSS equals parent with its originalCSS source block uniquely replaced; hashes/exactflags inJSON. AllJS unchanged.
+
+Name18/state16/explicit1.4lineheight avoids originalparentline-height0; thinbronze divider/ironbackground use existing visual language. Currentactive class is sole off/on authority shared withoriginalimages. No newflag/observer/timer/handler/save/economy logic. Caption isaria-hidden so originalaccessiblelabel Owner stays intact. No extra wrapper controlling layout/state.
+
+min-width82 makescaption/wholebutton wider thanoriginal78image;normalflowcaption also increasesactualheight. Do not claimunchangedgeometry or unchangedbuttonwidth: originalrowanchor andimage78 override retained,imagescentered. Actualfour-size after must show readablenames/states, no switcher/viewport overlap andoriginalclicktarget. OFFonly acceptance planned; ONruntime/resources remainunverified and must not be simulatedbyforciblysettingclass. Existingtiny sourcebitmap art remains insidePNG; caption solvesreadability separately. Noafterapproval,Chromeortrackededits byreviewer.

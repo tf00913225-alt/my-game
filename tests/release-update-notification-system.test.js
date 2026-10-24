@@ -264,6 +264,28 @@ async function test(name,callback){
         assert.doesNotMatch(css,/!important/);
     });
 
+    await test("cross-feature detail reveals its summary before the first paint, while blocked forced entry preserves the prior body",async()=>{
+        const harness=createHarness({responses:[releaseManifest("V173.41")]});
+        await harness.api.checkForUpdate("scroll-regression",{force:true});
+        harness.window.closeHomeFeature();
+        const stored=[...harness.storage.entries()];
+        // A hidden shared modal has no scrolling box. Its old offset becomes
+        // observable again on show; setting scrollTop while hidden is a no-op.
+        let borrowedScroll=1600;
+        Object.defineProperty(harness.body,"scrollTop",{
+            get(){return harness.modal.classList.contains("show")?borrowedScroll:0;},
+            set(value){if(harness.modal.classList.contains("show")){borrowedScroll=value;}}
+        });
+        assert.equal(harness.api.openReleaseDetail("acknowledge"),true);
+        assert.equal(harness.body.scrollTop,0,"a recycled shared body must reveal the summary before the opening task returns");
+        assert.deepEqual([...harness.storage.entries()],stored,"opening must not acknowledge or change preferences");
+        harness.window.closeHomeFeature();
+        harness.window.battleActive=true;
+        borrowedScroll=900;
+        assert.equal(harness.api.openReleaseDetail("forced"),false);
+        assert.equal(borrowedScroll,900,"a blocked forced update must not alter the active body's scroll");
+    });
+
     await test("Case A: current release auto-opens once per login even when it was already read before",async()=>{
         const current=releaseManifest("V173.41");
         const harness=createHarness({responses:[current],seen:current});

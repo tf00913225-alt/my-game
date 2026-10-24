@@ -1,0 +1,46 @@
+{
+  "base": "de4ebfb7cee62ebb5a591c9fe1e87cc6a766c345",
+  "scope": "Original UI/nav/material Owners only. Retain class owner and both existing return semantics; no battle/state/reward/numerical changes.",
+  "proof": [
+    {
+      "file": "css/46-v154-dev-fixes.css",
+      "before": "274b67e913ab1f28fcfadd12675161a89a9a68fbfa791b394504319233eaa8b5",
+      "after": "27b5869b9c7ae9a1501c7db09650e4487e058728356804c66bbc2773e38720eb"
+    },
+    {
+      "file": "css/50-v169-abyss-flow.css",
+      "before": "2ed327d0d534bfadaf0670aeb8121eb8aab3ce054b90b5d5dd26de209e824417",
+      "after": "e068ca8a35673ef8082865ecab843abc44b11792a7ea32bb9406e3119ca1171f"
+    },
+    {
+      "file": "css/54-v174-abyss-two-tier.css",
+      "before": "0bb6dd8e88213b166dde0ada937ad6def550e6910c1058ec6efff08a1d26f6f8",
+      "after": "f73cb6c3f401f41d24dd2fe118b58b21c7fd82d6ac17be241ac5416fd858dc88"
+    },
+    {
+      "file": "css/42-v146-system-polish.css",
+      "before": "66944c27353d2e3add6fd2b4f776a65eb720d22451c80cb4f76845572ba85a50",
+      "after": "ba9e7824d72eabea7421d11bf9adef50985019e2e052dbc1b100a56d96aecfa2"
+    },
+    {
+      "file": "js/41-v146-system-polish.js",
+      "before": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+      "after": "206e8d02322678bf719f838e117333e6ffd6a999e6044f0e0f2c4535fb508ec1"
+    },
+    {
+      "file": "js/42-v148-combat-dungeon-fixes.js",
+      "before": "672e787349abcf3f5f84d1256166c8174c640f45b5b4d366e041a34b2b6cfcc4",
+      "after": "21c17cabe54723374811031cf3fb07332fa5b71fdf32a2b5a93786fa39a93151"
+    },
+    {
+      "file": "js/59-abyss-two-tier-runtime.js",
+      "before": "e3f4afbc16f654e89d3b689889c6882db56973b87620269089617d6603f36ba3",
+      "after": "c7d35216f082fbde432fbca88cc93b64354c2c8d45f2e177dedbf324af68926d"
+    },
+    {
+      "file": "config/feature-manifest.json",
+      "before": "7f9d96ff8acbd3d7c1a6df4d96decc03961f686d6bfd22ebe66ddfd2c46098e4",
+      "after": "36fff5916f1f09440570ff6f7b2ea9284d57f9f9deada7041c448f4053566cc7"
+    }
+  ]
+}

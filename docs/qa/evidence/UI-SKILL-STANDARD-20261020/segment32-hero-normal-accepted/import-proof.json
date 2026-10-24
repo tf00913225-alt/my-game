@@ -1,0 +1,534 @@
+{
+  "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+  "reports": [
+    {
+      "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+      "viewport": "360x640",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json"
+    },
+    {
+      "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+      "viewport": "393x873",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json"
+    },
+    {
+      "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+      "viewport": "412x915",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json"
+    },
+    {
+      "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+      "viewport": "1280x800",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-end.png",
+      "sha256": "64139ab11ddc1ef856f1af46bfa3f3899c4e7813166650a51ba56e3ff54ead39"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-list-return.png",
+      "sha256": "8d2d99661688cb634919543c90ac07ac315490c3c0bcdea8c84aeb1e39e7cad5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-middle-0.png",
+      "sha256": "69727752b2320a714257b3599651a08e1e91d165d3670b729cfcf9eaad8175a2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-middle-1.png",
+      "sha256": "219befdb4edf147c6217ee082fffcd95a4d3cf275167d5ac429abed86d6b34ce"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-middle-2.png",
+      "sha256": "64139ab11ddc1ef856f1af46bfa3f3899c4e7813166650a51ba56e3ff54ead39"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-reopen.png",
+      "sha256": "a329c0cebafb3bda81977845bcf44976dae05bf05b7a8ac2dfd98e0222495afa"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\divineDogHongbao-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\divineDogHongbao-top.png",
+      "sha256": "86139cbd798baffc65e23a32aa30e662bc537300bb73d7e02086fd7181a4e81b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\empty-earth-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\empty-earth-end.png",
+      "sha256": "94ac2d9815726c65bf11e24ad996ff053871469888b54de3dc4fe44fa1d50ec2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\empty-earth.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\empty-earth.png",
+      "sha256": "9e92053ca25f5e853823ec23e431b980d80a614fa89af559c70647d3192d15ff"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\empty-water-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\empty-water-end.png",
+      "sha256": "f0b6f819d2fd2b3234a503c0f7743ac5f8c9a8a1ee9a6bb8e2dcf5a0ece5419f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\empty-water.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\empty-water.png",
+      "sha256": "c6a6d26e2e9ec0ea106dd4e4d2f2fb2c858561052b0de989f5e4712a56fbdb71"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\report.json",
+      "sha256": "a00b514f281ce064575f59031995f83941984224e6f1f55176751efc9fbfc865"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-end.png",
+      "sha256": "cfd0b0a42785a350fab446c9d68ba7de20b4d627997b990d7edb5e9ad0eaadde"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-list-return.png",
+      "sha256": "8d2d99661688cb634919543c90ac07ac315490c3c0bcdea8c84aeb1e39e7cad5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-middle-0.png",
+      "sha256": "c5273d585886ef896a92a393111a66c19a9e425fa6547b4aeb2be0c5d0d3d9f6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-middle-1.png",
+      "sha256": "985c7ffa0721a9546885f52e9a680b644d8bf48d46c6d20416062d8f5019cc6d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-middle-2.png",
+      "sha256": "cfd0b0a42785a350fab446c9d68ba7de20b4d627997b990d7edb5e9ad0eaadde"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-reopen.png",
+      "sha256": "aab67a3331962dfbca624004d5fa33d9020bdcb90217417ee4210d6cb6b6ba14"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\360x640\\vajraHeavenlyKing-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\360x640\\vajraHeavenlyKing-top.png",
+      "sha256": "aab67a3331962dfbca624004d5fa33d9020bdcb90217417ee4210d6cb6b6ba14"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-end.png",
+      "sha256": "dd9a89bf3d18992f4b0a360980cb09242073dff16b8740a3616d720785b931cb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-list-return.png",
+      "sha256": "56dd6bfdccf585b462b14a504fac7d18d5ac61417e2ab3f3122c57c1df0d4fae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-middle-0.png",
+      "sha256": "ce0af982c7dbfa8e72a3494ac5113723d07de1f53e6118387a305bcdd60ca9d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-middle-1.png",
+      "sha256": "c153693ea2734460d102a7b02a349dd54f2521f3743157d67ecaa9b4943d5b67"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-middle-2.png",
+      "sha256": "dd9a89bf3d18992f4b0a360980cb09242073dff16b8740a3616d720785b931cb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-reopen.png",
+      "sha256": "f4465fcb697d517df151a0e26acc80c4e963cf0aee7ac4d29c8149daf02efb23"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\divineDogHongbao-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\divineDogHongbao-top.png",
+      "sha256": "c40414551be39227381c9b066012a64e6855f848c96f9d3e61117d9146e09c24"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\empty-earth-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\empty-earth-end.png",
+      "sha256": "6015afb882a4db3422dbe66c48e22fe2e15e087163d4428114684547e15c4a27"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\empty-earth.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\empty-earth.png",
+      "sha256": "84611e6cf00395c769e3e8224f239bf25cfa59b2938afdab6474e9b58ac61e98"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\empty-water-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\empty-water-end.png",
+      "sha256": "713bbfc3c6041b6d1322f1079c8f266164d4a0b6c8836bce7c5aee64cb60547a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\empty-water.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\empty-water.png",
+      "sha256": "2cc7f58bdc6d3532bd78f13eb751057257d362fefc63d117f3a9506a2561d8d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\report.json",
+      "sha256": "06531e7cd8ed0b3037ec1cb06fd3936c222f64328cdf40f6bd94920abfe72ebb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-end.png",
+      "sha256": "c8dd0e0b376c9d0aded428f54e703d34e0736df17a71b15a3ad92176ea7a249d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-list-return.png",
+      "sha256": "42955a006e2629399b35311522853fdb4bd68890c811562cbd856c17dd1a8d17"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-middle-0.png",
+      "sha256": "ce71db994fb8d020e8aba48e846f19a0b8237b77bcbe5cf7ac8eaff6a3a7aac1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-middle-1.png",
+      "sha256": "6eee6083757fc4759e5aab5e055847497dba7a06bc35eaa1fa12404b2aefb9cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-middle-2.png",
+      "sha256": "c8dd0e0b376c9d0aded428f54e703d34e0736df17a71b15a3ad92176ea7a249d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-reopen.png",
+      "sha256": "1a7844f8187a26257120bd1f61755377609cb8c5eba14f57952f12f2ac4ae87d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\393x873\\vajraHeavenlyKing-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\393x873\\vajraHeavenlyKing-top.png",
+      "sha256": "0a2965171211dce501133bba6aee121f0cc12a2f57ac565b31102948d560fa32"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-end.png",
+      "sha256": "c78627dce4876e2a027ff3743de7b87e7a2cc1ba44c5d951129288ffa34f02e4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-list-return.png",
+      "sha256": "6346df0327780cb460fd6f47f1450f7900c95a181baf58e81d4adb39bcfda2bc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-middle-0.png",
+      "sha256": "f1228d63043f51b2b893953a0e74c0852a985507c90a8386b33982005fcbea34"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-middle-1.png",
+      "sha256": "4048ecec76e61b396f157a3b9c992b26430d5388c4fe3cd9639e0682a26d920c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-middle-2.png",
+      "sha256": "c78627dce4876e2a027ff3743de7b87e7a2cc1ba44c5d951129288ffa34f02e4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-reopen.png",
+      "sha256": "4749d709bfa7f2be87399f2414e42b56c481abf3a6e97010f7cd07d88a50a8eb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\divineDogHongbao-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\divineDogHongbao-top.png",
+      "sha256": "451a34e5273fc10f8033b6804de4b486f31d95cd97eb3317893a168743aa3f05"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\empty-earth-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\empty-earth-end.png",
+      "sha256": "21890eb7fa6396ad6298d5186748d779251f571e1204802f82d49aa4a77eefa2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\empty-earth.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\empty-earth.png",
+      "sha256": "013badb1c2378b19f37f3c3af3592131975debf4505bcaebe074ffd59f74f0e8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\empty-water-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\empty-water-end.png",
+      "sha256": "e0e5b1078f7c47f239b44d50c8efe1a2229b1aeae4bafdaf9696c25d02d4d3cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\empty-water.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\empty-water.png",
+      "sha256": "294d2f867fd89525253a0f2bc6ce81a60761557cc02d9b8e2e0e5e90c4b2de79"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\report.json",
+      "sha256": "cf7a3e3f89afddebe85d10f3d15aa4a08db16059c368540d2873b4f41b414c44"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-end.png",
+      "sha256": "9c7514ff42f45fc7c73ac96e5ba93864b3f42ef17e5a51bcca66b723084eb834"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-list-return.png",
+      "sha256": "c51413b0586b2d9bf2920346620f09c13cfddb0ceb31a97e472beb450e8da10a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-middle-0.png",
+      "sha256": "8ba5b521f6e0d429a43e3a132628cf60cafc5cf9c700b240a6d4542a108c17d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-middle-1.png",
+      "sha256": "394b6ddd1a9fc3d460c252f75e83a8b3890629e1086b24dc28898f25aae909ae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-middle-2.png",
+      "sha256": "9c7514ff42f45fc7c73ac96e5ba93864b3f42ef17e5a51bcca66b723084eb834"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-reopen.png",
+      "sha256": "cc55e731927545b0d5d34362424b9d371eec36d3e4568a90b0fe72f95365d99a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\412x915\\vajraHeavenlyKing-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\412x915\\vajraHeavenlyKing-top.png",
+      "sha256": "b0f66144500f531b7fd42a6f032a023a80b56dc6c41024d70901fd118f77f6ac"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-end.png",
+      "sha256": "4f38042a6c3d907d937ca7536b70f4201d3465c0bb68a191423a3c3b9a70d9d9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-list-return.png",
+      "sha256": "14600902ddbc2cafa552a50441f1078c8cbb1a28e4fc0f12be0baf05bfb08c27"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-middle-0.png",
+      "sha256": "0e3ce268bea15dd5313e28b70da08af084652e5841a4fb465b0ad74e10163711"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-middle-1.png",
+      "sha256": "7b247bb8e71d56f085032d2ef673ba2bef6b29f850ae2a0d16723779f2c58e26"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-middle-2.png",
+      "sha256": "08eb1e0ce87d2aec3394ce3fc6f767cbf4cb6794e567195b20219e0a90f31123"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-middle-3.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-middle-3.png",
+      "sha256": "d34da4ee8aa85a25f7e8cdfc7141b279a2051adb4f3fdce6ee5608a29be40919"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-middle-4.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-middle-4.png",
+      "sha256": "4f38042a6c3d907d937ca7536b70f4201d3465c0bb68a191423a3c3b9a70d9d9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-reopen.png",
+      "sha256": "dc8bc4985b871430ddf82d13e61c1f9803112b04f3ee6764195c2a5984fa5d99"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\divineDogHongbao-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\divineDogHongbao-top.png",
+      "sha256": "569400870dc5836704147a538050eeb4163d4e9c1c7df955011f159d137c0d71"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\empty-earth-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\empty-earth-end.png",
+      "sha256": "0c84cea8d480f5298cbd84c825d68b75b1499306da530fde5c85ec4b30fb3a4b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\empty-earth.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\empty-earth.png",
+      "sha256": "c8cd09e2c9b5cde5cd96ec413c078aac0732055e60076d448d0e74bac578e6d6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\empty-water-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\empty-water-end.png",
+      "sha256": "314192faf26441e67db2bb9350e77820cfbc293591b7619f3ce704e04bb15dba"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\empty-water.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\empty-water.png",
+      "sha256": "cd66f27ed24c5609920d1804e0ff121580d6ff44859908c90b3cba06759df114"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\report.json",
+      "sha256": "29a649077a7475e1d01ccac8e0e7433aec54464ef145b222600e64cefdab9e28"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-end.png",
+      "sha256": "3eeee74c06d3f2abd64858789199c03fa0e72bac8957e1917652bdb0888cc393"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-list-return.png",
+      "sha256": "14600902ddbc2cafa552a50441f1078c8cbb1a28e4fc0f12be0baf05bfb08c27"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-middle-0.png",
+      "sha256": "8461551eae6edd55d9e28d43af7579535c838f4a245c0caac9f91e95ef668b9e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-middle-1.png",
+      "sha256": "a753544a412ef1c7746983a096da574157df4a920dd349abcc3dde50647bfbb1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-middle-2.png",
+      "sha256": "9c09da354401df5e81d4736065d879dc28b800ed5eac660ef44b7ea6967cdf0f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-middle-3.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-middle-3.png",
+      "sha256": "cf806acb27c40b1effb27ab5791add12299ba69719ecf9c5717d37ff03479db9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-middle-4.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-middle-4.png",
+      "sha256": "3eeee74c06d3f2abd64858789199c03fa0e72bac8957e1917652bdb0888cc393"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-reopen.png",
+      "sha256": "f79be087a250c79d747da1230c92b818244cccbec4b4aca4d0b83b3d80a48bff"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-ea1b80a8\\empty-resolved\\1280x800\\vajraHeavenlyKing-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\1280x800\\vajraHeavenlyKing-top.png",
+      "sha256": "a57b8aba353fc4e2301320bd76d5a016fbbd9e296edce9ddd2895b94e1a663f2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-end.png",
+      "sha256": "33bf93c960f45b50edfdfa2a33fd55c67aa6032c0630a4728d59ae0f1a478c9d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-list-return.png",
+      "sha256": "17fe687861bb208f90ae19427e149742ba61a479d432180345c48528307f51f1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-middle-0.png",
+      "sha256": "7cd48b6c3b0b4fa8d7f6eb4bdaf5dbe6b3070fd21c5842a46192f350a3f864f7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-middle-1.png",
+      "sha256": "df70e595d9e23a94975dccc703f1430ce2ceb079637f3645864f112f279cd359"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-middle-2.png",
+      "sha256": "33bf93c960f45b50edfdfa2a33fd55c67aa6032c0630a4728d59ae0f1a478c9d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-reopen.png",
+      "sha256": "fcbf18f247a4bfe4bfd85e4708b1a41f89a936139a974c5f7c7c57b33c23ac7a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\divineDogHongbao-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\divineDogHongbao-top.png",
+      "sha256": "185836b9de547522a7edf5c6299c2fb682f32dd6f03d91a631888f2cbd902a9e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\empty-earth.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\empty-earth.png",
+      "sha256": "1364d0501283f68486fefabba9ad665cef4644278ef15596da9bdfb9503c93af"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\empty-water.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\empty-water.png",
+      "sha256": "6625a109f1822970844aa4a19636e8af2b904683cacb42df5ddabd0142366256"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\report.json",
+      "sha256": "45de42f8064e69ebfbdb01de477cc0a52a5f4e221601f13987398f3111b7cf00"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-end.png",
+      "sha256": "21e7f805900d3fbc3e7efbfce41cc466a1f3a2cfb87eb1639801c444c7a9ac6e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-list-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-list-return.png",
+      "sha256": "17fe687861bb208f90ae19427e149742ba61a479d432180345c48528307f51f1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-middle-0.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-middle-0.png",
+      "sha256": "6dba8acad0acefc24c939a9a3b10ac250f56fd0d36d5fe2bffab09093d872842"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-middle-1.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-middle-1.png",
+      "sha256": "842fec64772a99b05affb1ae633b40c5a906470dc6e5bb36ff6073945a95df14"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-middle-2.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-middle-2.png",
+      "sha256": "21e7f805900d3fbc3e7efbfce41cc466a1f3a2cfb87eb1639801c444c7a9ac6e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-reopen.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-reopen.png",
+      "sha256": "56ffc7b23d1a77b504990e6ad489e66dd42ecb131cba94b02628f0786c7ba79f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32-hero-detail-00ed3d10\\before\\360x640\\vajraHeavenlyKing-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\before-00ed3d10\\vajraHeavenlyKing-top.png",
+      "sha256": "56ffc7b23d1a77b504990e6ad489e66dd42ecb131cba94b02628f0786c7ba79f"
+    },
+    {
+      "from": "artifacts/segment32-hero-detail.mjs.before-empty-end.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\helpers\\segment32-hero-detail.mjs.before-empty-end.gz",
+      "sha256": "43a2b4a1cb8748b3a110d24dc0725e7927e6d417bfad2ea12476612510df85d3"
+    },
+    {
+      "from": "artifacts/run32-hero-detail.cjs",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\helpers\\run32-hero-detail.cjs",
+      "sha256": "b701f7078b65a9c02a397626d7e3d9d26acbb7c6df260b719797ea1cf6037613"
+    },
+    {
+      "from": "artifacts/segment32-markup-proof.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32-hero-normal-accepted\\helpers\\segment32-markup-proof.json",
+      "sha256": "3ad4034931016c1510a1f27508b8944067ddc89ba0341299130716eddd96abf3"
+    }
+  ],
+  "helperSha256": "45f0b7088175e375c46ebffdd564303cc8f15613a9aca5a0f480317dc0485e0c",
+  "limits": [
+    "Two real hero IDs detail/acquisition/growth/equipment readonly presentation, water/earth empty filter and true ends/return/reopen only",
+    "Six restore exacts and no QA transport mutations; privateHeroCachesExact false intentionally recorded, not full runtime cache restoration",
+    "No unlock/star/reset/equip/claim/formation mutation/combat/cloud authority acceptance",
+    "32B read-failure states are separate and not imported or approved here"
+  ]
+}

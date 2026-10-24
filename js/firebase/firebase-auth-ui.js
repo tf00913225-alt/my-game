@@ -52,11 +52,11 @@ function markup(){
     node.innerHTML=`
       <div class="firebase-auth-dialog" role="dialog" aria-modal="true" aria-labelledby="firebaseAuthTitle">
         <div class="firebase-auth-topbar">
-          <div class="firebase-auth-eyebrow">FOUR SYMBOLS ACCOUNT</div>
+          <div class="firebase-auth-eyebrow">帳號服務</div>
           <button id="firebaseAuthBackButton" class="firebase-auth-back-button" type="button" hidden>返回系統</button>
         </div>
         <h2 id="firebaseAuthTitle" class="firebase-auth-title">帳號與角色</h2>
-        <p class="firebase-auth-subtitle">先確認 Firebase UID，再讀取此帳號的角色資料。</p>
+        <p class="firebase-auth-subtitle">登入後，讀取此帳號的角色資料。</p>
         <div id="firebaseAuthStatus" class="firebase-auth-status"></div>
         <div id="firebaseAuthResumePanel" class="firebase-auth-resume-panel" hidden>
           <small>偵測到上次登入帳號</small>
@@ -82,7 +82,7 @@ function markup(){
           <div class="firebase-auth-footer">
             <button id="firebaseGuestButton" class="firebase-auth-button secondary" type="button">訪客開始遊戲</button>
           </div>
-          <p class="firebase-auth-note">訪客仍會透過 Firebase Anonymous Auth 取得專屬 UID；沒有 UID 時不能建立角色。</p>
+          <p class="firebase-auth-note">訪客同樣需要完成帳號驗證後，才能讀取或建立角色。</p>
           <button id="firebaseSupportButton" class="firebase-auth-button firebase-auth-support-button" type="button">聯絡客服</button>
         </div>
         <div id="firebaseSignedInPanel" class="firebase-auth-account">
@@ -170,10 +170,10 @@ function render(){
     const back=byId("firebaseAuthBackButton");
     if(back){ back.hidden=resumeActive||!(state.user&&(state.mode==="READY"||state.mode==="OFFLINE_READY")); }
     if(state.user){
-        byId("firebaseAccountName").textContent=state.user.displayName||state.user.email||(state.user.isAnonymous?"訪客帳號":"Firebase 帳號");
-        byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"Firebase 匿名登入":"已驗證帳號";
+        byId("firebaseAccountName").textContent=state.user.displayName||state.user.email||(state.user.isAnonymous?"訪客帳號":"遊戲帳號");
+        byId("firebaseAccountMeta").textContent=state.user.isAnonymous?"訪客帳號":"已驗證帳號";
         byId("firebaseAccountUid").textContent="UID："+state.user.uid;
-        byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料以此 UID 為 owner。";
+        byId("firebaseCloudState").textContent=state.mode==="SAVE_LOADING"?"正在讀取 UID 對應的雲端與本機資料…":"角色資料歸屬此 UID 帳號。";
     }
     const reauth=byId("firebaseGoogleReauthButton");
     if(reauth){ reauth.hidden=!state.sessionError||!state.user?.providerIds?.includes("google.com"); }
@@ -656,7 +656,7 @@ function bind(){
     });
     byId("firebaseGoogleButton").addEventListener("click",()=>performInteractive("正在開啟 Google 登入…",signInWithGoogle));
     byId("firebaseGoogleReauthButton").addEventListener("click",()=>performInteractive("正在重新驗證 Google 帳號…",reauthenticateWithGoogle));
-    byId("firebaseGuestButton").addEventListener("click",()=>performInteractive("正在建立 Firebase 訪客 UID…",signInAsAnonymous));
+    byId("firebaseGuestButton").addEventListener("click",()=>performInteractive("正在登入訪客帳號…",signInAsAnonymous));
     byId("firebaseEmailSignInButton").addEventListener("click",()=>performInteractive("正在登入 Email 帳號…",()=>{ const value=credentials(); return signInWithEmail(value.email,value.password); }));
     byId("firebaseEmailCreateButton").addEventListener("click",()=>performInteractive("正在建立 Email 帳號…",()=>{ const value=credentials(); return createAccountWithEmail(value.email,value.password); }));
     byId("firebaseSignOutButton").addEventListener("click",()=>perform("正在登出…",signOutFirebase));

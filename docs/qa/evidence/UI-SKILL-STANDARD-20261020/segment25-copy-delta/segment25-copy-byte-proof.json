@@ -1,0 +1,30 @@
+{
+  "base": "7be7db2937388febde436d5134ad62bc3c7ca9ca",
+  "source": "js/60-v173.64-skill-progression-rebalance.js",
+  "originalRestoredByteExact": true,
+  "changedDisplayLiterals": 4,
+  "ids": [
+    "bloodBurnArt",
+    "purifyMind",
+    "barrier"
+  ],
+  "sha256": "c67f8bd6cadc91315afb7d4aa43f19ab93363f60a3891904fbad79b61c9779b7",
+  "pairs": [
+    [
+      "%；不強化DoT；免費追擊沿用本次加成但不額外消耗次數",
+      "%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數"
+    ],
+    [
+      "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；",
+      "立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；"
+    ],
+    [
+      "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態",
+      "不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態"
+    ],
+    [
+      "回合；免疫一般直接傷害、DoT與反傷，",
+      "回合；免疫一般直接傷害、持續傷害與反傷，"
+    ]
+  ]
+}

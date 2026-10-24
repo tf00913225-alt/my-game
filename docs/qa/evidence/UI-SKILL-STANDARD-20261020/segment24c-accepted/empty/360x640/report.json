@@ -1,0 +1,1459 @@
+{
+  "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+  "mode": "empty",
+  "viewport": [
+    360,
+    640
+  ],
+  "complete": true,
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "00c9e420a40eb73ee126d0a3e1859663145e1d67746ac3cf1f18d91fba0eee00",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.ff7c0c2b329c.css": "ff7c0c2b329cc6ed9bec49bbf5ed515bcab5aff8326b7fcfd2a74d5776004b3f"
+  },
+  "checks": [
+    {
+      "phase": "before-owner-init",
+      "fixture": {
+        "original": {
+          "uid": "skill-runtime-browser-qa",
+          "key": "four_symbols_save:skill-runtime-browser-qa",
+          "meta": "four_symbols_save_meta:skill-runtime-browser-qa",
+          "raw": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"Skill Runtime QA\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":100,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\"},\"player2\":null,\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false}},\"commissionQuestState\":{\"date\":\"\",\"progress\":{\"killMonsters\":0,\"winBattle\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792510445819,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"name\":\"火法師\",\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"inventoryItems\":[]}",
+          "metadata": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"hydration-normalization\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":false,\"updatedAt\":1792510445819}"
+        },
+        "verified": {
+          "status": "ready",
+          "uid": "skill-runtime-browser-qa",
+          "save": {
+            "version": 6,
+            "heroAccount": {
+              "schemaVersion": 1,
+              "heroes": {
+                "divineDogHongbao": {
+                  "heroId": "divineDogHongbao",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                },
+                "vajraHeavenlyKing": {
+                  "heroId": "vajraHeavenlyKing",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                }
+              }
+            },
+            "player": {
+              "id": "Skill Runtime QA",
+              "element": "fire",
+              "level": 70,
+              "exp": 0,
+              "expNext": 100,
+              "attack": 10,
+              "vitality": 10,
+              "energy": 10,
+              "intelligence": 10,
+              "defensePoints": 0,
+              "agility": 10,
+              "bonusHP": 0,
+              "bonusSP": 0,
+              "hp": 300,
+              "sp": 120,
+              "attributePoints": 10,
+              "skillPoints": 999,
+              "activeBuffs": [],
+              "statusEffects": [],
+              "isDefending": false,
+              "gender": "male"
+            },
+            "player2": null,
+            "player3": null,
+            "sharedExp": 0,
+            "gold": 0,
+            "dailyQuestState": {
+              "date": "",
+              "progress": {
+                "checkin": 0,
+                "killMonsters": 0,
+                "winBattle": 0
+              },
+              "claimed": {
+                "checkin": false,
+                "killMonsters": false,
+                "winBattle": false
+              }
+            },
+            "commissionQuestState": {
+              "date": "",
+              "progress": {
+                "killMonsters": 0,
+                "winBattle": 0
+              },
+              "claimed": {
+                "killMonsters": false,
+                "winBattle": false
+              }
+            },
+            "bestiaryData": {},
+            "achievementState": {},
+            "lastSaveTimestamp": 1792510445819,
+            "selectedCreationElement": "fire",
+            "characterEquipment": {
+              "fire": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "water": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "wind": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:divineDogHongbao": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:vajraHeavenlyKing": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              }
+            },
+            "characterSkillLoadouts": {
+              "fire": {
+                "name": "火法師",
+                "skillLevels": {
+                  "fireRocket": 1
+                },
+                "equippedSkills": []
+              },
+              "water": {
+                "name": "水戰士",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "wind": {
+                "name": "風弓手",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "earth": {
+                "name": "土騎士",
+                "skillLevels": {},
+                "equippedSkills": []
+              }
+            },
+            "autoConfig": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "autoConfig2": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "autoConfig3": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "inventoryItems": [],
+            "teamLoadout": {
+              "relicId": null
+            },
+            "playerRelics": {
+              "relic_all_returning_array": {
+                "unlocked": true,
+                "level": 20,
+                "seen": true
+              }
+            }
+          },
+          "metadata": {
+            "schemaVersion": 2,
+            "ownerUid": "skill-runtime-browser-qa",
+            "source": "qa-local-summary-before-owner-init",
+            "cloudBaseFingerprint": "v1:249:72181a45e5c7319c21b8951dc0d4abac",
+            "localDirty": true,
+            "updatedAt": 1792510446380
+          }
+        },
+        "ownerAbsent": true,
+        "seedAt": 1267.300000011921
+      }
+    },
+    {
+      "homeScroll": {
+        "done": false,
+        "top": 0,
+        "x": 216,
+        "y": 544,
+        "to": 30
+      }
+    },
+    {
+      "homeScroll": {
+        "done": true,
+        "top": 112,
+        "x": 216,
+        "y": 544,
+        "to": 30
+      }
+    },
+    {
+      "phase": "summary-after-original-hydrate",
+      "before": {
+        "summary": "隊伍秘寶尚未裝備每隊僅能裝備1件秘寶選擇",
+        "ready": "true",
+        "ownerInstalled": true,
+        "loadout": {
+          "relicId": null,
+          "subRelicId": null
+        },
+        "owned": {
+          "unlocked": true,
+          "level": 20,
+          "exp": 0,
+          "seen": true
+        },
+        "canonical": {
+          "status": "ready",
+          "uid": "skill-runtime-browser-qa",
+          "save": {
+            "version": 6,
+            "heroAccount": {
+              "schemaVersion": 1,
+              "heroes": {
+                "divineDogHongbao": {
+                  "heroId": "divineDogHongbao",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                },
+                "vajraHeavenlyKing": {
+                  "heroId": "vajraHeavenlyKing",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                }
+              }
+            },
+            "player": {
+              "id": "Skill Runtime QA",
+              "element": "fire",
+              "level": 70,
+              "exp": 0,
+              "expNext": 9637200,
+              "attack": 10,
+              "vitality": 10,
+              "energy": 10,
+              "intelligence": 10,
+              "defensePoints": 0,
+              "agility": 10,
+              "bonusHP": 0,
+              "bonusSP": 0,
+              "hp": 300,
+              "sp": 120,
+              "attributePoints": 10,
+              "skillPoints": 999,
+              "activeBuffs": [],
+              "statusEffects": [],
+              "isDefending": false,
+              "gender": "male"
+            },
+            "player2": null,
+            "player3": null,
+            "sharedExp": 0,
+            "gold": 0,
+            "dailyQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "checkin": 0,
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill10": 0,
+                "win3": 0,
+                "skills5": 0
+              },
+              "claimed": {
+                "checkin": false,
+                "killMonsters": false,
+                "winBattle": false,
+                "kill10": false,
+                "win3": false,
+                "skills5": false
+              }
+            },
+            "commissionQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill30": 0,
+                "win5": 0,
+                "elite2": 0,
+                "skills15": 0
+              },
+              "claimed": {
+                "killMonsters": false,
+                "winBattle": false,
+                "kill30": false,
+                "win5": false,
+                "elite2": false,
+                "skills15": false
+              }
+            },
+            "bestiaryData": {},
+            "achievementState": {},
+            "lastSaveTimestamp": 1792510446428,
+            "selectedCreationElement": "fire",
+            "characterEquipment": {
+              "fire": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "water": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "wind": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:divineDogHongbao": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:vajraHeavenlyKing": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              }
+            },
+            "characterSkillLoadouts": {
+              "fire": {
+                "name": "火法師",
+                "skillLevels": {
+                  "fireRocket": 1
+                },
+                "equippedSkills": []
+              },
+              "water": {
+                "name": "水戰士",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "wind": {
+                "name": "風弓手",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "earth": {
+                "name": "土騎士",
+                "skillLevels": {},
+                "equippedSkills": []
+              }
+            },
+            "autoConfig": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            "autoConfig2": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "autoConfig3": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "allyFormation": {
+              "version": 1,
+              "characterIndexToSlot": {
+                "0": "ALLY_F2"
+              }
+            },
+            "playerRelics": {
+              "relic_all_returning_array": {
+                "unlocked": true,
+                "level": 20,
+                "seen": true
+              }
+            },
+            "teamLoadout": {
+              "relicId": null
+            },
+            "inventoryItems": []
+          },
+          "metadata": {
+            "schemaVersion": 2,
+            "ownerUid": "skill-runtime-browser-qa",
+            "source": "gameplay",
+            "cloudBaseFingerprint": "v1:249:72181a45e5c7319c21b8951dc0d4abac",
+            "localDirty": true,
+            "updatedAt": 1792510446428
+          }
+        }
+      }
+    },
+    {
+      "phase": "original-hydrate-consistency",
+      "after": {
+        "summary": "隊伍秘寶尚未裝備每隊僅能裝備1件秘寶選擇",
+        "ready": "true",
+        "ownerInstalled": true,
+        "loadout": {
+          "relicId": null,
+          "subRelicId": null
+        },
+        "owned": {
+          "unlocked": true,
+          "level": 20,
+          "exp": 0,
+          "seen": true
+        },
+        "canonical": {
+          "status": "ready",
+          "uid": "skill-runtime-browser-qa",
+          "save": {
+            "version": 6,
+            "heroAccount": {
+              "schemaVersion": 1,
+              "heroes": {
+                "divineDogHongbao": {
+                  "heroId": "divineDogHongbao",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                },
+                "vajraHeavenlyKing": {
+                  "heroId": "vajraHeavenlyKing",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                }
+              }
+            },
+            "player": {
+              "id": "QA 火角色",
+              "element": "fire",
+              "level": 70,
+              "exp": 0,
+              "expNext": 9637200,
+              "attack": 10,
+              "vitality": 10,
+              "energy": 10,
+              "intelligence": 10,
+              "defensePoints": 0,
+              "agility": 10,
+              "bonusHP": 0,
+              "bonusSP": 0,
+              "hp": 300,
+              "sp": 120,
+              "attributePoints": 10,
+              "skillPoints": 999,
+              "activeBuffs": [],
+              "statusEffects": [],
+              "isDefending": false,
+              "gender": "male",
+              "relicProgression": {
+                "version": 1,
+                "initialized": true,
+                "ownershipMigration": "preserved-existing",
+                "firstCharacterLevel20Grant": true,
+                "legacyTowerChoiceHandled": true,
+                "majorMilestoneClaims": {},
+                "pending": null
+              }
+            },
+            "player2": {
+              "id": "QA 水角色",
+              "element": "water",
+              "level": 70,
+              "skillPoints": 999
+            },
+            "player3": null,
+            "sharedExp": 0,
+            "gold": 0,
+            "dailyQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "checkin": 0,
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill10": 0,
+                "win3": 0,
+                "skills5": 0
+              },
+              "claimed": {
+                "checkin": false,
+                "killMonsters": false,
+                "winBattle": false,
+                "kill10": false,
+                "win3": false,
+                "skills5": false
+              }
+            },
+            "commissionQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill30": 0,
+                "win5": 0,
+                "elite2": 0,
+                "skills15": 0
+              },
+              "claimed": {
+                "killMonsters": false,
+                "winBattle": false,
+                "kill30": false,
+                "win5": false,
+                "elite2": false,
+                "skills15": false
+              }
+            },
+            "bestiaryData": {},
+            "achievementState": {},
+            "lastSaveTimestamp": 1792510449750,
+            "selectedCreationElement": "fire",
+            "characterEquipment": {
+              "fire": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "water": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "wind": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:divineDogHongbao": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:vajraHeavenlyKing": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              }
+            },
+            "characterSkillLoadouts": {
+              "fire": {
+                "skillLevels": {
+                  "fireRocket": 1
+                },
+                "equippedSkills": []
+              },
+              "water": {
+                "name": "水戰士",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "wind": {
+                "name": "風弓手",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "earth": {
+                "name": "土騎士",
+                "skillLevels": {},
+                "equippedSkills": []
+              }
+            },
+            "autoConfig": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            "autoConfig2": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "autoConfig3": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "allyFormation": {
+              "version": 1,
+              "characterIndexToSlot": {
+                "0": "ALLY_F2"
+              }
+            },
+            "playerRelics": {
+              "relic_qiankun_flask": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_sun_orb": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_xuanwu_seal": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_soul_bell": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_tiangang_banner": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_nine_dragon_fire": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_cold_spring_jade": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_qinglan_feather": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_rock_mountain_seal": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_returning_wheel": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_origin_talisman": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_broken_army_scroll": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_red_sky_war_mark": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_ice_mirror_heart": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_wind_chasing_talisman": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_mountain_river_cauldron": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_burning_star_mark": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_spirit_spring_bottle": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_demon_suppressing_seal": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_all_returning_array": {
+                "unlocked": true,
+                "level": 20,
+                "exp": 0,
+                "seen": true
+              }
+            },
+            "teamLoadout": {
+              "relicId": null,
+              "subRelicId": null
+            },
+            "gameplayProgress": {
+              "version": 1,
+              "personal": {
+                "personal-20": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-30": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-40": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-50": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-60": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-70": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-80": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-90": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-100": {
+                  "firstClear": false,
+                  "clears": 0
+                }
+              },
+              "world": {
+                "world-40": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-60": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-80": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-100": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                }
+              },
+              "tower": {
+                "weekKey": "2026-10-19",
+                "element": "wind",
+                "completedFloor": 0,
+                "highestThisWeek": 0,
+                "claimedFloors": {},
+                "historicalHighest": 0,
+                "pendingRelicChoice": false
+              }
+            },
+            "inventoryItems": []
+          },
+          "metadata": {
+            "schemaVersion": 2,
+            "ownerUid": "skill-runtime-browser-qa",
+            "source": "team-relic",
+            "cloudBaseFingerprint": "v1:249:72181a45e5c7319c21b8951dc0d4abac",
+            "localDirty": true,
+            "updatedAt": 1792510449751
+          }
+        }
+      },
+      "card": {
+        "text": "萬象歸元盤Lv.20・特殊裝備",
+        "classes": "team-relic-card rarity-four-symbol unlocked"
+      }
+    },
+    {
+      "phase": "true-return",
+      "returned": {
+        "summary": "隊伍秘寶尚未裝備每隊僅能裝備1件秘寶選擇",
+        "ready": "true",
+        "ownerInstalled": true,
+        "loadout": {
+          "relicId": null,
+          "subRelicId": null
+        },
+        "owned": {
+          "unlocked": true,
+          "level": 20,
+          "exp": 0,
+          "seen": true
+        },
+        "canonical": {
+          "status": "ready",
+          "uid": "skill-runtime-browser-qa",
+          "save": {
+            "version": 6,
+            "heroAccount": {
+              "schemaVersion": 1,
+              "heroes": {
+                "divineDogHongbao": {
+                  "heroId": "divineDogHongbao",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                },
+                "vajraHeavenlyKing": {
+                  "heroId": "vajraHeavenlyKing",
+                  "unlocked": false,
+                  "specificFragments": 0,
+                  "stars": 0,
+                  "allocationSeed": 1,
+                  "allocationVersion": 1
+                }
+              }
+            },
+            "player": {
+              "id": "QA 火角色",
+              "element": "fire",
+              "level": 70,
+              "exp": 0,
+              "expNext": 9637200,
+              "attack": 10,
+              "vitality": 10,
+              "energy": 10,
+              "intelligence": 10,
+              "defensePoints": 0,
+              "agility": 10,
+              "bonusHP": 0,
+              "bonusSP": 0,
+              "hp": 300,
+              "sp": 120,
+              "attributePoints": 10,
+              "skillPoints": 999,
+              "activeBuffs": [],
+              "statusEffects": [],
+              "isDefending": false,
+              "gender": "male",
+              "relicProgression": {
+                "version": 1,
+                "initialized": true,
+                "ownershipMigration": "preserved-existing",
+                "firstCharacterLevel20Grant": true,
+                "legacyTowerChoiceHandled": true,
+                "majorMilestoneClaims": {},
+                "pending": null
+              }
+            },
+            "player2": {
+              "id": "QA 水角色",
+              "element": "water",
+              "level": 70,
+              "skillPoints": 999
+            },
+            "player3": null,
+            "sharedExp": 0,
+            "gold": 0,
+            "dailyQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "checkin": 0,
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill10": 0,
+                "win3": 0,
+                "skills5": 0
+              },
+              "claimed": {
+                "checkin": false,
+                "killMonsters": false,
+                "winBattle": false,
+                "kill10": false,
+                "win3": false,
+                "skills5": false
+              }
+            },
+            "commissionQuestState": {
+              "date": "2026-10-20",
+              "progress": {
+                "killMonsters": 0,
+                "winBattle": 0,
+                "kill30": 0,
+                "win5": 0,
+                "elite2": 0,
+                "skills15": 0
+              },
+              "claimed": {
+                "killMonsters": false,
+                "winBattle": false,
+                "kill30": false,
+                "win5": false,
+                "elite2": false,
+                "skills15": false
+              }
+            },
+            "bestiaryData": {},
+            "achievementState": {},
+            "lastSaveTimestamp": 1792510449750,
+            "selectedCreationElement": "fire",
+            "characterEquipment": {
+              "fire": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "water": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "wind": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:divineDogHongbao": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              },
+              "heroNpc:vajraHeavenlyKing": {
+                "head": null,
+                "hand": null,
+                "shoulder": null,
+                "armor": null,
+                "shoes": null,
+                "ring": null
+              }
+            },
+            "characterSkillLoadouts": {
+              "fire": {
+                "skillLevels": {
+                  "fireRocket": 1
+                },
+                "equippedSkills": []
+              },
+              "water": {
+                "name": "水戰士",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "wind": {
+                "name": "風弓手",
+                "skillLevels": {},
+                "equippedSkills": []
+              },
+              "earth": {
+                "name": "土騎士",
+                "skillLevels": {},
+                "equippedSkills": []
+              }
+            },
+            "autoConfig": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            "autoConfig2": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "autoConfig3": {
+              "enabled": false,
+              "skill": "normal",
+              "hp": 50,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            },
+            "allyFormation": {
+              "version": 1,
+              "characterIndexToSlot": {
+                "0": "ALLY_F2"
+              }
+            },
+            "playerRelics": {
+              "relic_qiankun_flask": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_sun_orb": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_xuanwu_seal": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_soul_bell": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_tiangang_banner": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_nine_dragon_fire": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_cold_spring_jade": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_qinglan_feather": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_rock_mountain_seal": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_returning_wheel": {
+                "unlocked": true,
+                "level": 1,
+                "exp": 0,
+                "seen": true
+              },
+              "relic_origin_talisman": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_broken_army_scroll": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_red_sky_war_mark": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_ice_mirror_heart": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_wind_chasing_talisman": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_mountain_river_cauldron": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_burning_star_mark": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_spirit_spring_bottle": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_demon_suppressing_seal": {
+                "unlocked": false,
+                "level": 1,
+                "exp": 0,
+                "seen": false
+              },
+              "relic_all_returning_array": {
+                "unlocked": true,
+                "level": 20,
+                "exp": 0,
+                "seen": true
+              }
+            },
+            "teamLoadout": {
+              "relicId": null,
+              "subRelicId": null
+            },
+            "gameplayProgress": {
+              "version": 1,
+              "personal": {
+                "personal-20": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-30": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-40": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-50": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-60": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-70": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-80": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-90": {
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "personal-100": {
+                  "firstClear": false,
+                  "clears": 0
+                }
+              },
+              "world": {
+                "world-40": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-60": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-80": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                },
+                "world-100": {
+                  "completedStages": 0,
+                  "firstClear": false,
+                  "clears": 0
+                }
+              },
+              "tower": {
+                "weekKey": "2026-10-19",
+                "element": "wind",
+                "completedFloor": 0,
+                "highestThisWeek": 0,
+                "claimedFloors": {},
+                "historicalHighest": 0,
+                "pendingRelicChoice": false
+              }
+            },
+            "inventoryItems": []
+          },
+          "metadata": {
+            "schemaVersion": 2,
+            "ownerUid": "skill-runtime-browser-qa",
+            "source": "team-relic",
+            "cloudBaseFingerprint": "v1:249:72181a45e5c7319c21b8951dc0d4abac",
+            "localDirty": true,
+            "updatedAt": 1792510449751
+          }
+        }
+      },
+      "note": "Original page seen/save effects retained; no zero-save claim"
+    }
+  ],
+  "touches": [
+    {
+      "kind": "touch-swipe",
+      "from": 544,
+      "to": 30
+    },
+    {
+      "kind": "tap-attempt",
+      "sel": "#homePage > .team-relic-loadout-slot button",
+      "x": 322.3333435058594,
+      "y": 539.3958740234375,
+      "hit": true,
+      "w": 50,
+      "h": 44,
+      "id": "",
+      "display": "block",
+      "hitId": "",
+      "hitTag": "BUTTON",
+      "hitClass": ""
+    },
+    {
+      "kind": "touch-tap",
+      "sel": "#homePage > .team-relic-loadout-slot button",
+      "x": 322.3333435058594,
+      "y": 539.3958740234375,
+      "hit": true,
+      "w": 50,
+      "h": 44,
+      "id": "",
+      "display": "block",
+      "hitId": "",
+      "hitTag": "BUTTON",
+      "hitClass": ""
+    },
+    {
+      "kind": "tap-attempt",
+      "sel": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 309.7083435058594,
+      "y": 40,
+      "hit": true,
+      "w": 68.58331298828125,
+      "h": 44,
+      "id": "",
+      "display": "flex",
+      "hitId": "",
+      "hitTag": "BUTTON",
+      "hitClass": "home-feature-close-btn"
+    },
+    {
+      "kind": "touch-tap",
+      "sel": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 309.7083435058594,
+      "y": 40,
+      "hit": true,
+      "w": 68.58331298828125,
+      "h": 44,
+      "id": "",
+      "display": "flex",
+      "hitId": "",
+      "hitTag": "BUTTON",
+      "hitClass": "home-feature-close-btn"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "summary-after-original-hydrate"
+    },
+    {
+      "name": "relic-hydrated"
+    },
+    {
+      "name": "summary-return"
+    }
+  ],
+  "scope": "Fresh local canonical summary/relic hydrate consistency only; no equip/use/upgrade/cloud transaction. Original UI side effects retained.",
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true
+  },
+  "sourcesAfter": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "00c9e420a40eb73ee126d0a3e1859663145e1d67746ac3cf1f18d91fba0eee00",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.ff7c0c2b329c.css": "ff7c0c2b329cc6ed9bec49bbf5ed515bcab5aff8326b7fcfd2a74d5776004b3f"
+  },
+  "sourceUnchanged": true,
+  "driverFinallyRestore": {
+    "rawExact": true,
+    "metadataExact": true
+  }
+}

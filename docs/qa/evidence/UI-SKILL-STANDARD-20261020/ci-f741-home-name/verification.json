@@ -1,0 +1,18 @@
+{
+  "base": "f741d4e8",
+  "scope": "one static typography test only; product unchanged",
+  "testSha256": "99df31f184787605422f39ff211077302161c4f40de0d09db10012fc5c187719",
+  "formalProductCommit": "8aff17a6",
+  "ci": {
+    "run": 40013835262,
+    "attempt": 1,
+    "job": 120622309039
+  },
+  "result": "target typography test PASS; originalrenderer4viewport probes no name/card overflow, level nowrap",
+  "limits": [
+    "isolated fixture temporarily injects two long display IDs then restores without save",
+    "not hardware/realaccount/fullhomeinteractions",
+    "threeparty/highlevel/othernames not fully covered",
+    "latestHeadRequiredCI pending"
+  ]
+}

@@ -35,9 +35,8 @@
     margin:0 !important;
 }
 
-/* Never allow the map/training page itself to become the scrolling layer. */
-#game-stage > #app > #game-content #mapPage,
-#game-stage > #app > #game-content #trainingPage{
+/* Map coordinates stay fixed; the training list owns its own vertical pan. */
+#game-stage > #app > #game-content #mapPage{
     overscroll-behavior:none !important;
     touch-action:none !important;
 }

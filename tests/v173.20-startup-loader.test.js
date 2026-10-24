@@ -41,6 +41,34 @@ assert.match(source,/CREATION_PORTRAITS/);
 assert.match(source,/await prepareCreationRender\(\)/);
 console.log("✓ account-first startup state machine with real readiness");
 
+// A read failure must expose the account retry surface rather than leave it
+// behind the full-viewport loader. This presentation handoff cannot resolve save
+// authority or turn ERROR into a creation/gameplay destination.
+{
+    const vm=require('node:vm'),classes=new Set(),calls=[],timers=[];
+    const root={hidden:false,classList:{add:c=>classes.add(c),remove:c=>classes.delete(c)},setAttribute(){}};
+    const context={root,transitionToken:7,state:'SAVE_LOADING',saveResolved:true,lastError:null,
+        activeUser:{uid:'failed-read'},STATES:{ERROR:'ERROR',SAVE_LOADING:'SAVE_LOADING'},
+        global:{getComputedStyle:()=>({transitionDuration:'0.36s'}),setTimeout(fn){timers.push(fn);return timers.length;},clearTimeout(){}},
+        showCity(){},status(){},emit(){},Promise,parseFloat,String,
+        firebase:{setUiState(s){calls.push(['state',s.mode,s.error,s.message]);},openAuth(){calls.push(['account']);},closeAuth(){calls.push(['close']);}}
+    };
+    context.transition=next=>{context.state=next;};
+    vm.createContext(context);
+    vm.runInContext(source.slice(source.indexOf('    let exit=null;'),source.indexOf('    function safeCloudEmpty('))+
+        source.slice(source.indexOf('    function fail('),source.indexOf('    function reloadForAccountTransition('))+'this.failRead=fail;',context);
+    const error=new Error('read failed');context.failRead(error,'Cannot read safely.',7);
+    assert.deepEqual(calls,[['state','ERROR',true,'Cannot read safely.'],['account']], 'player copy uses the supplied explanation; raw error stays diagnostic');
+    assert.equal(context.state,'ERROR');assert.equal(context.saveResolved,false);assert.equal(context.lastError,error);
+    assert.ok(classes.has('is-leaving'),'account retry must not remain behind the loader');
+    timers.at(-1)();assert.equal(root.hidden,true);
+    const count=calls.length;context.failRead(new Error('stale'),'stale',6);assert.equal(calls.length,count);
+    context.firebase=null;context.failRead(error,'Auth unavailable.',7);
+    assert.equal(root.hidden,false,'without an account UI the original error loader remains');
+    assert.equal(classes.has('is-leaving'),false);assert.equal(context.state,'ERROR');assert.equal(context.saveResolved,false);
+    console.log('✓ read-error account retry handoff remains fail-closed');
+}
+
 // Presentation cannot hold real readiness or overwrite a later destination.
 {
     const vm=require('node:vm'),timers=new Map(),calls=[];let id=0;

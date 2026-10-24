@@ -1,0 +1,557 @@
+{
+  "head": "3b80199ccc7c2a409853b4392920f3c6947d1c3e",
+  "selected": [
+    {
+      "mode": "skill",
+      "size": "360x640",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\report.json"
+    },
+    {
+      "mode": "equipment",
+      "size": "360x640",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\report.json"
+    },
+    {
+      "mode": "recovery",
+      "size": "360x640",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\report.json"
+    },
+    {
+      "mode": "skill",
+      "size": "393x873",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\report.json"
+    },
+    {
+      "mode": "equipment",
+      "size": "393x873",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\report.json"
+    },
+    {
+      "mode": "recovery",
+      "size": "393x873",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\report.json"
+    },
+    {
+      "mode": "skill",
+      "size": "412x915",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\report.json"
+    },
+    {
+      "mode": "equipment",
+      "size": "412x915",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\report.json"
+    },
+    {
+      "mode": "recovery",
+      "size": "412x915",
+      "variant": "host-resolved",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\report.json"
+    },
+    {
+      "mode": "skill",
+      "size": "1280x800",
+      "variant": "desktop-native-wheel",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\report.json"
+    },
+    {
+      "mode": "equipment",
+      "size": "1280x800",
+      "variant": "desktop-native-wheel",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\report.json"
+    },
+    {
+      "mode": "recovery",
+      "size": "1280x800",
+      "variant": "desktop-native-wheel",
+      "report": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\report.json"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\360x640\\report.json",
+      "sha256": "1173f9b668cbaadb7becb0844beeea50c2e467b6cac588f82637d9bec0b3ecfb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\360x640\\tutorial-first.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\360x640\\original-system-entry.png",
+      "sha256": "8ca64b8be9c5fe22ba707e90071a53167d8c50e3dc0dc66502c673fa278eaa86"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\360x640\\original-system-end.png",
+      "sha256": "71329fa62ed3166153489b28f44735dbc4ce94ebbf91a9d7678c189d8ab06140"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\360x640\\tutorial-returned.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\360x640\\report.json",
+      "sha256": "41e5cdd643924845241b0c7ce5df3b2bb395fbcd1110dede363e5ed401c5eea3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\360x640\\tutorial-first.png",
+      "sha256": "a3cb8c7782a82a7926184663b0baba2db7532315dbc5ec50dd3b2ad1c890da2d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\360x640\\original-system-entry.png",
+      "sha256": "4fc5c68be4342b965e50a0b3fdc1a1eaf85a4b62b4b55c18493b3bdeb2f44feb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\360x640\\original-system-end.png",
+      "sha256": "5aa25f1ac34164fcb0d1e715706c4fc17289619c8db7f5aed43b2d5981e26c2f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\360x640\\tutorial-returned.png",
+      "sha256": "a3cb8c7782a82a7926184663b0baba2db7532315dbc5ec50dd3b2ad1c890da2d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\360x640\\report.json",
+      "sha256": "b6f2eed4fa1d09bd9624a90d50cf526a3074beb2cb25b4b81729726314b4ec94"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\360x640\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\360x640\\original-system-entry.png",
+      "sha256": "4fc5c68be4342b965e50a0b3fdc1a1eaf85a4b62b4b55c18493b3bdeb2f44feb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\360x640\\original-system-end.png",
+      "sha256": "5aa25f1ac34164fcb0d1e715706c4fc17289619c8db7f5aed43b2d5981e26c2f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\360x640\\tutorial-returned.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\393x873\\report.json",
+      "sha256": "47a2b47c623e3d199863a38e0b35822f3363656c144c74d941b39302a5622322"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\393x873\\tutorial-first.png",
+      "sha256": "176ac91bf6dcf7c006d53897fc89c6fdf2442a89d0d2421cdeeb5222e630006b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\393x873\\original-system-entry.png",
+      "sha256": "c4e6dbcb5fc9d930c294b346e1f011b792c73dd850d2dac6674df3cb977eb519"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\393x873\\original-system-end.png",
+      "sha256": "adba56512e94f675aee3f47a208a03c8ec9840b7b5f565b435da6071295bcbdf"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\393x873\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\393x873\\tutorial-returned.png",
+      "sha256": "176ac91bf6dcf7c006d53897fc89c6fdf2442a89d0d2421cdeeb5222e630006b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\393x873\\report.json",
+      "sha256": "371083ffcaa88041126ea0c08fcf1edd7100b3626a9069854fdaa69494e378dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\393x873\\tutorial-first.png",
+      "sha256": "c27f17333377a899f42a9db07eb6ab2b775c25ad9321af26938cd61408771391"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\393x873\\original-system-entry.png",
+      "sha256": "5ee7ff0a2fa22da7701bd454a1212b06b1cebc722e5a4721e86e7f1616e877c3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\393x873\\original-system-end.png",
+      "sha256": "21668622522fde422c2a4d7fbb1cf4b9eb06669a1db9e8962a115407a664b081"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\393x873\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\393x873\\tutorial-returned.png",
+      "sha256": "c27f17333377a899f42a9db07eb6ab2b775c25ad9321af26938cd61408771391"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\393x873\\report.json",
+      "sha256": "075d7b4e3f5518df74bf0e8cfae82263051d87415cfd493dc31032f861ee103e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\393x873\\tutorial-first.png",
+      "sha256": "edb1db61ca0292471e8a26a48b6985d41179e4c6310eface624e3f7250fe8221"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\393x873\\original-system-entry.png",
+      "sha256": "5ee7ff0a2fa22da7701bd454a1212b06b1cebc722e5a4721e86e7f1616e877c3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\393x873\\original-system-end.png",
+      "sha256": "21668622522fde422c2a4d7fbb1cf4b9eb06669a1db9e8962a115407a664b081"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\393x873\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\393x873\\tutorial-returned.png",
+      "sha256": "edb1db61ca0292471e8a26a48b6985d41179e4c6310eface624e3f7250fe8221"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\412x915\\report.json",
+      "sha256": "42156d00766817d9f91cdd5789479943bd3939f99e63cc74a1902bfa7890945c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\412x915\\tutorial-first.png",
+      "sha256": "2506513b4f5872aad9693dd060b4b01cbb90ecc419b4b8a771819343eb9899d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\412x915\\original-system-entry.png",
+      "sha256": "17db1373f5aac21c6a55abb2c1be5dff2f087eac2c2e8f6cf2a4056e428ed233"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\412x915\\original-system-end.png",
+      "sha256": "510bce0531fff1d35d9eb873580b965d68b280cf1c1fe1f747513527296f3550"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\412x915\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\412x915\\tutorial-returned.png",
+      "sha256": "2506513b4f5872aad9693dd060b4b01cbb90ecc419b4b8a771819343eb9899d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\412x915\\report.json",
+      "sha256": "f0b120a4c2b7b96250a5352e32c29876786e5d7c47e5abed22a971b1e5da4f12"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\412x915\\tutorial-first.png",
+      "sha256": "08245339bfc07c817e47326b5d2e83c8e27e8b950ec44f43efa72902fb493446"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\412x915\\original-system-entry.png",
+      "sha256": "611e3eb6205464d904c759724e6bc9b1af1cdca463fdea6ed339cd7ba817baed"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\412x915\\original-system-end.png",
+      "sha256": "5d84d61f32bb481e34d65644db935e8868a29284bd5a83d8ac3949df135b94fd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\equipment\\412x915\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\412x915\\tutorial-returned.png",
+      "sha256": "08245339bfc07c817e47326b5d2e83c8e27e8b950ec44f43efa72902fb493446"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\412x915\\report.json",
+      "sha256": "4db151ed100026a44f30afdb78bea03451fcb1c24ea80163707edfe104df4693"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\412x915\\tutorial-first.png",
+      "sha256": "f36fcb14fb7f4fe0159d16ae31cf2ef881981b57fe8114fbbb7b65a32597423c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\412x915\\original-system-entry.png",
+      "sha256": "611e3eb6205464d904c759724e6bc9b1af1cdca463fdea6ed339cd7ba817baed"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\412x915\\original-system-end.png",
+      "sha256": "5d84d61f32bb481e34d65644db935e8868a29284bd5a83d8ac3949df135b94fd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\recovery\\412x915\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\412x915\\tutorial-returned.png",
+      "sha256": "f36fcb14fb7f4fe0159d16ae31cf2ef881981b57fe8114fbbb7b65a32597423c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\1280x800\\report.json",
+      "sha256": "46d58a0d1e626958c2e44e1a5a226eda7417900123234c8f5ff38745ef48a0de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\1280x800\\tutorial-first.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\1280x800\\original-system-entry.png",
+      "sha256": "bc55572d2de325fab5464a1096e97ba30f26d4f4459697157505623b7dcc7ab0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\1280x800\\original-system-end.png",
+      "sha256": "77de08bcd6c7780a01ed0083daf3b3745b88196c76572a3d1cb22abb51e4f38e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\skill\\1280x800\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\skill\\1280x800\\tutorial-returned.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\1280x800\\report.json",
+      "sha256": "aac75052ed8c520558dc610d81f5b573e0f27e761c8be9a56c8d37b84a001f50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\1280x800\\tutorial-first.png",
+      "sha256": "e77296a81d465c1bf2e29502a1c1f8f1a1ba03a49a9bd7d54415e39323c902ed"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\1280x800\\original-system-entry.png",
+      "sha256": "c08d8b7209bbbae68e3df8317aa3d4741beaee6fa5f5dc3f492f0137c02e84d5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\1280x800\\original-system-end.png",
+      "sha256": "ea1f782ce7031f093f171cee4e7ef6b5e4685550014778cf1b1123ded9e5c1fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\equipment\\1280x800\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\equipment\\1280x800\\tutorial-returned.png",
+      "sha256": "e77296a81d465c1bf2e29502a1c1f8f1a1ba03a49a9bd7d54415e39323c902ed"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\1280x800\\report.json",
+      "sha256": "4a6232fb86aa455a4c49a6e17c25ef81d22d0bed6aaf0dc205be1452ef3ed5a0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\1280x800\\tutorial-first.png",
+      "sha256": "da2449567230aa74d845c17f42c1d6b998a41dc88c6032049299f70a268b56b3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\1280x800\\original-system-entry.png",
+      "sha256": "c08d8b7209bbbae68e3df8317aa3d4741beaee6fa5f5dc3f492f0137c02e84d5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\1280x800\\original-system-end.png",
+      "sha256": "ea1f782ce7031f093f171cee4e7ef6b5e4685550014778cf1b1123ded9e5c1fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\desktop-native-wheel\\recovery\\1280x800\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\accepted\\recovery\\1280x800\\tutorial-returned.png",
+      "sha256": "da2449567230aa74d845c17f42c1d6b998a41dc88c6032049299f70a268b56b3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\blocked-target.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\failure.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\original-system-entry.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\report.json",
+      "sha256": "1e67b104a4aa0dd7e41956768ad9b45c3206db013756f993978e03e5aaa8ab10"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-331f01f0\\recovery\\360x640\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\blocked-target.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\failure.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\original-system-entry.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\report.json",
+      "sha256": "59aed115d06b65f159c256338fb52c0877bdfa5779734177dde66358ba1bc549"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-fcb3eba9\\diagnostic\\recovery\\360x640\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\skill\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\skill\\360x640\\original-system-entry.png",
+      "sha256": "dd086f62ed9111db7e33a5a5b5b684199bcff9c6096450f717c2ce95fd1e466d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\skill\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\skill\\360x640\\report.json",
+      "sha256": "b2c6a6412d65873b95d0a633f95f2753ee64d986bc49ec0544b2731feae02320"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\skill\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\skill\\360x640\\tutorial-first.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\skill\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\skill\\360x640\\tutorial-returned.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\equipment\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\equipment\\360x640\\original-system-entry.png",
+      "sha256": "e288f4f17b93596dc7d8ec742fd87ffca6eec010a303490d66548fefd6f8be13"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\equipment\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\equipment\\360x640\\report.json",
+      "sha256": "47e1ee8a95d26d288504e2659b168d2f6896c4d6ca8deab49eaae06f4e3ce10b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\equipment\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\equipment\\360x640\\tutorial-first.png",
+      "sha256": "a3cb8c7782a82a7926184663b0baba2db7532315dbc5ec50dd3b2ad1c890da2d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-53019886\\equipment\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-53019886\\equipment\\360x640\\tutorial-returned.png",
+      "sha256": "a3cb8c7782a82a7926184663b0baba2db7532315dbc5ec50dd3b2ad1c890da2d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\failure.png",
+      "sha256": "e3af71796155d9148650fdd0f76b6119917b2c8c5ad9b61bc869dd6dbf8e583a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\original-system-entry.png",
+      "sha256": "b147512934baf8cf315050073e5f69afa8504d7d5db0261c0a6bbfb3c61d91e8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\report.json",
+      "sha256": "9ccf601cd41228714c214ff7be1c37cb30f5d11832a59895e61177f0422e72e6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-tutorial-display-3b80199c\\host-resolved\\skill\\1280x800\\tutorial-first.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\original-system-entry.png",
+      "sha256": "94a850752142d340f79c45ab6a7c9a44a741ced04acb5742e907632e691fe0c8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\report.json",
+      "sha256": "42a6afe0432dd7f208bd5b15ea2a941e1fcfa5628a8556fcf6085253f5092456"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\skill-after-3s.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\skill-after-3s.png",
+      "sha256": "99b759aa1c33361b56c5af63d7a006b030fcbd4a8b979d06a606367db5200310"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\tutorial-first.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-skill-host-diagnostic-53019886\\host-diagnostic\\skill\\360x640\\tutorial-returned.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\original-system-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\original-system-end.png",
+      "sha256": "5e850dd33f7596fede6a212cf78331e451e164d5aaa829c6b51aeb3e1b7ede47"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\original-system-entry.png",
+      "sha256": "6a2778539fe74e801d325b13b31db871661ff97a3408d358c567529ad4d2b68c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\report.json",
+      "sha256": "711a8d36079c138af2a6dabf81b721420efc300174b260b0fb36b1694973008d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\tutorial-first.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\excluded-diagnostics\\segment29-wheel-diagnostic-3b80199c\\three-wheels\\skill\\1280x800\\tutorial-returned.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\segment29-tutorial-display.mjs.before-host-gates.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\helpers\\segment29-tutorial-display.mjs.before-host-gates.gz",
+      "sha256": "f388d26bf7bdff22ca9fa479ffd64af46147dd4cc99c4f1d74fa52e3b503fc28"
+    },
+    {
+      "from": "artifacts\\segment29-tutorial-display.mjs.before-native-wheel.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29-tutorial-display-accepted\\helpers\\segment29-tutorial-display.mjs.before-native-wheel.gz",
+      "sha256": "9265045d0a37bd8fcc4d94115cde70f1cabbc00504d0d05b675fc89c38ddf13c"
+    }
+  ],
+  "helperSha256": "9d19c0302913fcf15035119f9aafd707cbf9ab46d91fe8d141fbc62ad72e5f77",
+  "limits": [
+    "Only isolated active-guidance skill/equipment/recovery system entry, destination read/end and return; not completed tutorials",
+    "Skill actual character modal/borrowed node restored; inventory natural empty slots only, not full120/pager/cancel-context",
+    "No learning/equipment/claim/preparation-confirm/potion/combat/settlement/cloud actions; recovery secondary confirmation is readable, not a verified disabled state",
+    "Same-task selected domain unchanged for entry/navigation/return, not zero local saves; original open lastViewedAt/beginChapter effects retained",
+    "Prior black/overlap/pointer/wheel failures retained only as diagnostics; desktop native-wheel replaces inadequate old bounded wheel distance"
+  ]
+}

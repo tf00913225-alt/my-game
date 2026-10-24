@@ -6,6 +6,9 @@ import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url),model=require('../functions/src/equipment-reforge');
 const progression=fs.readFileSync('js/equipment-progression.js','utf8');
 const forge=fs.readFileSync('js/36-v141-content-systems.js','utf8');
+const retiredModalSummary=fs.readFileSync('js/35-v141-ui-battle.js','utf8');
+assert.doesNotMatch(retiredModalSummary,/appendReforgeStatsToModal|v141-item-reforge/,'modal affixes have one canonical per-slot presentation owner');
+assert.doesNotMatch(fs.readFileSync('css/38-v141-system-expansion.css','utf8'),/v141-item-reforge/,'retired summary must not retain a competing style owner');
 const format=vm.runInNewContext(forge.match(/const STAT_LABEL=\{[^;]+;/)[0]+forge.slice(forge.indexOf('    function reforgeSlotText('),forge.indexOf('    window.FourSymbolsReforge='))+';reforgeSlotText');
 function detail(item){
  const rows=[];const c={window:{FourSymbolsEquipmentReforge:model,FourSymbolsReforge:{slotCount:model.slotCount,slots:model.slots,reason:()=>'',slotText:format}},
@@ -22,6 +25,7 @@ test('backpack shows canonical slots separately, counts only empty slots and nev
   const before=JSON.stringify(item),slots=model.slots(item),view=detail(item);
   assert.equal(view.remaining,slots.filter(a=>a===null).length);
   assert.equal(view.rows.length,slots.length);
+  slots.forEach((a,i)=>assert.ok(view.rows[i].includes('詞條 '+(i+1)+'：'+format(a)),'filled and empty slots must retain their original position labels'));
   slots.forEach((a,i)=>assert.ok(view.rows[i].includes(a?String(a.value):'[可冶煉]')));
   const html=vm.runInNewContext(forge.slice(forge.indexOf('        const affixes=currentEntries.map('),forge.indexOf('        const actions=pending?'))+';affixes',
    {currentEntries:slots,reforgeSlotText:format,escapeHtml:String,lockSet:new Set(),pending:null});

@@ -167,6 +167,7 @@
 
 #game-ui #homeFeatureModal.release-update-modal .release-update-suppress-today{
     display:flex;
+    min-height:132px;
     align-items:center;
     justify-content:flex-end;
     gap:21px;

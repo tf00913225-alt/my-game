@@ -1,0 +1,17 @@
+{
+  "head": "bd003a9fe5827abf983b499c99129249795b4d8d",
+  "factor": "Only ephemeral read of battle-turn-row-height64→20, product unchanged, old timer does not meet current readability and cannot be restored as fix",
+  "baseline": {
+    "artHeight": 90.0836181640625,
+    "unitHeight": 118.18942260742188,
+    "allyZone": 244.24179077148438,
+    "center": 160.87619018554688
+  },
+  "counterfactual": {
+    "artHeight": 100.806640625,
+    "unitHeight": 127.93765258789062,
+    "allyZone": 263.7382507324219,
+    "center": 117.71429443359375
+  },
+  "scope": "Static original fixture read to actual completion; no Gate bypass or gameplay claim"
+}

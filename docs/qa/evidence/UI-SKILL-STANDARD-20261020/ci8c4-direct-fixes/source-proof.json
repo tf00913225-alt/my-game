@@ -1,0 +1,31 @@
+{
+  "parent": "8c4cd1d0cfa34eb6e5ffa9f05c0244a51b9d8316",
+  "dirty": true,
+  "hashes": {
+    "css/fixed-slot-battlefield-rendering-v2.css": "779d59c6e032845d9221ef01c6b3e7b4bb8ecc22a40916fec977332a23f18c6d",
+    "js/adventure/adventure-ui-v1-20260915.js": "d6a77ce5e2dd7f9d687461eb352c4d06772efe69a551bb6bc4890029bf496b40",
+    "asset-manifest.json": "6c33dae571c050a743c2f1b6f0db6139eb7bed74de97ae59b03901924c86d2cc",
+    "tests/chapter1-story-finalization.test.js": "886ffa89f7439ddfb10705de427df08b0e9448d2dd07548039713ab43cf8e348"
+  },
+  "firstFailure": {
+    "run": 40094082451,
+    "attempt": 1,
+    "head": "8c4cd1d0cfa34eb6e5ffa9f05c0244a51b9d8316",
+    "coreJob": 120872778248,
+    "core": "battle-missing-repair-recovery: old78/300/overlay-selector assertions; real timer-card overlap confirmed before",
+    "adventureJob": 120872778405,
+    "artifact": 12560246546,
+    "adventure": "c1_02 guidance skill modal not .active; no-guide overlay; return hit blocked by this overlay"
+  },
+  "ownerHandoff": "991/d688 originalAdventure Owner delivered bounded legacy modal selector compatibility; exact1line only, no991merge/newflow/Core/Content, existing955 staticfooter retained",
+  "tests": {
+    "pass": 95,
+    "fail": 0
+  },
+  "itemScope": "four viewports empty/full/end actual touch/wheel/close, quantities unchanged, timer visible clear of cards; no consumption",
+  "legacyScope": "393 original trusted touch learn/equip/static return and c1_02 re-entry; no victory/five-lesson/twenty-node acceptance",
+  "invalidProbe": "first modal-visual helper used out-of-scope step label; no product change, excluded; final trace.length helper PASS",
+  "unchanged": "main/js35/skill costs/rewards/save/security/gameplay logic untouched",
+  "ci": "latestHead natural required CI after normal checkpoint push, not oldgreen",
+  "automation": "955 PAUSED"
+}

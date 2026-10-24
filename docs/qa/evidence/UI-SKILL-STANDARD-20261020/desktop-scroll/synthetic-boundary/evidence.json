@@ -1,0 +1,113 @@
+{
+  "head": "4f971647f0c4d414b247b9253125b1766823fb01",
+  "sourceHash": "c977d1fd9a6424b4f3db7b16f0704e94b276913932c73f0121114d4859183ae5",
+  "cases": [
+    {
+      "name": "original mouse drag missing",
+      "scroll": 0
+    },
+    {
+      "name": "mouse horizontal scale 1",
+      "scroll": 80,
+      "noReward": true
+    },
+    {
+      "name": "nested vertical scale 1",
+      "scroll": 65,
+      "noReward": true
+    },
+    {
+      "name": "mouse horizontal scale 0.5",
+      "scroll": 160,
+      "noReward": true
+    },
+    {
+      "name": "nested vertical scale 0.5",
+      "scroll": 130,
+      "noReward": true
+    },
+    {
+      "name": "native wheel retained"
+    },
+    {
+      "name": "keyboard activation retained"
+    },
+    {
+      "name": "both horizontal ends clamp without reward"
+    },
+    {
+      "name": "dedicated input excluded #edit"
+    },
+    {
+      "name": "dedicated input excluded #range"
+    },
+    {
+      "name": "dedicated input excluded #textarea"
+    },
+    {
+      "name": "dedicated input excluded #select"
+    },
+    {
+      "name": "dedicated input excluded #editable"
+    },
+    {
+      "name": "dedicated input excluded #emptyEditable"
+    },
+    {
+      "name": "dedicated input excluded #formation"
+    },
+    {
+      "name": "dedicated input excluded #battleElementBoxButton"
+    },
+    {
+      "name": "dedicated input excluded #v141TaskTracker"
+    },
+    {
+      "name": "dedicated input excluded #hold"
+    },
+    {
+      "name": "dedicated input excluded #canvas"
+    },
+    {
+      "name": "blur capture cleanup and next tap"
+    },
+    {
+      "name": "unregister during mouse drag and fresh click"
+    },
+    {
+      "name": "unregister then resize preserves keyboard and suppresses release"
+    },
+    {
+      "name": "unregister then blur preserves keyboard and suppresses release"
+    },
+    {
+      "name": "unregister while held longer than click lifetime cannot claim"
+    },
+    {
+      "name": "active blur held longer than completion lifetime cannot claim"
+    },
+    {
+      "name": "active resize held longer than completion lifetime cannot claim"
+    },
+    {
+      "name": "pointercancel retires capture and preserves next tap"
+    },
+    {
+      "name": "lostcapture retires capture and preserves next tap"
+    },
+    {
+      "name": "resize retires capture and preserves next tap"
+    },
+    {
+      "name": "removed retires capture and preserves next tap"
+    },
+    {
+      "name": "capture unavailable retains drag suppression"
+    },
+    {
+      "name": "native touch pan and no reward"
+    }
+  ],
+  "diagnostics": [],
+  "scope": "Synthetic inputs/actions only; no accounts, game rewards or saves; browser touch emulation, not hardware"
+}

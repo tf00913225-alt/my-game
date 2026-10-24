@@ -1,0 +1,6298 @@
+{
+  "head": "ea1b80a8539b6324d2137d07dbc5d1343796b94d",
+  "viewport": [
+    412,
+    915
+  ],
+  "clean": true,
+  "complete": true,
+  "sourceBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "js/00-main.js": "8dc2846d440b7f71f11c3e4940bc32644d4a47781a63c0b45da025419bcc0003",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.b9dc95f7bda0.js": "b9dc95f7bda06595e73c1a1cd2eefedd0515130e9e3d7b6caac3ea9ae3f627b7",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.980ae347f204.js": "980ae347f2048292d2cf2bac04a7c67c5694de3685d461afce0be46c7094bbc1",
+    "build/gameplay-core-secondary.5a9572681588.js": "5a957268158852d539bee7b8884d59f76d6a7c686e26f6764b174928fdcd20f0",
+    "build/gameplay-core.98f3502bd4a4.css": "98f3502bd4a4b3622e154496aefe542b04785a660ad0e639847f09d83129a986"
+  },
+  "inputs": [
+    {
+      "kind": "attempt",
+      "selector": "[data-city-entry=\"1\"]",
+      "x": 34.33333349227905,
+      "y": 515.5507965087891,
+      "rect": {
+        "x": 6.866666316986084,
+        "y": 488.0841369628906,
+        "width": 54.93333435058594,
+        "height": 54.933319091796875,
+        "top": 488.0841369628906,
+        "right": 61.80000066757202,
+        "bottom": 543.0174560546875,
+        "left": 6.866666316986084
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n            \n            英雄\n        "
+    },
+    {
+      "kind": "attempt",
+      "selector": "[onclick=\"filterHeroPage('water')\"]",
+      "x": 205.99701690673828,
+      "y": 284.6889343261719,
+      "rect": {
+        "x": 176.92991638183594,
+        "y": 259.51116943359375,
+        "width": 58.13420104980469,
+        "height": 50.35552978515625,
+        "top": 259.51116943359375,
+        "right": 235.06411743164062,
+        "bottom": 309.86669921875,
+        "left": 176.92991638183594
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "水"
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 0,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 345.3111572265625
+      }
+    },
+    {
+      "kind": "attempt",
+      "selector": "[onclick=\"filterHeroPage('earth')\"]",
+      "x": 336.00469970703125,
+      "y": 284.6889343261719,
+      "rect": {
+        "x": 306.9375915527344,
+        "y": 259.51116943359375,
+        "width": 58.13421630859375,
+        "height": 50.35552978515625,
+        "top": 259.51116943359375,
+        "right": 365.0718078613281,
+        "bottom": 309.86669921875,
+        "left": 306.9375915527344
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "土"
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 0,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 345.3111572265625
+      }
+    },
+    {
+      "kind": "attempt",
+      "selector": "[onclick=\"filterHeroPage('all')\"]",
+      "x": 75.98932075500488,
+      "y": 284.6889343261719,
+      "rect": {
+        "x": 46.92222213745117,
+        "y": 259.51116943359375,
+        "width": 58.13419723510742,
+        "height": 50.35552978515625,
+        "top": 259.51116943359375,
+        "right": 105.0564193725586,
+        "bottom": 309.86669921875,
+        "left": 46.92222213745117
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "全部"
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 0,
+        "client": 1194,
+        "total": 2547,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 345.3111572265625
+      }
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 1029,
+        "client": 1194,
+        "total": 2547,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 345.3111572265625
+      }
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-card[data-hero-id=\"divineDogHongbao\"]",
+      "x": 106.05185317993164,
+      "y": 606.5311431884766,
+      "rect": {
+        "x": 60.65555191040039,
+        "y": 498.7000427246094,
+        "width": 90.7926025390625,
+        "height": 215.66220092773438,
+        "top": 498.7000427246094,
+        "right": 151.4481544494629,
+        "bottom": 714.3622436523438,
+        "left": 60.65555191040039
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n        神犬紅包火・0 星Lv.70"
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 0,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 1988,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 3990,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-detail-back",
+      "x": 205.99999618530273,
+      "y": 225.1778335571289,
+      "rect": {
+        "x": 46.92222213745117,
+        "y": 200.00006103515625,
+        "width": 318.1555480957031,
+        "height": 50.35554504394531,
+        "top": 200.00006103515625,
+        "right": 365.0777702331543,
+        "bottom": 250.35560607910156,
+        "left": 46.92222213745117
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "‹ 返回英雄列表"
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-card[data-hero-id=\"divineDogHongbao\"]",
+      "x": 106.05185317993164,
+      "y": 606.5311431884766,
+      "rect": {
+        "x": 60.65555191040039,
+        "y": 498.7000427246094,
+        "width": 90.7926025390625,
+        "height": 215.66220092773438,
+        "top": 498.7000427246094,
+        "right": 151.4481544494629,
+        "bottom": 714.3622436523438,
+        "left": 60.65555191040039
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n        神犬紅包火・0 星Lv.70"
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-detail-back",
+      "x": 205.99999618530273,
+      "y": 225.1778335571289,
+      "rect": {
+        "x": 46.92222213745117,
+        "y": 200.00006103515625,
+        "width": 318.1555480957031,
+        "height": 50.35554504394531,
+        "top": 200.00006103515625,
+        "right": 365.0777702331543,
+        "bottom": 250.35560607910156,
+        "left": 46.92222213745117
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "‹ 返回英雄列表"
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-card[data-hero-id=\"vajraHeavenlyKing\"]",
+      "x": 205.99999237060547,
+      "y": 606.5311431884766,
+      "rect": {
+        "x": 160.60369873046875,
+        "y": 498.7000427246094,
+        "width": 90.79258728027344,
+        "height": 215.66220092773438,
+        "top": 498.7000427246094,
+        "right": 251.3962860107422,
+        "bottom": 714.3622436523438,
+        "left": 160.60369873046875
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n        金剛天王風・0 星Lv.70"
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 0,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 1955,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "true-scroll",
+      "selector": "#heroPageContent",
+      "direction": 1,
+      "before": {
+        "top": 3145,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        },
+        "x": 301.4466606140137,
+        "y": 752.800048828125,
+        "to": 285.800048828125
+      }
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-detail-back",
+      "x": 205.99999618530273,
+      "y": 225.1778335571289,
+      "rect": {
+        "x": 46.92222213745117,
+        "y": 200.00006103515625,
+        "width": 318.1555480957031,
+        "height": 50.35554504394531,
+        "top": 200.00006103515625,
+        "right": 365.0777702331543,
+        "bottom": 250.35560607910156,
+        "left": 46.92222213745117
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "‹ 返回英雄列表"
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-card[data-hero-id=\"vajraHeavenlyKing\"]",
+      "x": 205.99999237060547,
+      "y": 606.5311431884766,
+      "rect": {
+        "x": 160.60369873046875,
+        "y": 498.7000427246094,
+        "width": 90.79258728027344,
+        "height": 215.66220092773438,
+        "top": 498.7000427246094,
+        "right": 251.3962860107422,
+        "bottom": 714.3622436523438,
+        "left": 160.60369873046875
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n        金剛天王風・0 星Lv.70"
+    },
+    {
+      "kind": "attempt",
+      "selector": ".hero-detail-back",
+      "x": 205.99999618530273,
+      "y": 225.1778335571289,
+      "rect": {
+        "x": 46.92222213745117,
+        "y": 200.00006103515625,
+        "width": 318.1555480957031,
+        "height": 50.35554504394531,
+        "top": 200.00006103515625,
+        "right": 365.0777702331543,
+        "bottom": 250.35560607910156,
+        "left": 46.92222213745117
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "‹ 返回英雄列表"
+    },
+    {
+      "kind": "attempt",
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 326.0235900878906,
+      "y": 163.3778305053711,
+      "rect": {
+        "x": 286.96942138671875,
+        "y": 138.20005798339844,
+        "width": 78.10833740234375,
+        "height": 50.35554504394531,
+        "top": 138.20005798339844,
+        "right": 365.0777587890625,
+        "bottom": 188.55560302734375,
+        "left": 286.96942138671875
+      },
+      "disabled": false,
+      "hit": true,
+      "label": "\n        返回\n    "
+    }
+  ],
+  "checks": [
+    {
+      "phase": "before-acquisition-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": false,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": false,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "after-acquisition-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": true,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": true,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "before-growth-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": false,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": false,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "after-growth-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": false,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": false,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "before-formation-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": false,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": false,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "after-formation-read",
+      "status": {
+        "growth": {
+          "ready": true,
+          "busy": false,
+          "error": null,
+          "pending": null,
+          "loginRewards": [
+            {
+              "day": 3,
+              "heroId": "divineDogHongbao",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            },
+            {
+              "day": 7,
+              "heroId": "vajraHeavenlyKing",
+              "fragments": 25,
+              "marrowPills": 1,
+              "eligible": false,
+              "claimed": false
+            }
+          ],
+          "dailySupply": {
+            "periodDate": "20261021",
+            "fragments": {
+              "divineDogHongbao": 5,
+              "vajraHeavenlyKing": 5
+            },
+            "marrowPills": 1,
+            "claimed": true
+          },
+          "testMode": false,
+          "devAvailable": false,
+          "marrowPills": 5
+        },
+        "formation": {
+          "ready": true,
+          "busy": false,
+          "pending": null,
+          "error": null,
+          "playerIndexes": [
+            0
+          ]
+        }
+      }
+    },
+    {
+      "phase": "ready-owned-two-card-binding",
+      "ids": [
+        "divineDogHongbao",
+        "vajraHeavenlyKing"
+      ],
+      "growth": {
+        "ready": true,
+        "busy": false,
+        "error": null,
+        "pending": null,
+        "loginRewards": [
+          {
+            "day": 3,
+            "heroId": "divineDogHongbao",
+            "fragments": 25,
+            "marrowPills": 1,
+            "eligible": false,
+            "claimed": false
+          },
+          {
+            "day": 7,
+            "heroId": "vajraHeavenlyKing",
+            "fragments": 25,
+            "marrowPills": 1,
+            "eligible": false,
+            "claimed": false
+          }
+        ],
+        "dailySupply": {
+          "periodDate": "20261021",
+          "fragments": {
+            "divineDogHongbao": 5,
+            "vajraHeavenlyKing": 5
+          },
+          "marrowPills": 1,
+          "claimed": true
+        },
+        "testMode": false,
+        "devAvailable": false,
+        "marrowPills": 5
+      }
+    },
+    {
+      "phase": "empty-water",
+      "selected": null,
+      "tab": "overview",
+      "element": "water",
+      "owner": {
+        "top": 0,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 354.5000305175781,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 354.5000305175781,
+            "right": 351.344425201416,
+            "bottom": 385.4000549316406,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 355.26300048828125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 355.26300048828125,
+            "right": 185.39999771118164,
+            "bottom": 384.6370849609375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 633.7445068359375,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 633.7445068359375,
+            "right": 351.344425201416,
+            "bottom": 664.6444702148438,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 634.5074462890625,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 634.5074462890625,
+            "right": 185.39999771118164,
+            "bottom": 663.8815307617188,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "今日已領取",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 550.2000732421875,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 550.2000732421875,
+            "right": 351.344425201416,
+            "bottom": 600.5556030273438,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "empty-water-end",
+      "selected": null,
+      "tab": "overview",
+      "element": "water",
+      "owner": {
+        "top": 884,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 17.270423889160156,
+            "width": 290.6888732910156,
+            "height": 30.900001525878906,
+            "top": 17.270423889160156,
+            "right": 351.344425201416,
+            "bottom": 48.17042541503906,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 18.03338623046875,
+            "width": 124.74444580078125,
+            "height": 29.37407684326172,
+            "top": 18.03338623046875,
+            "right": 185.39999771118164,
+            "bottom": 47.40746307373047,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 296.5148620605469,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 296.5148620605469,
+            "right": 351.344425201416,
+            "bottom": 327.41485595703125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 297.27783203125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 297.27783203125,
+            "right": 185.39999771118164,
+            "bottom": 326.65191650390625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 457.88153076171875,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 457.88153076171875,
+            "right": 351.344425201416,
+            "bottom": 508.2370910644531,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 576.9037475585938,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 576.9037475585938,
+            "right": 351.344425201416,
+            "bottom": 627.25927734375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "同步登入與獎勵",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 627.25927734375,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 627.25927734375,
+            "right": 351.344425201416,
+            "bottom": 677.6148681640625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "visible-empty-filter-message",
+      "element": "water",
+      "text": "此分類目前沒有已擁有英雄。",
+      "ink": {
+        "x": 60.65555191040039,
+        "y": 690.2037353515625,
+        "width": 208.28887939453125,
+        "height": 23.2703857421875,
+        "top": 690.2037353515625,
+        "right": 268.94443130493164,
+        "bottom": 713.47412109375,
+        "left": 60.65555191040039
+      },
+      "box": {
+        "x": 60.65555191040039,
+        "y": 689.0592651367188,
+        "width": 290.6888732910156,
+        "height": 25.63079833984375,
+        "top": 689.0592651367188,
+        "right": 351.344425201416,
+        "bottom": 714.6900634765625,
+        "left": 60.65555191040039
+      },
+      "owner": {
+        "x": 46.92222213745117,
+        "y": 321.3111572265625,
+        "width": 318.1555480957031,
+        "height": 455.4888916015625,
+        "top": 321.3111572265625,
+        "right": 365.0777702331543,
+        "bottom": 776.800048828125,
+        "left": 46.92222213745117
+      },
+      "cards": 0
+    },
+    {
+      "phase": "empty-earth",
+      "selected": null,
+      "tab": "overview",
+      "element": "earth",
+      "owner": {
+        "top": 0,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 354.5000305175781,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 354.5000305175781,
+            "right": 351.344425201416,
+            "bottom": 385.4000549316406,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 355.26300048828125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 355.26300048828125,
+            "right": 185.39999771118164,
+            "bottom": 384.6370849609375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 633.7445068359375,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 633.7445068359375,
+            "right": 351.344425201416,
+            "bottom": 664.6444702148438,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 634.5074462890625,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 634.5074462890625,
+            "right": 185.39999771118164,
+            "bottom": 663.8815307617188,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "今日已領取",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 550.2000732421875,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 550.2000732421875,
+            "right": 351.344425201416,
+            "bottom": 600.5556030273438,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "empty-earth-end",
+      "selected": null,
+      "tab": "overview",
+      "element": "earth",
+      "owner": {
+        "top": 884,
+        "client": 1194,
+        "total": 2078,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 17.270423889160156,
+            "width": 290.6888732910156,
+            "height": 30.900001525878906,
+            "top": 17.270423889160156,
+            "right": 351.344425201416,
+            "bottom": 48.17042541503906,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 18.03338623046875,
+            "width": 124.74444580078125,
+            "height": 29.37407684326172,
+            "top": 18.03338623046875,
+            "right": 185.39999771118164,
+            "bottom": 47.40746307373047,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 296.5148620605469,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 296.5148620605469,
+            "right": 351.344425201416,
+            "bottom": 327.41485595703125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 297.27783203125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 297.27783203125,
+            "right": 185.39999771118164,
+            "bottom": 326.65191650390625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 457.88153076171875,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 457.88153076171875,
+            "right": 351.344425201416,
+            "bottom": 508.2370910644531,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 576.9037475585938,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 576.9037475585938,
+            "right": 351.344425201416,
+            "bottom": 627.25927734375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "同步登入與獎勵",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 627.25927734375,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 627.25927734375,
+            "right": 351.344425201416,
+            "bottom": 677.6148681640625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "visible-empty-filter-message",
+      "element": "earth",
+      "text": "此分類目前沒有已擁有英雄。",
+      "ink": {
+        "x": 60.65555191040039,
+        "y": 690.2037353515625,
+        "width": 208.28887939453125,
+        "height": 23.2703857421875,
+        "top": 690.2037353515625,
+        "right": 268.94443130493164,
+        "bottom": 713.47412109375,
+        "left": 60.65555191040039
+      },
+      "box": {
+        "x": 60.65555191040039,
+        "y": 689.0592651367188,
+        "width": 290.6888732910156,
+        "height": 25.63079833984375,
+        "top": 689.0592651367188,
+        "right": 351.344425201416,
+        "bottom": 714.6900634765625,
+        "left": 60.65555191040039
+      },
+      "owner": {
+        "x": 46.92222213745117,
+        "y": 321.3111572265625,
+        "width": 318.1555480957031,
+        "height": 455.4888916015625,
+        "top": 321.3111572265625,
+        "right": 365.0777702331543,
+        "bottom": 776.800048828125,
+        "left": 46.92222213745117
+      },
+      "cards": 0
+    },
+    {
+      "phase": "divineDogHongbao-top",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 0,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": 261.800048828125,
+            "width": 159.25062561035156,
+            "height": 30.899993896484375,
+            "top": 261.800048828125,
+            "right": 351.34442138671875,
+            "bottom": 292.7000427246094,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": 262.5630187988281,
+            "width": 83.16297912597656,
+            "height": 29.374053955078125,
+            "top": 262.5630187988281,
+            "right": 275.25677490234375,
+            "bottom": 291.93707275390625,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 500.2974853515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 500.2974853515625,
+            "right": 351.344425201416,
+            "bottom": 531.197509765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 501.0604553222656,
+            "width": 83.1629638671875,
+            "height": 29.374114990234375,
+            "top": 501.0604553222656,
+            "right": 143.8185157775879,
+            "bottom": 530.4345703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 655.9419555664062,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 655.9419555664062,
+            "right": 351.344425201416,
+            "bottom": 686.8419189453125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 656.7048950195312,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 656.7048950195312,
+            "right": 143.8185157775879,
+            "bottom": 686.0789794921875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1135.6787109375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1135.6787109375,
+            "right": 351.344425201416,
+            "bottom": 1166.5787353515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1136.441650390625,
+            "width": 41.581478118896484,
+            "height": 29.3741455078125,
+            "top": 1136.441650390625,
+            "right": 102.23703002929688,
+            "bottom": 1165.8157958984375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1364.1861572265625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1364.1861572265625,
+            "right": 351.344425201416,
+            "bottom": 1395.086181640625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1364.9490966796875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1364.9490966796875,
+            "right": 185.39999771118164,
+            "bottom": 1394.3231201171875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1538.1417236328125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1538.1417236328125,
+            "right": 351.344425201416,
+            "bottom": 1569.0416259765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1538.9046630859375,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": 1538.9046630859375,
+            "right": 143.8185157775879,
+            "bottom": 1568.2786865234375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1709.808349609375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1709.808349609375,
+            "right": 351.344425201416,
+            "bottom": 1740.7083740234375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1710.5712890625,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1710.5712890625,
+            "right": 185.39999771118164,
+            "bottom": 1739.9453125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1881.4749755859375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1881.4749755859375,
+            "right": 351.344425201416,
+            "bottom": 1912.375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1882.2379150390625,
+            "width": 234.07464599609375,
+            "height": 29.3741455078125,
+            "top": 1882.2379150390625,
+            "right": 294.73019790649414,
+            "bottom": 1911.612060546875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 2179.030517578125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 2179.030517578125,
+            "right": 351.344425201416,
+            "bottom": 2209.930419921875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 2179.79345703125,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 2179.79345703125,
+            "right": 185.39999771118164,
+            "bottom": 2209.16748046875,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "同步取得紀錄",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 572.3974609375,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 572.3974609375,
+            "right": 351.344425201416,
+            "bottom": 622.7530517578125,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "divineDogHongbao-middle-0",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 1888,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -458.43695068359375,
+            "width": 159.25062561035156,
+            "height": 30.89996337890625,
+            "top": -458.43695068359375,
+            "right": 351.34442138671875,
+            "bottom": -427.5369873046875,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -457.67401123046875,
+            "width": 83.16297912597656,
+            "height": 29.37408447265625,
+            "top": -457.67401123046875,
+            "right": 275.25677490234375,
+            "bottom": -428.2999267578125,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -219.93951416015625,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -219.93951416015625,
+            "right": 351.344425201416,
+            "bottom": -189.03952026367188,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -219.17654418945312,
+            "width": 83.1629638671875,
+            "height": 29.374053955078125,
+            "top": -219.17654418945312,
+            "right": 143.8185157775879,
+            "bottom": -189.802490234375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -64.29507446289062,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -64.29507446289062,
+            "right": 351.344425201416,
+            "bottom": -33.39508056640625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -63.53211975097656,
+            "width": 83.1629638671875,
+            "height": 29.37407684326172,
+            "top": -63.53211975097656,
+            "right": 143.8185157775879,
+            "bottom": -34.158042907714844,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 415.44171142578125,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 415.44171142578125,
+            "right": 351.344425201416,
+            "bottom": 446.3417053222656,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 416.2046813964844,
+            "width": 41.581478118896484,
+            "height": 29.374053955078125,
+            "top": 416.2046813964844,
+            "right": 102.23703002929688,
+            "bottom": 445.5787353515625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 643.9490966796875,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 643.9490966796875,
+            "right": 351.344425201416,
+            "bottom": 674.84912109375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 644.7120971679688,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 644.7120971679688,
+            "right": 185.39999771118164,
+            "bottom": 674.0861206054688,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 817.9046630859375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 817.9046630859375,
+            "right": 351.344425201416,
+            "bottom": 848.8046875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 818.6676025390625,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 818.6676025390625,
+            "right": 143.8185157775879,
+            "bottom": 848.0416870117188,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 989.5713500976562,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 989.5713500976562,
+            "right": 351.344425201416,
+            "bottom": 1020.4713134765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 990.3342895507812,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 990.3342895507812,
+            "right": 185.39999771118164,
+            "bottom": 1019.7083740234375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1161.238037109375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1161.238037109375,
+            "right": 351.344425201416,
+            "bottom": 1192.137939453125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1162.0009765625,
+            "width": 234.07464599609375,
+            "height": 29.3740234375,
+            "top": 1162.0009765625,
+            "right": 294.73019790649414,
+            "bottom": 1191.375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1458.7935791015625,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1458.7935791015625,
+            "right": 351.344425201416,
+            "bottom": 1489.6934814453125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1459.5565185546875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1459.5565185546875,
+            "right": 185.39999771118164,
+            "bottom": 1488.9305419921875,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "升星（25 碎片）",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 281.5417175292969,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 281.5417175292969,
+            "right": 351.344425201416,
+            "bottom": 331.89727783203125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "洗髓（1 顆）",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 331.89727783203125,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 331.89727783203125,
+            "right": 351.344425201416,
+            "bottom": 382.2528076171875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n頭\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 453.2083740234375,
+            "width": 94.85775756835938,
+            "height": 93.844482421875,
+            "top": 453.2083740234375,
+            "right": 155.51330947875977,
+            "bottom": 547.0528564453125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n手\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 158.56515502929688,
+            "y": 453.2083740234375,
+            "width": 94.86370849609375,
+            "height": 93.844482421875,
+            "top": 453.2083740234375,
+            "right": 253.42886352539062,
+            "bottom": 547.0528564453125,
+            "left": 158.56515502929688
+          }
+        },
+        {
+          "label": "＋\n護腕\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 256.480712890625,
+            "y": 453.2083740234375,
+            "width": 94.86370849609375,
+            "height": 93.844482421875,
+            "top": 453.2083740234375,
+            "right": 351.34442138671875,
+            "bottom": 547.0528564453125,
+            "left": 256.480712890625
+          }
+        },
+        {
+          "label": "＋\n衣服\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 550.1046752929688,
+            "width": 94.85775756835938,
+            "height": 93.84442138671875,
+            "top": 550.1046752929688,
+            "right": 155.51330947875977,
+            "bottom": 643.9490966796875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n鞋子\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 158.56515502929688,
+            "y": 550.1046752929688,
+            "width": 94.86370849609375,
+            "height": 93.84442138671875,
+            "top": 550.1046752929688,
+            "right": 253.42886352539062,
+            "bottom": 643.9490966796875,
+            "left": 158.56515502929688
+          }
+        },
+        {
+          "label": "＋\n戒指\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 256.480712890625,
+            "y": 550.1046752929688,
+            "width": 94.86370849609375,
+            "height": 93.84442138671875,
+            "top": 550.1046752929688,
+            "right": 351.34442138671875,
+            "bottom": 643.9490966796875,
+            "left": 256.480712890625
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "divineDogHongbao-middle-1",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 3906,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -1228.2666015625,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -1228.2666015625,
+            "right": 351.34442138671875,
+            "bottom": -1197.3665771484375,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -1227.503662109375,
+            "width": 83.16297912597656,
+            "height": 29.3741455078125,
+            "top": -1227.503662109375,
+            "right": 275.25677490234375,
+            "bottom": -1198.1295166015625,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -989.7691650390625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -989.7691650390625,
+            "right": 351.344425201416,
+            "bottom": -958.869140625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -989.006103515625,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": -989.006103515625,
+            "right": 143.8185157775879,
+            "bottom": -959.632080078125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -834.1246948242188,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -834.1246948242188,
+            "right": 351.344425201416,
+            "bottom": -803.2246704101562,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -833.3616943359375,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": -833.3616943359375,
+            "right": 143.8185157775879,
+            "bottom": -803.9876708984375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -354.3879089355469,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -354.3879089355469,
+            "right": 351.344425201416,
+            "bottom": -323.4878845214844,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -353.62493896484375,
+            "width": 41.581478118896484,
+            "height": 29.37408447265625,
+            "top": -353.62493896484375,
+            "right": 102.23703002929688,
+            "bottom": -324.2508544921875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -125.8804931640625,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -125.8804931640625,
+            "right": 351.344425201416,
+            "bottom": -94.98049926757812,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -125.11753845214844,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -125.11753845214844,
+            "right": 185.39999771118164,
+            "bottom": -95.74345397949219,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 48.07505416870117,
+            "width": 290.6888732910156,
+            "height": 30.89999771118164,
+            "top": 48.07505416870117,
+            "right": 351.344425201416,
+            "bottom": 78.97505187988281,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 48.83802032470703,
+            "width": 83.1629638671875,
+            "height": 29.374069213867188,
+            "top": 48.83802032470703,
+            "right": 143.8185157775879,
+            "bottom": 78.21208953857422,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 219.74171447753906,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 219.74171447753906,
+            "right": 351.344425201416,
+            "bottom": 250.64170837402344,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 220.5046844482422,
+            "width": 124.74444580078125,
+            "height": 29.374069213867188,
+            "top": 220.5046844482422,
+            "right": 185.39999771118164,
+            "bottom": 249.87875366210938,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 391.40838623046875,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 391.40838623046875,
+            "right": 351.344425201416,
+            "bottom": 422.3083801269531,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 392.17132568359375,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 392.17132568359375,
+            "right": 294.73019790649414,
+            "bottom": 421.54541015625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 688.9639282226562,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 688.9639282226562,
+            "right": 351.344425201416,
+            "bottom": 719.8638916015625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 689.7268676757812,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 689.7268676757812,
+            "right": 185.39999771118164,
+            "bottom": 719.1009521484375,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "divineDogHongbao-middle-2",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 4045,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -1281.29248046875,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -1281.29248046875,
+            "right": 351.34442138671875,
+            "bottom": -1250.3924560546875,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -1280.529541015625,
+            "width": 83.16297912597656,
+            "height": 29.3741455078125,
+            "top": -1280.529541015625,
+            "right": 275.25677490234375,
+            "bottom": -1251.1553955078125,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -1042.7950439453125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -1042.7950439453125,
+            "right": 351.344425201416,
+            "bottom": -1011.89501953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -1042.0321044921875,
+            "width": 83.1629638671875,
+            "height": 29.3741455078125,
+            "top": -1042.0321044921875,
+            "right": 143.8185157775879,
+            "bottom": -1012.657958984375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -887.150634765625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -887.150634765625,
+            "right": 351.344425201416,
+            "bottom": -856.2506103515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -886.3876342773438,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": -886.3876342773438,
+            "right": 143.8185157775879,
+            "bottom": -857.0135498046875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -407.413818359375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -407.413818359375,
+            "right": 351.344425201416,
+            "bottom": -376.5138244628906,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -406.6508483886719,
+            "width": 41.581478118896484,
+            "height": 29.374053955078125,
+            "top": -406.6508483886719,
+            "right": 102.23703002929688,
+            "bottom": -377.27679443359375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -178.90643310546875,
+            "width": 290.6888732910156,
+            "height": 30.900009155273438,
+            "top": -178.90643310546875,
+            "right": 351.344425201416,
+            "bottom": -148.0064239501953,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -178.14346313476562,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -178.14346313476562,
+            "right": 185.39999771118164,
+            "bottom": -148.76937866210938,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -4.95086669921875,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -4.95086669921875,
+            "right": 351.344425201416,
+            "bottom": 25.949127197265625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -4.187904357910156,
+            "width": 83.1629638671875,
+            "height": 29.374069213867188,
+            "top": -4.187904357910156,
+            "right": 143.8185157775879,
+            "bottom": 25.18616485595703,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 166.71578979492188,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 166.71578979492188,
+            "right": 351.344425201416,
+            "bottom": 197.61578369140625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 167.478759765625,
+            "width": 124.74444580078125,
+            "height": 29.374069213867188,
+            "top": 167.478759765625,
+            "right": 185.39999771118164,
+            "bottom": 196.8528289794922,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 338.3824462890625,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 338.3824462890625,
+            "right": 351.344425201416,
+            "bottom": 369.2824401855469,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 339.1454162597656,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 339.1454162597656,
+            "right": 294.73019790649414,
+            "bottom": 368.5195007324219,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 635.93798828125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 635.93798828125,
+            "right": 351.344425201416,
+            "bottom": 666.8380126953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 636.7009887695312,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 636.7009887695312,
+            "right": 185.39999771118164,
+            "bottom": 666.0750122070312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "divineDogHongbao-end",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 4045,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -1281.29248046875,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -1281.29248046875,
+            "right": 351.34442138671875,
+            "bottom": -1250.3924560546875,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -1280.529541015625,
+            "width": 83.16297912597656,
+            "height": 29.3741455078125,
+            "top": -1280.529541015625,
+            "right": 275.25677490234375,
+            "bottom": -1251.1553955078125,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -1042.7950439453125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -1042.7950439453125,
+            "right": 351.344425201416,
+            "bottom": -1011.89501953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -1042.0321044921875,
+            "width": 83.1629638671875,
+            "height": 29.3741455078125,
+            "top": -1042.0321044921875,
+            "right": 143.8185157775879,
+            "bottom": -1012.657958984375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -887.150634765625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -887.150634765625,
+            "right": 351.344425201416,
+            "bottom": -856.2506103515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -886.3876342773438,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": -886.3876342773438,
+            "right": 143.8185157775879,
+            "bottom": -857.0135498046875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -407.413818359375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -407.413818359375,
+            "right": 351.344425201416,
+            "bottom": -376.5138244628906,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -406.6508483886719,
+            "width": 41.581478118896484,
+            "height": 29.374053955078125,
+            "top": -406.6508483886719,
+            "right": 102.23703002929688,
+            "bottom": -377.27679443359375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -178.90643310546875,
+            "width": 290.6888732910156,
+            "height": 30.900009155273438,
+            "top": -178.90643310546875,
+            "right": 351.344425201416,
+            "bottom": -148.0064239501953,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -178.14346313476562,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -178.14346313476562,
+            "right": 185.39999771118164,
+            "bottom": -148.76937866210938,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -4.95086669921875,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -4.95086669921875,
+            "right": 351.344425201416,
+            "bottom": 25.949127197265625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -4.187904357910156,
+            "width": 83.1629638671875,
+            "height": 29.374069213867188,
+            "top": -4.187904357910156,
+            "right": 143.8185157775879,
+            "bottom": 25.18616485595703,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 166.71578979492188,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 166.71578979492188,
+            "right": 351.344425201416,
+            "bottom": 197.61578369140625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 167.478759765625,
+            "width": 124.74444580078125,
+            "height": 29.374069213867188,
+            "top": 167.478759765625,
+            "right": 185.39999771118164,
+            "bottom": 196.8528289794922,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 338.3824462890625,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 338.3824462890625,
+            "right": 351.344425201416,
+            "bottom": 369.2824401855469,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 339.1454162597656,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 339.1454162597656,
+            "right": 294.73019790649414,
+            "bottom": 368.5195007324219,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 635.93798828125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 635.93798828125,
+            "right": 351.344425201416,
+            "bottom": 666.8380126953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 636.7009887695312,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 636.7009887695312,
+            "right": 185.39999771118164,
+            "bottom": 666.0750122070312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "divineDogHongbao-list-return",
+      "selected": "divineDogHongbao",
+      "tab": "overview",
+      "element": "all",
+      "owner": {
+        "top": 1353,
+        "client": 1194,
+        "total": 2547,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -161.64437866210938,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -161.64437866210938,
+            "right": 351.344425201416,
+            "bottom": -130.744384765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -160.8814239501953,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -160.8814239501953,
+            "right": 185.39999771118164,
+            "bottom": -131.50733947753906,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 117.60005187988281,
+            "width": 290.6888732910156,
+            "height": 30.900009155273438,
+            "top": 117.60005187988281,
+            "right": 351.344425201416,
+            "bottom": 148.50006103515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 118.3630142211914,
+            "width": 124.74444580078125,
+            "height": 29.37407684326172,
+            "top": 118.3630142211914,
+            "right": 185.39999771118164,
+            "bottom": 147.73709106445312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 397.9889221191406,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 397.9889221191406,
+            "right": 351.344425201416,
+            "bottom": 448.344482421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "同步登入與獎勵",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 448.344482421875,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 448.344482421875,
+            "right": 351.344425201416,
+            "bottom": 498.7000427246094,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "神犬紅包\n火・0 星\nLv.70",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 498.7000427246094,
+            "width": 90.7926025390625,
+            "height": 215.66220092773438,
+            "top": 498.7000427246094,
+            "right": 151.4481544494629,
+            "bottom": 714.3622436523438,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "金剛天王\n風・0 星\nLv.70",
+          "disabled": false,
+          "rect": {
+            "x": 160.60369873046875,
+            "y": 498.7000427246094,
+            "width": 90.79258728027344,
+            "height": 215.66220092773438,
+            "top": 498.7000427246094,
+            "right": 251.3962860107422,
+            "bottom": 714.3622436523438,
+            "left": 160.60369873046875
+          }
+        }
+      ],
+      "cards": [
+        "divineDogHongbao",
+        "vajraHeavenlyKing"
+      ]
+    },
+    {
+      "phase": "divineDogHongbao-reopen",
+      "selected": "divineDogHongbao",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 0,
+        "client": 1350,
+        "total": 5395,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "神犬紅包",
+          "box": {
+            "x": 192.0937957763672,
+            "y": 261.800048828125,
+            "width": 159.25062561035156,
+            "height": 30.899993896484375,
+            "top": 261.800048828125,
+            "right": 351.34442138671875,
+            "bottom": 292.7000427246094,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": 262.5630187988281,
+            "width": 83.16297912597656,
+            "height": 29.374053955078125,
+            "top": 262.5630187988281,
+            "right": 275.25677490234375,
+            "bottom": 291.93707275390625,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 500.2974853515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 500.2974853515625,
+            "right": 351.344425201416,
+            "bottom": 531.197509765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 501.0604553222656,
+            "width": 83.1629638671875,
+            "height": 29.374114990234375,
+            "top": 501.0604553222656,
+            "right": 143.8185157775879,
+            "bottom": 530.4345703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 655.9419555664062,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 655.9419555664062,
+            "right": 351.344425201416,
+            "bottom": 686.8419189453125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 656.7048950195312,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 656.7048950195312,
+            "right": 143.8185157775879,
+            "bottom": 686.0789794921875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1135.6787109375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1135.6787109375,
+            "right": 351.344425201416,
+            "bottom": 1166.5787353515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1136.441650390625,
+            "width": 41.581478118896484,
+            "height": 29.3741455078125,
+            "top": 1136.441650390625,
+            "right": 102.23703002929688,
+            "bottom": 1165.8157958984375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1364.1861572265625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1364.1861572265625,
+            "right": 351.344425201416,
+            "bottom": 1395.086181640625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1364.9490966796875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1364.9490966796875,
+            "right": 185.39999771118164,
+            "bottom": 1394.3231201171875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1538.1417236328125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1538.1417236328125,
+            "right": 351.344425201416,
+            "bottom": 1569.0416259765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1538.9046630859375,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": 1538.9046630859375,
+            "right": 143.8185157775879,
+            "bottom": 1568.2786865234375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1709.808349609375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1709.808349609375,
+            "right": 351.344425201416,
+            "bottom": 1740.7083740234375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1710.5712890625,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1710.5712890625,
+            "right": 185.39999771118164,
+            "bottom": 1739.9453125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：火鳳天鳴 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1881.4749755859375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1881.4749755859375,
+            "right": 351.344425201416,
+            "bottom": 1912.375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1882.2379150390625,
+            "width": 234.07464599609375,
+            "height": 29.3741455078125,
+            "top": 1882.2379150390625,
+            "right": 294.73019790649414,
+            "bottom": 1911.612060546875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "神犬紅包被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 2179.030517578125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 2179.030517578125,
+            "right": 351.344425201416,
+            "bottom": 2209.930419921875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 2179.79345703125,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 2179.79345703125,
+            "right": 185.39999771118164,
+            "bottom": 2209.16748046875,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "同步取得紀錄",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 572.3974609375,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 572.3974609375,
+            "right": 351.344425201416,
+            "bottom": 622.7530517578125,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-top",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 0,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": 261.800048828125,
+            "width": 159.25062561035156,
+            "height": 30.899993896484375,
+            "top": 261.800048828125,
+            "right": 351.34442138671875,
+            "bottom": 292.7000427246094,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": 262.5630187988281,
+            "width": 83.16297912597656,
+            "height": 29.374053955078125,
+            "top": 262.5630187988281,
+            "right": 275.25677490234375,
+            "bottom": 291.93707275390625,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 500.2974853515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 500.2974853515625,
+            "right": 351.344425201416,
+            "bottom": 531.197509765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 501.0604553222656,
+            "width": 83.1629638671875,
+            "height": 29.374114990234375,
+            "top": 501.0604553222656,
+            "right": 143.8185157775879,
+            "bottom": 530.4345703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 683.4085693359375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 683.4085693359375,
+            "right": 351.344425201416,
+            "bottom": 714.30859375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 684.1715698242188,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 684.1715698242188,
+            "right": 143.8185157775879,
+            "bottom": 713.545654296875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1163.1453857421875,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1163.1453857421875,
+            "right": 351.344425201416,
+            "bottom": 1194.04541015625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1163.9083251953125,
+            "width": 41.581478118896484,
+            "height": 29.3741455078125,
+            "top": 1163.9083251953125,
+            "right": 102.23703002929688,
+            "bottom": 1193.282470703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1391.65283203125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1391.65283203125,
+            "right": 351.344425201416,
+            "bottom": 1422.552734375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1392.415771484375,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1392.415771484375,
+            "right": 185.39999771118164,
+            "bottom": 1421.789794921875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1565.6083984375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1565.6083984375,
+            "right": 351.344425201416,
+            "bottom": 1596.50830078125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1566.371337890625,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": 1566.371337890625,
+            "right": 143.8185157775879,
+            "bottom": 1595.745361328125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1737.2750244140625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1737.2750244140625,
+            "right": 351.344425201416,
+            "bottom": 1768.175048828125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1738.0379638671875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1738.0379638671875,
+            "right": 185.39999771118164,
+            "bottom": 1767.4119873046875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1908.941650390625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1908.941650390625,
+            "right": 351.344425201416,
+            "bottom": 1939.8416748046875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1909.70458984375,
+            "width": 234.07464599609375,
+            "height": 29.3741455078125,
+            "top": 1909.70458984375,
+            "right": 294.73019790649414,
+            "bottom": 1939.0787353515625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 2151.56396484375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 2151.56396484375,
+            "right": 351.344425201416,
+            "bottom": 2182.4638671875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 2152.326904296875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 2152.326904296875,
+            "right": 185.39999771118164,
+            "bottom": 2181.700927734375,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "同步取得紀錄",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 599.8641357421875,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 599.8641357421875,
+            "right": 351.344425201416,
+            "bottom": 650.2197265625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-middle-0",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 1880,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -455.3851318359375,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -455.3851318359375,
+            "right": 351.34442138671875,
+            "bottom": -424.485107421875,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -454.62213134765625,
+            "width": 83.16297912597656,
+            "height": 29.37408447265625,
+            "top": -454.62213134765625,
+            "right": 275.25677490234375,
+            "bottom": -425.248046875,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -216.88766479492188,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -216.88766479492188,
+            "right": 351.344425201416,
+            "bottom": -185.9876708984375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -216.12469482421875,
+            "width": 83.1629638671875,
+            "height": 29.374053955078125,
+            "top": -216.12469482421875,
+            "right": 143.8185157775879,
+            "bottom": -186.75064086914062,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -33.77656555175781,
+            "width": 290.6888732910156,
+            "height": 30.900001525878906,
+            "top": -33.77656555175781,
+            "right": 351.344425201416,
+            "bottom": -2.8765640258789062,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -33.01359558105469,
+            "width": 83.1629638671875,
+            "height": 29.374069213867188,
+            "top": -33.01359558105469,
+            "right": 143.8185157775879,
+            "bottom": -3.6395263671875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 445.9602355957031,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 445.9602355957031,
+            "right": 351.344425201416,
+            "bottom": 476.8602294921875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 446.72320556640625,
+            "width": 41.581478118896484,
+            "height": 29.374053955078125,
+            "top": 446.72320556640625,
+            "right": 102.23703002929688,
+            "bottom": 476.0972595214844,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 674.4676513671875,
+            "width": 290.6888732910156,
+            "height": 30.89996337890625,
+            "top": 674.4676513671875,
+            "right": 351.344425201416,
+            "bottom": 705.3676147460938,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 675.2305908203125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 675.2305908203125,
+            "right": 185.39999771118164,
+            "bottom": 704.6046752929688,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 848.4231567382812,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 848.4231567382812,
+            "right": 351.344425201416,
+            "bottom": 879.3231811523438,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 849.1861572265625,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 849.1861572265625,
+            "right": 143.8185157775879,
+            "bottom": 878.5602416992188,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1020.08984375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1020.08984375,
+            "right": 351.344425201416,
+            "bottom": 1050.98974609375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1020.852783203125,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1020.852783203125,
+            "right": 185.39999771118164,
+            "bottom": 1050.226806640625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1191.7564697265625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1191.7564697265625,
+            "right": 351.344425201416,
+            "bottom": 1222.656494140625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1192.5194091796875,
+            "width": 234.07464599609375,
+            "height": 29.3741455078125,
+            "top": 1192.5194091796875,
+            "right": 294.73019790649414,
+            "bottom": 1221.8935546875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1434.378662109375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1434.378662109375,
+            "right": 351.344425201416,
+            "bottom": 1465.2786865234375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1435.1417236328125,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1435.1417236328125,
+            "right": 185.39999771118164,
+            "bottom": 1464.5157470703125,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "升星（25 碎片）",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 312.06024169921875,
+            "width": 290.6888732910156,
+            "height": 50.35552978515625,
+            "top": 312.06024169921875,
+            "right": 351.344425201416,
+            "bottom": 362.415771484375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "洗髓（1 顆）",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 362.415771484375,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 362.415771484375,
+            "right": 351.344425201416,
+            "bottom": 412.7713317871094,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n頭\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 483.7268981933594,
+            "width": 94.85775756835938,
+            "height": 93.84439086914062,
+            "top": 483.7268981933594,
+            "right": 155.51330947875977,
+            "bottom": 577.5712890625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n手\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 158.56515502929688,
+            "y": 483.7268981933594,
+            "width": 94.86370849609375,
+            "height": 93.84439086914062,
+            "top": 483.7268981933594,
+            "right": 253.42886352539062,
+            "bottom": 577.5712890625,
+            "left": 158.56515502929688
+          }
+        },
+        {
+          "label": "＋\n護腕\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 256.480712890625,
+            "y": 483.7268981933594,
+            "width": 94.86370849609375,
+            "height": 93.84439086914062,
+            "top": 483.7268981933594,
+            "right": 351.34442138671875,
+            "bottom": 577.5712890625,
+            "left": 256.480712890625
+          }
+        },
+        {
+          "label": "＋\n衣服\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 580.6231689453125,
+            "width": 94.85775756835938,
+            "height": 93.844482421875,
+            "top": 580.6231689453125,
+            "right": 155.51330947875977,
+            "bottom": 674.4676513671875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "＋\n鞋子\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 158.56515502929688,
+            "y": 580.6231689453125,
+            "width": 94.86370849609375,
+            "height": 93.844482421875,
+            "top": 580.6231689453125,
+            "right": 253.42886352539062,
+            "bottom": 674.4676513671875,
+            "left": 158.56515502929688
+          }
+        },
+        {
+          "label": "＋\n戒指\n未裝備",
+          "disabled": false,
+          "rect": {
+            "x": 256.480712890625,
+            "y": 580.6231689453125,
+            "width": 94.86370849609375,
+            "height": 93.844482421875,
+            "top": 580.6231689453125,
+            "right": 351.34442138671875,
+            "bottom": 674.4676513671875,
+            "left": 256.480712890625
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-middle-1",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 3145,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -937.959228515625,
+            "width": 159.25062561035156,
+            "height": 30.90008544921875,
+            "top": -937.959228515625,
+            "right": 351.34442138671875,
+            "bottom": -907.0591430664062,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -937.1961669921875,
+            "width": 83.16297912597656,
+            "height": 29.3740234375,
+            "top": -937.1961669921875,
+            "right": 275.25677490234375,
+            "bottom": -907.8221435546875,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -699.4617309570312,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -699.4617309570312,
+            "right": 351.344425201416,
+            "bottom": -668.5617065429688,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -698.6987915039062,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": -698.6987915039062,
+            "right": 143.8185157775879,
+            "bottom": -669.32470703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -516.3506469726562,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -516.3506469726562,
+            "right": 351.344425201416,
+            "bottom": -485.45062255859375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -515.587646484375,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": -515.587646484375,
+            "right": 143.8185157775879,
+            "bottom": -486.21356201171875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -36.61383056640625,
+            "width": 290.6888732910156,
+            "height": 30.900001525878906,
+            "top": -36.61383056640625,
+            "right": 351.344425201416,
+            "bottom": -5.713829040527344,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -35.850868225097656,
+            "width": 41.581478118896484,
+            "height": 29.37407684326172,
+            "top": -35.850868225097656,
+            "right": 102.23703002929688,
+            "bottom": -6.4767913818359375,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 191.89356994628906,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 191.89356994628906,
+            "right": 351.344425201416,
+            "bottom": 222.79356384277344,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 192.65652465820312,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 192.65652465820312,
+            "right": 185.39999771118164,
+            "bottom": 222.03060913085938,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 365.84912109375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 365.84912109375,
+            "right": 351.344425201416,
+            "bottom": 396.7491149902344,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 366.6120910644531,
+            "width": 83.1629638671875,
+            "height": 29.374053955078125,
+            "top": 366.6120910644531,
+            "right": 143.8185157775879,
+            "bottom": 395.98614501953125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 537.5157470703125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 537.5157470703125,
+            "right": 351.344425201416,
+            "bottom": 568.415771484375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 538.2787475585938,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 538.2787475585938,
+            "right": 185.39999771118164,
+            "bottom": 567.65283203125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 709.1824340820312,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 709.1824340820312,
+            "right": 351.344425201416,
+            "bottom": 740.0824584960938,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 709.9453735351562,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 709.9453735351562,
+            "right": 294.73019790649414,
+            "bottom": 739.3194580078125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 951.8046264648438,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 951.8046264648438,
+            "right": 351.344425201416,
+            "bottom": 982.7046508789062,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 952.567626953125,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": 952.567626953125,
+            "right": 185.39999771118164,
+            "bottom": 981.9417114257812,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-middle-2",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 3973,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -1253.8258056640625,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -1253.8258056640625,
+            "right": 351.34442138671875,
+            "bottom": -1222.92578125,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -1253.0628662109375,
+            "width": 83.16297912597656,
+            "height": 29.3740234375,
+            "top": -1253.0628662109375,
+            "right": 275.25677490234375,
+            "bottom": -1223.6888427734375,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -1015.328369140625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -1015.328369140625,
+            "right": 351.344425201416,
+            "bottom": -984.4283447265625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -1014.5654296875,
+            "width": 83.1629638671875,
+            "height": 29.3741455078125,
+            "top": -1014.5654296875,
+            "right": 143.8185157775879,
+            "bottom": -985.1912841796875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -832.21728515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -832.21728515625,
+            "right": 351.344425201416,
+            "bottom": -801.3172607421875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -831.4542846679688,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": -831.4542846679688,
+            "right": 143.8185157775879,
+            "bottom": -802.0802612304688,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -352.4804992675781,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -352.4804992675781,
+            "right": 351.344425201416,
+            "bottom": -321.5804748535156,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -351.717529296875,
+            "width": 41.581478118896484,
+            "height": 29.37408447265625,
+            "top": -351.717529296875,
+            "right": 102.23703002929688,
+            "bottom": -322.34344482421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -123.97308349609375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -123.97308349609375,
+            "right": 351.344425201416,
+            "bottom": -93.07308959960938,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -123.21012878417969,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -123.21012878417969,
+            "right": 185.39999771118164,
+            "bottom": -93.83604431152344,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 49.98246383666992,
+            "width": 290.6888732910156,
+            "height": 30.89999771118164,
+            "top": 49.98246383666992,
+            "right": 351.344425201416,
+            "bottom": 80.88246154785156,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 50.745426177978516,
+            "width": 83.1629638671875,
+            "height": 29.374073028564453,
+            "top": 50.745426177978516,
+            "right": 143.8185157775879,
+            "bottom": 80.11949920654297,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 221.6491241455078,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 221.6491241455078,
+            "right": 351.344425201416,
+            "bottom": 252.5491180419922,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 222.41209411621094,
+            "width": 124.74444580078125,
+            "height": 29.374069213867188,
+            "top": 222.41209411621094,
+            "right": 185.39999771118164,
+            "bottom": 251.78616333007812,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 393.3157958984375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 393.3157958984375,
+            "right": 351.344425201416,
+            "bottom": 424.2157897949219,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 394.0787353515625,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 394.0787353515625,
+            "right": 294.73019790649414,
+            "bottom": 423.45281982421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 635.93798828125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 635.93798828125,
+            "right": 351.344425201416,
+            "bottom": 666.8380126953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 636.7009887695312,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 636.7009887695312,
+            "right": 185.39999771118164,
+            "bottom": 666.0750122070312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-end",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 3973,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": -1253.8258056640625,
+            "width": 159.25062561035156,
+            "height": 30.9000244140625,
+            "top": -1253.8258056640625,
+            "right": 351.34442138671875,
+            "bottom": -1222.92578125,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": -1253.0628662109375,
+            "width": 83.16297912597656,
+            "height": 29.3740234375,
+            "top": -1253.0628662109375,
+            "right": 275.25677490234375,
+            "bottom": -1223.6888427734375,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -1015.328369140625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -1015.328369140625,
+            "right": 351.344425201416,
+            "bottom": -984.4283447265625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -1014.5654296875,
+            "width": 83.1629638671875,
+            "height": 29.3741455078125,
+            "top": -1014.5654296875,
+            "right": 143.8185157775879,
+            "bottom": -985.1912841796875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -832.21728515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -832.21728515625,
+            "right": 351.344425201416,
+            "bottom": -801.3172607421875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -831.4542846679688,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": -831.4542846679688,
+            "right": 143.8185157775879,
+            "bottom": -802.0802612304688,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -352.4804992675781,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": -352.4804992675781,
+            "right": 351.344425201416,
+            "bottom": -321.5804748535156,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -351.717529296875,
+            "width": 41.581478118896484,
+            "height": 29.37408447265625,
+            "top": -351.717529296875,
+            "right": 102.23703002929688,
+            "bottom": -322.34344482421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -123.97308349609375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -123.97308349609375,
+            "right": 351.344425201416,
+            "bottom": -93.07308959960938,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -123.21012878417969,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -123.21012878417969,
+            "right": 185.39999771118164,
+            "bottom": -93.83604431152344,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 49.98246383666992,
+            "width": 290.6888732910156,
+            "height": 30.89999771118164,
+            "top": 49.98246383666992,
+            "right": 351.344425201416,
+            "bottom": 80.88246154785156,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 50.745426177978516,
+            "width": 83.1629638671875,
+            "height": 29.374073028564453,
+            "top": 50.745426177978516,
+            "right": 143.8185157775879,
+            "bottom": 80.11949920654297,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 221.6491241455078,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 221.6491241455078,
+            "right": 351.344425201416,
+            "bottom": 252.5491180419922,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 222.41209411621094,
+            "width": 124.74444580078125,
+            "height": 29.374069213867188,
+            "top": 222.41209411621094,
+            "right": 185.39999771118164,
+            "bottom": 251.78616333007812,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 393.3157958984375,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": 393.3157958984375,
+            "right": 351.344425201416,
+            "bottom": 424.2157897949219,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 394.0787353515625,
+            "width": 234.07464599609375,
+            "height": 29.37408447265625,
+            "top": 394.0787353515625,
+            "right": 294.73019790649414,
+            "bottom": 423.45281982421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 635.93798828125,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 635.93798828125,
+            "right": 351.344425201416,
+            "bottom": 666.8380126953125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 636.7009887695312,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 636.7009887695312,
+            "right": 185.39999771118164,
+            "bottom": 666.0750122070312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        }
+      ],
+      "cards": []
+    },
+    {
+      "phase": "vajraHeavenlyKing-list-return",
+      "selected": "vajraHeavenlyKing",
+      "tab": "overview",
+      "element": "all",
+      "owner": {
+        "top": 1353,
+        "client": 1194,
+        "total": 2547,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 321.3111572265625,
+          "width": 318.1555480957031,
+          "height": 455.4888916015625,
+          "top": 321.3111572265625,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "英雄每日補給",
+          "box": {
+            "x": 60.65555191040039,
+            "y": -161.64437866210938,
+            "width": 290.6888732910156,
+            "height": 30.899993896484375,
+            "top": -161.64437866210938,
+            "right": 351.344425201416,
+            "bottom": -130.744384765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": -160.8814239501953,
+            "width": 124.74444580078125,
+            "height": 29.37408447265625,
+            "top": -160.8814239501953,
+            "right": 185.39999771118164,
+            "bottom": -131.50733947753906,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "累計登入獎勵",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 117.60005187988281,
+            "width": 290.6888732910156,
+            "height": 30.900009155273438,
+            "top": 117.60005187988281,
+            "right": 351.344425201416,
+            "bottom": 148.50006103515625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 118.3630142211914,
+            "width": 124.74444580078125,
+            "height": 29.37407684326172,
+            "top": 118.3630142211914,
+            "right": 185.39999771118164,
+            "bottom": 147.73709106445312,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "佈陣",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "全部",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 259.51116943359375,
+            "width": 58.13419723510742,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 105.0564193725586,
+            "bottom": 309.86669921875,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "火",
+          "disabled": false,
+          "rect": {
+            "x": 111.92308807373047,
+            "y": 259.51116943359375,
+            "width": 58.140159606933594,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 170.06324768066406,
+            "bottom": 309.86669921875,
+            "left": 111.92308807373047
+          }
+        },
+        {
+          "label": "水",
+          "disabled": false,
+          "rect": {
+            "x": 176.92991638183594,
+            "y": 259.51116943359375,
+            "width": 58.13420104980469,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 235.06411743164062,
+            "bottom": 309.86669921875,
+            "left": 176.92991638183594
+          }
+        },
+        {
+          "label": "風",
+          "disabled": false,
+          "rect": {
+            "x": 241.9307861328125,
+            "y": 259.51116943359375,
+            "width": 58.140167236328125,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 300.0709533691406,
+            "bottom": 309.86669921875,
+            "left": 241.9307861328125
+          }
+        },
+        {
+          "label": "土",
+          "disabled": false,
+          "rect": {
+            "x": 306.9375915527344,
+            "y": 259.51116943359375,
+            "width": 58.13421630859375,
+            "height": 50.35552978515625,
+            "top": 259.51116943359375,
+            "right": 365.0718078613281,
+            "bottom": 309.86669921875,
+            "left": 306.9375915527344
+          }
+        },
+        {
+          "label": "未達成",
+          "disabled": true,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 397.9889221191406,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 397.9889221191406,
+            "right": 351.344425201416,
+            "bottom": 448.344482421875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "同步登入與獎勵",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 448.344482421875,
+            "width": 290.6888732910156,
+            "height": 50.355560302734375,
+            "top": 448.344482421875,
+            "right": 351.344425201416,
+            "bottom": 498.7000427246094,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "神犬紅包\n火・0 星\nLv.70",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 498.7000427246094,
+            "width": 90.7926025390625,
+            "height": 215.66220092773438,
+            "top": 498.7000427246094,
+            "right": 151.4481544494629,
+            "bottom": 714.3622436523438,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "label": "金剛天王\n風・0 星\nLv.70",
+          "disabled": false,
+          "rect": {
+            "x": 160.60369873046875,
+            "y": 498.7000427246094,
+            "width": 90.79258728027344,
+            "height": 215.66220092773438,
+            "top": 498.7000427246094,
+            "right": 251.3962860107422,
+            "bottom": 714.3622436523438,
+            "left": 160.60369873046875
+          }
+        }
+      ],
+      "cards": [
+        "divineDogHongbao",
+        "vajraHeavenlyKing"
+      ]
+    },
+    {
+      "phase": "vajraHeavenlyKing-reopen",
+      "selected": "vajraHeavenlyKing",
+      "tab": "details",
+      "element": "all",
+      "owner": {
+        "top": 0,
+        "client": 1350,
+        "total": 5323,
+        "rect": {
+          "x": 46.92222213745117,
+          "y": 261.800048828125,
+          "width": 318.1555480957031,
+          "height": 515,
+          "top": 261.800048828125,
+          "right": 365.0777702331543,
+          "bottom": 776.800048828125,
+          "left": 46.92222213745117
+        }
+      },
+      "titles": [
+        {
+          "text": "英雄",
+          "box": {
+            "x": 46.92222213745117,
+            "y": 141.63339233398438,
+            "width": 222.7076873779297,
+            "height": 43.4888916015625,
+            "top": 141.63339233398438,
+            "right": 269.62990951538086,
+            "bottom": 185.12228393554688,
+            "left": 46.92222213745117
+          },
+          "ink": {
+            "x": 148.6764373779297,
+            "y": 140.87042236328125,
+            "width": 63.72529602050781,
+            "height": 40.05555725097656,
+            "top": 140.87042236328125,
+            "right": 212.4017333984375,
+            "bottom": 180.9259796142578,
+            "left": 148.6764373779297
+          }
+        }
+      ],
+      "sections": [
+        {
+          "text": "金剛天王",
+          "box": {
+            "x": 192.0937957763672,
+            "y": 261.800048828125,
+            "width": 159.25062561035156,
+            "height": 30.899993896484375,
+            "top": 261.800048828125,
+            "right": 351.34442138671875,
+            "bottom": 292.7000427246094,
+            "left": 192.0937957763672
+          },
+          "ink": {
+            "x": 192.0937957763672,
+            "y": 262.5630187988281,
+            "width": 83.16297912597656,
+            "height": 29.374053955078125,
+            "top": 262.5630187988281,
+            "right": 275.25677490234375,
+            "bottom": 291.93707275390625,
+            "left": 192.0937957763672
+          }
+        },
+        {
+          "text": "永久取得",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 500.2974853515625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 500.2974853515625,
+            "right": 351.344425201416,
+            "bottom": 531.197509765625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 501.0604553222656,
+            "width": 83.1629638671875,
+            "height": 29.374114990234375,
+            "top": 501.0604553222656,
+            "right": 143.8185157775879,
+            "bottom": 530.4345703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "英雄成長",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 683.4085693359375,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 683.4085693359375,
+            "right": 351.344425201416,
+            "bottom": 714.30859375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 684.1715698242188,
+            "width": 83.1629638671875,
+            "height": 29.37408447265625,
+            "top": 684.1715698242188,
+            "right": 143.8185157775879,
+            "bottom": 713.545654296875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1163.1453857421875,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1163.1453857421875,
+            "right": 351.344425201416,
+            "bottom": 1194.04541015625,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1163.9083251953125,
+            "width": 41.581478118896484,
+            "height": 29.3741455078125,
+            "top": 1163.9083251953125,
+            "right": 102.23703002929688,
+            "bottom": 1193.282470703125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "共用背包裝備",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1391.65283203125,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1391.65283203125,
+            "right": 351.344425201416,
+            "bottom": 1422.552734375,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1392.415771484375,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1392.415771484375,
+            "right": 185.39999771118164,
+            "bottom": 1421.789794921875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "六圍配點",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1565.6083984375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 1565.6083984375,
+            "right": 351.344425201416,
+            "bottom": 1596.50830078125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1566.371337890625,
+            "width": 83.1629638671875,
+            "height": 29.3740234375,
+            "top": 1566.371337890625,
+            "right": 143.8185157775879,
+            "bottom": 1595.745361328125,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "基礎戰鬥數值",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1737.2750244140625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1737.2750244140625,
+            "right": 351.344425201416,
+            "bottom": 1768.175048828125,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1738.0379638671875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 1738.0379638671875,
+            "right": 185.39999771118164,
+            "bottom": 1767.4119873046875,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "怒氣技能：風哮電擊 Lv.8",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 1908.941650390625,
+            "width": 290.6888732910156,
+            "height": 30.9000244140625,
+            "top": 1908.941650390625,
+            "right": 351.344425201416,
+            "bottom": 1939.8416748046875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 1909.70458984375,
+            "width": 234.07464599609375,
+            "height": 29.3741455078125,
+            "top": 1909.70458984375,
+            "right": 294.73019790649414,
+            "bottom": 1939.0787353515625,
+            "left": 60.65555191040039
+          }
+        },
+        {
+          "text": "金剛天王被動",
+          "box": {
+            "x": 60.65555191040039,
+            "y": 2151.56396484375,
+            "width": 290.6888732910156,
+            "height": 30.89990234375,
+            "top": 2151.56396484375,
+            "right": 351.344425201416,
+            "bottom": 2182.4638671875,
+            "left": 60.65555191040039
+          },
+          "ink": {
+            "x": 60.65555191040039,
+            "y": 2152.326904296875,
+            "width": 124.74444580078125,
+            "height": 29.3740234375,
+            "top": 2152.326904296875,
+            "right": 185.39999771118164,
+            "bottom": 2181.700927734375,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 286.96942138671875,
+            "y": 138.20005798339844,
+            "width": 78.10833740234375,
+            "height": 50.35554504394531,
+            "top": 138.20005798339844,
+            "right": 365.0777587890625,
+            "bottom": 188.55560302734375,
+            "left": 286.96942138671875
+          }
+        },
+        {
+          "label": "‹ 返回英雄列表",
+          "disabled": false,
+          "rect": {
+            "x": 46.92222213745117,
+            "y": 200.00006103515625,
+            "width": 318.1555480957031,
+            "height": 50.35554504394531,
+            "top": 200.00006103515625,
+            "right": 365.0777702331543,
+            "bottom": 250.35560607910156,
+            "left": 46.92222213745117
+          }
+        },
+        {
+          "label": "同步取得紀錄",
+          "disabled": false,
+          "rect": {
+            "x": 60.65555191040039,
+            "y": 599.8641357421875,
+            "width": 290.6888732910156,
+            "height": 50.3555908203125,
+            "top": 599.8641357421875,
+            "right": 351.344425201416,
+            "bottom": 650.2197265625,
+            "left": 60.65555191040039
+          }
+        }
+      ],
+      "cards": []
+    }
+  ],
+  "scenes": [
+    "empty-water",
+    "empty-water-end",
+    "empty-earth",
+    "empty-earth-end",
+    "divineDogHongbao-top",
+    "divineDogHongbao-middle-0",
+    "divineDogHongbao-middle-1",
+    "divineDogHongbao-middle-2",
+    "divineDogHongbao-end",
+    "divineDogHongbao-list-return",
+    "divineDogHongbao-reopen",
+    "vajraHeavenlyKing-top",
+    "vajraHeavenlyKing-middle-0",
+    "vajraHeavenlyKing-middle-1",
+    "vajraHeavenlyKing-middle-2",
+    "vajraHeavenlyKing-end",
+    "vajraHeavenlyKing-list-return",
+    "vajraHeavenlyKing-reopen"
+  ],
+  "scope": "Segment32 read-only hero detail delta: two owned canonical IDs, all formal detail sections, water/earth empty list filters, true detail return/list anchor/reopen. No reward/claim/equip/mutation/formation save. Original background save effects delegated. Failure/retry/busy presentation not included; private acquisition/growth caches cannot be exact-restored through a public API and are discarded with fresh isolated profile.",
+  "loaded": [
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.1a331d452911.css",
+      "transferSize": 206072
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.9cdbe69aad4a.js",
+      "transferSize": 70272
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "transferSize": 7010
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth.9f8c09942b79.js",
+      "transferSize": 1480
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "transferSize": 4878
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-session.877a7842d6bd.js",
+      "transferSize": 842
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "transferSize": 49354
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.1a331d452911.css",
+      "transferSize": 206072
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.9cdbe69aad4a.js",
+      "transferSize": 70272
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "transferSize": 49354
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.9cdbe69aad4a.js",
+      "transferSize": 70272
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth.9f8c09942b79.js",
+      "transferSize": 6576
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "transferSize": 49354
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "transferSize": 7010
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/boot-core.1a331d452911.css",
+      "transferSize": 206072
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "transferSize": 13160
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-auth.9f8c09942b79.js",
+      "transferSize": 1480
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-config.4314d6321ba1.js",
+      "transferSize": 1981
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "transferSize": 7010
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-session.877a7842d6bd.js",
+      "transferSize": 3182
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/session-client.235aa8b1f47e.js",
+      "transferSize": 6412
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "transferSize": 4878
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-config.4314d6321ba1.js",
+      "transferSize": 1981
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/firebase-session.877a7842d6bd.js",
+      "transferSize": 842
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/firebase/session-client.235aa8b1f47e.js",
+      "transferSize": 6412
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/app-shell.725d1d00b39e.css",
+      "transferSize": 91196
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/app-shell.b9dc95f7bda0.js",
+      "transferSize": 1191676
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/app-shell.725d1d00b39e.css",
+      "transferSize": 91196
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/app-shell.b9dc95f7bda0.js",
+      "transferSize": 1191676
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-patrol.1cef20d37f82.css",
+      "transferSize": 2771
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-patrol.ab5bd3ce5582.js",
+      "transferSize": 10020
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core-primary.980ae347f204.js",
+      "transferSize": 679349
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-patrol.1cef20d37f82.css",
+      "transferSize": 2771
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core-secondary.5a9572681588.js",
+      "transferSize": 741223
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core.98f3502bd4a4.css",
+      "transferSize": 440571
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-patrol.ab5bd3ce5582.js",
+      "transferSize": 10020
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core-primary.980ae347f204.js",
+      "transferSize": 679349
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core-secondary.5a9572681588.js",
+      "transferSize": 741223
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/gameplay-core.98f3502bd4a4.css",
+      "transferSize": 440571
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-adventure-entry.f68f5350eccc.css",
+      "transferSize": 1606
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-adventure-entry.0f3635335ca7.js",
+      "transferSize": 5379
+    },
+    {
+      "url": "http://127.0.0.1:60054/build/feature-adventure-items.cf197e72837f.js",
+      "transferSize": 6723
+    }
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "actorsExact": true,
+    "inventoryExact": true,
+    "selectionExact": true,
+    "saveApiExact": true,
+    "delegatedSaveCalls": [],
+    "privateHeroCachesExact": false
+  },
+  "sourceAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "js/00-main.js": "8dc2846d440b7f71f11c3e4940bc32644d4a47781a63c0b45da025419bcc0003",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.b9dc95f7bda0.js": "b9dc95f7bda06595e73c1a1cd2eefedd0515130e9e3d7b6caac3ea9ae3f627b7",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.980ae347f204.js": "980ae347f2048292d2cf2bac04a7c67c5694de3685d461afce0be46c7094bbc1",
+    "build/gameplay-core-secondary.5a9572681588.js": "5a957268158852d539bee7b8884d59f76d6a7c686e26f6764b174928fdcd20f0",
+    "build/gameplay-core.98f3502bd4a4.css": "98f3502bd4a4b3622e154496aefe542b04785a660ad0e639847f09d83129a986"
+  },
+  "sourceUnchanged": true,
+  "reads": [
+    {
+      "at": 1792522062441,
+      "url": "/__qa_hero/read"
+    },
+    {
+      "at": 1792522062442,
+      "url": "/__qa_hero/read"
+    },
+    {
+      "at": 1792522062865,
+      "url": "/__qa_hero/read"
+    },
+    {
+      "at": 1792522062866,
+      "url": "/__qa_hero/read"
+    },
+    {
+      "at": 1792522062868,
+      "url": "/__qa_hero/read"
+    },
+    {
+      "at": 1792522062872,
+      "url": "/__qa_hero/read"
+    }
+  ],
+  "mutations": []
+}

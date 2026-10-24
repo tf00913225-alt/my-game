@@ -1,0 +1,273 @@
+{
+  "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\360x640\\report.json",
+      "sha256": "a37dda54a2ea4657b67226444dfad4275f9de734dfb48c0c0a13d3e3c5c32a33"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\360x640\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\360x640\\story-first.png",
+      "sha256": "9a0c356fb10a234312bf7f0509807c912f1bbbbc26033b785c1b8ad8fb942163"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\360x640\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\360x640\\story-next-no-terminal.png",
+      "sha256": "51b27cb5aa0f62c3ba8d340c51fc7da3e68e56733e779cb4ddf78a3ad86a265f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\360x640\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\360x640\\story-read-end.png",
+      "sha256": "9a0c356fb10a234312bf7f0509807c912f1bbbbc26033b785c1b8ad8fb942163"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\360x640\\story-reopened.png",
+      "sha256": "51b27cb5aa0f62c3ba8d340c51fc7da3e68e56733e779cb4ddf78a3ad86a265f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\393x873\\report.json",
+      "sha256": "f38ab5830d103707ff95d344f20e5b029a2a9b007a6feb7c2f8ecefd23b12ed3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\393x873\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\393x873\\story-first.png",
+      "sha256": "5fb5b358eb35f8590577debff197f628e11cce8d2c9b92aa722ff83e456899e8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\393x873\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\393x873\\story-next-no-terminal.png",
+      "sha256": "9af4ead15394e81a6cfc7e0146ed7168bfd055a9b509ae7e71a7fd7b78a591e9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\393x873\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\393x873\\story-read-end.png",
+      "sha256": "edb55e3b046d10bf078666e0b52d7380c5d31423572c50539b1f5adaa222b461"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\393x873\\story-reopened.png",
+      "sha256": "c6263459d3c84d48178aeb0ab898e7120a881a2470ecf8d8037463541bc8f135"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\412x915\\report.json",
+      "sha256": "144fc96ac67d4925957570d6a0ff9153f73f160aba2f0d6b75a8cd1ac070f12a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\412x915\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\412x915\\story-first.png",
+      "sha256": "0d5fed877a5ad276fe0098890dfea75cb37c9528b7bddc4bb5a393f75121d9fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\412x915\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\412x915\\story-next-no-terminal.png",
+      "sha256": "b4936548a81e17c3110b4e767ddf6ba3b1304406e07d267792df99ecf6d360d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\412x915\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\412x915\\story-read-end.png",
+      "sha256": "0d5fed877a5ad276fe0098890dfea75cb37c9528b7bddc4bb5a393f75121d9fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\412x915\\story-reopened.png",
+      "sha256": "b4936548a81e17c3110b4e767ddf6ba3b1304406e07d267792df99ecf6d360d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\1280x800\\report.json",
+      "sha256": "1e0a85760ac0065631e5a9dcefc6a19dabd1a462c59954ee13cbe9186e048d8a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\1280x800\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\1280x800\\story-first.png",
+      "sha256": "ba61cb8944cab943c8577cddf567520b636f9b43e9142305f2c5370bc8e2cae2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\1280x800\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\1280x800\\story-next-no-terminal.png",
+      "sha256": "a7f21f85cac22052e8d2f2f1c16d1da0acfe9a09c840264c69e3fb46cd32350d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\1280x800\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\1280x800\\story-read-end.png",
+      "sha256": "ba61cb8944cab943c8577cddf567520b636f9b43e9142305f2c5370bc8e2cae2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\short\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\short\\1280x800\\story-reopened.png",
+      "sha256": "a7f21f85cac22052e8d2f2f1c16d1da0acfe9a09c840264c69e3fb46cd32350d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\360x640\\report.json",
+      "sha256": "e7f8ebfbe73d78e2a8928d07acb5c0f96e3138d51783e4fba9ac528bd9002a46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\360x640\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\360x640\\story-first.png",
+      "sha256": "51b27cb5aa0f62c3ba8d340c51fc7da3e68e56733e779cb4ddf78a3ad86a265f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\360x640\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\360x640\\story-next-no-terminal.png",
+      "sha256": "d4c26d857fb941a1488dfbc0f2cdd93636fa73824f27d3c082fdf0ff4f0c57cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\360x640\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\360x640\\story-read-end.png",
+      "sha256": "51b27cb5aa0f62c3ba8d340c51fc7da3e68e56733e779cb4ddf78a3ad86a265f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\360x640\\story-reopened.png",
+      "sha256": "d4c26d857fb941a1488dfbc0f2cdd93636fa73824f27d3c082fdf0ff4f0c57cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\393x873\\report.json",
+      "sha256": "ca00ba6e4f9fdf9ac505263d608bd8cede4d36528a0b2a0041b2d1c752a42604"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\393x873\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\393x873\\story-first.png",
+      "sha256": "c6263459d3c84d48178aeb0ab898e7120a881a2470ecf8d8037463541bc8f135"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\393x873\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\393x873\\story-next-no-terminal.png",
+      "sha256": "b6165ac0336f9e6e7f11d893ba2736c8ed976841a7df8c8031cce62fee2708cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\393x873\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\393x873\\story-read-end.png",
+      "sha256": "9af4ead15394e81a6cfc7e0146ed7168bfd055a9b509ae7e71a7fd7b78a591e9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\393x873\\story-reopened.png",
+      "sha256": "be757a8cfe3996398a60a74bad10efb468780393905f65e4ebc98ba28aa14e88"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\412x915\\report.json",
+      "sha256": "260cd58720bbd80a820755aa342f3755e943da376554841d9963ee986b23d977"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\412x915\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\412x915\\story-first.png",
+      "sha256": "b4936548a81e17c3110b4e767ddf6ba3b1304406e07d267792df99ecf6d360d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\412x915\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\412x915\\story-next-no-terminal.png",
+      "sha256": "bf1f6b8672b98d930562a3258e41122fd9f483609818ff1dff24aacad0407263"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\412x915\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\412x915\\story-read-end.png",
+      "sha256": "b4936548a81e17c3110b4e767ddf6ba3b1304406e07d267792df99ecf6d360d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\412x915\\story-reopened.png",
+      "sha256": "bf1f6b8672b98d930562a3258e41122fd9f483609818ff1dff24aacad0407263"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\1280x800\\report.json",
+      "sha256": "25fbe37700c39ccb72d702cd122aec25580225684eed6ca124b83f1fd22bc155"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\1280x800\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\1280x800\\story-first.png",
+      "sha256": "a7f21f85cac22052e8d2f2f1c16d1da0acfe9a09c840264c69e3fb46cd32350d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\1280x800\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\1280x800\\story-next-no-terminal.png",
+      "sha256": "6fe14574be276d17d1ee5fdd0014e2094cbae0118353917f5574c49c6fcab8fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\1280x800\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\1280x800\\story-read-end.png",
+      "sha256": "a7f21f85cac22052e8d2f2f1c16d1da0acfe9a09c840264c69e3fb46cd32350d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\long\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\long\\1280x800\\story-reopened.png",
+      "sha256": "6fe14574be276d17d1ee5fdd0014e2094cbae0118353917f5574c49c6fcab8fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\blocked-target.png",
+      "sha256": "168cf87e304c6f079ac720d98992724326efa97451df32c29881740c7b2ffcf5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\failure.png",
+      "sha256": "168cf87e304c6f079ac720d98992724326efa97451df32c29881740c7b2ffcf5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\report.json",
+      "sha256": "4973b20cdda777220f2f67d0c0fe45668907b034f8e839980f3ab06cc83620b4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\story-first.png",
+      "sha256": "16f6d5ad5ced61406427abb5e884aacd5fe324e34b233b11de664f05fe65a9d3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\story-next-no-terminal.png",
+      "sha256": "168cf87e304c6f079ac720d98992724326efa97451df32c29881740c7b2ffcf5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\short\\360x640\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\short\\360x640\\story-read-end.png",
+      "sha256": "16f6d5ad5ced61406427abb5e884aacd5fe324e34b233b11de664f05fe65a9d3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\blocked-target.png",
+      "sha256": "cd18912f390475c746cae6ec00382eeb605c5d945deb096d20dd16105f3f45db"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\failure.png",
+      "sha256": "cd18912f390475c746cae6ec00382eeb605c5d945deb096d20dd16105f3f45db"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\report.json",
+      "sha256": "3341c0282dbd822c99989a35f404671de245b9ffba24ac500d6b95c61541ee9d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\story-first.png",
+      "sha256": "168cf87e304c6f079ac720d98992724326efa97451df32c29881740c7b2ffcf5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\story-next-no-terminal.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\story-next-no-terminal.png",
+      "sha256": "cd18912f390475c746cae6ec00382eeb605c5d945deb096d20dd16105f3f45db"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-9ea26af7\\long\\360x640\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-short-long-accepted\\before-diagnostic\\long\\360x640\\story-read-end.png",
+      "sha256": "168cf87e304c6f079ac720d98992724326efa97451df32c29881740c7b2ffcf5"
+    }
+  ],
+  "helperSha256": "f5dde5e34665c96b866af5b98df361196dfc672e072bc7098b5fa31bb1e8dfde",
+  "limits": [
+    "Only two canonical before-dialogue cursor cases, player/NPC speaker, short/long text and legal16-name, safe nonterminal next, true non-onboarding return/reopen",
+    "Active onboarding UI/guard actual case still pending; parent28 NOT fully accepted",
+    "No guidance/ending terminal click/continueTutorial/reward/creation/equip/learning/battle/transaction acceptance",
+    "Original open lastViewedAt/beginChapter/local saves retained; same-task domain snapshot does not prove zero save",
+    "No hardware device/keyboard acceptance"
+  ]
+}

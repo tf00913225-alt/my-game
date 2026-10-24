@@ -1,0 +1,71 @@
+{
+  "head": "c349a41065a7f1a2796b604a3022641bd8ea7c39",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\360x640\\report.json",
+      "sha256": "b39f848433add51e53eac4a093fe2c09f7f26208004a583431bfcbe9ba9112ce"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\360x640\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\360x640\\story-first.png",
+      "sha256": "f4abba29dd831a4bd8e334e88576bacfa75f2a02bb4963b348767c40ec1ab2d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\360x640\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\360x640\\story-read-end.png",
+      "sha256": "f4abba29dd831a4bd8e334e88576bacfa75f2a02bb4963b348767c40ec1ab2d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\393x873\\report.json",
+      "sha256": "0329b6fc0f0dcbd8e09a008032777c682d2b511e6421d0837d93ddccb1f74013"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\393x873\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\393x873\\story-first.png",
+      "sha256": "f96cd4875fbec215d5d35d33ac87c72f12a90874b359c430fe6e3f82ed5337d9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\393x873\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\393x873\\story-read-end.png",
+      "sha256": "63b2ff4ecd3fe7cc8f741468beb95df857ec6cda0b7eb62fd5a04806e65b9617"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\412x915\\report.json",
+      "sha256": "a08cbfa4af4fa45bfbb64b624a45d6030401d8e359c5463499dce0730a6137bc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\412x915\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\412x915\\story-first.png",
+      "sha256": "9b47bb657b07915e81fe52aa5b7b4b6df0fade7b6b852139975a8c1804d091b6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\412x915\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\412x915\\story-read-end.png",
+      "sha256": "9b47bb657b07915e81fe52aa5b7b4b6df0fade7b6b852139975a8c1804d091b6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\1280x800\\report.json",
+      "sha256": "64f586de9bcafd638666cd993cc9557d2be9bf991358bca9255386370b673ec4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\1280x800\\story-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\1280x800\\story-first.png",
+      "sha256": "a125c93852062d55b2443b1d4ea268766595292df2b9e208dc122d50223e251c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-display-c349a410\\active\\1280x800\\story-read-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-active-accepted\\1280x800\\story-read-end.png",
+      "sha256": "a125c93852062d55b2443b1d4ea268766595292df2b9e208dc122d50223e251c"
+    }
+  ],
+  "helperSha256": "26991f0e114b1078eae2fde51b0836e24315333082423cb7636832ece2f763af",
+  "limits": [
+    "Active onboarding c1_01 before0 presentation only; hidden back0x0, no next/back click or runtime guard bypass",
+    "Original open lastViewedAt/beginChapter/local save effects retained; raw/meta/playerid exact restore does not mean zero saves",
+    "No active tutorial system/continue/claim/terminal story/battle/transaction/hardware acceptance"
+  ]
+}

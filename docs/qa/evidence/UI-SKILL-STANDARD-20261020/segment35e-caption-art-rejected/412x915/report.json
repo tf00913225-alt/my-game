@@ -1,0 +1,1575 @@
+{
+  "head": "99b39edc496a9f4706c99695855c512ed59cc93e",
+  "viewport": [
+    412,
+    915
+  ],
+  "complete": true,
+  "clean": true,
+  "sourceBefore": {
+    "index.html": "9f3fc175a427bb298b4a99ad38cc07eee79ca2f6d9b497aaf79f31f5798b7a6c",
+    "asset-manifest.json": "c0a1f83cb331763b5a53996bf7b5fd77fefcfd1632227134982e128427527f35",
+    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "build/app-shell.254c23dc6ec9.js": "254c23dc6ec976f6a11703878e672eace83f5ad182a1c811c72dc11718ec55bc",
+    "build/app-shell.984f2e5f2fe4.css": "984f2e5f2fe47b40c389fef50970e598f36241272825b0fe44da858e58b696d0",
+    "build/boot-core.6eddb4647dab.css": "6eddb4647dabed4e8552963532220c0f701170444ddd16892b2bbf49b7569826",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.f5453e704d5f.js": "f5453e704d5fa56860af9ba0221fc073194df3dff9f80868992acf7f39880493",
+    "build/gameplay-core-secondary.1c4baa12cb83.js": "1c4baa12cb83ce6e5744c4399f3fa8718305a644bcec916221f30c3e9aa16c4c",
+    "build/gameplay-core.af5892190f1c.css": "af5892190f1cdfd5e71d57bfbaff1020029cb33db961a0980a1412b31695d35f"
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/app-shell.254c23dc6ec9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/app-shell.984f2e5f2fe4.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/app-shell.984f2e5f2fe4.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/app-shell.254c23dc6ec9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core-primary.f5453e704d5f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core-secondary.1c4baa12cb83.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core.af5892190f1c.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core.af5892190f1c.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core-primary.f5453e704d5f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/gameplay-core-secondary.1c4baa12cb83.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:55909/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    }
+  ],
+  "inputs": [
+    {
+      "selector": "#trainingNav",
+      "x": 123.59999084472656,
+      "y": 782.9037170410156,
+      "rect": {
+        "x": 82.39999389648438,
+        "y": 742.085205078125,
+        "width": 82.39999389648438,
+        "height": 81.63702392578125,
+        "top": 742.085205078125,
+        "right": 164.79998779296875,
+        "bottom": 823.7222290039062,
+        "left": 82.39999389648438
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "[onclick=\"openTrainingZoneInfo('forest')\"]",
+      "x": 116.97856426239014,
+      "y": 132.4778289794922,
+      "rect": {
+        "x": 13.733332633972168,
+        "y": 106.97306823730469,
+        "width": 206.49046325683594,
+        "height": 51.009521484375,
+        "top": 106.97306823730469,
+        "right": 220.2237958908081,
+        "bottom": 157.9825897216797,
+        "left": 13.733332633972168
+      },
+      "hit": true
+    },
+    {
+      "selector": "#trainingZoneModal button[onclick=\"closeTrainingZoneInfo();enterZone('forest');\"]",
+      "x": 126.54283905029297,
+      "y": 472.16322326660156,
+      "rect": {
+        "x": 51.99047088623047,
+        "y": 446.658447265625,
+        "width": 149.104736328125,
+        "height": 51.009552001953125,
+        "top": 446.658447265625,
+        "right": 201.09520721435547,
+        "bottom": 497.6679992675781,
+        "left": 51.99047088623047
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#v131PatrolAppearanceSwitch",
+      "x": 366.8761749267578,
+      "y": 136.4016456604004,
+      "rect": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#v131PatrolAppearanceSwitch",
+      "x": 366.8761749267578,
+      "y": 136.4016456604004,
+      "rect": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#bottomNav[data-nav-context=\"patrol\"] button[aria-label=\"返回\"]",
+      "x": 370.79998779296875,
+      "y": 782.9037170410156,
+      "rect": {
+        "x": 329.5999755859375,
+        "y": 742.085205078125,
+        "width": 82.4000244140625,
+        "height": 81.63702392578125,
+        "top": 742.085205078125,
+        "right": 412,
+        "bottom": 823.7222290039062,
+        "left": 329.5999755859375
+      },
+      "hit": true,
+      "disabled": false
+    }
+  ],
+  "checks": [
+    {
+      "phase": "patrol-map-static",
+      "domain": {
+        "actors": [
+          {
+            "id": "QA 火角色",
+            "hp": 300,
+            "sp": 120,
+            "level": 70
+          },
+          {
+            "id": "QA 水角色",
+            "level": 70
+          },
+          null
+        ],
+        "inventory": "[]",
+        "equipment": "{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}}",
+        "gold": 0,
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "autoBattle": false,
+        "autoPatrolEnabled": false,
+        "configs": [
+          false,
+          false,
+          false
+        ],
+        "elementBox": {
+          "active": false,
+          "remainingMs": 0
+        }
+      }
+    },
+    {
+      "phase": "patrol-map-static-presentation",
+      "mapActive": true,
+      "trainingActive": false,
+      "title": {
+        "present": false,
+        "text": null,
+        "rect": null,
+        "ink": null,
+        "note": "Legacy updateMapZoneLabels guards absent mapPageTitle; current index has no formal title node. This QA does not create a title or approve its alignment."
+      },
+      "mapBackground": "url(\"http://127.0.0.1:55909/assets/maps/forest.jpg\")",
+      "appearance": {
+        "open": false,
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "choices": [
+          {
+            "text": "QA 火角色",
+            "pressed": "true",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "ink": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "QA 水角色",
+            "pressed": "false",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            },
+            "ink": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          }
+        ]
+      },
+      "img": {
+        "src": "http://127.0.0.1:55909/assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+        "complete": true,
+        "naturalWidth": 56,
+        "naturalHeight": 84,
+        "rect": {
+          "x": 164.79998779296875,
+          "y": 300.4659118652344,
+          "width": 82.40000915527344,
+          "height": 123.60000610351562,
+          "top": 300.4659118652344,
+          "right": 247.1999969482422,
+          "bottom": 424.06591796875,
+          "left": 164.79998779296875
+        }
+      },
+      "switch": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "quickControls": [
+        {
+          "id": "quickAutoBattleToggle",
+          "present": true,
+          "label": "自動戰鬥",
+          "title": "",
+          "rect": {
+            "x": 9.809523582458496,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 90.2476110458374,
+            "bottom": 211.67440795898438,
+            "left": 9.809523582458496
+          },
+          "map": {
+            "x": 0,
+            "y": 91.27783203125,
+            "width": 412,
+            "height": 732.4342041015625,
+            "top": 91.27783203125,
+            "right": 412,
+            "bottom": 823.7120361328125,
+            "left": 0
+          },
+          "hit": true,
+          "computed": {
+            "display": "block",
+            "visibility": "visible"
+          },
+          "image": {
+            "src": "http://127.0.0.1:55909/assets/battle/auto-battle-off.png",
+            "complete": true,
+            "naturalWidth": 160,
+            "naturalHeight": 107,
+            "rect": {
+              "x": 11.771428108215332,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 88.28571033477783,
+              "bottom": 152.25015258789062,
+              "left": 11.771428108215332
+            }
+          }
+        },
+        {
+          "id": "quickAutoPatrolToggle",
+          "present": true,
+          "label": "自動巡怪",
+          "title": "",
+          "rect": {
+            "x": 100.05713653564453,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 180.49522399902344,
+            "bottom": 211.67440795898438,
+            "left": 100.05713653564453
+          },
+          "map": {
+            "x": 0,
+            "y": 91.27783203125,
+            "width": 412,
+            "height": 732.4342041015625,
+            "top": 91.27783203125,
+            "right": 412,
+            "bottom": 823.7120361328125,
+            "left": 0
+          },
+          "hit": true,
+          "computed": {
+            "display": "block",
+            "visibility": "visible"
+          },
+          "image": {
+            "src": "http://127.0.0.1:55909/assets/battle/auto-patrol-off.png",
+            "complete": true,
+            "naturalWidth": 160,
+            "naturalHeight": 107,
+            "rect": {
+              "x": 102.01904296875,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 178.5333251953125,
+              "bottom": 152.25015258789062,
+              "left": 102.01904296875
+            }
+          }
+        }
+      ],
+      "selectedRaw": null,
+      "context": "patrol",
+      "currentZone": "forest",
+      "monsters": [
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "風芽魈",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "岩薯卒",
+          "alive": true,
+          "hp": 80
+        }
+      ]
+    },
+    {
+      "phase": "visible-off-caption-map-off",
+      "buttons": [
+        {
+          "id": "quickAutoBattleToggle",
+          "active": false,
+          "aria": "自動戰鬥",
+          "onclick": "toggleAutoBattle()",
+          "rect": {
+            "x": 9.809523582458496,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 90.2476110458374,
+            "bottom": 211.67440795898438,
+            "left": 9.809523582458496
+          },
+          "hit": true,
+          "name": "自動戰鬥",
+          "nameInk": {
+            "x": 14.71428394317627,
+            "y": 160.0977783203125,
+            "width": 70.6285629272461,
+            "height": 25.5047607421875,
+            "top": 160.0977783203125,
+            "right": 85.34284687042236,
+            "bottom": 185.6025390625,
+            "left": 14.71428394317627
+          },
+          "caption": {
+            "box": {
+              "x": 9.809523582458496,
+              "y": 156.1739501953125,
+              "width": 80.4380874633789,
+              "height": 55.500457763671875,
+              "top": 156.1739501953125,
+              "right": 90.2476110458374,
+              "bottom": 211.67440795898438,
+              "left": 9.809523582458496
+            },
+            "ink": {
+              "x": 14.71428394317627,
+              "y": 160.0977783203125,
+              "width": 70.6285629272461,
+              "height": 48.250579833984375,
+              "top": 160.0977783203125,
+              "right": 85.34284687042236,
+              "bottom": 208.34835815429688,
+              "left": 14.71428394317627
+            },
+            "font": 17.657141150497807,
+            "nativeFont": 18,
+            "line": "25.2px"
+          },
+          "off": {
+            "text": "關閉",
+            "box": {
+              "x": 14.71428394317627,
+              "y": 185.78646850585938,
+              "width": 70.6285629272461,
+              "height": 21.964126586914062,
+              "top": 185.78646850585938,
+              "right": 85.34284687042236,
+              "bottom": 207.75059509277344,
+              "left": 14.71428394317627
+            },
+            "ink": {
+              "x": 34.33333206176758,
+              "y": 184.80551147460938,
+              "width": 31.39046859741211,
+              "height": 23.5428466796875,
+              "top": 184.80551147460938,
+              "right": 65.72380065917969,
+              "bottom": 208.34835815429688,
+              "left": 34.33333206176758
+            },
+            "font": 15.695236578220275,
+            "display": "block"
+          },
+          "on": {
+            "display": "none",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "image": {
+            "box": {
+              "x": 11.771428108215332,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 88.28571033477783,
+              "bottom": 152.25015258789062,
+              "left": 11.771428108215332
+            },
+            "nativeWidth": 78,
+            "src": "http://127.0.0.1:55909/assets/battle/auto-battle-off.png",
+            "complete": true,
+            "naturalWidth": 160
+          }
+        },
+        {
+          "id": "quickAutoPatrolToggle",
+          "active": false,
+          "aria": "自動巡怪",
+          "onclick": "toggleAutoPatrol()",
+          "rect": {
+            "x": 100.05713653564453,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 180.49522399902344,
+            "bottom": 211.67440795898438,
+            "left": 100.05713653564453
+          },
+          "hit": true,
+          "name": "自動巡怪",
+          "nameInk": {
+            "x": 104.96189880371094,
+            "y": 160.0977783203125,
+            "width": 70.62857055664062,
+            "height": 25.5047607421875,
+            "top": 160.0977783203125,
+            "right": 175.59046936035156,
+            "bottom": 185.6025390625,
+            "left": 104.96189880371094
+          },
+          "caption": {
+            "box": {
+              "x": 100.05713653564453,
+              "y": 156.1739501953125,
+              "width": 80.4380874633789,
+              "height": 55.500457763671875,
+              "top": 156.1739501953125,
+              "right": 180.49522399902344,
+              "bottom": 211.67440795898438,
+              "left": 100.05713653564453
+            },
+            "ink": {
+              "x": 104.96189880371094,
+              "y": 160.0977783203125,
+              "width": 70.62857055664062,
+              "height": 48.250579833984375,
+              "top": 160.0977783203125,
+              "right": 175.59046936035156,
+              "bottom": 208.34835815429688,
+              "left": 104.96189880371094
+            },
+            "font": 17.657141150497807,
+            "nativeFont": 18,
+            "line": "25.2px"
+          },
+          "off": {
+            "text": "關閉",
+            "box": {
+              "x": 104.96189880371094,
+              "y": 185.78646850585938,
+              "width": 70.62857055664062,
+              "height": 21.964126586914062,
+              "top": 185.78646850585938,
+              "right": 175.59046936035156,
+              "bottom": 207.75059509277344,
+              "left": 104.96189880371094
+            },
+            "ink": {
+              "x": 124.58094024658203,
+              "y": 184.80551147460938,
+              "width": 31.390480041503906,
+              "height": 23.5428466796875,
+              "top": 184.80551147460938,
+              "right": 155.97142028808594,
+              "bottom": 208.34835815429688,
+              "left": 124.58094024658203
+            },
+            "font": 15.695236578220275,
+            "display": "block"
+          },
+          "on": {
+            "display": "none",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "image": {
+            "box": {
+              "x": 102.01904296875,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 178.5333251953125,
+              "bottom": 152.25015258789062,
+              "left": 102.01904296875
+            },
+            "nativeWidth": 78,
+            "src": "http://127.0.0.1:55909/assets/battle/auto-patrol-off.png",
+            "complete": true,
+            "naturalWidth": 160
+          }
+        }
+      ],
+      "switch": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "menu": null,
+      "player": {
+        "x": 164.79998779296875,
+        "y": 300.4659118652344,
+        "width": 82.40000915527344,
+        "height": 123.60000610351562,
+        "top": 300.4659118652344,
+        "right": 247.1999969482422,
+        "bottom": 424.06591796875,
+        "left": 164.79998779296875
+      }
+    },
+    {
+      "phase": "appearance-open",
+      "domain": {
+        "actors": [
+          {
+            "id": "QA 火角色",
+            "hp": 300,
+            "sp": 120,
+            "level": 70
+          },
+          {
+            "id": "QA 水角色",
+            "level": 70
+          },
+          null
+        ],
+        "inventory": "[]",
+        "equipment": "{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}}",
+        "gold": 0,
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "autoBattle": false,
+        "autoPatrolEnabled": false,
+        "configs": [
+          false,
+          false,
+          false
+        ],
+        "elementBox": {
+          "active": false,
+          "remainingMs": 0
+        }
+      }
+    },
+    {
+      "phase": "appearance-open-presentation",
+      "mapActive": true,
+      "trainingActive": false,
+      "title": {
+        "present": false,
+        "text": null,
+        "rect": null,
+        "ink": null,
+        "note": "Legacy updateMapZoneLabels guards absent mapPageTitle; current index has no formal title node. This QA does not create a title or approve its alignment."
+      },
+      "mapBackground": "url(\"http://127.0.0.1:55909/assets/maps/forest.jpg\")",
+      "appearance": {
+        "open": true,
+        "rect": {
+          "x": 243.27618408203125,
+          "y": 175.63973999023438,
+          "width": 156.95236206054688,
+          "height": 127.5238037109375,
+          "top": 175.63973999023438,
+          "right": 400.2285461425781,
+          "bottom": 303.1635437011719,
+          "left": 243.27618408203125
+        },
+        "choices": [
+          {
+            "text": "QA 火角色",
+            "pressed": "true",
+            "rect": {
+              "x": 254.06666564941406,
+              "y": 186.43020629882812,
+              "width": 135.3714141845703,
+              "height": 51.009521484375,
+              "top": 186.43020629882812,
+              "right": 389.4380798339844,
+              "bottom": 237.43972778320312,
+              "left": 254.06666564941406
+            },
+            "ink": {
+              "x": 264.85711669921875,
+              "y": 198.60015869140625,
+              "width": 82.21609497070312,
+              "height": 25.504745483398438,
+              "top": 198.60015869140625,
+              "right": 347.0732116699219,
+              "bottom": 224.1049041748047,
+              "left": 264.85711669921875
+            }
+          },
+          {
+            "text": "QA 水角色",
+            "pressed": "false",
+            "rect": {
+              "x": 254.06666564941406,
+              "y": 241.36354064941406,
+              "width": 135.3714141845703,
+              "height": 51.00950622558594,
+              "top": 241.36354064941406,
+              "right": 389.4380798339844,
+              "bottom": 292.373046875,
+              "left": 254.06666564941406
+            },
+            "ink": {
+              "x": 264.85711669921875,
+              "y": 253.53347778320312,
+              "width": 82.21609497070312,
+              "height": 25.5047607421875,
+              "top": 253.53347778320312,
+              "right": 347.0732116699219,
+              "bottom": 279.0382385253906,
+              "left": 264.85711669921875
+            }
+          }
+        ]
+      },
+      "img": {
+        "src": "http://127.0.0.1:55909/assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+        "complete": true,
+        "naturalWidth": 56,
+        "naturalHeight": 84,
+        "rect": {
+          "x": 164.79998779296875,
+          "y": 300.4659118652344,
+          "width": 82.40000915527344,
+          "height": 123.60000610351562,
+          "top": 300.4659118652344,
+          "right": 247.1999969482422,
+          "bottom": 424.06591796875,
+          "left": 164.79998779296875
+        }
+      },
+      "switch": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "quickControls": [
+        {
+          "id": "quickAutoBattleToggle",
+          "present": true,
+          "label": "自動戰鬥",
+          "title": "",
+          "rect": {
+            "x": 9.809523582458496,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 90.2476110458374,
+            "bottom": 211.67440795898438,
+            "left": 9.809523582458496
+          },
+          "map": {
+            "x": 0,
+            "y": 91.27783203125,
+            "width": 412,
+            "height": 732.4342041015625,
+            "top": 91.27783203125,
+            "right": 412,
+            "bottom": 823.7120361328125,
+            "left": 0
+          },
+          "hit": true,
+          "computed": {
+            "display": "block",
+            "visibility": "visible"
+          },
+          "image": {
+            "src": "http://127.0.0.1:55909/assets/battle/auto-battle-off.png",
+            "complete": true,
+            "naturalWidth": 160,
+            "naturalHeight": 107,
+            "rect": {
+              "x": 11.771428108215332,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 88.28571033477783,
+              "bottom": 152.25015258789062,
+              "left": 11.771428108215332
+            }
+          }
+        },
+        {
+          "id": "quickAutoPatrolToggle",
+          "present": true,
+          "label": "自動巡怪",
+          "title": "",
+          "rect": {
+            "x": 100.05713653564453,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 180.49522399902344,
+            "bottom": 211.67440795898438,
+            "left": 100.05713653564453
+          },
+          "map": {
+            "x": 0,
+            "y": 91.27783203125,
+            "width": 412,
+            "height": 732.4342041015625,
+            "top": 91.27783203125,
+            "right": 412,
+            "bottom": 823.7120361328125,
+            "left": 0
+          },
+          "hit": true,
+          "computed": {
+            "display": "block",
+            "visibility": "visible"
+          },
+          "image": {
+            "src": "http://127.0.0.1:55909/assets/battle/auto-patrol-off.png",
+            "complete": true,
+            "naturalWidth": 160,
+            "naturalHeight": 107,
+            "rect": {
+              "x": 102.01904296875,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 178.5333251953125,
+              "bottom": 152.25015258789062,
+              "left": 102.01904296875
+            }
+          }
+        }
+      ],
+      "selectedRaw": null,
+      "context": "patrol",
+      "currentZone": "forest",
+      "monsters": [
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "哥布林",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "水靈狐",
+          "alive": true,
+          "hp": 48
+        },
+        {
+          "name": "風芽魈",
+          "alive": true,
+          "hp": 64
+        },
+        {
+          "name": "岩薯卒",
+          "alive": true,
+          "hp": 80
+        }
+      ]
+    },
+    {
+      "phase": "visible-off-caption-appearance-open",
+      "buttons": [
+        {
+          "id": "quickAutoBattleToggle",
+          "active": false,
+          "aria": "自動戰鬥",
+          "onclick": "toggleAutoBattle()",
+          "rect": {
+            "x": 9.809523582458496,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 90.2476110458374,
+            "bottom": 211.67440795898438,
+            "left": 9.809523582458496
+          },
+          "hit": true,
+          "name": "自動戰鬥",
+          "nameInk": {
+            "x": 14.71428394317627,
+            "y": 160.0977783203125,
+            "width": 70.6285629272461,
+            "height": 25.5047607421875,
+            "top": 160.0977783203125,
+            "right": 85.34284687042236,
+            "bottom": 185.6025390625,
+            "left": 14.71428394317627
+          },
+          "caption": {
+            "box": {
+              "x": 9.809523582458496,
+              "y": 156.1739501953125,
+              "width": 80.4380874633789,
+              "height": 55.500457763671875,
+              "top": 156.1739501953125,
+              "right": 90.2476110458374,
+              "bottom": 211.67440795898438,
+              "left": 9.809523582458496
+            },
+            "ink": {
+              "x": 14.71428394317627,
+              "y": 160.0977783203125,
+              "width": 70.6285629272461,
+              "height": 48.250579833984375,
+              "top": 160.0977783203125,
+              "right": 85.34284687042236,
+              "bottom": 208.34835815429688,
+              "left": 14.71428394317627
+            },
+            "font": 17.657141150497807,
+            "nativeFont": 18,
+            "line": "25.2px"
+          },
+          "off": {
+            "text": "關閉",
+            "box": {
+              "x": 14.71428394317627,
+              "y": 185.78646850585938,
+              "width": 70.6285629272461,
+              "height": 21.964126586914062,
+              "top": 185.78646850585938,
+              "right": 85.34284687042236,
+              "bottom": 207.75059509277344,
+              "left": 14.71428394317627
+            },
+            "ink": {
+              "x": 34.33333206176758,
+              "y": 184.80551147460938,
+              "width": 31.39046859741211,
+              "height": 23.5428466796875,
+              "top": 184.80551147460938,
+              "right": 65.72380065917969,
+              "bottom": 208.34835815429688,
+              "left": 34.33333206176758
+            },
+            "font": 15.695236578220275,
+            "display": "block"
+          },
+          "on": {
+            "display": "none",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "image": {
+            "box": {
+              "x": 11.771428108215332,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 88.28571033477783,
+              "bottom": 152.25015258789062,
+              "left": 11.771428108215332
+            },
+            "nativeWidth": 78,
+            "src": "http://127.0.0.1:55909/assets/battle/auto-battle-off.png",
+            "complete": true,
+            "naturalWidth": 160
+          }
+        },
+        {
+          "id": "quickAutoPatrolToggle",
+          "active": false,
+          "aria": "自動巡怪",
+          "onclick": "toggleAutoPatrol()",
+          "rect": {
+            "x": 100.05713653564453,
+            "y": 101.08735656738281,
+            "width": 80.4380874633789,
+            "height": 110.58705139160156,
+            "top": 101.08735656738281,
+            "right": 180.49522399902344,
+            "bottom": 211.67440795898438,
+            "left": 100.05713653564453
+          },
+          "hit": true,
+          "name": "自動巡怪",
+          "nameInk": {
+            "x": 104.96189880371094,
+            "y": 160.0977783203125,
+            "width": 70.62857055664062,
+            "height": 25.5047607421875,
+            "top": 160.0977783203125,
+            "right": 175.59046936035156,
+            "bottom": 185.6025390625,
+            "left": 104.96189880371094
+          },
+          "caption": {
+            "box": {
+              "x": 100.05713653564453,
+              "y": 156.1739501953125,
+              "width": 80.4380874633789,
+              "height": 55.500457763671875,
+              "top": 156.1739501953125,
+              "right": 180.49522399902344,
+              "bottom": 211.67440795898438,
+              "left": 100.05713653564453
+            },
+            "ink": {
+              "x": 104.96189880371094,
+              "y": 160.0977783203125,
+              "width": 70.62857055664062,
+              "height": 48.250579833984375,
+              "top": 160.0977783203125,
+              "right": 175.59046936035156,
+              "bottom": 208.34835815429688,
+              "left": 104.96189880371094
+            },
+            "font": 17.657141150497807,
+            "nativeFont": 18,
+            "line": "25.2px"
+          },
+          "off": {
+            "text": "關閉",
+            "box": {
+              "x": 104.96189880371094,
+              "y": 185.78646850585938,
+              "width": 70.62857055664062,
+              "height": 21.964126586914062,
+              "top": 185.78646850585938,
+              "right": 175.59046936035156,
+              "bottom": 207.75059509277344,
+              "left": 104.96189880371094
+            },
+            "ink": {
+              "x": 124.58094024658203,
+              "y": 184.80551147460938,
+              "width": 31.390480041503906,
+              "height": 23.5428466796875,
+              "top": 184.80551147460938,
+              "right": 155.97142028808594,
+              "bottom": 208.34835815429688,
+              "left": 124.58094024658203
+            },
+            "font": 15.695236578220275,
+            "display": "block"
+          },
+          "on": {
+            "display": "none",
+            "box": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          "image": {
+            "box": {
+              "x": 102.01904296875,
+              "y": 101.08735656738281,
+              "width": 76.5142822265625,
+              "height": 51.16279602050781,
+              "top": 101.08735656738281,
+              "right": 178.5333251953125,
+              "bottom": 152.25015258789062,
+              "left": 102.01904296875
+            },
+            "nativeWidth": 78,
+            "src": "http://127.0.0.1:55909/assets/battle/auto-patrol-off.png",
+            "complete": true,
+            "naturalWidth": 160
+          }
+        }
+      ],
+      "switch": {
+        "x": 333.5238037109375,
+        "y": 103.04926300048828,
+        "width": 66.70474243164062,
+        "height": 66.70476531982422,
+        "top": 103.04926300048828,
+        "right": 400.2285461425781,
+        "bottom": 169.7540283203125,
+        "left": 333.5238037109375
+      },
+      "menu": {
+        "x": 243.27618408203125,
+        "y": 175.63973999023438,
+        "width": 156.95236206054688,
+        "height": 127.5238037109375,
+        "top": 175.63973999023438,
+        "right": 400.2285461425781,
+        "bottom": 303.1635437011719,
+        "left": 243.27618408203125
+      },
+      "player": {
+        "x": 164.79998779296875,
+        "y": 300.4659118652344,
+        "width": 82.40000915527344,
+        "height": 123.60000610351562,
+        "top": 300.4659118652344,
+        "right": 247.1999969482422,
+        "bottom": 424.06591796875,
+        "left": 164.79998779296875
+      }
+    },
+    {
+      "phase": "original-patrol-return-binding",
+      "onclick": "leaveMap()",
+      "label": "返回"
+    },
+    {
+      "phase": "original-training-return-domain",
+      "domain": {
+        "actors": [
+          {
+            "id": "QA 火角色",
+            "hp": 300,
+            "sp": 120,
+            "level": 70
+          },
+          {
+            "id": "QA 水角色",
+            "level": 70
+          },
+          null
+        ],
+        "inventory": "[]",
+        "equipment": "{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}}",
+        "gold": 0,
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "autoBattle": false,
+        "autoPatrolEnabled": false,
+        "configs": [
+          false,
+          false,
+          false
+        ],
+        "elementBox": {
+          "active": false,
+          "remainingMs": 0
+        }
+      }
+    }
+  ],
+  "quickControlLimits": "Only original OFF caption/target/static layout; no active class setter, on-state switch, appearance choice, map/monster or auto toggle. Existing tiny bitmap text is retained; visible DOM captions now tested independently.",
+  "scope": "Segment35E caption-only static map and appearance-open delta, not training-list matrix; no character selection, map/monster/auto click or battle. No training ten-list matrix. Original PREPARE/isolated QA transport, true training forest information/enter static map, appearance toggle and original leaveMap return. Startup/normalization save side effects retained. Exact restore baseline is immediately before PREPARE actor seed, after startup/skill module initialization; earlier startup private caches and patrol transient currentZone/monsters/grid/closure selection are not claimed exact restored; original leaveMap lifecycle performs cleanup.",
+  "staticBaseline": {
+    "actors": [
+      {
+        "id": "QA 火角色",
+        "hp": 300,
+        "sp": 120,
+        "level": 70
+      },
+      {
+        "id": "QA 水角色",
+        "level": 70
+      },
+      null
+    ],
+    "inventory": "[]",
+    "equipment": "{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}}",
+    "gold": 0,
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null,
+    "autoBattle": false,
+    "autoPatrolEnabled": false,
+    "configs": [
+      false,
+      false,
+      false
+    ],
+    "elementBox": {
+      "active": false,
+      "remainingMs": 0
+    }
+  },
+  "delegatedSaveCalls": [],
+  "loaded": [
+    "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+    "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:55909/build/boot-core.b447fc7be00c.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:55909/build/boot-core.6eddb4647dab.css",
+    "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:55909/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:55909/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:55909/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:55909/build/app-shell.254c23dc6ec9.js",
+    "http://127.0.0.1:55909/build/app-shell.984f2e5f2fe4.css",
+    "http://127.0.0.1:55909/build/app-shell.254c23dc6ec9.js",
+    "http://127.0.0.1:55909/build/app-shell.984f2e5f2fe4.css",
+    "http://127.0.0.1:55909/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:55909/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:55909/build/gameplay-core-primary.f5453e704d5f.js",
+    "http://127.0.0.1:55909/build/gameplay-core-secondary.1c4baa12cb83.js",
+    "http://127.0.0.1:55909/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:55909/build/gameplay-core.af5892190f1c.css",
+    "http://127.0.0.1:55909/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:55909/build/gameplay-core-primary.f5453e704d5f.js",
+    "http://127.0.0.1:55909/build/gameplay-core-secondary.1c4baa12cb83.js",
+    "http://127.0.0.1:55909/build/gameplay-core.af5892190f1c.css",
+    "http://127.0.0.1:55909/build/feature-adventure-entry.f68f5350eccc.css",
+    "http://127.0.0.1:55909/build/feature-adventure-entry.0f3635335ca7.js",
+    "http://127.0.0.1:55909/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "actorsExact": true,
+    "inventoryExact": true,
+    "loadoutsExact": true,
+    "equipmentExact": true,
+    "patrolKeyExact": true,
+    "saveApiExact": true
+  },
+  "sourceAfter": {
+    "index.html": "9f3fc175a427bb298b4a99ad38cc07eee79ca2f6d9b497aaf79f31f5798b7a6c",
+    "asset-manifest.json": "c0a1f83cb331763b5a53996bf7b5fd77fefcfd1632227134982e128427527f35",
+    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "build/app-shell.254c23dc6ec9.js": "254c23dc6ec976f6a11703878e672eace83f5ad182a1c811c72dc11718ec55bc",
+    "build/app-shell.984f2e5f2fe4.css": "984f2e5f2fe47b40c389fef50970e598f36241272825b0fe44da858e58b696d0",
+    "build/boot-core.6eddb4647dab.css": "6eddb4647dabed4e8552963532220c0f701170444ddd16892b2bbf49b7569826",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.f5453e704d5f.js": "f5453e704d5fa56860af9ba0221fc073194df3dff9f80868992acf7f39880493",
+    "build/gameplay-core-secondary.1c4baa12cb83.js": "1c4baa12cb83ce6e5744c4399f3fa8718305a644bcec916221f30c3e9aa16c4c",
+    "build/gameplay-core.af5892190f1c.css": "af5892190f1cdfd5e71d57bfbaff1020029cb33db961a0980a1412b31695d35f"
+  },
+  "sourceUnchanged": true
+}

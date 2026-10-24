@@ -1,0 +1,97 @@
+{
+  "frames": [
+    [
+      435,
+      20,
+      410,
+      760
+    ],
+    [
+      435,
+      20,
+      410,
+      760
+    ],
+    [
+      435,
+      20,
+      410,
+      760
+    ],
+    [
+      435,
+      20,
+      410,
+      760
+    ]
+  ],
+  "chrome": [
+    "http://127.0.0.1:51065/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp",
+    "http://127.0.0.1:51065/assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp"
+  ],
+  "art": [
+    "http://127.0.0.1:51065/assets/characters/male_fire.jpg",
+    "http://127.0.0.1:51065/assets/characters/female_water.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-knife.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-frost-punch.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-ice-spin.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-frost-crush.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-ball.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-flood-beast.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-ice-arrow-rain.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-heal.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-revive.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-freeze.jpg",
+    "http://127.0.0.1:51065/assets/skills/water-purify-mind.webp",
+    "http://127.0.0.1:51065/assets/skills/water-ex.jpg"
+  ],
+  "scroll": {
+    "content": "auto",
+    "page": "visible",
+    "list": "visible"
+  },
+  "selected": "skill",
+  "cleared": true,
+  "header": {
+    "title": {
+      "x": 443.75,
+      "y": 32.5,
+      "w": 274.74609375,
+      "h": 47.5
+    },
+    "back": {
+      "x": 750.9375,
+      "y": 28.75,
+      "w": 85.3125,
+      "h": 55
+    },
+    "row": {
+      "x": 443.75,
+      "y": 28.75,
+      "w": 392.5,
+      "h": 55
+    },
+    "tracks": [
+      197.812,
+      395.625,
+      65.9375
+    ],
+    "gap": 0,
+    "direction": "ltr",
+    "center": 608.6912533638799,
+    "rangeCenter": 608.5904846191406,
+    "centerError": 0.1007687447392982,
+    "text": {
+      "left": 573.7890625,
+      "right": 643.3919067382812,
+      "top": 40.83876627746952,
+      "bottom": 69.60580795994296
+    },
+    "safe": {
+      "left": 528.9212890625,
+      "right": 663.546875,
+      "top": 36.26846590909091,
+      "bottom": 75.23245738636362
+    }
+  }
+}

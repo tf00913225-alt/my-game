@@ -1,0 +1,1585 @@
+{
+  "complete": true,
+  "head": "3d14c8b27b7347f3929d02f50d8e965a7f0e3c4d",
+  "viewport": [
+    1280,
+    800
+  ],
+  "sourceBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "eb76b8bab7de762eae773ae1c07e3f7f9117458ae18d1db1bb091914c9165761",
+    "js/battle-statistics-system.js": "ae7a1c492806927779c869b4fe34bdf44ee693598d5c8e89279daae7afb603e8",
+    "js/gameplay-boss-tower-system.js": "7ddcc4dafade8328164dc457d00c3b3f5ee44cd48a043e39acdca4e7ddaede70",
+    "css/battle-statistics-system.css": "dbeebe3ed4b059f5f8bd06e09198de15a18282118bf6e7fe3053d869305934e5",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.6598961131fb.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "build/feature-adventure-ui.846e8e2ef60e.js": "846e8e2ef60e941e46aee2a9b19436b87f674550d21857a38367cdaa36864fae",
+    "build/feature-adventure.fb47c554488e.css": "fb47c554488e8d668eb7b61ed94f092beef446aca94060f304c14523b9a14151",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.3917f3ca6416.css": "3917f3ca6416702505638561996e6cc3f414866f22eea02c8469c7631cff660a"
+  },
+  "scenes": [
+    {
+      "name": "empty-guard",
+      "open": false,
+      "text": "Boss 功能卡×",
+      "scroll": {
+        "top": 0,
+        "height": 672,
+        "total": 672
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 948.4000244140625,
+          "y": 18.214284896850586,
+          "width": 214.2855224609375,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 1162.685546875,
+          "bottom": 61.07142448425293,
+          "left": 948.4000244140625
+        },
+        "ink": {
+          "x": 996.4635620117188,
+          "y": 23.571426391601562,
+          "width": 118.15850830078125,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 1114.6220703125,
+          "bottom": 54.642852783203125,
+          "left": 996.4635620117188
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42855224609375,
+          "meta": false
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 1169.1142578125,
+            "y": 11.785713195800781,
+            "width": 55.71435546875,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 1224.82861328125,
+            "bottom": 67.5,
+            "left": 1169.1142578125
+          }
+        }
+      ]
+    },
+    {
+      "name": "drawer-top",
+      "open": true,
+      "text": "Boss 功能卡×!金剛護體傷害先由 BOSS 護盾吸收，溢出才扣生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!滅魂陣倒數歸零時發動大型攻擊；破壞即可取消。觸發條件Boss 戰鬥機制觸發目前狀態蓄力中剩餘2 回合!血祭圖騰存活期間，每回合恢復 BOSS 4% 最大生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!煞氣戰旗存活期間，BOSS 造成傷害提高 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!玄甲圖騰存活期間，BOSS 受到的傷害降低 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!鎖脈法器存活期間，我方治療與 SP 回復降低 40%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續",
+      "scroll": {
+        "top": 0,
+        "height": 672,
+        "total": 1498
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 574.642822265625,
+          "y": 18.214284896850586,
+          "width": 214.2857666015625,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 788.9285888671875,
+          "bottom": 61.07142448425293,
+          "left": 574.642822265625
+        },
+        "ink": {
+          "x": 622.7064819335938,
+          "y": 23.571426391601562,
+          "width": 118.158447265625,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 740.8649291992188,
+          "bottom": 54.642852783203125,
+          "left": 622.7064819335938
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42857666015625,
+          "meta": false
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "倒數歸零時發動大型攻擊；破壞即可取消。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 造成傷害提高 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 受到的傷害降低 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，我方治療與 SP 回復降低 40%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": false,
+          "rect": {
+            "x": 809.2857055664062,
+            "y": 105,
+            "width": 55.71429443359375,
+            "height": 60,
+            "top": 105,
+            "right": 865,
+            "bottom": 165,
+            "left": 809.2857055664062
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 795.3571166992188,
+            "y": 11.785713195800781,
+            "width": 55.71429443359375,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 851.0714111328125,
+            "bottom": 67.5,
+            "left": 795.3571166992188
+          }
+        }
+      ]
+    },
+    {
+      "name": "drawer-end",
+      "open": true,
+      "text": "Boss 功能卡×!金剛護體傷害先由 BOSS 護盾吸收，溢出才扣生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!滅魂陣倒數歸零時發動大型攻擊；破壞即可取消。觸發條件Boss 戰鬥機制觸發目前狀態蓄力中剩餘2 回合!血祭圖騰存活期間，每回合恢復 BOSS 4% 最大生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!煞氣戰旗存活期間，BOSS 造成傷害提高 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!玄甲圖騰存活期間，BOSS 受到的傷害降低 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!鎖脈法器存活期間，我方治療與 SP 回復降低 40%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續",
+      "scroll": {
+        "top": 826,
+        "height": 672,
+        "total": 1498
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 574.642822265625,
+          "y": 18.214284896850586,
+          "width": 214.2857666015625,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 788.9285888671875,
+          "bottom": 61.07142448425293,
+          "left": 574.642822265625
+        },
+        "ink": {
+          "x": 622.7064819335938,
+          "y": 23.571426391601562,
+          "width": 118.158447265625,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 740.8649291992188,
+          "bottom": 54.642852783203125,
+          "left": 622.7064819335938
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42857666015625,
+          "meta": false
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "倒數歸零時發動大型攻擊；破壞即可取消。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 造成傷害提高 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 受到的傷害降低 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，我方治療與 SP 回復降低 40%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": false,
+          "rect": {
+            "x": 809.2857055664062,
+            "y": 105,
+            "width": 55.71429443359375,
+            "height": 60,
+            "top": 105,
+            "right": 865,
+            "bottom": 165,
+            "left": 809.2857055664062
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 795.3571166992188,
+            "y": 11.785713195800781,
+            "width": 55.71429443359375,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 851.0714111328125,
+            "bottom": 67.5,
+            "left": 795.3571166992188
+          }
+        }
+      ]
+    },
+    {
+      "name": "drawer-closed",
+      "open": false,
+      "text": "Boss 功能卡×!金剛護體傷害先由 BOSS 護盾吸收，溢出才扣生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!滅魂陣倒數歸零時發動大型攻擊；破壞即可取消。觸發條件Boss 戰鬥機制觸發目前狀態蓄力中剩餘2 回合!血祭圖騰存活期間，每回合恢復 BOSS 4% 最大生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!煞氣戰旗存活期間，BOSS 造成傷害提高 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!玄甲圖騰存活期間，BOSS 受到的傷害降低 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!鎖脈法器存活期間，我方治療與 SP 回復降低 40%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續",
+      "scroll": {
+        "top": 826,
+        "height": 672,
+        "total": 1498
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 948.4000244140625,
+          "y": 18.214284896850586,
+          "width": 214.2855224609375,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 1162.685546875,
+          "bottom": 61.07142448425293,
+          "left": 948.4000244140625
+        },
+        "ink": {
+          "x": 996.4635620117188,
+          "y": 23.571426391601562,
+          "width": 118.15850830078125,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 1114.6220703125,
+          "bottom": 54.642852783203125,
+          "left": 996.4635620117188
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42855224609375,
+          "meta": false
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "倒數歸零時發動大型攻擊；破壞即可取消。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 造成傷害提高 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 受到的傷害降低 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，我方治療與 SP 回復降低 40%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": false,
+          "rect": {
+            "x": 809.2857055664062,
+            "y": 105,
+            "width": 55.71429443359375,
+            "height": 60,
+            "top": 105,
+            "right": 865,
+            "bottom": 165,
+            "left": 809.2857055664062
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 1169.1142578125,
+            "y": 11.785713195800781,
+            "width": 55.71435546875,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 1224.82861328125,
+            "bottom": 67.5,
+            "left": 1169.1142578125
+          }
+        }
+      ]
+    },
+    {
+      "name": "drawer-reopened",
+      "open": true,
+      "text": "Boss 功能卡×!金剛護體傷害先由 BOSS 護盾吸收，溢出才扣生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!滅魂陣倒數歸零時發動大型攻擊；破壞即可取消。觸發條件Boss 戰鬥機制觸發目前狀態蓄力中剩餘2 回合!血祭圖騰存活期間，每回合恢復 BOSS 4% 最大生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!煞氣戰旗存活期間，BOSS 造成傷害提高 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!玄甲圖騰存活期間，BOSS 受到的傷害降低 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!鎖脈法器存活期間，我方治療與 SP 回復降低 40%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續",
+      "scroll": {
+        "top": 0,
+        "height": 672,
+        "total": 1498
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 574.642822265625,
+          "y": 18.214284896850586,
+          "width": 214.2857666015625,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 788.9285888671875,
+          "bottom": 61.07142448425293,
+          "left": 574.642822265625
+        },
+        "ink": {
+          "x": 622.7064819335938,
+          "y": 23.571426391601562,
+          "width": 118.158447265625,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 740.8649291992188,
+          "bottom": 54.642852783203125,
+          "left": 622.7064819335938
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42857666015625,
+          "meta": false
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "倒數歸零時發動大型攻擊；破壞即可取消。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 造成傷害提高 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 受到的傷害降低 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，我方治療與 SP 回復降低 40%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.14284939236111,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.14284939236111,
+          "meta": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": false,
+          "rect": {
+            "x": 809.2857055664062,
+            "y": 105,
+            "width": 55.71429443359375,
+            "height": 60,
+            "top": 105,
+            "right": 865,
+            "bottom": 165,
+            "left": 809.2857055664062
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 795.3571166992188,
+            "y": 11.785713195800781,
+            "width": 55.71429443359375,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 851.0714111328125,
+            "bottom": 67.5,
+            "left": 795.3571166992188
+          }
+        }
+      ]
+    },
+    {
+      "name": "cleared-guard",
+      "open": false,
+      "text": "Boss 功能卡×!金剛護體傷害先由 BOSS 護盾吸收，溢出才扣生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!滅魂陣倒數歸零時發動大型攻擊；破壞即可取消。觸發條件Boss 戰鬥機制觸發目前狀態蓄力中剩餘2 回合!血祭圖騰存活期間，每回合恢復 BOSS 4% 最大生命。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!煞氣戰旗存活期間，BOSS 造成傷害提高 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!玄甲圖騰存活期間，BOSS 受到的傷害降低 25%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續!鎖脈法器存活期間，我方治療與 SP 回復降低 40%。觸發條件Boss 戰鬥機制觸發目前狀態生效中剩餘破壞前持續",
+      "scroll": {
+        "top": 0,
+        "height": 672,
+        "total": 1498
+      },
+      "title": {
+        "text": "Boss 功能卡",
+        "box": {
+          "x": 948.4000244140625,
+          "y": 18.214284896850586,
+          "width": 214.2855224609375,
+          "height": 42.857139587402344,
+          "top": 18.214284896850586,
+          "right": 1162.685546875,
+          "bottom": 61.07142448425293,
+          "left": 948.4000244140625
+        },
+        "ink": {
+          "x": 996.4635620117188,
+          "y": 23.571426391601562,
+          "width": 118.15850830078125,
+          "height": 31.071426391601562,
+          "top": 23.571426391601562,
+          "right": 1114.6220703125,
+          "bottom": 54.642852783203125,
+          "left": 996.4635620117188
+        }
+      },
+      "fonts": [
+        {
+          "text": "Boss 功能卡",
+          "font": 21.42855224609375,
+          "meta": false
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "倒數歸零時發動大型攻擊；破壞即可取消。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 造成傷害提高 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，BOSS 受到的傷害降低 25%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "!",
+          "font": 17.142857142857142,
+          "meta": true
+        },
+        {
+          "text": "存活期間，我方治療與 SP 回復降低 40%。",
+          "font": 19.285711038523708,
+          "meta": false
+        },
+        {
+          "text": "觸發條件",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "目前狀態",
+          "font": 17.142862955729168,
+          "meta": true
+        },
+        {
+          "text": "剩餘",
+          "font": 17.142862955729168,
+          "meta": true
+        }
+      ],
+      "controls": [
+        {
+          "text": "!",
+          "hidden": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "×",
+          "hidden": false,
+          "rect": {
+            "x": 1169.1142578125,
+            "y": 11.785713195800781,
+            "width": 55.71435546875,
+            "height": 55.71428680419922,
+            "top": 11.785713195800781,
+            "right": 1224.82861328125,
+            "bottom": 67.5,
+            "left": 1169.1142578125
+          }
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "type": "true-mouse",
+      "selector": "#battleMechanismAlert",
+      "x": 837.1428527832031,
+      "y": 135,
+      "rect": {
+        "x": 809.2857055664062,
+        "y": 105,
+        "width": 55.71429443359375,
+        "height": 60,
+        "top": 105,
+        "right": 865,
+        "bottom": 165,
+        "left": 809.2857055664062
+      }
+    },
+    {
+      "type": "true-wheel",
+      "index": 0
+    },
+    {
+      "type": "true-wheel",
+      "index": 1
+    },
+    {
+      "type": "true-mouse",
+      "selector": "#battleBossMechanismDrawer [data-close]",
+      "x": 823.2142639160156,
+      "y": 39.64285659790039,
+      "rect": {
+        "x": 795.3571166992188,
+        "y": 11.785713195800781,
+        "width": 55.71429443359375,
+        "height": 55.71428680419922,
+        "top": 11.785713195800781,
+        "right": 851.0714111328125,
+        "bottom": 67.5,
+        "left": 795.3571166992188
+      }
+    },
+    {
+      "type": "true-mouse",
+      "selector": "#battleMechanismAlert",
+      "x": 837.1428527832031,
+      "y": 135,
+      "rect": {
+        "x": 809.2857055664062,
+        "y": 105,
+        "width": 55.71429443359375,
+        "height": 60,
+        "top": 105,
+        "right": 865,
+        "bottom": 165,
+        "left": 809.2857055664062
+      }
+    }
+  ],
+  "checks": [
+    {
+      "label": "showPage-only",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": null,
+        "bossActive": false
+      }
+    },
+    {
+      "label": "empty-guard",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    },
+    {
+      "label": "drawer-top",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    },
+    {
+      "label": "drawer-end",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    },
+    {
+      "label": "drawer-closed",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    },
+    {
+      "label": "drawer-reopened",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    },
+    {
+      "label": "cleared-guard",
+      "state": {
+        "active": false,
+        "token": 0,
+        "timer": null,
+        "observer": {
+          "battleToken": "qa-boss-observer",
+          "active": true,
+          "result": null,
+          "combatants": []
+        },
+        "bossActive": false
+      }
+    }
+  ],
+  "scope": "Observer-only mechanisms display. No combat lifecycle, rewards, saving, escape or transactions.",
+  "fixture": {
+    "source": "js/gameplay-boss-tower-system.js::BOSS_OBJECT_DEFINITIONS / bossMechanismInspectorCards",
+    "definitions": {
+      "shield": {
+        "type": "shield",
+        "kind": "護盾",
+        "name": "金剛護體",
+        "shieldRatio": 0.24,
+        "effect": "傷害先由 BOSS 護盾吸收，溢出才扣生命。"
+      },
+      "charge": {
+        "type": "charge",
+        "kind": "法器",
+        "name": "滅魂陣",
+        "hpRatio": 0.2,
+        "countdown": 2,
+        "effect": "倒數歸零時發動大型攻擊；破壞即可取消。"
+      },
+      "heal": {
+        "type": "heal",
+        "kind": "圖騰",
+        "name": "血祭圖騰",
+        "hpRatio": 0.18,
+        "healRatio": 0.04,
+        "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。"
+      },
+      "amplify": {
+        "type": "amplify",
+        "kind": "戰旗",
+        "name": "煞氣戰旗",
+        "hpRatio": 0.18,
+        "damageMultiplier": 1.25,
+        "effect": "存活期間，BOSS 造成傷害提高 25%。"
+      },
+      "defense": {
+        "type": "defense",
+        "kind": "圖騰",
+        "name": "玄甲圖騰",
+        "hpRatio": 0.18,
+        "effect": "存活期間，BOSS 受到的傷害降低 25%。"
+      },
+      "seal": {
+        "type": "seal",
+        "kind": "法器",
+        "name": "鎖脈法器",
+        "hpRatio": 0.16,
+        "healingMultiplier": 0.6,
+        "effect": "存活期間，我方治療與 SP 回復降低 40%。"
+      }
+    },
+    "cards": [
+      {
+        "id": "qa-observer-shield",
+        "name": "金剛護體",
+        "effect": "傷害先由 BOSS 護盾吸收，溢出才扣生命。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "生效中",
+        "remaining": "破壞前持續"
+      },
+      {
+        "id": "qa-observer-charge",
+        "name": "滅魂陣",
+        "effect": "倒數歸零時發動大型攻擊；破壞即可取消。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "蓄力中",
+        "remaining": "2 回合"
+      },
+      {
+        "id": "qa-observer-heal",
+        "name": "血祭圖騰",
+        "effect": "存活期間，每回合恢復 BOSS 4% 最大生命。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "生效中",
+        "remaining": "破壞前持續"
+      },
+      {
+        "id": "qa-observer-amplify",
+        "name": "煞氣戰旗",
+        "effect": "存活期間，BOSS 造成傷害提高 25%。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "生效中",
+        "remaining": "破壞前持續"
+      },
+      {
+        "id": "qa-observer-defense",
+        "name": "玄甲圖騰",
+        "effect": "存活期間，BOSS 受到的傷害降低 25%。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "生效中",
+        "remaining": "破壞前持續"
+      },
+      {
+        "id": "qa-observer-seal",
+        "name": "鎖脈法器",
+        "effect": "存活期間，我方治療與 SP 回復降低 40%。",
+        "icon": "",
+        "trigger": "Boss 戰鬥機制觸發",
+        "status": "生效中",
+        "remaining": "破壞前持續"
+      }
+    ],
+    "note": "All six formal types combined only for long-list presentation; no claim this combination occurs in a live encounter. Empty icon uses formal inspector fallback."
+  },
+  "initial": {
+    "active": false,
+    "token": 0,
+    "timer": null,
+    "observer": null,
+    "bossActive": false
+  },
+  "reopenScroll": 0,
+  "loaded": [
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/boot-core.1a331d452911.css",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/boot-core.1a331d452911.css",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.9cdbe69aad4a.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.1a331d452911.css",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.257e4b6bac5a.js",
+    "/build/app-shell.725d1d00b39e.css",
+    "/build/app-shell.725d1d00b39e.css",
+    "/build/app-shell.257e4b6bac5a.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.d1e7d90cba12.js",
+    "/build/gameplay-core-secondary.db9536f36042.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core.3917f3ca6416.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.d1e7d90cba12.js",
+    "/build/gameplay-core-secondary.db9536f36042.js",
+    "/build/gameplay-core.3917f3ca6416.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.0f3635335ca7.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.9eb4fff74856.css"
+  ],
+  "loadedHashes": {
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/firebase/firebase-bootstrap.d69ddfb2eff7.js": "d69ddfb2eff75aeca741f55cd3f7b3a5204c34f285b2c7e4e22bab3e3a30bbec",
+    "build/firebase/firebase-auth.9f8c09942b79.js": "9f8c09942b79acc26665d2f3561d9824ce13725ad85c38303aff3dadb22c3489",
+    "build/firebase/firebase-cloud-save.dbb8d71d026f.js": "dbb8d71d026f24701d5e8a04c59d94fcccccc73c87a59a1e85037af9055a4b7a",
+    "build/firebase/firebase-session.877a7842d6bd.js": "877a7842d6bd93881b043e61e58ba9002f347f8c00637a9ad95717a65015cb3d",
+    "build/firebase/firebase-auth-ui.4624b380b4b9.js": "4624b380b4b98e48dc68fe61b2ec1e1b8374e85d52dfbfec2697866f522c0fb3",
+    "build/firebase/firebase-config.4314d6321ba1.js": "4314d6321ba1f5447e7089f309972422e52fd64ad5f1d37cbc554e9742134940",
+    "build/firebase/session-client.235aa8b1f47e.js": "235aa8b1f47ea17463e627473559219f63204235fd62f7bad671666b432d9752",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.3917f3ca6416.css": "3917f3ca6416702505638561996e6cc3f414866f22eea02c8469c7631cff660a",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0"
+  },
+  "sourceAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "eb76b8bab7de762eae773ae1c07e3f7f9117458ae18d1db1bb091914c9165761",
+    "js/battle-statistics-system.js": "ae7a1c492806927779c869b4fe34bdf44ee693598d5c8e89279daae7afb603e8",
+    "js/gameplay-boss-tower-system.js": "7ddcc4dafade8328164dc457d00c3b3f5ee44cd48a043e39acdca4e7ddaede70",
+    "css/battle-statistics-system.css": "dbeebe3ed4b059f5f8bd06e09198de15a18282118bf6e7fe3053d869305934e5",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.6598961131fb.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "build/feature-adventure-ui.846e8e2ef60e.js": "846e8e2ef60e941e46aee2a9b19436b87f674550d21857a38367cdaa36864fae",
+    "build/feature-adventure.fb47c554488e.css": "fb47c554488e8d668eb7b61ed94f092beef446aca94060f304c14523b9a14151",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.3917f3ca6416.css": "3917f3ca6416702505638561996e6cc3f414866f22eea02c8469c7631cff660a"
+  },
+  "sourceUnchanged": true
+}

@@ -1,0 +1,429 @@
+{
+  "complete": true,
+  "head": "db6a633cfa949a103ed0275826ed7bd35cefad37",
+  "dirty": false,
+  "viewport": [
+    393,
+    873
+  ],
+  "sourcesBefore": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "757e7782074721b06c3e17d7253c71a45f9f5f8da41487433e30314816a5f945",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.9c828c5bf57c.js": "9c828c5bf57c181b554639c320f885848a1f76cbcf191ba37fa38b8a39966b3d",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0"
+  },
+  "sourcesAfter": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "757e7782074721b06c3e17d7253c71a45f9f5f8da41487433e30314816a5f945",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.9c828c5bf57c.js": "9c828c5bf57c181b554639c320f885848a1f76cbcf191ba37fa38b8a39966b3d",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0"
+  },
+  "sourceUnchanged": true,
+  "touches": [
+    {
+      "selector": "#inventoryNav",
+      "x": 39.29999923706055,
+      "y": 746.8971862792969,
+      "hit": true,
+      "label": "背包\n背包"
+    },
+    {
+      "selector": "#inventoryCategoryTabs [data-filter=\"material\"]",
+      "x": 239.62083435058594,
+      "y": 504.54718017578125,
+      "hit": true,
+      "label": "材料"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 55.018293380737305,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×999"
+    },
+    {
+      "root": "#itemModal",
+      "scroll": "not-needed"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 95.45829391479492,
+      "y": 549.2600708007812,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 269.6416549682617,
+      "y": 599.2666168212891,
+      "to": 265.1079864501953,
+      "top": 649,
+      "client": 1056,
+      "height": 1705
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 196.49999237060547,
+      "y": 687.5833129882812,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 610.7572631835938,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 55.018293380737305,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×999"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 610.7572631835938,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "kind": "canonical-fixture-items",
+      "items": [
+        {
+          "id": "equipmentChest",
+          "name": "裝備寶箱",
+          "uid": "qa20-equipment-chest",
+          "type": "chest",
+          "count": 2
+        },
+        {
+          "id": "oreLow",
+          "name": "白階礦石",
+          "uid": "qa20-ore",
+          "type": "material",
+          "count": 999
+        },
+        {
+          "id": "oreLow",
+          "name": "白階礦石",
+          "uid": "qa20-ore",
+          "type": "material",
+          "count": 235,
+          "sourceIndex": 1
+        },
+        {
+          "id": "materialChest",
+          "name": "材料寶箱",
+          "uid": "qa20-material-chest",
+          "type": "chest",
+          "count": 2
+        }
+      ],
+      "note": "1234 ore is formally split into stacks; target three logical item IDs, not three physical stacks"
+    },
+    {
+      "kind": "actual-item-identity",
+      "id": "oreLow",
+      "name": "白階礦石",
+      "uid": "qa20-ore",
+      "selected": 1,
+      "description": "鍛造與材料合成用礦石。\n售價：0 金幣",
+      "disabled": {
+        "disabled": true,
+        "opacity": "1",
+        "text": "不可裝備"
+      }
+    },
+    {
+      "kind": "actual-item-identity",
+      "id": "oreLow",
+      "name": "白階礦石",
+      "uid": "qa20-ore",
+      "selected": 1,
+      "description": "鍛造與材料合成用礦石。\n售價：0 金幣",
+      "disabled": {
+        "disabled": true,
+        "opacity": "1",
+        "text": "不可裝備"
+      }
+    },
+    {
+      "kind": "actual-item-identity",
+      "id": "oreLow",
+      "name": "白階礦石",
+      "uid": "qa20-ore",
+      "selected": 1,
+      "description": "鍛造與材料合成用礦石。\n售價：0 金幣",
+      "disabled": {
+        "disabled": true,
+        "opacity": "1",
+        "text": "不可裝備"
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "name": "oreLow-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-detail-end",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-source-top",
+      "controls": [
+        {
+          "label": "返回",
+          "width": 292.566650390625,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-source-end",
+      "controls": [
+        {
+          "label": "返回",
+          "width": 292.566650390625,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-source-return",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-bag-return",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "oreLow-reopen",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    }
+  ],
+  "scope": "Ore-only final readability delta via actual inventory category/slot; two chest base d66 evidence retained. Actual source/preview/close/reopen when formal controls exist. No chest opening, use, selling, claims or successful transaction. No source invented for N/A. True end uses touch/wheel; first thrown assertion stops run. Original UI side effects retained."
+}

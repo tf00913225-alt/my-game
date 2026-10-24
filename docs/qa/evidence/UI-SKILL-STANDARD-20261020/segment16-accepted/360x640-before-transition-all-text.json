@@ -1,0 +1,242 @@
+[
+  {
+    "name": "detail-entry-transition",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "‹ 返回秘寶列表",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-detail-back",
+        "parent": "team-relic-detail"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 22.013723221115285,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "team-relic-detail-hero rarity-orange"
+      },
+      {
+        "text": "橙階・Lv.1 / 20",
+        "font": 15.009356741669514,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-detail-hero rarity-orange"
+      },
+      {
+        "text": "防禦",
+        "font": 14.008732958891546,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "team-relic-detail-hero rarity-orange"
+      },
+      {
+        "text": "專屬碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 100",
+        "font": 15.964285714285714,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶通用碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0",
+        "font": 16.187465122767858,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "已持有；多餘專屬碎片會保留。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "取得來源：點選獲取途徑查看完整條件與來源追溯",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 16,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "em.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "觸發條件",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "我方累積受到6次敵方有效攻擊後",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶效果",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "對敵方全體造成 0.65×秘寶威力。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "觸發限制",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "觸發後受擊計數歸零；每回合最多一次。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "下一強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "Lv.10：全體傷害0.80×並降攻5%一回合",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "Lv.1 → Lv.2：秘寶精華 ×26",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "持有：精華 0",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "強化",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-detail-actions"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-detail-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "‹ 返回秘寶列表",
+        "width": 126,
+        "height": 38,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 139,
+        "height": 52,
+        "overflow": false
+      },
+      {
+        "label": "強化",
+        "width": 151,
+        "height": 38,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 151,
+        "height": 38,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

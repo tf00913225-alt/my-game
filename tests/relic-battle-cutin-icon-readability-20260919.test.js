@@ -112,8 +112,8 @@ assert.doesNotMatch(relic,/team-relic-card-dev|team-relic-dev-equip|DEV 正式�
   "player-facing relic markup must not expose DEV or capability classification");
 assert.match(relic,/v174RelicDevPreviewPresentation=function\(id\)/,
   "internal manual presentation diagnostic may remain available without a player-facing button");
-assert.match(css,/\.team-relic-card \.team-relic-equip\{[^}]*min-height:34px/,
-  "formal equip control must be visibly actionable");
+assert.match(css,/\.team-relic-card \.team-relic-equip\{[^}]*min-height:44px/,
+  "formal equip control must retain the reviewed 44px touch contract");
 assert.doesNotMatch(css,/team-relic-card-dev|team-relic-dev-equip/,
   "relic CSS must not keep a second DEV-only card contract");
 assert.match(relic,/function equipRelic\(id\)[\s\S]*teamLoadout\.relicId=id;[\s\S]*saveRelics\(\);[\s\S]*syncHomeRelicUi\(\)/,

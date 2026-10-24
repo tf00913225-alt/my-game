@@ -1,0 +1,374 @@
+{
+  "head": "8e614356bc7983e3b30ee1199fd209506633c787",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\full-page-5-end.png",
+      "sha256": "149903a47ebb9d53b071611135b4a6525c4f50252dd2abbd95a45b7957633895"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\full-page5-detail-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\full-page5-detail-return.png",
+      "sha256": "355433d11fc5b840c91b70dd525e686199b203490a3cea1d85f16d4a1368f008"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\full-slot120-compare-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\full-slot120-compare-end.png",
+      "sha256": "ac7608d5fc04d39b0d707f870266f090c8676e918db5c526e496dce550aced83"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\full-slot120-detail-no-action.png",
+      "sha256": "bd3d43e8717b1f9fe73f15dbcd3e966090f8c1780d75362d853024c4250662dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\original-system-entry.png",
+      "sha256": "b54c2c641ef42f97bf3ff3dc1768790ceec19659a4a308f2fd8525799d0b391a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\report.json",
+      "sha256": "7ac6e02aac561db5d5be6f198a91849b2b17e7459888771e2fa6c49dc41b6c2f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\360x640\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\360x640\\tutorial-returned.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page-1-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page-1-end.png",
+      "sha256": "179e99978df23f331856196577b5da5875a25951ed3108a49de631b52a1447b5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page-2-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page-2-end.png",
+      "sha256": "c53a1f72e3a8bab45d800255c333780e87881ec97dd9a74c5ccd3da39183723a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page-3-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page-3-end.png",
+      "sha256": "969155045d5770899dcb5d96f1aeba72841e5b58c0f2f8b6a80fa391ba7de24d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page-4-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page-4-end.png",
+      "sha256": "a286741cd8b79ae44e4c598ad3d9379f2c38e416edd6cd25b10e3c7a3069fd42"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page-5-end.png",
+      "sha256": "edf54720f8f193900d4cb97598d553d0bdfb379bc65548efbdbba4cac4f3e6dc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-page5-detail-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-page5-detail-return.png",
+      "sha256": "9922107f88b1918149496a36104d84ccdcf72d50ad6d5e2f6e2e7e12027af7d3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-slot120-compare-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-slot120-compare-end.png",
+      "sha256": "426f9d97d1c793738e4ce121921f67f4b65aae857c04d9fac475e7adb2de6206"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\full-slot120-detail-no-action.png",
+      "sha256": "c6b313906ef7557eae0cb71c16e93dfc966a1d201d785374cd0ad1d498055a0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\original-system-entry.png",
+      "sha256": "49084a8cc47f315eca4418c2be32fdcba9737d16280fde16aba848d787f952fc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\report.json",
+      "sha256": "cca3cb7ee2b41ae2ded2f1fbb223f372a261049621c0e67dc9398d11dcf2c794"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\tutorial-first.png",
+      "sha256": "edb1db61ca0292471e8a26a48b6985d41179e4c6310eface624e3f7250fe8221"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\393x873\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\393x873\\tutorial-returned.png",
+      "sha256": "edb1db61ca0292471e8a26a48b6985d41179e4c6310eface624e3f7250fe8221"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page-1-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page-1-end.png",
+      "sha256": "acd16b793a5af0821905ab8b675ca532c4b0d8703f8f44ecb8863905d4851b97"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page-2-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page-2-end.png",
+      "sha256": "50314acb8b7d4e461f6677b63923e18f56ad68ff64c2814db0f0505322055a87"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page-3-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page-3-end.png",
+      "sha256": "0506409c499e13dcdf5a31ae20d42ca4bd71f73419470d78c3dbc38ae3812801"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page-4-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page-4-end.png",
+      "sha256": "644c83bb3c99142bd7d16ce289cbc1f5bbd5eb0fd6d81e935464d413b607b193"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page-5-end.png",
+      "sha256": "f25cead55f8f3793b70ddbe8e19290b7d42f95f2da5a2d8ca2f1e425735f30e8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-page5-detail-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-page5-detail-return.png",
+      "sha256": "88003666e2e2fa016d50a4aa4211483ea85d0b72a964c72a574117ee9830cca4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-slot120-compare-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-slot120-compare-end.png",
+      "sha256": "108fef60b71fd9e9199e29d121fe4fb9c33be6e844a43ebbd482d69894567721"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\full-slot120-detail-no-action.png",
+      "sha256": "ffd16167f0f1f512fabe502af1ffdde675c4313543d4497c541cc3ccbc87e521"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\original-system-entry.png",
+      "sha256": "1035e75ef6e9e2a86a7b89010e2ac31165e0ecd068fd165b23c116905e65fe63"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\report.json",
+      "sha256": "7738ef91cf9ee65baa63fba71735fc97fbe8f8d7ff67532aab3cb3cf31bc4c32"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\tutorial-first.png",
+      "sha256": "f36fcb14fb7f4fe0159d16ae31cf2ef881981b57fe8114fbbb7b65a32597423c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\412x915\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\412x915\\tutorial-returned.png",
+      "sha256": "f36fcb14fb7f4fe0159d16ae31cf2ef881981b57fe8114fbbb7b65a32597423c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page-1-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page-1-end.png",
+      "sha256": "d32fc418c4c4a83fbb19a5d3c8b9f28a4a2ca4155b3768c8b9dd94fbf66b4e86"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page-2-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page-2-end.png",
+      "sha256": "b07d6eb47c216e91d26e88f7f38a63241bbb479d9553e6d5a1df69c01ff125ee"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page-3-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page-3-end.png",
+      "sha256": "36adf222a61a1d319e9d8f719ee9f3fb4271d0b3b6fb1fb7710b3bc5a6d27ea3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page-4-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page-4-end.png",
+      "sha256": "023d28c711f6e155179710d37987275dc6703969cb684ff35761d7d86560bdd6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page-5-end.png",
+      "sha256": "b2f4717dd219520f992bf9523316c9a24103e0330ebf0a4c1baed926159e429a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-page5-detail-return.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-page5-detail-return.png",
+      "sha256": "97aef120df8868e6a950aa092cf0e6bb2461df1f7806cb13f360a76fdf0430ca"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-slot120-compare-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-slot120-compare-end.png",
+      "sha256": "80cd9b4f9057c5d00b174df605f2912adc51e78659689bf3dcf2f63d6eead013"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\full-slot120-detail-no-action.png",
+      "sha256": "1c70cb6444aae2ae713005d01c2e3d2de108c592fc1be789fb09d380f84fc110"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\original-system-entry.png",
+      "sha256": "153fb238810e382b8c11ad4413fd862ea978963655319c7ade4899730ac26cab"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\report.json",
+      "sha256": "05131de1b2ac583af8cd4be0be85134c87b5cdddb17fd8530e4efd3488669624"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\tutorial-first.png",
+      "sha256": "da2449567230aa74d845c17f42c1d6b998a41dc88c6032049299f70a268b56b3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-8e614356\\full120-title-resolved\\recovery\\1280x800\\tutorial-returned.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\accepted\\1280x800\\tutorial-returned.png",
+      "sha256": "da2449567230aa74d845c17f42c1d6b998a41dc88c6032049299f70a268b56b3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\blocked-target.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\failure.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-page-1-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-page-1-end.png",
+      "sha256": "a1545fcd83095df61e0304a07929dc55bdea689d1c557259168a33b10258dcc3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-page-2-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-page-2-end.png",
+      "sha256": "d2b897fc7a9df6f47bdb927d526859f86a2e6f1a4c8b31de5753c96348e041d9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-page-3-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-page-3-end.png",
+      "sha256": "5a8388b1fdfcefbd6db68a8556c135e3270c3442bb41b6f3232bc9fd7d0ec185"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-page-4-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-page-4-end.png",
+      "sha256": "3ba9f0c034d882f1f4db625ae2eed5d5de30dadece48aaf970c07da44fb248f9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-page-5-end.png",
+      "sha256": "149903a47ebb9d53b071611135b4a6525c4f50252dd2abbd95a45b7957633895"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\full-slot120-detail-no-action.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\original-system-entry.png",
+      "sha256": "b54c2c641ef42f97bf3ff3dc1768790ceec19659a4a308f2fd8525799d0b391a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\report.json",
+      "sha256": "306cc4ea72dec33e4afcff3838a4a30b7c5fe6096b08716dbde211e475d8165a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-a078c8bf\\full120\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-a078c8bf\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\blocked-target.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\failure.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\full-page-5-end.png",
+      "sha256": "149903a47ebb9d53b071611135b4a6525c4f50252dd2abbd95a45b7957633895"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\full-slot120-detail-no-action.png",
+      "sha256": "60fdcafa53cad091797bbea9172a1d02c14e5f65297f25081b7beab7e02ffa0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\original-system-entry.png",
+      "sha256": "b54c2c641ef42f97bf3ff3dc1768790ceec19659a4a308f2fd8525799d0b391a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\report.json",
+      "sha256": "fc53c7fefd208182ad3f4e5d7b790c441c81f501d38b938257a5caf85823103a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-89e15ced\\full120-resolved\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-89e15ced\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\failure.png",
+      "sha256": "d8e7cb20957ccb0649f89f7290b97698a3a734e8184f177c4cbbdb884e31e13b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\full-page-5-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\full-page-5-end.png",
+      "sha256": "149903a47ebb9d53b071611135b4a6525c4f50252dd2abbd95a45b7957633895"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\full-slot120-detail-no-action.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\full-slot120-detail-no-action.png",
+      "sha256": "d8e7cb20957ccb0649f89f7290b97698a3a734e8184f177c4cbbdb884e31e13b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\original-system-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\original-system-entry.png",
+      "sha256": "b54c2c641ef42f97bf3ff3dc1768790ceec19659a4a308f2fd8525799d0b391a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\report.json",
+      "sha256": "2190fdd6451ff58271ca671fc99402747f24f44cc13ca1453d55952831486418"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-inventory-full-fae5865d\\full120-title-resolved\\recovery\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29c-full120-accepted\\before-or-excluded-fae5865d\\tutorial-first.png",
+      "sha256": "3af39ca08917e1a559772b5ccdc570bf9b112482b4bfd128078e51971f6251cc"
+    }
+  ],
+  "helpers": [
+    {
+      "source": "artifacts/segment29-inventory-full.mjs",
+      "sha256": "fe436376934b1e55003273421332810154a6efa463d91a1d8b8aac842c37c218",
+      "saved": "segment29-inventory-full.mjs.gz"
+    },
+    {
+      "source": "artifacts/run29-full120-title-resolved.cjs",
+      "sha256": "e35e83997cc805214d7b7943e023456c550281ab1340673303f5f9b165cd6760",
+      "saved": "run29-full120-title-resolved.cjs.gz"
+    },
+    {
+      "source": "artifacts/segment29-inventory-full.mjs.before-compare-close.gz",
+      "sha256": "879713601ec005d4b516aeeccf217f189bfaf1c56d0280601be5ed3985e4eeb8",
+      "saved": "segment29-inventory-full.mjs.before-compare-close.gz"
+    },
+    {
+      "source": "artifacts/segment29-inventory-full.mjs.before-compare-title-end.gz",
+      "sha256": "2b36f7de12ae8ed3cb1be9fa0789ec3b6782e4d9e7dd5790939d15192269074e",
+      "saved": "segment29-inventory-full.mjs.before-compare-title-end.gz"
+    }
+  ],
+  "limits": [
+    "360 final is close-only/page5 delta; original a078 five-page evidence retained separately, not re-executed acceptance",
+    "393/412/1280 final each covers true five-page last-slot119 plus detail/body end/formal return",
+    "Three original tutorial handlers have selected-domain same-task observations; pager/detail clicks do not inherit that claim",
+    "No wear/sell/lock/acquisition/equipment/use/claim/combat actions clicked; background original save effects retained",
+    "Empty-current-equipment comparison state only; other equipment transaction states unverified"
+  ]
+}

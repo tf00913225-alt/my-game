@@ -1,0 +1,874 @@
+[
+  {
+    "kind": "native-Tab",
+    "name": "training-entry",
+    "selector": "#trainingNav",
+    "count": 19,
+    "tag": "BUTTON",
+    "label": "野怪區",
+    "rect": {
+      "x": 505,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 595,
+      "bottom": 800,
+      "left": 505
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "training",
+    "page": "trainingPage",
+    "context": "training",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "showPage('home')",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "training-back",
+    "selector": "#bottomNav button[aria-label=返回]",
+    "count": 5,
+    "tag": "BUTTON",
+    "label": "返回",
+    "rect": {
+      "x": 775,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 775
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "training-back-returned",
+    "page": "homePage",
+    "context": "main",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "背包",
+        "handler": "showPage('inventory')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "野怪區",
+        "handler": "showPage('training')",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "主城",
+        "handler": "showPage('home')",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "副本",
+        "handler": "openDungeonHub()",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "玩法",
+        "handler": "showPage('gameplay')",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "gameplay-entry",
+    "selector": "#bossNav",
+    "count": 5,
+    "tag": "BUTTON",
+    "label": "玩法",
+    "rect": {
+      "x": 775,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 775
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "gameplay",
+    "page": "gameplayPage",
+    "context": "gameplay:gameplayPage",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "v148ReturnFromGameplay()",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "boss-entry",
+    "selector": ".gameplay-mode-card.boss",
+    "count": 6,
+    "tag": "BUTTON",
+    "label": "BOSS\n\n個人 BOSS・世界 BOSS\n\n新的個人 BOSS 可攻略",
+    "rect": {
+      "x": 442.8571472167969,
+      "y": 135.6026611328125,
+      "width": 394.2856750488281,
+      "height": 221.78570556640625,
+      "top": 135.6026611328125,
+      "right": 837.142822265625,
+      "bottom": 357.38836669921875,
+      "left": 442.8571472167969
+    },
+    "focusVisible": true,
+    "outline": "auto 1px rgb(16, 16, 16)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "boss-overview",
+    "page": "bossPage",
+    "context": "gameplay:bossPage",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "v148ReturnFromGameplay()",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "boss-back",
+    "selector": "#bottomNav button[aria-label=返回]",
+    "count": 15,
+    "tag": "BUTTON",
+    "label": "返回",
+    "rect": {
+      "x": 775,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 775
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "boss-back-returned",
+    "page": "gameplayPage",
+    "context": "gameplay:gameplayPage",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "v148ReturnFromGameplay()",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "tower-entry",
+    "selector": ".gameplay-mode-card.tower",
+    "count": 7,
+    "tag": "BUTTON",
+    "label": "四象塔\n\n本週試煉：風元素\n\n目前最高樓層：0 / 100",
+    "rect": {
+      "x": 442.8571472167969,
+      "y": 368.1026611328125,
+      "width": 394.2856750488281,
+      "height": 221.78570556640625,
+      "top": 368.1026611328125,
+      "right": 837.142822265625,
+      "bottom": 589.8883666992188,
+      "left": 442.8571472167969
+    },
+    "focusVisible": true,
+    "outline": "auto 1px rgb(16, 16, 16)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "tower-overview",
+    "page": "towerPage",
+    "context": "gameplay:towerPage",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "v148ReturnFromGameplay()",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "tower-back",
+    "selector": "#bottomNav button[aria-label=返回]",
+    "count": 10,
+    "tag": "BUTTON",
+    "label": "返回",
+    "rect": {
+      "x": 775,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 775
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "tower-back-returned",
+    "page": "gameplayPage",
+    "context": "gameplay:gameplayPage",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "角色",
+        "handler": "openHomeFeature('character')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "handler": "v148OpenContextInventory()",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "handler": "v148OpenContextRelic()",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "handler": "openHomeFeature('autoBattleSettings')",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "handler": "v148ReturnFromGameplay()",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "kind": "native-Tab",
+    "name": "gameplay-back",
+    "selector": "#bottomNav button[aria-label=返回]",
+    "count": 5,
+    "tag": "BUTTON",
+    "label": "返回",
+    "rect": {
+      "x": 775,
+      "y": 710,
+      "width": 90,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 775
+    },
+    "focusVisible": true,
+    "outline": "solid 4px rgb(255, 227, 160)",
+    "hit": true,
+    "disabled": false
+  },
+  {
+    "kind": "context",
+    "name": "gameplay-back-returned",
+    "page": "homePage",
+    "context": "main",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "背包",
+        "handler": "showPage('inventory')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "野怪區",
+        "handler": "showPage('training')",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "主城",
+        "handler": "showPage('home')",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "副本",
+        "handler": "openDungeonHub()",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "玩法",
+        "handler": "showPage('gameplay')",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  }
+]

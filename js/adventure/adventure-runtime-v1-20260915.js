@@ -728,7 +728,7 @@
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction){return false;}
         if(o.requiredAction==="skill"){
             if(typeof currentSkillCharacter!=="undefined"){currentSkillCharacter=getPartyCharacterKey(0);}
-            hideOverlay();showPage("skill");if(typeof renderSkillLoadout==="function"){renderSkillLoadout();}
+            hideOverlay();showPage("home");openHomeFeature("character");switchCharacterTab("skill");
         }else if(o.requiredAction==="equipment"&&!state.grantedEquipmentUid){
             if(!getEquipmentLessonOfferIntent()){showMessage("請先領取追兵一戰的護具購置金。");return false;}
             hideOverlay();showPage("home");openHomeFeature("shop");
@@ -736,9 +736,13 @@
             hideOverlay();showPage("inventory");
             if(typeof renderInventory==="function"){renderInventory();}
         }
+        window.FourSymbolsAdventureUI?.syncTutorialReturn(o.requiredAction==="skill"?"skill":o.requiredAction==="equipment"&&!state.grantedEquipmentUid?"shop":"inventory");
         return true;
     }
-    function returnFromTutorial(){return open({panel:"tutorial"});}
+    function returnFromTutorial(){
+        if(typeof closeHomeFeature==="function"){closeHomeFeature();}
+        return open({panel:"tutorial"});
+    }
     function continueTutorial(){
         const state=chapterState(),o=state?.onboarding;if(!o?.active||!o.requiredAction||o.nodeId!==state.currentNodeId||state.completedNodes[o.nodeId]){return false;}
         const practice=recoveryNeedsPractice();

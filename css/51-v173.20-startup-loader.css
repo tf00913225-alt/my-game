@@ -136,6 +136,7 @@ body > #startupLoader.is-leaving{
 }
 
 #startupLoader .startup-loading-panel{
+    --startup-panel-unit:min(1vw,.5625dvh);
     position:absolute;
     left:50%;
     right:auto;
@@ -144,73 +145,61 @@ body > #startupLoader.is-leaving{
     width:min(calc(100% - 28px),calc(56.25dvh - 28px),680px);
     min-height:0;
     box-sizing:border-box;
-    padding:clamp(15px,4.4vw,30px) clamp(16px,5vw,34px) clamp(14px,4vw,26px);
+    padding:clamp(15px,calc(4.4 * var(--startup-panel-unit)),30px) clamp(16px,calc(5 * var(--startup-panel-unit)),34px) clamp(14px,calc(4 * var(--startup-panel-unit)),26px);
     border:1px solid rgba(229,190,103,.72);
-    border-radius:clamp(10px,3vw,14px);
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 10px / 0 stretch;
+    border-radius:clamp(10px,calc(3 * var(--startup-panel-unit)),14px);
     transform:translateX(-50%);
-    background:linear-gradient(180deg,rgba(13,11,8,.88),rgba(3,3,3,.96));
+    background:#151515;
     box-shadow:
         0 12px 36px rgba(0,0,0,.72),
         inset 0 0 26px rgba(225,174,72,.07),
         0 0 18px rgba(224,175,76,.1);
 }
 
-#startupLoader .startup-loading-panel::before,
-#startupLoader .startup-loading-panel::after{
-    content:"◆";
-    position:absolute;
-    top:-10px;
-    color:#f2cc73;
-    font-size:clamp(14px,4vw,24px);
-    line-height:1;
-    text-shadow:0 0 10px rgba(255,201,91,.75);
-}
-
-#startupLoader .startup-loading-panel::before{left:18px;}
-#startupLoader .startup-loading-panel::after{right:18px;}
-
 #startupLoader .startup-status-row{
     display:flex;
-    align-items:flex-end;
+    align-items:center;
     justify-content:space-between;
-    gap:clamp(10px,3vw,22px);
+    gap:clamp(10px,calc(3 * var(--startup-panel-unit)),22px);
 }
 
 #startupLoader .startup-status-copy{
     min-width:0;
     flex:1 1 auto;
+    text-align:center;
 }
 
 #startupLoader .startup-status-title{
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:#fff4d2;
-    font-size:clamp(18px,5.2vw,29px);
+    font-size:clamp(18px,calc(5.2 * var(--startup-panel-unit)),29px);
     font-weight:900;
     line-height:1.28;
     letter-spacing:.04em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
     text-shadow:0 2px 5px #000,0 0 10px rgba(255,202,102,.25);
 }
 
 #startupLoader .startup-status-detail{
     margin-top:6px;
-    overflow:hidden;
+    overflow:visible;
+    overflow-wrap:anywhere;
     color:rgba(224,213,187,.8);
     font-family:"Noto Sans TC",sans-serif;
-    font-size:clamp(11px,3.25vw,17px);
+    font-size:clamp(13px,calc(3.25 * var(--startup-panel-unit)),17px);
     font-weight:500;
     line-height:1.35;
     letter-spacing:.02em;
-    text-overflow:ellipsis;
-    white-space:nowrap;
+    white-space:normal;
 }
 
 #startupLoader .startup-percent{
     flex:0 0 auto;
     color:#f8d879;
     font-family:"Cinzel","Noto Serif TC",serif;
-    font-size:clamp(21px,6vw,34px);
+    font-size:clamp(21px,calc(6 * var(--startup-panel-unit)),34px);
     font-weight:900;
     line-height:1;
     letter-spacing:.025em;
@@ -220,8 +209,8 @@ body > #startupLoader.is-leaving{
 #startupLoader .startup-progress-track{
     position:relative;
     width:100%;
-    height:clamp(9px,2.7vw,14px);
-    margin-top:clamp(11px,3.5vw,20px);
+    height:clamp(9px,calc(2.7 * var(--startup-panel-unit)),14px);
+    margin-top:clamp(11px,calc(3.5 * var(--startup-panel-unit)),20px);
     overflow:hidden;
     border:1px solid rgba(223,183,92,.78);
     border-radius:999px;
@@ -239,9 +228,9 @@ body > #startupLoader.is-leaving{
 }
 
 #startupLoader .startup-enter-prompt{
-    margin-top:clamp(12px,3.5vw,22px);
+    margin-top:clamp(12px,calc(3.5 * var(--startup-panel-unit)),22px);
     color:#fff0bd;
-    font-size:clamp(21px,6vw,34px);
+    font-size:clamp(21px,calc(6 * var(--startup-panel-unit)),34px);
     font-weight:900;
     line-height:1.25;
     letter-spacing:.08em;

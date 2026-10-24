@@ -18,7 +18,7 @@ assert.match(css,/#autoBattleSettingsPanel\.v131-element-box-panel \.auto-premiu
 assert.match(css,/#autoBattleSettingsPanel\.v131-element-box-panel \.auto-setting-card\{[\s\S]*?min-height:64px;/);
 assert.match(css,/#autoBattleSettingsPanel\.v131-element-box-panel \.auto-setting-meta strong\{[\s\S]*?font-size:16px;/);
 assert.match(css,/#autoBattleSettingsPanel\.v131-element-box-panel \.auto-threshold-head strong\{[\s\S]*?font-size:15px;/);
-assert.match(css,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel \.auto-premium-status\{[\s\S]*?position:sticky !important;[\s\S]*?top:0 !important;/);
+assert.match(css,/body\.v162-element-box-settings-open #autoBattleSettingsPanel\.v131-element-box-panel \.auto-premium-status\{[^}]*position:sticky !important;[^}]*top:calc\(-1 \* var\(--ui-length-unit,1px\)\) !important;/);
 assert.match(css,/#autoBattleSettingsPanel\.v131-element-box-panel\.v17342-settings-locked #autoBattleButton\{[\s\S]*?display:none !important;/);
 assert.match(css,/#autoBattleSettingsPanel \.v169-element-box-stop\{[\s\S]*?min-height:44px;[\s\S]*?font:900 15px\/1 sans-serif;/);
 

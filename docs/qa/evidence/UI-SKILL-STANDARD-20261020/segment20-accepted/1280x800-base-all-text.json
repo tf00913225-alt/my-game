@@ -1,0 +1,3228 @@
+[
+  {
+    "name": "equipmentChest-detail-top",
+    "rows": [
+      {
+        "text": "裝備寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-detail-end",
+    "rows": [
+      {
+        "text": "裝備寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-source-top",
+    "rows": [
+      {
+        "text": "裝備寶箱｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "裝備副本｜主城 → 副本 → 每日副本 → 裝備副本，必定取得 ×2（可重複）；解鎖：任一角色Lv.10；通關3輪；每日1次；可選廣告雙倍×4",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-source-end",
+    "rows": [
+      {
+        "text": "裝備寶箱｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "裝備副本｜主城 → 副本 → 每日副本 → 裝備副本，必定取得 ×2（可重複）；解鎖：任一角色Lv.10；通關3輪；每日1次；可選廣告雙倍×4",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-source-return",
+    "rows": [
+      {
+        "text": "裝備寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-preview-top",
+    "rows": [
+      {
+        "text": "裝備寶箱開啟預覽",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備。",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "白階50%・藍階35%・紫階10%・橙階5%",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-preview-end",
+    "rows": [
+      {
+        "text": "裝備寶箱開啟預覽",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備。",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "白階50%・藍階35%・紫階10%・橙階5%",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-preview-return",
+    "rows": [
+      {
+        "text": "裝備寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-bag-return",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 30.052397733889755,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 19.98858893407534,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.32173886506454,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 20,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 18.78820762871215,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 18.797253024193548,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 21.24767447518302,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 21.25001451185533,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 21.24766359129152,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 22.412109375,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×2",
+        "font": 22.495821271623882,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue is-selected"
+      },
+      {
+        "text": "×2",
+        "font": 22.495801653180802,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-white"
+      },
+      {
+        "text": "重新整理",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 70,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 105,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "equipmentChest-reopen",
+    "rows": [
+      {
+        "text": "裝備寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "每個裝備寶箱開啟後固定隨機獲得3件裝備；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-detail-top",
+    "rows": [
+      {
+        "text": "白階礦石",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造與材料合成用礦石。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 22.499996592329985,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-detail-end",
+    "rows": [
+      {
+        "text": "白階礦石",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造與材料合成用礦石。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 22.499996592329985,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-source-top",
+    "rows": [
+      {
+        "text": "白階礦石｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "野怪區｜主城 → 野怪區 → 任一區域普通怪，5%機率取得 ×1（可重複）",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料寶箱｜材料寶箱，取得機率尚未定案 ×10（可重複）；暫定分布20%；正式掉率待核定",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料寶箱的獲取途徑",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "div.v132-preview-section-title",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料副本｜主城 → 副本 → 每日副本 → 材料副本，必定取得 ×1～3（可重複）；解鎖：任一角色Lv.10；通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "個人Boss｜首次赤焰君 Lv.20，必定取得 ×2；解鎖：至少一名角色達到Lv.20；通關後",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "個人Boss｜赤焰君 Lv.20，必定取得 ×1（可重複）；解鎖：至少一名角色達到Lv.20；再戰通關；背包無法放入時改給500金幣",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-source-end",
+    "rows": [
+      {
+        "text": "白階礦石｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "野怪區｜主城 → 野怪區 → 任一區域普通怪，5%機率取得 ×1（可重複）",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料寶箱｜材料寶箱，取得機率尚未定案 ×10（可重複）；暫定分布20%；正式掉率待核定",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料寶箱的獲取途徑",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "div.v132-preview-section-title",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "材料副本｜主城 → 副本 → 每日副本 → 材料副本，必定取得 ×1～3（可重複）；解鎖：任一角色Lv.10；通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "個人Boss｜首次赤焰君 Lv.20，必定取得 ×2；解鎖：至少一名角色達到Lv.20；通關後",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "個人Boss｜赤焰君 Lv.20，必定取得 ×1（可重複）；解鎖：至少一名角色達到Lv.20；再戰通關；背包無法放入時改給500金幣",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-source-return",
+    "rows": [
+      {
+        "text": "白階礦石",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造與材料合成用礦石。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 22.499996592329985,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-bag-return",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 30.052397733889755,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 19.98858893407534,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.32173886506454,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 20,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 18.78820762871215,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 18.797253024193548,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 21.24767447518302,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 21.25001451185533,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 21.24766359129152,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 22.412109375,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×999",
+        "font": 22.487789154052734,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-white is-selected"
+      },
+      {
+        "text": "×235",
+        "font": 22.487777709960938,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-white"
+      },
+      {
+        "text": "重新整理",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 70,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 105,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "oreLow-reopen",
+    "rows": [
+      {
+        "text": "白階礦石",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造與材料合成用礦石。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "售價：0 金幣",
+        "font": 22.499996592329985,
+        "button": false,
+        "primary": false,
+        "selector": "div.",
+        "parent": "itemModalStats"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "不可裝備",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#itemEquipButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "售出",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "button.item-modal-button.sell-button",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "不可裝備",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "售出",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-detail-top",
+    "rows": [
+      {
+        "text": "材料寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-detail-end",
+    "rows": [
+      {
+        "text": "材料寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-source-top",
+    "rows": [
+      {
+        "text": "材料寶箱｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "材料副本｜主城 → 副本 → 每日副本 → 材料副本，必定取得 ×1～3（可重複）；解鎖：任一角色Lv.10；通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-source-end",
+    "rows": [
+      {
+        "text": "材料寶箱｜獲取途徑",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "材料副本｜主城 → 副本 → 每日副本 → 材料副本，必定取得 ×1～3（可重複）；解鎖：任一角色Lv.10；通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-preview-list v132-preview-list-scroll"
+      },
+      {
+        "text": "返回",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-source-return",
+    "rows": [
+      {
+        "text": "材料寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-preview-top",
+    "rows": [
+      {
+        "text": "材料寶箱 開啟預覽",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "鍛造材料＋實戰消耗品。每箱抽取一項；以下為暫定分布，取得機率尚未定案。",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "白階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "20%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "藍階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "15%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "紫階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "10%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "橙階礦石 ×5",
+        "font": 16.278204752604168,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "5%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "回春散 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "12%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "凝氣散 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "12%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "大還丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "8%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "歸元丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "8%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "HP 50%補品 ×1",
+        "font": 16.272919336954754,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "4%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "SP 50%補品 ×1",
+        "font": 16.265252318904594,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "4%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "✦",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.v132-preview-icon",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "還魂丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "2%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "關閉",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-preview-end",
+    "rows": [
+      {
+        "text": "材料寶箱 開啟預覽",
+        "font": 27.5,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "鍛造材料＋實戰消耗品。每箱抽取一項；以下為暫定分布，取得機率尚未定案。",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v132-reward-modal-inner v17346-preview-modal"
+      },
+      {
+        "text": "白階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "20%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "藍階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "15%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "紫階礦石 ×10",
+        "font": 16.25205592105263,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "10%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "橙階礦石 ×5",
+        "font": 16.278204752604168,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "5%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "回春散 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "12%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "凝氣散 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "12%",
+        "font": 16.168387276785715,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "大還丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "8%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "歸元丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "8%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "HP 50%補品 ×1",
+        "font": 16.272919336954754,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "4%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "SP 50%補品 ×1",
+        "font": 16.265252318904594,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "4%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "✦",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.v132-preview-icon",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "還魂丹 ×1",
+        "font": 16.28411865234375,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v132-preview-row-main"
+      },
+      {
+        "text": "2%",
+        "font": 16.13762827388576,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v132-preview-row"
+      },
+      {
+        "text": "關閉",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v132-reward-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 335,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-preview-return",
+    "rows": [
+      {
+        "text": "材料寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-bag-return",
+    "rows": [
+      {
+        "text": "背包",
+        "font": 30.052397733889755,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "inventory-title-plate"
+      },
+      {
+        "text": "關閉",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#mapInventoryOverlayClose",
+        "parent": "inventory-header"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 19.98858893407534,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.32173886506454,
+        "button": false,
+        "primary": false,
+        "selector": "small.inventory-character-level",
+        "parent": "inventory-character-name"
+      },
+      {
+        "text": "詳",
+        "font": 20,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryCharacterDetailButton",
+        "parent": "inventoryPortraitFrame"
+      },
+      {
+        "text": "火",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryElement",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "等級 70",
+        "font": 18.75674195868201,
+        "button": false,
+        "primary": false,
+        "selector": "#inventorySummaryLevel",
+        "parent": "inventoryCharacterSummary"
+      },
+      {
+        "text": "最大 HP",
+        "font": 18.78820762871215,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "600",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "最大 SP",
+        "font": 18.797253024193548,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "200",
+        "font": 21.31640625,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "inventory-stat-row inventory-stat-primary inventory-character-resource-row"
+      },
+      {
+        "text": "頭",
+        "font": 21.24767447518302,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "手",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "護腕",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "衣服",
+        "font": 21.249992744072333,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "鞋子",
+        "font": 21.25001451185533,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "戒指",
+        "font": 21.24766359129152,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-equipment-slot-label",
+        "parent": "inventory-equipment-cell"
+      },
+      {
+        "text": "金幣",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.inventory-wallet-label",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "0",
+        "font": 22.412109375,
+        "button": false,
+        "primary": false,
+        "selector": "#inventoryGoldValue",
+        "parent": "inventory-wallet-bar"
+      },
+      {
+        "text": "裝備",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "物品",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab.active",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "材料",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "功能",
+        "font": 22.5,
+        "button": true,
+        "primary": false,
+        "selector": "div.inventory-category-tab",
+        "parent": "inventoryCategoryTabs"
+      },
+      {
+        "text": "×2",
+        "font": 22.495821271623882,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-blue"
+      },
+      {
+        "text": "×2",
+        "font": 22.495801653180802,
+        "button": false,
+        "primary": false,
+        "selector": "div.inventory-count",
+        "parent": "inventory-item inventory-item-classic has-item item-slot rarity-white is-selected"
+      },
+      {
+        "text": "重新整理",
+        "font": 22.5,
+        "button": true,
+        "primary": true,
+        "selector": "#inventoryRefreshButton",
+        "parent": "inventoryBottomActions"
+      },
+      {
+        "text": "1 / 5",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "#v141InventoryPageLabel",
+        "parent": "v141InventoryPager"
+      }
+    ],
+    "controls": [
+      {
+        "label": "關閉",
+        "width": 70,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "‹",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "›",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "詳",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "物品",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "功能",
+        "width": 98.75,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "重新整理",
+        "width": 105,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "←",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "→",
+        "width": 55,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "materialChest-reopen",
+    "rows": [
+      {
+        "text": "材料寶箱",
+        "font": 24.99999926107559,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalName",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "鍛造材料與實戰消耗品。每箱抽取一項；可先查看預覽。",
+        "font": 22.49999933496803,
+        "button": false,
+        "primary": false,
+        "selector": "#itemModalStats",
+        "parent": "item-modal-box"
+      },
+      {
+        "text": "數量",
+        "font": 22.500015258789062,
+        "button": false,
+        "primary": false,
+        "selector": "label.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "/ 2",
+        "font": 22.583705357142858,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17350-batch-max",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "批量開啟",
+        "font": 22.49999929393778,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v17350BatchAction"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 22.471453789855282,
+        "button": true,
+        "primary": true,
+        "selector": "#itemAcquisitionButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "開啟",
+        "font": 22.472761203442115,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemUseButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "預覽",
+        "font": 22.471459870848708,
+        "button": true,
+        "primary": true,
+        "selector": "#v132ItemPreviewButton",
+        "parent": "item-modal-buttons"
+      },
+      {
+        "text": "返回",
+        "font": 22.49999933496803,
+        "button": true,
+        "primary": true,
+        "selector": "button.close-item-button",
+        "parent": "item-modal-box"
+      }
+    ],
+    "controls": [
+      {
+        "label": "批量數量",
+        "width": 237.8189697265625,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "批量開啟",
+        "width": 324.1666564941406,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 112.77340698242188,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "開啟",
+        "width": 112.77996826171875,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "預覽",
+        "width": 112.7734375,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 344.1666564941406,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

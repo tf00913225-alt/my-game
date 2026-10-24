@@ -1,0 +1,1565 @@
+{
+  "head": "331f01f0c77525589ac86ce2a0cc4c6286f72299",
+  "viewport": [
+    360,
+    640
+  ],
+  "mode": "c1_05",
+  "chosen": {
+    "speaker": "npc",
+    "name": "藥師",
+    "text": "這位旅人被困在前面。救人之前，也得先照看自己。",
+    "i": 0,
+    "length": 23,
+    "last": false,
+    "id": "c1_05",
+    "title": "受困旅人"
+  },
+  "complete": true,
+  "clean": true,
+  "sourceBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "0f8f61296d0582805404c05d14230b89ff8455e98260db8d66962fd0097e8f24",
+    "js/adventure/adventure-content-v1-20260915.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "js/adventure/adventure-entry-v1-20260915.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "js/adventure/adventure-items-v1-20260915.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "js/adventure/adventure-runtime-v1-20260915.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "js/adventure/adventure-ui-v1-20260915.js": "a4792f08e4db1328a9f1b368a934e1214450868f5e82b119131b745c80377fd9",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.6598961131fb.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "build/feature-adventure-ui.a4792f08e4db.js": "a4792f08e4db1328a9f1b368a934e1214450868f5e82b119131b745c80377fd9",
+    "build/feature-adventure.8612b62010c8.css": "8612b62010c8527c215689aa1debe9cf8590f8cb6c495dac8d9aad098c0e1ac3",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.1987dfab76d6.css": "1987dfab76d6ac85d194d8cffa8325a358ceebe4fee7d7d4e44006c43c156e21"
+  },
+  "scenes": [
+    {
+      "name": "line-00",
+      "view": {
+        "nodeId": "c1_05",
+        "lineIndex": 0,
+        "phase": "before"
+      },
+      "panel": "story",
+      "headingHiddenEvidence": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "ink": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "grid"
+      },
+      "heading": {
+        "text": "第一章 · 山關初行",
+        "box": {
+          "x": 94.28572082519531,
+          "y": 6,
+          "width": 171.42857360839844,
+          "height": 44.57142639160156,
+          "top": 6,
+          "right": 265.71429443359375,
+          "bottom": 50.57142639160156,
+          "left": 94.28572082519531
+        },
+        "ink": {
+          "x": 112.84822082519531,
+          "y": 15.428571701049805,
+          "width": 134.30355834960938,
+          "height": 24.857141494750977,
+          "top": 15.428571701049805,
+          "right": 247.1517791748047,
+          "bottom": 40.28571319580078,
+          "left": 112.84822082519531
+        }
+      },
+      "speaker": {
+        "text": "藥師",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 457.3794860839844,
+          "width": 37.03125,
+          "height": 24.857147216796875,
+          "top": 457.3794860839844,
+          "right": 69.42857360839844,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 457.3794860839844,
+          "width": 37.03125,
+          "height": 24.857147216796875,
+          "top": 457.3794860839844,
+          "right": 69.42857360839844,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        }
+      },
+      "text": {
+        "text": "這位旅人被困在前面。救人之前，也得先照看自己。",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 492.5223083496094,
+          "width": 295.20538330078125,
+          "height": 52.446441650390625,
+          "top": 492.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 544.96875,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 494.23663330078125,
+          "width": 293.14288330078125,
+          "height": 48.5089111328125,
+          "top": 494.23663330078125,
+          "right": 325.5402069091797,
+          "bottom": 542.7455444335938,
+          "left": 32.39732360839844
+        }
+      },
+      "button": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "body": {},
+      "images": [
+        {
+          "src": "assets/story/backgrounds/mountain-road.webp",
+          "decoded": true
+        },
+        {
+          "src": "assets/characters/battle_male_fire.png",
+          "decoded": true
+        },
+        {
+          "src": "assets/monsters/shared/npc-shared-044.webp",
+          "decoded": true
+        }
+      ],
+      "handlers": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "name": "line-01",
+      "view": {
+        "nodeId": "c1_05",
+        "lineIndex": 1,
+        "phase": "before"
+      },
+      "panel": "story",
+      "headingHiddenEvidence": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "ink": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "grid"
+      },
+      "heading": {
+        "text": "第一章 · 山關初行",
+        "box": {
+          "x": 94.28572082519531,
+          "y": 6,
+          "width": 171.42857360839844,
+          "height": 44.57142639160156,
+          "top": 6,
+          "right": 265.71429443359375,
+          "bottom": 50.57142639160156,
+          "left": 94.28572082519531
+        },
+        "ink": {
+          "x": 112.84822082519531,
+          "y": 15.428571701049805,
+          "width": 134.30355834960938,
+          "height": 24.857141494750977,
+          "top": 15.428571701049805,
+          "right": 247.1517791748047,
+          "bottom": 40.28571319580078,
+          "left": 112.84822082519531
+        }
+      },
+      "speaker": {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 295.20538330078125,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 277.71429443359375,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 310.1116180419922,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        }
+      },
+      "text": {
+        "text": "氣血不足會撐不住，真氣不夠也使不出招式。",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 492.5223083496094,
+          "width": 295.20538330078125,
+          "height": 52.446441650390625,
+          "top": 492.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 544.96875,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 494.23663330078125,
+          "width": 277.71429443359375,
+          "height": 48.5089111328125,
+          "top": 494.23663330078125,
+          "right": 310.1116180419922,
+          "bottom": 542.7455444335938,
+          "left": 32.39732360839844
+        }
+      },
+      "button": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "body": {},
+      "images": [
+        {
+          "src": "assets/story/backgrounds/mountain-road.webp",
+          "decoded": true
+        },
+        {
+          "src": "assets/characters/battle_male_fire.png",
+          "decoded": true
+        },
+        {
+          "src": "assets/monsters/shared/npc-shared-044.webp",
+          "decoded": true
+        }
+      ],
+      "handlers": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "name": "line-02",
+      "view": {
+        "nodeId": "c1_05",
+        "lineIndex": 2,
+        "phase": "before"
+      },
+      "panel": "story",
+      "headingHiddenEvidence": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "ink": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "grid"
+      },
+      "heading": {
+        "text": "第一章 · 山關初行",
+        "box": {
+          "x": 94.28572082519531,
+          "y": 6,
+          "width": 171.42857360839844,
+          "height": 44.57142639160156,
+          "top": 6,
+          "right": 265.71429443359375,
+          "bottom": 50.57142639160156,
+          "left": 94.28572082519531
+        },
+        "ink": {
+          "x": 112.84822082519531,
+          "y": 15.428571701049805,
+          "width": 134.30355834960938,
+          "height": 24.857141494750977,
+          "top": 15.428571701049805,
+          "right": 247.1517791748047,
+          "bottom": 40.28571319580078,
+          "left": 112.84822082519531
+        }
+      },
+      "speaker": {
+        "text": "藥師",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 457.3794860839844,
+          "width": 37.03125,
+          "height": 24.857147216796875,
+          "top": 457.3794860839844,
+          "right": 69.42857360839844,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 457.3794860839844,
+          "width": 37.03125,
+          "height": 24.857147216796875,
+          "top": 457.3794860839844,
+          "right": 69.42857360839844,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        }
+      },
+      "text": {
+        "text": "看看自己的氣血與真氣，再按需要使用補品。準備妥當才上路。",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 492.5223083496094,
+          "width": 295.20538330078125,
+          "height": 52.446441650390625,
+          "top": 492.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 544.96875,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 494.23663330078125,
+          "width": 277.71429443359375,
+          "height": 48.5089111328125,
+          "top": 494.23663330078125,
+          "right": 310.1116180419922,
+          "bottom": 542.7455444335938,
+          "left": 32.39732360839844
+        }
+      },
+      "button": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "body": {},
+      "images": [
+        {
+          "src": "assets/story/backgrounds/mountain-road.webp",
+          "decoded": true
+        },
+        {
+          "src": "assets/characters/battle_male_fire.png",
+          "decoded": true
+        },
+        {
+          "src": "assets/monsters/shared/npc-shared-044.webp",
+          "decoded": true
+        }
+      ],
+      "handlers": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "name": "line-03",
+      "view": {
+        "nodeId": "c1_05",
+        "lineIndex": 3,
+        "phase": "before"
+      },
+      "panel": "story",
+      "headingHiddenEvidence": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "ink": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "grid"
+      },
+      "heading": {
+        "text": "第一章 · 山關初行",
+        "box": {
+          "x": 94.28572082519531,
+          "y": 6,
+          "width": 171.42857360839844,
+          "height": 44.57142639160156,
+          "top": 6,
+          "right": 265.71429443359375,
+          "bottom": 50.57142639160156,
+          "left": 94.28572082519531
+        },
+        "ink": {
+          "x": 112.84822082519531,
+          "y": 15.428571701049805,
+          "width": 134.30355834960938,
+          "height": 24.857141494750977,
+          "top": 15.428571701049805,
+          "right": 247.1517791748047,
+          "bottom": 40.28571319580078,
+          "left": 112.84822082519531
+        }
+      },
+      "speaker": {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 295.20538330078125,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 277.71429443359375,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 310.1116180419922,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        }
+      },
+      "text": {
+        "text": "明白。往後每次交手前，我都會先檢查行裝與補給。",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 492.5223083496094,
+          "width": 295.20538330078125,
+          "height": 52.446441650390625,
+          "top": 492.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 544.96875,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 494.23663330078125,
+          "width": 293.14288330078125,
+          "height": 48.5089111328125,
+          "top": 494.23663330078125,
+          "right": 325.5402069091797,
+          "bottom": 542.7455444335938,
+          "left": 32.39732360839844
+        }
+      },
+      "button": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "body": {},
+      "images": [
+        {
+          "src": "assets/story/backgrounds/mountain-road.webp",
+          "decoded": true
+        },
+        {
+          "src": "assets/characters/battle_male_fire.png",
+          "decoded": true
+        },
+        {
+          "src": "assets/monsters/shared/npc-shared-044.webp",
+          "decoded": true
+        }
+      ],
+      "handlers": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "name": "story-reopened",
+      "view": {
+        "nodeId": "c1_05",
+        "lineIndex": 3,
+        "phase": "before"
+      },
+      "panel": "story",
+      "headingHiddenEvidence": {
+        "box": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "ink": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "display": "grid"
+      },
+      "heading": {
+        "text": "第一章 · 山關初行",
+        "box": {
+          "x": 94.28572082519531,
+          "y": 6,
+          "width": 171.42857360839844,
+          "height": 44.57142639160156,
+          "top": 6,
+          "right": 265.71429443359375,
+          "bottom": 50.57142639160156,
+          "left": 94.28572082519531
+        },
+        "ink": {
+          "x": 112.84822082519531,
+          "y": 15.428571701049805,
+          "width": 134.30355834960938,
+          "height": 24.857141494750977,
+          "top": 15.428571701049805,
+          "right": 247.1517791748047,
+          "bottom": 40.28571319580078,
+          "left": 112.84822082519531
+        }
+      },
+      "speaker": {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 295.20538330078125,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 432.5223083496094,
+          "width": 277.71429443359375,
+          "height": 49.714324951171875,
+          "top": 432.5223083496094,
+          "right": 310.1116180419922,
+          "bottom": 482.23663330078125,
+          "left": 32.39732360839844
+        }
+      },
+      "text": {
+        "text": "明白。往後每次交手前，我都會先檢查行裝與補給。",
+        "box": {
+          "x": 32.39732360839844,
+          "y": 492.5223083496094,
+          "width": 295.20538330078125,
+          "height": 52.446441650390625,
+          "top": 492.5223083496094,
+          "right": 327.6027069091797,
+          "bottom": 544.96875,
+          "left": 32.39732360839844
+        },
+        "ink": {
+          "x": 32.39732360839844,
+          "y": 494.23663330078125,
+          "width": 293.14288330078125,
+          "height": 48.5089111328125,
+          "top": 494.23663330078125,
+          "right": 325.5402069091797,
+          "bottom": 542.7455444335938,
+          "left": 32.39732360839844
+        }
+      },
+      "button": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "body": {},
+      "images": [
+        {
+          "src": "assets/story/backgrounds/mountain-road.webp",
+          "decoded": true
+        },
+        {
+          "src": "assets/characters/battle_male_fire.png",
+          "decoded": true
+        },
+        {
+          "src": "assets/monsters/shared/npc-shared-044.webp",
+          "decoded": true
+        }
+      ],
+      "handlers": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "返回主城",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "kind": "true-home-scroll",
+      "step": 0
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventureHomeEntry",
+      "x": 180,
+      "y": 433.125,
+      "rect": {
+        "x": 80,
+        "y": 406.859375,
+        "width": 200,
+        "height": 52.53125,
+        "top": 406.859375,
+        "right": 280,
+        "bottom": 459.390625,
+        "left": 80
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventureHomeEntry",
+      "x": 180,
+      "y": 433.125,
+      "rect": {
+        "x": 80,
+        "y": 406.859375,
+        "width": 200,
+        "height": 52.53125,
+        "top": 406.859375,
+        "right": 280,
+        "bottom": 459.390625,
+        "left": 80
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "story-natural-content-no-scroll-needed"
+    },
+    {
+      "kind": "attempt",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "story-natural-content-no-scroll-needed"
+    },
+    {
+      "kind": "attempt",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "story-natural-content-no-scroll-needed"
+    },
+    {
+      "kind": "attempt",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": ".adventure-story-dialogue button",
+      "x": 272.74554443359375,
+      "y": 577.5402221679688,
+      "rect": {
+        "x": 217.88839721679688,
+        "y": 555.2545166015625,
+        "width": 109.71429443359375,
+        "height": 44.5714111328125,
+        "top": 555.2545166015625,
+        "right": 327.6026916503906,
+        "bottom": 599.825927734375,
+        "left": 217.88839721679688
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "story-natural-content-no-scroll-needed"
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventurePage .adventure-back-button",
+      "x": 47.14285945892334,
+      "y": 28.28571319580078,
+      "rect": {
+        "x": 7.714285850524902,
+        "y": 6,
+        "width": 78.85714721679688,
+        "height": 44.57142639160156,
+        "top": 6,
+        "right": 86.57143306732178,
+        "bottom": 50.57142639160156,
+        "left": 7.714285850524902
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventurePage .adventure-back-button",
+      "x": 47.14285945892334,
+      "y": 28.28571319580078,
+      "rect": {
+        "x": 7.714285850524902,
+        "y": 6,
+        "width": 78.85714721679688,
+        "height": 44.57142639160156,
+        "top": 6,
+        "right": 86.57143306732178,
+        "bottom": 50.57142639160156,
+        "left": 7.714285850524902
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventureHomeEntry",
+      "x": 180,
+      "y": 433.125,
+      "rect": {
+        "x": 80,
+        "y": 406.859375,
+        "width": 200,
+        "height": 52.53125,
+        "top": 406.859375,
+        "right": 280,
+        "bottom": 459.390625,
+        "left": 80
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventureHomeEntry",
+      "x": 180,
+      "y": 433.125,
+      "rect": {
+        "x": 80,
+        "y": 406.859375,
+        "width": 200,
+        "height": 52.53125,
+        "top": 406.859375,
+        "right": 280,
+        "bottom": 459.390625,
+        "left": 80
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventurePage .adventure-back-button",
+      "x": 47.14285945892334,
+      "y": 28.28571319580078,
+      "rect": {
+        "x": 7.714285850524902,
+        "y": 6,
+        "width": 78.85714721679688,
+        "height": 44.57142639160156,
+        "top": 6,
+        "right": 86.57143306732178,
+        "bottom": 50.57142639160156,
+        "left": 7.714285850524902
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventurePage .adventure-back-button",
+      "x": 47.14285945892334,
+      "y": 28.28571319580078,
+      "rect": {
+        "x": 7.714285850524902,
+        "y": 6,
+        "width": 78.85714721679688,
+        "height": 44.57142639160156,
+        "top": 6,
+        "right": 86.57143306732178,
+        "bottom": 50.57142639160156,
+        "left": 7.714285850524902
+      },
+      "hit": true,
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    }
+  ],
+  "checks": [
+    {
+      "phase": "original-login-announcement-wait",
+      "step": 0,
+      "state": {
+        "loadedReleaseVersion": "V173.73",
+        "availableReleaseVersion": "V173.73",
+        "noticeId": "release-v17373-20261003",
+        "pendingNormalReload": false,
+        "pendingForcedUpdate": false,
+        "pendingAnnouncement": false,
+        "loginAnnouncementShown": true,
+        "suppressedToday": false,
+        "criticalOperationCount": 0,
+        "unsafeReasons": [],
+        "pollIntervalMs": 240000,
+        "minimumCheckGapMs": 45000,
+        "devPreviewMode": null
+      },
+      "forced": false,
+      "open": false,
+      "release": false
+    },
+    {
+      "phase": "original-login-announcement-settled-no-ack",
+      "state": {
+        "loadedReleaseVersion": "V173.73",
+        "availableReleaseVersion": "V173.73",
+        "noticeId": "release-v17373-20261003",
+        "pendingNormalReload": false,
+        "pendingForcedUpdate": false,
+        "pendingAnnouncement": false,
+        "loginAnnouncementShown": true,
+        "suppressedToday": false,
+        "criticalOperationCount": 0,
+        "unsafeReasons": [],
+        "pollIntervalMs": 240000,
+        "minimumCheckGapMs": 45000,
+        "devPreviewMode": null
+      },
+      "note": "Original same-version modal shown then real header return only; no acknowledgement, checkbox, reload, storage suppression or timer change."
+    },
+    {
+      "phase": "schema3-before-module-init-fixture",
+      "chosen": {
+        "speaker": "npc",
+        "name": "藥師",
+        "text": "這位旅人被困在前面。救人之前，也得先照看自己。",
+        "i": 0,
+        "length": 23,
+        "last": false,
+        "id": "c1_05",
+        "title": "受困旅人"
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "line-00",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "line-01",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "line-02",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "line-03",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "formal-last-line-display-only",
+      "nodeId": "c1_05",
+      "lineIndex": 3,
+      "lastButtonNotClicked": true
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "返回主城",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "returned-home",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "返回主城",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "story-reopened",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "formal-last-reopen-exact",
+      "nodeId": "c1_05",
+      "lineIndex": 3,
+      "text": "明白。往後每次交手前，我都會先檢查行裝與補給。",
+      "speaker": "角色名稱長文測試甲乙丙丁戊己庚辛"
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "返回主城",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "返回主城",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    }
+  ],
+  "scope": "All20 formal node before-dialogue reading,76 lines total across separately invoked fresh profiles. This process only one formal node; no guidance/ending. Existing-character local schema3 fixture before module init. Original open lastViewedAt/beginChapter/local save/background effects retained. No transport write authorization change, creation, learning, equip, battle, completion, claim or last-line click; no hardware acceptance.",
+  "initial": {
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null,
+    "gold": 0,
+    "sharedExp": 0,
+    "inventory": "[]",
+    "characters": [
+      {
+        "hp": 300,
+        "sp": 120,
+        "level": 70,
+        "exp": 0
+      },
+      {
+        "level": 70
+      },
+      null
+    ]
+  },
+  "formalNode": {
+    "id": "c1_05",
+    "title": "受困旅人",
+    "scene": "road",
+    "npc": "herbalist",
+    "lineCount": 4
+  },
+  "loaded": [
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.257e4b6bac5a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.257e4b6bac5a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-secondary.db9536f36042.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core.1987dfab76d6.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-secondary.db9536f36042.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core.1987dfab76d6.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200
+    }
+  ],
+  "handlers": [
+    {
+      "label": "出城冒險　›",
+      "sameTaskDomainUnchanged": true
+    },
+    {
+      "label": "返回主城",
+      "sameTaskDomainUnchanged": true
+    },
+    {
+      "label": "出城冒險　›",
+      "sameTaskDomainUnchanged": true
+    },
+    {
+      "label": "返回主城",
+      "sameTaskDomainUnchanged": true
+    }
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "playerIdExact": true
+  },
+  "sourceAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "0f8f61296d0582805404c05d14230b89ff8455e98260db8d66962fd0097e8f24",
+    "js/adventure/adventure-content-v1-20260915.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "js/adventure/adventure-entry-v1-20260915.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "js/adventure/adventure-items-v1-20260915.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "js/adventure/adventure-runtime-v1-20260915.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "js/adventure/adventure-ui-v1-20260915.js": "a4792f08e4db1328a9f1b368a934e1214450868f5e82b119131b745c80377fd9",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.6598961131fb.js": "6598961131fbc53be0d9510cc4e90d5369d66345aa2622d8915cccad8069db96",
+    "build/feature-adventure-ui.a4792f08e4db.js": "a4792f08e4db1328a9f1b368a934e1214450868f5e82b119131b745c80377fd9",
+    "build/feature-adventure.8612b62010c8.css": "8612b62010c8527c215689aa1debe9cf8590f8cb6c495dac8d9aad098c0e1ac3",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.1987dfab76d6.css": "1987dfab76d6ac85d194d8cffa8325a358ceebe4fee7d7d4e44006c43c156e21"
+  }
+}

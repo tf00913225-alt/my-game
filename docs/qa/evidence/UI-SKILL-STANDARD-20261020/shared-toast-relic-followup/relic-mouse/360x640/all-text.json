@@ -1,0 +1,6646 @@
+[
+  {
+    "name": "list-initial",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・四象階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・攻擊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・控制",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "追風行符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tabs-right",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・四象階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・攻擊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・控制",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "追風行符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tabs-left",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・四象階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・攻擊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・控制",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "追風行符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-0",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "Lv.20・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・攻擊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・控制",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "追風行符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-1",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・攻擊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-2",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-3",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・防禦",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-4",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・橙階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-orange unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "追風行符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・藍階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-5",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・控制",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-6",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・元素聯動",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "Lv.1・回復",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "Lv.1・增益",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-blue unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-blue unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "tab-7",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "Lv.20・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "detail-top",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "‹ 返回秘寶列表",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-detail-back",
+        "parent": "team-relic-detail"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 22,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "四象階・Lv.20 / 20",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "專屬碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 100",
+        "font": 15.964285714285714,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶通用碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0",
+        "font": 16.187465122767858,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "已持有；多餘專屬碎片會保留。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "取得來源：點選獲取途徑查看完整條件與來源追溯",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 16,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "em.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "觸發條件",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "每第4回合開始",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶效果",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "平均HP≤40%歸生：回復18%HP、直接減傷12%、每人淨化1個；40%<HP≤75%調和：攻防+15%、異常抗性+10%；HP>75%破勢：主動技能直接最終傷害+20%。型態固",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "觸發限制",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "每次只判定1次，持續2回合。平均≤40%歸生；>40%且≤75%調和；>75%破勢。死亡角色不納入；破勢僅正式主動技能直接最終傷害。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "下一強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "已達最高等級。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "目前 Lv.20 / 20",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "已達目前秘寶等級上限。",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-detail-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "‹ 返回秘寶列表",
+        "width": 126,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 139,
+        "height": 52,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 151,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "detail-end",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "‹ 返回秘寶列表",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-detail-back",
+        "parent": "team-relic-detail"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 22,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "四象階・Lv.20 / 20",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "team-relic-detail-hero rarity-four-symbol"
+      },
+      {
+        "text": "專屬碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 100",
+        "font": 15.964285714285714,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶通用碎片",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "0",
+        "font": 16.187465122767858,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "已持有；多餘專屬碎片會保留。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "取得來源：點選獲取途徑查看完整條件與來源追溯",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "獲取途徑",
+        "font": 16,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "em.",
+        "parent": "relic-progression-detail-panel"
+      },
+      {
+        "text": "觸發條件",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "每第4回合開始",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "秘寶效果",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "平均HP≤40%歸生：回復18%HP、直接減傷12%、每人淨化1個；40%<HP≤75%調和：攻防+15%、異常抗性+10%；HP>75%破勢：主動技能直接最終傷害+20%。型態固",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "觸發限制",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "每次只判定1次，持續2回合。平均≤40%歸生；>40%且≤75%調和；>75%破勢。死亡角色不納入；破勢僅正式主動技能直接最終傷害。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "下一強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "已達最高等級。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "強化",
+        "font": 18,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "目前 Lv.20 / 20",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "已達目前秘寶等級上限。",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-upgrade"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-detail-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "‹ 返回秘寶列表",
+        "width": 126,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "獲取途徑",
+        "width": 139,
+        "height": 52,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 151,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "list-return",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "Lv.20・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "list-reopen",
+    "rows": [
+      {
+        "text": "秘 寶",
+        "font": 19.994104659436232,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "100 專屬碎片合成・通用碎片 2:1（每件最多替代 50）",
+        "font": 13.997494561777568,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "通用 0・精華 0・突破石 0",
+        "font": 14.005189229674258,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-resource-line"
+      },
+      {
+        "text": "寶",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "div.team-relic-empty-slot",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "目前隊伍秘寶",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "尚未裝備秘寶",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "每支隊伍只能啟用一件秘寶。",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "team-relic-current-copy"
+      },
+      {
+        "text": "選擇秘寶",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-select-first",
+        "parent": "team-relic-current-card empty"
+      },
+      {
+        "text": "全部",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "攻擊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "回復",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "防禦",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "增益",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "控制",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "元素聯動",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "特殊",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "team-relic-tabs"
+      },
+      {
+        "text": "萬象歸元盤",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "Lv.20・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-four-symbol unlocked"
+      },
+      {
+        "text": "回天寶輪",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "Lv.1・特殊",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-pink unlocked"
+      },
+      {
+        "text": "太初聖符",
+        "font": 16,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-name",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "碎片 0 / 100・紫階",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "span.team-relic-card-meta",
+        "parent": "team-relic-card rarity-purple unlocked"
+      },
+      {
+        "text": "裝備",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.team-relic-equip",
+        "parent": "team-relic-card rarity-purple unlocked"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "選擇秘寶",
+        "width": 82,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "全部",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "攻擊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回復",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "防禦",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "增益",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "控制",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "元素聯動",
+        "width": 84,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "特殊",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 290,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "裝備",
+        "width": 292,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

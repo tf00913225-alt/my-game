@@ -165,7 +165,7 @@ body.v162-element-box-settings-open #autoBattleSettingsPanel.v131-element-box-pa
 #game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) p{
     display:none !important;
 }
-#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete) button{
+#game-stage #dungeonPage.v146-abyss-intro-mode .v141-abyss-intro:not(.complete):not(.v174-abyss-selection) button{
     min-width:136px !important;
     min-height:38px !important;
     padding:7px 15px !important;

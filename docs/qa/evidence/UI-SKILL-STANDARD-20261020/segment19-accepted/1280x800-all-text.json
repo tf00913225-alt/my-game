@@ -1,0 +1,4606 @@
+[
+  {
+    "name": "commission-natural-top",
+    "rows": [
+      {
+        "text": "任務",
+        "font": 30.00365182576053,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "每日任務",
+        "font": 18.74615998247305,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnDaily",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "委託任務",
+        "font": 18.746801651200872,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnCommission",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "一鍵領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "#questClaimAllButton",
+        "parent": "quest-batch-actions"
+      },
+      {
+        "text": "委託：擊敗15隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗15隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 15",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1250",
+        "font": 17.467830882352942,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：打贏3場戰鬥",
+        "font": 21.25302297813746,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏三場完整戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 3",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1000　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：討伐30隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗30隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 30",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1750　EXP 540",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：五戰告捷",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏5場戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 5",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1500　EXP 660",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：精英獵手",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天擊敗2隻精英怪",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 2",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1300　EXP 360",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：招式演練",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天在戰鬥中施放15次技能",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 15",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1100　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "完成度寶箱",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "0%",
+        "font": 16.30734646704889,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "左右滑動查看全部獎勵",
+        "font": 16.246736259103933,
+        "button": false,
+        "primary": false,
+        "selector": "p.quest-scroll-hint",
+        "parent": "questCompletionPanel"
+      },
+      {
+        "text": "20%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "250金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "40%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "375金＋90EXP",
+        "font": 17.49702785326087,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "60%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "500金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "80%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "750金＋210EXP",
+        "font": 17.51463210702341,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "100%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "1250金＋360EXP",
+        "font": 17.5,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "每日任務",
+        "width": 190.79425048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "委託任務",
+        "width": 190.80078125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "一鍵領取",
+        "width": 135,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "寶箱250金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱375金＋90EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱500金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱750金＋210EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱1250金＋360EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "commission-natural-end",
+    "rows": [
+      {
+        "text": "任務",
+        "font": 30.00365182576053,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "每日任務",
+        "font": 18.74615998247305,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnDaily",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "委託任務",
+        "font": 18.746801651200872,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnCommission",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "一鍵領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "#questClaimAllButton",
+        "parent": "quest-batch-actions"
+      },
+      {
+        "text": "委託：擊敗15隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗15隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 15",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1250",
+        "font": 17.467830882352942,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：打贏3場戰鬥",
+        "font": 21.25302297813746,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏三場完整戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 3",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1000　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：討伐30隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗30隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 30",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1750　EXP 540",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：五戰告捷",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏5場戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 5",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1500　EXP 660",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：精英獵手",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天擊敗2隻精英怪",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 2",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1300　EXP 360",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：招式演練",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "進行中",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.progress",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天在戰鬥中施放15次技能",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card progress"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "0 / 15",
+        "font": 18.670543088751323,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1100　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "未達成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "完成度寶箱",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "0%",
+        "font": 16.30734646704889,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "左右滑動查看全部獎勵",
+        "font": 16.246736259103933,
+        "button": false,
+        "primary": false,
+        "selector": "p.quest-scroll-hint",
+        "parent": "questCompletionPanel"
+      },
+      {
+        "text": "20%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "250金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "40%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "375金＋90EXP",
+        "font": 17.49702785326087,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "60%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "500金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "80%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "750金＋210EXP",
+        "font": 17.51463210702341,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "100%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone "
+      },
+      {
+        "text": "寶箱",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "1250金＋360EXP",
+        "font": 17.5,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "每日任務",
+        "width": 190.79425048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "委託任務",
+        "width": 190.80078125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "一鍵領取",
+        "width": 135,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 54.99998474121094,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "未達成",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "寶箱250金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱375金＋90EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱500金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱750金＋210EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "寶箱1250金＋360EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "commission-available",
+    "rows": [
+      {
+        "text": "任務",
+        "font": 30.00365182576053,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "每日任務",
+        "font": 18.74615998247305,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnDaily",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "委託任務",
+        "font": 18.746801651200872,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnCommission",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "一鍵領取（6）",
+        "font": 18.77031005859375,
+        "button": true,
+        "primary": true,
+        "selector": "#questClaimAllButton",
+        "parent": "quest-batch-actions"
+      },
+      {
+        "text": "委託：擊敗15隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗15隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1250",
+        "font": 17.467830882352942,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：打贏3場戰鬥",
+        "font": 21.25302297813746,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏三場完整戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "3 / 3",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1000　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：討伐30隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗30隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "30 / 30",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1750　EXP 540",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：五戰告捷",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏5場戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "5 / 5",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1500　EXP 660",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：精英獵手",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天擊敗2隻精英怪",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "2 / 2",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1300　EXP 360",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：招式演練",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "可領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.ready",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天在戰鬥中施放15次技能",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card ready"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1100　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "完成度寶箱",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "100%",
+        "font": 16.208444491299716,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "左右滑動查看全部獎勵",
+        "font": 16.246736259103933,
+        "button": false,
+        "primary": false,
+        "selector": "p.quest-scroll-hint",
+        "parent": "questCompletionPanel"
+      },
+      {
+        "text": "20%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "250金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "40%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "375金＋90EXP",
+        "font": 17.49702785326087,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "60%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "500金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "80%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "750金＋210EXP",
+        "font": 17.51463210702341,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "100%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "1250金＋360EXP",
+        "font": 17.5,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "每日任務",
+        "width": 190.79425048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "委託任務",
+        "width": 190.80078125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "一鍵領取（6）",
+        "width": 156.41925048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取250金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取375金＋90EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取500金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取750金＋210EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取1250金＋360EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "commission-claimed",
+    "rows": [
+      {
+        "text": "任務",
+        "font": 30.00365182576053,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "每日任務",
+        "font": 18.74615998247305,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnDaily",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "委託任務",
+        "font": 18.746801651200872,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnCommission",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "一鍵領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "#questClaimAllButton",
+        "parent": "quest-batch-actions"
+      },
+      {
+        "text": "委託：擊敗15隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗15隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1250",
+        "font": 17.467830882352942,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：打贏3場戰鬥",
+        "font": 21.25302297813746,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏三場完整戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "3 / 3",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1000　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：討伐30隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗30隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "30 / 30",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1750　EXP 540",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：五戰告捷",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏5場戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "5 / 5",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1500　EXP 660",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：精英獵手",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天擊敗2隻精英怪",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "2 / 2",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1300　EXP 360",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：招式演練",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天在戰鬥中施放15次技能",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1100　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "完成度寶箱",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "100%",
+        "font": 16.208444491299716,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "左右滑動查看全部獎勵",
+        "font": 16.246736259103933,
+        "button": false,
+        "primary": false,
+        "selector": "p.quest-scroll-hint",
+        "parent": "questCompletionPanel"
+      },
+      {
+        "text": "20%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "250金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "40%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "375金＋90EXP",
+        "font": 17.49702785326087,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "60%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "500金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "80%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "750金＋210EXP",
+        "font": 17.51463210702341,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "100%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "1250金＋360EXP",
+        "font": 17.5,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "每日任務",
+        "width": 190.79425048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "委託任務",
+        "width": 190.80078125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "一鍵領取",
+        "width": 135,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取250金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取375金＋90EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取500金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取750金＋210EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取1250金＋360EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "commission-reopen",
+    "rows": [
+      {
+        "text": "任務",
+        "font": 30.00365182576053,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "每日任務",
+        "font": 18.74615998247305,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnDaily",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "委託任務",
+        "font": 18.746801651200872,
+        "button": true,
+        "primary": true,
+        "selector": "#questTabBtnCommission",
+        "parent": "quest-tabs"
+      },
+      {
+        "text": "一鍵領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "#questClaimAllButton",
+        "parent": "quest-batch-actions"
+      },
+      {
+        "text": "委託：擊敗15隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗15隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1250",
+        "font": 17.467830882352942,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：打贏3場戰鬥",
+        "font": 21.25302297813746,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏三場完整戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "3 / 3",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1000　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：討伐30隻怪物",
+        "font": 21.255647180435503,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天累計擊敗30隻怪物",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "30 / 30",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1750　EXP 540",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：五戰告捷",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天打贏5場戰鬥",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "5 / 5",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1500　EXP 660",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：精英獵手",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天擊敗2隻精英怪",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "2 / 2",
+        "font": 18.74035175030048,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1300　EXP 360",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "委託：招式演練",
+        "font": 21.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-name",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "已領取",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-status.claimed",
+        "parent": "quest-card-head"
+      },
+      {
+        "text": "今天在戰鬥中施放15次技能",
+        "font": 18.746039838111372,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-card-desc",
+        "parent": "quest-card claimed"
+      },
+      {
+        "text": "進度",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "15 / 15",
+        "font": 18.756103515625,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-progress-line"
+      },
+      {
+        "text": "獎勵",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.quest-reward-label",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "金幣 1100　EXP 450",
+        "font": 17.51784840078329,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-reward"
+      },
+      {
+        "text": "已領取",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.quest-claim-btn",
+        "parent": "quest-card-foot"
+      },
+      {
+        "text": "完成度寶箱",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "100%",
+        "font": 16.208444491299716,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "quest-completion-head"
+      },
+      {
+        "text": "左右滑動查看全部獎勵",
+        "font": 16.246736259103933,
+        "button": false,
+        "primary": false,
+        "selector": "p.quest-scroll-hint",
+        "parent": "questCompletionPanel"
+      },
+      {
+        "text": "20%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "250金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "40%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "375金＋90EXP",
+        "font": 17.49702785326087,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "60%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "500金",
+        "font": 17.490234375,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "80%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "750金＋210EXP",
+        "font": 17.51463210702341,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "100%",
+        "font": 16.25,
+        "button": false,
+        "primary": false,
+        "selector": "div.quest-milestone-percent",
+        "parent": "quest-milestone reached "
+      },
+      {
+        "text": "領取",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "quest-milestone-slot"
+      },
+      {
+        "text": "1250金＋360EXP",
+        "font": 17.5,
+        "button": true,
+        "primary": false,
+        "selector": "small.",
+        "parent": "quest-milestone-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "每日任務",
+        "width": 190.79425048828125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "委託任務",
+        "width": 190.80078125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "一鍵領取",
+        "width": 135,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "已領取",
+        "width": 85,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "領取250金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取375金＋90EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取500金",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取750金＋210EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      },
+      {
+        "label": "領取1250金＋360EXP",
+        "width": 150,
+        "height": 170,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-insufficient-top",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "白階 → 藍階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "白階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 50",
+        "font": 17.5364501953125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "藍階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "白階 → 藍階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-insufficient-end",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "白階 → 藍階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "白階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 50",
+        "font": 17.5364501953125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "藍階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "白階 → 藍階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-menu",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "白階 → 藍階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "白階 → 藍階",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-option selected"
+      },
+      {
+        "text": "藍階 → 紫階",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-option"
+      },
+      {
+        "text": "紫階 → 橙階",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-option"
+      },
+      {
+        "text": "橙階 → 桃紅階",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-option"
+      },
+      {
+        "text": "桃紅階 → 四象階",
+        "font": 18.75,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-option"
+      },
+      {
+        "text": "白階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 50",
+        "font": 17.5364501953125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "藍階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "白階 → 藍階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "白階 → 藍階✓",
+        "width": 345,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "藍階 → 紫階",
+        "width": 345,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "紫階 → 橙階",
+        "width": 345,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "橙階 → 桃紅階",
+        "width": 345,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "桃紅階 → 四象階",
+        "width": 345,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-selected-last",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "桃紅階 → 四象階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "桃紅階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "0 / 50",
+        "font": 17.5364501953125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "四象階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "桃紅階 → 四象階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-available-multidigit",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "桃紅階 → 四象階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "桃紅階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "1234 / 50",
+        "font": 17.5140673828125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "四象階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "桃紅階 → 四象階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-available-end",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "桃紅階 → 四象階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "桃紅階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "1234 / 50",
+        "font": 17.5140673828125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "四象階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "桃紅階 → 四象階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "material-reopen",
+    "rows": [
+      {
+        "text": "合成",
+        "font": 30,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 19.975609756097562,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "合成",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "金幣 0",
+        "font": 20.032421875,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-synthesis-wallet"
+      },
+      {
+        "text": "符咒合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "碎片合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "材料合成",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.active",
+        "parent": "v141-synthesis-tabs"
+      },
+      {
+        "text": "礦石升階",
+        "font": 22.5,
+        "button": false,
+        "primary": false,
+        "selector": "h4.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+        "font": 18.75,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": "v17363-material-card"
+      },
+      {
+        "text": "升階路線",
+        "font": 17.5,
+        "button": false,
+        "primary": false,
+        "selector": "span.v17363-material-field-label",
+        "parent": "v17363-material-field"
+      },
+      {
+        "text": "桃紅階 → 四象階",
+        "font": 18.74011075949367,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17363-game-select-trigger"
+      },
+      {
+        "text": "桃紅階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "1234 / 50",
+        "font": 17.5140673828125,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "四象階礦石",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": ""
+      },
+      {
+        "text": "×10",
+        "font": 17.426254443908004,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": ""
+      },
+      {
+        "text": "合成下一階礦石 ×10",
+        "font": 18.75,
+        "button": true,
+        "primary": true,
+        "selector": "button.v17363-craft-button",
+        "parent": "v17363-material-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 85.3125,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "符咒合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "碎片合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "材料合成",
+        "width": 122.5,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "桃紅階 → 四象階▾",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      },
+      {
+        "label": "合成下一階礦石 ×10",
+        "width": 360,
+        "height": 55,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

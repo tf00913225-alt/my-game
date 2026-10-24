@@ -1,0 +1,284 @@
+[
+  {
+    "name": "home",
+    "context": "main",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "rect": {
+      "x": 415,
+      "y": 710,
+      "width": 450,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 415
+    },
+    "borderImage": "url(\"http://127.0.0.1:51910/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+    "buttons": [
+      {
+        "label": "背包",
+        "active": false,
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "野怪區",
+        "active": false,
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "主城",
+        "active": true,
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "副本",
+        "active": false,
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "玩法",
+        "active": false,
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "name": "dungeon",
+    "context": "daily",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "rect": {
+      "x": 415,
+      "y": 710,
+      "width": 450,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 415
+    },
+    "borderImage": "url(\"http://127.0.0.1:51910/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+    "buttons": [
+      {
+        "label": "角色",
+        "active": false,
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "背包",
+        "active": false,
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "秘寶",
+        "active": false,
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "元素匣",
+        "active": false,
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "返回",
+        "active": false,
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  {
+    "name": "returned-home",
+    "context": "main",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "rect": {
+      "x": 415,
+      "y": 710,
+      "width": 450,
+      "height": 90,
+      "top": 710,
+      "right": 865,
+      "bottom": 800,
+      "left": 415
+    },
+    "borderImage": "url(\"http://127.0.0.1:51910/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+    "buttons": [
+      {
+        "label": "背包",
+        "active": false,
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "野怪區",
+        "active": false,
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "主城",
+        "active": true,
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "副本",
+        "active": false,
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "玩法",
+        "active": false,
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  }
+]

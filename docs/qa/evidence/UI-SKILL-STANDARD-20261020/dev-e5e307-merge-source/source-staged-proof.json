@@ -1,0 +1,360 @@
+{
+  "ui": "a199300d9dae288044204fb7eecadf7f6e6fad67",
+  "dev": "e5e307122f84edd3fda7d12c6395336c8b2a51c9",
+  "base": "758fe75cbdfe66a80a11a36b339fcbc7b6e21126",
+  "rows": [
+    {
+      "p": "css/adventure-v1-20260915.css",
+      "expectedFrom": "Independent 1b threeway plus reviewed four choices; UI product bytes unchanged since 1b",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "functions/src/hero-chapter-source.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/00-main.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/25-v131-fix-batch.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/27-v132-content-expansion.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/35-v141-ui-battle.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/45-v154-dev-fixes.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/adventure/adventure-content-v1-20260915.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/adventure/adventure-runtime-v1-20260915.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/adventure/adventure-ui-v1-20260915.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/equipment-progression.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/generated-item-acquisition-data.js",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "scripts/lib/hero-chapter-qualification.mjs",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "scripts/test-session-authority-emulator.mjs",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/00-main.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/01-stage-v8-map-page-fix.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/19-stage-v54-main-city-moderate-native-scale.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/20-stage-v60-training-only-safety.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/22-stage-v78-character-inventory-core.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/25-stage-v90-quest-interface-core.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/26-v110-auto-settings-premium.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/29-v125-character-creation-native.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/31-v131-fix-batch.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/32-v131-patrol-appearance.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/33-v132-content-expansion.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/38-v141-system-expansion.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/40-v143-combat-dungeon-polish.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/42-v146-system-polish.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/43-v148-combat-dungeon-fixes.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/46-v154-dev-fixes.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/48-v169-element-box-settings.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/49-v169-rpg-ui.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/50-v169-abyss-flow.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/51-v173.20-startup-loader.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/52-v173.50-inventory-qol.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/53-v173.51-qa.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/54-v174-abyss-two-tier.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/55-team-relic-system.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/56-v174-critical-ui-regressions.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/battle-statistics-system.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/firebase-auth.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/fixed-slot-battlefield-rendering-v2.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/gameplay-boss-tower.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/release-update-notification.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "css/relic-progression-drop-system.css",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/17-stage-v60-training-render-guard.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/36-v141-content-systems.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/41-v146-system-polish.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/42-v148-combat-dungeon-fixes.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/52-v173.20-startup-loader.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/55-v173.51-inventory-qa.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/58-v173.63-functional-fixes.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/59-abyss-two-tier-runtime.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/60-team-relic-system.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/60-v173.64-skill-progression-rebalance.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/battle-statistics-system.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/firebase/firebase-auth-ui.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/release-update-notification.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/relic-progression-drop-system.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "js/startup/support-contact.js",
+      "expectedFrom": "UI",
+      "expectedExact": true,
+      "stagedExact": true
+    }
+  ],
+  "failed": [],
+  "restrictedPolicySemanticBothExact": true,
+  "restrictedSourceHashesExact": true,
+  "heroPoliciesDevExact": true,
+  "noUnmerged": true,
+  "limits": "Source/staged proof; no browser or new Head CI approval."
+}

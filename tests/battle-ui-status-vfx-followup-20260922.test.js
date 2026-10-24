@@ -41,8 +41,10 @@ test("battle information is retired and turn timer remains visible",()=>{
   assert.doesNotMatch(html,/battleInfoToggle/,"retired battle log UI must stay absent");
   assert.ok(html.indexOf('id="battleActionRegion"')<html.indexOf('id="turnTargetRow"'),"turn row should be inside the battle action region");
   assert.match(css,/#battleActionRegion > \.turn-target-row[\s\S]*?opacity:1/);
-  assert.match(css,/\.turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\);[\s\S]*?opacity:1/);
-  assert.match(css,/\.turn-target-row\.battle-item-open\{[\s\S]*?opacity:1/);
+  assert.match(css,/\.turn-target-row\.skill-picker-open\{\s*top:calc\(100% - var\(--battle-command-row-height\) - var\(--battle-skill-menu-top-offset\) \+ 14px\);\s*right:94px;\s*bottom:auto;/,"readable skill picker keeps its timer in the header clear of cards/Return");
+  assert.match(css,/\.turn-target-row\.battle-item-open\{\s*top:auto;\s*bottom:calc\(var\(--battle-item-menu-bottom\) \+ var\(--battle-item-menu-height\) \+ var\(--battle-item-menu-gap\)\);\s*opacity:1;/,"item timer follows actual menu bounds, not the retired footer offset");
+  assert.match(css,/\.turn-target-row\.skill-picker-open\{[^}]*opacity:1;/);
+  assert.match(css,/\.turn-target-row\.battle-item-open\{[^}]*opacity:1;/);
   assert.match(css,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
   assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");

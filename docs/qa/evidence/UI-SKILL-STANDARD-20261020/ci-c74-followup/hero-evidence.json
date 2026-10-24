@@ -1,0 +1,133 @@
+{
+  "passed": true,
+  "environment": "production-local",
+  "sha": "c74f1286c5d3b1b9247014d73ed3218b4b539ca3",
+  "evidence": [
+    {
+      "width": 360,
+      "height": 640,
+      "grid": {
+        "columns": 3,
+        "overflow": 0
+      },
+      "geo": {
+        "box": {
+          "x": 24,
+          "y": 24,
+          "width": 312,
+          "height": 592,
+          "top": 24,
+          "right": 336,
+          "bottom": 616,
+          "left": 24
+        },
+        "overflow": 0,
+        "minFont": 42
+      },
+      "fgeo": {
+        "box": {
+          "x": 24,
+          "y": 42.66666793823242,
+          "width": 312,
+          "height": 554.6666870117188,
+          "top": 42.66666793823242,
+          "right": 336,
+          "bottom": 597.3333549499512,
+          "left": 24
+        },
+        "overflow": 0,
+        "verticalOverflow": 46,
+        "scrollTop": 46,
+        "bg": "linear-gradient(rgba(9, 9, 9, 0.333), rgba(9, 9, 9, 0.6)), url(\"http://127.0.0.1:55656/assets/maps/forest.jpg\")"
+      },
+      "actualPointerInput": true,
+      "saveReload": true,
+      "swapRemove": true,
+      "sharedEntrances": true
+    },
+    {
+      "width": 412,
+      "height": 915,
+      "grid": {
+        "columns": 3,
+        "overflow": 0
+      },
+      "geo": {
+        "box": {
+          "x": 27.466665267944336,
+          "y": 118.74449920654297,
+          "width": 357.066650390625,
+          "height": 677.5111083984375,
+          "top": 118.74449920654297,
+          "right": 384.53331565856934,
+          "bottom": 796.2556076049805,
+          "left": 27.466665267944336
+        },
+        "overflow": 0,
+        "minFont": 42
+      },
+      "fgeo": {
+        "box": {
+          "x": 27.466665267944336,
+          "y": 140.10745239257812,
+          "width": 357.066650390625,
+          "height": 634.78515625,
+          "top": 140.10745239257812,
+          "right": 384.53331565856934,
+          "bottom": 774.8926086425781,
+          "left": 27.466665267944336
+        },
+        "overflow": 0,
+        "verticalOverflow": 46,
+        "scrollTop": 0,
+        "bg": "linear-gradient(rgba(9, 9, 9, 0.333), rgba(9, 9, 9, 0.6)), url(\"http://127.0.0.1:55656/assets/maps/forest.jpg\")"
+      },
+      "actualPointerInput": true,
+      "saveReload": true,
+      "swapRemove": true,
+      "sharedEntrances": true
+    },
+    {
+      "width": 1280,
+      "height": 800,
+      "grid": {
+        "columns": 3,
+        "overflow": 0
+      },
+      "geo": {
+        "box": {
+          "x": 445,
+          "y": 30,
+          "width": 390,
+          "height": 740,
+          "top": 30,
+          "right": 835,
+          "bottom": 770,
+          "left": 445
+        },
+        "overflow": 0,
+        "minFont": 42
+      },
+      "fgeo": {
+        "box": {
+          "x": 445,
+          "y": 53.33333206176758,
+          "width": 390,
+          "height": 693.3333129882812,
+          "top": 53.33333206176758,
+          "right": 835,
+          "bottom": 746.6666450500488,
+          "left": 445
+        },
+        "overflow": 0,
+        "verticalOverflow": 46,
+        "scrollTop": 0,
+        "bg": "linear-gradient(rgba(9, 9, 9, 0.333), rgba(9, 9, 9, 0.6)), url(\"http://127.0.0.1:55656/assets/maps/forest.jpg\")"
+      },
+      "actualPointerInput": true,
+      "saveReload": true,
+      "swapRemove": true,
+      "sharedEntrances": true
+    }
+  ]
+}

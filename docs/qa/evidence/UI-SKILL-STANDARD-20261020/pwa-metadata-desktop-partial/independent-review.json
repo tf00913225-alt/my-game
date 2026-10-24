@@ -1,0 +1,23 @@
+{
+  "sourceHead": "9e101df27c6e3d0c746565875172edc7c4fb0efe",
+  "status": "partial-installability-blocked",
+  "input": {
+    "reviewer": "/root/map_input_review",
+    "screensViewed": true,
+    "findings": [
+      "root/prefix200 and decode/READY valid",
+      "preview64/192/512 is scaled display, not declared icon sizes",
+      "manifest-missing-suitable-icon remains",
+      "no installed/Android/OAuth/save/update acceptance"
+    ]
+  },
+  "scope": {
+    "reviewer": "/root/daily_scope",
+    "screensViewed": true,
+    "findings": [
+      "manifest/link/header/tests only",
+      "no SW/scaler/Auth/Save/game logic changes",
+      "static test misses desktop upper bound; no installation PASS"
+    ]
+  }
+}

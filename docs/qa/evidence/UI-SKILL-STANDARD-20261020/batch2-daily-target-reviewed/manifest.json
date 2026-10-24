@@ -1,0 +1,30 @@
+[
+  {
+    "device": "360x640",
+    "head": "b97730b4d970ec94ce111406f9a083eea3ae6b5d",
+    "reportSha256": "c0c55ac69db4e719eef4c4953445328ffff3c26b7b6aec2c92439b3d9058ba59",
+    "height": 44.57143020629883,
+    "hit": true
+  },
+  {
+    "device": "393x873",
+    "head": "b97730b4d970ec94ce111406f9a083eea3ae6b5d",
+    "reportSha256": "cb68ab4cd75c75b2ccc75b2647324ff73f6784ddd3e3cfd7cb70405d323da920",
+    "height": 48.65715026855469,
+    "hit": true
+  },
+  {
+    "device": "412x915",
+    "head": "b97730b4d970ec94ce111406f9a083eea3ae6b5d",
+    "reportSha256": "3108daf20d95f29c582dd9d6e813f562c3f9ae664d6f47d2ddeee40cf29db83b",
+    "height": 51.00953674316406,
+    "hit": true
+  },
+  {
+    "device": "1280x800",
+    "head": "b97730b4d970ec94ce111406f9a083eea3ae6b5d",
+    "reportSha256": "b8a334fea125eb457f7d0bf9de6d38ce130ef8cf61e3f9d6f9a8e2fb8168ab10",
+    "height": 55.71429443359375,
+    "hit": true
+  }
+]

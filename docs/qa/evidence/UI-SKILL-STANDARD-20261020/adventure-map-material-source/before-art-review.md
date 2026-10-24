@@ -1,0 +1,9 @@
+# Post-e5 adventure before visual review
+
+Head b389e184. Actually viewed5 supplied360x640 PNGs in `post-e5-adventure-b389e184/existing-natural/`: adventure-map, picker-open, c1_01-sheet, story-first-line and failure. Last failure repeats the story first line, not an error-message presentation. No after approval.
+
+Concrete gaps: the thin carved top strip's `出城冒險` sits near the left return icon instead of the symmetric writable-frame center, and its small lettering has much weaker hierarchy than the accepted skill title. Fix the original new-map heading geometry/typography, preserving the chapter heading's intentional left alignment and map composition. The story arrow's measured32.57px width fails touch target; preserve its location/art while restoring the original target size.
+
+The bottom node-preview sheet and picker are green gradient panels with multiple ordinary thin outlines. They are large functional foreground surfaces and visibly differ from the skill-family iron/bronze workmanship, despite the attractive map behind them. In their original presentation Owner, apply the existing dark iron material and restrained shared bronze frame, replacing redundant lines rather than stacking more borders. Preserve compact thumbnail/text/reward/action layout and anchored picker; do not replace the new map with the old full-page layout or carve every spatial node.
+
+Keep illustrated geography, path/node positions, readable spatial labels, hero/NPC story portraits and existing story dialogue shell. Node title should retain information alignment within its compact preview rather than being blindly forced into a full title plaque. Current picker locked rows are muted; further readability approval needs actual relevant locked-state coverage, not CSS-only inference. No new geography/logic or rewards changes proposed. No Chrome or tracked edits performed.

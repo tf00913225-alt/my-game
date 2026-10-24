@@ -1,0 +1,18 @@
+[
+  {
+    "source": "artifacts/segment24b-character-tabs.mjs",
+    "target": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/qa-source/segment24b-character-tabs.mjs.gz",
+    "originalSha256": "de45c41217a00cb137b1edf8253113bbe4d148b9ff65a69e0b0630c8b68df1e7",
+    "compressedSha256": "8f95b0f5b44aa67b37238d46302498b61139c7eb32ee5c30c18f8c78ad517b46",
+    "originalBytes": 20956,
+    "storage": "lossless gzip; no text normalization"
+  },
+  {
+    "source": "artifacts/segment26-exp-charge-controls.mjs",
+    "target": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment24b-accepted/qa-source/segment26-exp-charge-controls.mjs.gz",
+    "originalSha256": "aa7dfd8b1ff7acff5d8752b758a14aecd58f40d5d765b6e2c5ee224051652f07",
+    "compressedSha256": "164fd44bdf89e864a58a8559abdeef4543cf2684013cf5b011eb3764dd93b0b9",
+    "originalBytes": 24155,
+    "storage": "lossless gzip; no text normalization"
+  }
+]

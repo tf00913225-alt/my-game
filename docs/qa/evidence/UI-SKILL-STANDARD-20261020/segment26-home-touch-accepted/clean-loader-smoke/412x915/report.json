@@ -1,0 +1,2991 @@
+{
+  "head": "f7a837cdba2d7ce7e5421d24083ef7ffa35712a2",
+  "dirty": false,
+  "viewport": [
+    412,
+    915
+  ],
+  "complete": true,
+  "sourcesBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "d470969475a7c8384ae51df7f232e9f811e26a980f925aa3ca6f3c0388538e5c",
+    "js/16-stage-v54-main-city-runtime.js": "5f737500d811d70fb3fc1380d57e1ba578cf1c1726d249383dcbc703523ebbb7",
+    "js/relic-summary-catalog.js": "07c5f86837d229c2c1a4dbdbc067934a442f3a1f90d473053ec825293358df17",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.f5e440f14167.css": "f5e440f1416771b03e1bcee96aed3868ab7b1d8c02a64f5f1856ea05b78286ba"
+  },
+  "sourcesAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "d470969475a7c8384ae51df7f232e9f811e26a980f925aa3ca6f3c0388538e5c",
+    "js/16-stage-v54-main-city-runtime.js": "5f737500d811d70fb3fc1380d57e1ba578cf1c1726d249383dcbc703523ebbb7",
+    "js/relic-summary-catalog.js": "07c5f86837d229c2c1a4dbdbc067934a442f3a1f90d473053ec825293358df17",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.f5e440f14167.css": "f5e440f1416771b03e1bcee96aed3868ab7b1d8c02a64f5f1856ea05b78286ba"
+  },
+  "sourceUnchanged": true,
+  "touches": [
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "top",
+      "steps": 0,
+      "active": true,
+      "top": 0,
+      "client": 1704,
+      "height": 2123,
+      "overflow": "auto",
+      "rect": {
+        "x": 0,
+        "y": 91.27783203125,
+        "width": 412,
+        "height": 650.04443359375,
+        "top": 91.27783203125,
+        "right": 412,
+        "bottom": 741.322265625,
+        "left": 0
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    },
+    {
+      "kind": "home-true-scroll",
+      "owner": "#homePage",
+      "direction": "end",
+      "step": 0
+    },
+    {
+      "kind": "home-scroll-end",
+      "owner": "#homePage",
+      "direction": "end",
+      "steps": 1,
+      "active": true,
+      "top": 419,
+      "client": 1704,
+      "height": 2123,
+      "overflow": "auto",
+      "rect": {
+        "x": 0,
+        "y": 91.27783203125,
+        "width": 412,
+        "height": 650.04443359375,
+        "top": 91.27783203125,
+        "right": 412,
+        "bottom": 741.322265625,
+        "left": 0
+      },
+      "ancestors": [
+        {
+          "id": "game-ui",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-overlay-layer",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-stage",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "game-viewport",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        },
+        {
+          "id": "",
+          "cls": "",
+          "top": 0,
+          "left": 0
+        }
+      ]
+    }
+  ],
+  "checks": [
+    {
+      "homePlan": {
+        "segment": 24,
+        "mode": "preparation-only; no browser started",
+        "owners": [
+          "index.html:home-city-hud/homeHudGoldValue/homeHudExpValue",
+          "js/16-stage-v54-main-city-runtime.js:177-345 resource formatting, roster, summary, asset readiness",
+          "js/relic-summary-catalog.js",
+          "js/35-v141-ui-battle.js:notification calculation",
+          "js/41-v146-system-polish.js:notification projection"
+        ],
+        "entries": {
+          "character": "[data-city-entry=\"0\"]",
+          "formation": "#v146HomeRoster .v-fixed-formation-entry",
+          "relicSummary": "#homePage > .team-relic-loadout-slot button",
+          "relicCity": "[data-city-entry=\"4\"]",
+          "return": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)"
+        },
+        "limits": [
+          "Do not tap DEV grants, claim, create, equip, upgrade or submit formation.",
+          "Home roster article/name/HP/SP meters and resource spans are display-only, not invented buttons.",
+          "AccountSave.readForUid is frozen API; no claim that mutating its returned copy changes canonical save.",
+          "Summary loading is an initial ensureShell placeholder; sync() with unavailable save only flips ready=false, does not reset old loaded markup. Do not fake DOM reset and call it production loading.",
+          "prepareFirstScreenVisuals rejects and clears its cached promise; no standalone summary failure/retry button exists in this Owner. API readiness retry is not a player-visible retry control."
+        ]
+      }
+    },
+    {
+      "fixture": {
+        "count": 3,
+        "localOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "kind": "dev-geometry-only-no-dev-click",
+      "controls": [
+        {
+          "text": "金幣 +100萬",
+          "height": 50.355560302734375,
+          "width": 103.49472045898438,
+          "font": 17.185470186916223,
+          "rect": {
+            "x": 176.2265625,
+            "y": 212.082275390625,
+            "width": 103.49472045898438,
+            "height": 50.355560302734375,
+            "top": 212.082275390625,
+            "right": 279.7212829589844,
+            "bottom": 262.4378356933594,
+            "left": 176.2265625
+          },
+          "hit": true
+        },
+        {
+          "text": "經驗池 +10億",
+          "height": 50.355560302734375,
+          "width": 110.53424072265625,
+          "font": 17.151864939722522,
+          "rect": {
+            "x": 283.1546325683594,
+            "y": 212.082275390625,
+            "width": 110.53424072265625,
+            "height": 50.355560302734375,
+            "top": 212.082275390625,
+            "right": 393.6888732910156,
+            "bottom": 262.4378356933594,
+            "left": 283.1546325683594
+          },
+          "hit": true
+        }
+      ]
+    },
+    {
+      "captureAttempt": {
+        "name": "home-top",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 103.49472045898438,
+            "height": 50.355560302734375,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 110.53424072265625,
+            "height": 50.355560302734375,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 61.79998779296875,
+            "height": 50.35552978515625,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 97.84999084472656,
+            "height": 50.35552978515625,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 97.85000610351562,
+            "height": 50.35552978515625,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 97.8499755859375,
+            "height": 50.35552978515625,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 97.85000610351562,
+            "height": 50.35552978515625,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 228.88888549804688,
+            "height": 60.11907958984375,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 57.22222900390625,
+            "height": 50.3555908203125,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "kind": "footer-geometry-only-no-dev-click",
+      "controls": [
+        {
+          "text": "成就",
+          "height": 50.3555908203125,
+          "width": 97.84999084472656,
+          "font": 17.16666603088379,
+          "rect": {
+            "x": 10.299999237060547,
+            "y": 626.5618896484375,
+            "width": 97.84999084472656,
+            "height": 50.3555908203125,
+            "top": 626.5618896484375,
+            "right": 108.14999008178711,
+            "bottom": 676.91748046875,
+            "left": 10.299999237060547
+          },
+          "hit": true
+        },
+        {
+          "text": "公告",
+          "height": 50.3555908203125,
+          "width": 97.85000610351562,
+          "font": 17.166664123535156,
+          "rect": {
+            "x": 108.14999389648438,
+            "y": 626.5618896484375,
+            "width": 97.85000610351562,
+            "height": 50.3555908203125,
+            "top": 626.5618896484375,
+            "right": 206,
+            "bottom": 676.91748046875,
+            "left": 108.14999389648438
+          },
+          "hit": true
+        },
+        {
+          "text": "離線經驗",
+          "height": 50.3555908203125,
+          "width": 97.8499755859375,
+          "font": 17.166664123535156,
+          "rect": {
+            "x": 206,
+            "y": 626.5618896484375,
+            "width": 97.8499755859375,
+            "height": 50.3555908203125,
+            "top": 626.5618896484375,
+            "right": 303.8499755859375,
+            "bottom": 676.91748046875,
+            "left": 206
+          },
+          "hit": true
+        },
+        {
+          "text": "系統",
+          "height": 50.3555908203125,
+          "width": 97.85000610351562,
+          "font": 17.166671752929688,
+          "rect": {
+            "x": 303.8499755859375,
+            "y": 626.5618896484375,
+            "width": 97.85000610351562,
+            "height": 50.3555908203125,
+            "top": 626.5618896484375,
+            "right": 401.6999816894531,
+            "bottom": 676.91748046875,
+            "left": 303.8499755859375
+          },
+          "hit": true
+        }
+      ]
+    },
+    {
+      "captureAttempt": {
+        "name": "home-end",
+        "controls": [
+          {
+            "label": "金幣 +100萬",
+            "width": 103.49472045898438,
+            "height": 50.35554885864258,
+            "overflow": false
+          },
+          {
+            "label": "經驗池 +10億",
+            "width": 110.53424072265625,
+            "height": 50.35554885864258,
+            "overflow": false
+          },
+          {
+            "label": "佈陣",
+            "width": 61.79998779296875,
+            "height": 50.35554504394531,
+            "overflow": false
+          },
+          {
+            "label": "角色",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "英雄",
+            "width": 54.93333435058594,
+            "height": 54.933319091796875,
+            "overflow": false
+          },
+          {
+            "label": "商店",
+            "width": 54.93333435058594,
+            "height": 54.933319091796875,
+            "overflow": false
+          },
+          {
+            "label": "任務",
+            "width": 54.93333435058594,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "秘寶",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "元素匣",
+            "width": 54.933349609375,
+            "height": 54.933319091796875,
+            "overflow": false
+          },
+          {
+            "label": "鍛造",
+            "width": 54.933349609375,
+            "height": 54.933319091796875,
+            "overflow": false
+          },
+          {
+            "label": "合成",
+            "width": 54.933349609375,
+            "height": 54.933349609375,
+            "overflow": false
+          },
+          {
+            "label": "成就",
+            "width": 97.84999084472656,
+            "height": 50.3555908203125,
+            "overflow": false
+          },
+          {
+            "label": "公告",
+            "width": 97.85000610351562,
+            "height": 50.3555908203125,
+            "overflow": false
+          },
+          {
+            "label": "離線經驗",
+            "width": 97.8499755859375,
+            "height": 50.3555908203125,
+            "overflow": false
+          },
+          {
+            "label": "系統",
+            "width": 97.85000610351562,
+            "height": 50.3555908203125,
+            "overflow": false
+          },
+          {
+            "label": "出城冒險　›江湖主線 · 章節推進",
+            "width": 228.88888549804688,
+            "height": 60.11907958984375,
+            "overflow": false
+          },
+          {
+            "label": "選擇",
+            "width": 57.22222900390625,
+            "height": 50.35552978515625,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "loader": {
+        "href": "build/boot-core.1a331d452911.css",
+        "sheetReady": true,
+        "ruleCount": 774,
+        "linkDisabled": false,
+        "resources": [
+          {
+            "url": "/assets/ui/startup-logo.4631c0bc3f2b.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 6.9000000059604645
+          },
+          {
+            "url": "/build/boot-core.9cdbe69aad4a.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 12.299999997019768
+          },
+          {
+            "url": "/build/boot-core.1a331d452911.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 14.200000002980232
+          },
+          {
+            "url": "/assets/ui/startup-main-city.d43e67af1c1c.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 15.100000008940697
+          },
+          {
+            "url": "/assets/characters/female_fire.jpg",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 16.799999997019768
+          },
+          {
+            "url": "/privacy-consent.html",
+            "initiatorType": "iframe",
+            "responseStatus": 200,
+            "duration": 10.700000002980232
+          },
+          {
+            "url": "/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 6.5
+          },
+          {
+            "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/asset-manifest.json",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 2.2000000029802322
+          },
+          {
+            "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+            "initiatorType": "script",
+            "responseStatus": 200,
+            "duration": 2.6000000089406967
+          },
+          {
+            "url": "/assets/ui/startup-logo.4631c0bc3f2b.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 5.9000000059604645
+          },
+          {
+            "url": "/assets/ui/startup-main-city.d43e67af1c1c.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.4000000059604645
+          },
+          {
+            "url": "/build/boot-core.1a331d452911.css",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.100000008940697
+          },
+          {
+            "url": "/build/boot-core.9cdbe69aad4a.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 5
+          },
+          {
+            "url": "/favicon.ico",
+            "initiatorType": "other",
+            "responseStatus": 404,
+            "duration": 3.2999999970197678
+          },
+          {
+            "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 5.200000002980232
+          },
+          {
+            "url": "/build/boot-core.9cdbe69aad4a.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.0999999940395355
+          },
+          {
+            "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.8999999910593033
+          },
+          {
+            "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.7999999970197678
+          },
+          {
+            "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.800000011920929
+          },
+          {
+            "url": "/build/boot-core.1a331d452911.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3
+          },
+          {
+            "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.5
+          },
+          {
+            "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.7000000029802322
+          },
+          {
+            "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.5
+          },
+          {
+            "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.2000000029802322
+          },
+          {
+            "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.2999999970197678
+          },
+          {
+            "url": "/assets/ui/startup-logo.4631c0bc3f2b.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.5999999940395355
+          },
+          {
+            "url": "/build/firebase/session-client.235aa8b1f47e.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.2000000029802322
+          },
+          {
+            "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.2999999970197678
+          },
+          {
+            "url": "/privacy-consent.html",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.7000000029802322
+          },
+          {
+            "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.6000000089406967
+          },
+          {
+            "url": "/privacy.html",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 0.9000000059604645
+          },
+          {
+            "url": "/assets/characters/female_earth.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.399999991059303
+          },
+          {
+            "url": "/build/firebase/session-client.235aa8b1f47e.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5999999940395355
+          },
+          {
+            "url": "/assets/characters/female_fire.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 7.0999999940395355
+          },
+          {
+            "url": "/assets/ui/startup-main-city.d43e67af1c1c.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 5.700000002980232
+          },
+          {
+            "url": "/assets/characters/female_water.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.200000002980232
+          },
+          {
+            "url": "/assets/characters/female_wind.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6
+          },
+          {
+            "url": "/assets/characters/male_earth.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.0999999940395355
+          },
+          {
+            "url": "/assets/characters/female_earth.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.4000000059604645
+          },
+          {
+            "url": "/assets/characters/male_fire.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.4000000059604645
+          },
+          {
+            "url": "/assets/characters/female_fire.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/characters/male_water.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/assets/characters/female_water.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.800000011920929
+          },
+          {
+            "url": "/assets/characters/male_wind.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/characters/female_wind.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.4000000059604645
+          },
+          {
+            "url": "/assets/ui/home-achievement.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/characters/male_earth.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/assets/ui/home-announcement.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2
+          },
+          {
+            "url": "/assets/characters/male_fire.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.2999999970197678
+          },
+          {
+            "url": "/assets/ui/home-background-v17344.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 8.900000005960464
+          },
+          {
+            "url": "/assets/characters/male_water.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/home-bestiary.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.8999999910593033
+          },
+          {
+            "url": "/assets/characters/male_wind.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.0999999940395355
+          },
+          {
+            "url": "/assets/ui/home-character.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 5.600000008940697
+          },
+          {
+            "url": "/assets/ui/home-achievement.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.699999988079071
+          },
+          {
+            "url": "/assets/ui/home-element-box-v174.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.0999999940395355
+          },
+          {
+            "url": "/assets/ui/home-announcement.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/home-offline-exp.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.0999999940395355
+          },
+          {
+            "url": "/assets/ui/home-bestiary.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.4000000059604645
+          },
+          {
+            "url": "/assets/ui/home-quest.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.7000000029802322
+          },
+          {
+            "url": "/assets/ui/home-background-v17344.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 9.5
+          },
+          {
+            "url": "/assets/ui/home-element-box-v174.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/ui/home-relic-v174.eed14e806044.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2000000029802322
+          },
+          {
+            "url": "/assets/ui/home-rest.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/home-offline-exp.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.2000000029802322
+          },
+          {
+            "url": "/assets/ui/home-shop.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2
+          },
+          {
+            "url": "/assets/ui/home-character.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 8
+          },
+          {
+            "url": "/assets/ui/home-synthesis.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.300000011920929
+          },
+          {
+            "url": "/assets/ui/home-quest.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/home-system.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/ui/home-relic-v174.eed14e806044.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/map-return.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 9
+          },
+          {
+            "url": "/assets/ui/home-rest.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 5.0999999940395355
+          },
+          {
+            "url": "/assets/ui/nav-backpack.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 5.600000008940697
+          },
+          {
+            "url": "/assets/ui/home-shop.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.5
+          },
+          {
+            "url": "/assets/ui/nav-boss.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 4.700000002980232
+          },
+          {
+            "url": "/assets/ui/home-synthesis.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/assets/ui/nav-character.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.6000000089406967
+          },
+          {
+            "url": "/assets/ui/home-system.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/ui/nav-dungeon.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.2000000029802322
+          },
+          {
+            "url": "/assets/ui/nav-backpack.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.300000011920929
+          },
+          {
+            "url": "/assets/ui/nav-element-box.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.2999999970197678
+          },
+          {
+            "url": "/assets/ui/nav-boss.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5999999940395355
+          },
+          {
+            "url": "/assets/ui/nav-gameplay.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/ui/map-return.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 8.199999988079071
+          },
+          {
+            "url": "/assets/ui/nav-home.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/assets/ui/nav-character.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/nav-quest.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3
+          },
+          {
+            "url": "/assets/ui/nav-dungeon.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.0999999940395355
+          },
+          {
+            "url": "/assets/ui/nav-relic-v175.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/assets/ui/nav-element-box.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/assets/ui/nav-training.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.0999999940395355
+          },
+          {
+            "url": "/assets/ui/nav-gameplay.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.9000000059604645
+          },
+          {
+            "url": "/assets/ui/nav-home.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4
+          },
+          {
+            "url": "/assets/ui/patrol-appearance-switch-icon.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.1000000089406967
+          },
+          {
+            "url": "/build/app-shell.725d1d00b39e.css",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.199999988079071
+          },
+          {
+            "url": "/assets/ui/nav-quest.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3
+          },
+          {
+            "url": "/build/app-shell.aa32fb8e818d.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 7.700000002980232
+          },
+          {
+            "url": "/build/app-shell.725d1d00b39e.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/battle/moonlit-sanctuary-depth-20261018.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 7.9000000059604645
+          },
+          {
+            "url": "/assets/ui/nav-relic-v175.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/assets/characters/battle_female_earth.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.1000000089406967
+          },
+          {
+            "url": "/assets/ui/nav-training.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/ui/patrol-appearance-switch-icon.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.0999999940395355
+          },
+          {
+            "url": "/assets/characters/battle_female_fire.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.699999988079071
+          },
+          {
+            "url": "/assets/characters/battle_female_water.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 4
+          },
+          {
+            "url": "/build/app-shell.aa32fb8e818d.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.199999988079071
+          },
+          {
+            "url": "/assets/characters/battle_female_wind.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.1000000089406967
+          },
+          {
+            "url": "/assets/characters/battle_female_earth.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.9000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_male_earth.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 4.200000002980232
+          },
+          {
+            "url": "/assets/characters/battle_female_fire.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.100000008940697
+          },
+          {
+            "url": "/assets/characters/battle_male_fire.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.9000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_female_water.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.9000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_male_water.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 4.0999999940395355
+          },
+          {
+            "url": "/assets/characters/battle_female_wind.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/characters/battle_male_wind.png",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/assets/battle/moonlit-sanctuary-depth-20261018.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 8.399999991059303
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.4000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_male_earth.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5999999940395355
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_male_fire.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-fire-back.c12817139add.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.6000000089406967
+          },
+          {
+            "url": "/assets/characters/battle_male_water.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.4000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.9000000059604645
+          },
+          {
+            "url": "/assets/characters/battle_male_wind.png",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.0999999940395355
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.0999999940395355
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-fire-back.c12817139add.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.5
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.5
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.6000000089406967
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.5999999940395355
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.7999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.7999999970197678
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2000000029802322
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 1.9000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.2000000029802322
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.4000000059604645
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.6000000089406967
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.2000000029802322
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/ui/training-background.jpg",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 6.5
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.399999991059303
+          },
+          {
+            "url": "/build/feature-patrol.1cef20d37f82.css",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 4.299999997019768
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 4.0999999940395355
+          },
+          {
+            "url": "/build/feature-patrol.ab5bd3ce5582.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.5
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/build/gameplay-core-primary.a90218b9da1c.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.0999999940395355
+          },
+          {
+            "url": "/assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/build/gameplay-core-secondary.db9536f36042.js",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3
+          },
+          {
+            "url": "/build/feature-patrol.ab5bd3ce5582.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.3999999910593033
+          },
+          {
+            "url": "/build/gameplay-core.f5e440f14167.css",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 3.7999999970197678
+          },
+          {
+            "url": "/build/feature-patrol.1cef20d37f82.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.6000000089406967
+          },
+          {
+            "url": "/build/gameplay-core-primary.a90218b9da1c.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/build/gameplay-core-secondary.db9536f36042.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.1000000089406967
+          },
+          {
+            "url": "/build/gameplay-core.f5e440f14167.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 2.7999999970197678
+          },
+          {
+            "url": "/assets/ui/training-background.jpg",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 3.2999999970197678
+          },
+          {
+            "url": "/asset-manifest.json",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.2999999970197678
+          },
+          {
+            "url": "/build/feature-adventure-entry.f68f5350eccc.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.7000000029802322
+          },
+          {
+            "url": "/build/feature-adventure-entry.8215d893d208.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.199999988079071
+          },
+          {
+            "url": "/assets/equipment/warrior/weapon-01.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 3.199999988079071
+          },
+          {
+            "url": "/assets/equipment/mage/weapon-01.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 3.2000000029802322
+          },
+          {
+            "url": "/assets/equipment/warrior/head-01.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 2.5
+          },
+          {
+            "url": "/assets/equipment/warrior/armor-01.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 2.6000000089406967
+          },
+          {
+            "url": "/assets/equipment/warrior/shoes-01.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 3.1000000089406967
+          },
+          {
+            "url": "/assets/ui/home-background-v17344.png",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 52.3999999910593
+          },
+          {
+            "url": "/release/release-update.json",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 2.7000000029802322
+          },
+          {
+            "url": "/build/feature-adventure-items.cf197e72837f.js",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 1.699999988079071
+          },
+          {
+            "url": "/assets/vfx/normal/normal-impact.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 3.0999999940395355
+          },
+          {
+            "url": "/assets/vfx/fire/flame-slash-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 12
+          },
+          {
+            "url": "/assets/vfx/fire/fire-critical-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 13.200000002980232
+          },
+          {
+            "url": "/assets/vfx/fire/explosive-flurry-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 119.29999999701977
+          },
+          {
+            "url": "/assets/vfx/fire/dragon-slash-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 128.40000000596046
+          },
+          {
+            "url": "/assets/vfx/fire/fire-rocket-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 121.70000000298023
+          },
+          {
+            "url": "/assets/vfx/fire/blaze-spell-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 126.20000000298023
+          },
+          {
+            "url": "/assets/vfx/fire/flame-tornado-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 127.40000000596046
+          },
+          {
+            "url": "/assets/vfx/fire/phoenix-cry-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 126.5
+          },
+          {
+            "url": "/assets/vfx/fire/fire-soul-resonance-cast.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 137.59999999403954
+          },
+          {
+            "url": "/assets/vfx/fire/blood-burn-art-cast.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 139.70000000298023
+          },
+          {
+            "url": "/assets/vfx/fire/rage-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 138.20000000298023
+          },
+          {
+            "url": "/assets/vfx/water/water-blade-slash-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 142.29999999701977
+          },
+          {
+            "url": "/assets/vfx/water/frost-fist-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 149.5
+          },
+          {
+            "url": "/assets/vfx/water/frost-spinning-slash-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 148.1000000089407
+          },
+          {
+            "url": "/assets/vfx/water/water-orb-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 157
+          },
+          {
+            "url": "/assets/vfx/water/freeze-heavy-strike-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 159.20000000298023
+          },
+          {
+            "url": "/assets/vfx/water/frost-arrow-rain-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 165.20000000298023
+          },
+          {
+            "url": "/assets/vfx/water/freeze-cast-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 169.5
+          },
+          {
+            "url": "/assets/vfx/water/tidal-beast-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 170.1000000089407
+          },
+          {
+            "url": "/assets/vfx/water/water-heal-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 167.09999999403954
+          },
+          {
+            "url": "/assets/vfx/water/purify-mind-cast.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 174.8999999910593
+          },
+          {
+            "url": "/assets/vfx/water/water-revive-vfx.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 182
+          },
+          {
+            "url": "/assets/vfx/wind/storm-fist-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 192
+          },
+          {
+            "url": "/assets/vfx/wind/storm-flurry-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 194.5
+          },
+          {
+            "url": "/assets/vfx/wind/dizzy-fist-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 196.3999999910593
+          },
+          {
+            "url": "/assets/vfx/wind/wind-cross-slash-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 196.8999999910593
+          },
+          {
+            "url": "/assets/vfx/wind/wind-spell-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 199.29999999701977
+          },
+          {
+            "url": "/assets/vfx/wind/storm-circle-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 203.5
+          },
+          {
+            "url": "/assets/vfx/wind/dodge-skill-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 210.40000000596046
+          },
+          {
+            "url": "/assets/vfx/wind/stealth-skill-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 209.6000000089407
+          },
+          {
+            "url": "/assets/vfx/wind/wind-howl-lightning-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 212.80000001192093
+          },
+          {
+            "url": "/assets/vfx/wind/dinghaishenzhen-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 219
+          },
+          {
+            "url": "/assets/vfx/earth/stone-slash-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 219.90000000596046
+          },
+          {
+            "url": "/assets/vfx/wind/storm-rain-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 221.40000000596046
+          },
+          {
+            "url": "/assets/vfx/earth/petrify-fist-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 220.8999999910593
+          },
+          {
+            "url": "/assets/vfx/earth/stone-break-sky-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 226.8999999910593
+          },
+          {
+            "url": "/assets/vfx/earth/earthquake-crush-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 227.20000000298023
+          },
+          {
+            "url": "/assets/vfx/earth/stone-throw-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 237.20000000298023
+          },
+          {
+            "url": "/assets/vfx/earth/sand-wind-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 241
+          },
+          {
+            "url": "/assets/vfx/earth/flying-sand-strike-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 250.20000000298023
+          },
+          {
+            "url": "/assets/vfx/earth/dust-storm-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 251.29999999701977
+          },
+          {
+            "url": "/assets/vfx/earth/earth-shield-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 246.5
+          },
+          {
+            "url": "/assets/vfx/earth/rock-wall-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 247.79999999701977
+          },
+          {
+            "url": "/assets/vfx/earth/barrier-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 252.5
+          },
+          {
+            "url": "/assets/vfx/status/burn.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 254.59999999403954
+          },
+          {
+            "url": "/assets/vfx/status/rage.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 255.3999999910593
+          },
+          {
+            "url": "/assets/vfx/status/stun.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 258.5
+          },
+          {
+            "url": "/assets/vfx/status/windwalk.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 259.79999999701977
+          },
+          {
+            "url": "/assets/vfx/status/calm-mind.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 263.3999999910593
+          },
+          {
+            "url": "/assets/vfx/light/yuan-zu-blessing-cast.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 265.69999998807907
+          },
+          {
+            "url": "/assets/vfx/status/freeze.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 279.69999998807907
+          },
+          {
+            "url": "/assets/vfx/status/shield.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 262.90000000596046
+          },
+          {
+            "url": "/assets/vfx/status/earth-shield.webp",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 273.6000000089407
+          },
+          {
+            "url": "/assets/characters/battle_male_fire.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 124.20000000298023
+          },
+          {
+            "url": "/config/monster-portrait-registry.json",
+            "initiatorType": "fetch",
+            "responseStatus": 200,
+            "duration": 105.5
+          },
+          {
+            "url": "/assets/skills/fire-rocket.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 239
+          },
+          {
+            "url": "/assets/skills/fire-flame-slash.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 240.70000000298023
+          },
+          {
+            "url": "/assets/skills/fire-critical.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 240.5
+          },
+          {
+            "url": "/assets/skills/fire-explosive-flurry.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 240.70000000298023
+          },
+          {
+            "url": "/assets/skills/fire-dragon-slash.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 243.6000000089407
+          },
+          {
+            "url": "/assets/skills/fire-blaze-spell.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 243.20000000298023
+          },
+          {
+            "url": "/assets/skills/fire-flame-tornado.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 243.70000000298023
+          },
+          {
+            "url": "/assets/skills/fire-phoenix-cry.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 243.79999999701977
+          },
+          {
+            "url": "/assets/skills/fire-rage.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 244.09999999403954
+          },
+          {
+            "url": "/assets/skills/fire-ex.jpg",
+            "initiatorType": "css",
+            "responseStatus": 200,
+            "duration": 245.30000001192093
+          },
+          {
+            "url": "/assets/characters/battle_female_water.png",
+            "initiatorType": "img",
+            "responseStatus": 200,
+            "duration": 95.59999999403954
+          },
+          {
+            "url": "/build/feature-boss-relic.25e704feb9dd.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 7
+          },
+          {
+            "url": "/build/feature-relic-progression.9eb4fff74856.css",
+            "initiatorType": "link",
+            "responseStatus": 200,
+            "duration": 7.5
+          }
+        ],
+        "documentReady": "complete",
+        "homeActive": true
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "name": "home-top",
+      "rows": [
+        {
+          "text": "江湖旗號",
+          "font": 14.9206725529262,
+          "button": false,
+          "primary": false,
+          "selector": "span.home-banner-label",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "font": 19.455554962158203,
+          "button": false,
+          "primary": false,
+          "selector": "#homeBannerName",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "V173.73",
+          "font": 14.876578537459228,
+          "button": false,
+          "primary": false,
+          "selector": "#homeVersionBadge",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "金幣",
+          "font": 14.872328460216522,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-hud-resources"
+        },
+        {
+          "text": "10000億",
+          "font": 16.013172333499035,
+          "button": false,
+          "primary": false,
+          "selector": "#homeHudGoldValue",
+          "parent": ""
+        },
+        {
+          "text": "經驗池",
+          "font": 14.873050806077861,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-hud-resources"
+        },
+        {
+          "text": "10000億",
+          "font": 16.013173298663403,
+          "button": false,
+          "primary": false,
+          "selector": "#homeHudExpValue",
+          "parent": ""
+        },
+        {
+          "text": "DEV",
+          "font": 14.91555404663086,
+          "button": false,
+          "primary": false,
+          "selector": "span.home-test-label",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "金幣",
+          "font": 17.185470186916223,
+          "button": true,
+          "primary": false,
+          "selector": "#testGoldMillionButton",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "+100萬",
+          "font": 17.18976557649524,
+          "button": true,
+          "primary": false,
+          "selector": "b.",
+          "parent": "testGoldMillionButton"
+        },
+        {
+          "text": "經驗池",
+          "font": 17.151864939722522,
+          "button": true,
+          "primary": false,
+          "selector": "#testExpTenMillionButton",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "+10億",
+          "font": 17.1194677734375,
+          "button": true,
+          "primary": false,
+          "selector": "b.",
+          "parent": "testExpTenMillionButton"
+        },
+        {
+          "text": "角色 3 人",
+          "font": 14.889698028564453,
+          "button": false,
+          "primary": false,
+          "selector": "span.v146-home-roster-count",
+          "parent": ""
+        },
+        {
+          "text": "佈陣",
+          "font": 17.166663275824654,
+          "button": true,
+          "primary": true,
+          "selector": "button.v-fixed-formation-entry",
+          "parent": ""
+        },
+        {
+          "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "font": 17.16666539510091,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877776675754124,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "第二角色長名稱甲乙丙丁",
+          "font": 17.16666539510091,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877776675754124,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "第三角色長名稱甲乙丙丁",
+          "font": 17.16666751437717,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877778512460214,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "角色",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-primary"
+        },
+        {
+          "text": "英雄",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "商店",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-primary"
+        },
+        {
+          "text": "任務",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "秘寶",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-utility team-relic-home-entry"
+        },
+        {
+          "text": "元素匣",
+          "font": 17.216478620256694,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-utility team-element-box-home-entry"
+        },
+        {
+          "text": "鍛造",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "合成",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "成就",
+          "font": 17.16666603088379,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "公告",
+          "font": 17.166664123535156,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "離線經驗",
+          "font": 17.166664123535156,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "系統",
+          "font": 17.166671752929688,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "出城冒險　›",
+          "font": 24.033333047463078,
+          "button": true,
+          "primary": false,
+          "selector": "strong.",
+          "parent": "adventureHomeEntry"
+        },
+        {
+          "text": "江湖主線 · 章節推進",
+          "font": 14.877777600810477,
+          "button": true,
+          "primary": false,
+          "selector": "span.adventure-home-kicker",
+          "parent": "adventureHomeEntry"
+        },
+        {
+          "text": "隊伍秘寶",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "team-relic-loadout-slot"
+        },
+        {
+          "text": "尚未裝備",
+          "font": 16.02222126848388,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "team-relic-loadout-slot"
+        },
+        {
+          "text": "選擇",
+          "font": 17.166668701171876,
+          "button": true,
+          "primary": true,
+          "selector": "button.",
+          "parent": "team-relic-loadout-slot"
+        }
+      ],
+      "controls": [
+        {
+          "label": "金幣 +100萬",
+          "width": 103.49472045898438,
+          "height": 50.355560302734375,
+          "overflow": false
+        },
+        {
+          "label": "經驗池 +10億",
+          "width": 110.53424072265625,
+          "height": 50.355560302734375,
+          "overflow": false
+        },
+        {
+          "label": "佈陣",
+          "width": 61.79998779296875,
+          "height": 50.35552978515625,
+          "overflow": false
+        },
+        {
+          "label": "角色",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "英雄",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "商店",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "任務",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "秘寶",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "元素匣",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "鍛造",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "合成",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "成就",
+          "width": 97.84999084472656,
+          "height": 50.35552978515625,
+          "overflow": false
+        },
+        {
+          "label": "公告",
+          "width": 97.85000610351562,
+          "height": 50.35552978515625,
+          "overflow": false
+        },
+        {
+          "label": "離線經驗",
+          "width": 97.8499755859375,
+          "height": 50.35552978515625,
+          "overflow": false
+        },
+        {
+          "label": "系統",
+          "width": 97.85000610351562,
+          "height": 50.35552978515625,
+          "overflow": false
+        },
+        {
+          "label": "出城冒險　›江湖主線 · 章節推進",
+          "width": 228.88888549804688,
+          "height": 60.11907958984375,
+          "overflow": false
+        },
+        {
+          "label": "選擇",
+          "width": 57.22222900390625,
+          "height": 50.3555908203125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "home-end",
+      "rows": [
+        {
+          "text": "江湖旗號",
+          "font": 14.9206725529262,
+          "button": false,
+          "primary": false,
+          "selector": "span.home-banner-label",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "font": 19.455554962158203,
+          "button": false,
+          "primary": false,
+          "selector": "#homeBannerName",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "V173.73",
+          "font": 14.876578537459228,
+          "button": false,
+          "primary": false,
+          "selector": "#homeVersionBadge",
+          "parent": "home-hud-kicker"
+        },
+        {
+          "text": "金幣",
+          "font": 14.872328460216522,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-hud-resources"
+        },
+        {
+          "text": "10000億",
+          "font": 16.013172333499035,
+          "button": false,
+          "primary": false,
+          "selector": "#homeHudGoldValue",
+          "parent": ""
+        },
+        {
+          "text": "經驗池",
+          "font": 14.873050806077861,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-hud-resources"
+        },
+        {
+          "text": "10000億",
+          "font": 16.013173298663403,
+          "button": false,
+          "primary": false,
+          "selector": "#homeHudExpValue",
+          "parent": ""
+        },
+        {
+          "text": "DEV",
+          "font": 14.91555404663086,
+          "button": false,
+          "primary": false,
+          "selector": "span.home-test-label",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "金幣",
+          "font": 17.185470186916223,
+          "button": true,
+          "primary": false,
+          "selector": "#testGoldMillionButton",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "+100萬",
+          "font": 17.18976557649524,
+          "button": true,
+          "primary": false,
+          "selector": "b.",
+          "parent": "testGoldMillionButton"
+        },
+        {
+          "text": "經驗池",
+          "font": 17.151864939722522,
+          "button": true,
+          "primary": false,
+          "selector": "#testExpTenMillionButton",
+          "parent": "homeTestTools"
+        },
+        {
+          "text": "+10億",
+          "font": 17.1194677734375,
+          "button": true,
+          "primary": false,
+          "selector": "b.",
+          "parent": "testExpTenMillionButton"
+        },
+        {
+          "text": "角色 3 人",
+          "font": 14.889698028564453,
+          "button": false,
+          "primary": false,
+          "selector": "span.v146-home-roster-count",
+          "parent": ""
+        },
+        {
+          "text": "佈陣",
+          "font": 17.166663275824654,
+          "button": true,
+          "primary": true,
+          "selector": "button.v-fixed-formation-entry",
+          "parent": ""
+        },
+        {
+          "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "font": 17.16666539510091,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877776675754124,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "第二角色長名稱甲乙丙丁",
+          "font": 17.16666539510091,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877776675754124,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "第三角色長名稱甲乙丙丁",
+          "font": 17.16666751437717,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "Lv.70",
+          "font": 14.877778512460214,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v146-home-character"
+        },
+        {
+          "text": "HP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "SP",
+          "font": 14.877775573730469,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "home-status-meter"
+        },
+        {
+          "text": "角色",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-primary"
+        },
+        {
+          "text": "英雄",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "商店",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-primary"
+        },
+        {
+          "text": "任務",
+          "font": 17.095329203504196,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "秘寶",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-utility team-relic-home-entry"
+        },
+        {
+          "text": "元素匣",
+          "font": 17.216478620256694,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-utility team-element-box-home-entry"
+        },
+        {
+          "text": "鍛造",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "合成",
+          "font": 17.095325551134476,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-secondary"
+        },
+        {
+          "text": "成就",
+          "font": 17.16666603088379,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "公告",
+          "font": 17.166664123535156,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "離線經驗",
+          "font": 17.166664123535156,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "系統",
+          "font": 17.166671752929688,
+          "button": true,
+          "primary": false,
+          "selector": "span.home-card-label",
+          "parent": "home-card home-card-tertiary"
+        },
+        {
+          "text": "出城冒險　›",
+          "font": 24.033333047463078,
+          "button": true,
+          "primary": false,
+          "selector": "strong.",
+          "parent": "adventureHomeEntry"
+        },
+        {
+          "text": "江湖主線 · 章節推進",
+          "font": 14.877777600810477,
+          "button": true,
+          "primary": false,
+          "selector": "span.adventure-home-kicker",
+          "parent": "adventureHomeEntry"
+        },
+        {
+          "text": "隊伍秘寶",
+          "font": 14.877778053283691,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "team-relic-loadout-slot"
+        },
+        {
+          "text": "尚未裝備",
+          "font": 16.02222126848388,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "team-relic-loadout-slot"
+        },
+        {
+          "text": "選擇",
+          "font": 17.166668701171876,
+          "button": true,
+          "primary": true,
+          "selector": "button.",
+          "parent": "team-relic-loadout-slot"
+        }
+      ],
+      "controls": [
+        {
+          "label": "金幣 +100萬",
+          "width": 103.49472045898438,
+          "height": 50.35554885864258,
+          "overflow": false
+        },
+        {
+          "label": "經驗池 +10億",
+          "width": 110.53424072265625,
+          "height": 50.35554885864258,
+          "overflow": false
+        },
+        {
+          "label": "佈陣",
+          "width": 61.79998779296875,
+          "height": 50.35554504394531,
+          "overflow": false
+        },
+        {
+          "label": "角色",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "英雄",
+          "width": 54.93333435058594,
+          "height": 54.933319091796875,
+          "overflow": false
+        },
+        {
+          "label": "商店",
+          "width": 54.93333435058594,
+          "height": 54.933319091796875,
+          "overflow": false
+        },
+        {
+          "label": "任務",
+          "width": 54.93333435058594,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "秘寶",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "元素匣",
+          "width": 54.933349609375,
+          "height": 54.933319091796875,
+          "overflow": false
+        },
+        {
+          "label": "鍛造",
+          "width": 54.933349609375,
+          "height": 54.933319091796875,
+          "overflow": false
+        },
+        {
+          "label": "合成",
+          "width": 54.933349609375,
+          "height": 54.933349609375,
+          "overflow": false
+        },
+        {
+          "label": "成就",
+          "width": 97.84999084472656,
+          "height": 50.3555908203125,
+          "overflow": false
+        },
+        {
+          "label": "公告",
+          "width": 97.85000610351562,
+          "height": 50.3555908203125,
+          "overflow": false
+        },
+        {
+          "label": "離線經驗",
+          "width": 97.8499755859375,
+          "height": 50.3555908203125,
+          "overflow": false
+        },
+        {
+          "label": "系統",
+          "width": 97.85000610351562,
+          "height": 50.3555908203125,
+          "overflow": false
+        },
+        {
+          "label": "出城冒險　›江湖主線 · 章節推進",
+          "width": 228.88888549804688,
+          "height": 60.11907958984375,
+          "overflow": false
+        },
+        {
+          "label": "選擇",
+          "width": 57.22222900390625,
+          "height": 50.35552978515625,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    }
+  ],
+  "scope": "Clean loader smoke only: actual critical CSS resource200/sheet ready/no old CSS request or CSS HTTP failure, home top/end and DEV/footer geometry without clicks. Prior17-scene dirty-source interaction evidence separately bound by exact hashes; not repeated here. Original local fixture/background sideeffects retained."
+}

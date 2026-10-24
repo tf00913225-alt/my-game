@@ -21,7 +21,7 @@ assert.match(rewardCss,/\.v132-reward-modal \.v17363-preview-group p/);
 assert.match(inventory,/weapon:"hand"/);
 assert.match(inventory,/hand:"hand"/);
 assert.doesNotMatch(inventory,/t==="hand"\?"shoulder"/);
-assert.match(inventory,/裝備比較/);
+assert.match(inventory,/<b>裝備對照<\/b><span>部位・/);
 assert.match(inventory,/未穿戴此部位裝備/);
 assert.match(compareCss,/grid-template-columns:repeat\(2,minmax\(0,1fr\)\)/);
 assert.match(compareCss,/\.v17351-compare-back/);

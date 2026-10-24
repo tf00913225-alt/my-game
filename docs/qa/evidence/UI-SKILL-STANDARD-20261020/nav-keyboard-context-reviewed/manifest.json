@@ -1,0 +1,61 @@
+{
+  "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+  "viewport": [
+    1280,
+    800
+  ],
+  "reportSha256": "fd7b1b0163826f27880485245babf01a1be7f9139537980f9ae0fdddfd892f58",
+  "originalNavOwnersUnchangedSince": "e4966289d0fdf41580363fb835f301b430d182e3",
+  "unchanged": [
+    "js/04-stage-v11-native-bottom-nav-runtime.js",
+    "css/06-stage-v11-native-bottom-nav.css"
+  ],
+  "contexts": [
+    {
+      "name": "training",
+      "page": "trainingPage",
+      "context": "training"
+    },
+    {
+      "name": "training-back-returned",
+      "page": "homePage",
+      "context": "main"
+    },
+    {
+      "name": "gameplay",
+      "page": "gameplayPage",
+      "context": "gameplay:gameplayPage"
+    },
+    {
+      "name": "boss-overview",
+      "page": "bossPage",
+      "context": "gameplay:bossPage"
+    },
+    {
+      "name": "boss-back-returned",
+      "page": "gameplayPage",
+      "context": "gameplay:gameplayPage"
+    },
+    {
+      "name": "tower-overview",
+      "page": "towerPage",
+      "context": "gameplay:towerPage"
+    },
+    {
+      "name": "tower-back-returned",
+      "page": "gameplayPage",
+      "context": "gameplay:gameplayPage"
+    },
+    {
+      "name": "gameplay-back-returned",
+      "page": "homePage",
+      "context": "main"
+    }
+  ],
+  "focusCount": 8,
+  "screenshotCount": 16,
+  "navEventsOnly": true,
+  "productChanges": false,
+  "profileRemoved": true,
+  "runtimeRestoreExact": false
+}

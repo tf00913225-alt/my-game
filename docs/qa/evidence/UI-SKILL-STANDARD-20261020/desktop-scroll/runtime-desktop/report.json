@@ -1,0 +1,304 @@
+{
+  "head": "4f971647f0c4d414b247b9253125b1766823fb01",
+  "dirty": true,
+  "viewport": [
+    1280,
+    800
+  ],
+  "initialStatus": "M asset-manifest.json\n D build/app-shell.0738ef46f913.js\n M build/asset-manifest.json\n M js/01-stage-v8-touch-lock.js\n?? build/app-shell.91a6b568bfaa.js\n?? tests/desktop-mouse-scroll-browser.test.mjs\n?? tests/fixtures/desktop-scroll-gesture.html",
+  "finalStatus": "M asset-manifest.json\n D build/app-shell.0738ef46f913.js\n M build/asset-manifest.json\n M js/01-stage-v8-touch-lock.js\n?? build/app-shell.91a6b568bfaa.js\n?? tests/desktop-mouse-scroll-browser.test.mjs\n?? tests/fixtures/desktop-scroll-gesture.html",
+  "manifestUnchanged": true,
+  "loaded": [
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/boot-core.b447fc7be00c.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/boot-core.31557f65fbf1.css",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.7bc5e1c99233.css",
+    "/build/app-shell.91a6b568bfaa.js",
+    "/build/app-shell.7bc5e1c99233.css",
+    "/build/app-shell.91a6b568bfaa.js",
+    "/build/feature-patrol.0ea855f358ab.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.6491048bbb4f.js",
+    "/build/gameplay-core-secondary.bac5d79470d2.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.fb1c53e85193.css",
+    "/build/feature-patrol.0ea855f358ab.css",
+    "/build/gameplay-core.fb1c53e85193.css",
+    "/build/gameplay-core-primary.6491048bbb4f.js",
+    "/build/gameplay-core-secondary.bac5d79470d2.js",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.0f3635335ca7.js",
+    "/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "scenes": [
+    {
+      "name": "feature-rest",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero-tab-2",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero-tab-3",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-hero-tab-4",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-expPool",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-shop",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-shop-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-shop-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-character",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-character-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-character-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-character-tab-2",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-formation",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-offlineExp",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-quest",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-quest-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-quest-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-achievement",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-announcement",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-system",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-autoBattleSettings",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-synthesis",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-synthesis-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-synthesis-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-synthesis-tab-2",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-forge",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-forge-tab-0",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-forge-tab-1",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "feature-relic",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-home",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-inventoryPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-trainingPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-dungeonPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-gameplayPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-bossPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-towerPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-mapPage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    },
+    {
+      "name": "page-adventurePage",
+      "small": [],
+      "overflow": [],
+      "clippedControls": []
+    }
+  ],
+  "scope": "After presentation only, independent review pending; original isolated fixture and real production loader; no battle or transaction"
+}

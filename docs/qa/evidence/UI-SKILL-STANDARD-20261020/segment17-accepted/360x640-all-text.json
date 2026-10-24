@@ -1,0 +1,1176 @@
+[
+  {
+    "name": "choice-real-end",
+    "rows": [
+      {
+        "text": "秘寶碎片自選",
+        "font": 24,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 14.98179167219736,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "‹ 返回秘寶列表",
+        "font": 15.019479501023689,
+        "button": true,
+        "primary": true,
+        "selector": "button.relic-choice-back",
+        "parent": "relic-choice-page"
+      },
+      {
+        "text": "桃紅階以下秘寶碎片自選箱",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "選擇 25 個專屬碎片",
+        "font": 20,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": ""
+      },
+      {
+        "text": "只能選擇 桃紅階以下、且目前已開放的秘寶；已持有秘寶也可選，碎片會保留。",
+        "font": 14,
+        "button": false,
+        "primary": false,
+        "selector": "p.",
+        "parent": ""
+      },
+      {
+        "text": "回天寶輪",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-pink"
+      },
+      {
+        "text": "桃紅階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-pink"
+      },
+      {
+        "text": "山河寶鼎",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "橙階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "天罡戰旗",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "橙階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "伏魔金印",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "橙階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "赤霄戰紋",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "橙階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-orange"
+      },
+      {
+        "text": "九龍神火罩",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "太初聖符",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "玄冰鏡心",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "岩岳鎮印",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "烈陽神珠",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "破軍殘卷",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "寒泉玉珮",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "焚星殘印",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "鎮魂古鐘",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "紫階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-purple"
+      },
+      {
+        "text": "玄武靈印",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "藍階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "青嵐羽符",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "藍階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "追風行符",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "藍階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "乾坤玉壺",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "藍階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "靈泉法瓶",
+        "font": 15.978947368421052,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "rarity-blue"
+      },
+      {
+        "text": "藍階・碎片 ×25",
+        "font": 13.98157894736842,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "rarity-blue"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.58331298828125,
+        "height": 44.00000762939453,
+        "overflow": false
+      },
+      {
+        "label": "‹ 返回秘寶列表",
+        "width": 124.49479675292969,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "回天寶輪桃紅階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "山河寶鼎橙階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "天罡戰旗橙階・碎片 ×25",
+        "width": 150.5,
+        "height": 76.00000762939453,
+        "overflow": false
+      },
+      {
+        "label": "伏魔金印橙階・碎片 ×25",
+        "width": 150.5,
+        "height": 76.00000762939453,
+        "overflow": false
+      },
+      {
+        "label": "赤霄戰紋橙階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "九龍神火罩紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "太初聖符紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "玄冰鏡心紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "岩岳鎮印紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "烈陽神珠紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "破軍殘卷紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76.00001525878906,
+        "overflow": false
+      },
+      {
+        "label": "寒泉玉珮紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76.00001525878906,
+        "overflow": false
+      },
+      {
+        "label": "焚星殘印紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "鎮魂古鐘紫階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "玄武靈印藍階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "青嵐羽符藍階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "追風行符藍階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "乾坤玉壺藍階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      },
+      {
+        "label": "靈泉法瓶藍階・碎片 ×25",
+        "width": 150.5,
+        "height": 76,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "release-entry-top",
+    "rows": [
+      {
+        "text": "V173.73 四象塔挑戰與鍛造更新",
+        "font": 24.006744604316548,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 15.980487804878049,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "font": 18.005132299270073,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-version",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "以下是本次正式版本更新內容。",
+        "font": 16.00456204379562,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-intro",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "更新內容",
+        "font": 17.004847171532848,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "命中與閃避直接以百分比加減，一般攻擊的最終命中率介於 5%～99%；敏捷主要影響出手速度，裝備與技能的命中、閃避加成更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "角色能力整理為攻擊、智力、體質、能量、防禦與敏捷；能力頁顯示配點及裝備等加總點數，生命與內力仍顯示最大值。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "學會本命技能後可跨修其他元素技能，跨修初學成本加倍、每名角色最多攜帶一招；跨修仍依角色本命元素計算克制。技能學習與升級條件也更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "持續效果統一在每個大回合結束扣除一次，施放當回合即生效並計入持續時間；隱身只淡化立繪，生命條與狀態資訊仍清楚可見。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "四象塔每層固定十名敵人；火、水、風、土各有傷害、治療與控制、閃避與速度、防禦與生命的挑戰特色。小頭目使用單一格位，全體技能可攻擊所有存活敵人。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "圖鑑入口改為鍛造，冶煉移入鍛造且不再消耗設計圖。橙階、紅階與萬象裝備分別提供一、二、三個鑲嵌孔；寶石取得方式與更多鑲嵌功能仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善手動技能選目標、全體技能確認、洪水猛獸方向、當前角色指示與頭目援軍站位；查看戰鬥資訊時，文字與操作不再被技能演出遮住。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "背包、物品詳情與角色頁的排版和捲動更一致；改善首次進入野怪區的導覽、通知紅點，以及開啟背包或物品視窗時的底部導覽遮擋。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "冒險章節的路線、節點說明與成長提示更清楚，從野怪委託返回時會停止巡怪，避免背景再次進入戰鬥；預留旅程仍維持未開放。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "加入已完成的火、風、土元素怪物及水元素野怪立繪，更新部分副本怪物與玩法封面。主城、秘寶與玩法畫面會等待必要圖片準備完成再顯示。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善重新開啟遊戲後的登入接續與帳號資料隔離；需要重新驗證 Google 帳號時可從帳號頁操作。完整雲端存檔與跨手機角色恢復仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "發布時間：2026-10-03",
+        "font": 14.003991788321168,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-published",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "今日不再跳出提醒",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "release-update-suppress-today"
+      },
+      {
+        "text": "我知道了",
+        "font": 16.00456204379562,
+        "button": true,
+        "primary": true,
+        "selector": "button.release-update-primary",
+        "parent": "release-update-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.25,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "我知道了",
+        "width": 274.078125,
+        "height": 52,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "release-full-end",
+    "rows": [
+      {
+        "text": "V173.73 四象塔挑戰與鍛造更新",
+        "font": 24.006744604316548,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 15.980487804878049,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "font": 18.005132299270073,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-version",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "以下是本次正式版本更新內容。",
+        "font": 16.00456204379562,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-intro",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "更新內容",
+        "font": 17.004847171532848,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "命中與閃避直接以百分比加減，一般攻擊的最終命中率介於 5%～99%；敏捷主要影響出手速度，裝備與技能的命中、閃避加成更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "角色能力整理為攻擊、智力、體質、能量、防禦與敏捷；能力頁顯示配點及裝備等加總點數，生命與內力仍顯示最大值。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "學會本命技能後可跨修其他元素技能，跨修初學成本加倍、每名角色最多攜帶一招；跨修仍依角色本命元素計算克制。技能學習與升級條件也更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "持續效果統一在每個大回合結束扣除一次，施放當回合即生效並計入持續時間；隱身只淡化立繪，生命條與狀態資訊仍清楚可見。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "四象塔每層固定十名敵人；火、水、風、土各有傷害、治療與控制、閃避與速度、防禦與生命的挑戰特色。小頭目使用單一格位，全體技能可攻擊所有存活敵人。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "圖鑑入口改為鍛造，冶煉移入鍛造且不再消耗設計圖。橙階、紅階與萬象裝備分別提供一、二、三個鑲嵌孔；寶石取得方式與更多鑲嵌功能仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善手動技能選目標、全體技能確認、洪水猛獸方向、當前角色指示與頭目援軍站位；查看戰鬥資訊時，文字與操作不再被技能演出遮住。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "背包、物品詳情與角色頁的排版和捲動更一致；改善首次進入野怪區的導覽、通知紅點，以及開啟背包或物品視窗時的底部導覽遮擋。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "冒險章節的路線、節點說明與成長提示更清楚，從野怪委託返回時會停止巡怪，避免背景再次進入戰鬥；預留旅程仍維持未開放。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "加入已完成的火、風、土元素怪物及水元素野怪立繪，更新部分副本怪物與玩法封面。主城、秘寶與玩法畫面會等待必要圖片準備完成再顯示。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善重新開啟遊戲後的登入接續與帳號資料隔離；需要重新驗證 Google 帳號時可從帳號頁操作。完整雲端存檔與跨手機角色恢復仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "發布時間：2026-10-03",
+        "font": 14.003991788321168,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-published",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "今日不再跳出提醒",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "release-update-suppress-today"
+      },
+      {
+        "text": "我知道了",
+        "font": 16.00456204379562,
+        "button": true,
+        "primary": true,
+        "selector": "button.release-update-primary",
+        "parent": "release-update-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.25,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "我知道了",
+        "width": 274.078125,
+        "height": 52,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "release-preference-off",
+    "rows": [
+      {
+        "text": "V173.73 四象塔挑戰與鍛造更新",
+        "font": 24.006744604316548,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 15.980487804878049,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "font": 18.005132299270073,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-version",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "以下是本次正式版本更新內容。",
+        "font": 16.00456204379562,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-intro",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "更新內容",
+        "font": 17.004847171532848,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "命中與閃避直接以百分比加減，一般攻擊的最終命中率介於 5%～99%；敏捷主要影響出手速度，裝備與技能的命中、閃避加成更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "角色能力整理為攻擊、智力、體質、能量、防禦與敏捷；能力頁顯示配點及裝備等加總點數，生命與內力仍顯示最大值。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "學會本命技能後可跨修其他元素技能，跨修初學成本加倍、每名角色最多攜帶一招；跨修仍依角色本命元素計算克制。技能學習與升級條件也更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "持續效果統一在每個大回合結束扣除一次，施放當回合即生效並計入持續時間；隱身只淡化立繪，生命條與狀態資訊仍清楚可見。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "四象塔每層固定十名敵人；火、水、風、土各有傷害、治療與控制、閃避與速度、防禦與生命的挑戰特色。小頭目使用單一格位，全體技能可攻擊所有存活敵人。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "圖鑑入口改為鍛造，冶煉移入鍛造且不再消耗設計圖。橙階、紅階與萬象裝備分別提供一、二、三個鑲嵌孔；寶石取得方式與更多鑲嵌功能仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善手動技能選目標、全體技能確認、洪水猛獸方向、當前角色指示與頭目援軍站位；查看戰鬥資訊時，文字與操作不再被技能演出遮住。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "背包、物品詳情與角色頁的排版和捲動更一致；改善首次進入野怪區的導覽、通知紅點，以及開啟背包或物品視窗時的底部導覽遮擋。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "冒險章節的路線、節點說明與成長提示更清楚，從野怪委託返回時會停止巡怪，避免背景再次進入戰鬥；預留旅程仍維持未開放。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "加入已完成的火、風、土元素怪物及水元素野怪立繪，更新部分副本怪物與玩法封面。主城、秘寶與玩法畫面會等待必要圖片準備完成再顯示。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善重新開啟遊戲後的登入接續與帳號資料隔離；需要重新驗證 Google 帳號時可從帳號頁操作。完整雲端存檔與跨手機角色恢復仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "發布時間：2026-10-03",
+        "font": 14.003991788321168,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-published",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "今日不再跳出提醒",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "release-update-suppress-today"
+      },
+      {
+        "text": "我知道了",
+        "font": 16.00456204379562,
+        "button": true,
+        "primary": true,
+        "selector": "button.release-update-primary",
+        "parent": "release-update-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.25,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "我知道了",
+        "width": 274.078125,
+        "height": 52,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "release-reopen-top",
+    "rows": [
+      {
+        "text": "V173.73 四象塔挑戰與鍛造更新",
+        "font": 24.006744604316548,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 15.980487804878049,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "V173.73　四象塔每層十名敵人，新增鍛造入口，並改善命中閃避、技能操作、背包與戰鬥呈現。",
+        "font": 18.005132299270073,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-version",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "以下是本次正式版本更新內容。",
+        "font": 16.00456204379562,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-intro",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "更新內容",
+        "font": 17.004847171532848,
+        "button": false,
+        "primary": false,
+        "selector": "h3.",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "命中與閃避直接以百分比加減，一般攻擊的最終命中率介於 5%～99%；敏捷主要影響出手速度，裝備與技能的命中、閃避加成更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "角色能力整理為攻擊、智力、體質、能量、防禦與敏捷；能力頁顯示配點及裝備等加總點數，生命與內力仍顯示最大值。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "學會本命技能後可跨修其他元素技能，跨修初學成本加倍、每名角色最多攜帶一招；跨修仍依角色本命元素計算克制。技能學習與升級條件也更清楚。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "持續效果統一在每個大回合結束扣除一次，施放當回合即生效並計入持續時間；隱身只淡化立繪，生命條與狀態資訊仍清楚可見。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "四象塔每層固定十名敵人；火、水、風、土各有傷害、治療與控制、閃避與速度、防禦與生命的挑戰特色。小頭目使用單一格位，全體技能可攻擊所有存活敵人。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "圖鑑入口改為鍛造，冶煉移入鍛造且不再消耗設計圖。橙階、紅階與萬象裝備分別提供一、二、三個鑲嵌孔；寶石取得方式與更多鑲嵌功能仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善手動技能選目標、全體技能確認、洪水猛獸方向、當前角色指示與頭目援軍站位；查看戰鬥資訊時，文字與操作不再被技能演出遮住。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "背包、物品詳情與角色頁的排版和捲動更一致；改善首次進入野怪區的導覽、通知紅點，以及開啟背包或物品視窗時的底部導覽遮擋。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "冒險章節的路線、節點說明與成長提示更清楚，從野怪委託返回時會停止巡怪，避免背景再次進入戰鬥；預留旅程仍維持未開放。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "加入已完成的火、風、土元素怪物及水元素野怪立繪，更新部分副本怪物與玩法封面。主城、秘寶與玩法畫面會等待必要圖片準備完成再顯示。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "改善重新開啟遊戲後的登入接續與帳號資料隔離；需要重新驗證 Google 帳號時可從帳號頁操作。完整雲端存檔與跨手機角色恢復仍在開發。",
+        "font": 16.009247350251815,
+        "button": false,
+        "primary": false,
+        "selector": "li.",
+        "parent": "release-update-notes"
+      },
+      {
+        "text": "發布時間：2026-10-03",
+        "font": 14.003991788321168,
+        "button": false,
+        "primary": false,
+        "selector": "p.release-update-published",
+        "parent": "release-update-detail"
+      },
+      {
+        "text": "今日不再跳出提醒",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "release-update-suppress-today"
+      },
+      {
+        "text": "我知道了",
+        "font": 16.00456204379562,
+        "button": true,
+        "primary": true,
+        "selector": "button.release-update-primary",
+        "parent": "release-update-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 68.25,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "我知道了",
+        "width": 274.078125,
+        "height": 52,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

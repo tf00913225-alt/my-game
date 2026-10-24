@@ -1,0 +1,149 @@
+{
+  "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+  "reports": [
+    {
+      "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+      "viewport": "360x640",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\report.json"
+    },
+    {
+      "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+      "viewport": "393x873",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\report.json"
+    },
+    {
+      "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+      "viewport": "412x915",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\report.json"
+    },
+    {
+      "head": "00c5e015bbaa8dd8f0affbddb51c16ef5582c2bd",
+      "viewport": "1280x800",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\report.json"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\360x640\\growth-read-busy.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\growth-read-busy.png",
+      "sha256": "f3245e36af5e338369e151e1fb7cfd798dff255dba02ce0b05c040e0beaa79f8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\360x640\\growth-read-failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\growth-read-failure.png",
+      "sha256": "1dbad8385e52c633bd3374dcd5c6a372ee831a5447c3d7fcedecd69e8206f944"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\360x640\\growth-read-recovered.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\growth-read-recovered.png",
+      "sha256": "ae325979d709061dbb2c6399f46750a2d1a7c041430154b2850d383deab680b4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\360x640\\report.json",
+      "sha256": "ba0ed5e131e58fb5b93fc89341414a6c9ddafa8b4532d1b2984d6a42436ce095"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\393x873\\growth-read-busy.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\growth-read-busy.png",
+      "sha256": "e88c4bf352a08ba81c12c856d4f04955aae6fb903c82c0e3045e82df096b41d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\393x873\\growth-read-failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\growth-read-failure.png",
+      "sha256": "9f57a859b340eec49c615c0a02c592522d65948453bf5a69dbd93e09f4e4203a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\393x873\\growth-read-recovered.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\growth-read-recovered.png",
+      "sha256": "ae0799490a7512cc83009642c4b5c9d9083b0cf380eacfe53b4af422105533b5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\393x873\\report.json",
+      "sha256": "928073de6c1ed85fe3d2bde5d9b96ef1305e0f04d79f924a838b6cd02a2dc596"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\412x915\\growth-read-busy.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\growth-read-busy.png",
+      "sha256": "fde5405093fd539fffc0a2e5d450f17bb1810a5547a9cd2185d501701c34a2bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\412x915\\growth-read-failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\growth-read-failure.png",
+      "sha256": "cc971c2e889560a28bf24ef7b1a179a34307d199740e3d3ad410c3deab2f899a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\412x915\\growth-read-recovered.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\growth-read-recovered.png",
+      "sha256": "0735ffbbd112aef8519d68a9a5a911b237d3360f7505186e25f825dbe9dc95f0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\412x915\\report.json",
+      "sha256": "2349d7e221f069f5a3e37f34ac18df8ec748a9286d0cbc66f92ede34c0aa24e7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\1280x800\\growth-read-busy.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\growth-read-busy.png",
+      "sha256": "c4066e62d58ee988ac8681d2acdf4961ed0f2600a76c02251669bb35e8586f41"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\1280x800\\growth-read-failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\growth-read-failure.png",
+      "sha256": "6a9162fa457e48b39fa80fc40c8d9fb7924761cd34791f530d9e5ec7bb92be6f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\1280x800\\growth-read-recovered.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\growth-read-recovered.png",
+      "sha256": "1a51108513a5f7ca031e6ad42a0d99a8585d9427f86ab3c492b2b227ef3e826a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-00c5e015\\read-states\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\1280x800\\report.json",
+      "sha256": "fd54f7e9e82f850b9e3ce31be4ce6f0ace1595700de29ea53619cbbfa02b0c53"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-ea1b80a8\\read-states\\360x640\\growth-read-busy.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\before-ea1b80a8\\growth-read-busy.png",
+      "sha256": "ba15cc9ef98b895e6bee03beaac43de11d8de5f012dff9d42ef0717ffd093bb9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-ea1b80a8\\read-states\\360x640\\growth-read-failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\before-ea1b80a8\\growth-read-failure.png",
+      "sha256": "450dd24d39ebef1954a21b1e44108b93f87ef85d76f8016ec1f8ab01790ecb5a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-ea1b80a8\\read-states\\360x640\\growth-read-recovered.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\before-ea1b80a8\\growth-read-recovered.png",
+      "sha256": "859f7d30b7bb9379495c5e355fb90992c0b0cb4559cf826af24115fb6a29a1b0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment32b-hero-read-state-ea1b80a8\\read-states\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\before-ea1b80a8\\report.json",
+      "sha256": "b25ec9b917ad23ecc16c0997828a0c9269dd9f7892605570755334019c1824c0"
+    },
+    {
+      "from": "artifacts/segment32b-hero-read-state.mjs.before-busy-copy.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\helpers\\segment32b-hero-read-state.mjs.before-busy-copy.gz",
+      "sha256": "9c5d679e2da2cfbadd48fc85a92f9f9b0e7b9946bc205d5f0ff590713e4f573a"
+    },
+    {
+      "from": "artifacts/run32b-hero-read-state.cjs",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\helpers\\run32b-hero-read-state.cjs",
+      "sha256": "1559040c4d5e037576b177a41c8d5e23da355d45ffdebf7292a4419ece329bdb"
+    },
+    {
+      "from": "artifacts/segment32b-copy-proof.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment32b-read-states-accepted\\helpers\\segment32b-copy-proof.json",
+      "sha256": "c17e78825674978268940723b014833622a4b1f23d4a19bedfe1261ebf487f5a"
+    }
+  ],
+  "helperSha256": "006ce3f659ab05b14806355d3fcacc973cb6bee7f1d56763bdef34911434a90a",
+  "limits": [
+    "Actual held read busy/disabled display, original 503 failure and true original sync retry recovery, four viewport sizes",
+    "These are middle-of-detail read states; no 32B true page-end acceptance, particularly desktop failure lower content is outside capture",
+    "Six restore exact fields; privateHeroCachesExact false remains explicit; no full runtime cache restoration claim",
+    "No unlock/star/reset/equip/claim/purchase/combat/transaction; zero transport mutations in isolated QA"
+  ]
+}

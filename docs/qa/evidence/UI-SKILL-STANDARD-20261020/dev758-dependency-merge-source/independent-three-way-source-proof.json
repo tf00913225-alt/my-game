@@ -1,0 +1,251 @@
+{
+  "ui": "246815098b6d278355d944c107003ce49c933fef",
+  "dev": "758fe75cbdfe66a80a11a36b339fcbc7b6e21126",
+  "base": "190d249ed2dc56b73fac1e50d65e1b794d703645",
+  "rows": [
+    {
+      "p": "js/00-main.js",
+      "mergeStatus": 0,
+      "expectedSha": "7cb93562405b5261edb18a1a96ea1bfa7c494ca5d56b5f9982648d3166d86f7c",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "css/40-v143-combat-dungeon-polish.css",
+      "mergeStatus": 0,
+      "expectedSha": "a68179ad214dcade8805cd9201539b3b8cbae8e81389099def4a6eb8aa7d4f44",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "css/fixed-slot-battlefield-rendering-v2.css",
+      "mergeStatus": 0,
+      "expectedSha": "fac8fe770e72f1bcaad47bfa81b386fb896aad73a1daf96b20c1eea5538eb15d",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "js/54-v173.51-battle-qa.js",
+      "mergeStatus": 0,
+      "expectedSha": "753953401a6f14e72451e2761bd824e6b1174d501b1997b65e655e454417d8b5",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-character-motion-v1.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "2567c5503a9b77d3969479bca88c70779b778cd93aef52c0ad39b1f6d6c3811a",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-layout-vfx-runtime-20260917.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "0f0f9b5927fcce83e69030a2b6472fa3ad8f9913956d4ecf72a7f75a7638b7f8",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-normal-air-shot-20261021.test.js",
+      "expectedFrom": "dev new file",
+      "worktreeExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "tests/battle-portrait-row-clearance-20261020.test.js",
+      "expectedFrom": "dev new file",
+      "worktreeExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "tests/battle-runtime-hot-path-convergence-20260923.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "fbeb202b7a7018cd5f9ac3828c97d1bfe139f1a80f08e6017b4568c0334dd74f",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-status-info-assets-20260922.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "75f27e8203b4a27df3977af036dc56dd7a487077af474374039e370de235fe3f",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-touch-gesture-lifecycle.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "7127bd900d74fba80dc641bf137af69dabd471bbcda4cf66f403fbf6eaa3ac19",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/battle-ui-status-vfx-followup-20260922.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "57130cbb8abb3086f106ab10e58428dffebbec247e63b336521d9c7489334693",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/boot-javascript-compact.test.mjs",
+      "mergeStatus": 0,
+      "expectedSha": "b6dfca4ca52ba595dace818c59621f1893cc72f0e0d76d10759bdde70baedd6b",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/boss-battle-architecture-convergence-20260918.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "b82740539b3d59fa473a4dba4962fdde529265183db3fa649e642c91eab07820",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/cloud-save-immutable-candidate.test.mjs",
+      "mergeStatus": 0,
+      "expectedSha": "221de3c65668a2d640f9785bdd88927be8a9fbf9383874aa950b8d7dba48dcce",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/cloud-save-recovery-artifact-proof.test.mjs",
+      "mergeStatus": 0,
+      "expectedSha": "1159315155e27cd8b71916e519c28d75a65623738fe6e39bfcf60f5a1bdea151",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/enemy-resource-integer-presentation.test.mjs",
+      "mergeStatus": 0,
+      "expectedSha": "ef089f9a1b28ad24743aa87feee1e7820685cc3ee52324913f38bf0a959b4b3c",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/fixed-slot-battlefield-rendering-v2.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "ca37ab995b38d296f216b3900eda5b1f96ae61bc8ba624abba9113ba0c84de25",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/fixed-slot-command-drag-qa.test.mjs",
+      "expectedFrom": "dev new file",
+      "worktreeExact": true,
+      "stagedExact": true
+    },
+    {
+      "p": "tests/remaining-ui-regressions-20260914.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "af7d1ada87de6b9aa0083ec70b3a8a4a43614a9b54eaff90fab1f710e87ae679",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/v154-current-request.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "3b0138bba0f98595df06e1cc5f803a0ab0196d5de45391bac89c77b657381974",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/v174-cardless-battle-browser.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "36aaee65ccb7101ad142a18ffa5f4c595eb555380369b3c5891247f2e66ebea2",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "tests/v174-cardless-battle-presentation.test.js",
+      "mergeStatus": 0,
+      "expectedSha": "5ae8fa7f0c66fc1a3777840e45bc062452484077dcf37cba48d14a5f26a1e815",
+      "worktreeExact": true,
+      "stagedExact": true,
+      "unresolved": false
+    },
+    {
+      "p": "css/00-main.css",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "css/31-v131-fix-batch.css",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/17-stage-v60-training-render-guard.js",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/26-v131-patrol-appearance.js",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/41-v146-system-polish.js",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/42-v148-combat-dungeon-fixes.js",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/59-abyss-two-tier-runtime.js",
+      "expectedFrom": "UI",
+      "worktreeExact": true
+    },
+    {
+      "p": "functions/src/canonical-current-recovery.js",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    },
+    {
+      "p": "functions/src/recovery-audit-artifact.js",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/01-stage-v8-touch-lock.js",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/39-v143-skill-animation.js",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    },
+    {
+      "p": "js/battlefield-render-geometry-adapter.js",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    },
+    {
+      "p": "scripts/build-production.mjs",
+      "expectedFrom": "dev",
+      "worktreeExact": true
+    }
+  ],
+  "limits": "Source-only independent reconstruction. Generated bundles/policies require formal builder and separate verification. No visual or CI approval."
+}

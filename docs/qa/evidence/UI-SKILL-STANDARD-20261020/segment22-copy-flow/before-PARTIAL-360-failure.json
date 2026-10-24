@@ -1,0 +1,2998 @@
+{
+  "message": "Error: end not reached #v132RewardModal\n    at end (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment22-material-catalog.mjs:79:1404)\n    at async endIfNeeded (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment22-material-catalog.mjs:90:338)\n    at async file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment22-material-catalog.mjs:99:354",
+  "head": "2ff75880c1cc1abac938a1b14881df02174b9b0c",
+  "viewport": [
+    360,
+    640
+  ],
+  "touches": [
+    {
+      "selector": "#inventoryNav",
+      "x": 36,
+      "y": 604.3333435058594,
+      "hit": true,
+      "label": "背包\n背包"
+    },
+    {
+      "selector": "#inventoryCategoryTabs [data-filter=\"material\"]",
+      "x": 219.5,
+      "y": 382.3333435058594,
+      "hit": true,
+      "label": "材料"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 50.3984375,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 466.99998474121094,
+      "to": 199.1979217529297,
+      "top": 425,
+      "client": 953,
+      "height": 1379
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 50.3984375,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "x": 115.19792175292969,
+      "y": 442.73439025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 3136,
+      "client": 1056,
+      "height": 4192
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "x": 115.19792175292969,
+      "y": 442.73439025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 179.99740600585938,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 179.99740600585938,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(4)",
+      "x": 244.79689025878906,
+      "y": 442.73439025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 4007,
+      "client": 1056,
+      "height": 5063
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(4)",
+      "x": 244.79689025878906,
+      "y": 442.73439025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(5)",
+      "x": 309.59637451171875,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 124,
+      "client": 1056,
+      "height": 1180
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(5)",
+      "x": 309.59637451171875,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(6)",
+      "x": 50.3984375,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 124,
+      "client": 1056,
+      "height": 1180
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(6)",
+      "x": 50.3984375,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(7)",
+      "x": 115.19792175292969,
+      "y": 507.5364685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 124,
+      "client": 1056,
+      "height": 1180
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(7)",
+      "x": 115.19792175292969,
+      "y": 507.5364685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+      "x": 179.99740600585938,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 6749,
+      "client": 1056,
+      "height": 7805
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+      "x": 179.99740600585938,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+      "x": 244.79689025878906,
+      "y": 507.5364685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+      "x": 244.79689025878906,
+      "y": 507.5364685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(10)",
+      "x": 309.59637451171875,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 2665,
+      "client": 1056,
+      "height": 3721
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(10)",
+      "x": 309.59637451171875,
+      "y": 507.53387451171875,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(11)",
+      "attempt": 0,
+      "up": false
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(11)",
+      "x": 50.3984375,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 1540,
+      "client": 1056,
+      "height": 2596
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(11)",
+      "x": 50.3984375,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(12)",
+      "x": 115.19792175292969,
+      "y": 460.67189025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 466.99998474121094,
+      "to": 199.1979217529297,
+      "top": 3892,
+      "client": 953,
+      "height": 4845
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(12)",
+      "x": 115.19792175292969,
+      "y": 460.67189025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(13)",
+      "x": 179.99740600585938,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 2937,
+      "client": 1056,
+      "height": 3993
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(13)",
+      "x": 179.99740600585938,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(14)",
+      "x": 244.79689025878906,
+      "y": 460.67189025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 1268,
+      "client": 1056,
+      "height": 2324
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(14)",
+      "x": 244.79689025878906,
+      "y": 460.67189025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(15)",
+      "x": 309.59637451171875,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 723,
+      "client": 1056,
+      "height": 1779
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(15)",
+      "x": 309.59637451171875,
+      "y": 460.6692810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(16)",
+      "x": 50.3984375,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 723,
+      "client": 1056,
+      "height": 1779
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(16)",
+      "x": 50.3984375,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(17)",
+      "x": 115.19792175292969,
+      "y": 525.4739685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 723,
+      "client": 1056,
+      "height": 1779
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(17)",
+      "x": 115.19792175292969,
+      "y": 525.4739685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(18)",
+      "x": 179.99740600585938,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 723,
+      "client": 1056,
+      "height": 1779
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(18)",
+      "x": 179.99740600585938,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(19)",
+      "x": 244.79689025878906,
+      "y": 525.4739685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 10876,
+      "client": 1056,
+      "height": 11932
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(19)",
+      "x": 244.79689025878906,
+      "y": 525.4739685058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+      "x": 309.59637451171875,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+      "x": 309.59637451171875,
+      "y": 525.4713745117188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(21)",
+      "attempt": 0,
+      "up": false
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(21)",
+      "x": 50.3984375,
+      "y": 537.6067962646484,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 2991,
+      "client": 1056,
+      "height": 4047
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(21)",
+      "x": 50.3984375,
+      "y": 537.6067962646484,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(22)",
+      "x": 115.19792175292969,
+      "y": 537.6093902587891,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 3264,
+      "client": 1056,
+      "height": 4320
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(22)",
+      "x": 115.19792175292969,
+      "y": 537.6093902587891,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(23)",
+      "x": 179.99740600585938,
+      "y": 537.6067962646484,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 1595,
+      "client": 1056,
+      "height": 2651
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(23)",
+      "x": 179.99740600585938,
+      "y": 537.6067962646484,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(24)",
+      "x": 244.79689025878906,
+      "y": 537.6093902587891,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 1322,
+      "client": 1056,
+      "height": 2378
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(24)",
+      "x": 244.79689025878906,
+      "y": 537.6093902587891,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#v141InventoryPager button[aria-label=\"下一頁\"]",
+      "x": 230,
+      "y": 597,
+      "hit": true,
+      "label": "→"
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "attempt": 0,
+      "up": true
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "attempt": 1,
+      "up": true
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 50.3984375,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 1322,
+      "client": 1056,
+      "height": 2378
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+      "x": 50.3984375,
+      "y": 442.7317810058594,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 180.00000762939453,
+      "y": 479.625,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "x": 115.19792175292969,
+      "y": 442.73439025878906,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemAcquisitionButton",
+      "x": 87.44271469116211,
+      "y": 423.29168701171875,
+      "hit": true,
+      "label": "獲取途徑"
+    }
+  ],
+  "checks": [
+    {
+      "kind": "formal-material-catalog",
+      "formal": [
+        {
+          "id": "relicFragment_qiankun_flask",
+          "name": "乾坤玉壺碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_sun_orb",
+          "name": "烈陽神珠碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_xuanwu_seal",
+          "name": "玄武靈印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_soul_bell",
+          "name": "鎮魂古鐘碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_tiangang_banner",
+          "name": "天罡戰旗碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_nine_dragon_fire",
+          "name": "九龍神火罩碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_cold_spring_jade",
+          "name": "寒泉玉珮碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_qinglan_feather",
+          "name": "青嵐羽符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_rock_mountain_seal",
+          "name": "岩岳鎮印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_returning_wheel",
+          "name": "回天寶輪碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_origin_talisman",
+          "name": "太初聖符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_broken_army_scroll",
+          "name": "破軍殘卷碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_red_sky_war_mark",
+          "name": "赤霄戰紋碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_ice_mirror_heart",
+          "name": "玄冰鏡心碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_wind_chasing_talisman",
+          "name": "追風行符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_mountain_river_cauldron",
+          "name": "山河寶鼎碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_burning_star_mark",
+          "name": "焚星殘印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_spirit_spring_bottle",
+          "name": "靈泉法瓶碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_demon_suppressing_seal",
+          "name": "伏魔金印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_all_returning_array",
+          "name": "萬象歸元盤碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicUniversalFragment",
+          "name": "秘寶通用碎片",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicEssence",
+          "name": "秘寶精華",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicBreakthroughStone",
+          "name": "秘寶突破石",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicChoiceBoxBlue",
+          "name": "藍階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxPurple",
+          "name": "紫階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxOrange",
+          "name": "橙階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxPink",
+          "name": "桃紅階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "gemVitalityI",
+          "name": "體質寶石",
+          "type": "gem",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        }
+      ],
+      "included": [
+        {
+          "id": "relicFragment_all_returning_array",
+          "name": "萬象歸元盤碎片",
+          "uid": "qa22-relicFragment_all_returning_array",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 0
+        },
+        {
+          "id": "relicFragment_returning_wheel",
+          "name": "回天寶輪碎片",
+          "uid": "qa22-relicFragment_returning_wheel",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 1
+        },
+        {
+          "id": "relicChoiceBoxPink",
+          "name": "桃紅階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxPink",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 2
+        },
+        {
+          "id": "relicFragment_tiangang_banner",
+          "name": "天罡戰旗碎片",
+          "uid": "qa22-relicFragment_tiangang_banner",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 3
+        },
+        {
+          "id": "relicFragment_red_sky_war_mark",
+          "name": "赤霄戰紋碎片",
+          "uid": "qa22-relicFragment_red_sky_war_mark",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 4
+        },
+        {
+          "id": "relicFragment_mountain_river_cauldron",
+          "name": "山河寶鼎碎片",
+          "uid": "qa22-relicFragment_mountain_river_cauldron",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 5
+        },
+        {
+          "id": "relicFragment_demon_suppressing_seal",
+          "name": "伏魔金印碎片",
+          "uid": "qa22-relicFragment_demon_suppressing_seal",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 6
+        },
+        {
+          "id": "relicBreakthroughStone",
+          "name": "秘寶突破石",
+          "uid": "qa22-relicBreakthroughStone",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 7
+        },
+        {
+          "id": "relicChoiceBoxOrange",
+          "name": "橙階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxOrange",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 8
+        },
+        {
+          "id": "relicFragment_sun_orb",
+          "name": "烈陽神珠碎片",
+          "uid": "qa22-relicFragment_sun_orb",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 9
+        },
+        {
+          "id": "relicFragment_soul_bell",
+          "name": "鎮魂古鐘碎片",
+          "uid": "qa22-relicFragment_soul_bell",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 10
+        },
+        {
+          "id": "relicFragment_nine_dragon_fire",
+          "name": "九龍神火罩碎片",
+          "uid": "qa22-relicFragment_nine_dragon_fire",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 11
+        },
+        {
+          "id": "relicFragment_cold_spring_jade",
+          "name": "寒泉玉珮碎片",
+          "uid": "qa22-relicFragment_cold_spring_jade",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 12
+        },
+        {
+          "id": "relicFragment_rock_mountain_seal",
+          "name": "岩岳鎮印碎片",
+          "uid": "qa22-relicFragment_rock_mountain_seal",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 13
+        },
+        {
+          "id": "relicFragment_origin_talisman",
+          "name": "太初聖符碎片",
+          "uid": "qa22-relicFragment_origin_talisman",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 14
+        },
+        {
+          "id": "relicFragment_broken_army_scroll",
+          "name": "破軍殘卷碎片",
+          "uid": "qa22-relicFragment_broken_army_scroll",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 15
+        },
+        {
+          "id": "relicFragment_ice_mirror_heart",
+          "name": "玄冰鏡心碎片",
+          "uid": "qa22-relicFragment_ice_mirror_heart",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 16
+        },
+        {
+          "id": "relicFragment_burning_star_mark",
+          "name": "焚星殘印碎片",
+          "uid": "qa22-relicFragment_burning_star_mark",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 17
+        },
+        {
+          "id": "relicUniversalFragment",
+          "name": "秘寶通用碎片",
+          "uid": "qa22-relicUniversalFragment",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 18
+        },
+        {
+          "id": "relicChoiceBoxPurple",
+          "name": "紫階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxPurple",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 19
+        },
+        {
+          "id": "relicFragment_qiankun_flask",
+          "name": "乾坤玉壺碎片",
+          "uid": "qa22-relicFragment_qiankun_flask",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 20
+        },
+        {
+          "id": "relicFragment_xuanwu_seal",
+          "name": "玄武靈印碎片",
+          "uid": "qa22-relicFragment_xuanwu_seal",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 21
+        },
+        {
+          "id": "relicFragment_qinglan_feather",
+          "name": "青嵐羽符碎片",
+          "uid": "qa22-relicFragment_qinglan_feather",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 22
+        },
+        {
+          "id": "relicFragment_wind_chasing_talisman",
+          "name": "追風行符碎片",
+          "uid": "qa22-relicFragment_wind_chasing_talisman",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 23
+        },
+        {
+          "id": "relicFragment_spirit_spring_bottle",
+          "name": "靈泉法瓶碎片",
+          "uid": "qa22-relicFragment_spirit_spring_bottle",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 24
+        },
+        {
+          "id": "relicEssence",
+          "name": "秘寶精華",
+          "uid": "qa22-relicEssence",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 25
+        },
+        {
+          "id": "relicChoiceBoxBlue",
+          "name": "藍階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxBlue",
+          "type": "material",
+          "count": 3
+        }
+      ],
+      "excluded": [
+        {
+          "id": "gemVitalityI",
+          "name": "體質寶石",
+          "type": "gem",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        }
+      ],
+      "note": "No fixed guessed count. Includes every current formal type=material. Tower gem only if its formal type is material. Four choice boxes are material details only; bag use is not the relic-strip choice entry."
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_all_returning_array",
+      "name": "萬象歸元盤碎片",
+      "uid": "qa22-relicFragment_all_returning_array",
+      "selected": 0,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_all_returning_array-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_all_returning_array",
+      "name": "萬象歸元盤碎片",
+      "uid": "qa22-relicFragment_all_returning_array",
+      "selected": 0,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_all_returning_array",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_all_returning_array",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+        "sourceIndex": 0
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_all_returning_array",
+      "name": "萬象歸元盤碎片",
+      "uid": "qa22-relicFragment_all_returning_array",
+      "selected": 0,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_all_returning_array",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_returning_wheel",
+      "name": "回天寶輪碎片",
+      "uid": "qa22-relicFragment_returning_wheel",
+      "selected": 1,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_returning_wheel-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_returning_wheel",
+      "name": "回天寶輪碎片",
+      "uid": "qa22-relicFragment_returning_wheel",
+      "selected": 1,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_returning_wheel",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_returning_wheel",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+        "sourceIndex": 1
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_returning_wheel",
+      "name": "回天寶輪碎片",
+      "uid": "qa22-relicFragment_returning_wheel",
+      "selected": 1,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_returning_wheel",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPink",
+      "name": "桃紅階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPink",
+      "selected": 2,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxPink-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "name": "relicChoiceBoxPink-source-end",
+      "root": "#v132RewardModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPink",
+      "name": "桃紅階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPink",
+      "selected": 2,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+        "sourceIndex": 2
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPink",
+      "name": "桃紅階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPink",
+      "selected": 2,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_tiangang_banner",
+      "name": "天罡戰旗碎片",
+      "uid": "qa22-relicFragment_tiangang_banner",
+      "selected": 3,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_tiangang_banner-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_tiangang_banner",
+      "name": "天罡戰旗碎片",
+      "uid": "qa22-relicFragment_tiangang_banner",
+      "selected": 3,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_tiangang_banner",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_tiangang_banner",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(4)",
+        "sourceIndex": 3
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_tiangang_banner",
+      "name": "天罡戰旗碎片",
+      "uid": "qa22-relicFragment_tiangang_banner",
+      "selected": 3,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_tiangang_banner",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_red_sky_war_mark",
+      "name": "赤霄戰紋碎片",
+      "uid": "qa22-relicFragment_red_sky_war_mark",
+      "selected": 4,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_red_sky_war_mark-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_red_sky_war_mark",
+      "name": "赤霄戰紋碎片",
+      "uid": "qa22-relicFragment_red_sky_war_mark",
+      "selected": 4,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_red_sky_war_mark",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_red_sky_war_mark",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(5)",
+        "sourceIndex": 4
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_red_sky_war_mark",
+      "name": "赤霄戰紋碎片",
+      "uid": "qa22-relicFragment_red_sky_war_mark",
+      "selected": 4,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_red_sky_war_mark",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_mountain_river_cauldron",
+      "name": "山河寶鼎碎片",
+      "uid": "qa22-relicFragment_mountain_river_cauldron",
+      "selected": 5,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_mountain_river_cauldron-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_mountain_river_cauldron",
+      "name": "山河寶鼎碎片",
+      "uid": "qa22-relicFragment_mountain_river_cauldron",
+      "selected": 5,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_mountain_river_cauldron",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_mountain_river_cauldron",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(6)",
+        "sourceIndex": 5
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_mountain_river_cauldron",
+      "name": "山河寶鼎碎片",
+      "uid": "qa22-relicFragment_mountain_river_cauldron",
+      "selected": 5,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_mountain_river_cauldron",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_demon_suppressing_seal",
+      "name": "伏魔金印碎片",
+      "uid": "qa22-relicFragment_demon_suppressing_seal",
+      "selected": 6,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_demon_suppressing_seal-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_demon_suppressing_seal",
+      "name": "伏魔金印碎片",
+      "uid": "qa22-relicFragment_demon_suppressing_seal",
+      "selected": 6,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_demon_suppressing_seal",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_demon_suppressing_seal",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(7)",
+        "sourceIndex": 6
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_demon_suppressing_seal",
+      "name": "伏魔金印碎片",
+      "uid": "qa22-relicFragment_demon_suppressing_seal",
+      "selected": 6,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_demon_suppressing_seal",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicBreakthroughStone",
+      "name": "秘寶突破石",
+      "uid": "qa22-relicBreakthroughStone",
+      "selected": 7,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicBreakthroughStone-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicBreakthroughStone",
+      "name": "秘寶突破石",
+      "uid": "qa22-relicBreakthroughStone",
+      "selected": 7,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+        "sourceIndex": 7
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicBreakthroughStone",
+      "name": "秘寶突破石",
+      "uid": "qa22-relicBreakthroughStone",
+      "selected": 7,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxOrange",
+      "name": "橙階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxOrange",
+      "selected": 8,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxOrange-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "name": "relicChoiceBoxOrange-source-end",
+      "root": "#v132RewardModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxOrange",
+      "name": "橙階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxOrange",
+      "selected": 8,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+        "sourceIndex": 8
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxOrange",
+      "name": "橙階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxOrange",
+      "selected": 8,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_sun_orb",
+      "name": "烈陽神珠碎片",
+      "uid": "qa22-relicFragment_sun_orb",
+      "selected": 9,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_sun_orb-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_sun_orb",
+      "name": "烈陽神珠碎片",
+      "uid": "qa22-relicFragment_sun_orb",
+      "selected": 9,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_sun_orb",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_sun_orb",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(10)",
+        "sourceIndex": 9
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_sun_orb",
+      "name": "烈陽神珠碎片",
+      "uid": "qa22-relicFragment_sun_orb",
+      "selected": 9,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_sun_orb",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_soul_bell",
+      "name": "鎮魂古鐘碎片",
+      "uid": "qa22-relicFragment_soul_bell",
+      "selected": 10,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_soul_bell-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_soul_bell",
+      "name": "鎮魂古鐘碎片",
+      "uid": "qa22-relicFragment_soul_bell",
+      "selected": 10,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_soul_bell",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_soul_bell",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(11)",
+        "sourceIndex": 10
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_soul_bell",
+      "name": "鎮魂古鐘碎片",
+      "uid": "qa22-relicFragment_soul_bell",
+      "selected": 10,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_soul_bell",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_nine_dragon_fire",
+      "name": "九龍神火罩碎片",
+      "uid": "qa22-relicFragment_nine_dragon_fire",
+      "selected": 11,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_nine_dragon_fire-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_nine_dragon_fire",
+      "name": "九龍神火罩碎片",
+      "uid": "qa22-relicFragment_nine_dragon_fire",
+      "selected": 11,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_nine_dragon_fire",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_nine_dragon_fire",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(12)",
+        "sourceIndex": 11
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_nine_dragon_fire",
+      "name": "九龍神火罩碎片",
+      "uid": "qa22-relicFragment_nine_dragon_fire",
+      "selected": 11,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_nine_dragon_fire",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_cold_spring_jade",
+      "name": "寒泉玉珮碎片",
+      "uid": "qa22-relicFragment_cold_spring_jade",
+      "selected": 12,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_cold_spring_jade-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_cold_spring_jade",
+      "name": "寒泉玉珮碎片",
+      "uid": "qa22-relicFragment_cold_spring_jade",
+      "selected": 12,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_cold_spring_jade",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_cold_spring_jade",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(13)",
+        "sourceIndex": 12
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_cold_spring_jade",
+      "name": "寒泉玉珮碎片",
+      "uid": "qa22-relicFragment_cold_spring_jade",
+      "selected": 12,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_cold_spring_jade",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_rock_mountain_seal",
+      "name": "岩岳鎮印碎片",
+      "uid": "qa22-relicFragment_rock_mountain_seal",
+      "selected": 13,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_rock_mountain_seal-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_rock_mountain_seal",
+      "name": "岩岳鎮印碎片",
+      "uid": "qa22-relicFragment_rock_mountain_seal",
+      "selected": 13,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_rock_mountain_seal",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_rock_mountain_seal",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(14)",
+        "sourceIndex": 13
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_rock_mountain_seal",
+      "name": "岩岳鎮印碎片",
+      "uid": "qa22-relicFragment_rock_mountain_seal",
+      "selected": 13,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_rock_mountain_seal",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_origin_talisman",
+      "name": "太初聖符碎片",
+      "uid": "qa22-relicFragment_origin_talisman",
+      "selected": 14,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_origin_talisman-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_origin_talisman",
+      "name": "太初聖符碎片",
+      "uid": "qa22-relicFragment_origin_talisman",
+      "selected": 14,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_origin_talisman",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_origin_talisman",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(15)",
+        "sourceIndex": 14
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_origin_talisman",
+      "name": "太初聖符碎片",
+      "uid": "qa22-relicFragment_origin_talisman",
+      "selected": 14,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_origin_talisman",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_broken_army_scroll",
+      "name": "破軍殘卷碎片",
+      "uid": "qa22-relicFragment_broken_army_scroll",
+      "selected": 15,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_broken_army_scroll-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_broken_army_scroll",
+      "name": "破軍殘卷碎片",
+      "uid": "qa22-relicFragment_broken_army_scroll",
+      "selected": 15,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_broken_army_scroll",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_broken_army_scroll",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(16)",
+        "sourceIndex": 15
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_broken_army_scroll",
+      "name": "破軍殘卷碎片",
+      "uid": "qa22-relicFragment_broken_army_scroll",
+      "selected": 15,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_broken_army_scroll",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_ice_mirror_heart",
+      "name": "玄冰鏡心碎片",
+      "uid": "qa22-relicFragment_ice_mirror_heart",
+      "selected": 16,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_ice_mirror_heart-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_ice_mirror_heart",
+      "name": "玄冰鏡心碎片",
+      "uid": "qa22-relicFragment_ice_mirror_heart",
+      "selected": 16,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_ice_mirror_heart",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_ice_mirror_heart",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(17)",
+        "sourceIndex": 16
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_ice_mirror_heart",
+      "name": "玄冰鏡心碎片",
+      "uid": "qa22-relicFragment_ice_mirror_heart",
+      "selected": 16,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_ice_mirror_heart",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_burning_star_mark",
+      "name": "焚星殘印碎片",
+      "uid": "qa22-relicFragment_burning_star_mark",
+      "selected": 17,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_burning_star_mark-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_burning_star_mark",
+      "name": "焚星殘印碎片",
+      "uid": "qa22-relicFragment_burning_star_mark",
+      "selected": 17,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_burning_star_mark",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_burning_star_mark",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(18)",
+        "sourceIndex": 17
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_burning_star_mark",
+      "name": "焚星殘印碎片",
+      "uid": "qa22-relicFragment_burning_star_mark",
+      "selected": 17,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_burning_star_mark",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicUniversalFragment",
+      "name": "秘寶通用碎片",
+      "uid": "qa22-relicUniversalFragment",
+      "selected": 18,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicUniversalFragment-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicUniversalFragment",
+      "name": "秘寶通用碎片",
+      "uid": "qa22-relicUniversalFragment",
+      "selected": 18,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicUniversalFragment",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicUniversalFragment",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(19)",
+        "sourceIndex": 18
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicUniversalFragment",
+      "name": "秘寶通用碎片",
+      "uid": "qa22-relicUniversalFragment",
+      "selected": 18,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicUniversalFragment",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPurple",
+      "name": "紫階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPurple",
+      "selected": 19,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxPurple-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "name": "relicChoiceBoxPurple-source-end",
+      "root": "#v132RewardModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPurple",
+      "name": "紫階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPurple",
+      "selected": 19,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+        "sourceIndex": 19
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPurple",
+      "name": "紫階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPurple",
+      "selected": 19,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qiankun_flask",
+      "name": "乾坤玉壺碎片",
+      "uid": "qa22-relicFragment_qiankun_flask",
+      "selected": 20,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_qiankun_flask-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qiankun_flask",
+      "name": "乾坤玉壺碎片",
+      "uid": "qa22-relicFragment_qiankun_flask",
+      "selected": 20,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_qiankun_flask",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_qiankun_flask",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(21)",
+        "sourceIndex": 20
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qiankun_flask",
+      "name": "乾坤玉壺碎片",
+      "uid": "qa22-relicFragment_qiankun_flask",
+      "selected": 20,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_qiankun_flask",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_xuanwu_seal",
+      "name": "玄武靈印碎片",
+      "uid": "qa22-relicFragment_xuanwu_seal",
+      "selected": 21,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_xuanwu_seal-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_xuanwu_seal",
+      "name": "玄武靈印碎片",
+      "uid": "qa22-relicFragment_xuanwu_seal",
+      "selected": 21,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_xuanwu_seal",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_xuanwu_seal",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(22)",
+        "sourceIndex": 21
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_xuanwu_seal",
+      "name": "玄武靈印碎片",
+      "uid": "qa22-relicFragment_xuanwu_seal",
+      "selected": 21,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_xuanwu_seal",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qinglan_feather",
+      "name": "青嵐羽符碎片",
+      "uid": "qa22-relicFragment_qinglan_feather",
+      "selected": 22,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_qinglan_feather-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qinglan_feather",
+      "name": "青嵐羽符碎片",
+      "uid": "qa22-relicFragment_qinglan_feather",
+      "selected": 22,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_qinglan_feather",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_qinglan_feather",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(23)",
+        "sourceIndex": 22
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_qinglan_feather",
+      "name": "青嵐羽符碎片",
+      "uid": "qa22-relicFragment_qinglan_feather",
+      "selected": 22,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_qinglan_feather",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_wind_chasing_talisman",
+      "name": "追風行符碎片",
+      "uid": "qa22-relicFragment_wind_chasing_talisman",
+      "selected": 23,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_wind_chasing_talisman-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_wind_chasing_talisman",
+      "name": "追風行符碎片",
+      "uid": "qa22-relicFragment_wind_chasing_talisman",
+      "selected": 23,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_wind_chasing_talisman",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_wind_chasing_talisman",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(24)",
+        "sourceIndex": 23
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_wind_chasing_talisman",
+      "name": "追風行符碎片",
+      "uid": "qa22-relicFragment_wind_chasing_talisman",
+      "selected": 23,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_wind_chasing_talisman",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_spirit_spring_bottle",
+      "name": "靈泉法瓶碎片",
+      "uid": "qa22-relicFragment_spirit_spring_bottle",
+      "selected": 24,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicFragment_spirit_spring_bottle-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_spirit_spring_bottle",
+      "name": "靈泉法瓶碎片",
+      "uid": "qa22-relicFragment_spirit_spring_bottle",
+      "selected": 24,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_spirit_spring_bottle",
+      "sourceReturn": "same detail confirmed"
+    },
+    {
+      "id": "relicFragment_spirit_spring_bottle",
+      "bagReturn": {
+        "page": 1,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(1)",
+        "sourceIndex": 24
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicFragment_spirit_spring_bottle",
+      "name": "靈泉法瓶碎片",
+      "uid": "qa22-relicFragment_spirit_spring_bottle",
+      "selected": 24,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "id": "relicFragment_spirit_spring_bottle",
+      "reopened": true
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicEssence",
+      "name": "秘寶精華",
+      "uid": "qa22-relicEssence",
+      "selected": 25,
+      "description": "沒有額外能力加成。\n售價：0 金幣"
+    },
+    {
+      "name": "relicEssence-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    }
+  ],
+  "scenes": [
+    "relicFragment_all_returning_array-detail-top",
+    "relicFragment_all_returning_array-source-top",
+    "relicFragment_all_returning_array-source-end",
+    "relicFragment_returning_wheel-detail-top",
+    "relicFragment_returning_wheel-source-top",
+    "relicFragment_returning_wheel-source-end",
+    "relicChoiceBoxPink-detail-top",
+    "relicChoiceBoxPink-source-top",
+    "relicFragment_tiangang_banner-detail-top",
+    "relicFragment_tiangang_banner-source-top",
+    "relicFragment_tiangang_banner-source-end",
+    "relicFragment_red_sky_war_mark-detail-top",
+    "relicFragment_red_sky_war_mark-source-top",
+    "relicFragment_red_sky_war_mark-source-end",
+    "relicFragment_mountain_river_cauldron-detail-top",
+    "relicFragment_mountain_river_cauldron-source-top",
+    "relicFragment_mountain_river_cauldron-source-end",
+    "relicFragment_demon_suppressing_seal-detail-top",
+    "relicFragment_demon_suppressing_seal-source-top",
+    "relicFragment_demon_suppressing_seal-source-end",
+    "relicBreakthroughStone-detail-top",
+    "relicBreakthroughStone-source-top",
+    "relicBreakthroughStone-source-end",
+    "relicChoiceBoxOrange-detail-top",
+    "relicChoiceBoxOrange-source-top",
+    "relicFragment_sun_orb-detail-top",
+    "relicFragment_sun_orb-source-top",
+    "relicFragment_sun_orb-source-end",
+    "relicFragment_soul_bell-detail-top",
+    "relicFragment_soul_bell-source-top",
+    "relicFragment_soul_bell-source-end",
+    "relicFragment_nine_dragon_fire-detail-top",
+    "relicFragment_nine_dragon_fire-source-top",
+    "relicFragment_nine_dragon_fire-source-end",
+    "relicFragment_cold_spring_jade-detail-top",
+    "relicFragment_cold_spring_jade-source-top",
+    "relicFragment_cold_spring_jade-source-end",
+    "relicFragment_rock_mountain_seal-detail-top",
+    "relicFragment_rock_mountain_seal-source-top",
+    "relicFragment_rock_mountain_seal-source-end",
+    "relicFragment_origin_talisman-detail-top",
+    "relicFragment_origin_talisman-source-top",
+    "relicFragment_origin_talisman-source-end",
+    "relicFragment_broken_army_scroll-detail-top",
+    "relicFragment_broken_army_scroll-source-top",
+    "relicFragment_broken_army_scroll-source-end",
+    "relicFragment_ice_mirror_heart-detail-top",
+    "relicFragment_ice_mirror_heart-source-top",
+    "relicFragment_ice_mirror_heart-source-end",
+    "relicFragment_burning_star_mark-detail-top",
+    "relicFragment_burning_star_mark-source-top",
+    "relicFragment_burning_star_mark-source-end",
+    "relicUniversalFragment-detail-top",
+    "relicUniversalFragment-source-top",
+    "relicUniversalFragment-source-end",
+    "relicChoiceBoxPurple-detail-top",
+    "relicChoiceBoxPurple-source-top",
+    "relicFragment_qiankun_flask-detail-top",
+    "relicFragment_qiankun_flask-source-top",
+    "relicFragment_qiankun_flask-source-end",
+    "relicFragment_xuanwu_seal-detail-top",
+    "relicFragment_xuanwu_seal-source-top",
+    "relicFragment_xuanwu_seal-source-end",
+    "relicFragment_qinglan_feather-detail-top",
+    "relicFragment_qinglan_feather-source-top",
+    "relicFragment_qinglan_feather-source-end",
+    "relicFragment_wind_chasing_talisman-detail-top",
+    "relicFragment_wind_chasing_talisman-source-top",
+    "relicFragment_wind_chasing_talisman-source-end",
+    "relicFragment_spirit_spring_bottle-detail-top",
+    "relicFragment_spirit_spring_bottle-source-top",
+    "relicFragment_spirit_spring_bottle-source-end",
+    "relicEssence-detail-top",
+    "relicEssence-source-top"
+  ]
+}

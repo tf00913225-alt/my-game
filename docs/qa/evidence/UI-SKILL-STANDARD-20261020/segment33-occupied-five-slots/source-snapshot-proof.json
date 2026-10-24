@@ -1,0 +1,53 @@
+{
+  "reports": [
+    {
+      "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+      "viewport": "360x640",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\360x640\\report.json"
+    },
+    {
+      "head": "eaac1b0d33937919b91c03baa9c9867adcd72f88",
+      "viewport": "393x873",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\393x873\\report.json"
+    },
+    {
+      "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+      "viewport": "412x915",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\412x915\\report.json"
+    },
+    {
+      "head": "ba993e5de98b8712b595f1736e7a875bdb7613a4",
+      "viewport": "1280x800",
+      "report": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment33-occupied-five-slots\\1280x800\\report.json"
+    }
+  ],
+  "allCapturedProductHashesIdentical": true,
+  "hashes": {
+    "index.html": "bb7aa98fbc53c4323459f98b3f3025bb5738d188c29030cb89734026e4530fab",
+    "asset-manifest.json": "1bf4c58ef955d60842b9919abbc36a4cc905133416e26f27a88b258895117a36",
+    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "build/app-shell.5e2c273826d7.js": "5e2c273826d7a6d89e9388cec53f7a3ab81298b9d173c1fdfe695492fd73d829",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.4b747ff613ae.js": "4b747ff613ae33d82668a7f8f08adbe5029b53586c684d82d8768afaa0a175ae",
+    "build/gameplay-core-secondary.f18ec0c8c58f.js": "f18ec0c8c58f2e82ffc099666dc44aeb1854d3aafbe6d13be9eb515e220e04c5",
+    "build/gameplay-core.98f3502bd4a4.css": "98f3502bd4a4b3622e154496aefe542b04785a660ad0e639847f09d83129a986"
+  },
+  "headDifference": " ...LL-STANDARD-20261020-skill-parity-dependency.md |   9 +\n .../compare-loadout-parity-records.cjs             |   4 +\n .../import-proof.json                              |  61 +++++\n .../parity-dev190-records.json.gz                  | Bin 0 -> 235287 bytes\n .../parity-diff-classification.json                | 275 +++++++++++++++++++++\n .../parity-ui89-records.json.gz                    | Bin 0 -> 235540 bytes\n .../parity-ui89-vs-dev190-proof.json               |  19 ++\n .../record-loadout-parity.mjs                      |   6 +\n .../segment25-copy-byte-proof.json                 |  30 +++\n .../skill-parity-update-scope-review.md            |   7 +\n tests/cloud-save-skill-loadout-policy.test.mjs     |   2 +-\n tests/fixtures/skill-loadout-runtime-v1.json       |   8 +-\n 12 files changed, 419 insertions(+), 2 deletions(-)\n"
+}

@@ -1,0 +1,78 @@
+[
+  {
+    "text": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+    "name": {
+      "x": 10,
+      "y": 213.890625,
+      "width": 108,
+      "height": 67.5,
+      "top": 213.890625,
+      "right": 118,
+      "bottom": 281.390625,
+      "left": 10
+    },
+    "ink": {
+      "x": 10,
+      "y": 214.22396850585938,
+      "width": 105,
+      "height": 66.66665649414062,
+      "top": 214.22396850585938,
+      "right": 115,
+      "bottom": 280.890625,
+      "left": 10
+    },
+    "card": {
+      "x": 10,
+      "y": 210.890625,
+      "width": 108,
+      "height": 129.5,
+      "top": 210.890625,
+      "right": 118,
+      "bottom": 340.390625,
+      "left": 10
+    },
+    "nameWhiteSpace": "normal",
+    "wrap": "anywhere",
+    "level": "Lv.70",
+    "levelWhiteSpace": "nowrap",
+    "overflow": false
+  },
+  {
+    "text": "LongCharacterName",
+    "name": {
+      "x": 126,
+      "y": 216.703125,
+      "width": 108,
+      "height": 45,
+      "top": 216.703125,
+      "right": 234,
+      "bottom": 261.703125,
+      "left": 126
+    },
+    "ink": {
+      "x": 126,
+      "y": 217.03646850585938,
+      "width": 101.8125,
+      "height": 44.166656494140625,
+      "top": 217.03646850585938,
+      "right": 227.8125,
+      "bottom": 261.203125,
+      "left": 126
+    },
+    "card": {
+      "x": 126,
+      "y": 210.890625,
+      "width": 108,
+      "height": 129.5,
+      "top": 210.890625,
+      "right": 234,
+      "bottom": 340.390625,
+      "left": 126
+    },
+    "nameWhiteSpace": "normal",
+    "wrap": "anywhere",
+    "level": "Lv.70",
+    "levelWhiteSpace": "nowrap",
+    "overflow": false
+  }
+]

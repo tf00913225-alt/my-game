@@ -1,0 +1,910 @@
+[
+  {
+    "name": "home-top",
+    "rows": [
+      {
+        "text": "江湖旗號",
+        "font": 13.037481989179339,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-banner-label",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "#homeBannerName",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "V173.73",
+        "font": 12.998953475165612,
+        "button": false,
+        "primary": false,
+        "selector": "#homeVersionBadge",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "金幣",
+        "font": 12.995239645242691,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "10000億",
+        "font": 13.992094016936887,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudGoldValue",
+        "parent": ""
+      },
+      {
+        "text": "經驗池",
+        "font": 12.995867971646582,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "10000億",
+        "font": 13.99208822595068,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudExpValue",
+        "parent": ""
+      },
+      {
+        "text": "DEV",
+        "font": 13.0330078125,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-test-label",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "金幣",
+        "font": 15.016433040154377,
+        "button": true,
+        "primary": false,
+        "selector": "#testGoldMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+100萬",
+        "font": 15.020179495906198,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testGoldMillionButton"
+      },
+      {
+        "text": "經驗池",
+        "font": 14.987068176269531,
+        "button": true,
+        "primary": false,
+        "selector": "#testExpTenMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+10億",
+        "font": 14.958753662109375,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testExpTenMillionButton"
+      },
+      {
+        "text": "角色 3 人",
+        "font": 13.010416984558105,
+        "button": false,
+        "primary": false,
+        "selector": "span.v146-home-roster-count",
+        "parent": ""
+      },
+      {
+        "text": "佈陣",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.v-fixed-formation-entry",
+        "parent": ""
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "第二角色長名稱甲乙丙丁",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "第三角色長名稱甲乙丙丁",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "角色",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "英雄",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "商店",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "任務",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "秘寶",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-relic-home-entry"
+      },
+      {
+        "text": "元素匣",
+        "font": 15.043530055454799,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-element-box-home-entry"
+      },
+      {
+        "text": "鍛造",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "合成",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "成就",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "公告",
+        "font": 15.000003814697266,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "離線經驗",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "系統",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "出城冒險　›",
+        "font": 21.000000584734618,
+        "button": true,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "江湖主線 · 章節推進",
+        "font": 13.000000361978573,
+        "button": true,
+        "primary": false,
+        "selector": "span.adventure-home-kicker",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "隊伍秘寶",
+        "font": 13.000000953674316,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "尚未裝備",
+        "font": 14.000000322693424,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "選擇",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-loadout-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "金幣 +100萬",
+        "width": 90.43229675292969,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "經驗池 +10億",
+        "width": 96.58332824707031,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "佈陣",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "角色",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "英雄",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "商店",
+        "width": 48,
+        "height": 48.000030517578125,
+        "overflow": false
+      },
+      {
+        "label": "任務",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "秘寶",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "元素匣",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "鍛造",
+        "width": 48,
+        "height": 48.000030517578125,
+        "overflow": false
+      },
+      {
+        "label": "合成",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "成就",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "公告",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "離線經驗",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "系統",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "出城冒險　›江湖主線 · 章節推進",
+        "width": 200,
+        "height": 52.53125,
+        "overflow": false
+      },
+      {
+        "label": "選擇",
+        "width": 50,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "home-end",
+    "rows": [
+      {
+        "text": "江湖旗號",
+        "font": 13.037481989179339,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-banner-label",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17,
+        "button": false,
+        "primary": false,
+        "selector": "#homeBannerName",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "V173.73",
+        "font": 12.998953475165612,
+        "button": false,
+        "primary": false,
+        "selector": "#homeVersionBadge",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "金幣",
+        "font": 12.995239645242691,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "10000億",
+        "font": 13.992094016936887,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudGoldValue",
+        "parent": ""
+      },
+      {
+        "text": "經驗池",
+        "font": 12.995867971646582,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "10000億",
+        "font": 13.99208822595068,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudExpValue",
+        "parent": ""
+      },
+      {
+        "text": "DEV",
+        "font": 13.0330078125,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-test-label",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "金幣",
+        "font": 15.016433040154377,
+        "button": true,
+        "primary": false,
+        "selector": "#testGoldMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+100萬",
+        "font": 15.020179495906198,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testGoldMillionButton"
+      },
+      {
+        "text": "經驗池",
+        "font": 14.987068176269531,
+        "button": true,
+        "primary": false,
+        "selector": "#testExpTenMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+10億",
+        "font": 14.958753662109375,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testExpTenMillionButton"
+      },
+      {
+        "text": "角色 3 人",
+        "font": 13.010416984558105,
+        "button": false,
+        "primary": false,
+        "selector": "span.v146-home-roster-count",
+        "parent": ""
+      },
+      {
+        "text": "佈陣",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.v-fixed-formation-entry",
+        "parent": ""
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "第二角色長名稱甲乙丙丁",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "第三角色長名稱甲乙丙丁",
+        "font": 15,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 13,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "角色",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "英雄",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "商店",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "任務",
+        "font": 14.937667136496687,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "秘寶",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-relic-home-entry"
+      },
+      {
+        "text": "元素匣",
+        "font": 15.043530055454799,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-element-box-home-entry"
+      },
+      {
+        "text": "鍛造",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "合成",
+        "font": 14.937666223404255,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "成就",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "公告",
+        "font": 15.000003814697266,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "離線經驗",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "系統",
+        "font": 15,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "出城冒險　›",
+        "font": 21.000000584734618,
+        "button": true,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "江湖主線 · 章節推進",
+        "font": 13.000000361978573,
+        "button": true,
+        "primary": false,
+        "selector": "span.adventure-home-kicker",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "隊伍秘寶",
+        "font": 13.000000953674316,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "尚未裝備",
+        "font": 14.000000322693424,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "選擇",
+        "font": 15,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-loadout-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "金幣 +100萬",
+        "width": 90.43229675292969,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "經驗池 +10億",
+        "width": 96.58332824707031,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "佈陣",
+        "width": 54,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "角色",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "英雄",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "商店",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "任務",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "秘寶",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "元素匣",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "鍛造",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "合成",
+        "width": 48,
+        "height": 48,
+        "overflow": false
+      },
+      {
+        "label": "成就",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "公告",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "離線經驗",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "系統",
+        "width": 85.5,
+        "height": 44,
+        "overflow": false
+      },
+      {
+        "label": "出城冒險　›江湖主線 · 章節推進",
+        "width": 200,
+        "height": 52.53125,
+        "overflow": false
+      },
+      {
+        "label": "選擇",
+        "width": 50,
+        "height": 44,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

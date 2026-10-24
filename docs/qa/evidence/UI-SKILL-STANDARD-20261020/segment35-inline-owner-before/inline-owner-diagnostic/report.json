@@ -1,0 +1,904 @@
+{
+  "head": "eb5a180bc89a7b92e167ce68b4729a013efe3f42",
+  "viewport": [
+    360,
+    640
+  ],
+  "complete": false,
+  "clean": true,
+  "sourceBefore": {
+    "index.html": "5b979921838b14e8a737eab312bf119aeb1277a29380fd8ea5ff316f912d28eb",
+    "asset-manifest.json": "4cc255f009e27b671627fa32bb86672af86115931e3c485efd0feb36c99723b5",
+    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "build/app-shell.5e2c273826d7.js": "5e2c273826d7a6d89e9388cec53f7a3ab81298b9d173c1fdfe695492fd73d829",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.aa47a62134df.css": "aa47a62134df48c43a357ac8259b0ee63e5a12b21c68a1ce8f328111194c1bfe",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.f5453e704d5f.js": "f5453e704d5fa56860af9ba0221fc073194df3dff9f80868992acf7f39880493",
+    "build/gameplay-core-secondary.1c4baa12cb83.js": "1c4baa12cb83ce6e5744c4399f3fa8718305a644bcec916221f30c3e9aa16c4c",
+    "build/gameplay-core.af5892190f1c.css": "af5892190f1cdfd5e71d57bfbaff1020029cb33db961a0980a1412b31695d35f"
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.b447fc7be00c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/app-shell.5e2c273826d7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/app-shell.725d1d00b39e.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/app-shell.725d1d00b39e.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/app-shell.5e2c273826d7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-patrol.1cef20d37f82.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core-primary.f5453e704d5f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core-secondary.1c4baa12cb83.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-patrol.1cef20d37f82.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core-primary.f5453e704d5f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/gameplay-core-secondary.1c4baa12cb83.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:58143/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    }
+  ],
+  "inputs": [
+    {
+      "selector": "#trainingNav",
+      "x": 108,
+      "y": 604.3333435058594,
+      "rect": {
+        "x": 72,
+        "y": 568.6666870117188,
+        "width": 72,
+        "height": 71.33331298828125,
+        "top": 568.6666870117188,
+        "right": 144,
+        "bottom": 640,
+        "left": 72
+      },
+      "hit": true,
+      "disabled": false
+    }
+  ],
+  "checks": [
+    {
+      "phase": "original-training-inline-css-owner-diagnostic",
+      "count": 10,
+      "first": {
+        "text": "新手森林　Lv.1～10",
+        "rect": {
+          "x": 12,
+          "y": 13.714285850524902,
+          "width": 180.42857360839844,
+          "height": 36,
+          "top": 13.714285850524902,
+          "right": 192.42857360839844,
+          "bottom": 49.7142858505249,
+          "left": 12
+        },
+        "hit": true,
+        "hitElement": {
+          "id": "",
+          "className": "training-zone-item"
+        },
+        "inline": "font-size: 20px !important; padding: 6px 14px !important; min-height: 42px !important; line-height: 1.15 !important; box-sizing: border-box !important;",
+        "minHeightPriority": "important",
+        "computed": {
+          "height": "42px",
+          "minHeight": "42px",
+          "maxHeight": "none",
+          "padding": "6px 14px",
+          "boxSizing": "border-box",
+          "font": "700 20px / 23px \"Noto Sans TC\", Arial, sans-serif",
+          "fontSize": "20px",
+          "lineHeight": "23px",
+          "display": "flex",
+          "alignItems": "center",
+          "transform": "none",
+          "uiLengthUnit": ""
+        },
+        "scale": 0.8551117232625518,
+        "matchedCandidates": [
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 2,
+            "selector": "*",
+            "cssText": "box-sizing: border-box;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 3,
+            "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+            "cssText": "scrollbar-width: none !important;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 129,
+            "selector": ".training-zone-item",
+            "cssText": "box-sizing: border-box; display: flex; align-items: center; min-height: 52px; font-size: 17px; font-weight: bold; color: rgb(232, 221, 199); text-shadow: rgba(0, 0, 0, 0.8) 0px 2px 4px; background: rgba(120, 110, 95, 0.35); padding: 4px 10px; border-radius: 6px; cursor: pointer; width: fit-content; -webkit-tap-highlight-color: transparent; transition: transform 0.12s;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+            "order": 2055,
+            "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+            "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+            "conditions": []
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "",
+            "className": "training-zone-item",
+            "overflow": "visible",
+            "rect": {
+              "x": 12,
+              "y": 13.714285850524902,
+              "width": 180.42857360839844,
+              "height": 36,
+              "top": 13.714285850524902,
+              "right": 192.42857360839844,
+              "bottom": 49.7142858505249,
+              "left": 12
+            },
+            "top": 0,
+            "client": 42,
+            "total": 42
+          },
+          {
+            "id": "",
+            "className": "training-zone-list",
+            "overflow": "visible",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 526.2857666015625,
+              "top": 0,
+              "right": 360,
+              "bottom": 526.2857666015625,
+              "left": 0
+            },
+            "top": 0,
+            "client": 614,
+            "total": 614
+          },
+          {
+            "id": "trainingPage",
+            "className": "page active",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "",
+            "className": "content",
+            "overflow": "auto",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "gameInterface",
+            "className": "",
+            "overflow": "visible",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 0,
+              "top": 0,
+              "right": 360,
+              "bottom": 0,
+              "left": 0
+            },
+            "top": 0,
+            "client": 0,
+            "total": 0
+          },
+          {
+            "id": "game-content",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "app",
+            "className": "no-header v148-context-nav-active",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 1920,
+            "total": 1920
+          },
+          {
+            "id": "game-stage",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 1920,
+            "total": 1920
+          },
+          {
+            "id": "game-viewport",
+            "className": "",
+            "overflow": "clip",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          },
+          {
+            "id": "",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          },
+          {
+            "id": "",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          }
+        ]
+      },
+      "last": {
+        "text": "終焉之境　Lv.91～100",
+        "rect": {
+          "x": 12,
+          "y": 476.5714111328125,
+          "width": 200.6517791748047,
+          "height": 36,
+          "top": 476.5714111328125,
+          "right": 212.6517791748047,
+          "bottom": 512.5714111328125,
+          "left": 12
+        },
+        "hit": true,
+        "hitElement": {
+          "id": "trainingZoneItem_zone10",
+          "className": "training-zone-item locked"
+        },
+        "inline": "font-size: 20px !important; padding: 6px 14px !important; min-height: 42px !important; line-height: 1.15 !important; box-sizing: border-box !important;",
+        "minHeightPriority": "important",
+        "computed": {
+          "height": "42px",
+          "minHeight": "42px",
+          "maxHeight": "none",
+          "padding": "6px 14px",
+          "boxSizing": "border-box",
+          "font": "700 20px / 23px \"Noto Sans TC\", Arial, sans-serif",
+          "fontSize": "20px",
+          "lineHeight": "23px",
+          "display": "flex",
+          "alignItems": "center",
+          "transform": "none",
+          "uiLengthUnit": ""
+        },
+        "scale": 0.8574862357897636,
+        "matchedCandidates": [
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 2,
+            "selector": "*",
+            "cssText": "box-sizing: border-box;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 3,
+            "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+            "cssText": "scrollbar-width: none !important;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 129,
+            "selector": ".training-zone-item",
+            "cssText": "box-sizing: border-box; display: flex; align-items: center; min-height: 52px; font-size: 17px; font-weight: bold; color: rgb(232, 221, 199); text-shadow: rgba(0, 0, 0, 0.8) 0px 2px 4px; background: rgba(120, 110, 95, 0.35); padding: 4px 10px; border-radius: 6px; cursor: pointer; width: fit-content; -webkit-tap-highlight-color: transparent; transition: transform 0.12s;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+            "order": 131,
+            "selector": ".training-zone-item.locked",
+            "cssText": "color: rgb(201, 191, 168); opacity: 0.7;",
+            "conditions": []
+          },
+          {
+            "file": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+            "order": 2055,
+            "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+            "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+            "conditions": []
+          }
+        ],
+        "ancestors": [
+          {
+            "id": "trainingZoneItem_zone10",
+            "className": "training-zone-item locked",
+            "overflow": "visible",
+            "rect": {
+              "x": 12,
+              "y": 476.5714111328125,
+              "width": 200.6517791748047,
+              "height": 36,
+              "top": 476.5714111328125,
+              "right": 212.6517791748047,
+              "bottom": 512.5714111328125,
+              "left": 12
+            },
+            "top": 0,
+            "client": 42,
+            "total": 42
+          },
+          {
+            "id": "",
+            "className": "training-zone-list",
+            "overflow": "visible",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 526.2857666015625,
+              "top": 0,
+              "right": 360,
+              "bottom": 526.2857666015625,
+              "left": 0
+            },
+            "top": 0,
+            "client": 614,
+            "total": 614
+          },
+          {
+            "id": "trainingPage",
+            "className": "page active",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "",
+            "className": "content",
+            "overflow": "auto",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "gameInterface",
+            "className": "",
+            "overflow": "visible",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 0,
+              "top": 0,
+              "right": 360,
+              "bottom": 0,
+              "left": 0
+            },
+            "top": 0,
+            "client": 0,
+            "total": 0
+          },
+          {
+            "id": "game-content",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 639.9910888671875,
+              "top": 0,
+              "right": 360,
+              "bottom": 639.9910888671875,
+              "left": 0
+            },
+            "top": 0,
+            "client": 747,
+            "total": 747
+          },
+          {
+            "id": "app",
+            "className": "no-header v148-context-nav-active",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 1920,
+            "total": 1920
+          },
+          {
+            "id": "game-stage",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 1920,
+            "total": 1920
+          },
+          {
+            "id": "game-viewport",
+            "className": "",
+            "overflow": "clip",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          },
+          {
+            "id": "",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          },
+          {
+            "id": "",
+            "className": "",
+            "overflow": "hidden",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 360,
+              "height": 640,
+              "top": 0,
+              "right": 360,
+              "bottom": 640,
+              "left": 0
+            },
+            "top": 0,
+            "client": 640,
+            "total": 640
+          }
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "scope": "Segment35 original training first/last inline CSS owner diagnostic only; intentionallycompletefalse, no patrol entry; no character selection, map/monster/auto click or battle. No training ten-list matrix. Original PREPARE/isolated QA transport, true training forest information/enter static map, appearance toggle and original leaveMap return. Startup/normalization save side effects retained. Exact restore baseline is immediately before PREPARE actor seed, after startup/skill module initialization; earlier startup private caches and patrol transient currentZone/monsters/grid/closure selection are not claimed exact restored; original leaveMap lifecycle performs cleanup.",
+  "staticBaseline": {
+    "actors": [
+      {
+        "id": "QA 火角色",
+        "hp": 300,
+        "sp": 120,
+        "level": 70
+      },
+      {
+        "id": "QA 水角色",
+        "level": 70
+      },
+      null
+    ],
+    "inventory": "[]",
+    "equipment": "{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}}",
+    "gold": 0,
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null,
+    "autoBattle": false,
+    "autoPatrolEnabled": false,
+    "configs": [
+      false,
+      false,
+      false
+    ],
+    "elementBox": {
+      "active": false,
+      "remainingMs": 0
+    }
+  },
+  "diagnosticOnly": true,
+  "pending": "Original inline!important42 vs stylesheet52 owner diagnosis; no map entry and no44 acceptance",
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "actorsExact": true,
+    "inventoryExact": true,
+    "loadoutsExact": true,
+    "equipmentExact": true,
+    "patrolKeyExact": true,
+    "saveApiExact": true
+  },
+  "sourceAfter": {
+    "index.html": "5b979921838b14e8a737eab312bf119aeb1277a29380fd8ea5ff316f912d28eb",
+    "asset-manifest.json": "4cc255f009e27b671627fa32bb86672af86115931e3c485efd0feb36c99723b5",
+    "js/00-main.js": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+    "build/app-shell.5e2c273826d7.js": "5e2c273826d7a6d89e9388cec53f7a3ab81298b9d173c1fdfe695492fd73d829",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.aa47a62134df.css": "aa47a62134df48c43a357ac8259b0ee63e5a12b21c68a1ce8f328111194c1bfe",
+    "build/boot-core.b447fc7be00c.js": "b447fc7be00c08d5da1605b8df0f7fa2da4c6bb8ef6a068ac9ede20d2f98e637",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.f5453e704d5f.js": "f5453e704d5fa56860af9ba0221fc073194df3dff9f80868992acf7f39880493",
+    "build/gameplay-core-secondary.1c4baa12cb83.js": "1c4baa12cb83ce6e5744c4399f3fa8718305a644bcec916221f30c3e9aa16c4c",
+    "build/gameplay-core.af5892190f1c.css": "af5892190f1cdfd5e71d57bfbaff1020029cb33db961a0980a1412b31695d35f"
+  },
+  "sourceUnchanged": true
+}

@@ -1,0 +1,1742 @@
+{
+  "sourcesBefore": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "05c8a81ffe2a6dfe93238cc6f8ffa2b0efce163c3045b91a0b312bfe2ab85d22",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.d8c87227a829.css": "d8c87227a8292ba1e22a33dc048a49758210736787174689e4eaa57add3ff873"
+  },
+  "sourcesAfter": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "05c8a81ffe2a6dfe93238cc6f8ffa2b0efce163c3045b91a0b312bfe2ab85d22",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.d8c87227a829.css": "d8c87227a8292ba1e22a33dc048a49758210736787174689e4eaa57add3ff873"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.7c85620e671b.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core.d8c87227a829.css",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/gameplay-core.d8c87227a829.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.9eb4fff74856.css",
+    "/build/feature-relic-progression.464cd8f702a6.js",
+    "/build/feature-boss-relic.a8ff5e27d0a5.js"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"4\"]",
+      "x": 330,
+      "y": 247.22396850585938,
+      "hit": true,
+      "label": "秘寶"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_qiankun_flask')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1109,
+      "client": 1647,
+      "height": 2756
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_sun_orb')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1109,
+      "client": 1647,
+      "height": 2756
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_xuanwu_seal')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_soul_bell')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1235,
+      "client": 1647,
+      "height": 2882
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_nine_dragon_fire')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1235,
+      "client": 1647,
+      "height": 2882
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_cold_spring_jade')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_qinglan_feather')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1172,
+      "client": 1647,
+      "height": 2819
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_rock_mountain_seal')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_returning_wheel')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1172,
+      "client": 1647,
+      "height": 2819
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_origin_talisman')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1235,
+      "client": 1647,
+      "height": 2882
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_broken_army_scroll')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_red_sky_war_mark')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_ice_mirror_heart')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1298,
+      "client": 1647,
+      "height": 2945
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_wind_chasing_talisman')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1424,
+      "client": 1647,
+      "height": 3071
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_mountain_river_cauldron')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1424,
+      "client": 1647,
+      "height": 3071
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_burning_star_mark')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1361,
+      "client": 1647,
+      "height": 3008
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_spirit_spring_bottle')\"]",
+      "x": 180,
+      "y": 516,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1109,
+      "client": 1647,
+      "height": 2756
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_demon_suppressing_seal')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1424,
+      "client": 1647,
+      "height": 3071
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_all_returning_array')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1491,
+      "client": 1647,
+      "height": 3138
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_origin_talisman')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1457,
+      "client": 1647,
+      "height": 3104
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_origin_talisman')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1331,
+      "client": 1647,
+      "height": 2978
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_origin_talisman')\"]",
+      "x": 180,
+      "y": 347.3333435058594,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1331,
+      "client": 1647,
+      "height": 2978
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_origin_talisman')\"]",
+      "x": 180,
+      "y": 347.66668701171875,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 98,
+      "top": 1331,
+      "client": 1647,
+      "height": 2978
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 39,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    }
+  ],
+  "checks": [
+    {
+      "catalog": [
+        {
+          "id": "relic_qiankun_flask",
+          "name": "乾坤玉壺",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_sun_orb",
+          "name": "烈陽神珠",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_xuanwu_seal",
+          "name": "玄武靈印",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_soul_bell",
+          "name": "鎮魂古鐘",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_tiangang_banner",
+          "name": "天罡戰旗",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_nine_dragon_fire",
+          "name": "九龍神火罩",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_cold_spring_jade",
+          "name": "寒泉玉珮",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_qinglan_feather",
+          "name": "青嵐羽符",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_rock_mountain_seal",
+          "name": "岩岳鎮印",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_returning_wheel",
+          "name": "回天寶輪",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_origin_talisman",
+          "name": "太初聖符",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_broken_army_scroll",
+          "name": "破軍殘卷",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_red_sky_war_mark",
+          "name": "赤霄戰紋",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_ice_mirror_heart",
+          "name": "玄冰鏡心",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_wind_chasing_talisman",
+          "name": "追風行符",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_mountain_river_cauldron",
+          "name": "山河寶鼎",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_burning_star_mark",
+          "name": "焚星殘印",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_spirit_spring_bottle",
+          "name": "靈泉法瓶",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_demon_suppressing_seal",
+          "name": "伏魔金印",
+          "runtimeReady": true
+        },
+        {
+          "id": "relic_all_returning_array",
+          "name": "萬象歸元盤",
+          "runtimeReady": true
+        }
+      ],
+      "baselineInherited": "relic_tiangang_banner Segment16 Lv1/10/20"
+    },
+    {
+      "id": "relic_qiankun_flask",
+      "entry": {
+        "scroll": 0,
+        "name": "乾坤玉壺",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n乾坤玉壺\n\n藍階・Lv.20 / 20\n\n回復\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n奇數回合結束時\n\n秘寶效果\n\n恢復全隊 7%最大HP，並恢復2%最大SP。\n\n觸發限制\n\n無每場總次數限制；每個符合條件的奇數回合最多觸發一次。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_sun_orb",
+      "entry": {
+        "scroll": 0,
+        "name": "烈陽神珠",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n烈陽神珠\n\n紫階・Lv.20 / 20\n\n攻擊\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n偶數回合開始時\n\n秘寶效果\n\n對敵方全體造成 1.10×秘寶威力；燃燒目標額外+25%。\n\n觸發限制\n\n不能暴擊，不觸發角色追擊或吸血。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_xuanwu_seal",
+      "entry": {
+        "scroll": 0,
+        "name": "玄武靈印",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n玄武靈印\n\n藍階・Lv.20 / 20\n\n防禦\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n開場與每第3回合開始時\n\n秘寶效果\n\n開場與每第3回合刷新全隊12%最大HP玄武護盾；盾破獲得10%直接減傷至下一回合結束。\n\n觸發限制\n\n開場一次；每第3回合刷新同來源完整盾，不疊加、不移除其他來源盾；盾破守勢到下一回合結束。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_soul_bell",
+      "entry": {
+        "scroll": 0,
+        "name": "鎮魂古鐘",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n鎮魂古鐘\n\n紫階・Lv.20 / 20\n\n控制\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第3回合開始時\n\n秘寶效果\n\n鎮魂：敵方直接最終傷害-12%、最終命中-8%，持續2回合；BOSS保留80%效果。\n\n觸發限制\n\n鎮魂不疊加；刷新期限並保留較高值。BOSS僅保留80%效果，不影響DOT與環境傷害，不造成硬控。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_nine_dragon_fire",
+      "entry": {
+        "scroll": 0,
+        "name": "九龍神火罩",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n九龍神火罩\n\n紫階・Lv.20 / 20\n\n元素聯動\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n敵方累積完成7次有效行動後\n\n秘寶效果\n\n對敵方全體造成 1.10×火屬性秘寶傷害，燃燒機率30%，對燃燒目標額外+15%。\n\n觸發限制\n\n每完成7次完整敵方行動立即觸發並歸零；跨回合累積，MISS也計入；硬控完整跳過、DOT及狀態Tick不計。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_cold_spring_jade",
+      "entry": {
+        "scroll": 0,
+        "name": "寒泉玉珮",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n寒泉玉珮\n\n紫階・Lv.20 / 20\n\n回復\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n任一我方角色HP由35%以上降至35%以下時\n\n秘寶效果\n\n急救目標 18%最大HP並淨化1個一般負面、恢復4%最大SP；HP由35%以上降至35%以下時觸發，每場最多2次，冷卻3回合。\n\n觸發限制\n\n每場最多2次，全域冷卻3回合；同一傷害事件只判定一次。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_qinglan_feather",
+      "entry": {
+        "scroll": 0,
+        "name": "青嵐羽符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n青嵐羽符\n\n藍階・Lv.20 / 20\n\n增益\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n戰鬥開始時\n\n秘寶效果\n\n全隊最終閃躲+12%、最終異常抗性+12%，持續3回合。\n\n觸發限制\n\n只在開場觸發一次；維持風系靈活、防控定位。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_rock_mountain_seal",
+      "entry": {
+        "scroll": 0,
+        "name": "岩岳鎮印",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n岩岳鎮印\n\n紫階・Lv.20 / 20\n\n防禦\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n開場每名存活隊友獲得2層岩甲\n\n秘寶效果\n\n開場每人2層岩甲，每個敵方有效直接傷害行動減傷12%；每行動最多耗1層，末層消耗獲得6%HP護盾。\n\n觸發限制\n\n開場每角色2層；MISS、完全Barrier格擋、DOT及其他非敵方直接傷害不消耗。Lv20最後一層耗盡給6%最大HP護盾。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_returning_wheel",
+      "entry": {
+        "scroll": 0,
+        "name": "回天寶輪",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n回天寶輪\n\n桃紅階・Lv.20 / 20\n\n特殊\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n本場第一次有我方角色將受到致命傷害時\n\n秘寶效果\n\n阻止本場第一次死亡，保留1HP後恢復22%最大HP並獲得10%護盾。\n\n觸發限制\n\n整支隊伍每場只觸發一次，不是每個角色各一次。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_origin_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "太初聖符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.20 / 20\n\n增益\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化全部可解除負面；全隊回復10%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_broken_army_scroll",
+      "entry": {
+        "scroll": 0,
+        "name": "破軍殘卷",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n破軍殘卷\n\n紫階・Lv.20 / 20\n\n攻擊\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n角色普通攻擊／正式主動技能擊敗敵人後\n\n秘寶效果\n\n角色普通攻擊或主動技能擊殺後，對存活敵人HP比例最低者造成1.40×秘寶威力；每回合1次。\n\n觸發限制\n\n每回合最多1次；比例相同依戰場順序。秘寶、DOT、反擊、追擊、反射、環境擊殺不觸發；無敵人不演出。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_red_sky_war_mark",
+      "entry": {
+        "scroll": 0,
+        "name": "赤霄戰紋",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n赤霄戰紋\n\n橙階・Lv.20 / 20\n\n增益\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n戰鬥開始時\n\n秘寶效果\n\n赤霄：普通攻擊與主動技能直接傷害+10%、最終爆擊+8%，持續3回合；傷害加成遵守50%上限，爆擊遵守95%上限。\n\n觸發限制\n\n每場開場一次。傷害併入普通加算桶（上限50%），爆擊上限95%；DOT、反擊、追擊、秘寶不受益。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_ice_mirror_heart",
+      "entry": {
+        "scroll": 0,
+        "name": "玄冰鏡心",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n玄冰鏡心\n\n紫階・Lv.20 / 20\n\n元素聯動\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第3回合結束\n\n秘寶效果\n\n敵方全體受到1.15×秘寶威力；具有一般負面狀態的目標額外+25%，無負面仍造成傷害。\n\n觸發限制\n\n無負面仍造成傷害；只認正式一般負面，不把Boss機制或工程標記當負面；不附加冰封或刷新凍傷。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_wind_chasing_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "追風行符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n追風行符\n\n藍階・Lv.20 / 20\n\n增益\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第3回合開始\n\n秘寶效果\n\n乘風期間每角色首次完成主動技能返還實際SP消耗的25%；最終閃避+12%至該角色下一次正式行動開始。返還取floor，至少1、不超實耗；零消耗不返還。\n\n觸發限制\n\n乘風只持續當回合，每角色一次；返還取floor，至少1且不超過實耗，零消耗不返還；閃避到該角色下一次行動開始，不改速度或順序。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_mountain_river_cauldron",
+      "entry": {
+        "scroll": 0,
+        "name": "山河寶鼎",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n山河寶鼎\n\n橙階・Lv.20 / 20\n\n防禦\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n本回合敵方造成實際HP損失達回合開場隊伍最大HP總和30%時\n\n秘寶效果\n\n全隊回復12%最大HP，山河鎮勢直接減傷15%至下一回合結束；觸發前HP≤30%的存活隊友獲得8%最大HP護盾。\n\n觸發限制\n\n每回合最多1次，每場最多2次；計數每回合歸零。敵方DOT計入，護盾、結界、自損、HP消耗、環境與秘寶不計。鎮勢到下一回合結束。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_burning_star_mark",
+      "entry": {
+        "scroll": 0,
+        "name": "焚星殘印",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n焚星殘印\n\n紫階・Lv.20 / 20\n\n元素聯動\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n敵人HP由50%以上降至50%以下或相等且仍存活時\n\n秘寶效果\n\n對跨越50%血線且仍存活的敵人追擊1.30×秘寶威力；判定時HP≤25%則額外+30%。每回合1次，不要求燃燒。\n\n觸發限制\n\n每回合最多1次；直接擊殺不觸發，不要求燃燒。Lv20觸發判定時目標HP≤25%，本次傷害額外+30%。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_spirit_spring_bottle",
+      "entry": {
+        "scroll": 0,
+        "name": "靈泉法瓶",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n靈泉法瓶\n\n藍階・Lv.20 / 20\n\n回復\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第3回合結束\n\n秘寶效果\n\n所有存活隊友回復12%最大SP及5%最大HP，不超過上限。\n\n觸發限制\n\n死亡角色不受益；HP與SP不得超過上限。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_demon_suppressing_seal",
+      "entry": {
+        "scroll": 0,
+        "name": "伏魔金印",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n伏魔金印\n\n橙階・Lv.20 / 20\n\n防禦\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n戰鬥開始；首次成功受到一般負面狀態\n\n秘寶效果\n\n伏魔：最終異常抗性+15%，持續3回合；每角色各1枚伏魔印，在可解除負面成功寫入後立即淨化該狀態，不可淨化狀態不消耗印。\n\n觸發限制\n\n每角色每場各1印；正式成功寫入可淨化負面後才消耗並解除該狀態，不可淨化與Boss機制不消耗印；衍生效果只顯示伏魔・破邪。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_all_returning_array",
+      "entry": {
+        "scroll": 0,
+        "name": "萬象歸元盤",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 147,
+          "y": 102.66667175292969,
+          "width": 174,
+          "height": 27,
+          "top": 102.66667175292969,
+          "right": 321,
+          "bottom": 129.6666717529297,
+          "left": 147
+        },
+        "text": "‹ 返回秘寶列表\n萬象歸元盤\n\n四象階・Lv.20 / 20\n\n特殊\n專屬碎片\n0 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合開始\n\n秘寶效果\n\n平均HP≤40%歸生：回復18%HP、直接減傷12%、每人淨化1個；40%<HP≤75%調和：攻防+15%、異常抗性+10%；HP>75%破勢：主動技能直接最終傷害+20%。型態固定，持續2回合。\n\n觸發限制\n\n每次只判定1次，持續2回合。平均≤40%歸生；>40%且≤75%調和；>75%破勢。死亡角色不納入；破勢僅正式主動技能直接最終傷害。\n\n下一強化\n\n已達最高等級。\n\n強化\n\n目前 Lv.20 / 20\n\n已達目前秘寶等級上限。\n裝備"
+      }
+    },
+    {
+      "id": "relic_origin_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "太初聖符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.1 / 20\n\n增益\n專屬碎片\n49 / 100\n秘寶通用碎片\n0\n\n至少要先取得 50 個專屬碎片，才能使用通用碎片補足。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化1個可解除負面；全隊回復6%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\nLv.10：淨化最多2個，全隊回復8%HP\n\n合成\n\n固定需要 100 個等效專屬碎片；通用碎片 2 個可替代 1 個，但最多替代 50 個。\n\n至少需要 50 個專屬碎片，通用碎片不可取代超過 50 個\n碎片不足"
+      }
+    },
+    {
+      "specificFixture": 49,
+      "universalFixture": 0,
+      "state": {
+        "unlocked": false,
+        "level": 1,
+        "exp": 0,
+        "seen": true
+      }
+    },
+    {
+      "id": "relic_origin_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "太初聖符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.1 / 20\n\n增益\n專屬碎片\n75 / 100\n秘寶通用碎片\n0\n\n缺少 25；需要秘寶通用碎片 ×50。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化1個可解除負面；全隊回復6%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\nLv.10：淨化最多2個，全隊回復8%HP\n\n合成\n\n固定需要 100 個等效專屬碎片；通用碎片 2 個可替代 1 個，但最多替代 50 個。\n\n秘寶通用碎片不足\n碎片不足"
+      }
+    },
+    {
+      "specificFixture": 75,
+      "universalFixture": 0,
+      "state": {
+        "unlocked": false,
+        "level": 1,
+        "exp": 0,
+        "seen": true
+      }
+    },
+    {
+      "id": "relic_origin_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "太初聖符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.1 / 20\n\n增益\n專屬碎片\n100 / 100\n秘寶通用碎片\n0\n\n已達 100 專屬碎片，可直接合成。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化1個可解除負面；全隊回復6%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\nLv.10：淨化最多2個，全隊回復8%HP\n\n合成\n\n固定需要 100 個等效專屬碎片；通用碎片 2 個可替代 1 個，但最多替代 50 個。\n\n已達 100 專屬碎片，可直接合成。\n合成秘寶"
+      }
+    },
+    {
+      "specificFixture": 100,
+      "universalFixture": 0,
+      "state": {
+        "unlocked": false,
+        "level": 1,
+        "exp": 0,
+        "seen": true
+      }
+    },
+    {
+      "id": "relic_origin_talisman",
+      "entry": {
+        "scroll": 0,
+        "name": "太初聖符",
+        "body": {
+          "x": 16,
+          "y": 73,
+          "width": 328,
+          "height": 549,
+          "top": 73,
+          "right": 344,
+          "bottom": 622,
+          "left": 16
+        },
+        "title": {
+          "x": 146.5572967529297,
+          "y": 101.84896087646484,
+          "width": 175.4427032470703,
+          "height": 27.00000762939453,
+          "top": 101.84896087646484,
+          "right": 322,
+          "bottom": 128.84896850585938,
+          "left": 146.5572967529297
+        },
+        "text": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.19 / 20\n\n增益\n專屬碎片\n100 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化最多2個可解除負面；全隊回復9.8%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\nLv.20：選定隊友淨化全部一般負面，全隊回復10%HP\n\n強化\n\nLv.19 → Lv.20：秘寶精華 ×134\n\n持有：精華 0\n強化\n已裝備"
+      }
+    },
+    {
+      "state19": "‹ 返回秘寶列表\n太初聖符\n\n紫階・Lv.19 / 20\n\n增益\n專屬碎片\n100 / 100\n秘寶通用碎片\n0\n\n已持有；多餘專屬碎片會保留。\n\n取得來源：點選獲取途徑查看完整條件與來源追溯\n獲取途徑\n每件秘寶最多只能使用通用碎片替代 50 個專屬碎片。\n觸發條件\n\n每第4回合結束\n\n秘寶效果\n\n選定一般負面最多的存活隊友，淨化最多2個可解除負面；全隊回復9.8%最大HP，無負面仍回復。\n\n觸發限制\n\n同數量優先HP比例較低，再依隊伍順序；無負面仍回血；只淨化可解除的一般負面。\n\n下一強化\n\nLv.20：選定隊友淨化全部一般負面，全隊回復10%HP\n\n強化\n\nLv.19 → Lv.20：秘寶精華 ×134\n\n持有：精華 0\n強化\n已裝備"
+    }
+  ],
+  "head": "ff7e8cb671119e1053f56abaf090a317b793ae80",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "contexts": [
+    "20 catalog IDs: 19 additional owned Lv20 details; tiangang baseline inherited Segment16"
+  ],
+  "scenes": [
+    {
+      "name": "relic_qiankun_flask-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_qiankun_flask-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_sun_orb-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_sun_orb-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_xuanwu_seal-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_xuanwu_seal-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_soul_bell-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_soul_bell-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_nine_dragon_fire-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_nine_dragon_fire-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_cold_spring_jade-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_cold_spring_jade-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_qinglan_feather-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_qinglan_feather-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_rock_mountain_seal-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_rock_mountain_seal-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_returning_wheel-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_returning_wheel-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_origin_talisman-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_origin_talisman-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_broken_army_scroll-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_broken_army_scroll-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_red_sky_war_mark-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_red_sky_war_mark-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_ice_mirror_heart-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_ice_mirror_heart-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_wind_chasing_talisman-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_wind_chasing_talisman-middle",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_wind_chasing_talisman-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_mountain_river_cauldron-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_mountain_river_cauldron-middle",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_mountain_river_cauldron-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_burning_star_mark-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_burning_star_mark-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_spirit_spring_bottle-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_spirit_spring_bottle-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_demon_suppressing_seal-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_demon_suppressing_seal-middle",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_demon_suppressing_seal-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_all_returning_array-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_all_returning_array-middle",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic_all_returning_array-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "state-specific-49",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "state-specific-75",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "state-specific-100",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "state-level19-equipped-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "state-level19-equipped-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment18 catalog presentation only, 19 additional actual overlay entries at isolated owned Lv20; tiangang inherited Segment16. True end/return and four long-item middle captures. Representative canonical local fixtures: specific49/75/100 with universal0; Lv19 next20 and equipped label. Material counts and loadout only isolated fixture, no action submitted. No equip/upgrade/craft/choice transaction or guard bypass. Original UI mark-seen/saveRelics sideeffects retained; localhost DEV unlocked semantics retained."
+}

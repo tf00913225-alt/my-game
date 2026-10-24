@@ -210,18 +210,6 @@
         return inventorySlots[selectedInventorySlot]||null;
     }
 
-    function appendReforgeStatsToModal(item){
-        const stats=document.getElementById("itemModalStats");
-        if(!stats||!item){ return; }
-        const affixes=window.FourSymbolsEquipmentReforge.slots(item);
-        if(affixes.some(Boolean)){
-            stats.insertAdjacentHTML(
-                "beforeend",
-                '<section class="v141-item-reforge"><b>【冶煉】</b>'+affixes.map((a,i)=>a?'<div>槽 '+(i+1)+' '+getStatText({[a.stat]:a.value})+'</div>':'<div>槽 '+(i+1)+' 空槽</div>').join('')+'</section>'
-            );
-        }
-    }
-
     function syncDecomposeButton(item,slotIndex){
         const buttons=document.querySelector("#itemModal .item-modal-buttons");
         if(!buttons){ return; }
@@ -305,7 +293,6 @@
             const item=inventorySlots[slotIndex];
             const icon=document.getElementById("itemModalIcon");
             if(icon&&item){ icon.innerHTML=window.FourSymbolsItemSlot.art(item.icon,item); }
-            appendReforgeStatsToModal(item);
             syncDecomposeButton(item,slotIndex);
             syncInventoryPotionUseButton(item,slotIndex);
             return result;
@@ -318,7 +305,6 @@
             const result=originalOpenEquippedItem.apply(this,arguments);
             const icon=document.getElementById("itemModalIcon");
             if(icon&&item){ icon.innerHTML=item.icon||"◆"; }
-            appendReforgeStatsToModal(item);
             syncDecomposeButton(null,null);
             syncInventoryPotionUseButton(null,null);
             return result;

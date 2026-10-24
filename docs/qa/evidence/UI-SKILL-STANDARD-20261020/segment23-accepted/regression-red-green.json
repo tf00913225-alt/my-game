@@ -1,0 +1,30 @@
+{
+  "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+  "scope": "Extracted unchanged new block from existing test at indicated testRev; full file separately blocked locally by missing identify. Existing CI checks unchanged.",
+  "results": [
+    {
+      "rev": "3074e314",
+      "testRev": "5dcd47fa",
+      "sourceHash": "56b45e0ca0348a9f9890b348d03edb83b46ad258efb358530ad9fd2d0f46fdce",
+      "testHash": "d3714e7f1d3ad7fd70809108b18cd72ed29f2672e43ecb38874f068ee8bb6310",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: account retry must not remain behind the loader"
+    },
+    {
+      "rev": "5dcd47fa",
+      "testRev": "HEAD",
+      "sourceHash": "14b68682d614f98b47305a7a5ba500cb2b3e5f0399b443d1c78ad6940c4d96fa",
+      "testHash": "d0d67668064fc60a791e11ae20d35c213936138b12ce9409edcab1dcd79b506e",
+      "passed": false,
+      "error": "AssertionError [ERR_ASSERTION]: player copy uses the supplied explanation; raw error stays diagnostic\n+ actual - expected\n\n  [\n    [\n      'state',\n      'ERROR',\n      true,\n+     'Cannot read safely. read failed'\n-     'Cannot read safely.'\n    ],\n    [\n      'account'\n    ]\n  ]\n"
+    },
+    {
+      "rev": "HEAD",
+      "testRev": "HEAD",
+      "sourceHash": "195f767dd8510a440527b10da8bc736f8cf10235b0b45df95516863c56fc29df",
+      "testHash": "d0d67668064fc60a791e11ae20d35c213936138b12ce9409edcab1dcd79b506e",
+      "passed": true,
+      "error": null
+    }
+  ]
+}

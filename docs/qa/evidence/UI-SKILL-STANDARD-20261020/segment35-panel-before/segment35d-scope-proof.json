@@ -1,0 +1,22 @@
+{
+  "base": "60ce3985b5560c1dcddc0dc383cf80f277a2ac68",
+  "source": "css/32-v131-patrol-appearance.css",
+  "onlyTwoOriginalRulesChanged": true,
+  "sourceBefore": "73850faa068dc1079abc4877aa09c94ab11fd1db1a66c9a39693e46f2d367dca",
+  "sourceAfter": "0a3b4b4c83a049a5b78514570a2560e7a2fbe96b12b35b509f3394e732b15479",
+  "blocks": [
+    {
+      "before": "#game-stage #mapPage #v131PatrolAppearancePanel{\n    display:none;\n    min-width:128px;\n    max-width:190px;\n    padding:5px;\n    border:1px solid #8a6a3a;\n    border-radius:8px;\n    background:rgba(12,9,6,.94);\n    box-shadow:0 6px 18px rgba(0,0,0,.65);\n}",
+      "after": "#game-stage #mapPage #v131PatrolAppearancePanel{\n    display:none;\n    min-width:160px;\n    max-width:220px;\n    padding:10px;\n    border:1px solid #8a6a3a;\n    border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;\n    border-radius:4px;\n    background:var(--rpg-window-iron,#17130f);\n    box-shadow:0 6px 18px rgba(0,0,0,.65);\n}"
+    },
+    {
+      "before": "#game-stage #mapPage .v131-patrol-choice{\n    width:100%;\n    min-height:38px;\n    padding:6px 9px;\n    border:1px solid #66502d;\n    border-radius:6px;\n    background:linear-gradient(180deg,#2c2115,#161009);\n    color:#f2e3bf;\n    font-size:15px;\n    line-height:1.25;\n    font-weight:800;\n    text-align:left;\n}",
+      "after": "#game-stage #mapPage .v131-patrol-choice{\n    width:100%;\n    min-height:52px;\n    padding:8px 10px;\n    border:1px solid #66502d;\n    border-radius:4px;\n    background:linear-gradient(#30291f,#1b1812);\n    color:#f2e3bf;\n    font-size:18px;\n    line-height:1.4;\n    font-weight:800;\n    text-align:left;\n    overflow-wrap:anywhere;\n}"
+    }
+  ],
+  "bundleBefore": "build/feature-patrol.1cef20d37f82.css",
+  "bundleAfter": "build/feature-patrol.0ea855f358ab.css",
+  "completeBundleExpectedExact": true,
+  "bundleSha256": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+  "js26Unchanged": true
+}

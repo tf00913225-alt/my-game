@@ -1,0 +1,1006 @@
+[
+  {
+    "size": "360x640",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "clean": true,
+    "sourceSame": true,
+    "profile": true,
+    "pressed": {
+      "tested": true,
+      "active": false,
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "1px solid rgba(0, 0, 0, 0)",
+      "filter": "none",
+      "boxShadow": "none",
+      "opacity": "1",
+      "menuOpen": false,
+      "clicks": []
+    },
+    "cancel": {
+      "active": false,
+      "menuOpen": false,
+      "clicks": []
+    },
+    "tick": {
+      "startTimer": 20,
+      "startAt": 1792546511393,
+      "clockPolicy": "Original 1s timer; wait at most1200ms, no freeze/clock/timer API override",
+      "endTimer": 19,
+      "endAt": 1792546512420
+    },
+    "inputHits": true,
+    "rail": {
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "background": "rgb(21, 19, 15) none no-repeat scroll 50% 50% / 100% 100% padding-box border-box",
+      "border": "1px solid rgb(115, 88, 45)",
+      "borderRadius": "0px",
+      "borderImageSource": "url(\"http://127.0.0.1:59179/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "borderImageSlice": "115 fill",
+      "borderImageWidth": "6px",
+      "content": "\"\"",
+      "position": "absolute",
+      "zIndex": "1"
+    },
+    "buttons": [
+      {
+        "text": "技能",
+        "rect": {
+          "x": 12,
+          "y": 340.6071472167969,
+          "width": 65.14286041259766,
+          "height": 60,
+          "top": 340.6071472167969,
+          "right": 77.14286041259766,
+          "bottom": 400.6071472167969,
+          "left": 12
+        },
+        "ink": {
+          "left": 30.85714340209961,
+          "top": 360.3214111328125,
+          "right": 58.28571701049805,
+          "bottom": 380.89288330078125,
+          "width": 27.428573608398438,
+          "height": 20.57147216796875
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 30.85714340209961,
+            "y": 360.3214111328125,
+            "width": 27.428573608398438,
+            "height": 20.57147216796875,
+            "top": 360.3214111328125,
+            "right": 58.28571701049805,
+            "bottom": 380.89288330078125,
+            "left": 30.85714340209961
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "普通攻擊",
+        "rect": {
+          "x": 79.71428680419922,
+          "y": 340.6071472167969,
+          "width": 65.14286041259766,
+          "height": 60,
+          "top": 340.6071472167969,
+          "right": 144.85714721679688,
+          "bottom": 400.6071472167969,
+          "left": 79.71428680419922
+        },
+        "ink": {
+          "left": 84.85714721679688,
+          "top": 360.3214111328125,
+          "right": 139.71429443359375,
+          "bottom": 380.89288330078125,
+          "width": 54.857147216796875,
+          "height": 20.57147216796875
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 84.85714721679688,
+            "y": 360.3214111328125,
+            "width": 54.857147216796875,
+            "height": 20.57147216796875,
+            "top": 360.3214111328125,
+            "right": 139.71429443359375,
+            "bottom": 380.89288330078125,
+            "left": 84.85714721679688
+          }
+        ],
+        "offsetX": 0.000003814697265625,
+        "offsetY": 0
+      },
+      {
+        "text": "防禦",
+        "rect": {
+          "x": 215.1428680419922,
+          "y": 340.6071472167969,
+          "width": 65.14283752441406,
+          "height": 60,
+          "top": 340.6071472167969,
+          "right": 280.28570556640625,
+          "bottom": 400.6071472167969,
+          "left": 215.1428680419922
+        },
+        "ink": {
+          "left": 234,
+          "top": 360.3214111328125,
+          "right": 261.4285888671875,
+          "bottom": 380.89288330078125,
+          "width": 27.4285888671875,
+          "height": 20.57147216796875
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 234,
+            "y": 360.3214111328125,
+            "width": 27.4285888671875,
+            "height": 20.57147216796875,
+            "top": 360.3214111328125,
+            "right": 261.4285888671875,
+            "bottom": 380.89288330078125,
+            "left": 234
+          }
+        ],
+        "offsetX": 0.00000762939453125,
+        "offsetY": 0
+      },
+      {
+        "text": "背包",
+        "rect": {
+          "x": 147.42857360839844,
+          "y": 340.6071472167969,
+          "width": 65.14286804199219,
+          "height": 60,
+          "top": 340.6071472167969,
+          "right": 212.57144165039062,
+          "bottom": 400.6071472167969,
+          "left": 147.42857360839844
+        },
+        "ink": {
+          "left": 166.2857208251953,
+          "top": 360.3214111328125,
+          "right": 193.7142791748047,
+          "bottom": 380.89288330078125,
+          "width": 27.428558349609375,
+          "height": 20.57147216796875
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 166.2857208251953,
+            "y": 360.3214111328125,
+            "width": 27.428558349609375,
+            "height": 20.57147216796875,
+            "top": 360.3214111328125,
+            "right": 193.7142791748047,
+            "bottom": 380.89288330078125,
+            "left": 166.2857208251953
+          }
+        ],
+        "offsetX": -0.00000762939453125,
+        "offsetY": 0
+      },
+      {
+        "text": "逃脫",
+        "rect": {
+          "x": 282.8571472167969,
+          "y": 340.6071472167969,
+          "width": 65.14285278320312,
+          "height": 60,
+          "top": 340.6071472167969,
+          "right": 348,
+          "bottom": 400.6071472167969,
+          "left": 282.8571472167969
+        },
+        "ink": {
+          "left": 301.71429443359375,
+          "top": 360.3214111328125,
+          "right": 329.14288330078125,
+          "bottom": 380.89288330078125,
+          "width": 27.4285888671875,
+          "height": 20.57147216796875
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 301.71429443359375,
+            "y": 360.3214111328125,
+            "width": 27.4285888671875,
+            "height": 20.57147216796875,
+            "top": 360.3214111328125,
+            "right": 329.14288330078125,
+            "bottom": 380.89288330078125,
+            "left": 301.71429443359375
+          }
+        ],
+        "offsetX": 0.0000152587890625,
+        "offsetY": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "phase": "battle-hud-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-native-pressed-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-open-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "battle-hud-restored-baseline-geometry",
+        "max": 0
+      }
+    ],
+    "domainEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "posts": 0
+  },
+  {
+    "size": "393x873",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "clean": true,
+    "sourceSame": true,
+    "profile": true,
+    "pressed": {
+      "tested": true,
+      "active": false,
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "1px solid rgba(0, 0, 0, 0)",
+      "filter": "none",
+      "boxShadow": "none",
+      "opacity": "1",
+      "menuOpen": false,
+      "clicks": []
+    },
+    "cancel": {
+      "active": false,
+      "menuOpen": false,
+      "clicks": []
+    },
+    "tick": {
+      "startTimer": 20,
+      "startAt": 1792546521874,
+      "clockPolicy": "Original 1s timer; wait at most1200ms, no freeze/clock/timer API override",
+      "endTimer": 19,
+      "endAt": 1792546523014
+    },
+    "inputHits": true,
+    "rail": {
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "background": "rgb(21, 19, 15) none no-repeat scroll 50% 50% / 100% 100% padding-box border-box",
+      "border": "1px solid rgb(115, 88, 45)",
+      "borderRadius": "0px",
+      "borderImageSource": "url(\"http://127.0.0.1:50570/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "borderImageSlice": "115 fill",
+      "borderImageWidth": "6px",
+      "content": "\"\"",
+      "position": "absolute",
+      "zIndex": "1"
+    },
+    "buttons": [
+      {
+        "text": "技能",
+        "rect": {
+          "x": 13.100000381469727,
+          "y": 458.99609375,
+          "width": 71.11428833007812,
+          "height": 65.5,
+          "top": 458.99609375,
+          "right": 84.21428871154785,
+          "bottom": 524.49609375,
+          "left": 13.100000381469727
+        },
+        "ink": {
+          "left": 33.68571472167969,
+          "top": 480.5174865722656,
+          "right": 63.62857437133789,
+          "bottom": 502.97467041015625,
+          "width": 29.942859649658203,
+          "height": 22.457183837890625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 33.68571472167969,
+            "y": 480.5174865722656,
+            "width": 29.942859649658203,
+            "height": 22.457183837890625,
+            "top": 480.5174865722656,
+            "right": 63.62857437133789,
+            "bottom": 502.97467041015625,
+            "left": 33.68571472167969
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": -0.0000152587890625
+      },
+      {
+        "text": "普通攻擊",
+        "rect": {
+          "x": 87.02142333984375,
+          "y": 458.99609375,
+          "width": 71.11428833007812,
+          "height": 65.5,
+          "top": 458.99609375,
+          "right": 158.13571166992188,
+          "bottom": 524.49609375,
+          "left": 87.02142333984375
+        },
+        "ink": {
+          "left": 92.63571166992188,
+          "top": 480.5174865722656,
+          "right": 152.52142333984375,
+          "bottom": 502.97467041015625,
+          "width": 59.885711669921875,
+          "height": 22.457183837890625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 92.63571166992188,
+            "y": 480.5174865722656,
+            "width": 59.885711669921875,
+            "height": 22.457183837890625,
+            "top": 480.5174865722656,
+            "right": 152.52142333984375,
+            "bottom": 502.97467041015625,
+            "left": 92.63571166992188
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": -0.0000152587890625
+      },
+      {
+        "text": "防禦",
+        "rect": {
+          "x": 234.86428833007812,
+          "y": 458.99609375,
+          "width": 71.11428833007812,
+          "height": 65.5,
+          "top": 458.99609375,
+          "right": 305.97857666015625,
+          "bottom": 524.49609375,
+          "left": 234.86428833007812
+        },
+        "ink": {
+          "left": 255.4499969482422,
+          "top": 480.5174865722656,
+          "right": 285.3928527832031,
+          "bottom": 502.97467041015625,
+          "width": 29.942855834960938,
+          "height": 22.457183837890625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 255.4499969482422,
+            "y": 480.5174865722656,
+            "width": 29.942855834960938,
+            "height": 22.457183837890625,
+            "top": 480.5174865722656,
+            "right": 285.3928527832031,
+            "bottom": 502.97467041015625,
+            "left": 255.4499969482422
+          }
+        ],
+        "offsetX": -0.00000762939453125,
+        "offsetY": -0.0000152587890625
+      },
+      {
+        "text": "背包",
+        "rect": {
+          "x": 160.94285583496094,
+          "y": 458.99609375,
+          "width": 71.11428833007812,
+          "height": 65.5,
+          "top": 458.99609375,
+          "right": 232.05714416503906,
+          "bottom": 524.49609375,
+          "left": 160.94285583496094
+        },
+        "ink": {
+          "left": 181.52857971191406,
+          "top": 480.5174865722656,
+          "right": 211.47142028808594,
+          "bottom": 502.97467041015625,
+          "width": 29.942840576171875,
+          "height": 22.457183837890625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 181.52857971191406,
+            "y": 480.5174865722656,
+            "width": 29.942840576171875,
+            "height": 22.457183837890625,
+            "top": 480.5174865722656,
+            "right": 211.47142028808594,
+            "bottom": 502.97467041015625,
+            "left": 181.52857971191406
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": -0.0000152587890625
+      },
+      {
+        "text": "逃脫",
+        "rect": {
+          "x": 308.78570556640625,
+          "y": 458.99609375,
+          "width": 71.11428833007812,
+          "height": 65.5,
+          "top": 458.99609375,
+          "right": 379.8999938964844,
+          "bottom": 524.49609375,
+          "left": 308.78570556640625
+        },
+        "ink": {
+          "left": 329.3714294433594,
+          "top": 480.5174865722656,
+          "right": 359.3143005371094,
+          "bottom": 502.97467041015625,
+          "width": 29.94287109375,
+          "height": 22.457183837890625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 329.3714294433594,
+            "y": 480.5174865722656,
+            "width": 29.94287109375,
+            "height": 22.457183837890625,
+            "top": 480.5174865722656,
+            "right": 359.3143005371094,
+            "bottom": 502.97467041015625,
+            "left": 329.3714294433594
+          }
+        ],
+        "offsetX": 0.0000152587890625,
+        "offsetY": -0.0000152587890625
+      }
+    ],
+    "comparisons": [
+      {
+        "phase": "battle-hud-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-native-pressed-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-open-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "battle-hud-restored-baseline-geometry",
+        "max": 0
+      }
+    ],
+    "domainEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "posts": 0
+  },
+  {
+    "size": "412x915",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "clean": true,
+    "sourceSame": true,
+    "profile": true,
+    "pressed": {
+      "tested": true,
+      "active": false,
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "1px solid rgba(0, 0, 0, 0)",
+      "filter": "none",
+      "boxShadow": "none",
+      "opacity": "1",
+      "menuOpen": false,
+      "clicks": []
+    },
+    "cancel": {
+      "active": false,
+      "menuOpen": false,
+      "clicks": []
+    },
+    "tick": {
+      "startTimer": 20,
+      "startAt": 1792546539798,
+      "clockPolicy": "Original 1s timer; wait at most1200ms, no freeze/clock/timer API override",
+      "endTimer": 19,
+      "endAt": 1792546540930
+    },
+    "inputHits": true,
+    "rail": {
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "background": "rgb(21, 19, 15) none no-repeat scroll 50% 50% / 100% 100% padding-box border-box",
+      "border": "1px solid rgb(115, 88, 45)",
+      "borderRadius": "0px",
+      "borderImageSource": "url(\"http://127.0.0.1:54516/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "borderImageSlice": "115 fill",
+      "borderImageWidth": "6px",
+      "content": "\"\"",
+      "position": "absolute",
+      "zIndex": "1"
+    },
+    "buttons": [
+      {
+        "text": "技能",
+        "rect": {
+          "x": 13.733332633972168,
+          "y": 481.0837707519531,
+          "width": 74.55238342285156,
+          "height": 68.66665649414062,
+          "top": 481.0837707519531,
+          "right": 88.28571605682373,
+          "bottom": 549.7504272460938,
+          "left": 13.733332633972168
+        },
+        "ink": {
+          "left": 35.31428527832031,
+          "top": 503.6456604003906,
+          "right": 66.70475769042969,
+          "bottom": 527.1885375976562,
+          "width": 31.390472412109375,
+          "height": 23.542877197265625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 35.31428527832031,
+            "y": 503.6456604003906,
+            "width": 31.390472412109375,
+            "height": 23.542877197265625,
+            "top": 503.6456604003906,
+            "right": 66.70475769042969,
+            "bottom": 527.1885375976562,
+            "left": 35.31428527832031
+          }
+        ],
+        "offsetX": -0.00000286102294921875,
+        "offsetY": 0
+      },
+      {
+        "text": "普通攻擊",
+        "rect": {
+          "x": 91.22856903076172,
+          "y": 481.0837707519531,
+          "width": 74.55237579345703,
+          "height": 68.66665649414062,
+          "top": 481.0837707519531,
+          "right": 165.78094482421875,
+          "bottom": 549.7504272460938,
+          "left": 91.22856903076172
+        },
+        "ink": {
+          "left": 97.1142807006836,
+          "top": 503.6456604003906,
+          "right": 159.89523315429688,
+          "bottom": 527.1885375976562,
+          "width": 62.78095245361328,
+          "height": 23.542877197265625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 97.1142807006836,
+            "y": 503.6456604003906,
+            "width": 62.78095245361328,
+            "height": 23.542877197265625,
+            "top": 503.6456604003906,
+            "right": 159.89523315429688,
+            "bottom": 527.1885375976562,
+            "left": 97.1142807006836
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "防禦",
+        "rect": {
+          "x": 246.2190399169922,
+          "y": 481.0837707519531,
+          "width": 74.55235290527344,
+          "height": 68.66665649414062,
+          "top": 481.0837707519531,
+          "right": 320.7713928222656,
+          "bottom": 549.7504272460938,
+          "left": 246.2190399169922
+        },
+        "ink": {
+          "left": 267.79998779296875,
+          "top": 503.6456604003906,
+          "right": 299.1904602050781,
+          "bottom": 527.1885375976562,
+          "width": 31.390472412109375,
+          "height": 23.542877197265625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 267.79998779296875,
+            "y": 503.6456604003906,
+            "width": 31.390472412109375,
+            "height": 23.542877197265625,
+            "top": 503.6456604003906,
+            "right": 299.1904602050781,
+            "bottom": 527.1885375976562,
+            "left": 267.79998779296875
+          }
+        ],
+        "offsetX": 0.00000762939453125,
+        "offsetY": 0
+      },
+      {
+        "text": "背包",
+        "rect": {
+          "x": 168.7238006591797,
+          "y": 481.0837707519531,
+          "width": 74.55238342285156,
+          "height": 68.66665649414062,
+          "top": 481.0837707519531,
+          "right": 243.27618408203125,
+          "bottom": 549.7504272460938,
+          "left": 168.7238006591797
+        },
+        "ink": {
+          "left": 190.3047637939453,
+          "top": 503.6456604003906,
+          "right": 221.69522094726562,
+          "bottom": 527.1885375976562,
+          "width": 31.390457153320312,
+          "height": 23.542877197265625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 190.3047637939453,
+            "y": 503.6456604003906,
+            "width": 31.390457153320312,
+            "height": 23.542877197265625,
+            "top": 503.6456604003906,
+            "right": 221.69522094726562,
+            "bottom": 527.1885375976562,
+            "left": 190.3047637939453
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "逃脫",
+        "rect": {
+          "x": 323.7142639160156,
+          "y": 481.0837707519531,
+          "width": 74.55239868164062,
+          "height": 68.66665649414062,
+          "top": 481.0837707519531,
+          "right": 398.26666259765625,
+          "bottom": 549.7504272460938,
+          "left": 323.7142639160156
+        },
+        "ink": {
+          "left": 345.29522705078125,
+          "top": 503.6456604003906,
+          "right": 376.6856994628906,
+          "bottom": 527.1885375976562,
+          "width": 31.390472412109375,
+          "height": 23.542877197265625
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 345.29522705078125,
+            "y": 503.6456604003906,
+            "width": 31.390472412109375,
+            "height": 23.542877197265625,
+            "top": 503.6456604003906,
+            "right": 376.6856994628906,
+            "bottom": 527.1885375976562,
+            "left": 345.29522705078125
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "phase": "battle-hud-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-native-pressed-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-open-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "battle-hud-restored-baseline-geometry",
+        "max": 0
+      }
+    ],
+    "domainEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "posts": 0
+  },
+  {
+    "size": "1280x800",
+    "head": "1b2b750c2b5baf161cb9febbaefaefa5121b9e2a",
+    "complete": true,
+    "clean": true,
+    "sourceSame": true,
+    "profile": true,
+    "pressed": {
+      "tested": true,
+      "active": true,
+      "background": "rgba(0, 0, 0, 0) none repeat scroll 0% 0% / auto padding-box border-box",
+      "border": "1px solid rgba(0, 0, 0, 0)",
+      "filter": "none",
+      "boxShadow": "none",
+      "opacity": "1",
+      "menuOpen": false,
+      "clicks": []
+    },
+    "cancel": {
+      "active": false,
+      "menuOpen": false,
+      "clicks": []
+    },
+    "tick": {
+      "startTimer": 20,
+      "startAt": 1792546550122,
+      "clockPolicy": "Original 1s timer; wait at most1200ms, no freeze/clock/timer API override",
+      "endTimer": 19,
+      "endAt": 1792546551146
+    },
+    "inputHits": true,
+    "rail": {
+      "display": "block",
+      "visibility": "visible",
+      "opacity": "1",
+      "background": "rgb(21, 19, 15) none no-repeat scroll 50% 50% / 100% 100% padding-box border-box",
+      "border": "1px solid rgb(115, 88, 45)",
+      "borderRadius": "0px",
+      "borderImageSource": "url(\"http://127.0.0.1:54147/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "borderImageSlice": "115 fill",
+      "borderImageWidth": "6px",
+      "content": "\"\"",
+      "position": "absolute",
+      "zIndex": "1"
+    },
+    "buttons": [
+      {
+        "text": "技能",
+        "rect": {
+          "x": 430,
+          "y": 425.7589111328125,
+          "width": 81.4285888671875,
+          "height": 75,
+          "top": 425.7589111328125,
+          "right": 511.4285888671875,
+          "bottom": 500.7589111328125,
+          "left": 430
+        },
+        "ink": {
+          "left": 453.5714111328125,
+          "top": 450.4017639160156,
+          "right": 487.8571472167969,
+          "bottom": 476.1160583496094,
+          "width": 34.285736083984375,
+          "height": 25.71429443359375
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 453.5714111328125,
+            "y": 450.4017639160156,
+            "width": 34.285736083984375,
+            "height": 25.71429443359375,
+            "top": 450.4017639160156,
+            "right": 487.8571472167969,
+            "bottom": 476.1160583496094,
+            "left": 453.5714111328125
+          }
+        ],
+        "offsetX": -0.0000152587890625,
+        "offsetY": 0
+      },
+      {
+        "text": "普通攻擊",
+        "rect": {
+          "x": 514.642822265625,
+          "y": 425.7589111328125,
+          "width": 81.4285888671875,
+          "height": 75,
+          "top": 425.7589111328125,
+          "right": 596.0714111328125,
+          "bottom": 500.7589111328125,
+          "left": 514.642822265625
+        },
+        "ink": {
+          "left": 521.0714111328125,
+          "top": 450.4017639160156,
+          "right": 589.642822265625,
+          "bottom": 476.1160583496094,
+          "width": 68.5714111328125,
+          "height": 25.71429443359375
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 521.0714111328125,
+            "y": 450.4017639160156,
+            "width": 68.5714111328125,
+            "height": 25.71429443359375,
+            "top": 450.4017639160156,
+            "right": 589.642822265625,
+            "bottom": 476.1160583496094,
+            "left": 521.0714111328125
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "防禦",
+        "rect": {
+          "x": 683.9285888671875,
+          "y": 425.7589111328125,
+          "width": 81.42852783203125,
+          "height": 75,
+          "top": 425.7589111328125,
+          "right": 765.3571166992188,
+          "bottom": 500.7589111328125,
+          "left": 683.9285888671875
+        },
+        "ink": {
+          "left": 707.5,
+          "top": 450.4017639160156,
+          "right": 741.7857055664062,
+          "bottom": 476.1160583496094,
+          "width": 34.28570556640625,
+          "height": 25.71429443359375
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 707.5,
+            "y": 450.4017639160156,
+            "width": 34.28570556640625,
+            "height": 25.71429443359375,
+            "top": 450.4017639160156,
+            "right": 741.7857055664062,
+            "bottom": 476.1160583496094,
+            "left": 707.5
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "背包",
+        "rect": {
+          "x": 599.2857055664062,
+          "y": 425.7589111328125,
+          "width": 81.4285888671875,
+          "height": 75,
+          "top": 425.7589111328125,
+          "right": 680.7142944335938,
+          "bottom": 500.7589111328125,
+          "left": 599.2857055664062
+        },
+        "ink": {
+          "left": 622.857177734375,
+          "top": 450.4017639160156,
+          "right": 657.142822265625,
+          "bottom": 476.1160583496094,
+          "width": 34.28564453125,
+          "height": 25.71429443359375
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 622.857177734375,
+            "y": 450.4017639160156,
+            "width": 34.28564453125,
+            "height": 25.71429443359375,
+            "top": 450.4017639160156,
+            "right": 657.142822265625,
+            "bottom": 476.1160583496094,
+            "left": 622.857177734375
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      },
+      {
+        "text": "逃脫",
+        "rect": {
+          "x": 768.5714111328125,
+          "y": 425.7589111328125,
+          "width": 81.4285888671875,
+          "height": 75,
+          "top": 425.7589111328125,
+          "right": 850,
+          "bottom": 500.7589111328125,
+          "left": 768.5714111328125
+        },
+        "ink": {
+          "left": 792.142822265625,
+          "top": 450.4017639160156,
+          "right": 826.4285888671875,
+          "bottom": 476.1160583496094,
+          "width": 34.2857666015625,
+          "height": 25.71429443359375
+        },
+        "hit": true,
+        "textRects": [
+          {
+            "x": 792.142822265625,
+            "y": 450.4017639160156,
+            "width": 34.2857666015625,
+            "height": 25.71429443359375,
+            "top": 450.4017639160156,
+            "right": 826.4285888671875,
+            "bottom": 476.1160583496094,
+            "left": 792.142822265625
+          }
+        ],
+        "offsetX": 0,
+        "offsetY": 0
+      }
+    ],
+    "comparisons": [
+      {
+        "phase": "battle-hud-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-native-pressed-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "skill-open-baseline-geometry",
+        "max": 0
+      },
+      {
+        "phase": "battle-hud-restored-baseline-geometry",
+        "max": 0
+      }
+    ],
+    "domainEqual": true,
+    "rawSame": true,
+    "metaSame": true,
+    "saves": 0,
+    "posts": 0
+  }
+]

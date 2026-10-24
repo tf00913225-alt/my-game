@@ -1,0 +1,1164 @@
+{
+  "sourcesBefore": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "dbfc8cb058ccf868ce1192fd5a2b0d4d3d56e9c4f61d040d9adc5c4855f58016",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.b82b2ac7c9b1.js": "b82b2ac7c9b1d07ca4aed7eb9ba605402a449a46121682015b998852ad48abd9",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.30032fd100c3.css": "30032fd100c38a8a6e9e6151a487de6e91914cbe2ee78206fde0ad621d4c4161"
+  },
+  "sourcesAfter": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "dbfc8cb058ccf868ce1192fd5a2b0d4d3d56e9c4f61d040d9adc5c4855f58016",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.b82b2ac7c9b1.js": "b82b2ac7c9b1d07ca4aed7eb9ba605402a449a46121682015b998852ad48abd9",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.9381903ea71f.js": "9381903ea71f71a12753c8059108fdc54ee0a9c246a89d10df2345e4fb82d2d5",
+    "build/gameplay-core.30032fd100c3.css": "30032fd100c38a8a6e9e6151a487de6e91914cbe2ee78206fde0ad621d4c4161"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.7c85620e671b.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.b82b2ac7c9b1.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.b82b2ac7c9b1.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/gameplay-core.30032fd100c3.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.9381903ea71f.js",
+    "/build/gameplay-core.30032fd100c3.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.9eb4fff74856.css",
+    "/build/feature-relic-progression.464cd8f702a6.js",
+    "/build/feature-boss-relic.a8ff5e27d0a5.js"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"4\"]",
+      "x": 827.5,
+      "y": 309.0299377441406,
+      "hit": true,
+      "label": "秘寶"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 640,
+      "y": 770,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 742.5,
+      "y": 752.5,
+      "to": 116.25,
+      "top": 1235,
+      "client": 1647,
+      "height": 2882
+    },
+    {
+      "selector": "[data-relic-source]",
+      "x": 548.125,
+      "y": 434.44659423828125,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 723.75,
+      "y": 590,
+      "to": 200.12368774414062,
+      "top": 4411,
+      "client": 1056,
+      "height": 5467
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 640,
+      "y": 687.5,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 763.75,
+      "y": 48.75,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 640,
+      "y": 770,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 742.5,
+      "y": 752.5,
+      "to": 116.25,
+      "top": 1244,
+      "client": 1647,
+      "height": 2891
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 640,
+      "y": 770,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 742.5,
+      "y": 752.5,
+      "to": 116.25,
+      "top": 1109,
+      "client": 1647,
+      "height": 2756
+    },
+    {
+      "selector": ".relic-progression-box-strip button",
+      "x": 593.7662658691406,
+      "y": 240.625,
+      "hit": true,
+      "label": "桃紅階以下秘寶碎片自選箱 ×1"
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 742.5,
+      "y": 752.5000305175781,
+      "to": 201.74478149414062,
+      "top": 1670,
+      "client": 1442,
+      "height": 3112
+    },
+    {
+      "selector": ".relic-choice-back",
+      "x": 524.0592346191406,
+      "y": 215.49478149414062,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 802.1354064941406,
+      "y": 50,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"4\"]",
+      "x": 827.5,
+      "y": 309.0299377441406,
+      "hit": true,
+      "label": "秘寶"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 802.1354064941406,
+      "y": 50,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "fixture": {
+        "id": "relic_tiangang_banner",
+        "name": "天罡戰旗",
+        "dev": true,
+        "state": {
+          "unlocked": false,
+          "level": 1,
+          "exp": 0,
+          "seen": true
+        }
+      }
+    },
+    {
+      "detailEntry": {
+        "scroll": 0,
+        "body": {
+          "x": 435,
+          "y": 91.25,
+          "width": 410,
+          "height": 686.25,
+          "top": 91.25,
+          "right": 845,
+          "bottom": 777.5,
+          "left": 435
+        },
+        "hero": {
+          "x": 446.25,
+          "y": 102.5,
+          "width": 387.5,
+          "height": 155.69659423828125,
+          "top": 102.5,
+          "right": 833.75,
+          "bottom": 258.19659423828125,
+          "left": 446.25
+        },
+        "title": {
+          "x": 598.1965942382812,
+          "y": 127.31119537353516,
+          "width": 219.30340576171875,
+          "height": 33.74999237060547,
+          "top": 127.31119537353516,
+          "right": 817.5,
+          "bottom": 161.06118774414062,
+          "left": 598.1965942382812
+        },
+        "name": "天罡戰旗"
+      }
+    },
+    {
+      "lockedActual": {
+        "unlocked": false,
+        "level": 1,
+        "exp": 0,
+        "seen": true
+      }
+    },
+    {
+      "detailEntry": {
+        "scroll": 0,
+        "body": {
+          "x": 435,
+          "y": 91.25,
+          "width": 410,
+          "height": 686.25,
+          "top": 91.25,
+          "right": 845,
+          "bottom": 777.5,
+          "left": 435
+        },
+        "hero": {
+          "x": 446.25,
+          "y": 102.5,
+          "width": 387.5,
+          "height": 155.69659423828125,
+          "top": 102.5,
+          "right": 833.75,
+          "bottom": 258.19659423828125,
+          "left": 446.25
+        },
+        "title": {
+          "x": 598.1965942382812,
+          "y": 127.31119537353516,
+          "width": 219.30340576171875,
+          "height": 33.74999237060547,
+          "top": 127.31119537353516,
+          "right": 817.5,
+          "bottom": 161.06118774414062,
+          "left": 598.1965942382812
+        },
+        "name": "天罡戰旗"
+      }
+    },
+    {
+      "detailEntry": {
+        "scroll": 0,
+        "body": {
+          "x": 435,
+          "y": 91.25,
+          "width": 410,
+          "height": 686.25,
+          "top": 91.25,
+          "right": 845,
+          "bottom": 777.5,
+          "left": 435
+        },
+        "hero": {
+          "x": 446.25,
+          "y": 102.5,
+          "width": 387.5,
+          "height": 155.69659423828125,
+          "top": 102.5,
+          "right": 833.75,
+          "bottom": 258.19659423828125,
+          "left": 446.25
+        },
+        "title": {
+          "x": 598.1965942382812,
+          "y": 127.31119537353516,
+          "width": 219.30340576171875,
+          "height": 33.74999237060547,
+          "top": 127.31119537353516,
+          "right": 817.5,
+          "bottom": 161.06118774414062,
+          "left": 598.1965942382812
+        },
+        "name": "天罡戰旗"
+      }
+    },
+    {
+      "choice": {
+        "text": "秘寶碎片自選",
+        "ink": {
+          "x": 548.1965942382812,
+          "y": 38.33333206176758,
+          "width": 183.60028076171875,
+          "height": 43.33333206176758,
+          "top": 38.33333206176758,
+          "right": 731.796875,
+          "bottom": 81.66666412353516,
+          "left": 548.1965942382812
+        },
+        "body": {
+          "x": 435,
+          "y": 176.74478149414062,
+          "width": 410,
+          "height": 600.7552490234375,
+          "top": 176.74478149414062,
+          "right": 845,
+          "bottom": 777.5000305175781,
+          "left": 435
+        },
+        "options": [
+          {
+            "box": {
+              "x": 446.25,
+              "y": 422.0572814941406,
+              "width": 188.125,
+              "height": 94.99996948242188,
+              "top": 422.0572814941406,
+              "right": 634.375,
+              "bottom": 517.0572509765625,
+              "left": 446.25
+            },
+            "text": "回天寶輪\n桃紅階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 440.390625,
+                "width": 80,
+                "height": 29.166656494140625,
+                "top": 440.390625,
+                "right": 541.25,
+                "bottom": 469.5572814941406,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 472.63671875,
+                "width": 145.8463134765625,
+                "height": 25.416656494140625,
+                "top": 472.63671875,
+                "right": 607.0963134765625,
+                "bottom": 498.0533752441406,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 422.0572814941406,
+              "width": 188.125,
+              "height": 94.99996948242188,
+              "top": 422.0572814941406,
+              "right": 833.75,
+              "bottom": 517.0572509765625,
+              "left": 645.625
+            },
+            "text": "山河寶鼎\n橙階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 440.390625,
+                "width": 80,
+                "height": 29.166656494140625,
+                "top": 440.390625,
+                "right": 740.625,
+                "bottom": 469.5572814941406,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 472.63671875,
+                "width": 128.3463134765625,
+                "height": 25.416656494140625,
+                "top": 472.63671875,
+                "right": 788.9713134765625,
+                "bottom": 498.0533752441406,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 528.3072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 528.3072509765625,
+              "right": 634.375,
+              "bottom": 623.3072509765625,
+              "left": 446.25
+            },
+            "text": "天罡戰旗\n橙階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 546.640625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 546.640625,
+                "right": 541.25,
+                "bottom": 575.8072509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 578.88671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 578.88671875,
+                "right": 589.5963134765625,
+                "bottom": 604.3033447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 528.3072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 528.3072509765625,
+              "right": 833.75,
+              "bottom": 623.3072509765625,
+              "left": 645.625
+            },
+            "text": "伏魔金印\n橙階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 546.640625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 546.640625,
+                "right": 740.625,
+                "bottom": 575.8072509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 578.88671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 578.88671875,
+                "right": 788.9713134765625,
+                "bottom": 604.3033447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 634.5572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 634.5572509765625,
+              "right": 634.375,
+              "bottom": 729.5572509765625,
+              "left": 446.25
+            },
+            "text": "赤霄戰紋\n橙階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 652.890625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 652.890625,
+                "right": 541.25,
+                "bottom": 682.0572509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 685.13671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 685.13671875,
+                "right": 589.5963134765625,
+                "bottom": 710.5533447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 634.5572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 634.5572509765625,
+              "right": 833.75,
+              "bottom": 729.5572509765625,
+              "left": 645.625
+            },
+            "text": "九龍神火罩\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 652.890625,
+                "width": 100,
+                "height": 29.1666259765625,
+                "top": 652.890625,
+                "right": 760.625,
+                "bottom": 682.0572509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 685.13671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 685.13671875,
+                "right": 788.9713134765625,
+                "bottom": 710.5533447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 740.8072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 740.8072509765625,
+              "right": 634.375,
+              "bottom": 835.8072509765625,
+              "left": 446.25
+            },
+            "text": "太初聖符\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 759.140625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 759.140625,
+                "right": 541.25,
+                "bottom": 788.3072509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 791.38671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 791.38671875,
+                "right": 589.5963134765625,
+                "bottom": 816.8033447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 740.8072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 740.8072509765625,
+              "right": 833.75,
+              "bottom": 835.8072509765625,
+              "left": 645.625
+            },
+            "text": "玄冰鏡心\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 759.140625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 759.140625,
+                "right": 740.625,
+                "bottom": 788.3072509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 791.38671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 791.38671875,
+                "right": 788.9713134765625,
+                "bottom": 816.8033447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 847.0572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 847.0572509765625,
+              "right": 634.375,
+              "bottom": 942.0572509765625,
+              "left": 446.25
+            },
+            "text": "岩岳鎮印\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 865.390625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 865.390625,
+                "right": 541.25,
+                "bottom": 894.5572509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 897.63671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 897.63671875,
+                "right": 589.5963134765625,
+                "bottom": 923.0533447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 847.0572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 847.0572509765625,
+              "right": 833.75,
+              "bottom": 942.0572509765625,
+              "left": 645.625
+            },
+            "text": "烈陽神珠\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 865.390625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 865.390625,
+                "right": 740.625,
+                "bottom": 894.5572509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 897.63671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 897.63671875,
+                "right": 788.9713134765625,
+                "bottom": 923.0533447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 953.3072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 953.3072509765625,
+              "right": 634.375,
+              "bottom": 1048.3072509765625,
+              "left": 446.25
+            },
+            "text": "破軍殘卷\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 971.640625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 971.640625,
+                "right": 541.25,
+                "bottom": 1000.8072509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 1003.88671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1003.88671875,
+                "right": 589.5963134765625,
+                "bottom": 1029.3033447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 953.3072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 953.3072509765625,
+              "right": 833.75,
+              "bottom": 1048.3072509765625,
+              "left": 645.625
+            },
+            "text": "寒泉玉珮\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 971.640625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 971.640625,
+                "right": 740.625,
+                "bottom": 1000.8072509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 1003.88671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1003.88671875,
+                "right": 788.9713134765625,
+                "bottom": 1029.3033447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 1059.5572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1059.5572509765625,
+              "right": 634.375,
+              "bottom": 1154.5572509765625,
+              "left": 446.25
+            },
+            "text": "焚星殘印\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 1077.890625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1077.890625,
+                "right": 541.25,
+                "bottom": 1107.0572509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 1110.13671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1110.13671875,
+                "right": 589.5963134765625,
+                "bottom": 1135.5533447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 1059.5572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1059.5572509765625,
+              "right": 833.75,
+              "bottom": 1154.5572509765625,
+              "left": 645.625
+            },
+            "text": "鎮魂古鐘\n紫階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 1077.890625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1077.890625,
+                "right": 740.625,
+                "bottom": 1107.0572509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 1110.13671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1110.13671875,
+                "right": 788.9713134765625,
+                "bottom": 1135.5533447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 1165.8072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1165.8072509765625,
+              "right": 634.375,
+              "bottom": 1260.8072509765625,
+              "left": 446.25
+            },
+            "text": "玄武靈印\n藍階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 1184.140625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1184.140625,
+                "right": 541.25,
+                "bottom": 1213.3072509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 1216.38671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1216.38671875,
+                "right": 589.5963134765625,
+                "bottom": 1241.8033447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 1165.8072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1165.8072509765625,
+              "right": 833.75,
+              "bottom": 1260.8072509765625,
+              "left": 645.625
+            },
+            "text": "青嵐羽符\n藍階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 1184.140625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1184.140625,
+                "right": 740.625,
+                "bottom": 1213.3072509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 1216.38671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1216.38671875,
+                "right": 788.9713134765625,
+                "bottom": 1241.8033447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 1272.0572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1272.0572509765625,
+              "right": 634.375,
+              "bottom": 1367.0572509765625,
+              "left": 446.25
+            },
+            "text": "追風行符\n藍階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 1290.390625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1290.390625,
+                "right": 541.25,
+                "bottom": 1319.5572509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 1322.63671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1322.63671875,
+                "right": 589.5963134765625,
+                "bottom": 1348.0533447265625,
+                "left": 461.25
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 645.625,
+              "y": 1272.0572509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1272.0572509765625,
+              "right": 833.75,
+              "bottom": 1367.0572509765625,
+              "left": 645.625
+            },
+            "text": "乾坤玉壺\n藍階・碎片 ×25",
+            "children": [
+              {
+                "x": 660.625,
+                "y": 1290.390625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1290.390625,
+                "right": 740.625,
+                "bottom": 1319.5572509765625,
+                "left": 660.625
+              },
+              {
+                "x": 660.625,
+                "y": 1322.63671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1322.63671875,
+                "right": 788.9713134765625,
+                "bottom": 1348.0533447265625,
+                "left": 660.625
+              }
+            ]
+          },
+          {
+            "box": {
+              "x": 446.25,
+              "y": 1378.3072509765625,
+              "width": 188.125,
+              "height": 95,
+              "top": 1378.3072509765625,
+              "right": 634.375,
+              "bottom": 1473.3072509765625,
+              "left": 446.25
+            },
+            "text": "靈泉法瓶\n藍階・碎片 ×25",
+            "children": [
+              {
+                "x": 461.25,
+                "y": 1396.640625,
+                "width": 80,
+                "height": 29.1666259765625,
+                "top": 1396.640625,
+                "right": 541.25,
+                "bottom": 1425.8072509765625,
+                "left": 461.25
+              },
+              {
+                "x": 461.25,
+                "y": 1428.88671875,
+                "width": 128.3463134765625,
+                "height": 25.4166259765625,
+                "top": 1428.88671875,
+                "right": 589.5963134765625,
+                "bottom": 1454.3033447265625,
+                "left": 461.25
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "head": "f817bf18c364b1949ff08f5d39cdb301e35f4a7b",
+  "dirty": false,
+  "viewport": [
+    1280,
+    800
+  ],
+  "contexts": [
+    "home -> relic actual data-city-entry4"
+  ],
+  "scenes": [
+    {
+      "name": "relic-list",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-locked-detail-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-locked-detail-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-acquisition-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-acquisition-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-list-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-10-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-10-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-20-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-20-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-choice-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-choice-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-city-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-reopen",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment16 UI only: formal production loader and existing isolated account; actual city entry4, card-overlay details, source acquisition true end/return, owned Lv10/Lv20, choice-box strip to choice page true end/back/reopen. Canonical owned/material presentation fixtures only. Original UI mark-seen/saveRelics sideeffects remain; no claim of zero save calls. No equip, upgrade, craft, choice selection, reward claim or save-authority bypass. Detail entry asserts scroll0 plus visible hero/name; choice title/body separation, all19 option labels contained, modal controls44. Local DEV statusOf forces card unlocked; progression detail guard reads actual owned state. Unawakened catalog absent; no fabricated runtimeReady.",
+  "untested": [
+    "real production locked-card style under nonDEV host",
+    "unawakened catalog absent",
+    "physical devices",
+    "real transactions and settlement"
+  ]
+}
