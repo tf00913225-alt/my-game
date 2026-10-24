@@ -1,0 +1,83 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {spawn,execFileSync} from 'node:child_process';
+import {ROOT,startServer,waitJson,Cdp,findChrome} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+// Use the same isolated account and the real production loader as skill QA.
+const skillQa=fs.readFileSync(path.join(ROOT,'.github/scripts/run-skill-progression-browser-qa.mjs'),'utf8');
+const prepare=skillQa.match(/const PREPARE_RUNTIME=`([\s\S]*?)`;/)[1];
+const viewport=JSON.parse(process.env.UI_READING_VIEWPORT||'[393,873]');
+const sourceHead=process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();
+const sourceDirty=!!execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim();
+const out=path.join(ROOT,'artifacts/ui-skill-standard/dev986-integration',viewport.join('x'));if(fs.existsSync(out))throw Error('Output exists');
+fs.mkdirSync(out,{recursive:true});
+const hash=()=>Object.fromEntries(['index.html','asset-manifest.json',...fs.readdirSync('build').filter(x=>/\.(css|js)$/.test(x)).map(x=>'build/'+x)].map(p=>[p,crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')]));const sourcesBefore=hash(),touches=[],checks=[];const server=await startServer();
+const profile=fs.mkdtempSync(path.join(os.tmpdir(),'functional-reading-'));
+const port=9700+Math.floor(Math.random()*200);
+const chrome=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',windowsHide:true});
+let c;const scenes=[];
+const settle=()=>new Promise(r=>setTimeout(r,350));
+const measure=String.raw`(selector)=>{
+ const host=document.querySelector(selector);if(!host)throw Error('missing '+selector);
+ const elementScale=e=>{let box=e;while(box&&!box.offsetWidth)box=box.parentElement;return box?box.getBoundingClientRect().width/box.offsetWidth:1;};
+ const rows=[],overflow=[],controls=[];
+ const tree=document.createTreeWalker(host,NodeFilter.SHOW_TEXT);
+ while(tree.nextNode()){
+  const n=tree.currentNode,e=n.parentElement,text=n.textContent.trim();
+  if(!text||!e||e.closest('script,style,[aria-hidden="true"],.nav-sr-only,.inventory-title-plate-kicker'))continue;
+  const s=getComputedStyle(e),r=e.getBoundingClientRect();
+  if(!r.width||!r.height||s.visibility==='hidden'||s.display==='none')continue;
+  if(/^[＋+×‹›◀▶▼▲▾◇◆…·—→←？]+$/.test(text))continue;
+  const after=getComputedStyle(e,'::after');
+  const replaced=parseFloat(s.fontSize)===0&&after.content&&after.content!=='none';
+  const font=parseFloat(replaced?after.fontSize:s.fontSize)*elementScale(e);
+  const button=!!e.closest('button,[role="tab"],[role="button"]');
+  const primary=button&&e.matches('button,#creationSubmitLabel,.creation-next>span,.creation-back>span,.element-option .element-name')&&!e.closest('.home-test-tools');
+  rows.push({text:text.slice(0,90),font,button,primary,selector:e.id?'#'+e.id:e.tagName.toLowerCase()+'.'+String(e.className).trim().replace(/\s+/g,'.'),parent:e.parentElement.id||e.parentElement.className});
+ }
+ for(const e of host.querySelectorAll('button,[role="tab"],[role="button"]')){
+  const s=getComputedStyle(e),r=e.getBoundingClientRect();if(!r.width||!r.height||s.visibility==='hidden'||!e.textContent.trim())continue;
+  const walker=document.createTreeWalker(e,NodeFilter.SHOW_TEXT),bounds=[];
+  while(walker.nextNode()){const n=walker.currentNode;if(!n.textContent.trim()||n.parentElement.closest('[aria-hidden="true"]'))continue;const range=document.createRange();range.selectNodeContents(n);bounds.push(range.getBoundingClientRect());}
+  const t={left:Math.min(...bounds.map(b=>b.left)),right:Math.max(...bounds.map(b=>b.right)),top:Math.min(...bounds.map(b=>b.top)),bottom:Math.max(...bounds.map(b=>b.bottom))};
+  const clamped=Array.from(e.querySelectorAll('*')).some(n=>parseInt(getComputedStyle(n).webkitLineClamp)>0);
+  const labelControl=e.matches('button,[role="tab"]')&&!clamped;
+  controls.push({label:(e.textContent||e.getAttribute('aria-label')||'').trim().slice(0,60),width:r.width,height:r.height,overflow:labelControl&&(t.left<r.left-1||t.right>r.right+1||t.top<r.top-1||t.bottom>r.bottom+1)});
+ }
+ for(const e of host.querySelectorAll('h1,h2,h3,.item-modal-name,.home-feature-modal-title,[role="tablist"]')){
+  const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
+  if(e.scrollWidth>e.clientWidth+1)overflow.push({text:e.textContent.trim().slice(0,60),width:r.width,scroll:e.scrollWidth,client:e.clientWidth});
+ }
+ return {rows,controls,overflow};
+}`;
+try{
+ const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');
+ c=new Cdp(target.webSocketDebuggerUrl);await c.send('Page.enable');await c.send('Runtime.enable');
+ await c.send('Emulation.setDeviceMetricsOverride',{width:viewport[0],height:viewport[1],deviceScaleFactor:1,mobile:viewport[0]<800});
+ await c.send('Page.navigate',{url:server.url});await c.eval(prepare);
+ await c.eval("(async()=>{await FourSymbolsFeatures.ensure('relic','functional-reading');await FourSymbolsFeatures.ensure('gameplay-core','functional-reading');})()");
+ await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-equipped-armor'});const bagArmor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-bag-armor'});inventoryItems.push(bagArmor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
+ const capture=async(name,selector='#homeFeatureModal')=>{
+  await settle();const data=await c.eval(`(${measure})(${JSON.stringify(selector)})`);
+  assert.ok(data.rows.length||data.controls.length,name+': empty UI coverage');if(selector==='#homeFeatureModal'||selector==='#v132RewardModal')for(const q of data.controls)assert.ok(q.height>=44,name+' control below44 '+JSON.stringify(q));
+  scenes.push({name,...data});fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
+  const image=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
+  console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
+ };
+ const tap=async selector=>{
+  const point=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return null;const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,hit:hit===e||e.contains(hit),label:e.textContent.trim()};})()`);
+  touches.push({selector,...point});assert.ok(point?.hit,'real touch is blocked: '+selector+' '+JSON.stringify(point));
+  await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});
+  await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:point.x,y:point.y,button:'left',clickCount:1});await settle();
+ };
+
+ 
+ const end=async(root)=>{const sel=await c.eval('(()=>{const r=document.querySelector('+JSON.stringify(root)+'),e=[r,...r.querySelectorAll("*")].filter(e=>{const q=e.getBoundingClientRect();return q.height>50&&q.width>50&&e.scrollHeight>e.clientHeight+2&&/auto|scroll/.test(getComputedStyle(e).overflowY)}).sort((a,b)=>b.clientHeight-a.clientHeight)[0];if(!e)return null;e.dataset.qaScroll="active";return "[data-qa-scroll=active]"})()');if(!sel){touches.push({root,scroll:'not-needed'});return;}for(let n=0;n<20;n++){const p=await c.eval('(()=>{const e=document.querySelector('+JSON.stringify(sel)+'),r=e.getBoundingClientRect();return {x:r.x+r.width*.75,y:r.bottom-25,to:r.top+25,top:e.scrollTop,client:e.clientHeight,height:e.scrollHeight}})()');if(p.top+p.client>=p.height-2){touches.push({root,scroll:sel,...p});await c.eval('document.querySelector('+JSON.stringify(sel)+').removeAttribute("data-qa-scroll")');return;}if(viewport[0]>=800)await c.send('Input.dispatchMouseEvent',{type:'mouseWheel',x:p.x,y:(p.y+p.to)/2,deltaX:0,deltaY:550});else{await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:p.x,y:p.y}]});for(let i=1;i<=14;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x,y:p.y+(p.to-p.y)*i/14}]});await new Promise(r=>setTimeout(r,20));}await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}await settle();}throw Error('end not reached '+root);};
+const domainBefore=await c.eval('JSON.stringify({player,player2,player3,gold,sharedExp,inventoryItems,characterSkillLoadouts})');await c.eval("closeHomeFeature();showCreation()");
+async function portrait(name,expected){await c.eval('(async()=>{const img=document.getElementById("creationPortrait");await img.decode()})()');await capture(name,'#creationPage');const q=await c.eval(`(()=>{const n=document.getElementById('creationPortrait'),r=n.getBoundingClientRect(),s=getComputedStyle(n);return{src:n.getAttribute('src'),natural:[n.naturalWidth,n.naturalHeight],box:r.toJSON(),fit:s.objectFit,visible:getComputedStyle(document.getElementById('creationPage')).display}})()`);assert.equal(q.src,expected);assert.ok(q.natural[0]>0&&q.natural[1]>0);assert.equal(q.fit,'contain');assert.ok(q.box.left>=0&&q.box.right<=viewport[0]+1&&q.box.top>=0&&q.box.bottom<=viewport[1]+1);checks.push({name,...q});}
+await portrait('female-fire','assets/characters/player_female_01.webp');await tap("#creationPage [onclick=\"selectCreationGender('male')\"]");await tap("#creationPage [onclick=\"selectElement('earth')\"]");await portrait('male-earth','assets/characters/player_male_04.webp');assert.equal(await c.eval('JSON.stringify({player,player2,player3,gold,sharedExp,inventoryItems,characterSkillLoadouts})'),domainBefore);assert.deepEqual(hash(),sourcesBefore);
+fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({head:sourceHead,dirty:sourceDirty,viewport,checks,touches,scenes,sourceHashes:sourcesBefore,sourceUnchanged:true,domainUnchanged:true,scope:'Original synthetic isolated profile. Presentation-only showCreation, real mouse gender/element selection and decode/contain screenshot; no create/submit/save/real player. Existing986 full8-choice evidence retained, only two representative choices per two viewport dependency smoke.'},null,2));
+}finally{c?.close();try{execFileSync('taskkill',['/PID',String(chrome.pid),'/T','/F'],{stdio:'ignore',windowsHide:true});}catch{chrome.kill();}try{if(!path.resolve(profile).startsWith(path.resolve(os.tmpdir())+path.sep))throw Error('profile path');fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}server.server.closeAllConnections();await new Promise(r=>server.server.close(r));}

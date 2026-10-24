@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：dev8fdf正常來源整合/四尺寸限定實畫獨審通過；新Head必要CI待自然執行，非全介面完成",
+  "status": "施工中：dev986最小依賴整合/兩尺寸代表驗證；最新Head自然CI待確認，非全UI完成",
   "devices": [
     {
       "id": "360x640",
@@ -27893,6 +27893,19 @@
         "不吸991/989，不混Chrome/工具/Story新施工",
         "原初次timer定位讓字不見之探索圖INVALID，不作成功證據"
       ]
+    },
+    {
+      "segment": "dev986-integration",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev986-integration",
+      "uiParent": "94593d32f4055cfcde684a7cf01c13bf39a933a8",
+      "devParent": "34c4138524e59a5f970f2677465cd9ee3cb561db",
+      "status": "實際生成槽衝突正常整合；focused portrait/build check與兩尺寸代表圖證；新Head CI待確認",
+      "limits": [
+        "原75與986完整8choice證據沿用，不重做",
+        "非四尺寸/硬體/完整全介面驗收",
+        "不吸991/989、不merge dev或部署，955排程PAUSED"
+      ],
+      "pendingObservedIssue": "創角元素按鈕寬360約33.9px/1280約42.4px，不滿44px；原布局非本次986素材新增，仍是UI待處理，不因依賴審核通過宣稱控制全達標。"
     }
   ]
 }

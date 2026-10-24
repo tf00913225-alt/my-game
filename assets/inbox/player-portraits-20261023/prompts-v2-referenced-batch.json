@@ -1,0 +1,29 @@
+{
+  "common": "Generate ONE NEW distinct protagonist for 四象江湖傳 wuxia RPG. The two input images are STYLE REFERENCES ONLY, not edit targets: match their hand-painted 2D brushwork, line quality, natural facial painting, anatomy, upper-left lighting and game illustration finish. Do NOT copy their faces, blue-white costume, ponytail, belt chains or pose. Hero must be exceptionally handsome / heroine exceptionally beautiful, with confident protagonist presence and natural believable skin, not plastic influencer photo or 3D. Clothing refined and well-kept with excellent tailoring, restrained small detail rather than ragged commoner or god armor; no excessive jewelry, no glow, elemental symbolism or magic. Pose expressive asymmetrical relaxed weight distribution, FRONT-facing face and chest, only small natural shoulder/hip offset, not obvious three-quarter or profile, not stiff attention. FULL BODY including all hair, both boots and weapon tips with CLEAR 5% TRANSPARENT TOP/BOTTOM MARGINS on identical1024x1536 portrait canvas. Natural adult proportions. True transparent alpha background: no scenery, ground, shadows, haze, halo, gradient, text or watermark. Small-size silhouette clarity and future frontal 2D depth battlefield compatibility. ",
+  "specs": [
+    [
+      "male02",
+      "Handsome age27 Chinese youthful blade hero, square sculpted jaw, strong brows, warm slightly tanned skin, proud easy half-smile, tied-back medium black hair with plain dark red forehead band, no beard. Charcoal short martial overcoat with dark wine-red lapels and narrow restrained copper fasteners, fitted forearm leather, dark trousers and boots. Strong athletic but elegant build. Feet comfortably apart with one knee soft, one hand confidently rests on sheathed curved dao hilt at hip, other palm on rear side of waist; balanced open frontal shoulders, expressive not mannequin. Short garment silhouette, no huge flowing robe or chain jewelry."
+    ],
+    [
+      "male03",
+      "Beautifully handsome age23 Chinese gentleman hero, long almond eyes, softer clean oval masculine face and elegant nose, clever amused closed smile. Long black hair half-up with simple pale jade clip, no forehead band. Warm ivory and muted sage long scholar martial robe, subtle woven border, one small jade pendant and cloth sash, no armor and no chain. Frontal relaxed contrapposto, one hand holds half-open plain folding fan at mid chest, other gently supports opposite forearm below fan, elbows asymmetrical, one foot close and lightly forward. Smart graceful leading-man presence, not timid, not female face. Fan has no writing."
+    ],
+    [
+      "male04",
+      "Strikingly handsome age26 Chinese cool wandering hero, angular longer face, sharp narrow eyes, defined natural nose and clean-shaven jaw, composed intense gaze with subtle warmth. Black low-tied medium hair with distinctive long side fringe. Smoke-grey and deep plum fitted martial layers, short single shoulder cape, simple dark leather sash, tailored trousers and boots. Natural frontal crossed arms: one visible hand rests on opposite upper arm, other visible hand near elbow, relaxed asymmetry and weight on one leg, free foot slightly forward. Small plain sheathed short sword at waist. No duplicate blue robes, chains, metal boot armor or crown."
+    ],
+    [
+      "female02",
+      "Beautiful age26 Chinese bold young dao heroine, sculpted slightly angular face, long expressive eyes, confident friendly half-smile, healthy natural complexion and graceful athletic build. Black hair in high braided ponytail with plain crimson tie. Dark cinnabar-red and charcoal short martial jacket with subtle copper closure, refined leather bracers, trousers, flat boots, modest opaque high collar. Frontal feet planted asymmetrically, one hand rests on curved dao hilt at hip while other confidently on waist, elbows different angles, shoulders relaxed, head tiny tilt but face and gaze front. Spirited leading heroine, not bandit or fashion model. No large billowing skirt, chains, cleavage or heels."
+    ],
+    [
+      "female03",
+      "Beautiful age22 Chinese witty graceful fan heroine, soft rounded oval face clearly different from female reference, lively almond eyes, naturally curved brows, intelligent playful closed smile, adult anatomy not child. Black shoulder-length half-up hair with small plain wooden pin and loose ends. Pale apricot-white and subdued sage-green layered light short martial robe over flowing dark trousers, refined simple fabric sash and one small medicine pouch, flat cloth boots. Frontal body, weight on one leg, free foot lightly to side-front, one hand raises closed bamboo folding fan near shoulder, other naturally rests behind lower back with plausible arm anatomy. Slight head tilt, lively posture without exaggerated cute pout. Fully covered modest dress, no chains or armor."
+    ],
+    [
+      "female04",
+      "Exceptionally beautiful age25 Chinese reserved young sword heroine, longer elegant face with natural jaw, refined straight brows, narrow clear eyes and composed powerful direct gaze, subtle closed-mouth expression. Long black hair in low elegant knot, one lock over shoulder, simple small silver hair pin. Smoke-lilac, moon-grey and dark ink long martial outfit, clean short shoulder layer, subtle textile border, cloth belt with one small silver buckle, trousers and flat boots; modest opaque tailoring. Frontal face/chest, one foot softly forward, one hand holds fully sheathed slender jian low beside leg, other raised at abdomen lightly adjusts opposite sleeve cuff. Elegant asymmetry and calm commanding heroine presence, not rigid or side-facing. No sheer fabric, jewels, chains or glow."
+    ]
+  ]
+}

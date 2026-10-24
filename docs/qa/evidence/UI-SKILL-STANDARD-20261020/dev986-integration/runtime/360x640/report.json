@@ -1,0 +1,693 @@
+{
+  "head": "94593d32f4055cfcde684a7cf01c13bf39a933a8",
+  "dirty": true,
+  "viewport": [
+    360,
+    640
+  ],
+  "checks": [
+    {
+      "name": "female-fire",
+      "src": "assets/characters/player_female_01.webp",
+      "natural": [
+        1024,
+        1536
+      ],
+      "box": {
+        "x": 12.6640625,
+        "y": 89.28646087646484,
+        "width": 173.359375,
+        "height": 384,
+        "top": 89.28646087646484,
+        "right": 186.0234375,
+        "bottom": 473.28646087646484,
+        "left": 12.6640625
+      },
+      "fit": "contain",
+      "visible": "block"
+    },
+    {
+      "name": "male-earth",
+      "src": "assets/characters/player_male_04.webp",
+      "natural": [
+        1024,
+        1536
+      ],
+      "box": {
+        "x": 12.6640625,
+        "y": 89.28646087646484,
+        "width": 173.359375,
+        "height": 384,
+        "top": 89.28646087646484,
+        "right": 186.0234375,
+        "bottom": 473.28646087646484,
+        "left": 12.6640625
+      },
+      "fit": "contain",
+      "visible": "block"
+    }
+  ],
+  "touches": [
+    {
+      "selector": "#creationPage [onclick=\"selectCreationGender('male')\"]",
+      "x": 304.3359375,
+      "y": 133.8489646911621,
+      "hit": true,
+      "label": "♂\n                        男"
+    },
+    {
+      "selector": "#creationPage [onclick=\"selectElement('earth')\"]",
+      "x": 322.3724060058594,
+      "y": 198.41146850585938,
+      "hit": true,
+      "label": "土\n                        厚土"
+    }
+  ],
+  "scenes": [
+    {
+      "name": "female-fire",
+      "rows": [
+        {
+          "text": "創建角色",
+          "font": 19.333333333333332,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-title",
+          "parent": "creation-premium-header"
+        },
+        {
+          "text": "選擇你的元素之道，建立第一名冒險者",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "#creationContextSubtitle",
+          "parent": "creation-premium-header"
+        },
+        {
+          "text": "01 選擇角色",
+          "font": 13.025165490344563,
+          "button": false,
+          "primary": false,
+          "selector": "span.is-active",
+          "parent": "creation-step-progress"
+        },
+        {
+          "text": "02 能力配點",
+          "font": 13.02516944007536,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creation-step-progress"
+        },
+        {
+          "text": "火元素",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "#creationPortraitElement",
+          "parent": "creation-portrait-caption"
+        },
+        {
+          "text": "女俠",
+          "font": 13.69121647977281,
+          "button": false,
+          "primary": false,
+          "selector": "#creationPortraitGender",
+          "parent": "creation-portrait-caption"
+        },
+        {
+          "text": "性別",
+          "font": 12.997190906155494,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-section-kicker",
+          "parent": "creation-choice-panel"
+        },
+        {
+          "text": "♀",
+          "font": 13.379070002858231,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-gender-symbol",
+          "parent": "creationGenderFemale"
+        },
+        {
+          "text": "女",
+          "font": 15,
+          "button": true,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creationGenderFemale"
+        },
+        {
+          "text": "♂",
+          "font": 13.379055116234756,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-gender-symbol",
+          "parent": "creationGenderMale"
+        },
+        {
+          "text": "男",
+          "font": 15,
+          "button": true,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creationGenderMale"
+        },
+        {
+          "text": "元素",
+          "font": 12.997190906155494,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-section-kicker.creation-element-kicker",
+          "parent": "creation-choice-panel"
+        },
+        {
+          "text": "火",
+          "font": 13.00000354221889,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementFire"
+        },
+        {
+          "text": "烈焰",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementFire"
+        },
+        {
+          "text": "水",
+          "font": 13.000014168875557,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementWater"
+        },
+        {
+          "text": "寒水",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementWater"
+        },
+        {
+          "text": "風",
+          "font": 12.99999291556222,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementWind"
+        },
+        {
+          "text": "疾風",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementWind"
+        },
+        {
+          "text": "土",
+          "font": 12.99999291556222,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementEarth"
+        },
+        {
+          "text": "厚土",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementEarth"
+        },
+        {
+          "text": "火",
+          "font": 13.000002917121439,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementBadge",
+          "parent": "creation-role-title-row"
+        },
+        {
+          "text": "烈焰之道",
+          "font": 12.996240262632016,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementTitle",
+          "parent": ""
+        },
+        {
+          "text": "爆發輸出 · 爆擊 · 燃燒",
+          "font": 12.996240262632016,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementRole",
+          "parent": ""
+        },
+        {
+          "text": "以高爆發、爆擊與燃燒持續傷害壓制敵人，物理與法術兩條路線都偏向主動進攻。",
+          "font": 12.996969763912372,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementDescription",
+          "parent": "creation-role-card"
+        },
+        {
+          "text": "高爆發",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "爆擊強化",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "燃燒傷害",
+          "font": 13.000003306070962,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "01",
+          "font": 13.079484773718793,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-card-index",
+          "parent": "creation-card-heading"
+        },
+        {
+          "text": "玩家 ID",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-label",
+          "parent": ""
+        },
+        {
+          "text": "這會成為你的角色名稱",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-card-caption",
+          "parent": ""
+        },
+        {
+          "text": "下一步：能力配點",
+          "font": 16.000000586876503,
+          "button": true,
+          "primary": true,
+          "selector": "span.",
+          "parent": "creationPrimaryNextButton"
+        }
+      ],
+      "controls": [
+        {
+          "label": "♀\n                        女",
+          "width": 69.984375,
+          "height": 44.00000762939453,
+          "overflow": false
+        },
+        {
+          "label": "♂\n                        男",
+          "width": 69.984375,
+          "height": 44.00000762939453,
+          "overflow": false
+        },
+        {
+          "label": "火\n                        烈焰",
+          "width": 33.90625,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "水\n                        寒水",
+          "width": 33.911468505859375,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "風\n                        疾風",
+          "width": 33.90625,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "土\n                        厚土",
+          "width": 33.91143798828125,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "下一步：能力配點",
+          "width": 336,
+          "height": 44,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "male-earth",
+      "rows": [
+        {
+          "text": "創建角色",
+          "font": 19.333333333333332,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-title",
+          "parent": "creation-premium-header"
+        },
+        {
+          "text": "選擇你的元素之道，建立第一名冒險者",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "#creationContextSubtitle",
+          "parent": "creation-premium-header"
+        },
+        {
+          "text": "01 選擇角色",
+          "font": 13.025165490344563,
+          "button": false,
+          "primary": false,
+          "selector": "span.is-active",
+          "parent": "creation-step-progress"
+        },
+        {
+          "text": "02 能力配點",
+          "font": 13.02516944007536,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creation-step-progress"
+        },
+        {
+          "text": "土元素",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "#creationPortraitElement",
+          "parent": "creation-portrait-caption"
+        },
+        {
+          "text": "少俠",
+          "font": 13.69121647977281,
+          "button": false,
+          "primary": false,
+          "selector": "#creationPortraitGender",
+          "parent": "creation-portrait-caption"
+        },
+        {
+          "text": "性別",
+          "font": 12.997190906155494,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-section-kicker",
+          "parent": "creation-choice-panel"
+        },
+        {
+          "text": "♀",
+          "font": 13.379070002858231,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-gender-symbol",
+          "parent": "creationGenderFemale"
+        },
+        {
+          "text": "女",
+          "font": 15,
+          "button": true,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creationGenderFemale"
+        },
+        {
+          "text": "♂",
+          "font": 13.379055116234756,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-gender-symbol",
+          "parent": "creationGenderMale"
+        },
+        {
+          "text": "男",
+          "font": 15,
+          "button": true,
+          "primary": false,
+          "selector": "span.",
+          "parent": "creationGenderMale"
+        },
+        {
+          "text": "元素",
+          "font": 12.997190906155494,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-section-kicker.creation-element-kicker",
+          "parent": "creation-choice-panel"
+        },
+        {
+          "text": "火",
+          "font": 13.00000354221889,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementFire"
+        },
+        {
+          "text": "烈焰",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementFire"
+        },
+        {
+          "text": "水",
+          "font": 13.000014168875557,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementWater"
+        },
+        {
+          "text": "寒水",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementWater"
+        },
+        {
+          "text": "風",
+          "font": 12.99999291556222,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementWind"
+        },
+        {
+          "text": "疾風",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementWind"
+        },
+        {
+          "text": "土",
+          "font": 12.99999291556222,
+          "button": true,
+          "primary": false,
+          "selector": "span.creation-element-glyph",
+          "parent": "elementEarth"
+        },
+        {
+          "text": "厚土",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "span.element-name",
+          "parent": "elementEarth"
+        },
+        {
+          "text": "土",
+          "font": 13.000002917121439,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementBadge",
+          "parent": "creation-role-title-row"
+        },
+        {
+          "text": "厚土之道",
+          "font": 12.996240262632016,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementTitle",
+          "parent": ""
+        },
+        {
+          "text": "護盾防禦 · 降防 · 石化反傷",
+          "font": 12.996240262632016,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementRole",
+          "parent": ""
+        },
+        {
+          "text": "重視生存與隊伍防護，能建立護盾、反傷與結界，同時以降防與石化控制敵方。",
+          "font": 12.996969763912372,
+          "button": false,
+          "primary": false,
+          "selector": "#creationElementDescription",
+          "parent": "creation-role-card"
+        },
+        {
+          "text": "護盾防護",
+          "font": 13.000003306070962,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "降防石化",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "反傷結界",
+          "font": 13.000003306070962,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-role-tag",
+          "parent": "creationElementTags"
+        },
+        {
+          "text": "01",
+          "font": 13.079484773718793,
+          "button": false,
+          "primary": false,
+          "selector": "span.creation-card-index",
+          "parent": "creation-card-heading"
+        },
+        {
+          "text": "玩家 ID",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-label",
+          "parent": ""
+        },
+        {
+          "text": "這會成為你的角色名稱",
+          "font": 13,
+          "button": false,
+          "primary": false,
+          "selector": "div.creation-card-caption",
+          "parent": ""
+        },
+        {
+          "text": "下一步：能力配點",
+          "font": 16.000000586876503,
+          "button": true,
+          "primary": true,
+          "selector": "span.",
+          "parent": "creationPrimaryNextButton"
+        }
+      ],
+      "controls": [
+        {
+          "label": "♀\n                        女",
+          "width": 69.984375,
+          "height": 44.00000762939453,
+          "overflow": false
+        },
+        {
+          "label": "♂\n                        男",
+          "width": 69.984375,
+          "height": 44.00000762939453,
+          "overflow": false
+        },
+        {
+          "label": "火\n                        烈焰",
+          "width": 33.90625,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "水\n                        寒水",
+          "width": 33.911468505859375,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "風\n                        疾風",
+          "width": 33.90625,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "土\n                        厚土",
+          "width": 33.91143798828125,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "下一步：能力配點",
+          "width": 336,
+          "height": 44,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    }
+  ],
+  "sourceHashes": {
+    "index.html": "5e71ff7c24dad22076cbcbaa30c58cd75a7dcd9a2dabc87fe6375191c601eace",
+    "asset-manifest.json": "a75cdb4dee409997a323274f9d4d24cc28ac3f8efae1e893216fb6ccc62cacf3",
+    "build/app-shell.7bc5e1c99233.css": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+    "build/app-shell.b1ac1f4e3eb1.js": "b1ac1f4e3eb1125a4ddaa396dc4b8450ad9d7f3845736a51f3efefe4005113fb",
+    "build/boot-core.17c288641d4c.js": "17c288641d4c7770acdd57f95c08b88f959cac52b94d3560072d75fc99960a05",
+    "build/boot-core.78385a4c589b.css": "78385a4c589b8510d6927cc47b0efe2d8b726bfab8f864511283f4c5636764f8",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.f812f2d9ad9b.js": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.84bbc0a00468.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "build/feature-adventure-ui.e00b5fff8c35.js": "e00b5fff8c350574547b865510ed79bfcb8db5fb79c66a694e08fe626945a06b",
+    "build/feature-adventure.c82d45eb0990.css": "c82d45eb0990df11547e8c36e9bb258d8934b7c5253d1f6b28b57d4735f75ad6",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.5d80f0302203.js": "5d80f0302203089771562db8104462b5929b6a61d4d8467df141ac19633350ed",
+    "build/gameplay-core-secondary.78a1364f9a34.js": "78a1364f9a343f9da9e85343b5f6066571f9ad468314f7bdf309572536d639ac",
+    "build/gameplay-core.d5cb47fc6777.css": "d5cb47fc6777dd94a13402054f1362d79fa57a64b822d10cc6bfdb59b1f34d0d"
+  },
+  "sourceUnchanged": true,
+  "domainUnchanged": true,
+  "scope": "Original synthetic isolated profile. Presentation-only showCreation, real mouse gender/element selection and decode/contain screenshot; no create/submit/save/real player. Existing986 full8-choice evidence retained, only two representative choices per two viewport dependency smoke."
+}
