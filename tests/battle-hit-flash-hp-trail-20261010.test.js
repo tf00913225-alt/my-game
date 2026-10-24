@@ -33,8 +33,8 @@ context.clearTimers();assert.ok(flashCancelled);assert.equal(state.impactFlashes
 present(bar,{hp:100},1000);assert.equal(state.hpTrails.size,0,"new entity identity never inherits previous damage");
 const impact=fs.readFileSync("tests/battle-feel-impact-20261008.test.js","utf8");
 assert.ok(impact.includes('kind==="criticalDamage"'),"existing runtime test covers critical/direct/MISS/heal/status paths");
-const frames=source.slice(source.indexOf("const animation=node.animate(["),source.indexOf("    function clearTimers("));
-assert.match(frames,/opacity:1/);assert.match(frames,/offset:\.4/);assert.match(frames,/offset:\.6/);assert.match(frames,/duration:200/);
+const frames=source.slice(source.indexOf("    function createImpactFlash("),source.indexOf("    function clearTimers("));
+assert.match(frames,/opacity:1/);assert.match(frames,/offset:\.4/);assert.match(frames,/offset:\.6/);assert.match(frames,/duration:feedback\?feedback\.config\.flashMs:200/);
 assert.doesNotMatch(source,/const flash=artwork.animate/);
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");assert.match(css,/pointer-events:none/);assert.match(css,/\.hp-bar-inner\{transition:none;\}/);
 console.log("Two hit flashes80ms,40ms gap independent of existing recoil; HP loss260ms, repeat/heal/shield/death/identity/dispose PASS");

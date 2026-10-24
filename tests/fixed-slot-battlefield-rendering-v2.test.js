@@ -95,9 +95,9 @@ assert.doesNotMatch(css.match(/\.v143-skill-stage\[data-geometry-owner="fixed-sl
 
 // Execute the production sizing functions. These checks supplement, never
 // replace, fully loaded battle runtime visual acceptance.
-const sizingContext={spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1};
+const sizingContext={window:{},spriteFrameAspectCache:new Map(),SPRITE_SCALE_MULTIPLIER:1};
 vm.createContext(sizingContext);
-vm.runInContext(vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
+vm.runInContext(vfxSource.match(/function clamp\([^}]+\}/)[0]+"\n"+vfxSource.match(/const PLACEMENT_SIZE_SCALE=Object\.freeze\(\{[^;]+;/)[0]+"\n"+
     vfxSource.slice(vfxSource.indexOf("    function frameAspectFor("),vfxSource.indexOf("    function requestSpriteAspect(")),sizingContext);
 for(const [placement,factor] of Object.entries({single:.70,targetTrajectory:.72,trajectory:1,group:1,battlefield:1})){
     const sprite={dataset:{placement},style:{left:"180px",top:"240px"}};

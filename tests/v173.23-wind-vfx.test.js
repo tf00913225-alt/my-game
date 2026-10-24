@@ -17,11 +17,11 @@ function test(name,handler){ handler(); passed++; console.log("✓ "+name); }
 
 const CASTS={
     stormFist:{file:"storm-fist-cast.png",duration:1200,placement:"single",status:"agilityDown",size:[1536,1024],hash:"89e7ce2b0b79c75ad3213b71f7a6350a2e9ffd79f66ad3ef671c19a30dfbc3f6"},
-    stormFlurry:{file:"storm-flurry-cast.png",duration:1500,placement:"group",status:"damageDown",size:[1448,1086],hash:"3a6268f354f4fb4b2542adf4eb716f639bfba754c63bb1c75ab1548a36df41f9"},
+    stormFlurry:{file:"storm-flurry-cast.png",duration:1500,placement:"single",status:"damageDown",size:[1448,1086],hash:"3a6268f354f4fb4b2542adf4eb716f639bfba754c63bb1c75ab1548a36df41f9"},
     windCrossSlash:{file:"wind-cross-slash-cast.png",duration:1700,placement:"single",status:"damageDown",size:[1448,1086],hash:"b60928d85d758321bc147d0ea68b7f6de89875d83512a6a614063cb4e5e68d0a"},
     dizzyFist:{file:"dizzy-fist-cast.png",duration:1800,placement:"single",status:"stun",size:[1448,1086],hash:"e2e7142956c54b8d8f8e3a1c7b8a2b9a4896b527df42b64cd1923cec6ed8c453"},
-    windSpell:{file:"wind-spell-cast.png",duration:1400,placement:"group",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
-    stormCircle:{file:"storm-circle-cast.png",duration:1600,placement:"group",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
+    windSpell:{file:"wind-spell-cast.png",duration:1400,placement:"single",status:"agilityDown",size:[1448,1086],hash:"84679f1561dfa36f47f3efc805e4c5f082a7808c54b987946d09b4155fa01973"},
+    stormCircle:{file:"storm-circle-cast.png",duration:1600,placement:"single",status:"damageDown",size:[1536,1024],hash:"a9e24871d2ac32cc03e3d76529cf87389dc0d063f4833a074e105fd23953521a"},
     windHowlLightning:{file:"wind-howl-lightning-cast.png",duration:1900,placement:"single",status:"damageDown",size:[1448,1086],hash:"6593627d59d8330cd756d2b21123f662fa8e472b08111c37938f49aaa17a7a36"},
     stormRain:{file:"storm-rain-cast.png",duration:2600,placement:"battlefield",status:"stun",size:[1448,1086],hash:"da41b91ae4bdd5540f3b0288240f89aef7ab8791f383318d01c993979d08668c"},
     dodgeSkill:{file:"dodge-skill-cast.png",duration:1600,placement:"group",status:"dodgeSkill",size:[1448,1086],hash:"6bc6caf956b211295901bf17d191f0773117ef34672763df75296edf62549a88"},
@@ -63,6 +63,7 @@ function makeNode(rect){
             contains(name){ return classes.has(name); }
         },
         appendChild(child){ child.parentNode=this; this.children.push(child); return child; },
+        insertBefore(child,next){child.parentNode=this;const index=next?this.children.indexOf(next):this.children.length;this.children.splice(index,0,child);return child;},
         removeChild(child){
             this.children=this.children.filter(candidate=>candidate!==child);
             child.parentNode=null;
@@ -158,9 +159,14 @@ function loadRuntime(options={}){
         body,
         createElement(tag){
             const node=makeNode();
+            if(options.feedback){
+                const animations=[];node.getAnimations=()=>animations;
+                node.animate=(frames,timing)=>{const a={playState:"running",playbackRate:1,currentTime:0,
+                    effect:{getTiming:()=>timing,getKeyframes:()=>frames},pause(){this.playState="paused";},play(){this.playState="running";},cancel(){this.playState="idle";}};animations.push(a);return a;};
+            }
             if(tag==="canvas"){
                 const context={
-                    clearRect(){},
+                    clearRect(){},closePath(){},lineTo(){},setTransform(){},save(){},restore(){},translate(){},rotate(){},scale(){},beginPath(){},ellipse(){},stroke(){},moveTo(){},quadraticCurveTo(){},fill(){},fillRect(){},
                     drawImage(...args){ drawCalls.push({node,args}); }
                 };
                 node.getContext=()=>context;
@@ -254,7 +260,7 @@ function loadRuntime(options={}){
         dispose(){}
     };
     vm.createContext(context);
-    vm.runInContext(animation,context);
+    vm.runInContext(options.feedback?animation.replace("/* @battle-vfx-feedback-config */ null",fs.readFileSync("config/battle-vfx-feedback.json","utf8")):animation,context);
     return {
         context,body,cards,monsters,party,scheduled,raf,drawCalls,monsterHits,playerHits,cardEffects,
         setClock(value){
@@ -318,7 +324,7 @@ test("all eleven casts keep Sprite timing while six persistent states use low-mo
     Object.entries(CASTS).forEach(([id,spec])=>{
         const model=manifest[id];
         assert.ok(model&&model.sprite,id);
-        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-recipient-v1.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-wide-v2.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-wide-v2.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-recipient-v1.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
+        const expectedSource=id==="dinghaishenzhen"?"assets/vfx/wind/calm-mind-cast-person-v2.webp":id==="stormFlurry"?"assets/vfx/wind/storm-flurry-wide-v3.webp":id==="stormRain"?"assets/vfx/wind/storm-rain-recipient-v1.webp":id==="windSpell"?"assets/vfx/wind/wind-spell-recipient-v3.webp":id==="stormCircle"?"assets/vfx/wind/storm-circle-recipient-v3.webp":id==="dodgeSkill"?"assets/vfx/wind/dodge-recipient-v1.webp":"assets/vfx/wind/"+spec.file+"?v=173.24";
         assert.equal(model.sprite.src,expectedSource,id);
         assert.deepEqual(
             Array.from([model.sprite.columns,model.sprite.rows,model.sprite.frames,model.sprite.hitFrame]),
@@ -369,16 +375,31 @@ function losslessWebpInfo(file){
  throw new Error("Expected lossless VP8L image");
 }
 
-test("windSpell wide source preserves native frame aspect before and after image metadata arrives",()=>{
+test("independent Wind row sources are exact lossless transparent 4x3 sheets and preserve formal tri/row recipients",()=>{
+ const manifest=loadRuntime().context.v143SkillAnimationManifest;
+ for(const [id,hash] of [["windSpell","d37b924a5b95b21ed29b1b145b8abeea8132bdbf7897e6ab8541d01517c6afc3"],["stormCircle","524849b26cdd396a60c59d366f89dfefded97f9463a2ec2bf8226bc5eec831df"]]){
+  const sprite=manifest[id].sprite,bytes=fs.readFileSync(sprite.src),info=losslessWebpInfo(bytes);
+  assert.deepEqual([info.width,info.height,info.alpha],[1448,1086,1]);
+  assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),hash);
+  assert.equal(sprite.presentation,"per-recipient");assert.equal(sprite.cellAspect,1);
+  assert.deepEqual([sprite.columns,sprite.rows,sprite.frames,sprite.hitFrame],[4,3,12,7]);
+  const runtime=loadRuntime();runtime.context.v142SkillAnimationDirector.play(config(id,id==="windSpell"?"tri":"row","magic"),
+   {side:"player",actorIndex:0,targetId:1,targetIds:[0,1,2],targetSide:"monster"});
+  assert.deepEqual(stageSprites(runtime).sprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+ }
+});
+
+test("historical wide source stays exact; new independent source has stable square aspect",()=>{
     const candidate="assets/vfx/wind/wind-spell-wide-v2.webp",bytes=fs.readFileSync(candidate);
     const info=losslessWebpInfo(bytes);
     assert.deepEqual([info.width,info.height],[2172,724]);
     assert.equal(info.alpha,1);
     assert.equal(crypto.createHash("sha256").update(bytes).digest("hex"),"73b005cb0199578af99938aa083b10cd6a465f6151b973ce6a57f5c6922df42c");
     const sprite=loadRuntime().context.v143SkillAnimationManifest.windSpell.sprite;
-    assert.equal(sprite.src,candidate);
-    const actualAspect=(info.width/sprite.columns)/(info.height/sprite.rows);
-    assert.equal(actualAspect,2.25);
+    assert.equal(sprite.src,"assets/vfx/wind/wind-spell-recipient-v3.webp");
+    const active=losslessWebpInfo(sprite.src);
+    const actualAspect=(active.width/sprite.columns)/(active.height/sprite.rows);
+    assert.equal(actualAspect,1);
     assert.equal(sprite.cellAspect,actualAspect,'fallback agrees with the actual fractional-height cell');
     const start=animation.indexOf('function frameAspectFor('),end=animation.indexOf('function applySpriteBox(',start);
     assert.ok(start>=0&&end>start);
@@ -407,19 +428,19 @@ test("Wind casts use one DOM Sprite Sheet node and never invoke Canvas drawing",
     assert.equal(runtime.drawCalls.length,0,"DOM Sprite renderer must never call Canvas drawImage");
 });
 
-test("single, three-lane and battlefield casts each own one correctly positioned sheet",()=>{
+test("three-target and battlefield casts own independent sheets on explicit recipients",()=>{
     const group=loadRuntime();
     group.context.v142SkillAnimationDirector.play(
-        config("stormFlurry","tri","physical"),
+        config("windSpell","tri","magic"),
         {side:"player",actorIndex:0,targetId:1,targetIds:[0,1,2]}
     );
     [0,1,2].forEach(index=>group.context.showMonsterHit(index,10,"hp"));
     const groupSprites=stageSprites(group).sprites;
-    assert.equal(groupSprites.length,1,"one three-lane sheet, not nine effects");
-    assert.equal(groupSprites[0].dataset.placement,"group");
-    assert.equal(groupSprites[0].dataset.targetIndexes,"0,1,2");
-    assert.equal(groupSprites[0].style.left,"458px");
-    assert.equal(groupSprites[0].style.top,"140px");
+    assert.equal(groupSprites.length,3,"exactly one independent effect per real target");
+    assert.deepEqual(groupSprites.map(n=>n.dataset.targetIndex),["0","1","2"]);
+    assert.ok(groupSprites.every(n=>n.dataset.placement==="single"));
+    assert.equal(new Set(groupSprites.map(n=>n.style.left)).size,3,"each effect follows its own recipient");
+    assert.equal(group.context.v143SkillAnimationState.current.targetType,"tri","gameplay range unchanged");
 
     const all=loadRuntime();
     all.context.v142SkillAnimationDirector.play(
@@ -433,7 +454,7 @@ test("single, three-lane and battlefield casts each own one correctly positioned
     assert.equal(all.context.v143SkillAnimationState.current.targetType,"all");
 });
 
-test("three-target wind sheets keep their canonical three-slot artwork center after casualties",()=>{
+test("independent three-target Wind effects keep survivor anchors after casualties",()=>{
     const placements=[];
     [
         [
@@ -450,17 +471,16 @@ test("three-target wind sheets keep their canonical three-slot artwork center af
         const runtime=loadRuntime({monsters});
         const targetIds=monsters.map((monster,index)=>monster.alive?index:null).filter(Number.isInteger);
         runtime.context.v142SkillAnimationDirector.play(
-            config("stormFlurry","tri","physical"),
+            config("windSpell","tri","magic"),
             {side:"player",actorIndex:0,targetId:1,targetIds,targetSide:"monster"}
         );
-        const sprite=stageSprites(runtime).sprites[0];
-        assert.ok(sprite);
-        assert.equal(sprite.dataset.placement,"group");
-        assert.equal(sprite.style.left,"458px","artwork remains centered on the canonical three-slot footprint");
-        assert.equal(sprite.style.top,"140px");
+        const sprites=stageSprites(runtime).sprites;
+        assert.deepEqual(sprites.map(n=>+n.dataset.targetIndex),targetIds,"no extra effect on a casualty");
+        const sprite=sprites.find(n=>n.dataset.targetIndex==="1");
+        assert.ok(sprite);assert.equal(sprite.dataset.placement,"single");
         placements.push([sprite.style.left,sprite.style.top,sprite.style.width,sprite.style.height]);
     });
-    assert.deepEqual(placements[1],placements[0],"casualties do not shrink or move the three-target sheet");
+    assert.deepEqual(placements[1],placements[0],"casualties do not move or resize the surviving target effect");
 });
 
 
@@ -590,7 +610,7 @@ test("wide baseline bytes remain exact and active wide sources retain their nati
         const candidate="assets/vfx/"+file,bytes=fs.readFileSync(candidate),info=losslessWebpInfo(bytes);
         assert.deepEqual([info.width,info.height,info.alpha],[2172,724,1],id);
         assert.equal(require("node:crypto").createHash("sha256").update(bytes).digest("hex"),hash,id);
-        if(!["dodgeSkill"].includes(id)){
+        if(!["dodgeSkill","stormCircle"].includes(id)){
         assert.equal(manifest[id].sprite.src,candidate,id);
         assert.equal((info.width/manifest[id].sprite.columns)/(info.height/manifest[id].sprite.rows),2.25,id);
         assert.equal(manifest[id].sprite.cellAspect,2.25,id+" cold-cache source ratio");
@@ -608,7 +628,7 @@ test("stormFlurry reviewed wide source keeps paired-fist cast contract",()=>{
     assert.deepEqual([s.columns,s.rows,s.frames,s.hitFrame],[4,3,12,7]);
     assert.equal(s.cellAspect,(info.width/4)/(info.height/3));
     assert.equal(s.cellAspect,2.25);
-    assert.deepEqual([s.placement,s.scale,s.minSize,s.alignToSlots],["group",1.08,190,true]);
+    assert.deepEqual([s.placement,s.scale,s.minSize,s.maxSize,s.presentation,s.recipientSlice],["single",1.4,96,184,"per-recipient","center-third"]);
     assert.equal(model.hit,.5);
     assert.deepEqual(Array.from(model.deferredStatusTypes),["damageDown"]);
 });
@@ -804,6 +824,67 @@ test("Freeze column and tri artwork follows only formal portrait recipients on b
  }}
 });
 
+test("stormFlurry sample centers one original paired-fist slice on each formal recipient without a new hit clock",()=>{
+ const portraits=[{left:301,top:80,width:70,height:98},{left:405,top:101,width:80,height:110},{left:520,top:87,width:64,height:102}];
+ for(const side of ['monster','player']){
+  const runtime=loadRuntime({renderGeometry:{getUnitGeometry(s,i){return s===side?{artworkProjection:{rect:portraits[i]}}:null;}}});
+  runtime.setClock(100);
+  const gate=runtime.context.v142SkillAnimationDirector.play(config('stormFlurry','tri','physical'),{side:side==='monster'?'player':'monster',actorIndex:0,targetSide:side,targetId:1,targetIds:[0,1,2]});
+  const nodes=stageSprites(runtime).sprites;assert.equal(gate.config.duration,1500);assert.equal(gate.config.targetType,'tri');assert.equal(nodes.length,3);
+  nodes.forEach((node,i)=>{const p=portraits[i];assert.equal(node.dataset.targetIndexes,String(i));assert.equal(node.style.left,(p.left+p.width/2)+'px');assert.equal(node.style.top,(p.top+p.height/2)+'px');assert.equal(node.dataset.recipientSlice,'center-third');assert.equal(node.style.clipPath,'inset(0 33.333333%)');assert.equal(node.style['--v143-sprite-duration'],'1500ms');});
+  const before=runtime.scheduled.length;
+  [0,1,2].forEach(i=>{const delay=runtime.context.v143RunAtTargetHit(side,i,()=>{},true);assert.ok(delay>=749&&delay<=751,'original .5 hit stays750ms');});
+  assert.equal(runtime.scheduled.length,before,'recipient visuals reuse the existing per-target hit tasks');
+  runtime.context.v143ResolveBattleFeedbackTiming(side,5,'hp',false);assert.equal(stageSprites(runtime).sprites.length,3,'unrelated feedback cannot add a target');
+  runtime.context.v142SkillAnimationDirector.dispose();assert.equal(runtime.body.querySelectorAll('#v143-skill-stage').length,0,'dispose cleans recipient effects');
+ }
+});
+test("stormFlurry casualties and effective Boss-single only paint explicit living recipients",()=>{
+ for(const [type,targets] of [['tri',[0,2]],['single',[2]]]){
+  const runtime=loadRuntime({monsters:[{alive:true,hp:100,statusEffects:[],activeBuffs:[]},{alive:false,hp:0,statusEffects:[],activeBuffs:[]},{alive:true,hp:100,statusEffects:[],activeBuffs:[]}]});
+  const gate=runtime.context.v142SkillAnimationDirector.play(config('stormFlurry',type,'physical'),{side:'player',actorIndex:0,targetSide:'monster',targetId:2,targetIds:targets});
+  assert.equal(gate.config.targetType,type);assert.deepEqual(stageSprites(runtime).sprites.map(n=>Number(n.dataset.targetIndex)),targets);runtime.context.v142SkillAnimationDirector.dispose();
+ }
+});
+
+test("production config sweeps by screen position on both sides; callbacks remain target-local and gate unchanged",()=>{
+ for(const side of ["monster","player"]){
+  const rects=[300,100,200].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+  const runtime=loadRuntime({feedback:true,playerRects:rects,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+  runtime.setClock(100);const gate=runtime.context.v142SkillAnimationDirector.play(config("stormFlurry","tri","physical"),{side:side==="monster"?"player":"monster",targetSide:side,targetId:0,targetIds:[0,1,2]});runtime.setClock(100);
+  const seen=[];[1,2,0].forEach((i,rank)=>assert.equal(runtime.context.v143RunAtTargetHit(side,i,()=>seen.push(i),true),750+rank*100));
+  const fire=(delay,time)=>{runtime.setClock(time);runtime.scheduled.find(s=>s.delay===delay).callback();for(let n=0;n<2;n++)runtime.raf.splice(0).forEach(fn=>fn(time));};
+  fire(750,850);assert.deepEqual(seen,[1]);runtime.context.v143RunAtTargetHit(side,2,()=>seen.push("late2"),true);assert.deepEqual(seen,[1]);
+  fire(850,950);assert.deepEqual(seen,[1,2,"late2"]);fire(950,1050);assert.deepEqual(seen,[1,2,"late2",0]);
+  assert.equal(gate.config.duration,1500);assert.equal(gate.done,false);runtime.context.v142SkillAnimationDirector.dispose();assert.equal(runtime.body.querySelectorAll("#v143-skill-stage").length,0);
+ }
+});
+
+test("sweep weakening rings and icons require actual status success and disappear with the authoritative ledger",()=>{
+ const rects=[100,200,300].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+ const runtime=loadRuntime({feedback:true,monsterRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+ runtime.setClock(100);runtime.context.v142SkillAnimationDirector.play(config("stormFlurry","tri","physical"),{side:"player",targetSide:"monster",targetId:0,targetIds:[0,1,2]});
+ runtime.context.applyMonsterDebuff(runtime.monsters[1],"damageDown",2,30);runtime.setClock(100);
+ for(const [delay,time] of [[750,850],[850,950],[950,1050]]){runtime.setClock(time);runtime.scheduled.find(s=>s.delay===delay).callback();for(let n=0;n<2;n++)runtime.raf.splice(0).forEach(fn=>fn(time));}
+ const rings=runtime.context.v143SkillAnimationState.current.hitFeedback.snapshot().filter(n=>n.kind==="weaken");
+ assert.deepEqual(Array.from(rings,n=>n.targetIndex),["1"]);assert.ok(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"));
+ assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),null);
+ runtime.monsters[1].statusEffects=[];runtime.context.v143SyncStatusVisualEffects();assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"),null);
+ runtime.context.v142SkillAnimationDirector.dispose();
+});
+
+test("automatic support observes only a new expected successful named-buff entry, including identical refresh",()=>{
+ for(const mode of ["blocked","unrelated","refresh"]){
+  const rects=[100,200,300].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+  const r=loadRuntime({feedback:true,playerRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+  const prior={type:"rockWall",turnsLeft:4,percent:30};r.party[0].activeBuffs=[prior];r.setClock(100);
+  r.context.v142SkillAnimationDirector.play({id:"rockWall",element:"earth",category:"buff",targetType:"ally",duration:1500,resolveDuration:1500},{side:"player",targetSide:"player",targetId:0,targetIds:[0]});r.setClock(100);
+  const current=r.context.v143SkillAnimationState.current;let cues=0;current.hitFeedback.support=()=>{cues++;};
+  if(mode!=="blocked")r.party[0].activeBuffs.push({type:mode==="refresh"?"rockWall":"rage",turnsLeft:4,percent:30});
+  r.setClock(850);r.scheduled.find(j=>j.delay===750).callback();for(let n=0;n<2;n++)r.raf.splice(0).forEach(fn=>fn(850));
+  assert.equal(cues,mode==="refresh"?1:0,mode);r.context.v142SkillAnimationDirector.dispose();
+ }
+});
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");
 
 test("non-recipient full-field sheets stay locked to the complete enemy area after casualties",()=>{

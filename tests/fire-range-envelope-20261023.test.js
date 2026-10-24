@@ -6,7 +6,7 @@ function setup(id='explosiveFlurry',reduced=false){
  const tracks=[],node={style:{left:'80px',top:'100px',setProperty(){}},dataset:{},classList:{contains:()=>true},animate(frames,options){const a={frames,options,cancel(){this.cancelled=true;}};tracks.push(a);return a;}};
  const current={config:{id},model:{hit:7/12,sprite:{columns:4,rows:3,frames:12,src:'unchanged.webp'}},targetType:'tri',duration:1450,startedAt:100,visualStartedAt:0,firstVisibleFrameAt:0,spriteNodes:new Map()};
  const c={window:{matchMedia:()=>({matches:reduced})},state:{stage:{}},Date:{now:()=>900},DEFAULT_HIT:7/12,placementFor:()=> 'group',appendSpriteNode:()=>node,placeSprite(){},requestSpriteAspect(){}};
- vm.createContext(c);vm.runInContext(block,c);return {c,current,node,tracks};
+ vm.createContext(c);const choreography=source.slice(source.indexOf("    function placeAutomaticChoreography("),source.indexOf("\n    function ",source.indexOf("    function placeAutomaticChoreography(")+10));vm.runInContext(choreography+block,c);return {c,current,node,tracks};
 }
 const f=setup();f.c.addSprite(f.current,0,{});f.c.addSprite(f.current,1,{});f.c.addSprite(f.current,2,{});
 assert.equal(f.current.spriteNodes.size,1,'one shared group source, not three damage clips');

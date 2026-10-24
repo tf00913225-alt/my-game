@@ -1,0 +1,10 @@
+{
+ "workId":"WIND-FLURRY-SAMPLE-20261024","target":"dev","branch":"feature/wind-flurry-sample-20261024","baseDev":"5ca38d17aaaa4287d292bb4dc49662549d3099e7",
+ "scope":"One stormFlurry representative only; no all-Wind rollout",
+ "observed":"Original native phone sequence shows three baked paired-fist components offset from individual portraits",
+ "change":"Original V143 manifest opts this skill into existing per-recipient center-third slice path; one original paired-fist visual per formal artwork projection. No new renderer, sheet bytes, timer, actor motion or gameplay values.",
+ "preserved":"1500ms duration, .5/750ms hit,4x3/12frames/7th frame,formal tri/Boss effective-single,damageDown,all actor size/depth/HUD,accepted normal/fire and other skill metadata",
+ "verification":"27Wind+15Fire internal cases PASS; original shared group coverage retained with unchanged windSpell; new both-side exact recipient centers/750ms/no extra timers/nonrecipient rejection/dispose/casualties/effective-single regressions;build-check/diff-check PASS",
+ "pending":"Independent review, phone Core ordinary/critical/MISS candidate video, human sample acceptance, latestHead required CI. Draft; do not merge merely for CI green.",
+ "next":"Capture original-source candidate on isolated physical phone; stop at one sample for human judgment. #983 postmerge closeout stays separate."
+}

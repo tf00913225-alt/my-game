@@ -1,0 +1,60 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "humanAcceptance": "2026-10-24 user explicitly accepted final80ceae1a native11 size/Wind/depth occlusion/actor sway and authorized normal dev merge after Gates. No art or performance acceptance question remains.",
+  "approvedProductHead": "80ceae1a5afa68c27a71c28626e849b80580e914",
+  "absorbedDev": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+  "devDiff": "Adventure canonical character tutorial flow and forge QA safe port; no overlapping VFX source. Normal merge, no rebase/force.",
+  "ciFailureEvidence": {
+    "workflow": "CI",
+    "run": 40087086025,
+    "attempt": 1,
+    "event": "pull_request",
+    "head": "80ceae1a5afa68c27a71c28626e849b80580e914",
+    "coreJob": 120852836995,
+    "coreFirst": "battle-hit-flash-hp-trail source slice selected first new module animation then ended before flash Owner, empty slice; ordinary200ms /.4/.6 assertions retained under exact Owner extraction.",
+    "battleJob": 120852837026,
+    "battleFirst": "stormCircle old group/shared-sheet assumption conflicts with accepted independent per-recipient source; use actual alpha centre, exact survivor, formal slot, viewport/overflow/paint-containing ancestors, no unknown clip-path assumption and all formal HUD nonintersection, complete aspect/no crop/readable size/stage lifecycle retained.",
+    "adventureJob": 120852837123,
+    "adventureFirst": "Chrome DevTools startup deadline30000ms, ECONNREFUSED while diagnostics later show listener, folio_wait_bit_common; NOT VFX regression and not PASS. No old-head rerun performed; new Head from genuine test fixes and necessary dev merge, not quota reset."
+  },
+  "relatedRegression": "Primary target fixture now exact per-recipient3 slots/centres with unchanged primary and single-survivor true tri contract; geometry contract regex accommodates status purpose and unchanged returned fields.",
+  "focusedBrowser": "artifacts/989-wind-survivor-focused-desktop-rect-phone/evidence.json actual DESKTOP Chrome6v6, same new live assertion block PASS; historical folder suffix does not mean phone. No actual phone operation this continuation.",
+  "localFullBrowserLimit": "Windows hardcoded Linux /tmp and accidentally appended index.html base URL prevented first two local startup probes, retained. Temp copy with only OS temp path + correct origin then reached unrelated utility-center hit assertion before Wind section; not bypassed or called fullPASS. Original full latestHead CI remains required.",
+  "review": "fire_sample_review reviewed alpha-center/safety replacement; no inappropriate weakening, with base-footprint vs dynamic limit explicit. Existing exact80 phone evidence reused because product source/CSS/assets/config unchanged.",
+  "next": "Latest Head Required CI; diagnose direct failures only, no rerun lottery; after all Gates normal merge dev, own content/postmerge Gate, preserve QA checkout/backups then cleanup.",
+  "continuation090": {
+    "run": 40089147242,
+    "attempt": 1,
+    "head": "090bfc2866a4ee5aded4a86f3f010045628531a0",
+    "coreJob": 120858513150,
+    "firstFailure": "battle-status-info-assets old blanket body-art no icon predicate; accepted successful-entry gated automatic status icons are now part of contract.",
+    "scopedAudit": "One55-file directly related battle/VFX regression pass found7 blanket noCanvas assertions covering approved subordinate accent module and one CRLF-sensitive source fixture. Tests now forbid Canvas/SVG/crop in the COMPLETE original cast-body Owner suffix; shared fixture asserts formal installer and manifest markers. Other assertions unchanged, module25 still enforces accent pool/cap/status/lifecycle. No product bytes changed.",
+    "result": "55files183top-level PASS after aligning exact contracts; old status predicate additionally asserts helper.statusEnabled(type,entry) gate and iconSrc.",
+    "retry": "No old-head rerun/cancel/dispatch; genuine tests-only failure fix, not quota-reset commit."
+  },
+  "continuation23": {
+    "run": 40089833216,
+    "attempt": 1,
+    "head": "23e4bd29202f034696a8d31fb423473afbc03a20",
+    "result": "completed failure; all other selected necessary children SUCCESS, only core/battle and dependent aggregate failed",
+    "coreJob": 120860588918,
+    "coreFirst": "gameplay-ui-regressions whole-source noCanvas included approved accent module; same predicate also found in v173.40-beginner-balance and v173.5-bugfixes outside prior55-file naming set. Reuse shared complete cast-body-only guard; 3files PASS with all other assertions retained.",
+    "battleJob": 120860588882,
+    "battleFirst": "Boss stormCircle fixture still assumes shared group3slots. Accepted independent source uses exactly1selected Boss recipient and BOSS_FOOTPRINT; retain all existing formal resolver/shield/object/reward/HUD/slot/gate checks, add count1/single/contain/no crop and visible alpha centred on formal Boss paint.",
+    "adventure": "SUCCESS this attempt; no rerun of prior Chrome startup failure",
+    "products": "No source/config/CSS/assets/build changes from accepted80; no phone operation or new art.",
+    "releaseHold": "986 merge/deploy/acceptance window still held; no989merge/deploy until explicit return.",
+    "retry": "No23 rerun/cancel/dispatch. Genuine deterministic tests-only alignment, not dummy quota reset."
+  },
+  "integration986": {
+    "blockedHead": "f8edb2cd45d91da0ba83a7425cad55028eb7df25",
+    "evidence": "After20min both GET actions/runs?head_sha and commit check-runs returned0; status pending/no statuses; live PR mergeable=false/mergeable_state=dirty.",
+    "absorbedDev": "34c4138524e59a5f970f2677465cd9ee3cb561db",
+    "root": "986 player portraits advance changed generated manifest hashes/byte counts, conflicting with Wind generated artifacts; no overlapping Wind source.",
+    "resolution": "Normal dev-into989 merge; only root/build asset-manifest.json conflicts, regenerated by original builder (not ours/theirs overwrite). No989merge into dev or deployment.",
+    "acceptedWind": "git diff80 -- js39/js54/geometry/config/CSS/Windassets EMPTY. 986 assets/config/creation/loader/index retained from original dev Owner.",
+    "verification": "Original builder build/check PASS; targeted Wind module/field/narrow plus original portrait mapping tests. New Head necessary CI still required.",
+    "release": "986 still owns deploy/acceptance window; do not989merge/deploy until explicit return."
+  }
+}

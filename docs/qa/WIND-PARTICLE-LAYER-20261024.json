@@ -1,0 +1,124 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "status": "candidate; human rhythm/art and latest Head CI pending; undeployed",
+  "authorization": "User explicitly allowed this single independent Canvas particle layer; layout/portrait/depth/Core unchanged",
+  "sources": [
+    {
+      "path": "js/39-v143-skill-animation.js",
+      "sha256": "d2c0bb8bd9ba85515b24f8f1be2f7a183893ecad6179b806e3f4fe829f6bdeeb"
+    },
+    {
+      "path": "config/battle-vfx-feedback.json",
+      "sha256": "dc0eb8aae506fa33acf9f5a1da2e7ea57420f66d6fb324b299da58f5efc6fac0"
+    },
+    {
+      "path": "build/gameplay-core-primary.ac5ac6e18c76.js",
+      "sha256": "ac5ac6e18c7671a079461f7e12dbe2f3cb4d282bf8ba183db1573b450c16d98e"
+    }
+  ],
+  "evidence": "artifacts/wind-sweep-canvas-row-phone",
+  "video": {
+    "path": "artifacts/wind-sweep-canvas-row-phone/native-preview.mp4",
+    "sha256": "6124964793325c4dac5572ec632ec76704b6800df97f6c2e377212c01ff969c1",
+    "frames": 753,
+    "duration": 15.995678,
+    "averageFps": 47.01269930539987,
+    "p95": 35.43300000000027,
+    "max": 68.01100000000027,
+    "over50": 18
+  },
+  "limits": [
+    "Whole clip includes waiting; not a 60fps lock or whole combat performance PASS",
+    "Main-thread RAF has long intervals and is not compositor FPS",
+    "Phone movie precedes a DOM-flash age bookkeeping correction; native flash already excluded from hit-stop and source final regression covers correction"
+  ],
+  "functional": [
+    {
+      "mode": "部分削弱",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "loss": [
+        168,
+        168,
+        168,
+        0,
+        0,
+        0
+      ],
+      "debuffed": [
+        0,
+        2
+      ],
+      "rafP95": 66.79999999999927,
+      "rafMax": 234
+    },
+    {
+      "mode": "暴擊",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "loss": [
+        239,
+        239,
+        239,
+        0,
+        0,
+        0
+      ],
+      "debuffed": [
+        0,
+        1,
+        2
+      ],
+      "rafP95": 50.20000000000073,
+      "rafMax": 100.39999999999964
+    },
+    {
+      "mode": "未削弱",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "loss": [
+        168,
+        168,
+        168,
+        0,
+        0,
+        0
+      ],
+      "debuffed": [],
+      "rafP95": 50.19999999999709,
+      "rafMax": 133.59999999999854
+    },
+    {
+      "mode": "MISS",
+      "ids": [
+        0,
+        1,
+        2
+      ],
+      "loss": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "debuffed": [],
+      "rafP95": 33.5,
+      "rafMax": 117
+    }
+  ],
+  "cleanup": true,
+  "independentReview": "fire_sample_review: no direct blocker; extreme config bounds not fully proven",
+  "next": "Exact checkpoint phone movie, latest Head required CI, human review; no other skills"
+}

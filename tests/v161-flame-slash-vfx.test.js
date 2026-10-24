@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -58,7 +60,7 @@ test("Fire Slash lasts 0.76 seconds and starts its hit on frame eight",()=>{
 test("the official Sprite has no word-circle or procedural fallback",()=>{
     assert.doesNotMatch(wordRules,/installWordCircleDirector|v149-word-|previousPlay\(config,meta\)/);
     assert.doesNotMatch(css,/v149-word-flameSlash|v149-word-circle-stage|v160FlameSlashImpact/);
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|<svg\b/i);
+    assert.doesNotMatch(castBodySource(animation),/createElement\(["']canvas["']\)|getContext\(|drawImage\(|<svg\b/i);
 });
 
 test("the current cache version publishes the corrected source asset and metadata",()=>{

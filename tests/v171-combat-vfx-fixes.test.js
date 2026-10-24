@@ -3,7 +3,7 @@
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
-const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8");
+const animation=fs.readFileSync("js/39-v143-skill-animation.js","utf8").replace(/\r\n/g,"\n");
 const legacyRules=fs.readFileSync("js/43-v149-skill-ui-rules.js","utf8");
 const finalWaterRules=fs.readFileSync("js/60-v173.64-skill-progression-rebalance.js","utf8");
 const css=fs.readFileSync("css/40-v143-combat-dungeon-polish.css","utf8");
