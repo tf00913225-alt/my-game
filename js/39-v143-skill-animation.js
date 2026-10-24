@@ -2554,6 +2554,12 @@
         return current.emitted.has(index)?current:null;
     }
 
+    function clearShadowCache(current){
+        const page=current?.shadowCachePage;
+        if(page&&page.dataset.vfxShadowCache===String(current.sequence))delete page.dataset.vfxShadowCache;
+        if(current)current.shadowCachePage=null;
+    }
+
     function cleanupCurrent(current,reason){
         if(!current||current.done){ return; }
         if(current.model&&current.model.sprite&&current.model.sprite.impactOnly&&current.presentationReadyAt&&
@@ -2566,6 +2572,7 @@
             }
         }
         current.done=true;
+        if(current.shadowCachePage)clearShadowCache(current);
         if(current.fieldScene)clearFieldScene(current);
         current.hitFeedback?.dispose();
         current.pendingUpdateKeys?.forEach(key=>state.pendingUpdates?.delete(key));
@@ -2651,7 +2658,11 @@
             startedAt:Date.now(),visualStartedAt:0,firstVisibleFrameAt:0,
             duration:duration,hitReached:false,done:false,cleanupTimer:0
         };
-        if(current.hitFeedback)current.hitFeedback.onDispose=()=>clearFieldScene(current);
+        if(current.hitFeedback?.config.enabled&&current.hitFeedback.config.profile?.element==="wind"){
+            current.shadowCachePage=document.getElementById("battlePage");
+            if(current.shadowCachePage)current.shadowCachePage.dataset.vfxShadowCache=String(current.sequence);
+        }
+        if(current.hitFeedback)current.hitFeedback.onDispose=()=>{clearFieldScene(current);clearShadowCache(current);};
         current.targetIndexes=initialTargetIndexes(config,current,targetSide);
         current.supportBefore=new Map(current.targetIndexes.map(index=>{
             const entity=entityFor(targetSide,index);

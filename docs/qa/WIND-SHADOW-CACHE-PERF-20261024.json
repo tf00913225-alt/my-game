@@ -1,0 +1,31 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "parentHead": "794dbeb95eba22e6afb20caa00c3906e336312db",
+  "status": "partial performance improvement; NOT smoothness accepted",
+  "change": "Wind cast only: move existing grounded shadow and reactive selection glow from filtered parent to bitmap paint, inverse approved paint scale; sequence-owned cleanup on natural completion/dispose/disable/supersede. Generic portraits/normal/Fire fallback unchanged. No feel config, image, geometry size/depth, gameplay or clock changes.",
+  "tests": "34 targeted tests plus build/check/diff; independent fire_sample_review no direct lifecycle blocker; not pixel-identical shadow claim during breathing/rotation",
+  "phone": {
+    "device": "Samsung SM-N960F Android10 serial2858d1d9c23f7ece",
+    "ABBA": "artifacts/wind-perf-cache-production-ab-phone/evidence.json",
+    "callbackRates": [
+      21.4,
+      35.7,
+      34.7,
+      19.2
+    ],
+    "limitation": "Same-page RAF callback rates, NOT display FPS; temporary QA stylesheet restores original filter in A.",
+    "candidateVideo": "artifacts/wind11-shadow-cache-candidate-phone/wind-11-skills-shadow-cache.mp4",
+    "functional": "all11 actual Core isolated6v6/fixed labelled QA RNG, targets/status/sway/cleanup PASS",
+    "recordedChangedFramesFirst30s": {
+      "count": 913,
+      "rate": 30.392649,
+      "p95IntervalMs": 83.467,
+      "maxIntervalMs": 382.555
+    },
+    "nativeLimitation": "Recorded changed frames include waits/intentional stop/VFR. Whole-clip smoothness not passed; stormRain/dodge long intervals remain.",
+    "settings": "Authorized temporary low_power=0 probes restored1. dumpsys reports battery saver OFF while charging despite low_power key1; no proven saver root cause. GPU hardware Mali-G72 enabled. Own tabs/tunnels released, prior page restored.",
+    "failedProbe": "artifacts/wind11-794dbeb9-normalpower-phone/evidence.json transient cleanup windSpell, raw failed recording preserved; diagnostic repeat passed, root not reproduced."
+  },
+  "next": "Exact checkpoint native11 clip and latest necessary CI; diagnose remaining directly evidenced long frames without reducing Wind/occlusion/sway; keep Draft, no merge/deploy."
+}
