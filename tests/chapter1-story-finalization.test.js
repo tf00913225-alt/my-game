@@ -886,3 +886,19 @@ for(const outcome of ['win','lose','escape'])for(const saveMode of [true,false,'
         assert.equal(reopened.state().completedNodes.c1_01,undefined);
     }
 });
+test('guide reveals the same character action again after the EXP Owner restores its earlier viewport',()=>{
+    const h=guideHarness(),confirm=h.element(),scroller=h.element();let reveals=0,clipped=true;
+    h.c.battleActive=false;h.view.firstLesson={step:'upgrade',battleActive:false};
+    scroller.getBoundingClientRect=()=>({top:100,bottom:400,left:0,right:300,width:300,height:300});
+    confirm.closest=selector=>selector==='#characterTabContent'?scroller:null;
+    confirm.getBoundingClientRect=()=>({left:20,right:100,width:80,height:40,top:clipped?440:300,bottom:clipped?480:340});
+    confirm.scrollIntoView=()=>{reveals++;clipped=false;};
+    h.targets.set('#expDistributeList .v131-exp-confirm:not(:disabled)',[confirm]);
+    h.frame();assert.equal(reveals,1);
+    // The original preview Owner's deferred viewport restore changes geometry,
+    // without replacing or disabling the already selected confirm DOM node.
+    clipped=true;h.frame();assert.equal(reveals,2,'same DOM action must become visible again');
+    assert.equal(h.dispatch('click',confirm).stopped,false);
+    h.frame();assert.equal(reveals,2,'stable visible action must not keep scrolling');
+    h.view.tutorial.active=false;clipped=true;h.frame();assert.equal(reveals,2,'completed segment releases reveal ownership');
+});

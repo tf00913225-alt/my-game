@@ -450,7 +450,13 @@
         const target=step.target;
         const recovery=guide.overlay.querySelector('.adventure-guide-recovery');
         recovery.hidden=!!target||!!step.intro||!!step.waiting||(!!step.reading&&!!ui.storyPortraitPending);
-        if(target&&target!==guide.target){target.scrollIntoView({block:'nearest',inline:'nearest'});}
+        // The original EXP Owner restores its viewport over two animation
+        // frames after preview. Recheck the same target after that restoration;
+        // its identity alone does not prove that the next action is visible.
+        const scroller=target?.closest?.('#characterTabContent');
+        const targetBox=target?.getBoundingClientRect(),scrollBox=scroller?.getBoundingClientRect();
+        const clipped=scrollBox&&targetBox&&(targetBox.top<scrollBox.top||targetBox.bottom>scrollBox.bottom);
+        if(target&&(target!==guide.target||clipped)){target.scrollIntoView({block:'nearest',inline:'nearest'});}
         guide.target=target;
         const inBattle=step.battle&&typeof battleActive!=="undefined"&&battleActive;
         if(inBattle&&!guide.release){guide.release=window.FourSymbolsBattleFlow?.acquireInputGuideHold('adventure');}
