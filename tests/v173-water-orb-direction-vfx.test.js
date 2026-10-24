@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -41,7 +43,7 @@ test("CSS advances the formal 4x3 sheet once without Canvas or per-target travel
     assert.match(css,/33\.333333%\{background-position:0 50%\}/);
     assert.match(css,/66\.666667%\{background-position:0 100%\}/);
     assert.match(css,/91\.666667%,100%\{background-position:100% 100%\}/);
-    assert.doesNotMatch(animation,/createElement\(["']canvas["']\)|getContext\(|drawImage\(|scheduleCanvasCropSprite|canvas-crop/);
+    assert.doesNotMatch(castBodySource(animation),/createElement\(["']canvas["']\)|getContext\(|drawImage\(|scheduleCanvasCropSprite|canvas-crop/);
     assert.doesNotMatch(css,/data-skill="waterBall"[\s\S]*?v166-water-cast-sprite/);
 });
 

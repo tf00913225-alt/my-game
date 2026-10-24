@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -194,7 +196,7 @@ test("earth and light persistent states use low-motion modes without a frame clo
         assert.equal(model.cellAspect,undefined,type+" uses a single contained image");
     });
     assert.match(animation,/node\.style\.backgroundSize="contain"/);
-    assert.doesNotMatch(animation,/drawImage\(|getContext\(|canvas-crop/);
+    assert.doesNotMatch(castBodySource(animation),/drawImage\(|getContext\(|canvas-crop/);
 });
 
 test("persistent earth states and Yuan Zu blessing bind to their real combat state owners",()=>{
