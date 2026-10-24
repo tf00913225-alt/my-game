@@ -3696,6 +3696,23 @@
     pointer-events:none;
 }
 
+/* Same authoritative icon, no additional slot or turn-count timer. */
+.v143-status-icon[data-remaining-turns]::after{
+    content:attr(data-remaining-turns);
+    position:absolute;right:0;bottom:0;
+    min-width:9px;padding:1px;
+    font:700 10px/1 sans-serif;color:#fff;
+    background:#171923d9;border-radius:2px;
+    pointer-events:none;
+}
+.v143-feedback-dot{animation:v143FeedbackDot 1s ease-out infinite;mix-blend-mode:screen;}
+@keyframes v143FeedbackDot{
+    0%{transform:translateY(0) scale(.6);opacity:0;}
+    25%{opacity:.6;}
+    100%{transform:translateY(var(--v143-dot-rise,-18px)) scale(1);opacity:0;}
+}
+@media(prefers-reduced-motion:reduce){.v143-feedback-dot{display:none;animation:none;}}
+
 /* Document battle planes: cast 16000 < direct impact 16010 < real unit HUD
    16015 < skill name 16020. Floating Feedback retains its own text plane. */
 .v143-hit-feedback-overlay{

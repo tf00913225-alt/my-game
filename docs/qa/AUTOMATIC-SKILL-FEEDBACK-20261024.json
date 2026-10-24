@@ -1,0 +1,51 @@
+{
+  "workId": "WIND-FLURRY-SAMPLE-20261024",
+  "pr": 989,
+  "status": "IMPLEMENTED, latest checkpoint phone/CI/human rhythm review pending; Draft undeployed",
+  "scope": "Data-derived presentation rules; only stormFlurry/flameSlash/healSpell/rockWall enabled for initial review; fixed layout/paint/depth/source assets/Core unchanged",
+  "sources": [
+    {
+      "path": "js/39-v143-skill-animation.js",
+      "sha256": "746f924a5bafdaeb735cc2e6b5e674bdb54d89b4f506e779ceddcbccd8ebc88f"
+    },
+    {
+      "path": "css/40-v143-combat-dungeon-polish.css",
+      "sha256": "ddb7a96a085825d30aa652c684c7d4ca9db2f7e365f9c8c6c069f0d3a9f88888"
+    },
+    {
+      "path": "config/battle-vfx-feedback.json",
+      "sha256": "b0b7cbe74715febc3af7f4a45ff3c65acb8fd9170c433c34c1f8f9293b821d70"
+    },
+    {
+      "path": "build/gameplay-core-primary.f2f3af4df416.js",
+      "sha256": "f2f3af4df416361c1df35050ec2a6ac29a015de66f394ebfed9ecb313d3881e8"
+    },
+    {
+      "path": "build/gameplay-core.ab41bf65204d.css",
+      "sha256": "ab41bf65204d7e9e24849698dc7a104d80ea94461ec28ad6a334ae210183bd76"
+    }
+  ],
+  "validation": [
+    "module15 tests",
+    "Wind30 internal including expected-entry buff blocked/unrelated/identical refresh",
+    "Fire15+3 internal",
+    "raster9 internal",
+    "direct-overlay/cold-clock/impact/cardless6",
+    "build/check/diffcheck"
+  ],
+  "independentReview": "fire_sample_review: all three reported lineage/refresh/decorator cleanup defects resolved and focused tests added; no remaining direct blocker",
+  "historicalProbes": {
+    "fourSkillDesktop": "artifacts/automatic-vfx-four-candidate-phone/evidence.json (desktop despite directory suffix)",
+    "fourSkillPhone": "artifacts/automatic-vfx-four-usb-phone/evidence.json (pre-final lineage cleanup; not latest Head proof)",
+    "cpu": "artifacts/automatic-vfx-play-profile/cpu-profile.json",
+    "density": "artifacts/wind-sweep-phone-density-ab/evidence.json",
+    "spriteShadow": "artifacts/wind-sweep-sprite-glow-ab-phone/evidence.json"
+  },
+  "limits": [
+    "No stable60fps claim; latest exact checkpoint video/metrics pending",
+    "Only current append-new-entry named buff contract is verified; hypothetical future in-place mutation Owner is not assumed",
+    "Depth particle planes surround the original cast body, not a character size/depth rewrite",
+    "Poison palette does not create poison gameplay or a new status Owner"
+  ],
+  "next": "Save/push original branch, exact Head Wind and four-skill phone clips, latest required CI, human visual/rhythm review; no full-catalog enable before Gates"
+}

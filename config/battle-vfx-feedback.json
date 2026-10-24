@@ -19,13 +19,21 @@
     "poolLimit": 48,
     "sweepEnabled": false,
     "sweepGapMs": 100,
-    "hitStrength": [0.72, 0.92, 1.25],
+    "hitStrength": [
+      0.72,
+      0.92,
+      1.25
+    ],
     "maxEffectNodes": 48,
     "canvasDpr": 1.5,
     "windCount": 10,
     "leafCount": 5,
     "burstCount": 6,
-    "colors": ["#80f6d6", "#efffff", "#43c7bb"],
+    "colors": [
+      "#80f6d6",
+      "#efffff",
+      "#43c7bb"
+    ],
     "windMs": 900,
     "windSize": 2,
     "leafSize": 7,
@@ -43,9 +51,290 @@
     "screenFlashOpacity": 0.09,
     "screenFlashMs": 90,
     "weakenMs": 420,
-    "weakenDrop": 0.5
+    "weakenDrop": 0.5,
+    "criticalScale": 1.25,
+    "maxStopMs": 75,
+    "supportMs": 480,
+    "supportRise": 0.5,
+    "shieldOpacity": 0.16
   },
   "skills": {
-    "stormFlurry": { "enabled": true, "sweepEnabled": true }
+    "stormFlurry": {
+      "enabled": true,
+      "sweepEnabled": true
+    }
+  },
+  "automatic": {
+    "enabled": true,
+    "rolloutAll": false,
+    "previewSkills": [
+      "stormFlurry",
+      "flameSlash",
+      "healSpell",
+      "rockWall"
+    ],
+    "elementAliases": {
+      "fire": "fire",
+      "火": "fire",
+      "water": "water",
+      "ice": "water",
+      "冰": "water",
+      "水": "water",
+      "wind": "wind",
+      "風": "wind",
+      "thunder": "thunder",
+      "lightning": "thunder",
+      "雷": "thunder",
+      "earth": "earth",
+      "土": "earth",
+      "light": "light",
+      "光": "light",
+      "dark": "dark",
+      "暗": "dark"
+    },
+    "elements": {
+      "fire": {
+        "colors": [
+          "#ff7733",
+          "#fff0b0",
+          "#d94322"
+        ],
+        "shape": "ember",
+        "direction": "up",
+        "hints": [
+          "火",
+          "炎",
+          "焰"
+        ]
+      },
+      "water": {
+        "colors": [
+          "#83dfff",
+          "#f0ffff",
+          "#579cfa"
+        ],
+        "shape": "crystal",
+        "direction": "down",
+        "hints": [
+          "水",
+          "冰",
+          "霜"
+        ]
+      },
+      "wind": {
+        "colors": [
+          "#80f6d6",
+          "#efffff",
+          "#43c7bb"
+        ],
+        "shape": "leaf",
+        "direction": "sweep",
+        "hints": [
+          "風"
+        ]
+      },
+      "thunder": {
+        "colors": [
+          "#fff36b",
+          "#ffffef",
+          "#eac034"
+        ],
+        "shape": "arc",
+        "direction": "sweep",
+        "hints": [
+          "雷",
+          "電"
+        ]
+      },
+      "earth": {
+        "colors": [
+          "#cda35c",
+          "#ffe4a2",
+          "#89704b"
+        ],
+        "shape": "stone",
+        "direction": "down",
+        "hints": [
+          "土",
+          "石"
+        ]
+      },
+      "light": {
+        "colors": [
+          "#ffe990",
+          "#fffdef",
+          "#ebc756"
+        ],
+        "shape": "ray",
+        "direction": "up",
+        "hints": [
+          "聖光",
+          "光明"
+        ]
+      },
+      "dark": {
+        "colors": [
+          "#9665c4",
+          "#d3b1ef",
+          "#462958"
+        ],
+        "shape": "smoke",
+        "direction": "in",
+        "hints": [
+          "暗",
+          "幽冥"
+        ]
+      },
+      "neutral": {
+        "colors": [
+          "#f5f7ff",
+          "#ffffff",
+          "#b9c3d7"
+        ],
+        "shape": "spark",
+        "direction": "out"
+      }
+    },
+    "types": {
+      "single": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "windCount": 3,
+        "leafCount": 0,
+        "burstCount": 7
+      },
+      "multi": {
+        "sweepEnabled": true,
+        "sweepGapMs": 100
+      },
+      "all": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "screenFlashOpacity": 0.1
+      },
+      "heal": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 5,
+        "leafCount": 0,
+        "colors": [
+          "#98f4b8",
+          "#fff1bd",
+          "#67cda2"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      },
+      "buff": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 4,
+        "leafCount": 0,
+        "colors": [
+          "#ffe9a1",
+          "#c1f5b2",
+          "#e1c15a"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      },
+      "shield": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 3,
+        "leafCount": 0,
+        "colors": [
+          "#d8e9ff",
+          "#fff5c8",
+          "#9cc5ee"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      }
+    },
+    "status": {
+      "buff": {
+        "colors": [
+          "#ffe89c",
+          "#a9edaf"
+        ],
+        "direction": "up"
+      },
+      "debuff": {
+        "colors": [
+          "#ab78d9",
+          "#b84e69"
+        ],
+        "direction": "down"
+      },
+      "dot": [
+        "burn",
+        "poison"
+      ],
+      "control": [
+        "stun",
+        "silence",
+        "freeze",
+        "petrify"
+      ],
+      "dotElements": {
+        "burn": "fire",
+        "poison": "dark"
+      },
+      "dotParticleCap": 8,
+      "dotPerState": 2,
+      "dotSizePx": 3,
+      "dotDurationMs": 1000,
+      "dotRisePx": 18
+    }
+  },
+  "depth": {
+    "far": {
+      "size": 0.55,
+      "speed": 0.65,
+      "blur": 1.5,
+      "opacity": 0.3,
+      "cap": 2
+    },
+    "mid": {
+      "size": 1,
+      "speed": 1,
+      "blur": 0,
+      "opacity": 1,
+      "cap": 48
+    },
+    "near": {
+      "size": 1.8,
+      "speed": 1.45,
+      "blur": 2,
+      "opacity": 0.22,
+      "cap": 2
+    },
+    "assignment": {
+      "wind": "mid",
+      "leaf": "mid",
+      "burst": "mid",
+      "trail": "mid",
+      "shockwave": "mid",
+      "weaken": "mid",
+      "heal": "mid",
+      "buff": "mid",
+      "shield": "mid"
+    }
+  },
+  "performance": {
+    "adaptive": true,
+    "slowFrameMs": 28,
+    "slowFrames": 4,
+    "minQuality": 0.6,
+    "step": 0.1,
+    "canvasDpr": 1,
+    "spriteShadow": false
   }
 }

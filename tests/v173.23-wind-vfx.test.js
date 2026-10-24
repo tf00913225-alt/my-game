@@ -166,7 +166,7 @@ function loadRuntime(options={}){
             }
             if(tag==="canvas"){
                 const context={
-                    clearRect(){},setTransform(){},save(){},restore(){},translate(){},rotate(){},scale(){},beginPath(){},ellipse(){},stroke(){},moveTo(){},quadraticCurveTo(){},fill(){},fillRect(){},
+                    clearRect(){},closePath(){},lineTo(){},setTransform(){},save(){},restore(){},translate(){},rotate(){},scale(){},beginPath(){},ellipse(){},stroke(){},moveTo(){},quadraticCurveTo(){},fill(){},fillRect(){},
                     drawImage(...args){ drawCalls.push({node,args}); }
                 };
                 node.getContext=()=>context;
@@ -880,5 +880,18 @@ test("sweep weakening rings and icons require actual status success and disappea
  assert.equal(runtime.cards.battleMonster0.querySelector(".v143-status-icon-damageDown"),null);
  runtime.monsters[1].statusEffects=[];runtime.context.v143SyncStatusVisualEffects();assert.equal(runtime.cards.battleMonster1.querySelector(".v143-status-icon-damageDown"),null);
  runtime.context.v142SkillAnimationDirector.dispose();
+});
+
+test("automatic support observes only a new expected successful named-buff entry, including identical refresh",()=>{
+ for(const mode of ["blocked","unrelated","refresh"]){
+  const rects=[100,200,300].map(left=>({left,top:90,right:left+70,bottom:190,width:70,height:100}));
+  const r=loadRuntime({feedback:true,playerRects:rects,renderGeometry:{getUnitGeometry(s,i){return {artworkProjection:{rect:rects[i]}};}}});
+  const prior={type:"rockWall",turnsLeft:4,percent:30};r.party[0].activeBuffs=[prior];r.setClock(100);
+  r.context.v142SkillAnimationDirector.play({id:"rockWall",element:"earth",category:"buff",targetType:"ally",duration:1500,resolveDuration:1500},{side:"player",targetSide:"player",targetId:0,targetIds:[0]});r.setClock(100);
+  const current=r.context.v143SkillAnimationState.current;let cues=0;current.hitFeedback.support=()=>{cues++;};
+  if(mode!=="blocked")r.party[0].activeBuffs.push({type:mode==="refresh"?"rockWall":"rage",turnsLeft:4,percent:30});
+  r.setClock(850);r.scheduled.find(j=>j.delay===750).callback();for(let n=0;n<2;n++)r.raf.splice(0).forEach(fn=>fn(850));
+  assert.equal(cues,mode==="refresh"?1:0,mode);r.context.v142SkillAnimationDirector.dispose();
+ }
 });
 console.log("\n"+passed+" V173.39 wind Sprite VFX tests passed.");

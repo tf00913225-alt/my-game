@@ -130,6 +130,8 @@ test("V143 casts retain raster-only choreography; named persistent foot auras st
     const feedback=JSON.parse(fs.readFileSync("config/battle-vfx-feedback.json","utf8"));
     assert.equal(feedback.defaults.enabled,false,"additional wind accents require explicit per-skill authorization");
     assert.deepEqual(Object.keys(feedback.skills).filter(id=>feedback.skills[id].enabled),["stormFlurry"]);
+    assert.deepEqual(feedback.automatic.previewSkills,["stormFlurry","flameSlash","healSpell","rockWall"]);
+    assert.equal(feedback.automatic.rolloutAll,false,"four-skill review must not silently enable the full catalog");
     assert.ok(feedback.defaults.maxEffectNodes<=48,"bounded accents, no blanket emitter");
     assert.match(v143,/node\.dataset\.presentationRole="foot-aura"/);
     assert.match(v143,/rise\.className="v143-status-aura-rise"/);
@@ -215,7 +217,8 @@ test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>
 test("resolved group targets and successful deferred statuses remain authoritative VFX endpoints",()=>{
     assert.match(v143,/function geometrySeedIndexes\(current,indexes\)[\s\S]*?current\.targetIds\.slice\(\)[\s\S]*?current\.targetId/);
     assert.match(v143,/const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?const primaryAnchor=geometryPrimaryAnchor\(current,indexes\)/);
-    assert.match(v143,/if\(types\.indexOf\(type\)>=0\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
+    assert.match(v143,/if\(types\.indexOf\(type\)>=0\|\|automatic\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
+    assert.match(v143,/const automatic=current\.hitFeedback\?\.config\.enabled&&current\.targetIndexes\.includes\(index\)/);
 });
 
 test("secondary status owners cannot recreate procedural combat VFX",()=>{
