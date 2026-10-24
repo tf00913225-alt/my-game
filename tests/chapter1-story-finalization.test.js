@@ -393,7 +393,7 @@ function guideHarness(){
         CSS:{escape:value=>value},getComputedStyle:()=>({visibility:"visible"}),
         requestAnimationFrame(fn){frames.push(fn);return frames.length;},addEventListener(){},
         document:{readyState:"loading",addEventListener(type,fn,capture){if(capture)listeners.set(type,fn);},
-            querySelectorAll:selector=>targets.get(selector)||[],
+            querySelectorAll:selector=>targets.has(selector)?targets.get(selector):selector.split(',').flatMap(part=>targets.get(part.trim())||[]),
             getElementById:id=>id==="game-ui"?host:null,
             createElement(){return {...element(),querySelector:child};}}};
     c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),c);
@@ -416,13 +416,13 @@ test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',
     assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
 });
 
-for(const element of ['fire','water','wind','earth']){
-    test(`skill guide requires a real ${element} tab click before learning and equipping`,()=>{
+for(const surface of ['standalone','character-modal'])for(const element of ['fire','water','wind','earth']){
+    test(`skill guide requires a real ${element} tab click before learning and equipping in ${surface}`,()=>{
         const h=guideHarness(),page=h.element(),tab=h.element(),growth=h.element(),equip=h.element(),wrong=h.element();
         h.c.battleActive=false;h.view.tutorial.requiredAction='skill';h.view.tutorialProgress.nativeElement=element;
         let selected=false,learned=0,equipped=0;
         tab.getAttribute=()=>selected?'true':'false';tab.action=()=>{selected=true;};growth.action=()=>{learned++;h.view.tutorialProgress.loadout={skillLevels:{lessonSkill:1}};};equip.action=()=>{equipped++;};
-        h.targets.set('#skillPage.active',[page]);
+        h.targets.set(surface==='standalone'?'#skillPage.active':'#homeFeatureModal.show[data-character-tab="skill"] #skillPage',[page]);
         h.targets.set('#skillElementTabs [onclick="selectSkillElementTab(\''+element+'\')"]',[tab]);
         h.targets.set('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)',[growth]);
         h.targets.set('.skill-row[data-skill-id="lessonSkill"] [data-skill-action="equip"]',[equip]);

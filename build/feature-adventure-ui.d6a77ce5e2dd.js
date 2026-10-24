@@ -330,7 +330,7 @@
             }
             return step('#v17342InventoryPotionUse','點「使用」，恢復角色資源。');
         }
-        if(visibleGuideTarget('#skillPage.active')){
+        if(visibleGuideTarget('#skillPage.active,#homeFeatureModal.show[data-character-tab="skill"] #skillPage')){
             if(p.skillReady){return step('#adventureTutorialReturn','技能已裝好，返回故事再挑戰。');}
             const nativeTab=p.nativeElement&&visibleGuideTarget('#skillElementTabs [onclick="selectSkillElementTab(\''+CSS.escape(p.nativeElement)+'\')"]');
             if(nativeTab&&nativeTab.getAttribute('aria-selected')!=='true'){

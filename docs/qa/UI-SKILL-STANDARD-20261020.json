@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：dev986最小依賴整合/兩尺寸代表驗證；最新Head自然CI待確認，非全UI完成",
+  "status": "施工中：8c4自然CI兩首錯已最小修正，95回歸與限定實畫獨審通過；新Head CI待完成，非全UI完成",
   "devices": [
     {
       "id": "360x640",
@@ -27906,6 +27906,33 @@
         "不吸991/989、不merge dev或部署，955排程PAUSED"
       ],
       "pendingObservedIssue": "創角元素按鈕寬360約33.9px/1280約42.4px，不滿44px；原布局非本次986素材新增，仍是UI待處理，不因依賴審核通過宣稱控制全達標。"
+    },
+    {
+      "segment": "ci8c4-direct-fixes",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ci8c4-direct-fixes",
+      "parent": "8c4cd1d0cfa34eb6e5ffa9f05c0244a51b9d8316",
+      "scope": [
+        "實證物品倒數遮卡修正，不僅改測試",
+        "原legacy角色modal guide selector相容1line，保原static footer"
+      ],
+      "tests": 95,
+      "devices": {
+        "item": [
+          "360x640",
+          "393x873",
+          "412x915",
+          "1280x800"
+        ],
+        "legacy": [
+          "393x873"
+        ]
+      },
+      "pending": [
+        "新Head必要CI",
+        "原台帳其他未驗狀態及創角元素按鈕寬不足44問題",
+        "自然倒數/真結算/硬體不在此次限定驗收"
+      ],
+      "automation": "PAUSED"
     }
   ]
 }

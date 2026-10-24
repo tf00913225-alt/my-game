@@ -10,9 +10,9 @@ assert.doesNotMatch(main,/function finishBattleDurationAction\(\)[\s\S]*?expireB
 assert.match(main,/function battleItemIconMarkup\(item\)/);
 assert.match(itemCss,/\.battle-item-menu\{[^}]*bottom:var\(--battle-item-menu-bottom,78px\);[^}]*height:var\(--battle-item-menu-height,300px\);[^}]*max-height:var\(--battle-item-menu-height,300px\);/);
 assert.match(slotCss,/--battle-item-menu-bottom:78px;\s*--battle-item-menu-height:300px;/);
-assert.match(slotCss,/\.turn-target-row\.battle-item-open\)\{\s*--battle-turn-overlay-bottom:calc\(var\(--battle-item-menu-bottom\) \+ var\(--battle-item-menu-height\) \+ var\(--battle-item-menu-gap\)\);/);
-assert.match(slotCss,/\.turn-target-row:is\(\.skill-picker-open,\.battle-item-open\)\{\s*top:auto;\s*bottom:var\(--battle-turn-overlay-bottom\);\s*opacity:1;/);
-assert.match(slotCss,/#battleTurnIndicator\{\s*top:auto;\s*bottom:calc\(var\(--battle-turn-overlay-bottom\) \+ \(var\(--battle-turn-row-height\) - 20px\) \/ 2\);/);
+assert.match(slotCss,/\.turn-target-row\.battle-item-open\{\s*top:auto;\s*bottom:calc\(var\(--battle-item-menu-bottom\) \+ var\(--battle-item-menu-height\) \+ var\(--battle-item-menu-gap\)\);\s*opacity:1;/,"item timer follows actual menu bounds, not the retired footer offset");
+assert.match(slotCss,/\.turn-target-row\.skill-picker-open\{\s*top:calc\(100% - var\(--battle-command-row-height\) - var\(--battle-skill-menu-top-offset\) \+ 14px\);\s*right:94px;\s*bottom:auto;/,"readable skill picker keeps its timer in the header clear of cards/Return");
+assert.match(slotCss,/#battleTurnIndicator\{\s*position:absolute !important;\s*top:0;\s*left:0;\s*right:100px;/,"formal compact-footer round label stays independent of the original timer");
 assert.match(v143,/stealthSkill:statusVisual\("","none"/);
 assert.match(v143,/fireMomentum:statusVisual\("","none"/);
 assert.match(slotCss,/v143-unit-stealthed > \.v174-battle-art\{\s*opacity:\.35/);
