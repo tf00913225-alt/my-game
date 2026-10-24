@@ -5165,7 +5165,10 @@ function restoreFirstTutorialBattle(value,identity,onComplete){
         window.FourSymbolsBattlefieldSlots?.clearActiveEnemySnapshot();renderBattle();showPage('battle');
         syncBattleAutoSettings();updateAutoButton();
         // Already-settled round-start/duration/RNG facts must not run again.
-        beginBattleRoundDeclaration(token);return true;
+        beginBattleRoundDeclaration(token);
+        const turnIndicator=$("battleTurnIndicator");
+        if(turnIndicator){turnIndicator.textContent="第"+turn+"回合"+battleWaveHudText();}
+        return true;
     }catch(error){
         clearFirstTutorialPendingWork();battleActive=false;battleToken++;window.v132ActiveDungeonRun=null;
         statisticsRestore?.rollback();

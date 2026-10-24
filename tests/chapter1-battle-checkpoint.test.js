@@ -15,6 +15,7 @@ function harness(){
         attack:4,magicAttack:0,defense:0,agility:0,speed:0,accuracy:0,evasion:0,criticalChance:0,
         skillIds:[],skillChance:0,statusEffects:[],activeBuffs:[],alive:true,vAdventure:true,vAdventureEncounterId:'tutorial_1'};
     let declarations=0;
+    const turnIndicator={textContent:'第 1 回合'};
     const c={console:{error(){}},player,monsters:[monster],currentZone:'dungeon',currentBattleMonsters:[0],heroBattleCombatants:[],
         battleActive:true,battleToken:7,turn:2,selectedMonster:0,activeBattleCharacterIndex:0,timerId:17,battleAdvanceTimeoutId:null,battleAdvanceScheduled:false,
         battleEscapePendingToken:null,battlePresentationLocks:new Set(),battleInputGuideHolds:new Set(),
@@ -31,6 +32,7 @@ function harness(){
         clearBattleActionWatchdog(){},clearBattleRoundPrompt(){},clearBattleActionNotice(){},closeMenus(){},
         clearBattleTargetSelectionMode(){},resumeBattleAfterPresentationLocks(){},updateActionHudVisibility(){},
         renderBattle(){},showPage(){},syncBattleAutoSettings(){},updateAutoButton(){},
+        $:id=>id==='battleTurnIndicator'?turnIndicator:null,battleWaveHudText:()=>'',
         beginBattleRoundDeclaration(){declarations++;},startTurn(){throw Error('must not replay round start');},
         FourSymbolsAccountSave:{getActiveUid:()=>identity.uid},FourSymbolsStartupPolicy:{getUid:()=>identity.uid},
         FourSymbolsAdventureContent:{tutorialEncounters:{tutorial_1:{name:'攔路惡徒',hpRatio:2.05}}},
@@ -43,7 +45,7 @@ function harness(){
     const owner=c.FourSymbolsBattleStatistics,id=c.buildBattleStatisticsCombatant(0).id;
     owner.begin({battleToken:7,combatants:[c.buildBattleStatisticsCombatant(0)]});
     owner.recordDamage({sourceId:id,amount:18});owner.recordDamage({targetId:id,amount:20});owner.recordCritical({id});
-    return {c,identity,onboarding,world,flow:c.FourSymbolsBattleFlow,declarations:()=>declarations};
+    return {c,identity,onboarding,world,turnIndicator,flow:c.FourSymbolsBattleFlow,declarations:()=>declarations};
 }
 function suspend(h){
     assert.equal(h.flow.checkpointFirstTutorialBattle(h.identity,value=>{h.onboarding.battleCheckpoint=value;return true;},true),true);
@@ -99,6 +101,7 @@ test('JSON reload resumes the same saved enemies/round/resources/statistics with
     h.onboarding.battleCheckpoint=dto;let finished=0;
     assert.equal(h.flow.restoreFirstTutorialBattle(dto,h.identity,()=>finished++),true);
     assert.equal(h.c.monsters[0].hp,9);assert.equal(h.c.monsters[0].level,1);assert.equal(h.c.turn,2);
+    assert.equal(h.turnIndicator.textContent,'第2回合','restored HUD projects the retained round without startTurn');
     assert.equal(h.c.player.level,2);assert.equal(h.c.player.hp,80);assert.equal(h.c.player.sp,40);
     assert.equal(h.declarations(),1);assert.equal(h.c.battleToken,1);
     assert.deepEqual(Array.from(h.c.battleRoundBoundaryKeys),['1:round_start:1','1:round_end:1','1:round_start:2']);
