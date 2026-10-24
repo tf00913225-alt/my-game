@@ -5392,23 +5392,30 @@ button:active{
 */
 
 .level-up-toast{
-    position:fixed;
+    position:absolute;
 
     left:50%;
-    top:14px;
+    top:calc(14 * var(--ui-length-unit,1px));
 
     transform:
         translateX(-50%)
-        translateY(-30px);
+        translateY(calc(-30 * var(--ui-length-unit,1px)));
 
-    background:#f0b429;
-    color:#0c0b0a;
+    background:var(--rpg-window-iron,#0D0C09);
+    color:var(--rpg-window-text,#f4ead4);
+    border:calc(6 * var(--ui-length-unit,1px)) solid transparent;
+    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
 
     font-weight:900;
-    font-size:15px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:1.5;
 
-    padding:11px 22px;
-    border-radius:20px;
+    width:calc(320 * var(--ui-length-unit,1px));
+    max-width:calc(100% - 32 * var(--ui-length-unit,1px));
+    box-sizing:border-box;
+    padding:calc(10 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px));
+    border-radius:0;
+    text-align:center;
 
     box-shadow:0 4px 16px rgba(0,0,0,.5);
 
@@ -5421,7 +5428,8 @@ button:active{
         transform .25s ease;
 
     pointer-events:none;
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .level-up-toast.show{
@@ -5591,8 +5599,7 @@ button:active{
     max-height:96% !important;
 }
 
-#game-stage > #app > #game-content .exp-toast,
-#game-stage > #app > #game-content .level-up-toast{
+#game-stage > #app > #game-content .exp-toast{
     position:absolute !important;
     top:14px !important;
 }

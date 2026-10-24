@@ -1,0 +1,16 @@
+{
+  "parent": "8a056cd141c48cb17f5faec48e8aa9fad93a1c1c",
+  "dirty": true,
+  "hashes": {
+    "js/00-main.js": "111b22055bc814b9bf215b067993bb9c1207f4f5990d25d2faa6234847ac5636",
+    "css/00-main.css": "f958713c79672c0b4cbae4bcf37b7d126b88380451e69a6368e3f89ef48f4b73",
+    "index.html": "8cf71db27cc7c8f2291c74b142428812cee39640cc79848a5a80d3f9bf11e1ab",
+    "asset-manifest.json": "3e7c0d01fb0226bbd41e93b2467ecbd452d4944d8f380ef72b2a1d48b2f9658a",
+    "functions/src/generated/restricted-forest-instance-policy.json": "ebc5b3f09bf6ee328e47ca10da21da1acf9391da4758b6ded2ad2788bcfd8421"
+  },
+  "buildCheck": "PASS",
+  "typographyFocusedSuites": 3,
+  "automation": "955 PAUSED",
+  "ci": "8a056cd1 check-runs/statuses/workflow-runs empty; PR mergeable false; no bypass/rerun/cancel",
+  "scope": "UI notification presentation only, original timer/display APIs unchanged. Existing profile discarded; no claim of exact private/runtime/cache restoration."
+}

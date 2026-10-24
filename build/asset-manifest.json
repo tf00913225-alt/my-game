@@ -7,7 +7,7 @@
       "build/boot-core.b447fc7be00c.js"
     ],
     "styles": [
-      "build/boot-core.31557f65fbf1.css"
+      "build/boot-core.78385a4c589b.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.32aa0e17043b.js"
+          "build/app-shell.49bce648876d.js"
         ],
         "styles": [
           "build/app-shell.7bc5e1c99233.css"
@@ -211,9 +211,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.31557f65fbf1.css",
-        "sha256": "31557f65fbf1",
-        "bytes": 206958,
+        "path": "build/boot-core.78385a4c589b.css",
+        "sha256": "78385a4c589b",
+        "bytes": 207486,
         "priority": "P0",
         "type": "style",
         "decode": false
@@ -563,9 +563,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.32aa0e17043b.js",
-        "sha256": "32aa0e17043b",
-        "bytes": 1210934,
+        "path": "build/app-shell.49bce648876d.js",
+        "sha256": "49bce648876d",
+        "bytes": 1210949,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -827,8 +827,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "676338bc5c1c",
-    "totalBytes": 24087426,
+    "manifestHash": "01d376f11b51",
+    "totalBytes": 24087969,
     "totalResources": 79
   },
   "assets": {
@@ -836,9 +836,9 @@
       "sha256": "b447fc7be00c",
       "bytes": 69972
     },
-    "build/app-shell.32aa0e17043b.js": {
-      "sha256": "32aa0e17043b",
-      "bytes": 1210934
+    "build/app-shell.49bce648876d.js": {
+      "sha256": "49bce648876d",
+      "bytes": 1210949
     },
     "build/gameplay-core-primary.6491048bbb4f.js": {
       "sha256": "6491048bbb4f",
@@ -884,9 +884,9 @@
       "sha256": "ecc7fc233097",
       "bytes": 52606
     },
-    "build/boot-core.31557f65fbf1.css": {
-      "sha256": "31557f65fbf1",
-      "bytes": 206958
+    "build/boot-core.78385a4c589b.css": {
+      "sha256": "78385a4c589b",
+      "bytes": 207486
     },
     "build/app-shell.7bc5e1c99233.css": {
       "sha256": "7bc5e1c99233",

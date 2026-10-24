@@ -1098,7 +1098,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
     ui.dataset.presentationDomain="native";
     document.getElementById("game-overlay-layer").appendChild(ui);
     for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
-                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal","levelUpToast"]){
         const node=document.getElementById(id);
         if(node) ui.appendChild(node);
     }

@@ -1,0 +1,109 @@
+import fs from 'node:fs';
+import os from 'node:os';
+import crypto from 'node:crypto';
+import path from 'node:path';
+import assert from 'node:assert/strict';
+import {spawn,execFileSync} from 'node:child_process';
+import {ROOT,startServer,waitJson,Cdp,findChrome} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+// Use the same isolated account and the real production loader as skill QA.
+const skillQa=fs.readFileSync(path.join(ROOT,'.github/scripts/run-skill-progression-browser-qa.mjs'),'utf8');
+const prepare=skillQa.match(/const PREPARE_RUNTIME=`([\s\S]*?)`;/)[1];
+const viewport=JSON.parse(process.env.UI_READING_VIEWPORT||'[393,873]');
+const sourceHead=process.env.GITHUB_SHA||execFileSync('git',['rev-parse','HEAD'],{cwd:ROOT,encoding:'utf8'}).trim();
+const sourceDirty=!!execFileSync('git',['status','--porcelain'],{cwd:ROOT,encoding:'utf8'}).trim();
+const out=path.join(ROOT,'artifacts/ui-skill-standard/shared-toast-relic-after-8a056cd1',viewport.join('x'));if(fs.existsSync(out))throw Error('Output exists');
+fs.mkdirSync(out,{recursive:true});
+const hash=()=>Object.fromEntries(['index.html','asset-manifest.json',...fs.readdirSync('build').filter(x=>/\.(css|js)$/.test(x)).map(x=>'build/'+x)].map(p=>[p,crypto.createHash('sha256').update(fs.readFileSync(p)).digest('hex')]));const sourcesBefore=hash(),touches=[],checks=[];const server=await startServer();
+const profile=fs.mkdtempSync(path.join(os.tmpdir(),'functional-reading-'));
+const port=9700+Math.floor(Math.random()*200);
+const chrome=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu',`--remote-debugging-port=${port}`,`--user-data-dir=${profile}`,'about:blank'],{stdio:'ignore',windowsHide:true});
+let c;const scenes=[];
+const settle=()=>new Promise(r=>setTimeout(r,350));
+const measure=String.raw`(selector)=>{
+ const host=document.querySelector(selector);if(!host)throw Error('missing '+selector);
+ const elementScale=e=>{let box=e;while(box&&!box.offsetWidth)box=box.parentElement;return box?box.getBoundingClientRect().width/box.offsetWidth:1;};
+ const rows=[],overflow=[],controls=[];
+ const tree=document.createTreeWalker(host,NodeFilter.SHOW_TEXT);
+ while(tree.nextNode()){
+  const n=tree.currentNode,e=n.parentElement,text=n.textContent.trim();
+  if(!text||!e||e.closest('script,style,[aria-hidden="true"],.nav-sr-only,.inventory-title-plate-kicker'))continue;
+  const s=getComputedStyle(e),r=e.getBoundingClientRect();
+  if(!r.width||!r.height||s.visibility==='hidden'||s.display==='none')continue;
+  if(/^[＋+×‹›◀▶▼▲▾◇◆…·—→←？]+$/.test(text))continue;
+  const after=getComputedStyle(e,'::after');
+  const replaced=parseFloat(s.fontSize)===0&&after.content&&after.content!=='none';
+  const font=parseFloat(replaced?after.fontSize:s.fontSize)*elementScale(e);
+  const button=!!e.closest('button,[role="tab"],[role="button"]');
+  const primary=button&&e.matches('button,#creationSubmitLabel,.creation-next>span,.creation-back>span,.element-option .element-name')&&!e.closest('.home-test-tools');
+  rows.push({text:text.slice(0,90),font,button,primary,selector:e.id?'#'+e.id:e.tagName.toLowerCase()+'.'+String(e.className).trim().replace(/\s+/g,'.'),parent:e.parentElement.id||e.parentElement.className});
+ }
+ for(const e of host.querySelectorAll('button,[role="tab"],[role="button"]')){
+  const s=getComputedStyle(e),r=e.getBoundingClientRect();if(!r.width||!r.height||s.visibility==='hidden'||!e.textContent.trim())continue;
+  const walker=document.createTreeWalker(e,NodeFilter.SHOW_TEXT),bounds=[];
+  while(walker.nextNode()){const n=walker.currentNode;if(!n.textContent.trim()||n.parentElement.closest('[aria-hidden="true"]'))continue;const range=document.createRange();range.selectNodeContents(n);bounds.push(range.getBoundingClientRect());}
+  const t={left:Math.min(...bounds.map(b=>b.left)),right:Math.max(...bounds.map(b=>b.right)),top:Math.min(...bounds.map(b=>b.top)),bottom:Math.max(...bounds.map(b=>b.bottom))};
+  const clamped=Array.from(e.querySelectorAll('*')).some(n=>parseInt(getComputedStyle(n).webkitLineClamp)>0);
+  const labelControl=e.matches('button,[role="tab"]')&&!clamped;
+  controls.push({label:(e.textContent||e.getAttribute('aria-label')||'').trim().slice(0,60),width:r.width,height:r.height,overflow:labelControl&&(t.left<r.left-1||t.right>r.right+1||t.top<r.top-1||t.bottom>r.bottom+1)});
+ }
+ for(const e of host.querySelectorAll('h1,h2,h3,.item-modal-name,.home-feature-modal-title,[role="tablist"]')){
+  const r=e.getBoundingClientRect();if(!r.width||!r.height)continue;
+  if(e.scrollWidth>e.clientWidth+1)overflow.push({text:e.textContent.trim().slice(0,60),width:r.width,scroll:e.scrollWidth,client:e.clientWidth});
+ }
+ return {rows,controls,overflow};
+}`;
+try{
+ const target=(await waitJson(`http://127.0.0.1:${port}/json/list`)).find(t=>t.type==='page');
+ c=new Cdp(target.webSocketDebuggerUrl);await c.send('Page.enable');await c.send('Runtime.enable');
+ await c.send('Emulation.setDeviceMetricsOverride',{width:viewport[0],height:viewport[1],deviceScaleFactor:1,mobile:viewport[0]<800});
+ await c.send('Page.navigate',{url:server.url});await c.eval(prepare);
+ await c.eval("(async()=>{await FourSymbolsFeatures.ensure('relic','functional-reading');await FourSymbolsFeatures.ensure('gameplay-core','functional-reading');})()");
+ await c.eval("(()=>{const armor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-equipped-armor'});const bagArmor=v17346GenerateEquipment(()=>.2,{slot:'armor',classType:'warrior',rarity:'orange',uid:'reading-bag-armor'});inventoryItems.push(bagArmor,{...getPotionDefinition('hpPotion10'),count:30});characterEquipment.fire.armor=armor;rebuildInventorySlots();renderInventory();})()");
+ const capture=async(name,selector='#homeFeatureModal')=>{
+  await settle();const data=await c.eval(`(${measure})(${JSON.stringify(selector)})`);
+  assert.ok(data.rows.length||data.controls.length,name+': empty UI coverage');if(selector==='#homeFeatureModal'||selector==='#v132RewardModal')for(const q of data.controls)assert.ok(q.height>=44,name+' control below44 '+JSON.stringify(q));
+  scenes.push({name,...data});fs.writeFileSync(path.join(out,'all-text.json'),JSON.stringify(scenes,null,2));
+  const image=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from(image.data,'base64'));
+  console.log(name+': '+data.rows.length+' text nodes, '+data.rows.filter(x=>x.font<12.9).length+' below minimum');
+ };
+ const tap=async selector=>{
+  const point=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)return null;const r=e.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,hit=document.elementFromPoint(x,y);return {x,y,hit:hit===e||e.contains(hit),label:e.textContent.trim()};})()`);
+  touches.push({selector,...point});assert.ok(point?.hit,'real touch is blocked: '+selector+' '+JSON.stringify(point));
+  await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x:point.x,y:point.y,button:'left',clickCount:1});
+  await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:point.x,y:point.y,button:'left',clickCount:1});await settle();
+ };
+
+ 
+ const end=async(root)=>{const sel=await c.eval('(()=>{const r=document.querySelector('+JSON.stringify(root)+'),e=[r,...r.querySelectorAll("*")].filter(e=>{const q=e.getBoundingClientRect();return q.height>50&&q.width>50&&e.scrollHeight>e.clientHeight+2&&/auto|scroll/.test(getComputedStyle(e).overflowY)}).sort((a,b)=>b.clientHeight-a.clientHeight)[0];if(!e)return null;e.dataset.qaScroll="active";return "[data-qa-scroll=active]"})()');if(!sel){touches.push({root,scroll:'not-needed'});return;}for(let n=0;n<20;n++){const p=await c.eval('(()=>{const e=document.querySelector('+JSON.stringify(sel)+'),r=e.getBoundingClientRect();return {x:r.x+r.width*.75,y:r.bottom-25,to:r.top+25,top:e.scrollTop,client:e.clientHeight,height:e.scrollHeight}})()');if(p.top+p.client>=p.height-2){touches.push({root,scroll:sel,...p});await c.eval('document.querySelector('+JSON.stringify(sel)+').removeAttribute("data-qa-scroll")');return;}if(viewport[0]>=800)await c.send('Input.dispatchMouseEvent',{type:'mouseWheel',x:p.x,y:(p.y+p.to)/2,deltaX:0,deltaY:550});else{await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:p.x,y:p.y}]});for(let i=1;i<=14;i++){await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:p.x,y:p.y+(p.to-p.y)*i/14}]});await new Promise(r=>setTimeout(r,20));}await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}await settle();}throw Error('end not reached '+root);};
+async function pan(selector,axis,direction){
+ const p=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)}),r=n.getBoundingClientRect();const start= ${JSON.stringify(direction)}<0?.8:.2;for(const f of [.75,.5,.25]){const x=r.x+r.width*(${JSON.stringify(axis)}==='x'?start:f),y=r.y+r.height*(${JSON.stringify(axis)}==='y'?start:.6),h=document.elementFromPoint(x,y);if(h&&n.contains(h)&&FourSymbolsGestureArbiter.findScrollOwner(h,${JSON.stringify(axis)})?.node===n){return{x,y,d:Math.min(110,(${JSON.stringify(axis)}==='x'?r.width:r.height)*.55),from:${JSON.stringify(axis)}==='x'?n.scrollLeft:n.scrollTop,max:${JSON.stringify(axis)}==='x'?n.scrollWidth-n.clientWidth:n.scrollHeight-n.clientHeight};}}throw Error('no mouse owner '+${JSON.stringify(selector)});})()`);
+ const dx=axis==='x'?p.d*direction:0,dy=axis==='y'?p.d*direction:0;
+ await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:p.x,y:p.y});await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x:p.x,y:p.y,button:'left',clickCount:1});
+ for(let i=1;i<=8;i++)await c.send('Input.dispatchMouseEvent',{type:'mouseMoved',x:p.x+dx*i/8,y:p.y+dy*i/8,button:'left',buttons:1});
+ await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x:p.x+dx,y:p.y+dy,button:'left',clickCount:1});await settle();
+ const to=await c.eval(`(()=>{const n=document.querySelector(${JSON.stringify(selector)});return ${JSON.stringify(axis)}==='x'?n.scrollLeft:n.scrollTop})()`);touches.push({selector,axis,direction,...p,to});return Math.abs(to-p.from)>.1;
+}
+const wait=async selector=>c.eval('(async()=>{const end=Date.now()+15000;while(Date.now()<end){if(document.querySelector('+JSON.stringify(selector)+'))return true;await new Promise(r=>setTimeout(r,60));}throw Error("not ready")})()');
+await c.eval("closeHomeFeature();showPage('home')");await tap('[data-city-entry="4"]');await wait('.team-relic-card-open-overlay');
+const active=()=>c.eval("document.querySelector('.team-relic-tabs button.active').innerText");const beforeTab=await active();
+for(let i=0;i<8;i++){const q=await c.eval("(()=>{const n=document.querySelector('.team-relic-tabs');return{pos:n.scrollLeft,max:n.scrollWidth-n.clientWidth}})()");if(q.pos>=q.max-1)break;await pan('.team-relic-tabs','x',-1);assert.equal(await active(),beforeTab);}
+const right=await c.eval("(()=>{const n=document.querySelector('.team-relic-tabs');return{pos:n.scrollLeft,max:n.scrollWidth-n.clientWidth}})()");assert.ok(right.pos>=right.max-1);assert.equal(await pan('.team-relic-tabs','x',-1),false);assert.equal(await active(),beforeTab);checks.push({right,active:beforeTab});await capture('mouse-right-end','#homeFeatureModal');
+for(let i=0;i<8;i++){if(await c.eval("document.querySelector('.team-relic-tabs').scrollLeft<1"))break;await pan('.team-relic-tabs','x',1);assert.equal(await active(),beforeTab);}
+assert.equal(await pan('.team-relic-tabs','x',1),false);assert.equal(await active(),beforeTab);checks.push({left:await c.eval("document.querySelector('.team-relic-tabs').scrollLeft"),active:beforeTab});await capture('mouse-left-end','#homeFeatureModal');
+await c.eval("Object.assign(v174RelicSystem.getOwnedState().relic_qiankun_flask,{unlocked:true,level:20});document.querySelector('.team-relic-card-open-overlay[onclick*=relic_qiankun_flask]').scrollIntoView({block:'center'})");
+const resourceBefore=await c.eval('JSON.stringify({gold,inventoryItems,loadout:v174RelicSystem.getTeamLoadout()})');await tap('.team-relic-card-open-overlay[onclick*=relic_qiankun_flask]');await wait('.team-relic-detail');await capture('mouse-card-detail','#homeFeatureModal');assert.equal(await c.eval('JSON.stringify({gold,inventoryItems,loadout:v174RelicSystem.getTeamLoadout()})'),resourceBefore);
+await c.eval("closeHomeFeature();showPage('home')");
+await c.eval(`window.__toastSnapshots=[];window.__toastRead=()=>JSON.stringify({actors:[player,player2,player3],gold,sharedExp,inventoryItems,equipment:typeof equipment!=='undefined'?equipment:null,loadouts:characterSkillLoadouts,uid:window.firebaseAuth?.currentUser?.uid,storage:Object.fromEntries(Object.keys(localStorage).sort().map(k=>[k,localStorage.getItem(k)]))});`);
+const observed=async expression=>{const result=await c.eval(`(()=>{const before=__toastRead(),time=performance.now();${expression};const after=__toastRead();return{time,same:before===after}})()`);assert.ok(result.same,'presentation API must preserve synthetic state');checks.push({api:expression,...result});return result.time;};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+const toastState=async selector=>c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)}),r=e.getBoundingClientRect(),range=document.createRange();range.selectNodeContents(e);const ink=range.getBoundingClientRect(),s=getComputedStyle(e);return{text:e.innerText,show:e.classList.contains('show'),opacity:s.opacity,box:r.toJSON(),ink:ink.toJSON(),pointer:s.pointerEvents,viewport:{width:innerWidth,height:innerHeight},time:performance.now()}})()`);
+async function shot(name,selector){const data=await toastState(selector);checks.push({scene:name,...data});fs.writeFileSync(path.join(out,name+'.png'),Buffer.from((await c.send('Page.captureScreenshot',{format:'png'})).data,'base64'));return data;}
+const start=await observed('v141ShowBlackGoldReward({exp:1,gold:0,items:[]})');await sleep(450);await shot('reward-short-visible','#v141RewardToast');await sleep(4000);let q=await shot('reward-short-expired','#v141RewardToast');assert.equal(q.show,false);assert.ok(q.time-start>=4200);
+await observed("v141ShowBlackGoldReward({exp:2,gold:3,items:[{id:'qa-presentation-only',name:'玄鐵靈紋長名稱展示材料未實際發放',count:1}]})");await sleep(450);q=await shot('reward-long-visible','#v141RewardToast');const p={x:q.box.x+q.box.width/2,y:q.box.y+q.box.height/2};const hit=await c.eval(`(()=>{const e=document.elementFromPoint(${p.x},${p.y});return !!e?.closest('#v141RewardToast')})()`);checks.push({dismissHit:hit});assert.ok(hit);await c.send('Input.dispatchMouseEvent',{type:'mousePressed',...p,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',...p,button:'left',clickCount:1});await sleep(350);q=await shot('reward-long-dismissed','#v141RewardToast');assert.equal(q.show,false);
+const a=await observed('v141ShowBlackGoldReward({exp:11,gold:0,items:[]});window.__rewardNode=document.querySelector("#v141RewardToast")');await sleep(800);const b=await observed('v141ShowBlackGoldReward({exp:22,gold:0,items:[]})');await sleep(450);q=await shot('reward-replacement-B','#v141RewardToast');assert.ok(q.text.includes('22'));assert.ok(await c.eval('__rewardNode===document.querySelector("#v141RewardToast")'));
+await sleep(3100);q=await shot('reward-after-A-deadline','#v141RewardToast');assert.ok(q.time-a>4200&&q.time-b<4200&&q.show);await sleep(850);q=await shot('reward-replacement-expired','#v141RewardToast');assert.ok(q.time-b>=4200&&!q.show);
+await observed("showLevelUpToast('天地玄黃宇宙洪荒日月盈昃辰宿列張',20)");await sleep(450);q=await shot('level-long-visible','#levelUpToast');assert.ok(q.text.includes('天地玄黃宇宙洪荒日月盈昃辰宿列張'));await sleep(2450);q=await shot('level-long-expired','#levelUpToast');assert.equal(q.show,false);
+await c.eval('delete window.__toastRead;delete window.__toastSnapshots;delete window.__rewardNode');assert.deepEqual(hash(),sourcesBefore);
+fs.writeFileSync(path.join(out,'report.json'),JSON.stringify({head:sourceHead,viewport,checks,touches,scenes,sourcesBefore,sourceUnchanged:true,scope:'Synthetic isolated original runtime only. Real mouse relic x endpoints/clamps without tab changes, real card entry; toast original presentation API lifecycle, no grant/level-up/claim/save calls. Same-task synthetic actors/resources/storage preserved by presentation calls. No hardware or true reward settlement acceptance.'},null,2));
+}finally{c?.close();try{execFileSync('taskkill',['/PID',String(chrome.pid),'/T','/F'],{stdio:'ignore',windowsHide:true});}catch{chrome.kill();}try{if(!path.resolve(profile).startsWith(path.resolve(os.tmpdir())+path.sep))throw Error('profile path');fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}server.server.closeAllConnections();await new Promise(r=>server.server.close(r));}

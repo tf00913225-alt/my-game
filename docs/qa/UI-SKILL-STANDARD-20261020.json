@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：8fb新地圖四尺寸限定審核已保存，必要CI失敗待診斷；非全UI完成",
+  "status": "施工中：shared.toast四尺寸呈現/生命週期及秘寶mouse缺口已補；最新Head CI/正常dev相依整合與其餘台帳仍待完成，非全UI完成",
   "devices": [
     {
       "id": "360x640",
@@ -7751,6 +7751,24 @@
               "delta": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment16-accepted/1280x800-delta-report.json"
             }
           ]
+        },
+        {
+          "segment": "shared-toast-relic-followup",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup",
+          "states": [
+            "8分類真mouse點擊",
+            "橫列真mouse左右末端/clamp且active不變",
+            "長owned詳情y雙端",
+            "真卡片入口",
+            "返回/重開"
+          ],
+          "limits": "舊16/18視覺證據保留，不重標其他業務/硬體狀態已驗；未操作equip/upgrade/claim。"
         }
       ],
       "reviews": {
@@ -7834,7 +7852,26 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "segment": "shared-toast-relic-followup",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup",
+          "states": [
+            "8分類真mouse點擊",
+            "橫列真mouse左右末端/clamp且active不變",
+            "長owned詳情y雙端",
+            "真卡片入口",
+            "返回/重開"
+          ],
+          "limits": "舊16/18視覺證據保留，不重標其他業務/硬體狀態已驗；未操作equip/upgrade/claim。"
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
@@ -7985,6 +8022,24 @@
           "head": "3b4963f8a1fdb5ea699432220a853f8ec5c0cf4b",
           "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment18-accepted",
           "scope": "呈現與導航限定；詳見逐ID條目與報告；不批准交易/正式鎖卡/所有業務狀態"
+        },
+        {
+          "segment": "shared-toast-relic-followup",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup",
+          "states": [
+            "8分類真mouse點擊",
+            "橫列真mouse左右末端/clamp且active不變",
+            "長owned詳情y雙端",
+            "真卡片入口",
+            "返回/重開"
+          ],
+          "limits": "舊16/18視覺證據保留，不重標其他業務/硬體狀態已驗；未操作equip/upgrade/claim。"
         }
       ],
       "reviews": {
@@ -16291,9 +16346,9 @@
     {
       "id": "shared.toast",
       "label": "共用 toast",
-      "entry": "由實際功能開啟既有共用對話框",
-      "owner": "index.html; js/00-main.js; js/27-v132-content-expansion.js; css/33-v132-content-expansion.css; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "entry": "原 v141ShowBlackGoldReward(summary) / showLevelUpToast(name,level) 展示API；無發獎/升級",
+      "owner": "index.html; js/00-main.js (levelUpToast); js/35-v141-ui-battle.js (v141ShowBlackGoldReward); js/44-v152-dev-fixes.js (dismiss); css/00-main.css; css/38-v141-system-expansion.css; css/49-v169-rpg-ui.css",
+      "status": "部分已實際驗證",
       "states": [
         "短文",
         "長文",
@@ -16314,39 +16369,106 @@
       ],
       "deviceEvidence": {
         "360x640": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "before": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/before/level-long-visible.png",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/360x640",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/360x640/report.json",
+          "remaining": "真升級/發獎/自然結算與實機未驗；泛用loading/disabled/cancel/confirmation不是toast實作狀態，不自造。"
         },
         "393x873": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "before": "同根因DOM證據，未另拍修前",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/393x873",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/393x873/report.json",
+          "remaining": "真升級/發獎/自然結算與實機未驗；泛用loading/disabled/cancel/confirmation不是toast實作狀態，不自造。"
         },
         "412x915": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "before": "同根因DOM證據，未另拍修前",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/412x915",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/412x915/report.json",
+          "remaining": "真升級/發獎/自然結算與實機未驗；泛用loading/disabled/cancel/confirmation不是toast實作狀態，不自造。"
         },
         "1280x800": {
-          "status": "未檢查",
-          "head": null,
-          "before": null,
-          "after": null,
-          "interaction": null
+          "status": "部分已實際驗證",
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "before": "同根因DOM證據，未另拍修前",
+          "after": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/1280x800",
+          "interaction": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/1280x800/report.json",
+          "remaining": "真升級/發獎/自然結算與實機未驗；泛用loading/disabled/cancel/confirmation不是toast實作狀態，不自造。"
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "device": "360x640",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/360x640/report.json",
+          "states": [
+            "短/長reward摘要呈現",
+            "4200ms自然hide",
+            "真mouse點擊dismiss",
+            "A→B同DOM替換與期限重設",
+            "16字角色名level提示全文/2600ms自然hide"
+          ],
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "limits": "原展示API合成資料；不驗真正等級/獎勵/完整owned/equipment/auth，未凍結timer。"
+        },
+        {
+          "device": "393x873",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/393x873/report.json",
+          "states": [
+            "短/長reward摘要呈現",
+            "4200ms自然hide",
+            "真mouse點擊dismiss",
+            "A→B同DOM替換與期限重設",
+            "16字角色名level提示全文/2600ms自然hide"
+          ],
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "limits": "原展示API合成資料；不驗真正等級/獎勵/完整owned/equipment/auth，未凍結timer。"
+        },
+        {
+          "device": "412x915",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/412x915/report.json",
+          "states": [
+            "短/長reward摘要呈現",
+            "4200ms自然hide",
+            "真mouse點擊dismiss",
+            "A→B同DOM替換與期限重設",
+            "16字角色名level提示全文/2600ms自然hide"
+          ],
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "limits": "原展示API合成資料；不驗真正等級/獎勵/完整owned/equipment/auth，未凍結timer。"
+        },
+        {
+          "device": "1280x800",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/after/1280x800/report.json",
+          "states": [
+            "短/長reward摘要呈現",
+            "4200ms自然hide",
+            "真mouse點擊dismiss",
+            "A→B同DOM替換與期限重設",
+            "16字角色名level提示全文/2600ms自然hide"
+          ],
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+          "limits": "原展示API合成資料；不驗真正等級/獎勵/完整owned/equipment/auth，未凍結timer。"
+        }
+      ],
       "reviews": {
-        "art": null,
-        "interaction": null,
-        "scope": null
+        "art": {
+          "reviewer": "remaining_audit_review",
+          "result": "四尺寸實圖限定通過；16字升級名稱/等級與reward長文完整，原黑鐵古銅框；暫遮頂部資源，主要入口/nav無遮擋。"
+        },
+        "interaction": {
+          "reviewer": "relic_input_review",
+          "result": "四尺寸真mouse端點582/0與clamp、active保持全部、真card入口；reward自然hide/dismiss/A-B期限及level自然hide通過。",
+          "limits": "未比對完整owned；toast設備/uid非正式Owner讀值不作證，僅腳本實際序列化欄位同task相同。"
+        },
+        "scope": {
+          "reviewer": "pending_scope_review",
+          "result": "原js00掛載名單及css00 toast原規則；bundle/index/manifest為原builder；generated restricted policy僅main sourceDigest，無政策語意變更。實看360前後圖，其他尺寸由art/input獨審。"
+        }
       }
     },
     {
@@ -27745,5 +27867,18 @@
       "教學guide禁止點時不得為驗取消繞過guard",
       "Chrome工程獨立；CI/部署仍未確認"
     ]
-  }
+  },
+  "followupCheckpoints": [
+    {
+      "segment": "shared-toast-relic-followup",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup",
+      "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/source-proof.json",
+      "status": "列出四尺寸合成呈現/操作通過；必要CI缺失/merge衝突仍阻塞；非全介面完成",
+      "pending": [
+        "正常dev相依merge：生成包/戰場/Story/受保護來源衝突需按原Owner收斂，不跨線改邏輯",
+        "Latest Head required CI",
+        "原台帳未列證動態/硬體/真交易狀態；不重做舊有效證據"
+      ]
+    }
+  ]
 }
