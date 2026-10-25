@@ -1221,13 +1221,13 @@ function map(){
 }
 function objectMarkup(object){
   if(object.art==='solid')return '';
-  if(object.art==='gate')return '<img src="'+asset('gate')+'" alt=""><span class="taoxi-object-label">村口</span>';
+  if(object.art==='gate')return '<img src="'+asset('gate')+'" alt="">';
   if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>';
   if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
   if(object.art==='door')return '<span class="taoxi-door">出口</span>';
   const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
   const frame=frames[object.art],clip='taoxi-frame-'+object.id;
-  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
+  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>';
 }
 function scene(id,spawn){
   if(!sameOwner()){leave();return;}

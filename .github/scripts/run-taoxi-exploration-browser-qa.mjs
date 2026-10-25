@@ -42,6 +42,8 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     await wait(`window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')`,'formal boot');
     if(await c.eval("document.getElementById('homeFeatureModal')?.classList.contains('show')"))await tap('#homeFeatureModal [onclick="closeHomeFeature()"]');
     await c.eval(`FourSymbolsFeatures.ensure('adventure','taoxi-qa')`);
+    const homeHits=await c.eval(`[...document.querySelectorAll('#homePage .home-card,#adventureHomeEntry,#taoxiHomeEntry')].map(e=>{const r=e.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {name:e.getAttribute('aria-label')||e.id,visible:r.width>0&&r.height>0,hit:e===hit||e.contains(hit)};}).filter(e=>e.visible)`);
+    for(const row of homeHits)assert.equal(row.hit,true,'home control '+row.name);await capture('home-entry');
     const stage=await c.eval(`(()=>{const r=document.getElementById('game-stage').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
     assert.ok(Math.abs(stage.width/stage.height-9/16)<.001,'one 9:16 canvas');assert.ok(Math.abs(stage.x+stage.width/2-width/2)<1,'centered canvas');
     await tap('#taoxiHomeEntry');await wait(`document.querySelector('#explorationPage [data-village]')`,'world map');
@@ -70,6 +72,21 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     await wait(`window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')`,'reload boot');if(await c.eval("document.getElementById('homeFeatureModal')?.classList.contains('show')"))await tap('#homeFeatureModal [onclick="closeHomeFeature()"]');await c.eval(`FourSymbolsFeatures.ensure('adventure','taoxi-reload')`);
     assert.equal(await c.eval(`player.explorationProgress.searched['a-chest']`),true,'reload retained receipt');assert.equal(await c.eval(`getPotionCount('hpPotion10')`),count,'reload retained inventory');
     await c.eval(`FourSymbolsAdventure.open()`);await tap('#taoxiStoryEntry');await wait(`document.getElementById('explorationPage').dataset.scene==='map'&&!document.getElementById('explorationPage').hidden`,'story entry');await tap('#explorationPage [data-back]');assert.equal(await c.eval(`document.getElementById('adventurePage').classList.contains('active')`),true);
+    if(width===393&&process.argv.includes('--appearances')){
+      await tap('#taoxiStoryEntry');
+      const originals=await c.eval(`({gender:player.gender,element:player.element})`);
+      for(const gender of ['male','female'])for(const element of ['fire','water','wind','earth']){
+        await c.eval(`Object.assign(player,${JSON.stringify({gender,element})})`);await tap('[data-village]');
+        for(const [key,code,facing] of [['ArrowLeft',37,'left'],['ArrowRight',39,'right'],['ArrowUp',38,'up'],['ArrowDown',40,'down']]){
+          await c.send('Input.dispatchKeyEvent',{type:'keyDown',key,code:key,windowsVirtualKeyCode:code});await sleep(240);
+          assert.equal(await c.eval(`document.querySelector('[data-player]').dataset.facing`),facing);
+          await c.send('Input.dispatchKeyEvent',{type:'keyUp',key,code:key,windowsVirtualKeyCode:code});
+        }
+        await capture('appearance-'+gender+'-'+element);await tap('#explorationPage [data-back]');
+      }
+      await c.eval(`Object.assign(player,${JSON.stringify(originals)})`);await tap('#explorationPage [data-back]');
+      fs.writeFileSync(path.join(out,'appearances.json'),JSON.stringify({eightAppearances:true,fourDirectionsEach:true,actualKeyInput:true,viewport:{width,height},build:JSON.parse(fs.readFileSync('asset-manifest.json','utf8')).featureManifest.bundles['feature-adventure']},null,2));
+    }
     if(width===393&&!process.argv.includes('--first-loop-only')){
       // The same real pointer path exercises the entire content set. No position setter.
       await tap('#taoxiStoryEntry');await tap('[data-village]');

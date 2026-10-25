@@ -1,0 +1,178 @@
+{
+  "workId": "EXPLORATION-CORNER-20261023",
+  "pr": 985,
+  "baseDev": "632e3281",
+  "status": "local-mode implementation and verification; Draft pending Cloud reload scope and latest required CI",
+  "tests": {
+    "exploration": 23,
+    "relatedOwnerRegression": 98,
+    "productionLoop": [
+      {
+        "width": 393,
+        "height": 873,
+        "firstLoop": true,
+        "storyEntry": true,
+        "reload": true,
+        "repeatNoGrant": true,
+        "storyUnchanged": true,
+        "transport": "isolated Auth/Cloud; explicit earned-progress fixture; local save only"
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "firstLoop": true,
+        "storyEntry": true,
+        "reload": true,
+        "repeatNoGrant": true,
+        "storyUnchanged": true,
+        "transport": "isolated Auth/Cloud; explicit earned-progress fixture; local save only"
+      }
+    ],
+    "fullContent": {
+      "fullFiveHouses": true,
+      "tenSearchPoints": true,
+      "eightAppearances": true,
+      "dualControl": true,
+      "cancel": true,
+      "storageRefusalAndRetry": true,
+      "uidIsolationFixture": true,
+      "transport": "existing UID-local Boot mode; external Auth/Cloud and earned main progress are explicit QA fixtures",
+      "build": {
+        "scripts": [
+          "build/feature-adventure-content.79628452fab4.js",
+          "build/feature-adventure-runtime.cbc1c29d58c7.js",
+          "build/feature-adventure-ui.091d2401cca0.js"
+        ],
+        "styles": [
+          "build/feature-adventure.1ae88fdaf19f.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ],
+        "assets": [
+          "assets/exploration/taoxi-v1/gate.webp",
+          "assets/exploration/taoxi-v1/ground.webp",
+          "assets/exploration/taoxi-v1/house.webp",
+          "assets/exploration/taoxi-v1/interior.webp",
+          "assets/exploration/taoxi-v1/player_female_01.webp",
+          "assets/exploration/taoxi-v1/player_female_02.webp",
+          "assets/exploration/taoxi-v1/player_female_03.webp",
+          "assets/exploration/taoxi-v1/player_female_04.webp",
+          "assets/exploration/taoxi-v1/player_male_01.webp",
+          "assets/exploration/taoxi-v1/player_male_02.webp",
+          "assets/exploration/taoxi-v1/player_male_03.webp",
+          "assets/exploration/taoxi-v1/player_male_04.webp",
+          "assets/exploration/taoxi-v1/props.webp",
+          "assets/exploration/taoxi-v1/villagers.webp",
+          "assets/exploration/taoxi-v1/world-map.webp"
+        ]
+      },
+      "evidence": "completed full 393x873 pointer run; console terminal captured before result-file instrumentation"
+    },
+    "appearances": {
+      "eightAppearances": true,
+      "fourDirectionsEach": true,
+      "actualKeyInput": true,
+      "viewport": {
+        "width": 393,
+        "height": 873
+      },
+      "build": {
+        "scripts": [
+          "build/feature-adventure-content.79628452fab4.js",
+          "build/feature-adventure-runtime.cbc1c29d58c7.js",
+          "build/feature-adventure-ui.a7340a57d1b3.js"
+        ],
+        "styles": [
+          "build/feature-adventure.4e5b95c843fc.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ],
+        "assets": [
+          "assets/exploration/taoxi-v1/gate.webp",
+          "assets/exploration/taoxi-v1/ground.webp",
+          "assets/exploration/taoxi-v1/house.webp",
+          "assets/exploration/taoxi-v1/interior.webp",
+          "assets/exploration/taoxi-v1/player_female_01.webp",
+          "assets/exploration/taoxi-v1/player_female_02.webp",
+          "assets/exploration/taoxi-v1/player_female_03.webp",
+          "assets/exploration/taoxi-v1/player_female_04.webp",
+          "assets/exploration/taoxi-v1/player_male_01.webp",
+          "assets/exploration/taoxi-v1/player_male_02.webp",
+          "assets/exploration/taoxi-v1/player_male_03.webp",
+          "assets/exploration/taoxi-v1/player_male_04.webp",
+          "assets/exploration/taoxi-v1/props.webp",
+          "assets/exploration/taoxi-v1/villagers.webp",
+          "assets/exploration/taoxi-v1/world-map.webp"
+        ]
+      }
+    },
+    "cloudConflict": {
+      "expectedState": "MIGRATION_REQUIRED",
+      "localReceiptRetained": true,
+      "cloudReadinessUnchanged": true,
+      "scope": "isolated authoritative Cloud response; original resolver refusal, no true account or server write"
+    }
+  },
+  "art": {
+    "tool": "built-in imagegen",
+    "assets": 15,
+    "validation": "assets/inbox/taoxi-v1/validation.json",
+    "prompts": "assets/inbox/taoxi-v1/prompts.json"
+  },
+  "latestBuild": {
+    "scripts": [
+      "build/feature-adventure-content.79628452fab4.js",
+      "build/feature-adventure-runtime.cbc1c29d58c7.js",
+      "build/feature-adventure-ui.a9a25dbcf4be.js"
+    ],
+    "styles": [
+      "build/feature-adventure.4e5b95c843fc.css"
+    ],
+    "dependencies": [
+      "gameplay-core"
+    ],
+    "assets": [
+      "assets/exploration/taoxi-v1/gate.webp",
+      "assets/exploration/taoxi-v1/ground.webp",
+      "assets/exploration/taoxi-v1/house.webp",
+      "assets/exploration/taoxi-v1/interior.webp",
+      "assets/exploration/taoxi-v1/player_female_01.webp",
+      "assets/exploration/taoxi-v1/player_female_02.webp",
+      "assets/exploration/taoxi-v1/player_female_03.webp",
+      "assets/exploration/taoxi-v1/player_female_04.webp",
+      "assets/exploration/taoxi-v1/player_male_01.webp",
+      "assets/exploration/taoxi-v1/player_male_02.webp",
+      "assets/exploration/taoxi-v1/player_male_03.webp",
+      "assets/exploration/taoxi-v1/player_male_04.webp",
+      "assets/exploration/taoxi-v1/props.webp",
+      "assets/exploration/taoxi-v1/villagers.webp",
+      "assets/exploration/taoxi-v1/world-map.webp"
+    ]
+  },
+  "screenshots": [
+    "docs/qa/taoxi-exploration-20261025/393-home-entry.png",
+    "docs/qa/taoxi-exploration-20261025/393-locked-map.png",
+    "docs/qa/taoxi-exploration-20261025/393-village.png",
+    "docs/qa/taoxi-exploration-20261025/393-interior.png",
+    "docs/qa/taoxi-exploration-20261025/393-search.png",
+    "docs/qa/taoxi-exploration-20261025/1920-interior.png",
+    "docs/qa/taoxi-exploration-20261025/393-authoritative-conflict.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-fire.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-water.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-wind.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-earth.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-fire.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-water.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-wind.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-earth.png"
+  ],
+  "limits": [
+    "Auth/Cloud transport and earned chapter progress are QA fixtures; no real-account or physical-phone evidence",
+    "Authoritative-cloud plus local-dirty reload remains MIGRATION_REQUIRED; local receipt retained. No bypass or Cloud entitlement.",
+    "Full content run precedes cosmetic label/clip cleanup and current-dev portrait merge; two-size first loop and eight four-direction appearances reverified after merge. Latest full run/CI belongs to PR current checkpoint.",
+    "No dev merge/deployment or main release claimed."
+  ],
+  "cleanup": "Keep active #985 branch/worktree; no unabsorbed content deleted."
+}
