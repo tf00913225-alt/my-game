@@ -10,7 +10,7 @@
     {
       "id": "CLOUD-P4-FIELDS-01",
       "status": "TODO",
-      "requirement": "逐欄盤點一般進度和獎勵／經濟耦合，僅允許經審核欄位進入 Phase 4 權威資料。",
+      "requirement": "逐欄盤點完整角色、資產、進度、獎勵／付款權益與正式 Owner，僅允許經審核欄位進入權威資料；缺資料不得假造未領獎或完整角色。",
       "evidence": [
         "docs/CLOUD_SAVE_PHASE4_CONTRACT.md",
         "functions/src/cloud-preferences.js",
@@ -21,7 +21,7 @@
     {
       "id": "CLOUD-P4-SERVER-02",
       "status": "TODO",
-      "requirement": "後端以有效 session、UID、schema、expected serverRevision 在單一交易中驗證與寫入，拒絕整包本機值及跨 UID／衝突提交。",
+      "requirement": "後端以有效 session、UID、schema、expected serverRevision 在單一交易中驗證與寫入；實際驗證不串帳、舊 session 不得覆寫。付款須後端驗證、order 綁 UID、唯一 grant，漏發可補足一次且重試不重發；未實作／未授權的真金付款不得列為通過。",
       "evidence": [
         "functions/index.js::saveCloudPreferences",
         "functions/src/session-authority.js::runProtected",
@@ -32,7 +32,7 @@
     {
       "id": "CLOUD-P4-CLIENT-03",
       "status": "TODO",
-      "requirement": "同 UID 本機候選與雲端讀取分離；登入、登出、離線與回線均不靜默覆蓋現有資料。",
+      "requirement": "同 UID 本機候選與雲端讀取分離；guest 正式綁定不丟進度、衝突不覆寫，未綁定不可購買。統一連網、本機戰鬥、關鍵進度後端保存；短斷明示未存、回線重驗權威，不做完整 offline 或多裝置離線 merge。",
       "evidence": [
         "js/firebase/firebase-cloud-save.js::saveLocalAutoBattlePreferences",
         "js/firebase/firebase-auth-ui.js",
@@ -43,7 +43,7 @@
     {
       "id": "CLOUD-P4-RESTORE-04",
       "status": "TODO",
-      "requirement": "已驗證的允許欄位能在 DEV 重新登入後安全恢復，局部資料絕不偽裝為完整可玩角色。",
+      "requirement": "正常 load 最新有效存檔；DEV 第二手機完整恢復可玩角色。歷史 restore 須核身、保留現況、批准及 audit，並由有效備份實際還原且遊戲可載入；不得倒退訂單、造型、月卡效期、每日已領或補償紀錄，不自動重發全包。",
       "evidence": [
         "js/00-main.js::restoreAutoBattlePreferences",
         "js/firebase/firebase-auth-ui.js::restoreCloudPreferences",
@@ -56,7 +56,7 @@
     {
       "id": "CLOUD-P4-QA-05",
       "status": "TODO",
-      "requirement": "emulator、既有 Boot browser QA 及手機 DEV 覆蓋重複操作、兩裝置 revision 衝突、不同 UID、離線與獎勵不可重領。",
+      "requirement": "emulator、既有 Boot browser QA 及真手機分層覆蓋不串帳、guest 綁定、換機、短斷衝突、重複領獎、付款漏發重試、舊檔保權益及有效備份實際還原；付款／發貨錯誤、退款與人工補償按原 order／case／reason／結果可查並防無限重複。",
       "evidence": [
         "2026-09-24 phone Chrome confirms manual preference restore; second-device/offline/reward verification PENDING"
       ]
@@ -64,7 +64,7 @@
     {
       "id": "CLOUD-P4-CLOSEOUT-06",
       "status": "TODO",
-      "requirement": "PR→dev、必要 CI／後端部署、DEV exact SHA 與 Game／Cache 一致並完成真手機驗收；main 不修改。",
+      "requirement": "PR→dev、必要 CI／後端部署、DEV exact SHA 與 Game／Cache 一致並完成實際玩家／真手機驗收；函式測試數、內部 fixture、merged 或部署不能替代玩家結果。待決費用／供應商／保留期限／補發操作／月卡刷新次數不編造，main 不修改。",
       "evidence": [
         "PR #559/#560/#561 merged to dev; dev@01c543564498400b38dd8778acccb9d76777131f CI/DEV SHA verified; full Phase 4 phone acceptance PENDING"
       ]
@@ -74,6 +74,6 @@
     "repositoryChecks": "PR #561 36021711282 SUCCESS; merged dev 36022298612 Repository checks SUCCESS; Session Authority 36022298060 SUCCESS",
     "devDeploy": "dev@01c543564498400b38dd8778acccb9d76777131f run 36022298612 SUCCESS, exact deployment SHA verified, Game/Cache 173.72",
     "liveValidation": "Phone Chrome upload/readback and post-fix manual preference restore confirmed (Revision 7, success message); new button labels and second-device/offline/reward checks PENDING",
-    "characterAuthority": "NOT IMPLEMENTED: no trusted gameplay writer, no historical legacy acceptance policy, no full-character restore; Phase 4 0/6 VERIFIED"
+    "characterAuthority": "Historical 2026-09-24 evidence above is preference-only. Later UID/session/revision/private snapshot/archive/audit and limited canonical writers remain partial foundations (current Work PRs own evidence), not complete guest binding/payment/support/playable restore. Policy aligned 2026-10-24 with DATA_SECURITY_CONTRACTS.md and docs/CLOUD_SAVE_PHASE4_CONTRACT.md; no new player verification; Phase 4 0/6 VERIFIED"
   }
 }
