@@ -640,8 +640,8 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 :is(#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges::-webkit-scrollbar{display:none;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges:empty{display:none !important;}
 
-/* Manual-turn feedback shares the stationary art frame and its depth/row cap.
-   The foot ellipse sits behind paint; ::after keeps the existing foot shadow. */
+/* Manual input projects the existing active-turn state, in every mode.
+   Stationary foot marker and caption never change portrait/HUD geometry. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{
     content:"" !important;
     position:absolute !important;
@@ -653,26 +653,28 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     height:10px !important;
     transform:translateX(-50%) !important;
     box-sizing:border-box !important;
-    border:1px solid rgba(241,210,137,.72) !important;
+    border:1px solid rgb(204,28,43) !important;
     border-radius:50% !important;
-    background:radial-gradient(ellipse,rgba(241,210,137,.12),rgba(241,210,137,.25) 65%,transparent 74%) !important;
-    box-shadow:0 0 5px 1px rgba(241,210,137,.3) !important;
+    background:radial-gradient(ellipse,rgba(142,8,22,.18),rgba(190,18,36,.62) 65%,transparent 74%) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,244,244,.95),0 0 5px 1px rgba(190,18,36,.8) !important;
     opacity:.65;
     pointer-events:none !important;
     z-index:-1 !important;
     animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
-    display:none;position:absolute;left:50%;top:-5px;width:22px;height:5px;
-    background:#241603;clip-path:polygon(0 0,100% 0,50% 100%);
-    transform:translateX(-50%);pointer-events:none;z-index:2;
+    display:none;position:absolute;left:50%;bottom:11px;
+    width:max-content;padding:2px 6px;border:1px solid #cc1c2b;border-radius:4px;
+    color:#fff5f5;background:rgba(62,5,10,.94);font-size:13px;font-weight:700;line-height:16px;
+    white-space:nowrap;transform:translateX(-50%);pointer-events:none;z-index:2;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow::after{
-    content:"";position:absolute;inset:1px 3px 2px;background:#ffe16c;
-    clip-path:polygon(0 0,100% 0,50% 100%);
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-text{
+    display:inline-block;animation:v174ManualTurnTextBlink 1.2s ease-in-out infinite;
 }
-/* Five unscaled pixels fit the existing six-pixel paired-HUD clearance even
-   at 1.18 depth. No glow extends the arrow into the information band. */
+@keyframes v174ManualTurnTextBlink{
+    0%,100%{opacity:1;}
+    50%{opacity:.25;}
+}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
     content:none !important;
@@ -717,9 +719,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
    battlePage is migrated into the native V20 battle shell on real mobile,
    so this owner must survive reparenting and must not depend on #app/#game-content.
    targetable = selectable candidate; target = formally selected enemy. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
@@ -736,6 +736,23 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     transform:translate(-50%,-50%) !important;
     pointer-events:none !important;
     animation:none !important;
+}
+/* One stationary wuxia targeting seal: four sword points, concentric bronze
+   rings and a cinnabar centre. Original target states own visibility/clicks. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{content:none !important;display:none !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-target-reticle{
+    display:none;position:absolute;left:50%;top:60%;width:54px;height:54px;
+    background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20100%20100%22%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2226%22%20fill%3D%22none%22%20stroke%3D%22%2321150c%22%20stroke-width%3D%226%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2226%22%20fill%3D%22none%22%20stroke%3D%22%23e8c779%22%20stroke-width%3D%222.5%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%2220%22%20fill%3D%22none%22%20stroke%3D%22%23b78a3e%22%20stroke-width%3D%221%22%2F%3E%3Cg%20id%3D%22blade%22%3E%3Cpath%20d%3D%22M50%203L57%2020L52%2017L52%2031L48%2031L48%2017L43%2020Z%22%20fill%3D%22%23eed28d%22%20stroke%3D%22%23281a0e%22%20stroke-width%3D%222%22%2F%3E%3Cpath%20d%3D%22M50%207V26%22%20stroke%3D%22%23fff1c4%22%20stroke-width%3D%221%22%2F%3E%3Cpath%20d%3D%22M62%2012A40%2040%200%200%201%2088%2038%22%20fill%3D%22none%22%20stroke%3D%22%23281a0e%22%20stroke-width%3D%225%22%2F%3E%3Cpath%20d%3D%22M62%2012A40%2040%200%200%201%2088%2038%22%20fill%3D%22none%22%20stroke%3D%22%23cba354%22%20stroke-width%3D%222%22%2F%3E%3C%2Fg%3E%3Cuse%20href%3D%22%23blade%22%20transform%3D%22rotate%2890%2050%2050%29%22%2F%3E%3Cuse%20href%3D%22%23blade%22%20transform%3D%22rotate%28180%2050%2050%29%22%2F%3E%3Cuse%20href%3D%22%23blade%22%20transform%3D%22rotate%28270%2050%2050%29%22%2F%3E%3Cpath%20d%3D%22M50%2038V44M50%2056V62M38%2050H44M56%2050H62%22%20stroke%3D%22%23f6e2b3%22%20stroke-width%3D%222%22%2F%3E%3Ccircle%20cx%3D%2250%22%20cy%3D%2250%22%20r%3D%224%22%20fill%3D%22%23a51c2c%22%20stroke%3D%22%23fff0bf%22%20stroke-width%3D%221.5%22%2F%3E%3C%2Fsvg%3E") center/contain no-repeat;
+    transform:translate(-50%,-50%);pointer-events:none;z-index:3;
+    opacity:.9;filter:drop-shadow(0 1px 1px rgba(0,0,0,.85));
+    animation:v174TargetSealBlink 1.2s ease-in-out infinite;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit:is(.targetable,.target) > .v174-battle-art > .v174-target-reticle{display:block;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art > .v174-target-reticle{opacity:1;}
+@keyframes v174TargetSealBlink{
+    0%,100%{opacity:1;}
+    50%{opacity:.4;}
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
@@ -862,6 +879,8 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     to{opacity:1;filter:brightness(1.3)}
 }
 @media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage.v-fixed-slot-render-v2 .v174-target-reticle{animation:none !important;opacity:1;}
+    #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-text{animation:none !important;opacity:1;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{animation:none !important;opacity:.65;}
     #game-stage #battlePage .v174-action-motion,
     #game-stage #battlePage .v174-portrait-paint,

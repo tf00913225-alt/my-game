@@ -1,0 +1,125 @@
+{
+  "workId": "BATTLE-CASTER-MANUAL-CUES-20261025",
+  "branch": "fix/battle-caster-manual-cues-20261025",
+  "baseDev": "4e5756e6a6cf5f7c76dadad1f0dd8fa106289442",
+  "scope": [
+    "caster-local skill label with formal HUD avoidance",
+    "existing active-turn cyan-white ring and manual-only caption",
+    "existing enemy targetable/target thin gold foot ring and pointer"
+  ],
+  "unchanged": [
+    "Core and turn authority",
+    "VFX source/config/assets",
+    "paint1.3225 and depth",
+    "UI955 picker/timer/quickbar hunks",
+    "2D exploration paused"
+  ],
+  "validation": {
+    "directTests": 15,
+    "cardlessBrowser": "PASS",
+    "fixedSlotBrowser": "PASS 412x915,393x873,390x844,360x800",
+    "fullProductionIsolatedBrowser": "PASS desktop Chrome emulation 393x873,360x640,1280x720; NOT physical handset",
+    "nativePhone": "not operated this continuation",
+    "independentReview": "pending",
+    "requiredCI": "pending new Head"
+  },
+  "evidence": "artifacts/battle-caster-manual-cues-20261025",
+  "limitations": [
+    "Initial reused-page QA navigation read stale document/startup; failed evidence retained, corrected to separate browser session and natural auth overlay dismissal.",
+    "No physical phone approval claimed.",
+    "restricted forest generated policy only tracks changed whole-main source digest; rule bytes and individual normal-attack declarations unchanged."
+  ],
+  "sourceSha256": {
+    "js\\00-main.js": "d33f57badbd9a3ca5e4cceb0f75f691fb97028fb64607a41b99224fc92a21435",
+    "js\\54-v173.51-battle-qa.js": "8cb875392b7d6e142cc03a2980f83869c868d8c9f8e91b37da9ec5baa8a0ef21",
+    "css\\fixed-slot-battlefield-rendering-v2.css": "e087f92117333370e1d33adcf14e1841b30f55b4bb7d55dea4911bd8762dc9e0"
+  },
+  "phoneContinuation": {
+    "scope": "user requests physical handset PNGs; no size/depth/VFX changes",
+    "finding": "enemy pointer at original carrier top lies in preceding information band; intermediate2px candidate measured pointer within47.937..53.707 CSS-px HP band, so rejected. Final pointer top10px moves only its own5px marker below information band.",
+    "focused": "10 direct presentation tests and Fixed Slot4viewport PASS; final exact Head phone images pending",
+    "capture": "For name-position screenshots only, isolated QA holds original label visible40% animation frame and delays its own removal; original skill body, gameplay and product source untouched. Original raw/faded and intermediate candidate images retained.",
+    "pixelNote": "Physical Chrome computed1px border reports0.761905px due existing coordinate projection; exact1px diagnostic mismatch retained, not a claim ring missing.",
+    "sourceChanges": [
+      "CSS enemy pointer top:-5px ->10px",
+      "direct regression; generated CSS/manifest"
+    ],
+    "unchanged": [
+      "all portrait and paint scale1.3225/depth",
+      "VFX source/config/assets",
+      "Core and UI955 hunks"
+    ]
+  },
+  "manualStyleRevision": {
+    "user": "2026-10-25 explicit darker red-white foot ring + larger 操作中",
+    "changes": [
+      "same66%x10px ring: deep red border/glow + white inner edge",
+      "caption10px/12px ->13px/16px, dark red plate, larger padding"
+    ],
+    "unchanged": [
+      "enemy thin gold ring + small pointer pending user decision",
+      "caster names",
+      "VFX size/paint1.3225/depth/gameplay/auto visibility"
+    ],
+    "verification": "16direct tests, FixedSlot4viewport, cardless browser and build/check PASS; newHead CI pending"
+  },
+  "manualTextBlink": {
+    "user": "2026-10-25 操作中的字樣要閃爍",
+    "implementation": "existing caption contains one text span, opacity1→.25→1 over1.2s; plate geometry/background remain stable, no timers/turn authority",
+    "accessibility": "prefers-reduced-motion keeps text steady and fully opaque",
+    "verification": "actual Chrome sampled bright1/dim.25, plate1 both, exact same caption rect; 16direct +cardless browser+FixedSlot4viewport+build-check PASS",
+    "unchanged": "darker red-white ring, enlarged13px caption, enemy hints, VFX sizes/depth, gameplay and auto hidden"
+  },
+  "enemyReticleRevision": {
+    "user": "2026-10-25 金圈小箭頭不明顯，要求恢復準星且武俠風",
+    "implementation": "one stationary54px targeting seal in original art: four sword points, bronze concentric/segmented rings, cinnabar centre; authored inline SVG background, no raster/sprite replacement",
+    "retired": "enemy thin foot circle and arrow CSS/node removed; targetable/target authority unchanged",
+    "unchanged": "manual dark red-white ring,13px blinking caption, caster labels, VFX size/paint1.3225/depth/gameplay",
+    "verification": "16direct + FixedSlot4viewport+cardless/actual blink+build/check PASS; both Boss/object seals display,54px,pointer-eventsnone; exactHead phone pending"
+  },
+  "enemyReticleBlink": {
+    "humanAcceptance": "2026-10-25 martial reticle appearance approved; requests blinking",
+    "change": "same SVG/54px/position: opacity1→.4→1 over1.2s, no rotation/scale; reduced motion steady",
+    "verification": "actual Chrome bright/dim and identical rect,4viewport+16direct+build/check PASS",
+    "unchanged": "manual text blink/red-white ring, caster names,VFX/portrait size/depth/Core"
+  },
+  "ciAlignment": {
+    "failedHead": "b663f6ae3492a8cf73bcdca1b47bd30e1264cf08",
+    "workflow": "CI",
+    "run": 40186026464,
+    "attempt": 1,
+    "job": 121147513714,
+    "step": "Run all Node unit and integration suites",
+    "firstError": "tests/hit-evasion-final-percent-status-formula-20260923.test.js:163 expected retired shared ally/enemy root reticle selector",
+    "selectedOtherJobs": "all selected browser/Boss/Abyss/Adventure/portrait and Session SUCCESS; Repository121154722221 dependentfailure",
+    "fix": "tests-only: preserve ally root reticle, require disabled retired enemy root markers and original-state single54px art seal with pointer-eventsnone; reject oldarrow. No formula/status/target/product modification.",
+    "verification": "17direct tests +build-check/diff PASS",
+    "retryLedger": "failedHead logical retries0, deterministic test mismatch fixed directly, no rerun/cancel/dispatch",
+    "next": "save original branch checkpoint and wait NEW Head required CI;955release hold persists"
+  },
+  "ciDomFixtureAlignment": {
+    "failedHead": "fc257e8c83478a3a3f8d35cdbfcd2213539f49ae",
+    "workflow": "CI",
+    "run": 40189640515,
+    "attempt": 1,
+    "job": 121157881596,
+    "step": "Run all Node unit and integration suites",
+    "firstError": "v174-cardless-battle-presentation.test.js:96 TypeError arrow.setAttribute is not a function",
+    "cause": "minimal DOM mock lacked standard setAttribute and discarded appended child nodes; real browser supports both",
+    "fix": "tests-only mock attribute storage/direct-child query and reuse; preserve original portrait/HUD assertions, additionally enforce exactly one aria-hidden target seal",
+    "verification": "direct mock suite6 plus original presentation/name/formula targeted suites PASS; build-check/diff PASS",
+    "broaderOwnerRead": "46/48 top-level PASS; two unrelated local environment failures: missing identify and Chrome executable env unset. Not fullPASS, no code/CI bypass or install. Latest selected browser jobs already succeeded on unchanged product.",
+    "retryLedger": "fc failedHead retries0; deterministic fixture fix, no rerun/cancel/dispatch",
+    "next": "newHead natural requiredCI;955window stillhold"
+  },
+  "devIntegration995": {
+    "absorbedDev": "632e3281d73484c307e55fe90076ebb4d2e776c5",
+    "reason": "after20min53dead had0runs/0checks via direct+wrapper and live PRmergeablefalse/dirty; merge-tree confirmed real conflicts",
+    "incoming": "#992policy documents, #995 normal city/inventory/formation/story portraits. Battle artwork source remains separate.",
+    "conflicts": "only root/build asset manifests, app-shell rename/rename, restricted source digest; original builder regenerated. main source auto merged nonoverlapping getCharacterArtworkPath.",
+    "acceptedEvidence": "CSS/js54/config/js39 exactb663; positionBattleSkillNameBadge exactb663; no VFX/size/depth/art changes from this line",
+    "validation": "29focused including portrait mappings/formation/city +build/check/diff PASS",
+    "release": "ONLY dev into994 branch; no994merge-to-dev/deployment;955window stillhold",
+    "retry": "no rerun/dummycommit/force/rebase; newHead requiredCI mandatory"
+  }
+}

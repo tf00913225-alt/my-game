@@ -137,10 +137,10 @@ test("battle target selection avoids the dense compositor and unrelated global U
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
   assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?\.battle-player\.v174-cardless-unit\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
-  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.target::before\{/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before\{/);
   const activeFrameRule=fixed.match(/#game-stage #battlePage\.v-fixed-slot-render-v2 \.battle-player\.v174-cardless-unit\.active-turn > \.v174-battle-art::before\{([^}]*)\}/);
   assert.ok(activeFrameRule,"Fixed Slot must own the manual active-character frame");
-  assert.match(activeFrameRule[1],/border:1px solid rgba\(241,210,137,\.72\) !important/);
+  assert.match(activeFrameRule[1],/border:1px solid rgb\(204,28,43\) !important/);
   assert.match(activeFrameRule[1],/box-shadow:[^;]+!important/);
   assert.match(activeFrameRule[1],/animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important/);
   assert.match(activeFrameRule[1],/z-index:-1 !important/);
@@ -212,4 +212,12 @@ test("more menu opens only in manual selection and cannot survive utility mode",
  bits.add('target-selecting');ctx.setBattleUtilityMenuOpen(true);assert.equal(attrs['aria-expanded'],'false');bits.delete('target-selecting');region.dataset.controlMode='utility';ctx.setBattleUtilityMenuOpen(true);assert.equal(attrs['aria-expanded'],'false');
  assert.match(html,/id="battleMoreButton"[^>]*aria-controls="battleUtilityTray"/);
  const owner=read('js/20-anonymous-20.js');assert.match(owner,/event.key!=="Escape"/);assert.match(owner,/pointerdown/);assert.doesNotMatch(owner,/initBattleElementBoxDrag/);
+});
+
+
+test("enemy selection uses one noninteractive sword seal without the superseded foot ring or arrow",()=>{
+ const css=read("css/fixed-slot-battlefield-rendering-v2.css"),runtime=read("js/54-v173.51-battle-qa.js");
+ assert.doesNotMatch(css,/v174-target-arrow/);assert.doesNotMatch(runtime,/v174-target-arrow/);
+ const rule=css.match(/\.v174-target-reticle\{([^}]+)\}/)?.[1];assert.ok(rule);assert.match(rule,/width:54px;height:54px/);assert.match(rule,/pointer-events:none/);assert.match(rule,/data:image\/svg\+xml/);
+ assert.match(runtime,/kind==="monster"&&!art.querySelector\(":scope > \.v174-target-reticle"\)/);
 });

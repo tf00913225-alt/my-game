@@ -160,7 +160,13 @@ assert.doesNotMatch(statusText,/個百分點/,"player-visible status text must u
     assert.match(fixedCss,/\.monster-status-badges\{[\s\S]*?bottom:46px !important;[\s\S]*?min-height:14px !important;[\s\S]*?z-index:32 !important/);
     assert.match(statusCss,/--v143-status-layer-hud:34/);
     assert.match(fixedCss,/\.targetable::after,[\s\S]*?\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
-    assert.match(fixedCss,/\.ally-targetable::before,[\s\S]*?\.targetable::before,[\s\S]*?\.target::before\{/);
+    // Ally reticle keeps the original root owner; enemy selection now uses
+    // the approved single artwork seal, with retired root markers disabled.
+    assert.match(fixedCss,/\.battle-player\.v174-cardless-unit\.ally-targetable::before\{[\s\S]*?pointer-events:none !important/);
+    assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.target::before\{content:none !important;display:none !important;/);
+    assert.match(fixedCss,/\.battle-monster\.v174-cardless-unit:is\(\.targetable,\.target\) > \.v174-battle-art > \.v174-target-reticle\{display:block;/);
+    assert.match(fixedCss,/\.v174-target-reticle\{[^}]*width:54px;height:54px;[^}]*pointer-events:none/);
+    assert.doesNotMatch(fixedCss,/v174-target-arrow/);
     assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
     assert.doesNotMatch(fixedCss,/battle-info-region/,"retired battle log UI must stay absent");
     assert.match(fixedCss,/#battleActionRegion\.target-selecting > \.turn-target-row\{[\s\S]*?top:auto;[\s\S]*?bottom:calc\(var\(--battle-target-prompt-height\) \+ var\(--battle-target-select-gap\)\);[\s\S]*?opacity:1/);

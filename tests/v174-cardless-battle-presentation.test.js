@@ -82,8 +82,14 @@ test('Abyss keeps its existing portrait owner but avoids double-rendering artwor
 test('canonical artwork updates reuse one child and preserve the selected portrait',()=>{
     const children=[];
     const makeStyle=()=>({setProperty(name,value){this[name]=value;},removeProperty(name){delete this[name];}});
+    // Keep the small DOM fixture faithful to direct-child reuse and ARIA;
+    // newly approved decorative children must not be silently dropped.
+    const makeElement=()=>({style:makeStyle(),dataset:{},children:[],attributes:{},classList:{toggle(){}},
+        querySelector(selector){const name=selector.match(/\.([\w-]+)/)?.[1];return this.children.find(node=>String(node.className).split(/\s+/).includes(name))||null;},
+        appendChild(node){const previous=this.children.indexOf(node);if(previous>=0)this.children.splice(previous,1);this.children.push(node);node.parentNode=this;},
+        setAttribute(name,value){this.attributes[name]=String(value);},getAttribute(name){return this.attributes[name]??null;},addEventListener(){}});
     const context=vm.createContext({
-        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement(){return {style:makeStyle(),dataset:{},classList:{toggle(){}},querySelector(){return null;},appendChild(){},addEventListener(){}};}},
+        document:{body:{classList:{remove(){}}},getElementById(){return null;},querySelectorAll(){return [];},createElement:makeElement},
         addEventListener(){},getComputedStyle:()=>({getPropertyValue:()=> 'url("abyss-selected.webp")',backgroundImage:"none"}),console
     });
     context.window=context;
@@ -98,5 +104,8 @@ test('canonical artwork updates reuse one child and preserve the selected portra
     assert.equal(children.filter(node=>node.className==="v174-battle-art").length,1,"repeated updates cannot duplicate portrait DOM");
     assert.equal(children.filter(node=>node.className==="v174-unit-hud").length,1,"one real HUD");
     assert.equal(children[0].style.backgroundImage,'url("abyss-selected.webp")');
+    const seals=children[0].children.filter(node=>node.className==="v174-target-reticle");
+    assert.equal(seals.length,1,"repeated artwork updates must reuse the single target seal");
+    assert.equal(seals[0].getAttribute("aria-hidden"),"true","decorative target seal does not duplicate accessible gameplay controls");
     assert.equal(card.style["background-image"],"none","the card background cannot draw a second portrait");
 });
