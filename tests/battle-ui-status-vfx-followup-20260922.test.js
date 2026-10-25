@@ -213,3 +213,9 @@ test("more menu opens only in manual selection and cannot survive utility mode",
  assert.match(html,/id="battleMoreButton"[^>]*aria-controls="battleUtilityTray"/);
  const owner=read('js/20-anonymous-20.js');assert.match(owner,/event.key!=="Escape"/);assert.match(owner,/pointerdown/);assert.doesNotMatch(owner,/initBattleElementBoxDrag/);
 });
+
+
+test("enemy pointer stays below the carrier top instead of covering its preceding HP band",()=>{
+ const css=read("css/fixed-slot-battlefield-rendering-v2.css");
+ const rule=css.match(/\.v174-target-arrow\{([^}]+)\}/)?.[1];assert.ok(rule);assert.match(rule,/top:10px/);assert.match(rule,/width:16px;height:5px/);assert.match(rule,/pointer-events:none/);
+});

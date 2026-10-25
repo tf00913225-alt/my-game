@@ -740,7 +740,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     background:rgba(245,207,114,.08);transform:translateX(-50%);pointer-events:none;z-index:-1;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-target-arrow{
-    display:none;position:absolute;left:50%;top:-5px;width:16px;height:5px;
+    display:none;position:absolute;left:50%;top:10px;width:16px;height:5px;
     background:#f5cf72;clip-path:polygon(0 0,100% 0,50% 100%);
     transform:translateX(-50%);pointer-events:none;z-index:2;
 }

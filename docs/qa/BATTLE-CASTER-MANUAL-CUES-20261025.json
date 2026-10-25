@@ -33,5 +33,21 @@
     "js\\00-main.js": "d33f57badbd9a3ca5e4cceb0f75f691fb97028fb64607a41b99224fc92a21435",
     "js\\54-v173.51-battle-qa.js": "8cb875392b7d6e142cc03a2980f83869c868d8c9f8e91b37da9ec5baa8a0ef21",
     "css\\fixed-slot-battlefield-rendering-v2.css": "e087f92117333370e1d33adcf14e1841b30f55b4bb7d55dea4911bd8762dc9e0"
+  },
+  "phoneContinuation": {
+    "scope": "user requests physical handset PNGs; no size/depth/VFX changes",
+    "finding": "enemy pointer at original carrier top lies in preceding information band; intermediate2px candidate measured pointer within47.937..53.707 CSS-px HP band, so rejected. Final pointer top10px moves only its own5px marker below information band.",
+    "focused": "10 direct presentation tests and Fixed Slot4viewport PASS; final exact Head phone images pending",
+    "capture": "For name-position screenshots only, isolated QA holds original label visible40% animation frame and delays its own removal; original skill body, gameplay and product source untouched. Original raw/faded and intermediate candidate images retained.",
+    "pixelNote": "Physical Chrome computed1px border reports0.761905px due existing coordinate projection; exact1px diagnostic mismatch retained, not a claim ring missing.",
+    "sourceChanges": [
+      "CSS enemy pointer top:-5px ->10px",
+      "direct regression; generated CSS/manifest"
+    ],
+    "unchanged": [
+      "all portrait and paint scale1.3225/depth",
+      "VFX source/config/assets",
+      "Core and UI955 hunks"
+    ]
   }
 }
