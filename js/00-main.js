@@ -211,6 +211,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 
 
 
+
 /* =====================================================
    ★ 1080 × 1920 整體等比例縮放控制器
    - 遊戲邏輯舞台固定 1080 × 1920
@@ -5259,28 +5260,24 @@ if(window.FourSymbolsCombatEvents){
 
 function getCharacterArtworkPath(character){
     if(!character){ return ""; }
+    if(character.combatantKind==="heroNpc"){
+        return getCharacterBattleArtworkPath(character);
+    }
 
     const gender=character.gender==="male" ? "male" : "female";
     const element=elementDatabase[character.element]
         ? character.element
         : "fire";
 
-    return "assets/characters/"+gender+"_"+element+".jpg";
+    const portraitNumber={fire:"01",water:"02",wind:"03",earth:"04"}[element];
+    return "assets/characters/player_"+gender+"_"+portraitNumber+".webp";
 }
 
 
 /*
-   ★ 新增（依照使用者要求，「玩家戰鬥立繪能否去背」）：
-   跟getCharacterArtworkPath()共用同一組gender/element
-   判斷邏輯，但回傳的是另外用rembg去背過的透明PNG
-   （assets/characters/battle_性別_元素.png），只給戰鬥
-   卡片（.battle-player的background-image）這一個用途
-   使用。角色創建預覽、背包立繪頁面的大圖仍然呼叫
-   getCharacterArtworkPath()、繼續顯示原本帶場景背景的
-   版本——這兩個地方的圖片本來就是同一份素材共用，
-   直接把來源檔案整個換成去背版會連帶影響到那些其實
-   使用者沒有要求改的畫面，所以另外開一個函式、
-   只在戰鬥卡片那一處呼叫，其餘地方完全不受影響。
+   一般玩家立繪由 getCharacterArtworkPath 提供新版透明 WebP，
+   共用於主城、角色／背包、佈陣預覽及故事對話。
+   戰鬥卡片與戰鬥事件繼續由此函式提供獨立戰鬥姿勢；不混用一般立繪。
 */
 function getCharacterBattleArtworkPath(character){
     if(!character){ return ""; }

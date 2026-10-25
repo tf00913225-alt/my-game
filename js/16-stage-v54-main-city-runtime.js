@@ -327,7 +327,7 @@
             const members=party.characters;
             scene.dataset.partySize=String(members.length);
             scene.innerHTML=members.map(({character,index},position)=>{
-                const artwork=getCharacterBattleArtworkPath(character);
+                const artwork=getCharacterArtworkPath(character);
                 return '<figure class="home-party-portrait" data-city-position="'+position+'" data-party-identity="character:'+index+'"><img src="'+rosterEscape(artwork)+'" alt="'+rosterEscape(character.id)+' Lv.'+Math.max(1,Math.floor(rosterNumber(character.level)||1))+'" draggable="false" decoding="async"></figure>';
             }).join("");
         }

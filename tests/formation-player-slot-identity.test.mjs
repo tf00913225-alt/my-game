@@ -11,7 +11,7 @@ test('formation keeps canonical player slot identity across an empty middle char
  let confirmed={version:2,characterIndexToSlot:{0:'ALLY_F1',2:'ALLY_F3'},heroIdToSlot:{}};
  const calls=[];
  const c={battleActive:false,getCharacters:()=>players.filter(Boolean),getPartyCharacterByIndex:i=>players[i],
-  getExistingPartyIndexes:()=>[0,2],heroPageHtml:String,getCharacterBattleArtworkPath:()=>'',
+  getExistingPartyIndexes:()=>[0,2],heroPageHtml:String,getCharacterBattleArtworkPath:()=>'',getCharacterArtworkPath:()=>'',
   fixedBattlefieldSlots:()=>({allySlots:Policy.slots}),
   document:{getElementById:()=>null},
   FourSymbolsTeamFormation:{getConfirmed:()=>structuredClone(confirmed),getStatus:()=>({ready:true,busy:false,pending:null,playerIndexes:[0,2]}),
