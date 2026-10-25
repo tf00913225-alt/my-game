@@ -8,7 +8,7 @@ const rect=(left,top,width,height)=>({left,top,width,height,right:left+width,bot
 function fn(name,next){return source.slice(source.indexOf('function '+name+'('),source.indexOf('function '+next+'('));}
 function node(){return {dataset:{},children:[],appendChild(n){this.children.push(n);},style:{setProperty(k,v){this[k]=v;}},setAttribute(){}};}
 function runtime(){
-  const c={Math,String,document:{createElement:node},STATUS_VISUAL_LAYERS:{HARD_CONTROL_BASE:4,ROTATING:5},statusVisual:(src,mode,bucket,extra)=>({src,mode,bucket,visualLayer:mode==='icon'?34:5,...extra})};
+  const c={Math,String,state:{},window:{},document:{createElement:node},STATUS_VISUAL_LAYERS:{HARD_CONTROL_BASE:4,ROTATING:5},statusVisual:(src,mode,bucket,extra)=>({src,mode,bucket,visualLayer:mode==='icon'?34:5,...extra})};
   vm.createContext(c);
   vm.runInContext(source.slice(source.indexOf('const STATUS_BODY_PRESENTATION='),source.indexOf('function protectObject('))+'\nthis.profiles=STATUS_BODY_PRESENTATION;this.specs=RAW_STATUS_VISUALS;'+fn('placeStatusBodyVisual','activeBodyStatusTypesForLayer')+fn('createBodyStatusVisual','createStatusIcon'),c);
   return c;
@@ -109,7 +109,7 @@ test('a full rotation reads every unit before DOM writes and refreshes one snaps
   Object.assign(c,{STATUS_VISUALS:c.specs,currentBattleMonsters:[0,1,2],statusRotationByUnit:new Map(),reportHardControlVisualContractViolation(){},
     cardFor:(side,i)=>cards.get(side+':'+i)||null,entityFor:(side,i)=>cards.has(side+':'+i)?{hp:100}:null,hasTimedEffect:(e,type)=>!!e&&active.has(type),deferredStatusDuringCast:()=>false,
     purgeLegacyCardVfx:write,statusIconHost:(side,i,card)=>card&&card.host,statusIconNode:(host,type)=>{const card=[...cards.values()].find(c=>c.host===host);return card&&card.icons.get(type);},
-    statusVisualNode:(card,type)=>card&&card.bodies.get(type),createStatusIcon:type=>({type}),
+    statusVisualNode:(card,type)=>card&&card.bodies.get(type),createStatusIcon:type=>({type,dataset:{}}),
     removeStatusVisual:(card,side,i,type)=>{const n=card&&card.bodies.get(type);if(n)n.remove();},
     slotAnchor(side,i){const key=side+':'+i;read('anchor',key);anchorReads.set(key,(anchorReads.get(key)||0)+1);return {slot:key,rect:rect(i*150,side==='monster'?0:250+offset,120,200)};},
     window:{FourSymbolsBattlefieldRenderGeometry:{getUnitGeometry(side,i){const key=side+':'+i;read('geometry',key);geometryReads.set(key,(geometryReads.get(key)||0)+1);return {artworkProjection:{rect:rect(i*150,side==='monster'?0:250+offset,120,200)}};}}}});
@@ -238,4 +238,15 @@ test('outer shells remain visible behind portrait paint while hard controls keep
     const rows=JSON.parse(match[1]);assert.equal(rows.length,18);
     for(const row of rows){assert.ok(row.center,'portrait must occlude shell front ribbons');assert.ok(row.edge,'shell perimeter must remain visible');assert.ok(row.hardControl,'freeze/petrify foreground must remain intact');assert.deepEqual(row.after,row.before,'plane change must not resize or move source');assert.equal(row.background,'rgba(0, 0, 0, 0)');assert.equal(row.isolation,'isolate');}
   }finally{fs.rmSync(directory,{recursive:true,force:true});}
+});
+
+test('Wind status narrow reads preserve the full fallback for all other skills',()=>{
+ const c=runtime(),calls=[];const snapshot={portraitRect:rect(0,0,100,200)};
+ Object.assign(c,{entityFor:()=>({hp:100}),cardFor:()=>({getBoundingClientRect:()=>rect(0,0,100,200)}),slotAnchor:()=>({slot:'F1',rect:rect(0,0,100,200)}),
+ activeBodyStatusTypesForLayer:()=>['freeze'],window:{FourSymbolsBattlefieldRenderGeometry:{getUnitGeometry(){calls.push('full');return snapshot;},getStatusGeometry(){calls.push('status');return snapshot;}}}});
+ vm.runInContext(fn('readStatusPresentation','syncStatusVisualsForUnit'),c);
+ c.state.current={hitFeedback:{config:{enabled:true,profile:{element:'wind'}}}};assert.equal(c.readStatusPresentation('player',0).geometry,snapshot);
+ c.state.current.hitFeedback.config.profile.element='fire';c.readStatusPresentation('player',0);
+ c.state.current.hitFeedback.config.profile.element='wind';c.state.current.hitFeedback.config.enabled=false;c.readStatusPresentation('player',0);
+ assert.deepEqual(calls,['status','full','full']);
 });

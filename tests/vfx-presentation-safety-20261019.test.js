@@ -32,7 +32,7 @@ test("range artwork fits the visible target side without changing aspect, target
     const center={x:210,y:130},bounds=rect(10,10,400,240);
     const node={style:{width:"600px",height:"300px",left:"210px",top:"130px"},dataset:{targetIndexes:"0,2,4",geometrySlots:"B1,B2,B3"}};
     const before=JSON.stringify({center,bounds,targets:node.dataset.targetIndexes,slots:node.dataset.geometrySlots});
-    fitRuntime(side,overlay)(node,{targetSide:"monster"},bounds,center);
+    fitRuntime(side,overlay)(node,{targetSide:"monster",model:{sprite:{}}},bounds,center);
     assertInside(node,center,rect(30,20,360,210));
     assert.equal(parseFloat(node.style.width)/parseFloat(node.style.height),2);
     assert.equal(node.style.left,"210px");assert.equal(node.style.top,"130px");
@@ -43,19 +43,19 @@ test("an edge tri anchor retains its center and footprint while fitting proporti
     const safe=rect(0,0,360,300),fit=fitRuntime(safe,safe);
     const center={x:60,y:70},bounds=rect(0,0,360,100);
     const node={style:{width:"360px",height:"180px"},dataset:{}};
-    fit(node,{targetSide:"player"},bounds,center);
+    fit(node,{targetSide:"player",model:{sprite:{}}},bounds,center);
     assertInside(node,center,safe);
     assert.equal(parseFloat(node.style.width)/parseFloat(node.style.height),2);
     assert.equal(node.dataset.semanticWidth,"360");assert.equal(node.dataset.semanticHeight,"100");
     const small={style:{width:"40px",height:"20px"},dataset:{}};
-    fit(small,{targetSide:"player"},bounds,center);
+    fit(small,{targetSide:"player",model:{sprite:{}}},bounds,center);
     assert.equal(small.style.width,"40px");assert.equal(small.style.height,"20px");
 });
 test("low group art cannot expand and relocate below its canonical target center",()=>{
     const safe=rect(0,0,360,300),center={x:180,y:240},bounds=rect(0,180,360,120);
     const node={style:{width:"360px",height:"360px"},dataset:{targetIndexes:"0,1,2"}};
     const semantic=JSON.stringify(bounds);
-    fitRuntime(safe,safe)(node,{targetSide:"monster"},bounds,center);
+    fitRuntime(safe,safe)(node,{targetSide:"monster",model:{sprite:{}}},bounds,center);
     assert.equal(parseFloat(node.style.width),120);
     assert.equal(parseFloat(node.style.height),120);
     assert.equal(center.x,180);assert.equal(center.y,240);
@@ -122,7 +122,7 @@ test("a single target near the visible edge keeps its hit center and source rati
     assertInside(node,target,safe);
 });
 test("HUD detaches for the whole cast, returns during reading, and restores the original node on cleanup",()=>{
-    function host(){return {children:[],appendChild(node){if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(x=>x!==node);this.children.push(node);node.parentNode=this;},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(x=>x!==this);}};}
+    function host(){return {children:[],insertBefore(node,next){if(node.parentNode)node.parentNode.children=node.parentNode.children.filter(x=>x!==node);const at=next?this.children.indexOf(next):this.children.length;this.children.splice(at,0,node);node.parentNode=this;},appendChild(node){this.insertBefore(node,null);},remove(){if(this.parentNode)this.parentNode.children=this.parentNode.children.filter(x=>x!==this);}};}
     const body=host();let reading=false,stage=true,hit=false;
     body.classList={contains:()=>reading};
     const card=host();card.id="battleMonster0";card.isConnected=true;card.classList={contains:()=>false};
@@ -132,7 +132,7 @@ test("HUD detaches for the whole cast, returns during reading, and restores the 
     const projection={rect:{left:20,top:30,width:80,height:100},width:80,height:100,scaleX:1,scaleY:1};
     const context={document:{body,getElementById:()=>page,createElement:()=>host(),querySelector(selector){return selector.split(",").some(s=>s===".v143-skill-stage"?stage:s===".v143-hit-feedback-overlay"?hit:false)?{}:null;}},
         window:{FourSymbolsBattlefieldRenderGeometry:{getUnitGeometry:()=>({hudSurface:projection})}},battleActive:true,
-        hudLayer:null,prepareUnitHud:()=>hud,Array,Number};
+        hudLayer:null,hudBatchDepth:0,hudBatchPending:false,prepareUnitHud:()=>hud,Array,Number};
     vm.createContext(context);
     vm.runInContext(functionSource(presentation,"clearUnitHud","syncHud")+functionSource(presentation,"syncHud","syncResourceNumbers"),context);
     context.syncHud();assert.equal(hud.parentNode,context.hudLayer,"cast startup has no hit overlay but HUD must remain readable");

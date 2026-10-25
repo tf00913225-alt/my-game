@@ -5,5 +5,10 @@
     "catalogueSize": 52,
     "cases": 112390,
     "sha256": "23cbb26b88596c17618b13cab5fe4ffde2645f1e1d415f264e6a1d69e9be5baf"
+  },
+  "retiredStormResult": {
+    "catalogueSize": 51,
+    "cases": 110229,
+    "sha256": "3fd6444e3e3598f24d292f448b5a5e87812744786f05aa10cdb4cb2efe349fee"
   }
 }

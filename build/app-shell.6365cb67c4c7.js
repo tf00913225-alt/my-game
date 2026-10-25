@@ -3488,7 +3488,6 @@ const FORMAL_DAMAGE_SKILL_ROLES = Object.freeze({
     stormCircle:"tri_damage",
     windHowlLightning:"single_normal",
     stormRain:"aoe_damage",
-    stormSpell:"aoe_damage",
     stoneSlash:"single_low",
     petrifyFist:"tri_damage",
     stoneBreakSky:"single_normal",
@@ -5043,8 +5042,179 @@ if(typeof window!=="undefined"){
     });
 }
 
+// A UID-local teaching checkpoint, not a general battle replay/Cloud source.
+// Only a fully settled declaration boundary with zero pending intents is
+// admitted. Restoring never calls launch/startTurn or replays a boundary.
+const FIRST_TUTORIAL_MONSTER_FIELDS=[
+    'name','portraitName','monsterKey','portraitKey','level','element','rank','mode','tutorialEncounter',
+    'hp','maxHP','sp','maxSP','attack','magicAttack','defense','agility','speed','accuracy','evasion',
+    'criticalChance','skillIds','skillChance','statusEffects','activeBuffs','alive','vAdventure','vAdventureEncounterId'
+];
+function firstTutorialContext(identity){
+    const uid=window.FourSymbolsAccountSave?.getActiveUid?.();
+    const state=player?.adventureProgress?.chapters?.chapter_v1,onboarding=state?.onboarding;
+    const profile=window.FourSymbolsAdventureContent?.tutorialEncounters?.tutorial_1;
+    if(!profile||!uid||uid!==window.FourSymbolsStartupPolicy?.getUid?.()||identity?.uid!==uid||
+       !onboarding?.active||onboarding.source!=='new-character'||onboarding.flowVersion!==3||
+       state.currentNodeId!=='c1_01'||state.completedNodes.c1_01||
+       typeof identity.battleId!=='string'||identity.battleId.length<8||identity.battleId.length>100||
+       onboarding.battleId!==identity.battleId||getExistingPartyIndexes().length!==1||heroBattleCombatants.length){return null;}
+    if(Object.prototype.hasOwnProperty.call(onboarding,'battleKillReward')){
+        const reward=onboarding.battleKillReward;
+        if(!reward||typeof reward!=='object'||Array.isArray(reward)||Object.keys(reward).length!==4||
+           Object.keys(reward).some(key=>!['uid','battleId','monsterKey','gold'].includes(key))||
+           reward.uid!==uid||reward.battleId!==identity.battleId||reward.monsterKey!=='tutorial.c1_01'||
+           !Number.isSafeInteger(reward.gold)||reward.gold<=0){return null;}
+    }
+    return {uid,state,onboarding,sourceProfile:JSON.stringify(profile)};
+}
+function canRestartFirstTutorialBattle(identity){
+    return !!firstTutorialContext(identity)&&!battleActive&&!window.v132ActiveDungeonRun;
+}
+function firstTutorialSafeBoundary(identity){
+    const context=firstTutorialContext(identity),run=window.v132ActiveDungeonRun;
+    if(!context||!battleActive||!run||run.mode!=='adventure'||!run.tutorial||run.adventureNodeId!=='c1_01'||
+       battlePhase!=='declare'||actionReady||pendingAction!==null||battleAdvanceScheduled||battleEscapePendingToken!==null||
+       battlePresentationLocks.size||battleAutoActionResume||battleInputResumeToken!==null||battleResolutionResumeToken!==null||
+       activeBattleStatisticsAction||(battleDurationAction&&!battleDurationAction.completed)||
+       resolutionPhaseStarted||turnAdvancePending||Object.keys(queuedPlayerActions).length||
+       initiativeIndex<initiativeQueue.length||currentBattleMonsters.length!==1||currentBattleMonsters[0]!==0||
+       !monsters[0]?.alive||monsters[0].monsterKey!=='tutorial.c1_01'||monsters[0].hp<=0||battleWaveState||player.isDefending!==false){return null;}
+    return context;
+}
+function validateFirstTutorialCheckpoint(value,identity){
+    const context=firstTutorialContext(identity),row=value?.roster?.[0],party=value?.party;
+    const stats=getBattleStatisticsOwner(),combatant=buildBattleStatisticsCombatant(0);
+    const fields=['version','source','sourceProfile','uid','battleId','sequence','turn','startedAt','roster','party','boundaries','statistics'];
+    if(!context||!value||Object.keys(value).some(key=>!fields.includes(key))||value.version!==1||value.source!=='chapter1-first-tutorial'||value.uid!==context.uid||
+       value.sourceProfile!==context.sourceProfile||value.battleId!==identity.battleId||!Number.isSafeInteger(value.sequence)||value.sequence<1||
+       !Number.isSafeInteger(value.turn)||value.turn<1||value.turn>1000||!Number.isFinite(value.startedAt)||value.startedAt<0||
+       !Array.isArray(value.roster)||value.roster.length!==1||!row||
+       Object.keys(row).some(key=>!FIRST_TUTORIAL_MONSTER_FIELDS.includes(key))||
+       row.monsterKey!=='tutorial.c1_01'||row.mode!=='tutorial'||row.tutorialEncounter!==true||row.alive!==true||
+       row.vAdventure!==true||row.vAdventureEncounterId!=='tutorial_1'||row.rank!=='regular'||
+       !['fire','water','wind','earth'].includes(row.element)||!Number.isInteger(row.level)||row.level<1||
+       !['name','portraitName','portraitKey'].every(key=>typeof row[key]==='string')||
+       !['hp','maxHP','sp','maxSP','attack','magicAttack','defense','agility','speed','accuracy','evasion','criticalChance','skillChance','level']
+           .every(key=>Number.isFinite(row[key])&&row[key]>=0)||row.hp<=0||row.hp>row.maxHP||row.sp>row.maxSP||
+       !Array.isArray(row.statusEffects)||row.statusEffects.length||!Array.isArray(row.activeBuffs)||row.activeBuffs.length||
+       !Array.isArray(row.skillIds)||row.skillIds.length||
+       !party||Array.isArray(party)||Object.keys(party).some(key=>!['hp','sp','statusEffects','activeBuffs','isDefending'].includes(key))||
+       !Number.isFinite(party.hp)||party.hp<=0||!Number.isFinite(party.sp)||party.sp<0||
+       !Array.isArray(party.statusEffects)||party.statusEffects.length||!Array.isArray(party.activeBuffs)||party.activeBuffs.length||party.isDefending!==false||
+       !Array.isArray(value.boundaries)||value.boundaries.some(key=>!/^round_(start|end):[1-9][0-9]*$/.test(key))||
+       value.boundaries.length!==2*value.turn-1||new Set(value.boundaries).size!==value.boundaries.length||
+       !Array.from({length:value.turn},(_,index)=>'round_start:'+(index+1)).every(key=>value.boundaries.includes(key))||
+       !Array.from({length:value.turn-1},(_,index)=>'round_end:'+(index+1)).every(key=>value.boundaries.includes(key))||
+       !stats?.validateFirstTutorialSnapshot?.(value.statistics,combatant?.id)){return false;}
+    try{return JSON.stringify(value).length<=32768;}catch(_){return false;}
+}
+function clearFirstTutorialPendingWork(){
+    clearInterval(timerId);timerId=null;
+    if(battleAdvanceTimeoutId){clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;}
+    clearBattleActionWatchdog();clearBattleRoundPrompt();clearBattleActionNotice();
+    battleAdvanceScheduled=false;battleInputResumeToken=null;battleResolutionResumeToken=null;battleAutoActionResume=null;
+    actionReady=false;pendingAction=null;activeBattleStatisticsAction=null;battleDurationAction=null;
+    closeMenus();clearBattleTargetSelectionMode();
+}
+function checkpointFirstTutorialBattle(identity,commit,suspend=false){
+    const context=firstTutorialSafeBoundary(identity);
+    if(!context||typeof commit!=='function'){return false;}
+    const run=window.v132ActiveDungeonRun,stats=getBattleStatisticsOwner();
+    const roster=[Object.fromEntries(FIRST_TUTORIAL_MONSTER_FIELDS.filter(key=>key in monsters[0]).map(key=>[key,monsters[0][key]]))];
+    let snapshot;
+    try{snapshot=JSON.parse(JSON.stringify({version:1,source:'chapter1-first-tutorial',sourceProfile:context.sourceProfile,uid:context.uid,battleId:identity.battleId,
+        sequence:(context.onboarding.battleCheckpoint?.sequence||0)+1,turn,startedAt:run.startedAt,roster,
+        party:{hp:player.hp,sp:player.sp,statusEffects:player.statusEffects,activeBuffs:player.activeBuffs,isDefending:player.isDefending},
+        boundaries:Array.from(battleRoundBoundaryKeys).map(key=>key.split(':').slice(1).join(':')),
+        statistics:stats?.getSnapshot?.()}));}catch(_){return false;}
+    if(!validateFirstTutorialCheckpoint(snapshot,identity)){return false;}
+    const release=window.FourSymbolsBattleFlow.acquirePauseLock('chapter1-checkpoint');
+    let accepted=false;
+    try{accepted=commit(JSON.parse(JSON.stringify(snapshot)))===true;}
+    catch(error){console.error('首關 checkpoint 未保存。',error);}
+    finally{if(!accepted){release();}}
+    if(!accepted){return false;}
+    if(!suspend){release();return true;}
+    // Save acceptance precedes teardown. No victory/loss, reward or new battle
+    // event is emitted; the original statistics ledger remains in the DTO.
+    clearFirstTutorialPendingWork();battleActive=false;battleToken++;
+    battlePresentationLocks.clear();battleInputGuideHolds.clear();battleEscapePendingToken=null;
+    monsters=run.previousMonsters;currentZone=run.previousZone;window.v132ActiveDungeonRun=null;
+    release();return true;
+}
+function restoreFirstTutorialBattle(value,identity,onComplete){
+    if(battleActive||window.v132ActiveDungeonRun||typeof onComplete!=='function'||!validateFirstTutorialCheckpoint(value,identity)){return false;}
+    const context=firstTutorialContext(identity),retained=context.onboarding.battleCheckpoint;
+    // An old, consumed or different-generation DTO cannot revive a battle.
+    if(!retained||JSON.stringify(retained)!==JSON.stringify(value)){return false;}
+    const original={monsters,currentZone,hp:player.hp,sp:player.sp,statusEffects:player.statusEffects,activeBuffs:player.activeBuffs,isDefending:player.isDefending,
+        core:{currentBattleMonsters,selectedMonster,turn,autoBattle,battlePhase,activeBattleCharacterIndex,battleRoundBoundaryKeys,
+            battleWaveState,battleEscapePendingToken,initiativeQueue,initiativeIndex,processedInitiativeIndexes,queuedPlayerActions,
+            resolutionPhaseStarted,turnAdvancePending,declaredCharacterIndexes,battleInputResumeToken,battleResolutionResumeToken,battleAutoActionResume},
+        locks:Array.from(battlePresentationLocks),holds:Array.from(battleInputGuideHolds),
+        page:typeof document!=='undefined'?document.querySelector?.('.page.active')?.id:null};
+    const restored=JSON.parse(JSON.stringify(value)),token=battleToken+1;
+    let statisticsRestore;
+    try{
+    clearFirstTutorialPendingWork();battleToken=token;
+    monsters=restored.roster;currentBattleMonsters=[0];currentZone='dungeon';selectedMonster=0;turn=restored.turn;
+    battleRoundBoundaryKeys=new Set(restored.boundaries.map(key=>token+':'+key));
+    battlePresentationLocks.clear();battleInputGuideHolds.clear();battleEscapePendingToken=null;battleWaveState=null;
+    initiativeQueue=[];initiativeIndex=0;processedInitiativeIndexes=new Set();queuedPlayerActions={};
+    resolutionPhaseStarted=false;turnAdvancePending=false;declaredCharacterIndexes=new Set();
+    const limits=getPartyBattleStats(0);
+    player.hp=Math.min(restored.party.hp,limits.maxHP);player.sp=Math.min(restored.party.sp,limits.maxSP);
+    player.statusEffects=restored.party.statusEffects;player.activeBuffs=restored.party.activeBuffs;player.isDefending=false;
+    window.v132ActiveDungeonRun={identityVersion:1,mode:'adventure',gameplayMode:null,dailyDungeonType:null,
+        previousMonsters:original.monsters,previousZone:original.currentZone,onComplete,normalizeFailureResources:false,
+        tutorial:true,startedAt:restored.startedAt,adventure:true,adventureNodeId:'c1_01'};
+    statisticsRestore=getBattleStatisticsOwner().restoreFirstTutorialSnapshot(restored.statistics,buildBattleStatisticsCombatant(0).id,token);
+    if(!statisticsRestore?.rollback){throw new Error('Original statistics Owner refused checkpoint');}
+    battleActive=true;autoBattle=false;
+        if(!window.v141AdoptRestoredBattleEntry?.(token)){throw new Error('Original battle presentation Owner refused restore');}
+        window.FourSymbolsBattlefieldSlots?.clearActiveEnemySnapshot();renderBattle();showPage('battle');
+        syncBattleAutoSettings();updateAutoButton();
+        // Already-settled round-start/duration/RNG facts must not run again.
+        beginBattleRoundDeclaration(token);
+        const turnIndicator=$("battleTurnIndicator");
+        if(turnIndicator){turnIndicator.textContent="第"+turn+"回合"+battleWaveHudText();}
+        return true;
+    }catch(error){
+        clearFirstTutorialPendingWork();battleActive=false;battleToken++;window.v132ActiveDungeonRun=null;
+        statisticsRestore?.rollback();
+        monsters=original.monsters;currentZone=original.currentZone;
+        ({currentBattleMonsters,selectedMonster,turn,autoBattle,battlePhase,activeBattleCharacterIndex,battleRoundBoundaryKeys,
+            battleWaveState,battleEscapePendingToken,initiativeQueue,initiativeIndex,processedInitiativeIndexes,queuedPlayerActions,
+            resolutionPhaseStarted,turnAdvancePending,declaredCharacterIndexes,battleInputResumeToken,battleResolutionResumeToken,battleAutoActionResume}=original.core);
+        battlePresentationLocks.clear();original.locks.forEach(lock=>battlePresentationLocks.add(lock));
+        battleInputGuideHolds.clear();original.holds.forEach(hold=>battleInputGuideHolds.add(hold));
+        Object.assign(player,{hp:original.hp,sp:original.sp,statusEffects:original.statusEffects,activeBuffs:original.activeBuffs,isDefending:original.isDefending});
+        if(original.page){try{showPage(original.page.replace(/Page$/,''));}catch(_){/* caller retains its recovery view */}}
+        console.error('首關戰鬥續接未完成；保留原 checkpoint。',error);return false;
+    }
+}
+
+function firstTutorialKillRewardContext(monster){
+    const run=window.v132ActiveDungeonRun,state=player?.adventureProgress?.chapters?.chapter_v1,onboarding=state?.onboarding;
+    if(!run||run.mode!=='adventure'||!run.tutorial||run.adventureNodeId!=='c1_01'||
+       onboarding?.flowVersion!==3||state.currentNodeId!=='c1_01'||state.completedNodes.c1_01||
+       monster?.monsterKey!=='tutorial.c1_01'){return null;}
+    const identity={uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:onboarding.battleId};
+    const context=firstTutorialContext(identity);
+    // A retained but invalid receipt/checkpoint cannot issue another reward.
+    // Legitimate terminal retries have no DTO but retain the same battle ID
+    // and its once-only receipt in onboarding.
+    return {context:context&&(!Object.prototype.hasOwnProperty.call(onboarding,'battleCheckpoint')||
+        validateFirstTutorialCheckpoint(onboarding.battleCheckpoint,identity))?context:null};
+}
+
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
+        canRestartFirstTutorialBattle:canRestartFirstTutorialBattle,
+        checkpointFirstTutorialBattle:checkpointFirstTutorialBattle,
+        restoreFirstTutorialBattle:restoreFirstTutorialBattle,
+        validateFirstTutorialCheckpoint:validateFirstTutorialCheckpoint,
         subscribeActionFinished(observer){
             if(typeof observer!=="function"){ return function(){}; }
             battleActionFinishObservers.add(observer);
@@ -8181,6 +8351,10 @@ function normalizeHydratedRetiredSkillReferences(){
         "fireBurstStrike"
     ]);
 
+    // Legacy-only ID: preserve learned levels as historical observations; never restore ownership.
+    // Retain until old account saves can no longer carry this retired identifier.
+    const retiredObservationSkillId="stormSpell";
+
     Object.values(characterSkillLoadouts||{}).forEach(loadout=>{
         if(!loadout||typeof loadout!=="object"){ return; }
 
@@ -8190,7 +8364,7 @@ function normalizeHydratedRetiredSkillReferences(){
 
         if(Array.isArray(loadout.equippedSkills)){
             loadout.equippedSkills=loadout.equippedSkills.filter(skillId=>{
-                if(retiredPlayerSkillIds.has(skillId)){ return false; }
+                if(retiredPlayerSkillIds.has(skillId)||skillId===retiredObservationSkillId){ return false; }
                 const skill=skillDatabase&&skillDatabase[skillId];
                 return !!(skill&&skill.monsterOnly!==true);
             });
@@ -8198,8 +8372,12 @@ function normalizeHydratedRetiredSkillReferences(){
     });
 
     [autoConfig,autoConfig2,autoConfig3].forEach(config=>{
-        if(config&&retiredPlayerSkillIds.has(config.skill)){
+        if(config&&(retiredPlayerSkillIds.has(config.skill)||config.skill===retiredObservationSkillId)){
             config.skill="normal";
+        }
+        if(config&&config.v136LastSkill===retiredObservationSkillId){
+            delete config.v136LastSkill;
+            if(config.v136ActionIntent==="skill"){ config.v136ActionIntent="normal"; }
         }
     });
 }
@@ -12924,6 +13102,7 @@ function syncTurnTimerWithBattlePickers(){
 
 
 function toggleSkillQuickBar(){
+    setBattleUtilityMenuOpen(false);
 
     const overlay=
         $("skillQuickBar");
@@ -13308,6 +13487,7 @@ function timeoutTurn(token){
 ===================================================== */
 
 function prepareAction(type){
+    setBattleUtilityMenuOpen(false);
 
     /*
        ★ 修正：
@@ -20654,6 +20834,7 @@ function openItemMenu(){
 
 
 function closeMenus(){
+    setBattleUtilityMenuOpen(false);
 
     const quickBar=
         $("skillQuickBar");
@@ -21330,7 +21511,25 @@ function toggleAutoBattle(){
 }
 
 
+function setBattleUtilityMenuOpen(open){
+    const region=$("battleActionRegion"),more=$("battleMoreButton");
+    const allowed=!!open&&region?.dataset.controlMode==="manual"&&!region.classList.contains("target-selecting");
+    if(region){ region.classList.toggle("utility-menu-open",allowed); }
+    if(more){ more.setAttribute("aria-expanded",allowed?"true":"false"); }
+}
+function toggleBattleUtilityMenu(){
+    const region=$("battleActionRegion");
+    setBattleUtilityMenuOpen(!region?.classList.contains("utility-menu-open"));
+}
+
 function updateAutoButton(){
+    const battleToggle=$("battleAutoToggle");
+    if(battleToggle){
+        battleToggle.classList.toggle("is-active",!!autoBattle);
+        battleToggle.setAttribute("aria-pressed",autoBattle?"true":"false");
+        battleToggle.setAttribute("aria-label",autoBattle?"停止自動戰鬥":"啟用自動戰鬥");
+    }
+
 
     /*
        ★ 修正（依照使用者指定版面）：
@@ -23490,15 +23689,29 @@ function killMonster(index){
         bossOwner.onEnemyDeath(index,monster);
     }
 
-    if(!monster.noRewards){
+    const firstTutorialReward=monster.noRewards?null:firstTutorialKillRewardContext(monster);
+    const firstTutorialRewardHandled=firstTutorialReward!==null;
+    const rewardContext=firstTutorialReward?.context;
+    if(!monster.noRewards&&(!firstTutorialRewardHandled||(rewardContext&&!rewardContext.onboarding.battleKillReward))){
         recordMonsterKillForBestiary(monster);
-        awardMonsterGoldDrop(monster);
+        const awardedGold=awardMonsterGoldDrop(monster);
+        if(firstTutorialRewardHandled){
+            // Gold, original kill progress and this battle's receipt share the
+            // original UID main-save. This receipt follows the battle ID,
+            // including a loss/escape retry that consumes the live DTO.
+            window.v141RecordQuestProgress?.('kill10',1,'daily');
+            window.v141RecordQuestProgress?.('kill30',1,'commission');
+            rewardContext.onboarding.battleKillReward={uid:rewardContext.uid,
+                battleId:rewardContext.onboarding.battleId,monsterKey:monster.monsterKey,gold:awardedGold};
+        }
         /* 怪物掉落與擊殺進度一起即時存檔，避免中途戰敗/切背景遺失。 */
         saveGame();
     }
 
 
     updateMonsterUI(index);
+
+    if(firstTutorialRewardHandled){return {firstTutorialRewardHandled:true};}
 
 }
 
@@ -24979,6 +25192,71 @@ function getSkillNameBadgeDuration(skillName,elementType){
 }
 
 
+function positionBattleSkillNameBadge(badge,side,index,element){
+    const owner=window.FourSymbolsBattlefieldRenderGeometry;
+    const geometry=owner?.getUnitGeometry?.(side,index);
+    const fallback=element.getBoundingClientRect();
+    const portrait=geometry?.artworkProjection?.rect||geometry?.portraitRect||fallback;
+    const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
+    // Reserve the existing short forward cast motion; never move the Unit/HUD.
+    let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
+    let x=portrait.left+portrait.width/2;
+    badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
+    badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
+    if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
+    let width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+    const blockers=[];
+    document.querySelectorAll("#battlePage .battle-player,#battlePage .battle-monster").forEach(card=>{
+        if(card===element)return;
+        const match=String(card.id).match(/^battle(PlayerCard|Monster)(\d+)$/);if(!match)return;
+        const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
+        for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
+    });
+    document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion,#releaseUpdateMarquee").forEach(node=>{
+        const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
+    });
+    // In a dense pair of rows the nearest free band can be above the front row.
+    // Read only the formal projections; this does not create a second scaler.
+    for(let pass=0;pass<blockers.length;pass++){
+        let moved=false;
+        for(const rect of blockers){
+            if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top+1>rect.top&&top-height<rect.top+rect.height){
+                top=rect.top-6;moved=true;
+            }
+        }
+        if(!moved)break;
+    }
+    if(top-height<0){
+        // A short PC viewport has no space for the normal two-line pop above
+        // the top HUD. Use one compact line without overshoot, never cover HP.
+        badge.dataset.compact="true";width=badge.offsetWidth;height=badge.offsetHeight;
+        top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:1);
+        for(let pass=0;pass<blockers.length;pass++){
+            let moved=false;
+            for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
+            if(!moved)break;
+        }
+        if(top-height<0){
+            // The PC overlay can occupy the entire band above the top row.
+            // Use available side gutter for this transient label, not a new
+            // battlefield scale or a change to the announcement's lifecycle.
+            const bounds=[...blockers,portrait,...(hud?[hud]:[])];
+            const desiredX=x,desiredTop=Math.min(portrait.top,hud?.top??portrait.top)-1;
+            const xs=[x,...bounds.flatMap(r=>[r.left-width/2-2,r.left+r.width+width/2+2])];
+            const ys=[Math.max(height+1,desiredTop),height+1];
+            let best;
+            for(const cx of xs)for(const cy of ys){
+                if(cx-width/2<1||cx+width/2>window.innerWidth-1||cy-height<1||cy>portrait.top-1)continue;
+                if(bounds.some(r=>cx+width/2>r.left&&cx-width/2<r.left+r.width&&cy>r.top&&cy-height<r.top+r.height))continue;
+                const distance=Math.abs(cx-desiredX)+Math.abs(cy-desiredTop);
+                if(!best||distance<best.distance)best={x:cx,top:cy,distance};
+            }
+            if(best){x=best.x;top=best.top;}
+        }
+    }
+    badge.style.left=x+"px";badge.style.top=top+"px";
+}
+
 function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){
 
     const targetContract=createBattleTargetContract(
@@ -25048,11 +25326,8 @@ function showSkillNameBadge(skillName,elementType,characterIndex,targetId,target
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"player",Number.isInteger(characterIndex)?characterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -25147,11 +25422,8 @@ function showMonsterSkillNameBadge(
         badgeDuration+"ms"
     );
     badge.dataset.skillElement=String(elementType||"normal");
-const badgePoint={x:rect.left+rect.width/2,y:rect.top};
-
-    badge.style.left=badgePoint.x+"px";
-    badge.style.top=badgePoint.y+"px";
     document.body.appendChild(badge);
+    positionBattleSkillNameBadge(badge,"monster",Number.isInteger(monsterIndex)?monsterIndex:0,element);
 
 
     setTimeout(()=>{
@@ -32987,7 +33259,8 @@ function syncBattleUiPriorityLayer(){
 
     const statusDetail=page.querySelector(".battle-status-detail-modal:not([hidden])");
     const sideDrawer=page.querySelector(".battle-insight-drawer.open");
-    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer);
+    const settingsOpen=body&&body.classList.contains("v162-element-box-settings-open");
+    const active=page.classList.contains("active")&&!!(statusDetail||sideDrawer||settingsOpen);
 
     if(stage){ stage.classList.remove("battle-ui-priority"); }
     if(body){ body.classList.toggle("v174-battle-reading-open",active); }
@@ -33077,6 +33350,9 @@ function updateActionHudVisibility(){
 
     const shouldHide=
         activeAuto || battlePhase==="resolve" || battlePresentationActive;
+    const actionRegion=$("battleActionRegion");
+    if(actionRegion){ actionRegion.dataset.controlMode=shouldHide?"utility":"manual"; }
+    if(shouldHide){ setBattleUtilityMenuOpen(false); }
 
 
     /*
@@ -36213,7 +36489,8 @@ window.FourSymbolsItemAcquisitionData={
       ]
     },
     "story_first_growth": {
-      "sharedExp": 15
+      "sharedExp": 15,
+      "firstTutorialSharedExp": 300
     },
     "story_starter_gear": {
       "starterEquipmentFunding": "leatherArmor"
@@ -36307,8 +36584,8 @@ window.FourSymbolsItemAcquisitionData={
   if(oreIndex>0)add({sourceType:"synthesis",sourceId:"ore-promotion",materialItemId:oreIds[oreIndex-1],mode:"礦石升階",location:"主城 → 合成 → 材料合成",quantity:10,chance:1,repeatable:true,notes:"50個前一階礦石換10個；高階礦石合成不表示材料寶箱開放該階"});
   const talisman=id.match(/^(freeze|stealth|barrier)Talisman(Mid|High|Perfect)$/);
   if(talisman){const tierIndex=["Low","Mid","High","Perfect"].indexOf(talisman[2]);add({sourceType:"synthesis",sourceId:"talisman-promotion",materialItemId:talisman[1]+"Talisman"+["Low","Mid","High"][tierIndex-1],mode:"符咒合成",location:"主城 → 合成 → 符咒合成",quantity:1,chance:1,repeatable:true,notes:"3張同款前一階符咒＋"+data.talismanGold[tiers[tierIndex-1]]+"金幣"});}
-  if(id==="materialChest")add({sourceType:"dungeon",sourceId:"material",mode:"材料副本",location:"主城 → 副本 → 每日副本 → 材料副本",quantityRange:[1,3],repeatable:true,chance:1,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；每日1次；可選廣告雙倍"});
-  if(id==="equipmentChest")add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:2,chance:1,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；每日1次；可選廣告雙倍×4"});
+  if(id==="materialChest")add({sourceType:"dungeon",sourceId:"material",mode:"材料副本",location:"主城 → 副本 → 每日副本 → 材料副本",quantityRange:[1,3],repeatable:true,chance:1,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；總回合少於15給3箱、15～29給2箱、30以上給1箱；可選廣告雙倍"});
+  if(id==="equipmentChest")add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:2,chance:1,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；可選廣告雙倍×4"});
   const series=data.series.find(row=>'fragment'+row.setId.charAt(0).toUpperCase()+row.setId.slice(1)===id);
   if(series)add({sourceType:"dismantle",sourceId:series.setId,materialItemId:series.setId,mode:"裝備分解",location:"背包 → "+series.label+"系列裝備 → 分解",quantity:data.seriesDismantleQuantity,chance:1,repeatable:true,notes:"消耗1件對應系列裝備；裝備抽獎券來源可由同系列裝備詳情追溯"});
   if(data.equipmentDungeonFragments.setIds.some(setId=>'fragment'+setId.charAt(0).toUpperCase()+setId.slice(1)===id))add({sourceType:"dungeon",sourceId:"equipment",mode:"裝備副本",location:"主城 → 副本 → 每日副本 → 裝備副本",quantity:data.equipmentDungeonFragments.count,chance:1/data.equipmentDungeonFragments.setIds.length,repeatable:true,unlockRequirement:"任一角色Lv.10",notes:"通關3輪；四系列隨機一種；暫定分布；廣告雙倍數量"});
@@ -37668,16 +37945,16 @@ window.syncCharacterTouchMode=syncCharacterTouchMode;
 
     const PORTRAITS={
         female:{
-            fire:"assets/characters/female_fire.jpg",
-            water:"assets/characters/female_water.jpg",
-            wind:"assets/characters/female_wind.jpg",
-            earth:"assets/characters/female_earth.jpg"
+            fire:"assets/characters/player_female_01.webp",
+            water:"assets/characters/player_female_02.webp",
+            wind:"assets/characters/player_female_03.webp",
+            earth:"assets/characters/player_female_04.webp"
         },
         male:{
-            fire:"assets/characters/male_fire.jpg",
-            water:"assets/characters/male_water.jpg",
-            wind:"assets/characters/male_wind.jpg",
-            earth:"assets/characters/male_earth.jpg"
+            fire:"assets/characters/player_male_01.webp",
+            water:"assets/characters/player_male_02.webp",
+            wind:"assets/characters/player_male_03.webp",
+            earth:"assets/characters/player_male_04.webp"
         }
     };
 
@@ -38637,46 +38914,29 @@ const V_ASSET_VERSION="173.73";
     }
 })();
 
-(function initBattleElementBoxDrag(){
+(function initBattleUtilityControls(){
     function bind(){
         const button=document.getElementById("battleElementBoxButton");
-        const page=document.getElementById("battlePage");
-        if(!button||!page||button.dataset.dragReady==="1"){ return; }
-        button.dataset.dragReady="1";
-        let drag=null; let suppressClick=false; const threshold=5;
-        function logicalScale(){
-            const host=button.offsetParent||page;
-            const rect=host.getBoundingClientRect();
-            return {rect,host,sx:rect.width?host.clientWidth/rect.width:1,sy:rect.height?host.clientHeight/rect.height:1};
-        }
-        button.addEventListener("pointerdown",event=>{
-            if(event.pointerType==="mouse"&&event.button!==0){ return; }
-            const scale=logicalScale(); const bounds=button.getBoundingClientRect();
-            drag={pointerId:event.pointerId,x:event.clientX,y:event.clientY,left:(bounds.left-scale.rect.left)*scale.sx,top:(bounds.top-scale.rect.top)*scale.sy,sx:scale.sx,sy:scale.sy,moved:false};
-            suppressClick=false; button.classList.add("dragging");
-            try{ button.setPointerCapture(event.pointerId); }catch(_){ }
-            event.preventDefault();
-        });
-        button.addEventListener("pointermove",event=>{
-            if(!drag||event.pointerId!==drag.pointerId){ return; }
-            const dx=event.clientX-drag.x,dy=event.clientY-drag.y;
-            if(!drag.moved&&Math.hypot(dx,dy)>=threshold){ drag.moved=true; }
-            if(!drag.moved){ return; }
-            const left=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientWidth-button.offsetWidth),drag.left+dx*drag.sx));
-            const top=Math.max(0,Math.min(Math.max(0,(button.offsetParent||page).clientHeight-button.offsetHeight),drag.top+dy*drag.sy));
-            button.style.setProperty("left",left+"px","important"); button.style.setProperty("top",top+"px","important");
-            button.style.setProperty("bottom","auto","important"); event.preventDefault();
-        });
-        function finish(event){
-            if(!drag||event.pointerId!==drag.pointerId){ return; }
-            suppressClick=drag.moved; drag=null; button.classList.remove("dragging"); event.preventDefault();
-        }
-        button.addEventListener("pointerup",finish); button.addEventListener("pointercancel",finish);
-        button.addEventListener("click",event=>{
-            if(suppressClick){ suppressClick=false; event.preventDefault(); event.stopPropagation(); return; }
+        if(!button||button.dataset.utilityReady==="1"){ return; }
+        button.dataset.utilityReady="1";
+        button.addEventListener("click",()=>{
+            if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
             if(typeof openHomeFeature==="function"){ openHomeFeature("autoBattleSettings"); }
         });
-        button.addEventListener("dragstart",event=>event.preventDefault());
+        document.addEventListener("pointerdown",event=>{
+            const region=document.getElementById("battleActionRegion");
+            if(region?.classList.contains("utility-menu-open")&&!event.target.closest("#battleUtilityTray,#battleMoreButton")){
+                if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
+            }
+        });
+        document.addEventListener("keydown",event=>{
+            if(event.key!=="Escape"){ return; }
+            const region=document.getElementById("battleActionRegion");
+            if(region?.classList.contains("utility-menu-open")){
+                if(typeof setBattleUtilityMenuOpen==="function"){ setBattleUtilityMenuOpen(false); }
+                document.getElementById("battleMoreButton")?.focus();
+            }
+        });
     }
     if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",bind,{once:true}); }else{ bind(); }
 })();

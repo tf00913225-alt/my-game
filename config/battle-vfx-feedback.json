@@ -1,0 +1,831 @@
+{
+  "enabled": true,
+  "defaults": {
+    "enabled": false,
+    "stopFrames": 3,
+    "fps": 60,
+    "shakePx": 4,
+    "decay": 0.85,
+    "shakeSteps": 8,
+    "stepMs": 12,
+    "referenceDamage": 168,
+    "minDamageScale": 0.35,
+    "maxDamageScale": 2,
+    "brightness": 2.5,
+    "flashMs": 80,
+    "hitFrameMultiplier": 2,
+    "frameDurations": null,
+    "blendMode": "screen",
+    "poolLimit": 48,
+    "sweepEnabled": false,
+    "sweepGapMs": 100,
+    "hitStrength": [
+      0.72,
+      0.92,
+      1.25
+    ],
+    "maxEffectNodes": 48,
+    "canvasDpr": 1.5,
+    "windCount": 10,
+    "leafCount": 5,
+    "burstCount": 6,
+    "colors": [
+      "#80f6d6",
+      "#efffff",
+      "#43c7bb"
+    ],
+    "windMs": 900,
+    "windSize": 2,
+    "leafSize": 7,
+    "windSpread": 0.6,
+    "glowPx": 3,
+    "glowBrightness": 1.18,
+    "particleOpacity": 0.76,
+    "trailLength": 1.8,
+    "trailWidth": 2,
+    "trailMs": 460,
+    "burstMs": 300,
+    "burstRadius": 0.6,
+    "shockwaveMs": 380,
+    "shockwaveScale": 1.45,
+    "screenFlashOpacity": 0.09,
+    "screenFlashMs": 90,
+    "weakenMs": 420,
+    "weakenDrop": 0.5,
+    "criticalScale": 1.25,
+    "maxStopMs": 75,
+    "supportMs": 480,
+    "supportRise": 0.5,
+    "shieldOpacity": 0.16
+  },
+  "skills": {
+    "stormFlurry": {
+      "enabled": true,
+      "sweepEnabled": true,
+      "choreography": {
+        "enabled": false
+      }
+    },
+    "stormFist": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.007812,
+          0,
+          0.992188,
+          1
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windCrossSlash": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0,
+          0,
+          1,
+          1
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dizzyFist": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.016575,
+          0.008287,
+          0.994475,
+          0.975138
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windSpell": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.013812154696132596,
+          0,
+          0.9640883977900553,
+          0.9806629834254144
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "stormCircle": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.0856353591160221,
+          0.16298342541436464,
+          0.9226519337016574,
+          0.914364640883978
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "windHowlLightning": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.013812,
+          0.005525,
+          0.994475,
+          0.98895
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      },
+      "shape": "arc"
+    },
+    "stormRain": {
+      "visibility": {
+        "heightRatio": 1.18,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.127072,
+          0.140884,
+          0.895028,
+          0.914365
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 3,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dodgeSkill": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.088398,
+          0.179558,
+          0.944751,
+          0.845304
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.16,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "stealthSkill": {
+      "visibility": {
+        "heightRatio": 1.18,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.035912,
+          0.058011,
+          0.961326,
+          0.977901
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "dinghaishenzhen": {
+      "visibility": {
+        "heightRatio": 1.12,
+        "minPaintHeight": 48,
+        "paintBounds": [
+          0.118785,
+          0.129834,
+          0.89779,
+          0.883978
+        ],
+        "scale": 1
+      },
+      "glowBrightness": 1.22,
+      "windCount": 4,
+      "leafCount": 2,
+      "burstCount": 4,
+      "depth": {
+        "far": {
+          "cap": 1
+        },
+        "near": {
+          "cap": 1
+        }
+      }
+    },
+    "flameSlash": {
+      "choreography": {
+        "enabled": false
+      }
+    }
+  },
+  "automatic": {
+    "enabled": true,
+    "rolloutAll": false,
+    "previewSkills": [
+      "stormFlurry",
+      "flameSlash",
+      "healSpell",
+      "rockWall",
+      "stormFist",
+      "windCrossSlash",
+      "dizzyFist",
+      "windSpell",
+      "stormCircle",
+      "windHowlLightning",
+      "stormRain",
+      "dodgeSkill",
+      "stealthSkill",
+      "dinghaishenzhen"
+    ],
+    "elementAliases": {
+      "fire": "fire",
+      "火": "fire",
+      "water": "water",
+      "ice": "water",
+      "冰": "water",
+      "水": "water",
+      "wind": "wind",
+      "風": "wind",
+      "thunder": "thunder",
+      "lightning": "thunder",
+      "雷": "thunder",
+      "earth": "earth",
+      "土": "earth",
+      "light": "light",
+      "光": "light",
+      "dark": "dark",
+      "暗": "dark"
+    },
+    "elements": {
+      "fire": {
+        "colors": [
+          "#ff7733",
+          "#fff0b0",
+          "#d94322"
+        ],
+        "shape": "ember",
+        "direction": "up",
+        "hints": [
+          "火",
+          "炎",
+          "焰"
+        ]
+      },
+      "water": {
+        "colors": [
+          "#83dfff",
+          "#f0ffff",
+          "#579cfa"
+        ],
+        "shape": "crystal",
+        "direction": "down",
+        "hints": [
+          "水",
+          "冰",
+          "霜"
+        ]
+      },
+      "wind": {
+        "colors": [
+          "#80f6d6",
+          "#efffff",
+          "#43c7bb"
+        ],
+        "shape": "leaf",
+        "direction": "sweep",
+        "hints": [
+          "風"
+        ]
+      },
+      "thunder": {
+        "colors": [
+          "#fff36b",
+          "#ffffef",
+          "#eac034"
+        ],
+        "shape": "arc",
+        "direction": "sweep",
+        "hints": [
+          "雷",
+          "電"
+        ]
+      },
+      "earth": {
+        "colors": [
+          "#cda35c",
+          "#ffe4a2",
+          "#89704b"
+        ],
+        "shape": "stone",
+        "direction": "down",
+        "hints": [
+          "土",
+          "石"
+        ]
+      },
+      "light": {
+        "colors": [
+          "#ffe990",
+          "#fffdef",
+          "#ebc756"
+        ],
+        "shape": "ray",
+        "direction": "up",
+        "hints": [
+          "聖光",
+          "光明"
+        ]
+      },
+      "dark": {
+        "colors": [
+          "#9665c4",
+          "#d3b1ef",
+          "#462958"
+        ],
+        "shape": "smoke",
+        "direction": "in",
+        "hints": [
+          "暗",
+          "幽冥"
+        ]
+      },
+      "neutral": {
+        "colors": [
+          "#f5f7ff",
+          "#ffffff",
+          "#b9c3d7"
+        ],
+        "shape": "spark",
+        "direction": "out"
+      }
+    },
+    "types": {
+      "single": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "windCount": 3,
+        "leafCount": 0,
+        "burstCount": 7
+      },
+      "multi": {
+        "sweepEnabled": true,
+        "sweepGapMs": 100
+      },
+      "all": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "screenFlashOpacity": 0.1
+      },
+      "heal": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 5,
+        "leafCount": 0,
+        "colors": [
+          "#98f4b8",
+          "#fff1bd",
+          "#67cda2"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      },
+      "buff": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 4,
+        "leafCount": 0,
+        "colors": [
+          "#ffe9a1",
+          "#c1f5b2",
+          "#e1c15a"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      },
+      "shield": {
+        "sweepEnabled": true,
+        "sweepGapMs": 0,
+        "stopFrames": 0,
+        "shakePx": 0,
+        "windCount": 3,
+        "leafCount": 0,
+        "colors": [
+          "#d8e9ff",
+          "#fff5c8",
+          "#9cc5ee"
+        ],
+        "direction": "up",
+        "shape": "spark"
+      }
+    },
+    "status": {
+      "buff": {
+        "colors": [
+          "#ffe89c",
+          "#a9edaf"
+        ],
+        "direction": "up"
+      },
+      "debuff": {
+        "colors": [
+          "#ab78d9",
+          "#b84e69"
+        ],
+        "direction": "down"
+      },
+      "dot": [
+        "burn",
+        "poison"
+      ],
+      "control": [
+        "stun",
+        "silence",
+        "freeze",
+        "petrify"
+      ],
+      "dotElements": {
+        "burn": "fire",
+        "poison": "dark"
+      },
+      "dotParticleCap": 8,
+      "dotPerState": 2,
+      "dotSizePx": 3,
+      "dotDurationMs": 1000,
+      "dotRisePx": 18
+    }
+  },
+  "depth": {
+    "far": {
+      "size": 0.55,
+      "speed": 0.65,
+      "blur": 1.5,
+      "opacity": 0.3,
+      "cap": 2
+    },
+    "mid": {
+      "size": 1,
+      "speed": 1,
+      "blur": 0,
+      "opacity": 1,
+      "cap": 48
+    },
+    "near": {
+      "size": 1.8,
+      "speed": 1.45,
+      "blur": 2,
+      "opacity": 0.22,
+      "cap": 2
+    },
+    "assignment": {
+      "wind": "mid",
+      "leaf": "mid",
+      "burst": "mid",
+      "trail": "mid",
+      "shockwave": "mid",
+      "weaken": "mid",
+      "heal": "mid",
+      "buff": "mid",
+      "shield": "mid"
+    }
+  },
+  "performance": {
+    "adaptive": true,
+    "slowFrameMs": 28,
+    "slowFrames": 4,
+    "minQuality": 0.6,
+    "step": 0.1,
+    "canvasDpr": 1,
+    "spriteShadow": false
+  },
+  "choreography": {
+    "enabled": true,
+    "defaults": {
+      "anticipation": 0.18,
+      "settle": 0.82,
+      "startScale": 0.58,
+      "tailScale": 0.86,
+      "travel": 0.12,
+      "drift": 0.06,
+      "rise": 0,
+      "recoilPx": 5,
+      "tiltDeg": 3,
+      "recoilMs": 180
+    },
+    "archetypes": {
+      "strike": {
+        "anticipation": 0.12,
+        "startScale": 0.7,
+        "travel": 0.1,
+        "drift": 0,
+        "recoilMs": 160
+      },
+      "projectile": {
+        "anticipation": 0.16,
+        "startScale": 0.48,
+        "travel": 0.2
+      },
+      "sweep": {
+        "anticipation": 0.15,
+        "travel": 0.18,
+        "drift": 0.12
+      },
+      "surge": {
+        "travel": 0,
+        "rise": 0.12
+      },
+      "field": {
+        "startScale": 0.65,
+        "travel": 0,
+        "drift": 0,
+        "recoilPx": 7,
+        "recoilMs": 220
+      },
+      "vortex": {
+        "startScale": 0.62,
+        "travel": 0.14,
+        "drift": 0.14,
+        "recoilPx": 8,
+        "tiltDeg": 6,
+        "recoilMs": 600
+      },
+      "heal": {
+        "startScale": 0.65,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.15
+      },
+      "buff": {
+        "startScale": 0.7,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.12
+      },
+      "shield": {
+        "startScale": 0.6,
+        "travel": 0,
+        "drift": 0,
+        "rise": 0.06
+      }
+    },
+    "elements": {
+      "fire": {
+        "rise": 0.1,
+        "recoilPx": 6
+      },
+      "water": {
+        "rise": -0.08,
+        "recoilMs": 220
+      },
+      "wind": {
+        "tiltDeg": 5
+      },
+      "thunder": {
+        "anticipation": 0.08,
+        "recoilMs": 120
+      },
+      "earth": {
+        "rise": -0.12,
+        "recoilPx": 7,
+        "recoilMs": 240
+      },
+      "light": {
+        "rise": 0.1
+      },
+      "dark": {
+        "startScale": 0.9,
+        "tailScale": 0.55,
+        "rise": 0
+      },
+      "neutral": {}
+    }
+  },
+  "fieldScene": {
+    "enabled": true,
+    "maxFunnels": 3,
+    "sizeRatio": 0.46,
+    "maxScale": 1.3,
+    "occlusionStep": 0.16,
+    "tiltDeg": 7,
+    "swayPx": 10,
+    "swayCycles": 3,
+    "phaseOffsets": [
+      0,
+      0.16,
+      0.34,
+      0.5,
+      0.68,
+      0.86,
+      1
+    ],
+    "paths": [
+      [
+        [
+          0.12,
+          0.8
+        ],
+        [
+          0.28,
+          0.18
+        ],
+        [
+          0.82,
+          0.7
+        ],
+        [
+          0.65,
+          0.3
+        ],
+        [
+          0.18,
+          0.65
+        ],
+        [
+          0.75,
+          0.2
+        ],
+        [
+          0.85,
+          0.5
+        ]
+      ],
+      [
+        [
+          0.5,
+          0.2
+        ],
+        [
+          0.82,
+          0.7
+        ],
+        [
+          0.2,
+          0.28
+        ],
+        [
+          0.35,
+          0.8
+        ],
+        [
+          0.82,
+          0.24
+        ],
+        [
+          0.3,
+          0.65
+        ],
+        [
+          0.15,
+          0.5
+        ]
+      ],
+      [
+        [
+          0.88,
+          0.75
+        ],
+        [
+          0.6,
+          0.3
+        ],
+        [
+          0.15,
+          0.8
+        ],
+        [
+          0.72,
+          0.2
+        ],
+        [
+          0.48,
+          0.7
+        ],
+        [
+          0.15,
+          0.3
+        ],
+        [
+          0.5,
+          0.5
+        ]
+      ]
+    ],
+    "phaseScales": [
+      0.45,
+      0.85,
+      1,
+      1,
+      1,
+      0.85,
+      0.65
+    ]
+  }
+}

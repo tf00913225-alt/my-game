@@ -324,7 +324,43 @@
         return rect&&rect.width>0&&rect.height>0?{rect:rect,ratio:ratio,shieldRatio:shieldRatio||0}:null;
     }
 
-    function unitGeometry(side,index){
+    function artworkProjectionFor(art,portraitRect){
+        const paint=art&&(art.querySelector(".v174-portrait-paint")||art.querySelector(".v174-action-motion"))||art;
+        const paintRect=paint&&paint!==art?paint.getBoundingClientRect():(portraitRect||art&&art.getBoundingClientRect());
+        let computed=null;const readStyle=(key,fallback)=>String(paint.style&&paint.style[key]||(computed||(computed=window.getComputedStyle(paint)))[key]||fallback);
+        const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:readStyle("backgroundImage",""),backgroundSize:readStyle("backgroundSize","contain"),backgroundPosition:readStyle("backgroundPosition","center"),backgroundRepeat:readStyle("backgroundRepeat","no-repeat")} : null;
+        if(artworkProjection&&art.classList?.contains("v174-generic-portrait")){
+            const style=window.getComputedStyle(art);
+            artworkProjection.genericPortrait=true;
+            artworkProjection.portraitVariables={
+                "--portrait-body-height":style.getPropertyValue("--portrait-body-height"),
+                "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
+            };
+        }
+        return artworkProjection;
+    }
+    function hudSurfaceFor(card,cardRect){
+        const cardStyle=window.getComputedStyle(card);
+        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
+        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
+        return hudWidth>0&&hudHeight>0?{
+            rect:cardRect,width:hudWidth,height:hudHeight,
+            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
+        }:null;
+    }
+    function presentationCard(side,index){
+        const i=Number(index);return Number.isInteger(i)?document.getElementById((side==="monster"?"battleMonster":"battlePlayerCard")+i):null;
+    }
+    function artworkForUnit(side,index){
+        const card=presentationCard(side,index);
+        return card?artworkProjectionFor(card.querySelector(".v174-battle-art,.battle-monster-icon,.battle-player-icon")):null;
+    }
+    function hudForUnit(side,index){
+        const card=presentationCard(side,index),rect=card&&typeof card.getBoundingClientRect==="function"?plainRect(card.getBoundingClientRect()):null;
+        return rect?hudSurfaceFor(card,rect):null;
+    }
+
+    function unitGeometry(side,index,purpose){
         const targetSide=side==="monster"?"monster":"player";
         const unitIndex=Number(index);
         if(!Number.isInteger(unitIndex)){ return null; }
@@ -351,24 +387,7 @@
         const hudNodes=Array.from(hud.querySelectorAll(
             ".monster-hp,.hp-bar,.sp-bar,.battle-monster-name,.battle-player-id,.monster-status-badges"
         ));
-        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
-        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
-        const resourceState=resourceStateFor(targetSide,unitIndex);
-        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
-        const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
-        const hpRect=hpProjection&&hpProjection.rect;
-        const spRect=spProjection&&spProjection.rect;
-        const paint=art&&(art.querySelector(".v174-portrait-paint")||art.querySelector(".v174-action-motion"))||art;
-        const paintRect=paint&&paint!==art?paint.getBoundingClientRect():portraitRect;
-        const artworkProjection=paint&&paintRect?{rect:paintRect,backgroundImage:String(paint.style&&paint.style.backgroundImage||window.getComputedStyle(paint).backgroundImage||""),backgroundSize:String(paint.style&&paint.style.backgroundSize||window.getComputedStyle(paint).backgroundSize||"contain"),backgroundPosition:String(paint.style&&paint.style.backgroundPosition||window.getComputedStyle(paint).backgroundPosition||"center"),backgroundRepeat:String(paint.style&&paint.style.backgroundRepeat||window.getComputedStyle(paint).backgroundRepeat||"no-repeat")} : null;
-        if(artworkProjection&&art.classList?.contains("v174-generic-portrait")){
-            const style=window.getComputedStyle(art);
-            artworkProjection.genericPortrait=true;
-            artworkProjection.portraitVariables={
-                "--portrait-body-height":style.getPropertyValue("--portrait-body-height"),
-                "--portrait-baseline":style.getPropertyValue("--portrait-baseline")
-            };
-        }
+        const artworkProjection=artworkProjectionFor(art,portraitRect);
         const statusBadge=targetSide==="monster"?hud.querySelector('.monster-status-badges'):null;
         const badgeRect=statusBadge?plainRect(statusBadge.getBoundingClientRect()):null;
         const statusBadgeRect=badgeRect&&badgeRect.width>0&&badgeRect.height>0?badgeRect:null;
@@ -384,6 +403,18 @@
             width:unitRect.width,height:Math.max(0,Math.min(unitRect.bottom,hudBottom)-safeHudTop)
         };
 
+        // Status bodies consume the same paint/HUD geometry, never HP/SP
+        // ratios or feedback collision lanes. Keep one projection owner.
+        const hudSurface=hudSurfaceFor(card,cardRect);
+        if(purpose==="status")return {owner:"fixed-slot",side:targetSide,index:unitIndex,slot,
+            unitRect,portraitRect,artworkProjection,hudSafeRect,hudSurface};
+        const hpNodes=Array.from(hud.querySelectorAll(".monster-hp,.hp-bar,.battle-hp-bar,.player-hp-bar,[data-hud=\"hp\"],[data-stat=\"hp\"]"));
+        const spNodes=Array.from(hud.querySelectorAll(".monster-sp,.sp-bar,.battle-sp-bar,.player-sp-bar,[data-hud=\"sp\"],[data-stat=\"sp\"]"));
+        const resourceState=resourceStateFor(targetSide,unitIndex);
+        const hpProjection=projectionFor(hpNodes[0],resourceState&&resourceState.hpRatio,resourceState&&resourceState.shieldRatio);
+        const spProjection=targetSide==="monster"?null:projectionFor(spNodes[0],resourceState&&resourceState.spRatio,0);
+        const hpRect=hpProjection&&hpProjection.rect;
+        const spRect=spProjection&&spProjection.rect;
         let feedbackTop=Math.max(unitRect.top+6,Math.min(unitRect.bottom-24,portraitRect.top+6));
         let feedbackBottom=Math.min(unitRect.bottom-6,safeHudTop-8);
         if(feedbackBottom-feedbackTop<26){
@@ -408,13 +439,6 @@
 
         // The existing Unit rect is the only placement source. Display scale
         // comes from its actual CSS box; no Slot/Boss coordinates are duplicated.
-        const cardStyle=window.getComputedStyle(card);
-        const hudWidth=parseFloat(cardStyle.width)||card.offsetWidth;
-        const hudHeight=parseFloat(cardStyle.height)||card.offsetHeight;
-        const hudSurface=hudWidth>0&&hudHeight>0?{
-            rect:cardRect,width:hudWidth,height:hudHeight,
-            scaleX:cardRect.width/hudWidth,scaleY:cardRect.height/hudHeight
-        }:null;
         return {
             hudSurface:hudSurface,
             owner:"fixed-slot",side:targetSide,index:unitIndex,slot:slot,
@@ -458,6 +482,9 @@
         getAnchorForSlot:anchorForSlot,
         getVfxGeometry:geometryForVfx,
         getUnitGeometry:unitGeometry,
+        getStatusGeometry:(side,index)=>unitGeometry(side,index,"status"),
+        getArtworkProjection:artworkForUnit,
+        getHudSurface:hudForUnit,
         getBattlefieldOverlayGeometry:battlefieldOverlayGeometry,
         neutralizeLegacyPresentationGeometry:neutralizeLegacyPresentationGeometry
     });

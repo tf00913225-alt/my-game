@@ -1,0 +1,194 @@
+{
+  "head": "103d8aee0258d3fc3482dbccdad5a6b03991168c",
+  "scope": "desktop412x915 emulation; isolated6v6 real Core explosiveFlurry ordinary only; no new phone acceptance",
+  "passed": true,
+  "ids": [
+    0,
+    1,
+    2
+  ],
+  "loss": [
+    218,
+    218,
+    218,
+    0,
+    0,
+    0
+  ],
+  "firstFeedbackMs": 1025.0999999642372,
+  "lastPriorSampleMs": 992.5,
+  "priorHp": [
+    999782,
+    999782,
+    999782,
+    1000000,
+    1000000,
+    1000000
+  ],
+  "hitHp": [
+    999782,
+    999782,
+    999782,
+    1000000,
+    1000000,
+    1000000
+  ],
+  "groupSprites": [
+    {
+      "targets": "0,1,2",
+      "rect": [
+        29.591262817382812,
+        107.09161376953125,
+        352.7862548828125,
+        156.5980224609375
+      ]
+    }
+  ],
+  "targets": [
+    {
+      "i": 0,
+      "slot": "ENEMY_B1",
+      "unitCenter": {
+        "x": 73.89330196380615,
+        "y": 185.40328216552734
+      },
+      "artwork": {
+        "x": 42.5225715637207,
+        "y": 140.21571350097656,
+        "width": 62.70772933959961,
+        "height": 94.06159973144531,
+        "top": 140.21571350097656,
+        "right": 105.23030090332031,
+        "bottom": 234.27731323242188,
+        "left": 42.5225715637207
+      },
+      "scale": 0.9809542367950596,
+      "impact": {
+        "index": "0",
+        "rect": [
+          42.515625,
+          140.203125,
+          62.703125,
+          94.046875
+        ]
+      },
+      "feedback": {
+        "index": "0",
+        "left": "73.89330196380615px",
+        "top": "245.83349609375px",
+        "text": "-218HP",
+        "kind": "damage",
+        "style": "fire-sample",
+        "critical": false,
+        "transform": "matrix(0.42, 0, 0, 0.42, -49.8828, -27.2969)",
+        "color": "rgb(255, 243, 215)",
+        "fontSize": "26px",
+        "rect": [
+          52.939842224121094,
+          226.4473419189453,
+          41.90155792236328,
+          11.464691162109375
+        ]
+      }
+    },
+    {
+      "i": 1,
+      "slot": "ENEMY_B2",
+      "unitCenter": {
+        "x": 205.99232482910156,
+        "y": 185.40328216552734
+      },
+      "artwork": {
+        "x": 174.5372314453125,
+        "y": 139.1385498046875,
+        "width": 62.89335632324219,
+        "height": 94.34002685546875,
+        "top": 139.1385498046875,
+        "right": 237.4305877685547,
+        "bottom": 233.47857666015625,
+        "left": 174.5372314453125
+      },
+      "scale": 0.9809514803913855,
+      "impact": {
+        "index": "1",
+        "rect": [
+          174.53125,
+          139.125,
+          62.890625,
+          94.328125
+        ]
+      },
+      "feedback": {
+        "index": "1",
+        "left": "205.99232482910156px",
+        "top": "245.83349609375px",
+        "text": "-218HP",
+        "kind": "damage",
+        "style": "fire-sample",
+        "critical": false,
+        "transform": "matrix(0.42, 0, 0, 0.42, -49.8828, -27.2969)",
+        "color": "rgb(255, 243, 215)",
+        "fontSize": "26px",
+        "rect": [
+          185.03359985351562,
+          226.4473419189453,
+          41.90156555175781,
+          11.464691162109375
+        ]
+      }
+    },
+    {
+      "i": 2,
+      "slot": "ENEMY_B3",
+      "unitCenter": {
+        "x": 338.09901428222656,
+        "y": 185.40328216552734
+      },
+      "artwork": {
+        "x": 306.56402587890625,
+        "y": 138.2113494873047,
+        "width": 63.053131103515625,
+        "height": 94.57966613769531,
+        "top": 138.2113494873047,
+        "right": 369.6171569824219,
+        "bottom": 232.791015625,
+        "left": 306.56402587890625
+      },
+      "scale": 0.9809510133046626,
+      "impact": {
+        "index": "2",
+        "rect": [
+          306.5625,
+          138.203125,
+          63.046875,
+          94.578125
+        ]
+      },
+      "feedback": {
+        "index": "2",
+        "left": "338.09901428222656px",
+        "top": "245.83349609375px",
+        "text": "-218HP",
+        "kind": "damage",
+        "style": "fire-sample",
+        "critical": false,
+        "transform": "matrix(0.42, 0, 0, 0.42, -49.8828, -27.2969)",
+        "color": "rgb(255, 243, 215)",
+        "fontSize": "26px",
+        "rect": [
+          317.1429748535156,
+          226.4473419189453,
+          41.90155029296875,
+          11.464691162109375
+        ]
+      }
+    }
+  ],
+  "limits": [
+    "No Modal layer test yet; shared Owner coordination required.",
+    "No x2/x3 or audio listening acceptance; no new clock or sound mechanism.",
+    "No claim of free-running natural first-turn battle: Core entry on isolated roster and held action flow.",
+    "Group raster spans legal row; individual hit flash/feedback retain per-target projection. No new per-target projectile exists for this authored group sheet."
+  ],
+  "next": "Preserve accepted sample; Modal/normal battle first-turn evidence and human art direction remain open; do not invent travel/hit-stop or expand skills without proof."
+}

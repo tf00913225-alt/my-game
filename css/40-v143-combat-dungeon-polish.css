@@ -72,6 +72,26 @@
     box-shadow:none !important;
 }/* Formal cast Sprite Sheet stage. The viewport edge is the only VFX clip owner.
    Do not use strict/paint containment here: it creates an additional paint clip. */
+/* One fire representative: caster ground ring, behind its action paint. */
+#battlePage .v174-battle-art > .v174-fire-cast-ring{
+    position:absolute;left:50%;top:var(--battle-portrait-baseline,100%);
+    width:104%;height:18%;z-index:1;pointer-events:none;
+    border:3px solid #ffd578;border-radius:50%;
+    background:radial-gradient(ellipse,transparent 32%,rgba(255,85,12,.35) 48%,#ffdb63 58%,#ff791b 66%,rgba(226,39,7,.85) 73%,transparent 80%);
+    box-shadow:0 -3px 10px #ff7e1b,0 0 16px rgba(255,62,9,.85),inset 0 0 8px #ffe194;
+    transform:translate(-50%,-50%);
+}
+#battlePage .v174-fire-cast-ring{overflow:hidden;}
+#battlePage .v174-fire-cast-ember{
+    position:absolute;left:0;top:0;width:8%;height:68%;pointer-events:none;
+    offset-path:ellipse(40% 12% at 50% 50%);offset-anchor:50% 50%;offset-rotate:0deg;
+    border-radius:65% 35% 55% 45%;
+    background:radial-gradient(ellipse at 45% 70%,#fff5bd 12%,#ffd13c 35%,#ff7918 62%,rgba(199,32,4,.8) 80%,transparent 96%);
+    clip-path:polygon(50% 0,85% 40%,100% 70%,70% 100%,25% 95%,0 65%,25% 30%);
+    animation:v174FireCastOrbit var(--fire-cast-duration,1450ms) linear calc(var(--ember-phase,0) * var(--fire-cast-duration,1450ms) * -1) infinite;
+}
+@keyframes v174FireCastOrbit{0%{offset-distance:0%;opacity:.75;transform:scale(.85)}50%{opacity:1;transform:scale(1.1)}100%{offset-distance:100%;opacity:.75;transform:scale(.85)}}
+
 .v143-skill-stage{
     position:fixed;
     inset:0;
@@ -80,6 +100,23 @@
     contain:layout style;
     pointer-events:none;
 }
+
+/* Same authoritative icon, no additional slot or turn-count timer. */
+.v143-status-icon[data-remaining-turns]::after{
+    content:attr(data-remaining-turns);
+    position:absolute;right:0;bottom:0;
+    min-width:9px;padding:1px;
+    font:700 10px/1 sans-serif;color:#fff;
+    background:#171923d9;border-radius:2px;
+    pointer-events:none;
+}
+.v143-feedback-dot{animation:v143FeedbackDot 1s ease-out infinite;mix-blend-mode:screen;}
+@keyframes v143FeedbackDot{
+    0%{transform:translateY(0) scale(.6);opacity:0;}
+    25%{opacity:.6;}
+    100%{transform:translateY(var(--v143-dot-rise,-18px)) scale(1);opacity:0;}
+}
+@media(prefers-reduced-motion:reduce){.v143-feedback-dot{display:none;animation:none;}}
 
 /* Document battle planes: cast 16000 < direct impact 16010 < real unit HUD
    16015 < skill name 16020. Floating Feedback retains its own text plane. */
@@ -97,6 +134,11 @@
     filter:brightness(0) invert(1);
     opacity:0;
 }
+.v143-field-portrait-plane{position:fixed;inset:0;z-index:15999;overflow:hidden;pointer-events:none;}
+.v143-field-portrait-front{z-index:16005;}
+.v143-field-portrait{position:fixed;display:block;pointer-events:none;transform-origin:center bottom;}
+body.v174-battle-reading-open .v143-field-portrait-plane{display:none!important;}
+body.v174-battle-reading-open .v143-field-source-hidden{opacity:1!important;}
 
 .v143-vfx-sprite{
     position:fixed;
@@ -114,8 +156,14 @@
 
 .v143-vfx-sprite.v143-vfx-sprite-active{
     animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+/* The recipe owns carrier transform/opacity; sheet selection keeps its own
+   child track. Do not run the historical envelope over the same properties. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-choreography]{
+    animation:var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
 }
 
 .v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"]{

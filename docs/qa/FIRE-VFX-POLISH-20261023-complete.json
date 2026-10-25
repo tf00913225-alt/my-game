@@ -1,0 +1,54 @@
+{
+  "workId": "FIRE-VFX-POLISH-20261023",
+  "pr": 983,
+  "productHead": "4b93e1c8aaf9fac34de0a75166755ec3651b6f43",
+  "status": "Source/focused Core phone cases reviewed; human art confirmation and Latest Head CI pending. Draft DO NOT MERGE.",
+  "reference": "User local Screen_Recording_20261023_104821_Claude.mp4 inspected as decoded native frames; attack clarity, ivory ordinary / gold critical bounce direction.",
+  "scope": "Only explosiveFlurry complete presentation profile; prior flameSlash recoil retained. No Core formulas, actual targets, damage, original1450ms clock or crit follow-up changes. Shared CSS40 transient cast-stage section only; #955 fixed UI sections untouched.",
+  "phone": {
+    "device": "Samsung SM-N960F",
+    "source": "actual castDamageSkill(explosiveFlurry), isolated QA account transport and roster, fixed RNG; no real save",
+    "cases": [
+      {
+        "kind": "ordinary",
+        "rng": 0.5,
+        "damagePerTarget": 218
+      },
+      {
+        "kind": "critical",
+        "rng": 0.001,
+        "damagePerTarget": 620,
+        "note": "two310 hits including original crit follow-up"
+      },
+      {
+        "kind": "MISS",
+        "rng": 0.999999,
+        "damagePerTarget": 0
+      }
+    ],
+    "spPerCase": 47,
+    "cleanup": true,
+    "stableHudAndSlots": true,
+    "movie": {
+      "path": "artifacts/fire-complete-usb/native-preview.mp4",
+      "duration": 17.078956,
+      "width": 720,
+      "height": 1280,
+      "bytes": 3178742,
+      "sha256": "500c3b5e35fabaf6ded84d4c4a15cffba4a5fd3a8354f94e743ba7bd7c2c7e16"
+    },
+    "metadataCorrection": "Raw helper recording string says12s; decoder confirms actual17.078956s. Native original is authoritative."
+  },
+  "comparison": {
+    "path": "artifacts/fire-comparison/before-after.webm",
+    "bytes": 2553013,
+    "sha256": "0cc117857d2f30e3d9d3ce32fd7e12dd7b226789c69ac15fe2baffa64fda6a7d",
+    "note": "Postprocessed review copy:8s prior presentation fixture, then15.8s current actual Core isolated RNG; not identical gameplay scenarios."
+  },
+  "validation": {
+    "focused": "6files10tests PASS; official build/check and diffcheck PASS",
+    "independent": "fire_sample_review confirmed sticky lane flag fixed, ordinary/critical/MISS pictures readable, no remaining bounded source blocker; still frames cannot independently prove animation feel",
+    "limits": "No full natural-combat/all-skill/shield/lethal/Core matrix claimed. Human art acceptance pending. No generic Library upload interface available; no upload claimed."
+  },
+  "next": "Show original and comparison; retain single sample/Draft until human direction. Obtain latest evidence Head required checks before any integration; do not change Chrome Owner or expand all-fire."
+}

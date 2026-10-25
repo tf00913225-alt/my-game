@@ -71,9 +71,10 @@ test("status body art uses the projected character and per-status presentation o
   assert.match(js,/node\.style\.backgroundSize="contain"/);
 });
 
-test("body-art statuses do not duplicate a HUD icon but detail data keeps iconSrc",()=>{
+test("body-art HUD icons require the approved successful-status gate and preserve detail iconSrc",()=>{
   const js=read("js/39-v143-skill-animation.js");
-  assert.match(js,/if\(spec\.mode==="icon"\)[\s\S]*?host\.appendChild\(createStatusIcon\(type,spec\)\)[\s\S]*?else if\(existingIcon\)/);
+  assert.match(js,/if\(spec\.mode==="icon"\|\|automaticIcon\)[\s\S]*?host\.appendChild\(createStatusIcon\(type,spec\)\)[\s\S]*?else if\(existingIcon\)/);
+  assert.match(js,/const automaticIcon=window\.FourSymbolsHitFeedback\?\.statusEnabled\(type,entry\)/);
   assert.match(js,/iconSrc:spec\.iconSrc\|\|spec\.src\|\|""/);
 });
 

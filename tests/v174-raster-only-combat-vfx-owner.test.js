@@ -106,6 +106,7 @@ test("V142 is timing-only and contains no legacy visual renderer",()=>{
 });
 
 test("V143 casts retain raster-only choreography; named persistent foot auras stay within the same DOM status owner",()=>{
+    const castRuntime=v143.slice(v143.indexOf("(function installV143SkillAnimationRuntime(){"));
     [
         /createElement\(["']canvas["']\)/,
         /getContext\s*\(/,
@@ -117,14 +118,21 @@ test("V143 casts retain raster-only choreography; named persistent foot auras st
         /v143-hit-impact/,
         /v143-hit-particle/,
         /canvas-crop/
-    ].forEach(pattern=>assert.doesNotMatch(v143,pattern));
+    ].forEach(pattern=>assert.doesNotMatch(castRuntime,pattern));
+    assert.match(v143.slice(0,v143.indexOf("(function installV143SkillAnimationRuntime(){")),/document\.createElement\("canvas"\)/,"authorized accent layer remains isolated from cast bodies");
     assert.equal((v143.match(/requestAnimationFrame\(start\)/g)||[]).length,1,"one paint-clock handoff only; frame selection remains CSS raster");
     assert.equal((v143.match(/requestAnimationFrame\(presentHit\)/g)||[]).length,1,"one hit paint-clock handoff callsite");
     assert.equal((v143.match(/requestAnimationFrame\s*\(/g)||[]).length,3,"one start and a bounded two-frame hit fence, no procedural RAF renderer");
     assert.match(v143,/requestAnimationFrame\(\(\)=>requestAnimationFrame\(presentHit\)\)/);
     assert.match(v143,/const presentHit=\(\)=>settleTargetVisual\(current,index\);/);
     assert.match(v143,/renderer:"dom-sprite"/);
-    assert.match(v143,/Casts have no Canvas, SVG, WebGL, shader, particle, glyph or procedural fallback/);
+    assert.match(v143,/Cast bodies remain Sprite Sheets, with no Canvas\/SVG\/WebGL fallback/);
+    const feedback=JSON.parse(fs.readFileSync("config/battle-vfx-feedback.json","utf8"));
+    assert.equal(feedback.defaults.enabled,false,"additional wind accents require explicit per-skill authorization");
+    assert.deepEqual(Object.keys(feedback.skills).filter(id=>feedback.skills[id].enabled),["stormFlurry"]);
+    assert.deepEqual(feedback.automatic.previewSkills,["stormFlurry","flameSlash","healSpell","rockWall","stormFist","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen"]);
+    assert.equal(feedback.automatic.rolloutAll,false,"authorized Wind batch must not silently enable the full element catalog");
+    assert.ok(feedback.defaults.maxEffectNodes<=48,"bounded accents, no blanket emitter");
     assert.match(v143,/node\.dataset\.presentationRole="foot-aura"/);
     assert.match(v143,/rise\.className="v143-status-aura-rise"/);
     assert.doesNotMatch(v143.slice(v143.indexOf('function createBodyStatusVisual('),v143.indexOf('function createStatusIcon(')),/setInterval|setTimeout|requestAnimationFrame|canvas|createElementNS/,'status aura uses one existing-node child, never an emitter clock/engine');
@@ -164,7 +172,7 @@ test("all formal four-element active skills resolve to raster Sprite Sheets",()=
     const active=[
         "flameSlash","fireCritical","fireBurstStrike","explosiveFlurry","dragonSlash","fireRocket","blazeSpell","flameTornado","phoenixCry","rage",
         "waterKnife","frostPunch","iceSpin","frostCrush","waterBall","floodBeast","iceArrowRain","freeze","healSpell","revive",
-        "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","stormSpell","windArrow",
+        "stormFist","stormFlurry","windCrossSlash","dizzyFist","windSpell","stormCircle","windHowlLightning","stormRain","dodgeSkill","stealthSkill","dinghaishenzhen","windArrow",
         "stoneSlash","petrifyFist","stoneBreakSky","earthquakeCrush","stoneThrow","sandWind","flyingSandStrike","dustStorm","earthShield","rockWall","barrier"
     ];
     active.forEach(id=>{
@@ -209,7 +217,8 @@ test("the same raster owner dispatches player-to-enemy and enemy-to-player",()=>
 test("resolved group targets and successful deferred statuses remain authoritative VFX endpoints",()=>{
     assert.match(v143,/function geometrySeedIndexes\(current,indexes\)[\s\S]*?current\.targetIds\.slice\(\)[\s\S]*?current\.targetId/);
     assert.match(v143,/const bounds=geometryBounds\(current,indexes,placement\);[\s\S]*?const primaryAnchor=geometryPrimaryAnchor\(current,indexes\)/);
-    assert.match(v143,/if\(types\.indexOf\(type\)>=0\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
+    assert.match(v143,/if\(types\.indexOf\(type\)>=0\|\|automatic\)\{[\s\S]*?registerTarget\(side,index,false\);[\s\S]*?current\.deferredStatusTargets\.get\(type\)/);
+    assert.match(v143,/const automatic=current\.hitFeedback\?\.config\.enabled&&current\.targetIndexes\.includes\(index\)/);
 });
 
 test("secondary status owners cannot recreate procedural combat VFX",()=>{

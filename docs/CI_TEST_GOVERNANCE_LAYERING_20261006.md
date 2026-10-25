@@ -317,3 +317,31 @@ Chrome suites require the GitHub runner's Chrome (not counted as local passes).
 Governance contracts: 138/138 PASS. Remote full acceptance remains required.
 The d109f12d Boss job failed before gameplay at Chrome CDP ECONNREFUSED; evidence
 is retained, and a later exact-head execution must pass the unchanged QA.
+
+## 2026-10-20 Chrome startup investigation checkpoint
+
+Work ID: `CI-CHROME-COLD-START-20261020`; base dev
+`233e69bfd64923523765311b1cbb9771b5705335`. This is an unresolved infrastructure
+investigation, not a diagnosed cause or completed repair. PR #954 delivered
+bounded observation tools and is closed; its former task explicitly did not
+accept a subsequent root-cause work line. Open PRs and matching remote branch
+names were checked before establishing this separate work identity.
+
+- PR #971 Head `9a587455acff5ba3f6bcfc732298433851576840`, CI
+  [39437771863/a1, Boss 118682134157](https://github.com/tf00913225-alt/my-game/actions/runs/39437771863/job/118682134157):
+  14:29:22.970Z DevTools port 29697 refused after the original 15-second wait;
+  root 16826 was in D/folio wait, without a listener. This caller had no startup
+  observer; earlier passing fixture console messages are not its failing step.
+- PR #974 Head `3d226ac7757fe508182d9632d8ffc2a221dcee11`, CI
+  [39438442702/a1, Battle 118686866346](https://github.com/tf00913225-alt/my-game/actions/runs/39438442702/job/118686866346):
+  original 15-second DevTools deadline failed at 14:39:07.474Z. Root 2617 had
+  no listener at 1.001/5.001/10.001 seconds; read bytes were respectively
+  15,343,616 / 59,236,352 / 133,898,240 and CPU time 18.15/47.91/201.64 ms.
+  First stderr arrived at 10.160 seconds. At 16.084 seconds a listener existed,
+  but the separate direct HTTP diagnostic timed out. Page-wait metadata was
+  captured; sibling strace attachment was denied. D/folio alone proves no cause.
+
+Next: compare original launch/readiness behavior and successful controls before
+choosing a repair. Both workflows were still live when these individual failed
+jobs were read. No rerun, deadline increase, acceptance reduction, gameplay,
+Cloud, credentials or production release change forms part of this checkpoint.

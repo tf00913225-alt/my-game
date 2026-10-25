@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.4899cadea887.js"
+      "build/boot-core.bbbaf3175142.js"
     ],
     "styles": [
       "build/boot-core.3c6f6f5d87d2.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.1af4757ef73f.js"
+          "build/app-shell.6365cb67c4c7.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -49,11 +49,11 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.8666be0592a0.js",
-          "build/gameplay-core-secondary.bd07f1e57ceb.js"
+          "build/gameplay-core-primary.65a9f18e5df5.js",
+          "build/gameplay-core-secondary.d4c9c9ba2893.js"
         ],
         "styles": [
-          "build/gameplay-core.d4f91da44aa9.css"
+          "build/gameplay-core.55939f4dd2fe.css"
         ],
         "dependencies": [
           "app-shell",
@@ -131,12 +131,12 @@
       },
       "feature-adventure": {
         "scripts": [
-          "build/feature-adventure-content.f812f2d9ad9b.js",
-          "build/feature-adventure-runtime.4d7e8a5b1925.js",
-          "build/feature-adventure-ui.f53f573c1bce.js"
+          "build/feature-adventure-content.79628452fab4.js",
+          "build/feature-adventure-runtime.cbc1c29d58c7.js",
+          "build/feature-adventure-ui.09360cb202fc.js"
         ],
         "styles": [
-          "build/feature-adventure.a197967e212f.css"
+          "build/feature-adventure.571a0577caba.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -218,9 +218,9 @@
         "decode": false
       },
       {
-        "path": "build/boot-core.4899cadea887.js",
-        "sha256": "4899cadea887",
-        "bytes": 69999,
+        "path": "build/boot-core.bbbaf3175142.js",
+        "sha256": "bbbaf3175142",
+        "bytes": 69855,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -298,65 +298,65 @@
         "decode": false
       },
       {
-        "path": "assets/characters/female_earth.jpg",
-        "sha256": "263cdadc095c",
-        "bytes": 454737,
+        "path": "assets/characters/player_female_01.webp",
+        "sha256": "dc5058974a47",
+        "bytes": 1295046,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_fire.jpg",
-        "sha256": "9bf0580e1c04",
-        "bytes": 506412,
+        "path": "assets/characters/player_female_02.webp",
+        "sha256": "5cb04f00ce72",
+        "bytes": 1092118,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_water.jpg",
-        "sha256": "d1a903b2cbd6",
-        "bytes": 497357,
+        "path": "assets/characters/player_female_03.webp",
+        "sha256": "4cabe19a63af",
+        "bytes": 1250292,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/female_wind.jpg",
-        "sha256": "6600198db569",
-        "bytes": 414943,
+        "path": "assets/characters/player_female_04.webp",
+        "sha256": "907d2b62a1ba",
+        "bytes": 1284410,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_earth.jpg",
-        "sha256": "3fc06609e539",
-        "bytes": 479971,
+        "path": "assets/characters/player_male_01.webp",
+        "sha256": "d25acae6ab94",
+        "bytes": 1178648,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_fire.jpg",
-        "sha256": "a269c72a396d",
-        "bytes": 549452,
+        "path": "assets/characters/player_male_02.webp",
+        "sha256": "00eb785f7b0b",
+        "bytes": 1086984,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_water.jpg",
-        "sha256": "31696971afef",
-        "bytes": 568385,
+        "path": "assets/characters/player_male_03.webp",
+        "sha256": "2946ba0e51ed",
+        "bytes": 1170932,
         "priority": "P1",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/male_wind.jpg",
-        "sha256": "6f5127957346",
-        "bytes": 486566,
+        "path": "assets/characters/player_male_04.webp",
+        "sha256": "5fa20547517b",
+        "bytes": 1125640,
         "priority": "P1",
         "type": "image",
         "decode": true
@@ -562,9 +562,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.1af4757ef73f.js",
-        "sha256": "1af4757ef73f",
-        "bytes": 1206177,
+        "path": "build/app-shell.6365cb67c4c7.js",
+        "sha256": "6365cb67c4c7",
+        "bytes": 1225680,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -802,50 +802,50 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.8666be0592a0.js",
-        "sha256": "8666be0592a0",
-        "bytes": 680403,
+        "path": "build/gameplay-core-primary.65a9f18e5df5.js",
+        "sha256": "65a9f18e5df5",
+        "bytes": 761716,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.bd07f1e57ceb.js",
-        "sha256": "bd07f1e57ceb",
-        "bytes": 738568,
+        "path": "build/gameplay-core-secondary.d4c9c9ba2893.js",
+        "sha256": "d4c9c9ba2893",
+        "bytes": 748879,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.d4f91da44aa9.css",
-        "sha256": "d4f91da44aa9",
-        "bytes": 438977,
+        "path": "build/gameplay-core.55939f4dd2fe.css",
+        "sha256": "55939f4dd2fe",
+        "bytes": 451646,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "b7b925166362",
-    "totalBytes": 24070499,
+    "manifestHash": "d258a27e7406",
+    "totalBytes": 29720398,
     "totalResources": 79
   },
   "assets": {
-    "build/boot-core.4899cadea887.js": {
-      "sha256": "4899cadea887",
-      "bytes": 69999
+    "build/boot-core.bbbaf3175142.js": {
+      "sha256": "bbbaf3175142",
+      "bytes": 69855
     },
-    "build/app-shell.1af4757ef73f.js": {
-      "sha256": "1af4757ef73f",
-      "bytes": 1206177
+    "build/app-shell.6365cb67c4c7.js": {
+      "sha256": "6365cb67c4c7",
+      "bytes": 1225680
     },
-    "build/gameplay-core-primary.8666be0592a0.js": {
-      "sha256": "8666be0592a0",
-      "bytes": 680403
+    "build/gameplay-core-primary.65a9f18e5df5.js": {
+      "sha256": "65a9f18e5df5",
+      "bytes": 761716
     },
-    "build/gameplay-core-secondary.bd07f1e57ceb.js": {
-      "sha256": "bd07f1e57ceb",
-      "bytes": 738568
+    "build/gameplay-core-secondary.d4c9c9ba2893.js": {
+      "sha256": "d4c9c9ba2893",
+      "bytes": 748879
     },
     "build/feature-patrol.ab5bd3ce5582.js": {
       "sha256": "ab5bd3ce5582",
@@ -871,17 +871,17 @@
       "sha256": "cf197e72837f",
       "bytes": 6423
     },
-    "build/feature-adventure-content.f812f2d9ad9b.js": {
-      "sha256": "f812f2d9ad9b",
-      "bytes": 39861
+    "build/feature-adventure-content.79628452fab4.js": {
+      "sha256": "79628452fab4",
+      "bytes": 39896
     },
-    "build/feature-adventure-runtime.4d7e8a5b1925.js": {
-      "sha256": "4d7e8a5b1925",
-      "bytes": 72057
+    "build/feature-adventure-runtime.cbc1c29d58c7.js": {
+      "sha256": "cbc1c29d58c7",
+      "bytes": 86611
     },
-    "build/feature-adventure-ui.f53f573c1bce.js": {
-      "sha256": "f53f573c1bce",
-      "bytes": 51688
+    "build/feature-adventure-ui.09360cb202fc.js": {
+      "sha256": "09360cb202fc",
+      "bytes": 59059
     },
     "build/boot-core.3c6f6f5d87d2.css": {
       "sha256": "3c6f6f5d87d2",
@@ -891,9 +891,9 @@
       "sha256": "801bc1a9895d",
       "bytes": 90552
     },
-    "build/gameplay-core.d4f91da44aa9.css": {
-      "sha256": "d4f91da44aa9",
-      "bytes": 438977
+    "build/gameplay-core.55939f4dd2fe.css": {
+      "sha256": "55939f4dd2fe",
+      "bytes": 451646
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",
@@ -915,9 +915,9 @@
       "sha256": "f68f5350eccc",
       "bytes": 1306
     },
-    "build/feature-adventure.a197967e212f.css": {
-      "sha256": "a197967e212f",
-      "bytes": 25693
+    "build/feature-adventure.571a0577caba.css": {
+      "sha256": "571a0577caba",
+      "bytes": 26024
     },
     "build/firebase/firebase-config.4314d6321ba1.js": {
       "sha256": "4314d6321ba1",

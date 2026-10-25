@@ -18,11 +18,9 @@
     const build=global.__FOUR_SYMBOLS_BUILD__||{};
     const logoTargetMs=Math.max(0,Number(root&&root.dataset.logoTargetMs)||900);
     const CREATION_PORTRAITS=[
-        "assets/characters/female_fire.jpg","assets/characters/female_water.jpg",
-        "assets/characters/female_wind.jpg","assets/characters/female_earth.jpg",
-        "assets/characters/male_fire.jpg","assets/characters/male_water.jpg",
-        "assets/characters/male_wind.jpg","assets/characters/male_earth.jpg"
-    ];
+        "female_01","female_02","female_03","female_04",
+        "male_01","male_02","male_03","male_04"
+    ].map(name=>"assets/characters/player_"+name+".webp");
     let state=STATES.BOOT_LOADING;
     let activeUser=null;
     let resolvedUid=null;

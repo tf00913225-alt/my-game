@@ -99,7 +99,7 @@ assert.doesNotMatch(index,/<div class="battle-monster-gap-filler"><\/div>/,"lega
 assert.match(layoutCss,/--battle-enemy-region-track:54\.785fr/);
 assert.match(layoutCss,/--battle-center-region-track:12fr/);
 assert.match(layoutCss,/--battle-ally-region-track:45\.215fr/);
-assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-center-region-track\)[\s\S]*var\(--battle-ally-region-track\)/);
+assert.match(layoutCss,/grid-template-rows:[\s\S]*var\(--battle-enemy-region-track\)[\s\S]*var\(--battle-ally-region-track\)[\s\S]*var\(--battle-center-region-track\)/);
 assert.doesNotMatch(layoutCss,/--battle-info-region-track/,"battle info must not consume a structural grid track");
 assert.match(layoutCss,/grid-template-columns:repeat\(var\(--battle-enemy-columns,5\),minmax\(0,1fr\)\)/,"enemy slots remain equal width");
 assert.match(layoutCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/,"ally slots remain equal width");
@@ -108,7 +108,7 @@ assert.doesNotMatch(layoutCss,/battle-info-region/,"retired battle log UI must s
 assert.doesNotMatch(layoutCss,/battle-info-region/,"retired battle log UI must stay absent");
 assert.match(layoutCss,/\.battle-center-region\{[\s\S]*background:none !important/,"middle controls must not own a black translucent plate");
 assert.doesNotMatch(index,/battleInfoToggle/,"retired battle log UI must stay absent");
-assert.match(layoutCss,/\.battle-element-box-button\{[\s\S]*width:66px !important;[\s\S]*height:66px !important/,"the mobile element-box touch target keeps its original large size");
+assert.match(layoutCss,/\.battle-utility-button\{[\s\S]*width:52px !important;[\s\S]*height:52px !important/,"the shared utility controls retain the authorized52px touch target");
 assert.match(layoutCss,/\.v-fixed-ally-slot\{[\s\S]*overflow:visible !important/,"unit artwork must not be clipped by its slot");
 assert.match(layoutCss,/\.v143-skill-stage\[data-geometry-owner="fixed-slot"\]\{[\s\S]*overflow:visible !important/,"VFX stage must not clip at a card or region boundary");
 
@@ -160,7 +160,7 @@ assert.ok(
     "battlefield dimming must precede target reveal"
 );
 assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
-assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*artworkProjection[\s\S]*hpProjection[\s\S]*hudSafeRect[\s\S]*feedbackAnchor/,
+assert.match(geometry,/function unitGeometry\(side,index,purpose\)[\s\S]*artworkProjection[\s\S]*hudSafeRect[\s\S]*hpProjection[\s\S]*feedbackAnchor/,
     "one geometry adapter must expose projection, HUD-safe feedback and canonical anchors");
 assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function laneMetrics\(context\)[\s\S]*capacity:[\s\S]*function freeLane\(context,metrics\)[\s\S]*context\.queue\.push\(request\)/,
     "floating feedback must size target-scoped lanes from canonical geometry and queue overflow");

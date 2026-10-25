@@ -38,7 +38,7 @@ if(process.argv.includes('--serve-only')){
     server.server.closeAllConnections();await new Promise(resolve=>server.server.close(resolve));
 }else{
 try{
-    for(const [width,height] of [[360,800],[393,873],[412,915],[1920,1080]]){
+    for(const [width,height] of (process.argv.includes('--first-lesson-only')?[[393,873]]:[[360,800],[393,873],[412,915],[1920,1080]])){
         const mobile=width<700,trace=[],scenes=[],portraitChecks=[],rounds=[],purchases=[],attempts=[];
         const port=await new Promise((resolve,reject)=>{const s=net.createServer();s.once('error',reject);s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(error=>error?reject(error):resolve(p));});});
         const profile=fs.mkdtempSync(path.join(os.tmpdir(),'chapter1-pointer-qa-'));
@@ -63,14 +63,36 @@ try{
             };
             const capture=async label=>{await new Promise(r=>setTimeout(r,350));const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(artifact,width+'x'+height+'-'+label+'.png'),Buffer.from(shot.data,'base64'));};
             const observe=()=>client.eval(`({view:FourSymbolsAdventure.getView(),hp:player.hp,sp:player.sp,gold,sharedExp,battle:typeof battleActive!=='undefined'&&battleActive,turn:typeof turn==='undefined'?null:turn,phase:typeof battlePhase==='undefined'?null:battlePhase,pending:typeof pendingAction==='undefined'?null:pendingAction,maxHP:getPartyBattleStats(0).maxHP,maxSP:getPartyBattleStats(0).maxSP,potions:Object.fromEntries(potionDefinitions.map(p=>[p.id,getPotionCount(p.id)])),inventory:inventoryItems.map(i=>({uid:i.v141Uid,name:i.name,definitionId:i.definitionId})),equipped:Object.values(characterEquipment[player.element]||{}).map(i=>i?.v141Uid),enemies:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.map(i=>({id:i,hp:monsters[i]?.hp,alive:monsters[i]?.alive}))})`);
-            const guidePoint=()=>client.eval(`(()=>{const overlay=document.getElementById('adventureInputGuide'),ring=overlay?.querySelector('.adventure-guide-ring');if(!overlay||overlay.hidden||!ring||ring.hidden)return null;const r=ring.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y),target=hit?.closest('button,[role="tab"],[data-item-id],[data-item-uid]')||hit;return {x,y,selector:'visible-guide-highlight',text:target?.textContent||'',id:target?.id,handler:target?.getAttribute('onclick'),copy:overlay.querySelector('.adventure-guide-copy')?.textContent,error:!target||target===overlay||overlay.contains(target)?'highlight not over player target':target.disabled?'disabled':null};})()`);
+            const guidePoint=()=>client.eval(`(()=>{const overlay=document.getElementById('adventureInputGuide'),ring=overlay?.querySelector('.adventure-guide-ring');if(!overlay||overlay.hidden||!ring)return null;const next=overlay.querySelector('.adventure-guide-next:not([hidden]):not(:disabled)');if(ring.hidden&&!next)return null;const r=(next||ring).getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y),target=hit?.closest('button,[role="tab"],[data-item-id],[data-item-uid]')||hit;return {x,y,selector:'visible-guide-highlight',text:target?.textContent||'',id:target?.id,handler:target?.getAttribute('onclick'),copy:overlay.querySelector('.adventure-guide-copy')?.textContent,error:!target||target===overlay||target.id==='game-viewport'||(overlay.contains(target)&&!next)?'highlight not over player target':target.disabled?'disabled':null};})()`);
             const tapGuide=async()=>{
-                await wait(`(()=>{if(!FourSymbolsAdventure.getView().tutorial.active)return true;if(battleActive&&!(battlePhase==='declare'&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)))return false;const g=document.getElementById('adventureInputGuide'),r=g?.querySelector('.adventure-guide-ring');return !!g&&!g.hidden&&!!r&&!r.hidden;})()`,'formal manual turn and visible guide target, or completed onboarding');
-                const ready=await observe();if(!ready.view.tutorial.active)return false;
+                const free=await observe();
+                if(free.view.firstLesson?.step==='finish-battle'||(free.view.state.onboarding.flowVersion===3&&free.view.state.onboarding.basicComplete&&['c1_02','c1_03'].includes(free.view.state.currentNodeId))){
+                    const tapUnlocked=async selector=>{
+                        await wait(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e||e.disabled)return false;const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return r.width>0&&r.height>0&&(hit===e||e.contains(hit));})()`,'released control receives native pointer after original guide cleanup');
+                        await tap(selector);
+                    };
+                    await captureStory();
+                    if(free.view.dialogue){await tapUnlocked('#adventurePage [onclick*="advanceDialogue"]');return true;}
+                    if(free.battle){
+                        await wait('!battleActive||(battlePhase==="declare"&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex))','normal unlocked stage two/three input');
+                        const current=await observe();if(!current.battle)return true;
+                        if(current.pending){await tapUnlocked('#battleMonsterArea [id^="battleMonster"]');}
+                        else{await tapUnlocked('#mainBattleMenu button[onclick*="normal"]');}
+                        return true;
+                    }
+                    if(free.view.panel==='node-reward'){await tapUnlocked('#adventurePage [onclick*="claimNodeReward"]');return true;}
+                    await tapUnlocked('.adventure-sheet-actions > .adventure-button.primary');return true;
+                }
+                await wait(`(()=>{if(!FourSymbolsAdventure.getView().tutorial.active||FourSymbolsAdventure.getView().firstLesson?.step==='finish-battle'||FourSymbolsAdventure.getView().state.onboarding.basicComplete&&['c1_02','c1_03'].includes(FourSymbolsAdventure.getView().state.currentNodeId))return true;if(battleActive&&!(battlePhase==='declare'&&!battleAdvanceScheduled&&battlePresentationLocks.size===0&&declaredCharacterIndexes.has(activeBattleCharacterIndex)))return false;const g=document.getElementById('adventureInputGuide'),r=g?.querySelector('.adventure-guide-ring');if(!g||g.hidden||!r)return false;const n=g.querySelector('.adventure-guide-next:not([hidden]):not(:disabled)'),box=(n||r).getBoundingClientRect();if(r.hidden&&!n)return false;const hit=document.elementFromPoint(box.x+box.width/2,box.y+box.height/2);return !!hit?.closest('button,[role="tab"],[data-item-id],[data-item-uid],[id^="battleMonster"],.ally-targetable');})()`,'formal manual turn and visible guide target, or completed onboarding');
+                const ready=await observe();if(!ready.view.tutorial.active||ready.view.firstLesson?.step==='finish-battle'||ready.view.state.onboarding.basicComplete&&['c1_02','c1_03'].includes(ready.view.state.currentNodeId))return false;
                 await captureStory();
                 if(ready.view.panel==='node-reward'&&ready.view.selectedNodeId==='c1_01'){assert.equal(ready.view.state.currentNodeId,'c1_02');assert.equal(ready.view.state.rewardClaims.c1_01,'ready');await capture('first-victory');}
+                if(ready.view.firstLesson?.step==='cast-intro'){
+                    await wait(`(()=>{const page=document.getElementById('battlePage'),ally=document.getElementById('battlePlayerCard0'),enemy=document.getElementById('battleMonster0');return !!page&&!page.classList.contains('v141-preparing-entry')&&[ally,enemy].every(e=>{if(!e)return false;const r=e.getBoundingClientRect(),s=getComputedStyle(e);return r.width>0&&r.height>0&&Number(s.opacity)>=.99&&s.visibility!=='hidden'&&s.display!=='none';});})()`,'original restored actors visible without replaying entry');
+                    await capture('first-battle-resumed');
+                }
                 const target=await guidePoint();
-                if(target?.copy==='技能已裝好，返回故事再挑戰。')assert.equal(target.id,'adventureTutorialReturn','visible guide center must hit the original tutorial return button');
+                if(['技能已裝好，返回故事再挑戰。','技能已裝好，接回剛才的戰鬥。'].some(text=>target?.copy?.startsWith(text)))assert.equal(target.id,'adventureTutorialReturn','visible guide center must hit the original tutorial return button');
                 if(target.handler==="v169SwitchShopPage('equipment')")assert.equal(await client.eval('!!document.querySelector("#homeFeatureModal .v17345-equipment-shop")'),false,'fresh shop starts with the real potion category');
                 const offer=target.id==='chapter1TutorialArmorBuy'?await client.eval(String.raw`(()=>{const b=document.getElementById('chapter1TutorialArmorBuy'),price=b.textContent.match(/([\d,]+)\s*金幣/);if(!price)throw Error('formal armor offer price missing');return {name:b.closest('[data-tutorial-offer]').querySelector('.v17346-shop-name').textContent.trim(),cost:Number(price[1].replaceAll(',',''))};})()`):null;
                 await point(target);
@@ -141,8 +163,16 @@ try{
             if(width===360||width===412){results.push({width,height,trace,portraits,portraitChecks,scenes,nextRect});continue;}
             let firstClaimed=false,lessonDefeats={},lessonInitial=null;
             for(let step=0;step<240;step++){
-                const before=await observe();if(!before.view.tutorial.active)break;
+                const before=await observe();if(process.argv.includes('--first-lesson-only')&&before.view.state.onboarding.basicComplete)break;if(!before.view.tutorial.active)break;
                 await captureStory();
+                if(before.view.firstLesson?.step==='status-intro'){
+                    assert.equal(before.view.firstLesson.level,2);assert.equal(before.sharedExp,0);
+                    assert.equal(before.view.firstLesson.attributePoints,5,'personal upgrade retains all optional attribute points');
+                }
+                if(before.view.firstLesson?.step==='cast-intro'){
+                    assert.equal(before.turn,before.view.state.onboarding.battleCheckpoint.turn,'same retained round resumes');
+                    assert.equal(await client.eval('document.getElementById("battleTurnIndicator").textContent'),'第'+before.turn+'回合','visible round agrees with the retained battle');
+                }
                 if(before.battle){rounds.push(before);if(!lessonInitial)lessonInitial=before;}
                 if(before.view.panel==='node-reward'&&before.view.selectedNodeId==='c1_01'){
                     assert.equal(before.view.state.currentNodeId,'c1_02');await capture('first-victory');
@@ -150,7 +180,7 @@ try{
                 if(before.view.dialogue?.phase==='guidance')lessonDefeats[before.view.dialogue.nodeId]=true;
                 await tapGuide();
                 const after=await observe();
-                if(lessonInitial&&!after.battle){
+                if(lessonInitial&&!after.battle&&!after.view.firstLesson){
                     const id=lessonInitial.view.tutorial.battleNodeId;
                     if(!after.view.state.completedNodes[id]){
                         assert.ok(['c1_02','c1_04'].includes(id),'only the authored defeat lessons may fail');
@@ -161,11 +191,11 @@ try{
                     lessonInitial=null;
                 }
                 if(!firstClaimed&&after.view.state.rewardClaims.c1_01==='claimed'){
-                    firstClaimed=true;assert.equal(after.view.selectedNodeId,'c1_02');await capture('reward-claimed-map');
+                    firstClaimed=true;assert.ok(['city-intro','city'].includes(after.view.firstLesson?.step),'early receipt remains before character upgrade');assert.equal(after.sharedExp,300);assert.equal(after.view.state.completedNodes.c1_01,undefined);await capture('first-exp-before-upgrade');
                 }
             }
-            let current=await observe();assert.equal(current.view.tutorial.active,false,'bounded five-lesson player guide');
-            assert.ok(firstClaimed);assert.ok(lessonDefeats.c1_02&&lessonDefeats.c1_04,'both authored defeat lessons actually occurred');
+            let current=await observe();if(process.argv.includes('--first-lesson-only')){assert.equal(current.view.state.onboarding.basicComplete,true);assert.equal(current.view.state.currentNodeId,'c1_02');assert.equal(current.view.state.rewardClaims.c1_01,'claimed');assert.equal(current.view.state.onboarding.battleCheckpoint,undefined);await capture('first-lesson-complete');results.push({width,height,trace,portraits,portraitChecks,scenes,nextRect,firstLesson:current});continue;}assert.equal(current.view.tutorial.active,false,'bounded five-lesson player guide');
+            assert.ok(firstClaimed);assert.equal(lessonDefeats.c1_02,undefined,'stage two retains its fight without redundant forced basics');assert.ok(current.view.state.completedNodes.c1_02&&current.view.state.completedNodes.c1_03,'both retained stages really completed');assert.ok(lessonDefeats.c1_04,'equipment defeat lesson actually occurred');
             assert.equal(purchases.filter(p=>p.kind==='lesson-armor').length,1);assert.equal(current.view.state.rewardClaims.c1_05,'claimed','supplies were really claimed before practice, not granted after victory');
             assert.ok(trace.some(action=>action.handler==="v169SwitchShopPage('equipment')"),'the player really selected the equipment shop category');
             assert.ok(current.potions.hpPotion10<current.view.state.onboarding.preparation.hpCount||current.potions.spPotion10<current.view.state.onboarding.preparation.spCount,'stage5 requires an original inventory or battle potion consumed after its claimed baseline');
@@ -268,6 +298,6 @@ try{
         }finally{client?.close();proc.kill();}
     }
     fs.writeFileSync(path.join(artifact,'evidence.json'),JSON.stringify({passed:true,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),manifest:createHash('sha256').update(fs.readFileSync('build/asset-manifest.json')).digest('hex'),transport:'isolated external transport; trusted pointer/touch player actions',results},null,2));
-    console.log('Pointer/touch four-viewport opening, five guided lessons and twenty-node player journey PASS');
+    console.log(process.argv.includes('--first-lesson-only')?'Pointer/touch focused first lesson PASS':'Pointer/touch four-viewport opening, five guided lessons and twenty-node player journey PASS');
 }finally{server.server.closeAllConnections();await new Promise(resolve=>server.server.close(resolve));}
 }

@@ -112,6 +112,11 @@
 
     function fitEnemyBars(card){
         const hud=window.FourSymbolsBattlePresentation?.getUnitHud?.(card)||card;
+        // Fixed Slot V2 intentionally keeps ordinary exact resource text as
+        // 1px clipped accessibility nodes. Never shrink-to-fit hidden text;
+        // its formal CSS/number Owner already controls this presentation.
+        const fixed=document.getElementById("battlePage")?.classList?.contains("v-fixed-slot-render-v2");
+        if(fixed&&hud!==card&&hud.classList?.contains("v174-unit-hud")&&!card.classList?.contains("gameplay-boss-card")){return;}
         hud.querySelectorAll(".monster-bar-text").forEach(node=>{
             node.style.removeProperty("transform");
             node.style.setProperty("font-size","13px","important");
