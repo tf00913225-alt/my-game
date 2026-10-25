@@ -46,6 +46,19 @@ test('UID mismatch and malformed retained history fail closed without grants',()
   const f=setup();f.progress.search('a-letter');const before=f.saved;f.uid='bob';assert.equal(f.progress.search('a-chest').ok,false);assert.equal(f.saved,before);assert.equal(f.items.hpPotion10,undefined);
   f.uid='alice';f.p.explorationProgress.searched['a-chest']=false;assert.equal(f.progress.search('a-chest').ok,false);assert.equal(f.items.hpPotion10,undefined);
 });
+test('actual hydration clears an absent next-UID extension after the original validated copy boundary',()=>{
+  const main=fs.readFileSync(new URL('js/00-main.js',root),'utf8');
+  const boundary=main.slice(main.indexOf('const hydratedHeroAccount='));
+  const copy=boundary.match(/Object\.assign\(\s*player,\s*data\.player\s*\);[\s\S]*?(?=migrateLegacySixStats\(player\))/);
+  assert.ok(copy,'formal hydration boundary must exist');
+  const alice={version:1,ownerUid:'alice',talked:{},searched:{'a-chest':true}};
+  const player={id:'Alice',explorationProgress:alice};
+  const context=vm.createContext({player,data:{player:{id:'Bob'}}});
+  vm.runInContext(copy[0],context);assert.equal(player.id,'Bob');assert.equal(Object.hasOwn(player,'explorationProgress'),false);
+  assert.equal(alice.searched['a-chest'],true,'retained original record is not erased');
+  context.data={player:{id:'Alice',explorationProgress:alice}};
+  vm.runInContext(copy[0],context);assert.equal(player.explorationProgress,alice,'explicit retained extension survives');
+});
 test('all five houses, NPC approaches, exits and ten points have collision-safe routes',()=>{
   const {C,G}=setup(),v=C.village();assert.equal(G.canStand(v.spawn.x,v.spawn.y,v),true);
   for(const object of v.objects.filter(o=>o.interaction))assert.ok(G.findRoute(v.spawn,object.approach,v),'village '+object.id);

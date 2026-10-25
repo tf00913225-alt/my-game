@@ -26,7 +26,7 @@ Work ID：`EXPLORATION-CORNER-20261023`。施工線與即時狀態 Owner：[PR #
 
 ## 驗證階段
 
-23 個探索 targeted tests 通過：既有原型幾何 10、生命週期／透明命中區 6、探索配置／進度 7。相關存檔／創角／主線／隊伍回歸另有 98 個通過。新增測試含解鎖可達性、前五關與教學條件、普通交談不改主線、重複領取、保存失敗、滿包、UID／損壞紀錄拒絕與所有出入口／互動點可達性。
+24 個探索 targeted tests 通過：既有原型幾何 10、生命週期／透明命中區 6、探索配置／進度 8。相關存檔／創角／主線／隊伍回歸另有 99 個通過。新增測試含解鎖可達性、前五關與教學條件、普通交談不改主線、重複領取、保存失敗、滿包、UID／損壞紀錄拒絕與所有出入口／互動點可達性。
 
 Browser QA 使用正式 index／build／Display／導航／Inventory／AccountSave，只隔離外部 Auth/Cloud 與明確設定 QA 主線進度 fixture。它不證明真實闖關取得資格、雲端接受或真手機操作。實際畫面與後續完整驗證以 PR 最新 checkpoint 為準。未完成 Gate 不得宣稱首版完工或合併；不發布 main。
 
@@ -35,3 +35,5 @@ Browser QA 使用正式 index／build／Display／導航／Inventory／AccountSa
 施工 checkpoint CI `40191709119` 在舊 Head `56b4dc1c` 找到新入口遮住公告、測試腳本分類問題；前者在原入口區改雙欄，後者移至既有 `.github/scripts` QA 目錄，沒有降低檢查。最新必要 CI 以 PR 即時紀錄為準，舊 Head 的成功或失敗都不充當新 Head 結果。
 
 固定 `1257984c` 已再次走完五戶十點與雙尺寸循環。另補齊真正 Story 對話面板的同一探索按鈕：從 header 移至原 Adventure root 共用層，章節地圖與 Story 都可見。兩尺寸實際點擊探索並返回後，原 node／line／phase cursor 完全相同；不自動 advance。相關 Story 截圖與結果已加入 QA 索引。
+
+CI `40194973390` / attempt1 / Head `2cc35074` / job `121174453165` 的第一個失敗是 all-Node 內 `hero-core-phase1.test.js`：原本新增在 validated character-copy 前的探索欄位清理闖入 Hero 無 player 的驗證片段。清理已移到原 `Object.assign(player,data.player)` 後，僅在新 payload 缺欄位時清掉舊的記憶體欄位；不改磁碟原帳號。既有 Hero 斷言不變；新增實際 hydration 片段的 next-UID 缺欄位／顯式舊紀錄測試。123 個直接相關測試全通過，builder 和 skill mutation Gate 均未放寬。最新必要 CI 仍須用修正後 Head 驗證。

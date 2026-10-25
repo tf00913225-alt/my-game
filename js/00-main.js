@@ -7607,12 +7607,14 @@ function loadGame(){
                 window.FourSymbolsHeroCore.listHeroDefinitions().map(hero=>hero.heroId));
         } // Structural cache validation only; the protected reader supplies authority.
         heroAccountState=hydratedHeroAccount;
-        // An absent optional field in the next UID must not retain the previous UID cache.
-        delete player.explorationProgress;
         Object.assign(
             player,
             data.player
         );
+        // After the existing validation/copy boundary, discard only stale in-memory UID data.
+        if(data.player.explorationProgress===undefined){
+            delete player.explorationProgress;
+        }
         migrateLegacySixStats(player);
 
 
