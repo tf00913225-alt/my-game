@@ -7344,6 +7344,7 @@ function resetSharedCreationForm(){
 
     updateCreationUI();
     updateCreationScreenContext();
+    updateInitialCharacterCreationFeedback();
 }
 
 
@@ -7828,13 +7829,23 @@ function createSecondCharacter(){
 ===================================================== */
 
 let initialCharacterCreationPending=false;
-function updateInitialCharacterCreationFeedback(message){
+function updateInitialCharacterCreationFeedback(message,detail){
+    if(message===undefined&&detail===undefined&&initialCharacterCreationPending){return;}
     const button=$("creationSubmitButton"),label=$("creationSubmitLabel");
     if(button){
         button.disabled=initialCharacterCreationPending;
         button.setAttribute("aria-busy",String(initialCharacterCreationPending));
     }
     if(label){label.textContent=message||(creationTargetSlot===1?"開始冒險":"完成創建");}
+    const feedback=$("creationFeedback");
+    if(feedback){
+        feedback.textContent=detail||"";
+        feedback.hidden=!detail;
+    }
+    if(detail){
+        const explanation=$("creationPage")?.querySelector?.(".creation-stat-details");
+        if(explanation){explanation.open=false;}
+    }
 }
 async function createCharacter(){
 
@@ -7851,9 +7862,7 @@ async function createCharacter(){
 
     if(!id){
 
-        alert(
-            "請先輸入角色 ID。"
-        );
+        updateInitialCharacterCreationFeedback(null,"請先輸入角色 ID。");
 
         return;
 
@@ -7862,9 +7871,7 @@ async function createCharacter(){
 
     if(id.length<2){
 
-        alert(
-            "ID至少需要2個字元。"
-        );
+        updateInitialCharacterCreationFeedback(null,"ID至少需要2個字元。");
 
         return;
 
@@ -7937,11 +7944,10 @@ async function createCharacter(){
         }
     }catch(error){
         initialCharacterCreationPending=false;
-        updateInitialCharacterCreationFeedback("創角未完成，請重試");
         console.error("受保護創角未完成；本機角色尚未建立。",error);
         const oldAccount=String(error&&error.message||"")
             .includes("Existing accounts require the original-device migration path");
-        alert(oldAccount
+        updateInitialCharacterCreationFeedback("創角未完成，請重試",oldAccount
             ?"此帳號需要保留原手機角色並走遷移流程，不能當作全新帳號創角。"
             :"創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。");
         return false;

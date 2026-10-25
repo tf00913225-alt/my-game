@@ -6507,6 +6507,14 @@ body.creation-fixed-active{
     margin-bottom:24px;
 }
 
+#creationPage .creation-feedback{
+    margin:0 0 18px;
+    color:#f0d38a;
+    font-size:45px;
+    line-height:1.45;
+    overflow-wrap:anywhere;
+}
+
 #creationPage .creation-points-badge b{
     margin-left:5.143px;
     color:#ffc85e;

@@ -15,7 +15,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.78385a4c589b.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.f1642214e8d1.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -245,6 +245,7 @@
                 maxlength="16"
                 placeholder="輸入 2～16 個字元"
                 autocomplete="off"
+                oninput="updateInitialCharacterCreationFeedback()"
             >
         </section>
 
@@ -287,6 +288,7 @@
                 </div>
             </div>
 
+            <p id="creationFeedback" class="creation-feedback" role="alert" hidden></p>
             <div class="creation-stat-grid">
 
                 <div class="creation-stat" data-stat="attack">

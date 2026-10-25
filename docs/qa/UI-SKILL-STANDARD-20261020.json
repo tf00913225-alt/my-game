@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：完整證據checkpoint；創角原生提示已證問題待最小修正；五代表mid/max限定補驗通過，其他台帳未完",
+  "status": "施工中：完整證據已遠端保存；創角inline提示已最小修復及四尺寸獨審，新HeadCI/部署與其他台帳未完",
   "devices": [
     {
       "id": "360x640",
@@ -15388,7 +15388,7 @@
       "label": "創角 submit",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "有問題",
+      "status": "部分已實際驗證",
       "states": [
         "首次角色",
         "新增角色",
@@ -15467,6 +15467,24 @@
             "No successful/additional creation, real backend/cloud, pending doubletap/back or unallocated submit test",
             "Prior stable creation geometry is not recertified"
           ]
+        },
+        {
+          "state": "Original inline cold-creation validation/pending/refusal/retry/migration; edit clears stale text; errors reveal guidance by closing explanation",
+          "status": "已實際驗證（限定本機合成狀態）",
+          "parent": "a1f97c5e12cbf027092b3df674b3750420d3892c",
+          "sourceProof": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/creation-inline-feedback/source-and-review.json",
+          "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/creation-inline-feedback/evidence.zip",
+          "devices": [
+            "360x640",
+            "393x873",
+            "412x915",
+            "1280x800"
+          ],
+          "limits": [
+            "Initial44 screenshots intermediate; final24delta fixes stale hint and expanded explanation",
+            "No successful creation/real backend/cloud/physical/PWA/pending doubleclick/back stress",
+            "Latest Head CI and deployed symptom acceptance pending"
+          ]
         }
       ],
       "reviews": {
@@ -15474,7 +15492,7 @@
         "interaction": null,
         "scope": null
       },
-      "notes": "Cold-start native browser alerts observed; original RPG dialog Owner not initialized before gameplay feature ensure. Unfixed at evidence checkpoint."
+      "notes": "Cold-start native-alert issue minimally corrected in original feedback Owner; local four-size initial+delta reviewed, latest Head CI/deploy remain pending. Other creation states not approved."
     },
     {
       "id": "creation.cancel",
@@ -28248,6 +28266,15 @@
         "Original remaining ledger/devices/PWA",
         "Latest Head gates; GitHub merge-service external blocker"
       ],
+      "automation": "PAUSED",
+      "exploration": "product-paused"
+    },
+    {
+      "segment": "creation-inline-feedback",
+      "parent": "a1f97c5e12cbf027092b3df674b3750420d3892c",
+      "report": "docs/qa/UI-SKILL-STANDARD-20261020-creation-inline-feedback.md",
+      "focusedPass": 26,
+      "scope": "Original presentation Owner only; authority and values untouched",
       "automation": "PAUSED",
       "exploration": "product-paused"
     }

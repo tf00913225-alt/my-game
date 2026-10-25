@@ -1,0 +1,87 @@
+{
+  "workId": "UI-SKILL-STANDARD-20261020",
+  "parent": "a1f97c5e12cbf027092b3df674b3750420d3892c",
+  "scope": "Minimal creation UI feedback only; prior complete evidence checkpoint pushed first",
+  "files": {
+    "index.html": "fa66a7b2be02d05954751fd10947b2926061830487de7eb93102a634b2a2853f",
+    "js/00-main.js": "17a40be0a2c566dfdb235dd22411f104d9a65dc227db2c231652e4a841c729a6",
+    "css/29-v125-character-creation-native.css": "ce8bcc7d578ff5671dfd5d3733f92030f79d5fded4ab902d115733955c8bd8c0",
+    "tests/character-creation-feedback.test.cjs": "a41ee43b8bbbb05a09fe5cbbd0b972b4fd6f2f5090ac6888735a0a41991d852e",
+    "functions/src/generated/restricted-forest-instance-policy.json": "8824670548c13511954c45c8d612a4d8e7107c1aeff6b5407911e8c1d62323b1",
+    "asset-manifest.json": "439c812d9879bfe9f41e47a98cba82b7ab56142d09c85456e5783406348ddc01"
+  },
+  "focused": {
+    "pass": 26,
+    "fail": 0
+  },
+  "reviews": {
+    "scope": "ci_player_flow_review approved original-feedback-only scope including input clear/pending preservation/explanation close; UID/save/revision/points/transactions unchanged",
+    "art": "dev992_art_review approved four-size44 original fix images representative24 and latest24delta representative20; no overlap or clipping, pending explanation final row visible",
+    "input": "dev992_input_review approved true touch/mobile and mouse/desktop, original pending/refusal/retry, native events0; stale name error found then fixed and delta approved"
+  },
+  "groups": [
+    {
+      "group": "creation-inline-feedback-after-a1f97c5e",
+      "viewport": "1280x800",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-after-a1f97c5e/1280x800/report.json",
+      "sha256": "b27c38b01069b1fcce898d18ff7d92ea86963806251c45992bde3528211bc451",
+      "scenes": 11
+    },
+    {
+      "group": "creation-inline-feedback-after-a1f97c5e",
+      "viewport": "360x640",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-after-a1f97c5e/360x640/report.json",
+      "sha256": "7f5bb31310b1756ff5a5bfc18c3fbb224041df1e5084e920b7badbb800ddd947",
+      "scenes": 11
+    },
+    {
+      "group": "creation-inline-feedback-after-a1f97c5e",
+      "viewport": "393x873",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-after-a1f97c5e/393x873/report.json",
+      "sha256": "7e403263a483fccc08a2939e3fa63f9bc1aa0d6b94ca98579fba250cc055fd23",
+      "scenes": 11
+    },
+    {
+      "group": "creation-inline-feedback-after-a1f97c5e",
+      "viewport": "412x915",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-after-a1f97c5e/412x915/report.json",
+      "sha256": "d142d5e88777e1a6bff846600f401ee4194367432d370128c58e69c64a1923be",
+      "scenes": 11
+    },
+    {
+      "group": "creation-inline-feedback-delta-a1f97c5e",
+      "viewport": "1280x800",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-delta-a1f97c5e/1280x800/report.json",
+      "sha256": "723cbd1d2cff065083d390085c698585f90c85f92824cc20c78ae3b6c77e181d",
+      "scenes": 6
+    },
+    {
+      "group": "creation-inline-feedback-delta-a1f97c5e",
+      "viewport": "360x640",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-delta-a1f97c5e/360x640/report.json",
+      "sha256": "2a587b99471fb180ab9a0972ee1bc3a94180d80278785e66050d8b4718054c73",
+      "scenes": 6
+    },
+    {
+      "group": "creation-inline-feedback-delta-a1f97c5e",
+      "viewport": "393x873",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-delta-a1f97c5e/393x873/report.json",
+      "sha256": "934d42f9ff3bc250176b9720673f7c33e98644210d4b22a3670c9302c2901acf",
+      "scenes": 6
+    },
+    {
+      "group": "creation-inline-feedback-delta-a1f97c5e",
+      "viewport": "412x915",
+      "report": "artifacts/ui-skill-standard/creation-inline-feedback-delta-a1f97c5e/412x915/report.json",
+      "sha256": "ab8b7ec23f39c728b2ddc23788332642e7c55ef17e62df7df41ded952379f4d2",
+      "scenes": 6
+    }
+  ],
+  "limits": [
+    "no successful creation/true backend or real cloud writes",
+    "no physical device, pending double-click/back stress or all UI acceptance",
+    "first44 images are an intermediate snapshot with stale hint; final24 delta closes that issue and binds final product hashes"
+  ],
+  "automation": "PAUSED",
+  "exploration": "product-paused"
+}
