@@ -1,0 +1,23 @@
+[
+  {
+    "id": "male_03",
+    "prompt": "Use case precise-object-edit. Edit ONLY BOTH REAR BOOTS in this BACK-VIEW wuxia patrol illustration. Current calf backs accidentally show FRONT shin armor motifs. Remove the silver leaf-tip/diamond/V-shaped kneecap and long silver shin plate designs from BOTH calf backs. Replace with plain dark fitted LEATHER REAR BOOT SHAFTS, narrow seams, small normal functional straps/heel trim only. Clear plain leather backs, no decorative front shin guards on calf backs. Keep EXACT original identity, head, hair, shoulders, robe colors, all asymmetrical cloth panel positions, hand/weapon/fan, walking legs/foot placement, lifted heel and visible sole, body proportions, pose, entire canvas and alpha transparency. Do not move sword/fan or mirror image. Change only boot design BELOW KNEES, no other pixels deliberately changed. No new objects/background/text. Full-body transparent portrait.",
+    "path": "C:\\Users\\User\\.codex\\generated_images\\01a1672c-506c-7a70-99ba-acf09e547ed6\\exec-ac6fb6a3-d882-40b7-ac47-4a8fd7ab3ef8.png"
+  },
+  {
+    "id": "male_04",
+    "prompt": "Use case precise-object-edit. Edit ONLY BOTH REAR BOOTS in this BACK-VIEW wuxia patrol illustration. Current calf backs accidentally show FRONT shin armor motifs. Remove the silver leaf-tip/diamond/V-shaped kneecap and long silver shin plate designs from BOTH calf backs. Replace with plain dark fitted LEATHER REAR BOOT SHAFTS, narrow seams, small normal functional straps/heel trim only. Clear plain leather backs, no decorative front shin guards on calf backs. Keep EXACT original identity, head, hair, shoulders, robe colors, all asymmetrical cloth panel positions, hand/weapon/fan, walking legs/foot placement, lifted heel and visible sole, body proportions, pose, entire canvas and alpha transparency. Do not move sword/fan or mirror image. Change only boot design BELOW KNEES, no other pixels deliberately changed. No new objects/background/text. Full-body transparent portrait.",
+    "path": "C:\\Users\\User\\.codex\\generated_images\\01a1672c-506c-7a70-99ba-acf09e547ed6\\exec-1334abfc-8f52-4b4b-b8d7-234329c819d4.png"
+  },
+  {
+    "id": "female_02",
+    "prompt": "Use case precise-object-edit. Edit ONLY BOTH REAR BOOTS in this BACK-VIEW female02 wuxia patrol illustration. Current calf backs accidentally show FRONT shin armor motifs: gold Y-shaped kneecap, long gold shin lines and diamond ankle medallions. REMOVE these front-only armor motifs from BOTH calf backs. Plain dark leather rear boot shafts with narrow seams and small normal functional straps only; keep modest gold heel trim and lifted walking sole. NO Y/diamond kneecap, no long decorative shin guards on calf backs. Preserve EXACT woman identity/bob/red hairpin, shoulders, red-black-bronze costume, asymmetrical red panel on viewerLEFT, right-hand sheathed saber on viewerRIGHT, body proportions, pose, leg/foot positions, whole canvas and transparent alpha. Change only boots below knees; do not alter hands, hair, robe or weapon. No background/text/new objects.",
+    "path": "C:\\Users\\User\\.codex\\generated_images\\01a1672c-506c-7a70-99ba-acf09e547ed6\\exec-40e53cb3-0936-4188-8351-9d0af6693372.png"
+  },
+  {
+    "id": "female_02",
+    "revision": 3,
+    "prompt": "Use case background-extraction. The attached female02 BACK patrol illustration is the EDIT TARGET. Its outer canvas incorrectly contains dark textured rectangular/corner background artifacts. REMOVE ALL background pixels and all haze/backdrop/rectangular corners, producing genuinely clean TRANSPARENT ALPHA outside the exact character silhouette, including transparent gaps between legs, sword/hand and body, between cloth panels. Do not use black, white, gray or checkerboard as actual background. Alpha=0 on all empty canvas, no residual dark texture or colored haze. KEEP the woman's bob/hairpin, red-black-bronze outfit, left-side shoulder and cloth motifs, right-hand sheathed saber, natural walking pose, plain rear leather boots with small straps and gold heels, entire head and both feet, framing/proportions and high-quality hand-painted2D style unchanged. Do NOT reintroduce front shin armor or redesign any costume. One back-view fullbody transparent image, same portrait canvas. This is ONLY clean background extraction, no scene, no floor, no new shadow, no text.",
+    "path": "C:\\Users\\User\\.codex\\generated_images\\01a1672c-506c-7a70-99ba-acf09e547ed6\\exec-4f67e263-5667-49c0-a03a-cf6b38905aa7.png"
+  }
+]

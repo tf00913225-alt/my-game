@@ -1,0 +1,632 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "updatedAt": "2026-10-25T15:03:20.519048+00:00",
+  "status": "pass",
+  "scope": "Inbox-only technical verification; NOT art approval, runtime, animation or deployment acceptance",
+  "sourcePolicy": "No trim/crop/resize/rotate/alpha changes; only labeled 84x126 review copies resized",
+  "backgroundCleanliness": "Corner alpha values are observations only. Clean background requires separate visual QA; pixel-exact conversion does not certify it.",
+  "previewSheet": "all-eight-patrol-84x126-comparison.png",
+  "counts": {
+    "pass": 8,
+    "pending": 0,
+    "fail": 0
+  },
+  "pairs": [
+    {
+      "identity": "male_01",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_male_01_patrol_front_source.png",
+          "webp": "player_male_01_patrol_front.webp",
+          "sourceSha256": "30f682f044136262424da5ba51912ce33dbd8d409b55f61c5c7a189f5e0a5469",
+          "webpSha256": "2fbe777afadaa0177979c395bdb680e7e94a7a8911b9c278aa61adc098a83c9a",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Existing human-approved WebP; verified, not rewritten",
+          "preview": "player_male_01_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_male_01_patrol_back_source.png",
+          "webp": "player_male_01_patrol_back.webp",
+          "sourceSha256": "8ce47e546526c8e9b863643f6e29f35c909b0ad00820399b8004708fdbc5e4aa",
+          "webpSha256": "792c3e9357deb20d7aa6b4d58d7517e76ec14b4e9832e1be99692844ef699325",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Existing human-approved WebP; verified, not rewritten",
+          "preview": "player_male_01_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_male_01_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "male_02",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_male_02_patrol_front_source.png",
+          "webp": "player_male_02_patrol_front.webp",
+          "sourceSha256": "55a6c4f79b4d88d94b1dc5fed93546d0cfd78daa9931530063b9d94408e85914",
+          "webpSha256": "32868ccf02dc7b5a8d124cf72e69deba1e8eb7d4a79fe4b98ff81ed62b5140da",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_02_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_male_02_patrol_back_source.png",
+          "webp": "player_male_02_patrol_back.webp",
+          "sourceSha256": "90606cdd8b57107a8dab447c44798ecff645ebdcfd6b82e052f096f76776f7e0",
+          "webpSha256": "37000310182cefd26a9c5eeaa261138ab291cb7a851d9a179243a1d65d4fd700",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_02_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_male_02_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "male_03",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_male_03_patrol_front_source.png",
+          "webp": "player_male_03_patrol_front.webp",
+          "sourceSha256": "d8aee3d183a83952d81f5e5a09e9b32c951d946ed27b509f99f6dc044ff87331",
+          "webpSha256": "68581fa853a8a394a1cedb38dbae5bdf5cde6b72fe71f36b4c025d4c5620d710",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_03_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_male_03_patrol_back_source.png",
+          "webp": "player_male_03_patrol_back.webp",
+          "sourceSha256": "49d134a4d639eab1fb17a5543f4eb5727234b3fde84162bdb16f3d32d73cc31f",
+          "webpSha256": "baa78526987bb4db7dacd50692935995b43f977195e99f8b86a86b599de96f43",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_03_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_male_03_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "male_04",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_male_04_patrol_front_source.png",
+          "webp": "player_male_04_patrol_front.webp",
+          "sourceSha256": "3b3adfa52a77d2478df9922e1f226a997aa1f8747c33a2af62ee168c7bb4810b",
+          "webpSha256": "cb5f2a79d88001bddaf5356b450b8d65191b77cccdf7f2772527ab1aae7b18b1",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_04_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_male_04_patrol_back_source.png",
+          "webp": "player_male_04_patrol_back.webp",
+          "sourceSha256": "8227c629b595f0ca16bc8798237c8127d81f85c8d15d9eaf9fae89f77f7876fa",
+          "webpSha256": "1e2a5ed85bb8d4b7875ebb81216bb0401c7110a92f27e25f2923807a2484ced1",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_male_04_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_male_04_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "female_01",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_female_01_patrol_front_source.png",
+          "webp": "player_female_01_patrol_front.webp",
+          "sourceSha256": "bb80ea0d167361915dbb37da136458fc4304b8c310087d0fae0e270bd21377a3",
+          "webpSha256": "21e88afe70194b14da300d21f6398f9de9f19ba636fa3aa7113d491283e8f2a2",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_01_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_female_01_patrol_back_source.png",
+          "webp": "player_female_01_patrol_back.webp",
+          "sourceSha256": "63f3b4a9e31d5bdfde4b565c6ba850d807a65629811b7b02c442fb386d8278bf",
+          "webpSha256": "71074afbf83427d15a2cdd58072b084fd8b2ee959eb490f35b3654d3f50d6d3c",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 1,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_01_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_female_01_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "female_02",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_female_02_patrol_front_source.png",
+          "webp": "player_female_02_patrol_front.webp",
+          "sourceSha256": "069eea1f5e0c8da718f36c2905943f63821cd654c82da49f9fe9cf1121cb4c58",
+          "webpSha256": "08e5b5b0b6af4f02e52995ba44276f3fb3fe0a5883e00175eb0da196c46f90f9",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_02_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_female_02_patrol_back_source.png",
+          "webp": "player_female_02_patrol_back.webp",
+          "sourceSha256": "0971155463b7bfaff5cd107339fc6723f209fe3cd9a268fe7e8617bd66f9cc59",
+          "webpSha256": "47bad9891733c53f2130e87e3ea7845b42429e7cf79a68eadabf1b64706d9ae8",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_02_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_female_02_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "female_03",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_female_03_patrol_front_source.png",
+          "webp": "player_female_03_patrol_front.webp",
+          "sourceSha256": "93acac62018e349048f801f52e7892c4d6b6065d11a829551a4e7815b647a8ba",
+          "webpSha256": "7b6ed6170a8b1a08fd65a6b0d91c63317bef8ff266accd8da0fa63d920f4c172",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_03_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_female_03_patrol_back_source.png",
+          "webp": "player_female_03_patrol_back.webp",
+          "sourceSha256": "9f2411b6bec42062e87f6d70a7cb9b1be1f9d9ae0d8a2e504f99eb833e7c5576",
+          "webpSha256": "2acdd4187eef44639b1800b02395d7b7c9373d7649368e9888c170f39b8ca222",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_03_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_female_03_patrol_batch_comparison.png"
+    },
+    {
+      "identity": "female_04",
+      "status": "pass",
+      "assets": [
+        {
+          "side": "front",
+          "source": "player_female_04_patrol_front_source.png",
+          "webp": "player_female_04_patrol_front.webp",
+          "sourceSha256": "132d9eb7feda229bd8537c993472bc5ec40adbbc79cb42cc838455923a9ad1d8",
+          "webpSha256": "a658b6c0799ae4b327eea17ae7b027fa617eb7a4be09d6d761bfd4f612edf4c8",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_04_patrol_front_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        },
+        {
+          "side": "back",
+          "source": "player_female_04_patrol_back_source.png",
+          "webp": "player_female_04_patrol_back.webp",
+          "sourceSha256": "0a3f6d3408e0b3fc4ac6812045ae2cd630ec202c101baf1b16b13d504b8e0b6b",
+          "webpSha256": "6c2247042c3d8e4e7a4a736e4de0b442c60977160a27af35b99176e01bdc973d",
+          "sourceMode": "RGBA",
+          "sourceSize": [
+            1024,
+            1536
+          ],
+          "decodedSize": [
+            1024,
+            1536
+          ],
+          "alphaExtrema": [
+            0,
+            254
+          ],
+          "corner24MaxAlpha": {
+            "topLeft": 0,
+            "topRight": 0,
+            "bottomLeft": 0,
+            "bottomRight": 0
+          },
+          "rgbaPixelExact": true,
+          "alphaExact": true,
+          "sourceUnchanged": true,
+          "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+          "preview": "player_female_04_patrol_back_preview_84x126.png",
+          "previewSize": [
+            84,
+            126
+          ]
+        }
+      ],
+      "comparison": "player_female_04_patrol_batch_comparison.png"
+    }
+  ]
+}

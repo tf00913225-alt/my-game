@@ -3,7 +3,7 @@
 Work ID: PLAYER-PATROL-SAMPLE-20261025
 Branch: feature/player-patrol-sample-20261025
 Base dev: 4ef6a09cf56d6789d1968481da1ee669b1cafd61
-Status: male01 human-approved 2026-10-25 22:40 Asia/Taipei; remaining seven pairs in production. Inbox only; runtime wiring requires shared-file handoff.
+Status: male01 human-approved 2026-10-25 22:40 Asia/Taipei; remaining seven pairs completed as independently reviewed candidates. Inbox only; human review and runtime shared-file handoff pending.
 
 代表原角色：assets/characters/player_male_01.webp。male01正背樣張已由使用者22:40直接回覆「可以」批准；沿同一方向製作其餘七位正背，仍須分離獨審與84×126檢視。此目錄僅 inbox，無正式引用或 manifest 更動。與 #998 主城定位修正分離。戰鬥八圖由原 Owner 負責。
 
@@ -21,3 +21,5 @@ Status: male01 human-approved 2026-10-25 22:40 Asia/Taipei; remaining seven pair
 背面 v2 精確修訂提示：Image1 back edit target, Image2 front reference only. Move only large asymmetric teal/silver crane panel to back viewer LEFT, matching character LEFT. Keep sword and feather pauldron at viewer LEFT; do not mirror entire character. Replace viewer RIGHT crane panel with plain navy/teal cloth. Remove front-only rear waist diamond buckle and dangling chain; plain wrapped teal sash. Rear boots simple leather seams/trim, no copied front shin guards; retain walking sole. Preserve pose, ponytail, palette, proportions, canvas and transparent alpha. No background/text/new accessories.
 
 背面v2獨審：先前阻塞解除，可交人工審樣，非正式採用通過。左右衣襬/劍/羽肩一致，後腰後靴合理，正背同角色、雙腳完整、84×126可辨。人工仍須確認細長身形在巡怪畫面的比例，以及步態強度；未驗runtime/動畫/點擊。Status: INDEPENDENT_REVIEW_READY_FOR_HUMAN_SAMPLE_APPROVAL.
+
+全批素材段完成：16張1024×1536 RGBA母圖與lossless WebP精確一致，84×126全8對照獨審通過候選。男03/04後靴v2、女02後靴/透明v3為canonical，拒件留於rejected-*不可導入。女02背略較亮/飽和，人工審樣注意。只有男01已有人審批准，其餘7位候選待呈現；未驗正式接入/互動/實景/部署/真機效能。精確新mapping、16新hash檔名、舊16保留及共享manifest序列見runtime-handoff-plan.json。新16WebP合計20,192,630bytes（約19.3MiB），接線階段須驗載入/快取/手機，不擅自改有損或尺寸。

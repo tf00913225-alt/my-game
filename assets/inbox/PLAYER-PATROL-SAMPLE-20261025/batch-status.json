@@ -7,7 +7,7 @@
     "answer": "可以",
     "scope": "male01 style/proportion/pose approved; produce remaining seven front/back"
   },
-  "status": "FOURTEEN_SOURCES_GENERATED_INDEPENDENT_QA_REVISIONS_PENDING",
+  "status": "ASSET_PHASE_COMPLETE_HUMAN_REVIEW_AND_SHARED_RUNTIME_HANDOFF_PENDING",
   "runtimeChanges": false,
   "sharedFilesPendingHandoff": [
     "exploration character mapping/resolver owner",
@@ -23,18 +23,15 @@
     "do not claim #998 or current exploration deployment acceptance"
   ],
   "pending": [
-    "14 sources",
-    "lossless pixel/alpha verification",
-    "independent art review",
-    "84x126 clarity",
-    "precise mapping and shared-file handoff before runtime changes"
+    "remaining seven human candidate review",
+    "coordinate shared-file and deployment window",
+    "runtime implementation and latest Head CI after handoff",
+    "exact dev deployment and mobile/PC/physical runtime acceptance"
   ],
   "generatedSources": 14,
-  "independentPending": [
-    "male03/back rear boot correction",
-    "male04/back rear boot correction",
-    "female back art review",
-    "all 84x126 review"
-  ],
-  "technicalStatus": "separate processor running; no final PASS yet"
+  "independentPending": [],
+  "technicalStatus": "16 lossless WebP exact RGBA/Alpha PASS, source-sized1024x1536",
+  "canonicalTotalSources": 16,
+  "independentStatus": "All8 pairs final84x126 independently accepted as candidates",
+  "next": "Present final contact sheet and precise runtime-handoff-plan.json; keep current inbox-only branch unmerged until coordinated integration stage"
 }
