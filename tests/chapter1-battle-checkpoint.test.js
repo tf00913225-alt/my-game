@@ -315,6 +315,21 @@ test('ordinary dungeon kill keeps its original reward path without a teaching re
     replay.c.killMonster(0);
     assert.equal(replayStore.saved().gold,325,'an ordinary replay of a completed node remains outside the fresh first battle');
 });
+test('noRewards enemies still die and notify the original Boss owner without gold, bestiary or a teaching receipt',()=>{
+    for(const mode of ['adventure','boss']){
+        const h=harness(),store=installRewardOwners(h);let deaths=0;
+        h.c.v132ActiveDungeonRun.mode=mode;h.c.monsters[0].noRewards=true;
+        h.c.FourSymbolsBossBattle={onEnemyDeath(index,monster){
+            assert.equal(index,0);assert.equal(monster.alive,false);deaths++;
+        }};
+        h.c.goldDraws=0;vm.runInContext('Math.random=()=>{goldDraws++;return 0.5;};',h.c);
+        h.c.killMonster(0);
+        assert.equal(h.c.monsters[0].alive,false);assert.equal(h.c.monsters[0].hp,0);assert.equal(deaths,1);
+        assert.equal(h.c.gold,300);assert.equal(h.c.goldDraws,0);assert.deepEqual(h.c.bestiaryData,{});
+        assert.equal(h.onboarding.battleKillReward,undefined);assert.equal(store.writes(),0);
+        assert.equal(h.c.dailyQuestState.progress.kill10,1,'the existing outer quest observer is unchanged for this path');
+    }
+});
 
 function installFirstTutorialTerminalRetry(h){
     const c=h.c,source=fs.readFileSync('js/adventure/adventure-runtime-v1-20260915.js','utf8');
