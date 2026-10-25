@@ -96,5 +96,20 @@
     "verification": "17direct tests +build-check/diff PASS",
     "retryLedger": "failedHead logical retries0, deterministic test mismatch fixed directly, no rerun/cancel/dispatch",
     "next": "save original branch checkpoint and wait NEW Head required CI;955release hold persists"
+  },
+  "ciDomFixtureAlignment": {
+    "failedHead": "fc257e8c83478a3a3f8d35cdbfcd2213539f49ae",
+    "workflow": "CI",
+    "run": 40189640515,
+    "attempt": 1,
+    "job": 121157881596,
+    "step": "Run all Node unit and integration suites",
+    "firstError": "v174-cardless-battle-presentation.test.js:96 TypeError arrow.setAttribute is not a function",
+    "cause": "minimal DOM mock lacked standard setAttribute and discarded appended child nodes; real browser supports both",
+    "fix": "tests-only mock attribute storage/direct-child query and reuse; preserve original portrait/HUD assertions, additionally enforce exactly one aria-hidden target seal",
+    "verification": "direct mock suite6 plus original presentation/name/formula targeted suites PASS; build-check/diff PASS",
+    "broaderOwnerRead": "46/48 top-level PASS; two unrelated local environment failures: missing identify and Chrome executable env unset. Not fullPASS, no code/CI bypass or install. Latest selected browser jobs already succeeded on unchanged product.",
+    "retryLedger": "fc failedHead retries0; deterministic fixture fix, no rerun/cancel/dispatch",
+    "next": "newHead natural requiredCI;955window stillhold"
   }
 }
