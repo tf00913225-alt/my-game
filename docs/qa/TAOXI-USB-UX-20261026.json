@@ -1,0 +1,39 @@
+{
+  "workId": "TAOXI-ENTRY-20261025",
+  "device": {"model": "Samsung SM-N960F", "android": "10", "cssViewport": "411x717", "devicePixelRatio": 2.625},
+  "method": "Physical USB ADB tap/swipe; Chrome CDP over the same USB connection observes DOM, timing and render state. No viewport emulation. Device serial is intentionally omitted.",
+  "dataBoundary": "A new localhost origin serves the production candidate with existing isolated Auth/Cloud fixtures and explicit earned-progress fixture. Original live game tab and real account data are preserved. This is not true-account/cloud acceptance.",
+  "initialPhonePage": "Original dev tab retained an older app-shell.b12515cb7429.js, no exploration entry, and incomplete first five stages. It was observed, not altered or force-unlocked.",
+  "coldEntry": {"milliseconds": 1738.9, "busyFeedbackVisible": true, "scope": "First load of isolated QA origin over USB; not internet/cellular cold-load evidence"},
+  "before": {
+    "groundFirstMoveMs": 14.6,
+    "joystickFirstMoveMs": 11.3,
+    "releaseDriftNativePixels": 0,
+    "npcNorthDistanceNativePixels": 122.2608,
+    "npcNorthButtonDisabled": true,
+    "joystickThumbStatic": true
+  },
+  "fixes": [
+    "NPC interaction distance uses its foot point from every side; approach remains the click-to-walk destination",
+    "Joystick thumb follows touch, including within the movement deadzone; press lights the ring, release/cancel centers it",
+    "Thumb transform writes are cached independently of browser CSS serialization to avoid redundant idle-frame style writes"
+  ],
+  "after": {
+    "bundle": "build/feature-adventure-ui.232fe02442a6.js",
+    "style": "build/feature-adventure.d8e9cb36cb8f.css",
+    "groundFirstMoveMs": 17.2,
+    "joystickFirstMoveMs": 8.7,
+    "releaseDriftNativePixels": 0,
+    "thumbHeld": {"pressed": true, "xNativePixels": -0.1, "yNativePixels": -55.5},
+    "thumbReleased": {"pressed": false, "xNativePixels": 0, "yNativePixels": 0},
+    "npcNorthButtonEnabled": true,
+    "npcNorthDialogueOpenedByExplicitTap": true,
+    "ordinaryDialogueLeavesMainStoryUnchanged": true,
+    "oneTapPortal": {"firstMovementMs": 42.8, "walkAndEnterMs": 2181.4, "entered": "a", "singleTapExitReturned": "village", "returnPosition": "390.00,2475.00", "extraConfirmation": false},
+    "portalFrameSample": {"medianMs": 16.7, "p95Ms": 33.4}
+  },
+  "limits": "Short USB-injected touch samples on one real device, not a sustained-FPS guarantee or a human finger study. Native swipe injection itself affects event frequency. No movement speed, cloud authority or real player progress changed.",
+  "regression": "31 focused tests PASS; final production build synchronized; 393x873 and1920x1080 isolated Browser first-loop/Story/reload tests PASS",
+  "screenshot": "taoxi-entry-20261025/usb-phone-final.png",
+  "latestCiDeploy": "Owned by PR1000; this file is task-specific physical-device evidence, not deployment or production/main approval"
+}

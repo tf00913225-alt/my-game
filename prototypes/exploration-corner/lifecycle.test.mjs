@@ -29,8 +29,26 @@ function fixture(){
   for(const file of ['scene.js','runtime.js'])vm.runInContext(fs.readFileSync(new URL(file,import.meta.url),'utf8'),context);
   const emit=(el,type,props={})=>{const event=new Event(type,{cancelable:true});Object.assign(event,props);el.dispatchEvent(event);};
   const step=(count=1)=>{for(let i=0;i<count;i++){clock+=16;const batch=[...frames.values()];frames.clear();batch.forEach(fn=>fn(clock));}};
-  return {api:context.FourSymbolsExploration,root,world,viewport,prompt,exit,pads,frames,window,document,emit,step,services:{eventToPoint:e=>({x:e.x,y:e.y})}};
+  return {api:context.FourSymbolsExploration,root,world,viewport,prompt,exit,pads,frames,window,document,emit,step,makeElement:()=>new Element(),services:{eventToPoint:e=>({x:e.x,y:e.y})}};
 }
+
+test('NPC proximity uses the foot point from every side, separately from its click approach',()=>{
+  const f=fixture(),data={width:1080,height:1420,viewWidth:1080,viewHeight:1420,radius:23,speed:320,spawn:{x:540,y:600},objects:[{id:'villager',x:540,y:700,width:200,height:200,approach:{x:540,y:800},interactionPoint:{x:540,y:700},interaction:'talk'}]};
+  let calls=0;const c=f.api.mount(f.root,{...f.services,scene:data,renderObject:()=>'',onInteract:({close})=>{calls++;close();}});c.enter();
+  assert.equal(f.prompt.disabled,false,'standing north of the NPC is close enough');assert.equal(calls,0,'proximity alone never starts dialogue');
+  f.emit(f.prompt,'click');assert.equal(calls,1);c.destroy();
+});
+
+test('joystick thumb follows touch inside and outside the deadzone, then centers on cancel',()=>{
+  const f=fixture(),stick=f.makeElement(),thumb=f.makeElement();
+  Object.assign(stick,{offsetLeft:0,offsetTop:0,offsetWidth:235,offsetHeight:235,parentElement:{offsetTop:0}});thumb.offsetWidth=104;
+  stick.nodes.set('[data-stick-thumb]',thumb);f.root.nodes.set('[data-joystick]',stick);
+  const c=f.api.mount(f.root,f.services);c.enter();const centered=thumb.style.transform;
+  f.emit(stick,'pointerdown',{pointerId:1,isPrimary:true,x:177.5,y:117.5});f.step(3);assert.notEqual(thumb.style.transform,centered);
+  f.emit(stick,'pointermove',{pointerId:1,x:122.5,y:117.5});const position=f.root.dataset.position;f.step(3);
+  assert.equal(f.root.dataset.position,position,'deadzone still prevents movement');assert.notEqual(thumb.style.transform,centered,'small thumb motion still has feedback');
+  f.emit(stick,'pointercancel',{pointerId:1});f.step(2);assert.equal(thumb.style.transform,centered);c.destroy();
+});
 
 test('transparent scene-object padding cannot redirect ground taps to an interaction',()=>{
   const f=fixture();

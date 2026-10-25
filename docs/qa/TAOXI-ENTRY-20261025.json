@@ -14,7 +14,7 @@
     "loading": "Immediate loading/busy feedback and duplicate-click suppression on original entries; restoration on success/failure/UID cancellation. Artwork quality and asset loading readiness unchanged. No speedup claim."
   },
   "validation": {
-    "targetedTests": "29 PASS: 28 exploration geometry/lifecycle/progress/entry/portal regressions plus existing feature-loader-runtime",
+    "targetedTests": "31 PASS: 30 exploration geometry/lifecycle/progress/entry/portal/USB-UX regressions plus existing feature-loader-runtime",
     "environment": "First sandbox run denied localhost EACCES; identical targeted suite passed with approved localhost execution; no test weakened",
     "productionBuildCheck": "PASS",
     "browser": "Formal index/build/Display/UI/Inventory/AccountSave with isolated Auth/Cloud and explicit earned-progress fixture; not a real account or physical phone",
@@ -23,7 +23,8 @@
     "screenshots": ["taoxi-entry-20261025/393-entry-arrows.png", "taoxi-entry-20261025/393-house-front.png", "taoxi-entry-20261025/393-house-behind.png", "taoxi-entry-20261025/393-npc-pass-through.png", "taoxi-entry-20261025/1920-house-front.png"],
     "fullEvidence": "taoxi-entry-20261025/full-content.json",
     "fullSnapshot": "full-content.json records the full five-house/ten-point run on feature-adventure-ui.33215dbd46ce.js. Subsequent marker appearance/door-center alignment changes are separately verified by focused first-loop and geometry tests; do not label the older full run as the newest bundle.",
-    "bundles": ["build/feature-adventure-entry.5e09bea7a0b6.js", "build/feature-adventure-ui.a95bb58809a9.js", "build/feature-adventure.f91c25eec12f.css"]
+    "usbEvidence": "TAOXI-USB-UX-20261026.json: physical Note9 native ADB touch, no real account writes; north-side NPC proximity and joystick feedback fixed and retested",
+    "bundles": ["build/feature-adventure-entry.5e09bea7a0b6.js", "build/feature-adventure-ui.232fe02442a6.js", "build/feature-adventure.d8e9cb36cb8f.css"]
   },
   "ciDeploy": "Latest status is owned by the work PR; this file records local symptom evidence only. Main release not authorized."
 }

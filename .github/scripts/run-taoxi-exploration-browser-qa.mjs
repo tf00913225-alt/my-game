@@ -64,6 +64,9 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
     assert.ok(behind.y<1980&&behind.y>1900);assert.ok(behind.actor<behind.house,'house renders in front only behind it');await capture('house-behind');
     await walk(50,1700);await walk(840,2600);await walk(840,2240);
     assert.equal(await c.eval(`!!document.querySelector('.adventure-transient-dialogue')`),false,'passing NPC never starts conversation');await capture('npc-pass-through');
+    await heldKey('ArrowDown',400);
+    assert.equal(await c.eval(`document.querySelector('[data-interact]').disabled`),false,'NPC is interactive from its north side');
+    assert.match(await c.eval(`document.querySelector('[data-interact]').textContent`),/周伯/);await capture('npc-north-interaction');
     const before=await c.eval(`JSON.stringify(player.adventureProgress)`);
     await tapArt('[data-object="elder"]');await wait(`Math.abs(Number(document.getElementById('explorationPage').dataset.position.split(',')[1])-2570)<5`,'clicked NPC approach');
     assert.equal(await c.eval(`!!document.querySelector('.adventure-transient-dialogue')`),false,'NPC click only approaches');await tap('[data-interact]');await capture('dialogue');
@@ -117,6 +120,7 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
       assert.ok(await c.eval(`document.getElementById('explorationPage').dataset.destination`),'tap takes over');
       await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:joy.x-25,y:joy.y}]});await sleep(100);
       assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.destination`),'','joystick cancels route');
+      assert.equal(await c.eval(`document.querySelector('[data-joystick]').classList.contains('is-held')`),true,'joystick shows held feedback');
       await c.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
       const canceled=await c.eval(`document.getElementById('explorationPage').dataset.position`);await sleep(250);assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.position`),canceled,'cancel stops movement');
       await tap('#explorationPage [data-back]');await tap('[data-village]');

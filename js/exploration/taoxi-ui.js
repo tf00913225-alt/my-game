@@ -56,7 +56,7 @@ function scene(id,spawn){
     '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
     '<div class="taoxi-ground '+(id==='village'?'taoxi-village-ground':'taoxi-room-ground')+'"></div>'+
     '<div class="explore-player taoxi-player" data-player><span class="explore-shadow"></span><span class="taoxi-character" style="background-image:url('+asset(appearance)+')"></span></div><span class="explore-destination" data-destination hidden></span></div></div>'+
-    '<footer class="taoxi-controls"><div data-joystick class="taoxi-joystick" aria-label="虛擬搖桿"><span aria-hidden="true">✥</span></div><div><button type="button" data-interact disabled>靠近可互動</button><p data-status role="status">點地移動，也可拖動左側搖桿。</p></div></footer>'+
+    '<footer class="taoxi-controls"><div data-joystick class="taoxi-joystick" aria-label="虛擬搖桿"><span data-stick-thumb aria-hidden="true">✥</span></div><div><button type="button" data-interact disabled>靠近可互動</button><p data-status role="status">點地移動，也可拖動左側搖桿。</p></div></footer>'+
     '<p class="taoxi-save-note">本機探索紀錄 · 尚非雲端同步</p>';
   const character=root.querySelector('.taoxi-character');
   controller=scope.FourSymbolsExploration.mount(root,{
