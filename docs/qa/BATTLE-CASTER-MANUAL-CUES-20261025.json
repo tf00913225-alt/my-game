@@ -82,5 +82,19 @@
     "change": "same SVG/54px/position: opacity1→.4→1 over1.2s, no rotation/scale; reduced motion steady",
     "verification": "actual Chrome bright/dim and identical rect,4viewport+16direct+build/check PASS",
     "unchanged": "manual text blink/red-white ring, caster names,VFX/portrait size/depth/Core"
+  },
+  "ciAlignment": {
+    "failedHead": "b663f6ae3492a8cf73bcdca1b47bd30e1264cf08",
+    "workflow": "CI",
+    "run": 40186026464,
+    "attempt": 1,
+    "job": 121147513714,
+    "step": "Run all Node unit and integration suites",
+    "firstError": "tests/hit-evasion-final-percent-status-formula-20260923.test.js:163 expected retired shared ally/enemy root reticle selector",
+    "selectedOtherJobs": "all selected browser/Boss/Abyss/Adventure/portrait and Session SUCCESS; Repository121154722221 dependentfailure",
+    "fix": "tests-only: preserve ally root reticle, require disabled retired enemy root markers and original-state single54px art seal with pointer-eventsnone; reject oldarrow. No formula/status/target/product modification.",
+    "verification": "17direct tests +build-check/diff PASS",
+    "retryLedger": "failedHead logical retries0, deterministic test mismatch fixed directly, no rerun/cancel/dispatch",
+    "next": "save original branch checkpoint and wait NEW Head required CI;955release hold persists"
   }
 }
