@@ -1,0 +1,214 @@
+{
+  "workId": "EXPLORATION-CORNER-20261023",
+  "pr": 985,
+  "baseDev": "632e3281",
+  "status": "local-mode implementation and verification; Draft pending Cloud reload scope and latest required CI",
+  "tests": {
+    "exploration": 24,
+    "relatedOwnerRegression": 99,
+    "productionLoop": [
+      {
+        "width": 393,
+        "height": 873,
+        "firstLoop": true,
+        "storyEntry": true,
+        "actualStoryEntry": true,
+        "storyCursorPreserved": true,
+        "reload": true,
+        "repeatNoGrant": true,
+        "storyUnchanged": true,
+        "transport": "isolated Auth/Cloud; explicit earned-progress fixture; local save only"
+      },
+      {
+        "width": 1920,
+        "height": 1080,
+        "firstLoop": true,
+        "storyEntry": true,
+        "actualStoryEntry": true,
+        "storyCursorPreserved": true,
+        "reload": true,
+        "repeatNoGrant": true,
+        "storyUnchanged": true,
+        "transport": "isolated Auth/Cloud; explicit earned-progress fixture; local save only"
+      }
+    ],
+    "fullContent": {
+      "fullFiveHouses": true,
+      "tenSearchPoints": true,
+      "eightAppearances": true,
+      "dualControl": true,
+      "cancel": true,
+      "storageRefusalAndRetry": true,
+      "uidIsolationFixture": true,
+      "transport": "existing UID-local Boot mode; external Auth/Cloud and earned main progress are explicit QA fixtures",
+      "build": {
+        "scripts": [
+          "build/feature-adventure-content.79628452fab4.js",
+          "build/feature-adventure-runtime.cbc1c29d58c7.js",
+          "build/feature-adventure-ui.a9a25dbcf4be.js"
+        ],
+        "styles": [
+          "build/feature-adventure.4e5b95c843fc.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ],
+        "assets": [
+          "assets/exploration/taoxi-v1/gate.webp",
+          "assets/exploration/taoxi-v1/ground.webp",
+          "assets/exploration/taoxi-v1/house.webp",
+          "assets/exploration/taoxi-v1/interior.webp",
+          "assets/exploration/taoxi-v1/player_female_01.webp",
+          "assets/exploration/taoxi-v1/player_female_02.webp",
+          "assets/exploration/taoxi-v1/player_female_03.webp",
+          "assets/exploration/taoxi-v1/player_female_04.webp",
+          "assets/exploration/taoxi-v1/player_male_01.webp",
+          "assets/exploration/taoxi-v1/player_male_02.webp",
+          "assets/exploration/taoxi-v1/player_male_03.webp",
+          "assets/exploration/taoxi-v1/player_male_04.webp",
+          "assets/exploration/taoxi-v1/props.webp",
+          "assets/exploration/taoxi-v1/villagers.webp",
+          "assets/exploration/taoxi-v1/world-map.webp"
+        ]
+      },
+      "head": "1257984c6a1864184e62ef0e166a84d5f68868b9"
+    },
+    "appearances": {
+      "eightAppearances": true,
+      "fourDirectionsEach": true,
+      "actualKeyInput": true,
+      "viewport": {
+        "width": 393,
+        "height": 873
+      },
+      "build": {
+        "scripts": [
+          "build/feature-adventure-content.79628452fab4.js",
+          "build/feature-adventure-runtime.cbc1c29d58c7.js",
+          "build/feature-adventure-ui.a7340a57d1b3.js"
+        ],
+        "styles": [
+          "build/feature-adventure.4e5b95c843fc.css"
+        ],
+        "dependencies": [
+          "gameplay-core"
+        ],
+        "assets": [
+          "assets/exploration/taoxi-v1/gate.webp",
+          "assets/exploration/taoxi-v1/ground.webp",
+          "assets/exploration/taoxi-v1/house.webp",
+          "assets/exploration/taoxi-v1/interior.webp",
+          "assets/exploration/taoxi-v1/player_female_01.webp",
+          "assets/exploration/taoxi-v1/player_female_02.webp",
+          "assets/exploration/taoxi-v1/player_female_03.webp",
+          "assets/exploration/taoxi-v1/player_female_04.webp",
+          "assets/exploration/taoxi-v1/player_male_01.webp",
+          "assets/exploration/taoxi-v1/player_male_02.webp",
+          "assets/exploration/taoxi-v1/player_male_03.webp",
+          "assets/exploration/taoxi-v1/player_male_04.webp",
+          "assets/exploration/taoxi-v1/props.webp",
+          "assets/exploration/taoxi-v1/villagers.webp",
+          "assets/exploration/taoxi-v1/world-map.webp"
+        ]
+      }
+    },
+    "cloudConflict": {
+      "expectedState": "MIGRATION_REQUIRED",
+      "localReceiptRetained": true,
+      "cloudReadinessUnchanged": true,
+      "scope": "isolated authoritative Cloud response; original resolver refusal, no true account or server write"
+    },
+    "combinedTargeted": {
+      "total": 123,
+      "passed": 123,
+      "failed": 0
+    }
+  },
+  "art": {
+    "tool": "built-in imagegen",
+    "assets": 15,
+    "validation": "assets/inbox/taoxi-v1/validation.json",
+    "prompts": "assets/inbox/taoxi-v1/prompts.json"
+  },
+  "latestBuild": {
+    "scripts": [
+      "build/feature-adventure-content.79628452fab4.js",
+      "build/feature-adventure-runtime.cbc1c29d58c7.js",
+      "build/feature-adventure-ui.6dae9290698f.js"
+    ],
+    "styles": [
+      "build/feature-adventure.170bb326fdf2.css"
+    ],
+    "dependencies": [
+      "gameplay-core"
+    ],
+    "assets": [
+      "assets/exploration/taoxi-v1/gate.webp",
+      "assets/exploration/taoxi-v1/ground.webp",
+      "assets/exploration/taoxi-v1/house.webp",
+      "assets/exploration/taoxi-v1/interior.webp",
+      "assets/exploration/taoxi-v1/player_female_01.webp",
+      "assets/exploration/taoxi-v1/player_female_02.webp",
+      "assets/exploration/taoxi-v1/player_female_03.webp",
+      "assets/exploration/taoxi-v1/player_female_04.webp",
+      "assets/exploration/taoxi-v1/player_male_01.webp",
+      "assets/exploration/taoxi-v1/player_male_02.webp",
+      "assets/exploration/taoxi-v1/player_male_03.webp",
+      "assets/exploration/taoxi-v1/player_male_04.webp",
+      "assets/exploration/taoxi-v1/props.webp",
+      "assets/exploration/taoxi-v1/villagers.webp",
+      "assets/exploration/taoxi-v1/world-map.webp"
+    ]
+  },
+  "screenshots": [
+    "docs/qa/taoxi-exploration-20261025/393-home-entry.png",
+    "docs/qa/taoxi-exploration-20261025/393-locked-map.png",
+    "docs/qa/taoxi-exploration-20261025/393-village.png",
+    "docs/qa/taoxi-exploration-20261025/393-interior.png",
+    "docs/qa/taoxi-exploration-20261025/393-search.png",
+    "docs/qa/taoxi-exploration-20261025/1920-interior.png",
+    "docs/qa/taoxi-exploration-20261025/393-authoritative-conflict.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-fire.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-water.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-wind.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-male-earth.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-fire.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-water.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-wind.png",
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-earth.png",
+    "docs/qa/taoxi-exploration-20261025/393-story-entry.png",
+    "docs/qa/taoxi-exploration-20261025/1920-story-entry.png"
+  ],
+  "limits": [
+    "Auth/Cloud transport and earned chapter progress are QA fixtures; no real-account or physical-phone evidence",
+    "Authoritative-cloud plus local-dirty reload remains MIGRATION_REQUIRED; local receipt retained. No bypass or Cloud entitlement.",
+    "Full five-house run passed fixed Head1257984c; subsequent Story-entry presentation-only change passed two-size real Story cursor/return checks. Latest required CI belongs to current PR Head.",
+    "No dev merge/deployment or main release claimed."
+  ],
+  "cleanup": "Keep active #985 branch/worktree; no unabsorbed content deleted.",
+  "ciFailures": [
+    {
+      "run": 40191709119,
+      "head": "56b4dc1c",
+      "job": 121164058329,
+      "firstFailure": "Responsive Item: home announcement control covered by new exploration entry",
+      "fix": "share original entrance safe area, do not cover utility row"
+    },
+    {
+      "run": 40191709119,
+      "head": "56b4dc1c",
+      "job": 121164058441,
+      "firstFailure": "Unclassified JavaScript under tests/fixtures",
+      "fix": "move runner to existing .github/scripts QA directory"
+    },
+    {
+      "run": 40194973390,
+      "attempt": 1,
+      "head": "2cc35074",
+      "job": 121174453165,
+      "firstFailure": "all Node / hero-core-phase1.test.js / player undefined in pre-copy validation slice",
+      "fix": "clear absent optional field only after validated player copy; preserve original assertion; add next-UID hydration regression",
+      "verification": "123 targeted tests and canonical builder pass; latest new-Head CI pending"
+    }
+  ]
+}

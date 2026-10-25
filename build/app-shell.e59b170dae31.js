@@ -7945,6 +7945,7 @@ async function createCharacter(){
     selectedCreationElement=selection.element;
     Object.keys(creationStats).forEach(key=>{ creationStats[key]=selection.attributes[key]; });
     creationPoints=0;
+    delete player.explorationProgress;
     player.id=id;
     player.gender=selection.gender;
 
@@ -8454,6 +8455,10 @@ function loadGame(){
             player,
             data.player
         );
+        // After the existing validation/copy boundary, discard only stale in-memory UID data.
+        if(data.player.explorationProgress===undefined){
+            delete player.explorationProgress;
+        }
         migrateLegacySixStats(player);
 
 
@@ -9407,6 +9412,8 @@ function showPage(page,options={}){
     });
 
 
+    const explorationPage=$('explorationPage');
+    if(explorationPage){explorationPage.hidden=page!=='exploration';if(page!=='exploration')window.FourSymbolsTaoxi?.leave();}
     // Adventure is a route, not an overlay above whichever page was last active.
     // Project its visibility here alongside the same .page.active authority.
     const adventurePage=$("adventurePage");
@@ -9485,6 +9492,7 @@ function showPage(page,options={}){
         "skill",
         "home",
         "adventure",
+        "exploration",
         "training",
         "dungeon",
         "gameplay",
@@ -37036,6 +37044,7 @@ window.FourSymbolsItemAcquisitionData={
        never expose the main navigation first and replace it later. */
     function foregroundSuppressionReason(){
         const app=document.getElementById("app");
+        if(document.getElementById('explorationPage')?.classList?.contains('active'))return 'hidden-exploration';
         if(document.getElementById("adventurePage")?.classList?.contains("active")){
             return "hidden-adventure";
         }
