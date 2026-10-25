@@ -180,14 +180,26 @@ assert.equal(frostbiteRuntime.getOutgoingDamageDownPercent({statusEffects:[]}),0
 assert.match(navShell,/\["秘寶","assets\/ui\/nav-relic-v175\.webp","v148OpenContextRelic\(\)"\]/);
 assert.match(navShell,/\["元素匣","assets\/ui\/nav-element-box\.png","openHomeFeature\('autoBattleSettings'\)"\]/);
 assert.match(navShell,/\["返回","assets\/ui\/map-return\.png"/);
-assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回上一層"\)/);
+assert.match(dungeonPolish,/topReturn\.setAttribute\("aria-label","返回玩法"\)/);
+assert.match(dungeonPolish,/topReturn\.onclick=window\.v146ExitAbyssMap/);
+// Execute the original exit Owner: the accessible label must describe both routes.
+const exitOwner=homePolish.match(/window\.v146ExitAbyssMap=function\(\)\{[\s\S]*?\n    \};/);
+assert.ok(exitOwner,"original Abyss exit Owner must exist");
+const exitCalls=[];
+const exitRuntime={window:{v174AbyssLeaveToGameplay:()=>exitCalls.push("formal")},showPage:page=>exitCalls.push(page)};
+vm.runInNewContext(exitOwner[0],exitRuntime);
+exitRuntime.window.v146ExitAbyssMap();
+assert.deepEqual(exitCalls,["formal"],"prefer formal gameplay return without invoking fallback");
+delete exitRuntime.window.v174AbyssLeaveToGameplay;
+exitRuntime.window.v146ExitAbyssMap();
+assert.deepEqual(exitCalls,["formal","gameplay"],"fallback returns to gameplay");
 assert.match(navShell,/grid-template-columns|renderGameplayContext/);
 
 assert.match(homeRosterCss,/grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
 assert.match(creationCss,/creation-stat-details\[open\] \.creation-stat-details-body\{[\s\S]*font-size:39px/);
 assert.match(questCss,/quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after/);
-assert.match(questCss,/quest-milestone:not\(\.reached\)[\s\S]*opacity:\.5 !important/);
-assert.match(questCss,/quest-milestone\.claimed[\s\S]*opacity:\.5 !important/);
+assert.match(questCss,/quest-milestone:not\(\.reached\) \.quest-milestone-slot,\s*#game-ui #homeFeatureModal\.quest-mode \.quest-milestone\.claimed \.quest-milestone-slot\{\s*opacity:1 !important;/);
+assert.match(questCss,/quest-milestone:not\(\.reached\) \.quest-milestone-chest,\s*#game-ui #homeFeatureModal\.quest-mode \.quest-milestone\.claimed \.quest-milestone-chest\{\s*filter:saturate\(\.35\) brightness\(\.58\) !important;/);
 
 assert.match(baseCss,/#homePage\{[^}]*background-image:url\(\.\.\/assets\/ui\/home-background-v17344\.png\)/);
 assert.match(abyssCss,/gold-v17344\.png/);
