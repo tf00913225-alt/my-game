@@ -229,7 +229,7 @@ function runViewport(chrome,width,height){
     for(const frame of data.elementFrames){
         assert.equal(frame.arrow,"block");assert.equal(frame.arrowCount,1);
         assert.equal(frame.animation,"v174ManualTurnFootBreath",frame.element);
-        assert.equal(frame.border,"rgba(241, 210, 137, 0.72)",frame.element+" uses the manual frame color owner");
+        assert.equal(frame.border,"rgba(181, 248, 255, 0.95)",frame.element+" uses the manual frame color owner");
     }
     assert.equal(data.rows,2);
     assert.equal(data.enemies,10);

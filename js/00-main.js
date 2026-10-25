@@ -24353,64 +24353,50 @@ function positionBattleSkillNameBadge(badge,side,index,element){
     const geometry=owner?.getUnitGeometry?.(side,index);
     const fallback=element.getBoundingClientRect();
     const portrait=geometry?.artworkProjection?.rect||geometry?.portraitRect||fallback;
-    const unit=geometry?.unitRect||fallback,hud=geometry?.hudSafeRect;
-    // Reserve the existing short forward cast motion; never move the Unit/HUD.
-    let top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:6);
-    let x=portrait.left+portrait.width/2;
+    const unit=geometry?.unitRect||fallback;
+    const desiredX=portrait.left+portrait.width/2,desiredTop=portrait.top-6;
     badge.dataset.battleAnchor=side+":"+index;badge.title=badge.textContent;
     badge.style.setProperty("--skill-name-max-width",Math.max(40,(unit.width-12)/1.15)+"px");
-    if(top-badge.offsetHeight*1.05<4){ badge.dataset.compact="true"; }
-    let width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+    // Other portraits are not placement authorities: walking above every front
+    // row can put a rear caster's name in the opposing formation. Reserve all
+    // formal HUDs and command/banner surfaces, but keep the label by its caster.
     const blockers=[];
     document.querySelectorAll("#battlePage .battle-player,#battlePage .battle-monster").forEach(card=>{
-        if(card===element)return;
         const match=String(card.id).match(/^battle(PlayerCard|Monster)(\d+)$/);if(!match)return;
         const other=owner?.getUnitGeometry?.(match[1]==="Monster"?"monster":"player",Number(match[2]));
-        for(const rect of [other?.artworkProjection?.rect,other?.hudSafeRect])if(rect)blockers.push(rect);
+        if(other?.hudSafeRect)blockers.push(other.hudSafeRect);
     });
     document.querySelectorAll("#battleTurnIndicator,#turnTargetRow,#battleActionRegion,#releaseUpdateMarquee").forEach(node=>{
         const rect=node.getBoundingClientRect();if(rect.width>0&&rect.height>0)blockers.push(rect);
     });
-    // In a dense pair of rows the nearest free band can be above the front row.
-    // Read only the formal projections; this does not create a second scaler.
-    for(let pass=0;pass<blockers.length;pass++){
-        let moved=false;
-        for(const rect of blockers){
-            if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top+1>rect.top&&top-height<rect.top+rect.height){
-                top=rect.top-6;moved=true;
-            }
+    let best;
+    for(const compact of [false,true]){
+        if(compact)badge.dataset.compact="true";else delete badge.dataset.compact;
+        const width=badge.offsetWidth*1.05,height=badge.offsetHeight*1.05;
+        const minX=Math.max(1+width/2,unit.left+width/2);
+        const maxX=Math.min((window.innerWidth||Infinity)-width/2-1,unit.left+unit.width-width/2);
+        const x=Math.max(minX,Math.min(maxX,desiredX));
+        const minY=Math.max(height+1,desiredTop);
+        const maxY=Math.max(minY,portrait.top+portrait.height-6);
+        const ys=[minY,...blockers.flatMap(r=>[r.top-3,r.top+r.height+height+3])];
+        for(const y of ys){
+            if(y<minY||y>maxY)continue;
+            if(blockers.some(r=>x+width/2>r.left&&x-width/2<r.left+r.width&&y>r.top&&y-height<r.top+r.height))continue;
+            const distance=Math.abs(y-desiredTop);
+            if(!best||distance<best.distance)best={x,top:y,distance,compact};
         }
-        if(!moved)break;
+        if(best)break;
     }
-    if(top-height<0){
-        // A short PC viewport has no space for the normal two-line pop above
-        // the top HUD. Use one compact line without overshoot, never cover HP.
-        badge.dataset.compact="true";width=badge.offsetWidth;height=badge.offsetHeight;
-        top=Math.min(portrait.top,hud?.top??portrait.top)-(side==="player"?36:1);
-        for(let pass=0;pass<blockers.length;pass++){
-            let moved=false;
-            for(const rect of blockers)if(x+width/2>rect.left&&x-width/2<rect.left+rect.width&&top>rect.top&&top-height<rect.top+rect.height){top=rect.top-1;moved=true;}
-            if(!moved)break;
-        }
-        if(top-height<0){
-            // The PC overlay can occupy the entire band above the top row.
-            // Use available side gutter for this transient label, not a new
-            // battlefield scale or a change to the announcement's lifecycle.
-            const bounds=[...blockers,portrait,...(hud?[hud]:[])];
-            const desiredX=x,desiredTop=Math.min(portrait.top,hud?.top??portrait.top)-1;
-            const xs=[x,...bounds.flatMap(r=>[r.left-width/2-2,r.left+r.width+width/2+2])];
-            const ys=[Math.max(height+1,desiredTop),height+1];
-            let best;
-            for(const cx of xs)for(const cy of ys){
-                if(cx-width/2<1||cx+width/2>window.innerWidth-1||cy-height<1||cy>portrait.top-1)continue;
-                if(bounds.some(r=>cx+width/2>r.left&&cx-width/2<r.left+r.width&&cy>r.top&&cy-height<r.top+r.height))continue;
-                const distance=Math.abs(cx-desiredX)+Math.abs(cy-desiredTop);
-                if(!best||distance<best.distance)best={x:cx,top:cy,distance};
-            }
-            if(best){x=best.x;top=best.top;}
-        }
+    if(best){
+        if(best.compact)badge.dataset.compact="true";else delete badge.dataset.compact;
+        badge.style.left=best.x+"px";badge.style.top=best.top+"px";
+    }else{
+        // Pathological full HUD coverage: retain caster identity and complete
+        // text rather than sending its name into another unit or side gutter.
+        delete badge.dataset.compact;
+        badge.style.left=desiredX+"px";
+        badge.style.top=Math.max(badge.offsetHeight+1,desiredTop)+"px";
     }
-    badge.style.left=x+"px";badge.style.top=top+"px";
 }
 
 function showSkillNameBadge(skillName,elementType,characterIndex,targetId,targetIds,targetSide,targetTypeOverride){

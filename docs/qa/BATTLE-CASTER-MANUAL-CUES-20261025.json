@@ -1,0 +1,37 @@
+{
+  "workId": "BATTLE-CASTER-MANUAL-CUES-20261025",
+  "branch": "fix/battle-caster-manual-cues-20261025",
+  "baseDev": "4e5756e6a6cf5f7c76dadad1f0dd8fa106289442",
+  "scope": [
+    "caster-local skill label with formal HUD avoidance",
+    "existing active-turn cyan-white ring and manual-only caption",
+    "existing enemy targetable/target thin gold foot ring and pointer"
+  ],
+  "unchanged": [
+    "Core and turn authority",
+    "VFX source/config/assets",
+    "paint1.3225 and depth",
+    "UI955 picker/timer/quickbar hunks",
+    "2D exploration paused"
+  ],
+  "validation": {
+    "directTests": 15,
+    "cardlessBrowser": "PASS",
+    "fixedSlotBrowser": "PASS 412x915,393x873,390x844,360x800",
+    "fullProductionIsolatedBrowser": "PASS desktop Chrome emulation 393x873,360x640,1280x720; NOT physical handset",
+    "nativePhone": "not operated this continuation",
+    "independentReview": "pending",
+    "requiredCI": "pending new Head"
+  },
+  "evidence": "artifacts/battle-caster-manual-cues-20261025",
+  "limitations": [
+    "Initial reused-page QA navigation read stale document/startup; failed evidence retained, corrected to separate browser session and natural auth overlay dismissal.",
+    "No physical phone approval claimed.",
+    "restricted forest generated policy only tracks changed whole-main source digest; rule bytes and individual normal-attack declarations unchanged."
+  ],
+  "sourceSha256": {
+    "js\\00-main.js": "d33f57badbd9a3ca5e4cceb0f75f691fb97028fb64607a41b99224fc92a21435",
+    "js\\54-v173.51-battle-qa.js": "8cb875392b7d6e142cc03a2980f83869c868d8c9f8e91b37da9ec5baa8a0ef21",
+    "css\\fixed-slot-battlefield-rendering-v2.css": "e087f92117333370e1d33adcf14e1841b30f55b4bb7d55dea4911bd8762dc9e0"
+  }
+}

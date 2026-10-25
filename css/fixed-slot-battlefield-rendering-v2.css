@@ -640,8 +640,8 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 :is(#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud[data-side="monster"] .monster-status-badges::-webkit-scrollbar{display:none;}
 :is(#game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2,#game-stage #battlePage.v-fixed-slot-render-v2,.v174-battle-hud-layer) .v174-unit-hud .monster-status-badges:empty{display:none !important;}
 
-/* Manual-turn feedback shares the stationary art frame and its depth/row cap.
-   The foot ellipse sits behind paint; ::after keeps the existing foot shadow. */
+/* Manual input projects the existing active-turn state, in every mode.
+   Stationary foot marker and caption never change portrait/HUD geometry. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{
     content:"" !important;
     position:absolute !important;
@@ -653,26 +653,21 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     height:10px !important;
     transform:translateX(-50%) !important;
     box-sizing:border-box !important;
-    border:1px solid rgba(241,210,137,.72) !important;
+    border:1px solid rgba(181,248,255,.95) !important;
     border-radius:50% !important;
-    background:radial-gradient(ellipse,rgba(241,210,137,.12),rgba(241,210,137,.25) 65%,transparent 74%) !important;
-    box-shadow:0 0 5px 1px rgba(241,210,137,.3) !important;
+    background:radial-gradient(ellipse,rgba(158,242,255,.08),rgba(158,242,255,.24) 65%,transparent 74%) !important;
+    box-shadow:0 0 5px 1px rgba(158,242,255,.4) !important;
     opacity:.65;
     pointer-events:none !important;
     z-index:-1 !important;
     animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
-    display:none;position:absolute;left:50%;top:-5px;width:22px;height:5px;
-    background:#241603;clip-path:polygon(0 0,100% 0,50% 100%);
-    transform:translateX(-50%);pointer-events:none;z-index:2;
+    display:none;position:absolute;left:50%;bottom:11px;
+    width:max-content;padding:1px 4px;border:1px solid rgba(181,248,255,.65);border-radius:4px;
+    color:#e6fcff;background:rgba(7,33,40,.88);font-size:10px;font-weight:700;line-height:12px;
+    white-space:nowrap;transform:translateX(-50%);pointer-events:none;z-index:2;
 }
-#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow::after{
-    content:"";position:absolute;inset:1px 3px 2px;background:#ffe16c;
-    clip-path:polygon(0 0,100% 0,50% 100%);
-}
-/* Five unscaled pixels fit the existing six-pixel paired-HUD clearance even
-   at 1.18 depth. No glow extends the arrow into the information band. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
     content:none !important;
@@ -717,9 +712,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
    battlePage is migrated into the native V20 battle shell on real mobile,
    so this owner must survive reparenting and must not depend on #app/#game-content.
    targetable = selectable candidate; target = formally selected enemy. */
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
-#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.ally-targetable::before{
     content:"" !important;
     position:absolute !important;
     z-index:30 !important;
@@ -737,6 +730,21 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     pointer-events:none !important;
     animation:none !important;
 }
+/* Enemy candidate/selection is a thin foot ellipse and a small pointer.
+   The existing target state still owns eligibility, clicks and selection. */
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.targetable::before,
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target::before{content:none !important;display:none !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit:is(.targetable,.target) > .v174-battle-art::before{
+    content:"";position:absolute;left:50%;bottom:-2px;width:66%;height:10px;
+    box-sizing:border-box;border:1px solid #f5cf72;border-radius:50%;
+    background:rgba(245,207,114,.08);transform:translateX(-50%);pointer-events:none;z-index:-1;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-target-arrow{
+    display:none;position:absolute;left:50%;top:-5px;width:16px;height:5px;
+    background:#f5cf72;clip-path:polygon(0 0,100% 0,50% 100%);
+    transform:translateX(-50%);pointer-events:none;z-index:2;
+}
+#game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit:is(.targetable,.target) > .v174-battle-art > .v174-target-arrow{display:block;}
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
     --battle-focus-color:var(--v138-element-glow,rgba(255,220,120,.7));

@@ -137,10 +137,10 @@ test("battle target selection avoids the dense compositor and unrelated global U
   assert.ok(start>=0&&end>start);
   assert.doesNotMatch(selectBlock,/updateUI\(\)/);
   assert.match(fixed,/\.battle-monster\.v174-cardless-unit\.targetable::after,[\s\S]*?\.battle-player\.v174-cardless-unit\.ally-targetable:not\(\.active-turn\)::after\{[\s\S]*?content:none !important;[\s\S]*?display:none !important/);
-  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.targetable::before,[\s\S]*?\.battle-monster\.v174-cardless-unit\.target::before\{/);
+  assert.match(fixed,/\.battle-player\.v174-cardless-unit\.ally-targetable::before\{/);
   const activeFrameRule=fixed.match(/#game-stage #battlePage\.v-fixed-slot-render-v2 \.battle-player\.v174-cardless-unit\.active-turn > \.v174-battle-art::before\{([^}]*)\}/);
   assert.ok(activeFrameRule,"Fixed Slot must own the manual active-character frame");
-  assert.match(activeFrameRule[1],/border:1px solid rgba\(241,210,137,\.72\) !important/);
+  assert.match(activeFrameRule[1],/border:1px solid rgba\(181,248,255,\.95\) !important/);
   assert.match(activeFrameRule[1],/box-shadow:[^;]+!important/);
   assert.match(activeFrameRule[1],/animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important/);
   assert.match(activeFrameRule[1],/z-index:-1 !important/);
