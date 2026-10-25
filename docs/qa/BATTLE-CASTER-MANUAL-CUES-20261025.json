@@ -49,5 +49,18 @@
       "VFX source/config/assets",
       "Core and UI955 hunks"
     ]
+  },
+  "manualStyleRevision": {
+    "user": "2026-10-25 explicit darker red-white foot ring + larger 操作中",
+    "changes": [
+      "same66%x10px ring: deep red border/glow + white inner edge",
+      "caption10px/12px ->13px/16px, dark red plate, larger padding"
+    ],
+    "unchanged": [
+      "enemy thin gold ring + small pointer pending user decision",
+      "caster names",
+      "VFX size/paint1.3225/depth/gameplay/auto visibility"
+    ],
+    "verification": "16direct tests, FixedSlot4viewport, cardless browser and build/check PASS; newHead CI pending"
   }
 }

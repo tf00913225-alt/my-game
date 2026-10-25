@@ -361,7 +361,7 @@ function runViewport(chrome,width,height){
         assert.deepEqual(state.active,[`battlePlayerCard${index}`],`${key} must be the only manual active character`);
         assert.equal(state.frame.content,'""');
         assert.equal(state.frame.border,"1px");
-        assert.equal(state.frame.borderColor,"rgba(181, 248, 255, 0.95)");
+        assert.equal(state.frame.borderColor,"rgb(204, 28, 43)");
         assert.notEqual(state.frame.shadow,"none");
         assert.equal(state.frame.animationName,"v174ManualTurnFootBreath");
         assert.equal(state.frame.animationDuration,"2s");

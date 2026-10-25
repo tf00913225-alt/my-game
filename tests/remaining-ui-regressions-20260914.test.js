@@ -28,7 +28,7 @@ assert.match(battlefieldCss,/\.v174-unit-hud\[data-side="monster"\] \.battle-mon
 assert.match(battlefieldCss,/\.v-fixed-battle-slot > \.battle-monster > \.v174-battle-art,[\s\S]*bottom:var\(--battle-art-hud-reserve\) !important/,
     "the Fixed Slot layout owner must reserve card-bottom HUD space");
 assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn\{[\s\S]*outline:0 !important;[\s\S]*box-shadow:none !important/);
-assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn > \.v174-battle-art::before\{[\s\S]*border:1px solid rgba\(181,248,255,\.95\) !important;[\s\S]*animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important/);
+assert.match(battlefieldCss,/battle-player\.v174-cardless-unit\.active-turn > \.v174-battle-art::before\{[\s\S]*border:1px solid rgb\(204,28,43\) !important;[\s\S]*animation:v174ManualTurnFootBreath 2s ease-in-out infinite !important/);
 assert.match(vfx,/const SPRITE_SCALE_MULTIPLIER=1;/);
 assert.doesNotMatch(vfx,/function visualRectForCard\(/,"VFX geometry must not regress to character/art DOM bounds");
 assert.match(vfx,/function geometryOwner\(\)\{[\s\S]*window\.FourSymbolsBattlefieldSlots/);

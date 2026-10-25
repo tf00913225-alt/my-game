@@ -8057,10 +8057,10 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     height:10px !important;
     transform:translateX(-50%) !important;
     box-sizing:border-box !important;
-    border:1px solid rgba(181,248,255,.95) !important;
+    border:1px solid rgb(204,28,43) !important;
     border-radius:50% !important;
-    background:radial-gradient(ellipse,rgba(158,242,255,.08),rgba(158,242,255,.24) 65%,transparent 74%) !important;
-    box-shadow:0 0 5px 1px rgba(158,242,255,.4) !important;
+    background:radial-gradient(ellipse,rgba(142,8,22,.18),rgba(190,18,36,.62) 65%,transparent 74%) !important;
+    box-shadow:inset 0 0 0 1px rgba(255,244,244,.95),0 0 5px 1px rgba(190,18,36,.8) !important;
     opacity:.65;
     pointer-events:none !important;
     z-index:-1 !important;
@@ -8068,8 +8068,8 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-arrow{
     display:none;position:absolute;left:50%;bottom:11px;
-    width:max-content;padding:1px 4px;border:1px solid rgba(181,248,255,.65);border-radius:4px;
-    color:#e6fcff;background:rgba(7,33,40,.88);font-size:10px;font-weight:700;line-height:12px;
+    width:max-content;padding:2px 6px;border:1px solid #cc1c2b;border-radius:4px;
+    color:#fff5f5;background:rgba(62,5,10,.94);font-size:13px;font-weight:700;line-height:16px;
     white-space:nowrap;transform:translateX(-50%);pointer-events:none;z-index:2;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
