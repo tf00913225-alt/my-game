@@ -1,0 +1,26 @@
+{
+  "workId": "TAOXI-ENTRY-20261025",
+  "baseDev": "4ef6a09cf56d6789d1968481da1ee669b1cafd61",
+  "scope": "Follow-up to merged PR985: loading feedback, physical house-depth ordering and passable villagers",
+  "diagnosis": {
+    "entry": "User confirmed delayed loading, not a dead button. Foreground Adventure loads and decodes its first-screen assets before navigation; previously no pending feedback. Prior QA preloaded Adventure and masked the first-click wait.",
+    "house": "Sprite padding put the image-bottom depth line 65 logical pixels in front of the physical house footprint, hiding a player standing at the front wall.",
+    "npc": "NPC solid rectangles blocked continuous movement; tap-to-NPC redirected to an approach point. Both are removed for passable Taoxi NPCs. Explicit talk remains."
+  },
+  "implementation": {
+    "houseDepth": "sortY = physical house footprint front edge; actor uses original foot-y ordering",
+    "npc": "No solid rectangle and no automatic tap approach for non-solid talk interactions",
+    "loading": "Immediate loading/busy feedback and duplicate-click suppression on original entries; restoration on success/failure/UID cancellation. Artwork quality and asset loading readiness unchanged. No speedup claim."
+  },
+  "validation": {
+    "targetedTests": "27 exploration geometry/lifecycle/progress/entry regressions PASS + feature-loader-runtime PASS",
+    "environment": "First sandbox run denied localhost EACCES; identical targeted suite passed with approved localhost execution; no test weakened",
+    "productionBuildCheck": "PASS",
+    "browser": "Formal index/build/Display/UI/Inventory/AccountSave with isolated Auth/Cloud and explicit earned-progress fixture; not a real account or physical phone",
+    "viewports": ["393x873 touch", "1920x1080 mouse"],
+    "checks": ["first entry without explicit Adventure preload", "house front player visible", "house behind player occluded", "building still stops continuous movement", "tap movement through NPC without automatic dialogue", "existing dual input and return", "Story cursor unchanged", "local reload and no repeat grant", "no runtime exceptions"],
+    "screenshots": ["taoxi-entry-20261025/393-house-front.png", "taoxi-entry-20261025/393-house-behind.png", "taoxi-entry-20261025/393-npc-pass-through.png", "taoxi-entry-20261025/1920-house-front.png"],
+    "bundles": ["build/feature-adventure-entry.5e09bea7a0b6.js", "build/feature-adventure-ui.63a78d10407b.js"]
+  },
+  "ciDeploy": "Latest status is owned by the work PR; this file records local symptom evidence only. Main release not authorized."
+}

@@ -39,8 +39,8 @@ function village(spawn){
     {id:'village-exit',name:'桃溪村口',art:'gate',x:900,y:3070,width:600,height:600,approach:{x:900,y:2960},hitbox:{x:800,y:2990,width:200,height:80},interaction:'exit-map',label:'離開桃溪村'},
     {id:'gate-left',art:'solid',x:0,y:0,width:0,height:0,solid:{x:680,y:2910,width:65,height:65}},
     {id:'gate-right',art:'solid',x:0,y:0,width:0,height:0,solid:{x:1060,y:2980,width:70,height:70}},
-    ...houses.map(h=>({...h,art:'house',width:660,height:660,solid:{x:h.x-260,y:h.y-370,width:520,height:305},approach:{x:h.x-30,y:h.y+40},hitbox:{x:h.x-260,y:h.y-580,width:520,height:590},interaction:'house',label:'進入 '+h.name})),
-    ...npcs.map(n=>({...n,art:'npc',width:200,height:200,solid:{x:n.x-22,y:n.y-38,width:44,height:38},approach:{x:n.x,y:n.y+100},hitbox:{x:n.x-45,y:n.y-185,width:90,height:185},interaction:'talk',label:'交談 · '+n.name})),
+    ...houses.map(h=>({...h,art:'house',width:660,height:660,sortY:h.y-65,solid:{x:h.x-260,y:h.y-370,width:520,height:305},approach:{x:h.x-30,y:h.y+40},hitbox:{x:h.x-260,y:h.y-580,width:520,height:590},interaction:'house',label:'進入 '+h.name})),
+    ...npcs.map(n=>({...n,art:'npc',width:200,height:200,approach:{x:n.x,y:n.y+100},hitbox:{x:n.x-45,y:n.y-185,width:90,height:185},interaction:'talk',label:'交談 · '+n.name})),
     ...[[280,2810],[1520,2750],[130,1890],[1690,1710],[150,830],[1640,650]].map(([x,y],i)=>({id:'peach-'+i,art:'peach',x,y,width:480,height:600,solid:{x:x-23,y:y-50,width:46,height:50}}))
   ]};
 }

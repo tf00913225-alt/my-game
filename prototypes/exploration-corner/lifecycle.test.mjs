@@ -45,6 +45,16 @@ test('transparent scene-object padding cannot redirect ground taps to an interac
   assert.equal(f.root.dataset.destination,'500.00,650.00');c.destroy();
 });
 
+test('passable NPC taps keep the ground destination and object depth uses its explicit base line',()=>{
+  const f=fixture(),data={width:1080,height:1420,viewWidth:1080,viewHeight:1420,radius:23,speed:320,spawn:{x:540,y:1000},objects:[
+    {id:'npc',x:540,y:700,width:200,height:200,sortY:650,hitbox:{x:495,y:515,width:90,height:185},approach:{x:540,y:800},interaction:'talk'}
+  ]};
+  const c=f.api.mount(f.root,{...f.services,scene:data,renderObject:()=>''});c.enter();
+  assert.equal(f.world.children[0].style.zIndex,'650');
+  f.emit(f.viewport,'pointerdown',{pointerId:1,isPrimary:true,button:0,x:540,y:600});
+  assert.equal(f.root.dataset.destination,'540.00,600.00','no automatic stop at NPC approach');c.destroy();
+});
+
 test('classic single owner mounts dormant, enters once, leaves without input/RAF, reenters and destroys',()=>{
   const f=fixture(),c=f.api.mount(f.root,f.services);
   assert.equal(f.frames.size,0);assert.equal(f.world.children.length,3);
