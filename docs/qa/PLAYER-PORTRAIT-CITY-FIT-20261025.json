@@ -1,0 +1,26 @@
+{
+  "workId": "PLAYER-PORTRAIT-CITY-FIT-20261025",
+  "branch": "fix/player-portrait-city-fit-20261025",
+  "baseDev": "632e3281d73484c307e55fe90076ebb4d2e776c5",
+  "predecessor": 995,
+  "status": "LOCAL_INDEPENDENT_QA_PASS_REMOTE_GATES_PENDING",
+  "symptom": "Three-party main city rear heads overlapped roster HUD",
+  "change": "Only original rear-position bottom rules adapt to scene height; preserve size, depth, HUD, controls, assets and battle",
+  "verification": {
+    "productionBuild": "PASS",
+    "physicalPhone": "SM-N960F 411x717 48 cases PASS; original tabs restored; cleanup errors empty",
+    "coverage": "All eight appearances, party sizes 1/2/3, short and legal 16-character names; exact WebP decode, head/HUD and feet/CTA bounds, eight entry hit-tests",
+    "productionBuildCheck": "PASS",
+    "independentQA": "Separate QA agent reviewed all eight mobile three-party rotations plus long-name, single/two-party, PC and physical-phone screenshots; PASS local scope only",
+    "mobile": "360x640 48 cases PASS",
+    "focusedTests": "7 PASS",
+    "pc": "1440x900 48 cases PASS"
+  },
+  "pending": [
+    "Latest Head CI",
+    "Normal dev merge",
+    "Exact deployed SHA and stylesheet verification",
+    "Deployed visual acceptance"
+  ],
+  "artifactDirectory": "C:/Users/User/.codex/visualizations/2026/10/23/01a1672c-506c-7a70-99ba-acf09e547ed6/portrait-static-replacement-20261025"
+}
