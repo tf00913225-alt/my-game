@@ -214,7 +214,7 @@
         const presentation=CONTENT().storyPresentation;
         const playerActive=line.speaker==="player";
         let portrait="",name="少俠";
-        try{if(typeof player!=="undefined"){portrait=getCharacterBattleArtworkPath(player);name=player.id||name;}}catch(_){}
+        try{if(typeof player!=="undefined"){portrait=getCharacterArtworkPath(player);name=player.id||name;}}catch(_){}
         const portraitKey=presentation.npcs[line.npcAssetId||node.npc];
         const npc=window.v154ResolveMonsterPortraitRecord?.({portraitKey})?.path||"";
         if(!npc&&ui.storyPortraitAttempted!==portraitKey){
@@ -1226,14 +1226,14 @@ function objectMarkup(object){
   if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
   if(object.art==='door')return '<span class="taoxi-door">出口</span>';
   const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
-  const frame=frames[object.art];
-  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><image href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
+  const frame=frames[object.art],clip='taoxi-frame-'+object.id;
+  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
 }
 function scene(id,spawn){
   if(!sameOwner()){leave();return;}
   const s=progress.snapshot();if(!C.available(s.chapter)){map();return;}
   if(id!=='village'&&!C.unlocked(C.houses.find(h=>h.id===id),s.chapter,s.state)){map();return;}
-  stop();current=id;root.dataset.scene=id;
+  stop();current=id;root.dataset.scene=id;delete root.dataset.area;
   const data=id==='village'?C.village(spawn):C.interior(id),appearance=C.appearance(s.player);
   root.innerHTML=header(id==='village'?'桃溪村':data.name)+
     '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
