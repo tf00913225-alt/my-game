@@ -1,0 +1,106 @@
+{
+  "workId": "PLAYER-PORTRAIT-REPLACEMENT-20261025",
+  "branch": "fix/player-portrait-static-replacement-20261025",
+  "baseDev": "3a9283467b0b663af7314993da6066e2e223c971",
+  "predecessor": 986,
+  "status": "HERO_INVENTORY_REGRESSION_FIXED_LOCAL_QA_PASS_NEW_REMOTE_GATES_PENDING",
+  "symptom": "DEV main city and existing normal player displays still showed old art after creation-only PR986",
+  "cause": {
+    "normalResolver": "getCharacterArtworkPath still returned gender_element.jpg",
+    "incorrectBattleConsumers": [
+      "main city",
+      "inventory portrait",
+      "formation player preview",
+      "story dialogue player"
+    ]
+  },
+  "change": "Existing normal resolver maps all gender/element combinations to original approved8 player_* WebP; nonbattle consumers use it; creation already matches. Existing characters need no recreation or save migration.",
+  "retained": [
+    "Actual combat resolver/callers and battle PNGs",
+    "Hero/NPC art",
+    "All original PNG masters and8lossless WebP hashes",
+    "UI/CSS geometry, character data, skills, rewards and save schema"
+  ],
+  "deletedAssets": [],
+  "verification": {
+    "focusedTests": {
+      "pass": 102,
+      "fail": 0,
+      "files": 4
+    },
+    "originalBuilder": "PASS",
+    "originalBuildCheck": "PASS",
+    "independentCodeAudit": "Separate QA found no direct function/scope blocker; battle helper/hero branches unchanged; sourceDigest-only generated policy delta verified",
+    "browser": {
+      "environment": "local production bundles, original isolated read-only account transport; synthetic appearance changes only",
+      "mobile": [
+        360,
+        640
+      ],
+      "desktop": [
+        1440,
+        900
+      ],
+      "choicesPerViewport": 8,
+      "surfaces": [
+        "main city deployed player",
+        "inventory full portrait",
+        "character selection avatar",
+        "formation player preview"
+      ],
+      "result": "both completed scenarios PASS; expected normal WebP and unchanged battle PNG resolved for every appearance",
+      "physicalPhone": "SM-N960F411x717 eight appearances/four surfaces PASS; own1922 closed, original tabs/prior1814 restored; no true player/Cloud writes",
+      "story": "Formal UI renderer with read-only presentation view snapshot,8new sources/decode/contain PASS; story progress/advance/save not tested"
+    },
+    "limits": [
+      "Initial existing release notice intercepted clicks; acknowledged via actual normal control, retained diagnostic evidence",
+      "Inventory is a modal overlay; use its actual close button, not hidden underlying nav",
+      "Second navigation after synthetic local fixture mutations required migration; preserved gate, did not bypass. PC used fresh isolated profile; no trueCloud/save-reload certification"
+    ],
+    "heroBrowser": {
+      "runner": ".github/scripts/run-hero-page-browser-qa.mjs (unchanged)",
+      "result": "PASS",
+      "viewports": [
+        [
+          360,
+          640
+        ],
+        [
+          412,
+          915
+        ],
+        [
+          1280,
+          800
+        ]
+      ],
+      "scope": "original isolated hero fixture including inventory artwork and equipment controls; not real Cloud/player data",
+      "evidence": "artifacts/browser-qa/responsive-item/hero/evidence.json",
+      "binding": "Executed working tree after guard fix; runner internal precommit HEAD label36149df0 is not new-Head CI; tested source digests below"
+    },
+    "independentVisualReview": "All8home+8inventory360x640 and2PC, high-risk physical-phone home/inventory, character/formation previews and8story presentation frames independently reviewed; no new product geometry/cropping blocker. Normal-branch visual evidence reusable after hero-only guard; not new-Head CI proof."
+  },
+  "generated": "Original builder regenerated app-shell/adventure-ui/gameplay-core-primary and manifests; restricted-forest-instance-policy only changes whole-main sourceDigest, no readiness/authority values. Original LF preserved to avoid unrelated rules digest drift.",
+  "evidence": "C:/Users/User/.codex/visualizations/2026/10/23/01a1672c-506c-7a70-99ba-acf09e547ed6/portrait-static-replacement-20261025",
+  "pending": [
+    "Latest new Head natural Required CI and Session",
+    "Normal dev merge and exact deployed-SHA existing-character symptom acceptance",
+    "Safe cleanup under original retention instructions"
+  ],
+  "discoveredRegression": {
+    "oldHead": "36149df00bdd2db645761b6f2357965d0bc1ace3",
+    "run": 40188303916,
+    "job": 121153856904,
+    "directFailure": "run-hero-page-browser-qa.mjs:205 expected assets/heroes/*.webp; got player_female_01.webp",
+    "cause": "inventory also accepts heroNpc; general resolver previously lacked that branch",
+    "fix": "heroNpc delegates existing dedicated artwork resolver before normal gender fallback; actual battle helper unchanged",
+    "independentReview": "Separate QA approved minimal delegation and regression assertions; earlier audit missed inventory heroNpc consumer"
+  },
+  "testedSourceHashes": {
+    "js/00-main.js": "76d7e9d36b0b38b4d64fd7a38b2a5ca6f42c5841b9b1121a47c60cc91dc00ca3",
+    "js/16-stage-v54-main-city-runtime.js": "8b84c594daa0b8aa8128e84407089d0e0117b83ef85cdfd7cb3ea09a750d5ce9",
+    "js/25-v131-fix-batch.js": "ce264f47bc3805ac994b5064b16f0feeb5b57660fa8580b0e54e6dc63d63c8ff",
+    "js/adventure/adventure-ui-v1-20260915.js": "63bc4cffdc04c83ccc4dd09a10b09d5552b45276a8e8f66aa019785c764cce7c",
+    "tests/player-creation-portraits.test.js": "9632b3b9524b12584d58bd4d3b8a1fd307d4aaa659ec2dd97cc58f1a7b395460"
+  }
+}

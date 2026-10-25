@@ -1,6 +1,23 @@
 # Cloud Save Phase 4：一般進度遷移契約（施工中）
 
-狀態：IN PROGRESS / 0/6 VERIFIED。偏好欄位已在 PR #559／#560／#561 合入 dev，最新 `dev@01c543564498400b38dd8778acccb9d76777131f` 已通過 CI 與 DEV exact-SHA 部署（Game／Cache 173.72）。手機已驗證上傳、讀回及修復確認視窗後的手動取回成功（Revision 7）；「返回／取回」易混淆，改為「取消／套用雲端設定」。跨裝置完整角色恢復仍未開啟。正式角色 gameplay cloud write 仍未開啟；`main` 禁止修改。
+狀態：IN PROGRESS / 0/6 VERIFIED。下述偏好驗證為歷史 checkpoint：PR #559／#560／#561 合入 `dev@01c543564498400b38dd8778acccb9d76777131f`，通過 CI 與 DEV exact-SHA 部署（Game／Cache 173.72）。手機已驗證上傳、讀回及修復確認視窗後的手動取回成功（Revision 7）；「返回／取回」易混淆，改為「取消／套用雲端設定」。後續有限 canonical／archive／audit 實作見既有進度及各 Work PR，不能由這份歷史偏好證據推定完整角色恢復。跨裝置完整角色恢復與完整 gameplay cloud write 仍未驗收；`main` 禁止修改。
+
+## 2026-10-24 定案範圍與玩家驗收
+
+產品與安全 Owner 為 `../DATA_SECURITY_CONTRACTS.md`，短斷規則由 `OFFLINE_AUTHORITY_POLICY.md` 擁有；本節只對應既有六項 requirement，不建立第二套權威或以政策替代實作。以簡易建設、低維護優先，統一連網、本機戰鬥、關鍵進度後端保存；不建完整 offline、多裝置離線 merge、伺服器戰鬥或大型客服台。Guest 購買、付款補發與歷史還原仍須各自完整安全 Gate 與特定操作授權。
+
+| 既有 requirement | 必要玩家結果與證據（均未因此文件更新而標為通過） |
+| --- | --- |
+| FIELDS-01 | 完整角色／資產／進度、原有領獎與付款權益的欄位／Owner 對照；缺少資料不能補成未領獎或假完整角色。 |
+| SERVER-02 | 真實帳號 A／B 不串帳；同 UID takeover 後舊 session 不得覆寫。付款由後端驗證、order 綁 UID、唯一正式 grant；漏發可按原單補足一次，重試不得多發。實際金流／操作仍待供應商與授權。 |
+| CLIENT-03 | Guest 試玩後以可恢復的正式帳號綁定，進度不丟且衝突不覆寫；未綁定不可購買。短斷清楚顯示未保存，回線重查 UID／session／revision，不能假成功或自動合併多裝置離線資料。 |
+| RESTORE-04 | 正常 load 最新有效存檔；第二手機完整恢復可玩角色。客服核身、保留現況、批准及 audit 後，須用有效備份實際還原並由遊戲載入；內部封包／readback／current revision 修復不是此驗收。舊檔不得倒退訂單、造型、月卡效期、每日已領及補償紀錄，不得自動重發全包。 |
+| QA-05 | emulator／Browser／真手機依風險各自留證，覆蓋上述不串帳、guest 綁定、換機、漏發重試、舊檔保權益及實際有效備份還原；付款／發貨錯誤、退款及人工補償能以 order／case／reason／結果查核，非自動補償。 |
+| CLOSEOUT-06 | 各項實作、最新必要 CI／部署 SHA 與玩家結果分開記錄。函式測試數、內部 fixture、merged 或部署成功不等於完整服務驗收；不得虛報完成率或沿用歷史 PASS 替新快照背書。 |
+
+已存在且須保留：UID 隔離、單一有效 session、revision、防重與私有 snapshot／archive／audit 的有限基礎。仍待補齊並驗收：完整 guest-to-bound-account 流程、真金付款與漏發查核／唯一發貨、可查客服操作，以及歷史／第二裝置恢復接回原 Boot／Save resolver。現有受限復原與純投影不等於可玩恢復，不能直接翻轉 readiness flag。
+
+待決：金流供應商／費用、有限 backup 天數與獨立的訂單／audit 保留期限、人工補發／善意補一包的實際授權與去重操作、月卡額外副本刷新次數。有限備份為盡力救援，不承諾永久或任何情況必可恢復；天數未定不授權刪資料。這些缺口不得填入臆測數字、新費用或實作完成標記。原始資料、歷史紀錄及既有安全程式不因產品簡化而刪除。
 
 ## 現有 owner 與風險
 
@@ -22,7 +39,7 @@
 1. 任何舊主存檔僅能是 UID-bound **untrusted candidate**；後端按欄位驗證、決定權威值，不能把整包 JSON 改名 `gameSave`／`authoritativeSave` 後寫回 Phase 2 envelope。
 2. 受保護寫入須在同一 Firestore transaction 內查 active session、owner、schema 與預期 `serverRevision`，由伺服器增加 revision 並使用 server timestamp；revision 不合、登出或 UID 改變時拒絕，不能背景自動重送失敗的舊寫入。
 3. 已有雲端權威資料時，客戶端絕不依 local timestamp、dirty flag 或 fingerprint 自動覆蓋。若無法同時安全恢復角色與高價值狀態，維持既有完整 UID 本機遊戲，不把局部進度當作完整雲端角色灌入 Boot。
-4. 離線只保留同 UID 本機候選；重新上線須重新讀 revision 並明確處理衝突。不得跨 Google／訪客 UID 自動搬移、刪除舊檔、變更金幣／物品／獎勵或隱性重置進度。
+4. 短斷只保留同 UID 本機候選並明示未保存；重新上線須重新讀 session／revision 並明確處理衝突。不得跨 Google／訪客 UID 自動搬移、刪除舊檔、變更金幣／物品／獎勵或隱性重置進度；不建完整離線或多裝置離線 merge，現有 runtime 不由本文件直接變更。
 5. 以 emulator 與既有 Boot browser QA 驗證舊版 envelope 升級、同 UID 重複提交、兩裝置 revision 競態、UID／session 變動、未驗證獎勵及離線衝突；真手機 DEV 驗收後才宣稱 Phase 4 完成。
 
 Phase 4 的可交付面需能真正恢復**允許範圍**內的資料，並明示未涵蓋的角色／資產。沒有後端驗證的領獎狀態不能因為名稱含「進度」就放行；若與高價值資料不可分割，必須保留為待 Phase 5 處理並明確標示範圍，不能為達成階段數字而靜默承認不可信存檔。

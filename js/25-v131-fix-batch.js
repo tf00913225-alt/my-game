@@ -305,7 +305,7 @@
         }
         const index=Number(unit.slice(7));
         const character=[0,1,2].includes(index)?getPartyCharacterByIndex(index):null;
-        return character?.id?{name:character.id,artwork:getCharacterBattleArtworkPath(character)}:null;
+        return character?.id?{name:character.id,artwork:getCharacterArtworkPath(character)}:null;
     }
     function formationUnitContent(unit){
         const row=formationUnitData(unit);
@@ -472,7 +472,7 @@
             img.draggable=false;
             frame.insertBefore(img,frame.firstChild);
         }
-        img.src=getCharacterBattleArtworkPath(character);
+        img.src=getCharacterArtworkPath(character);
         img.alt=(character.id||"角色")+"立繪";
     }
 

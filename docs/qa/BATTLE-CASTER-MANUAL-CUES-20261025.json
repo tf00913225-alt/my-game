@@ -111,5 +111,15 @@
     "broaderOwnerRead": "46/48 top-level PASS; two unrelated local environment failures: missing identify and Chrome executable env unset. Not fullPASS, no code/CI bypass or install. Latest selected browser jobs already succeeded on unchanged product.",
     "retryLedger": "fc failedHead retries0; deterministic fixture fix, no rerun/cancel/dispatch",
     "next": "newHead natural requiredCI;955window stillhold"
+  },
+  "devIntegration995": {
+    "absorbedDev": "632e3281d73484c307e55fe90076ebb4d2e776c5",
+    "reason": "after20min53dead had0runs/0checks via direct+wrapper and live PRmergeablefalse/dirty; merge-tree confirmed real conflicts",
+    "incoming": "#992policy documents, #995 normal city/inventory/formation/story portraits. Battle artwork source remains separate.",
+    "conflicts": "only root/build asset manifests, app-shell rename/rename, restricted source digest; original builder regenerated. main source auto merged nonoverlapping getCharacterArtworkPath.",
+    "acceptedEvidence": "CSS/js54/config/js39 exactb663; positionBattleSkillNameBadge exactb663; no VFX/size/depth/art changes from this line",
+    "validation": "29focused including portrait mappings/formation/city +build/check/diff PASS",
+    "release": "ONLY dev into994 branch; no994merge-to-dev/deployment;955window stillhold",
+    "retry": "no rerun/dummycommit/force/rebase; newHead requiredCI mandatory"
   }
 }
