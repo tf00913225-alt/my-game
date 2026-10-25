@@ -1,26 +1,29 @@
 {
   "workId": "TAOXI-ENTRY-20261025",
   "baseDev": "4ef6a09cf56d6789d1968481da1ee669b1cafd61",
-  "scope": "Follow-up to merged PR985: loading feedback, physical house-depth ordering and passable villagers",
+  "scope": "Follow-up to merged PR985: loading feedback, physical house-depth ordering, passable villagers, explicit target approach and one-click doorway portals",
   "diagnosis": {
     "entry": "User confirmed delayed loading, not a dead button. Foreground Adventure loads and decodes its first-screen assets before navigation; previously no pending feedback. Prior QA preloaded Adventure and masked the first-click wait.",
     "house": "Sprite padding put the image-bottom depth line 65 logical pixels in front of the physical house footprint, hiding a player standing at the front wall.",
-    "npc": "NPC solid rectangles blocked continuous movement; tap-to-NPC redirected to an approach point. Both are removed for passable Taoxi NPCs. Explicit talk remains."
+    "npc": "NPC solid rectangles blocked continuous movement. Removed solids; per latest user instruction an explicit NPC click approaches the NPC, while ordinary movement can pass through. Talk remains explicit."
   },
   "implementation": {
     "houseDepth": "sortY = physical house footprint front edge; actor uses original foot-y ordering",
-    "npc": "No solid rectangle and no automatic tap approach for non-solid talk interactions",
+    "npc": "No solid rectangle; explicit NPC/chest clicks walk to their approach positions, never automatically talk/search",
+    "portals": "Unlocked doors have small two-tier faceted gold SVG markers with highlight, shaded sides and bobbing. Marker center is aligned to the source door opening (38% image width); the approach x uses the same door center. One door/marker click plans movement then enters/exits exactly once at the approach point. Manual movement, new target, blur and leave cancel portal intent. Locked doors have no marker or auto-entry. Door hitboxes exclude roof/transparent padding. Reduced-motion disables bobbing.",
     "loading": "Immediate loading/busy feedback and duplicate-click suppression on original entries; restoration on success/failure/UID cancellation. Artwork quality and asset loading readiness unchanged. No speedup claim."
   },
   "validation": {
-    "targetedTests": "27 exploration geometry/lifecycle/progress/entry regressions PASS + feature-loader-runtime PASS",
+    "targetedTests": "29 PASS: 28 exploration geometry/lifecycle/progress/entry/portal regressions plus existing feature-loader-runtime",
     "environment": "First sandbox run denied localhost EACCES; identical targeted suite passed with approved localhost execution; no test weakened",
     "productionBuildCheck": "PASS",
     "browser": "Formal index/build/Display/UI/Inventory/AccountSave with isolated Auth/Cloud and explicit earned-progress fixture; not a real account or physical phone",
     "viewports": ["393x873 touch", "1920x1080 mouse"],
-    "checks": ["first entry without explicit Adventure preload", "house front player visible", "house behind player occluded", "building still stops continuous movement", "tap movement through NPC without automatic dialogue", "existing dual input and return", "Story cursor unchanged", "local reload and no repeat grant", "no runtime exceptions"],
-    "screenshots": ["taoxi-entry-20261025/393-house-front.png", "taoxi-entry-20261025/393-house-behind.png", "taoxi-entry-20261025/393-npc-pass-through.png", "taoxi-entry-20261025/1920-house-front.png"],
-    "bundles": ["build/feature-adventure-entry.5e09bea7a0b6.js", "build/feature-adventure-ui.63a78d10407b.js"]
+    "checks": ["first entry without explicit Adventure preload", "house front player visible", "house behind player occluded", "building still stops continuous movement", "movement through NPC without automatic dialogue", "click NPC and chest approaches target with explicit talk/search", "one-click house entry and exit", "arrows only on unlocked doors", "all five homes and ten points", "mixed clue/main-story unlocks", "existing dual input and cancellation", "real Storage failure rollback and retry", "UID fixture isolation", "Story cursor unchanged", "local reload and no repeat grant", "no runtime exceptions"],
+    "screenshots": ["taoxi-entry-20261025/393-entry-arrows.png", "taoxi-entry-20261025/393-house-front.png", "taoxi-entry-20261025/393-house-behind.png", "taoxi-entry-20261025/393-npc-pass-through.png", "taoxi-entry-20261025/1920-house-front.png"],
+    "fullEvidence": "taoxi-entry-20261025/full-content.json",
+    "fullSnapshot": "full-content.json records the full five-house/ten-point run on feature-adventure-ui.33215dbd46ce.js. Subsequent marker appearance/door-center alignment changes are separately verified by focused first-loop and geometry tests; do not label the older full run as the newest bundle.",
+    "bundles": ["build/feature-adventure-entry.5e09bea7a0b6.js", "build/feature-adventure-ui.a95bb58809a9.js", "build/feature-adventure.f91c25eec12f.css"]
   },
   "ciDeploy": "Latest status is owned by the work PR; this file records local symptom evidence only. Main release not authorized."
 }

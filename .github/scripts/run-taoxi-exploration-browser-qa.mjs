@@ -14,7 +14,7 @@ const server=await startServer(cloudConflict?{}:{cloudModule:localCloud,handleRe
  const html=fs.readFileSync('index.html','utf8').replace('<!-- build:critical-script -->',qaPrelude()+seed+'<!-- build:critical-script -->');res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});res.end(html);return true;
 }}),results=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080]])){
+try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-only')?[[393,873]]:process.argv.includes('--desktop-only')?[[1920,1080]]:[[393,873],[1920,1080]])){
   const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const n=s.address().port;s.close(()=>resolve(n));});});
   const profile=fs.mkdtempSync(path.join(os.tmpdir(),'taoxi-qa-'));
   const chrome=process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':findChrome();
@@ -30,6 +30,7 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     const input=async(x,y)=>{if(width<700){await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});}};
     const tap=async selector=>{const p=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('missing '+${JSON.stringify(selector)});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(e.disabled||r.width<=0||r.height<=0||!e.contains(hit))throw Error('not actionable '+${JSON.stringify(selector)});return {x,y};})()`);await input(p.x,p.y);await sleep(180);};
     const capture=async label=>{await sleep(180);const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,`${width}-${label}.png`),Buffer.from(shot.data,'base64'));};
+    const tapArt=async(selector,rx=.5,ry=.5)=>{const p=await c.eval(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width*${rx},y:r.y+r.height*${ry}};})()`);await input(p.x,p.y);};
     const walk=async(x,y)=>{
       for(let n=0;n<16;n++){
         const p=await c.eval(`(()=>{const root=document.getElementById('explorationPage'),v=root.querySelector('.taoxi-viewport'),r=v.getBoundingClientRect(),cam=root.dataset.camera.split(',').map(Number),pos=root.dataset.position.split(',').map(Number);return {cam,pos,r:{x:r.x,y:r.y,width:r.width,height:r.height}};})()`);
@@ -54,23 +55,26 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     await wait(`document.getElementById('explorationPage').dataset.scene==='village'`,'village');await capture('village');
     // Physical front/back depth, including the transparent padding reported by the player.
     const heldKey=async(key,ms)=>{await c.send('Input.dispatchKeyEvent',{type:'keyDown',key,code:key});await sleep(ms);await c.send('Input.dispatchKeyEvent',{type:'keyUp',key,code:key});await sleep(80);};
-    await walk(470,2430);await heldKey('ArrowUp',900);
+    assert.equal(await c.eval(`document.querySelectorAll('[data-object] .taoxi-entry-arrow').length`),2,'only unlocked homes show arrows');
+    await capture('entry-arrows');await walk(470,2500);await heldKey('ArrowUp',1000);
     const front=await c.eval(`(()=>{const r=document.getElementById('explorationPage'),a=r.querySelector('[data-player]'),h=r.querySelector('[data-object="a"]');return {y:Number(r.dataset.position.split(',')[1]),actor:Number(a.style.zIndex),house:Number(h.style.zIndex)};})()`);
     assert.ok(front.y<2350&&front.y>2285,'player stops at house footprint');assert.ok(front.actor>front.house,'player renders in front of house');await capture('house-front');
     await walk(50,2430);await walk(50,1700);await walk(470,1700);await heldKey('ArrowDown',1000);
     const behind=await c.eval(`(()=>{const r=document.getElementById('explorationPage');return {y:Number(r.dataset.position.split(',')[1]),actor:Number(r.querySelector('[data-player]').style.zIndex),house:Number(r.querySelector('[data-object="a"]').style.zIndex)};})()`);
     assert.ok(behind.y<1980&&behind.y>1900);assert.ok(behind.actor<behind.house,'house renders in front only behind it');await capture('house-behind');
-    await walk(50,1700);await walk(840,2600);await walk(840,2440);
+    await walk(50,1700);await walk(840,2600);await walk(840,2240);
     assert.equal(await c.eval(`!!document.querySelector('.adventure-transient-dialogue')`),false,'passing NPC never starts conversation');await capture('npc-pass-through');
     const before=await c.eval(`JSON.stringify(player.adventureProgress)`);
-    await walk(840,2570);await tap('[data-interact]');await capture('dialogue');
+    await tapArt('[data-object="elder"]');await wait(`Math.abs(Number(document.getElementById('explorationPage').dataset.position.split(',')[1])-2570)<5`,'clicked NPC approach');
+    assert.equal(await c.eval(`!!document.querySelector('.adventure-transient-dialogue')`),false,'NPC click only approaches');await tap('[data-interact]');await capture('dialogue');
     await tap('.adventure-transient-dialogue button');await tap('.adventure-transient-dialogue button');
     assert.equal(await c.eval(`JSON.stringify(player.adventureProgress)`),before,'ordinary dialogue must not advance story');
-    await walk(440,2390);await tap('[data-interact]');await wait(`document.getElementById('explorationPage').dataset.scene==='a'`,'first house');await capture('interior');
-    await walk(790,1035);await tap('[data-interact]');await capture('search');
+    await tapArt('[data-object="a"] .taoxi-entry-arrow');await wait(`document.getElementById('explorationPage').dataset.scene==='a'`,'single click auto enters house');await capture('interior');
+    await tapArt('[data-object="a-chest"]');await wait(`Math.abs(Number(document.getElementById('explorationPage').dataset.position.split(',')[1])-1035)<5`,'clicked chest approach');
+    assert.equal(await c.eval(`!!document.querySelector('.adventure-transient-dialogue')`),false,'chest click only approaches');await tap('[data-interact]');await capture('search');
     assert.equal(await c.eval(`player.explorationProgress.searched['a-chest']`),true);const count=await c.eval(`getPotionCount('hpPotion10')`);
     await tap('.adventure-transient-dialogue button');await tap('[data-interact]');await tap('.adventure-transient-dialogue button');assert.equal(await c.eval(`getPotionCount('hpPotion10')`),count,'repeat no second grant');
-    await tap('#explorationPage [data-back]');await wait(`document.getElementById('explorationPage').dataset.scene==='village'`,'outdoor return');await tap('#explorationPage [data-back]');await tap('#explorationPage [data-back]');
+    await tapArt('[data-object="door"] .taoxi-entry-arrow');await wait(`document.getElementById('explorationPage').dataset.scene==='village'`,'single click auto exits house');await tap('#explorationPage [data-back]');await tap('#explorationPage [data-back]');
     assert.equal(await c.eval(`document.getElementById('homePage').classList.contains('active')`),true,'return origin');
     const oldOrigin=await c.eval('performance.timeOrigin');await c.send('Page.reload');await wait('performance.timeOrigin!=='+oldOrigin,'new document');
     if(cloudConflict){
@@ -119,11 +123,15 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
       const house=async id=>{
         const target=await c.eval(`FourSymbolsTaoxiContent.village().objects.find(o=>o.id===${JSON.stringify(id)}).approach`);
         const currentY=await c.eval(`Number(document.getElementById('explorationPage').dataset.position.split(',')[1])`);
-        await walk(990,currentY);await walk(990,target.y);await walk(target.x,target.y);await tap('[data-interact]');
+        await walk(990,currentY);await walk(990,target.y+300);await walk(id==='e'?1050:Math.max(700,Math.min(1100,target.x)),target.y+300);
+        const portal=await c.eval(`!!document.querySelector('[data-object="'+${JSON.stringify(id)}+'"] .taoxi-entry-arrow')`);
+        await tapArt('[data-object="'+id+'"]'+(portal?' .taoxi-entry-arrow':''),portal ? .5 : .46,portal ? .5 : .88);
+        if(portal)await wait(`document.getElementById('explorationPage').dataset.scene===${JSON.stringify(id)}`,'house portal '+id);
+        else{await wait(`Math.hypot(...document.getElementById('explorationPage').dataset.position.split(',').map((v,i)=>Number(v)-[${target.x},${target.y}][i]))<5`,'locked door approach');await tap('[data-interact]');}
       };
       const search=async id=>{
         const target=await c.eval(`FourSymbolsTaoxiContent.interior(document.getElementById('explorationPage').dataset.scene).objects.find(o=>o.id===${JSON.stringify(id)}).approach`);
-        await walk(target.x,target.y);await tap('[data-interact]');
+        await tapArt('[data-object="'+id+'"]');await wait(`Math.hypot(...document.getElementById('explorationPage').dataset.position.split(',').map((v,i)=>Number(v)-[${target.x},${target.y}][i]))<5`,'search approach '+id);await tap('[data-interact]');
       };
       await house('a');await search('a-letter');await tap('.adventure-transient-dialogue button');await tap('#explorationPage [data-back]');
       await walk(900,2475);await walk(940,1940);await tap('[data-interact]');await tap('.adventure-transient-dialogue button');await tap('.adventure-transient-dialogue button');
@@ -139,10 +147,10 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
       await search('c-chest');await tap('.adventure-transient-dialogue button');await search('c-journal');await tap('.adventure-transient-dialogue button');await capture('house-c');await tap('#explorationPage [data-back]');
       await house('d');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'village','D still story locked');await capture('locked-house');await tap('.adventure-transient-dialogue button');
       await c.eval(`player.adventureProgress.chapters.chapter_v1.completedNodes.c1_06=true;saveGame()`);
-      await tap('[data-interact]');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'d');
+      await tap('#explorationPage [data-back]');await tap('[data-village]');await house('d');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'d');
       await search('d-chest');await tap('.adventure-transient-dialogue button');await search('d-box');await tap('.adventure-transient-dialogue button');await capture('house-d');await tap('#explorationPage [data-back]');
       await house('e');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'village','E still story locked');await tap('.adventure-transient-dialogue button');
-      await c.eval(`player.adventureProgress.chapters.chapter_v1.completedNodes.c1_16=true;saveGame()`);await tap('[data-interact]');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'e');
+      await c.eval(`player.adventureProgress.chapters.chapter_v1.completedNodes.c1_16=true;saveGame()`);await tap('#explorationPage [data-back]');await tap('[data-village]');await house('e');assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.scene`),'e');
       await search('e-chest');await tap('.adventure-transient-dialogue button');await search('e-record');await tap('.adventure-transient-dialogue button');await capture('house-e');
       assert.equal(await c.eval(`Object.keys(player.explorationProgress.searched).length`),10,'all ten points');assert.equal(await c.eval(`getPotionCount('hpPotion10')`),3);assert.equal(await c.eval(`getPotionCount('spPotion10')`),3);
       await tap('#explorationPage [data-back]');await tap('#explorationPage [data-back]');

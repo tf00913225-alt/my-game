@@ -21,7 +21,7 @@ function mount(root,services={}){
   const directions=new Map(),captures=new Map();
   let abort=null,active=false,generation=0,interactionGeneration=0,interactionCleanup=null;
   let state={...data.spawn,facing:'up',moving:false},frame=0,last=0,opened=false,disposed=false;
-  let route=[],destination=null,gesture=null,walkTime=0;
+  let route=[],destination=null,gesture=null,walkTime=0,arrivalTarget=null;
 
   for(const item of data.objects){
     const el=document.createElement('div');el.className='explore-object';el.dataset.object=item.id;
@@ -29,7 +29,7 @@ function mount(root,services={}){
     el.innerHTML=services.renderObject?services.renderObject(item):`<svg viewBox="0 0 ${item.width} ${item.height}" aria-hidden="true"><use href="/prototypes/exploration-corner/art.svg#${item.art}"/></svg>`;
     world.append(el);
   }
-  function cancelRoute(){route=[];destination=null;gesture=null;}
+  function cancelRoute(){route=[];destination=null;gesture=null;arrivalTarget=null;}
   function clearInput(){
     for(const [id,el] of captures){if(el.hasPointerCapture(id))el.releasePointerCapture(id);}
     captures.clear();directions.clear();analog=null;cancelRoute();state.moving=false;last=0;render();
@@ -42,8 +42,9 @@ function mount(root,services={}){
   function closeInteraction(){
     try{endInteraction();}finally{clearInput();if(active)root.focus({preventScroll:true});}
   }
-  function interact(){
-    if(!active||opened||!nearby(state))return;
+  function interact(targetId){
+    const target=typeof targetId==='string'?data.objects.find(o=>o.id===targetId&&o.interaction&&Math.hypot(state.x-o.approach.x,state.y-o.approach.y)<(o.range||145)):nearby(state);
+    if(!active||opened||!target)return;
     if(typeof services.onInteract!=='function'){status.textContent='對話尚未接通';return;}
     opened=true;clearInput();const token=generation,interactionToken=++interactionGeneration;
     const close=()=>{
@@ -51,7 +52,7 @@ function mount(root,services={}){
       closeInteraction();
     };
     try{
-      const cleanup=services.onInteract({npcId:nearby(state).id,close});
+      const cleanup=services.onInteract({npcId:target.id,close});
       if(cleanup!=null&&typeof cleanup!=='function')throw new TypeError('Interaction must return synchronous cleanup');
       if(!active||token!==generation||interactionToken!==interactionGeneration||!opened)cleanup?.();else interactionCleanup=cleanup;
     }catch(error){
@@ -94,12 +95,14 @@ function mount(root,services={}){
     }catch(_){clearInput();status.textContent='座標尚未就緒，請重試';return;}
     const camera=cameraFor(state,data);
     const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
-    const npc=services.scene?data.objects.find(o=>{if(!o.interaction||(o.interaction==='talk'&&!o.solid))return false;const b=o.hitbox||{x:o.x-o.width/2,y:o.y-o.height,width:o.width,height:o.height};return target.x>=b.x&&target.x<=b.x+b.width&&target.y>=b.y&&target.y<=b.y+b.height;}):data.objects.find(o=>o.id==='npc');
-    const npcHit=npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
+    const npc=services.scene?data.objects.find(o=>{if(!o.interaction)return false;const b=o.hitbox||{x:o.x-o.width/2,y:o.y-o.height,width:o.width,height:o.height};return target.x>=b.x&&target.x<=b.x+b.width&&target.y>=b.y&&target.y<=b.y+b.height;}):data.objects.find(o=>o.id==='npc');
+    const npcHit=services.scene?!!npc:npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
     const planned=npcHit?(services.scene?findRoute(state,npc.approach,data):npcRoute(state,data)):findRoute(state,target,data);route=planned||[];
+    arrivalTarget=planned&&npcHit&&npc.autoInteract===true?npc.id:null;
     destination=route.at(-1)||null;
-    status.textContent=destination?(npcHit?'走近村民後，按招呼確認':'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
+    status.textContent=destination?(npcHit?(npc.autoInteract?'走向入口，到達後自動進出':npc.interaction==='talk'?'走近村民後，按交談':'走近目標後，按互動'):'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
     root.focus({preventScroll:true});render();
+    if(arrivalTarget&&!route.length){const id=arrivalTarget;arrivalTarget=null;interact(id);}
   },{signal});
   viewport.addEventListener('pointerup',e=>{captures.delete(e.pointerId);if(gesture?.id===e.pointerId)gesture=null;},{signal});
   viewport.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)clearInput();},{signal});
@@ -150,7 +153,7 @@ function mount(root,services={}){
       const held=new Set(directions.values());
       state=move(state,pointer?pointer[1]:[Number(held.has('right'))-Number(held.has('left')),Number(held.has('down'))-Number(held.has('up'))],seconds,data);
     }
-    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){destination=null;status.textContent=nearNpc(state)?'已走近，按招呼確認':'已抵達；點地面繼續走';}}
+    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){const id=arrivalTarget;arrivalTarget=null;destination=null;status.textContent=nearby(state)?'已走近，可按互動':'已抵達；點地面繼續走';if(id&&data.objects.some(o=>o.id===id&&Math.hypot(state.x-o.approach.x,state.y-o.approach.y)<1))interact(id);}}
     else state={...state,moving:false};
     walkTime=state.moving?walkTime+Math.min(seconds,.05):0;
     render();frame=requestAnimationFrame(tick);

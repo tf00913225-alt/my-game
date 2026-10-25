@@ -35,11 +35,12 @@ function map(){
   bindBack(close);root.querySelector('[data-village]').addEventListener('click',()=>scene('village'));root.focus({preventScroll:true});
 }
 function objectMarkup(object){
+  const arrow=object.autoInteract?'<span class="taoxi-entry-arrow" aria-hidden="true"><svg viewBox="0 0 64 96" focusable="false"><g stroke="#a56108" stroke-width="2" stroke-linejoin="round"><path fill="#fff5a0" d="M4 10 32 2 60 10 32 23Z"/><path fill="#ffe73e" d="M4 10 32 23 32 36 9 25Z"/><path fill="#ffb81f" d="M32 23 60 10 55 25 32 36Z"/><path fill="#fff388" d="M7 46 32 37 57 46 32 59Z"/><path fill="#ffe132" d="M7 46 32 59 32 93Z"/><path fill="#f5a714" d="M32 59 57 46 32 93Z"/></g><path d="M9 10 32 5 54 11M12 46 32 40 51 46" fill="none" stroke="#fffce0" stroke-width="3" stroke-linecap="round"/></svg></span>':'';
   if(object.art==='solid')return '';
   if(object.art==='gate')return '<img src="'+asset('gate')+'" alt="">';
-  if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>';
+  if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>'+arrow;
   if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
-  if(object.art==='door')return '<span class="taoxi-door">出口</span>';
+  if(object.art==='door')return '<span class="taoxi-door">出口</span>'+arrow;
   const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
   const frame=frames[object.art],clip='taoxi-frame-'+object.id;
   return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>';
@@ -50,6 +51,7 @@ function scene(id,spawn){
   if(id!=='village'&&!C.unlocked(C.houses.find(h=>h.id===id),s.chapter,s.state)){map();return;}
   stop();current=id;root.dataset.scene=id;delete root.dataset.area;
   const data=id==='village'?C.village(spawn):C.interior(id),appearance=C.appearance(s.player);
+  for(const object of data.objects)if(object.interaction==='house')object.autoInteract=C.unlocked(object,s.chapter,s.state);
   root.innerHTML=header(id==='village'?'桃溪村':data.name)+
     '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
     '<div class="taoxi-ground '+(id==='village'?'taoxi-village-ground':'taoxi-room-ground')+'"></div>'+
