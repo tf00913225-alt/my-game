@@ -1818,7 +1818,7 @@ try{
             footprint:rect(footprint),bossCard:rect(bossCard),bossArt:rect(bossCard?.querySelector(':scope > .v174-battle-art')),bossCount:document.querySelectorAll('.v-fixed-boss-footprint > .gameplay-boss-card').length,
             bossHud:{hp:rect(bossHp),sp:rect(bossSp),name:rect(bossName),hpPosition:getComputedStyle(bossHp).position,spPosition:getComputedStyle(bossSp).position,hpDisplay:getComputedStyle(bossHp).display,spDisplay:getComputedStyle(bossSp).display},
             sideVisuals:reinforcements.concat([healIndex,flagIndex]).map(sideVisual),
-            healFeedback:{className:healCard?.className||'',reticleBorder:healReticle.borderTopWidth,reticleAnimation:healReticle.animationName,footBorder:getComputedStyle(healCard.querySelector('.v174-battle-art'),'::before').borderTopWidth,arrowDisplay:getComputedStyle(healCard.querySelector('.v174-target-arrow')).display},
+            healFeedback:{className:healCard?.className||'',reticleBorder:healReticle.borderTopWidth,reticleAnimation:healReticle.animationName,footBorder:getComputedStyle(healCard.querySelector('.v174-battle-art'),'::before').borderTopWidth,arrowDisplay:getComputedStyle(healCard.querySelector('.v174-target-reticle')).display,sealWidth:healCard.querySelector('.v174-target-reticle').offsetWidth,sealPointer:getComputedStyle(healCard.querySelector('.v174-target-reticle')).pointerEvents},
             bossFeedback:{className:bossCard?.className||''},
             vfx:{targetIndexes:String(sprite?.dataset.targetIndexes||'').split(',').filter(Boolean),geometrySlot:sprite?.dataset.geometrySlot||null,placement:sprite?.dataset.placement||null,emitted:sprite?.dataset.emittedVisual||null,count:stage?.querySelectorAll('.v143-vfx-sprite').length,frameFit:sprite?.dataset.frameFit,clipPath:sprite?.style.clipPath,paintBounds:window.FourSymbolsHitFeedback.config.skills.stormCircle.visibility.paintBounds,box:{left:parseFloat(sprite?.style.left),top:parseFloat(sprite?.style.top),width:parseFloat(sprite?.style.width),height:parseFloat(sprite?.style.height)},portrait:(()=>{const r=window.FourSymbolsBattlefieldRenderGeometry.getArtworkProjection('monster',bossIndex)?.rect;return r?{left:r.left,top:r.top,width:r.width,height:r.height}:null;})()},
             livingCount:currentBattleMonsters.filter(index=>monsters[index]?.alive).length
@@ -1839,8 +1839,9 @@ try{
     assert.equal(/(?:^|\\s)(?:red-hit|hit)(?:\\s|$)/.test(bossMode.bossFeedback.className),false,"Heal must not add a red damage state");
     assert.equal(bossMode.healFeedback.reticleBorder,"0px","Retired root reticle stays absent; enemy foot marker is owned by stationary art");
     assert.equal(bossMode.healFeedback.reticleAnimation,"none","Formal shared target reticle stays static");
-    assert.equal(bossMode.healFeedback.footBorder,"1px","Dynamic Boss object exposes thin formal foot ring");
-    assert.equal(bossMode.healFeedback.arrowDisplay,"block","Dynamic Boss object exposes target pointer");
+    assert.equal(bossMode.healFeedback.footBorder,"0px","Superseded enemy foot ring stays absent");
+    assert.equal(bossMode.healFeedback.arrowDisplay,"block","Dynamic Boss object exposes wuxia target seal");
+    assert.equal(bossMode.healFeedback.sealWidth,54);assert.equal(bossMode.healFeedback.sealPointer,"none");
     assert.ok(Math.abs(bossMode.footprint.left-bossMode.bossCard.left)<=1&&Math.abs(bossMode.footprint.right-bossMode.bossCard.right)<=1&&Math.abs(bossMode.footprint.top-bossMode.bossCard.top)<=1&&Math.abs(bossMode.footprint.bottom-bossMode.bossCard.bottom)<=1,"One Boss hit area must fill the central six-Slot visual footprint");
     assert.equal(bossMode.bossHud.hpPosition,"absolute","Boss HP must remain on its absolute HUD anchor");
     assert.equal(bossMode.bossHud.spPosition,"absolute","Boss SP must remain on its absolute HUD anchor");

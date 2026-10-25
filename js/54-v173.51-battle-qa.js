@@ -117,9 +117,9 @@ function syncUnitArtwork(card,kind,selectedRecord){
         const text=document.createElement("span");text.className="v174-manual-turn-text";text.textContent="操作中";
         arrow.appendChild(text);arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
     }
-    // Enemy selection reuses targetable/target; this node is presentation only.
-    if(kind==="monster"&&!art.querySelector(":scope > .v174-target-arrow")){
-        const arrow=document.createElement("span");arrow.className="v174-target-arrow";
+    // Enemy selection reuses targetable/target; one stationary targeting seal.
+    if(kind==="monster"&&!art.querySelector(":scope > .v174-target-reticle")){
+        const arrow=document.createElement("span");arrow.className="v174-target-reticle";
         arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
     }
     let paint=action.querySelector(":scope > .v174-portrait-paint");

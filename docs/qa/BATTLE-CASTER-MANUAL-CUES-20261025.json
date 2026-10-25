@@ -69,5 +69,12 @@
     "accessibility": "prefers-reduced-motion keeps text steady and fully opaque",
     "verification": "actual Chrome sampled bright1/dim.25, plate1 both, exact same caption rect; 16direct +cardless browser+FixedSlot4viewport+build-check PASS",
     "unchanged": "darker red-white ring, enlarged13px caption, enemy hints, VFX sizes/depth, gameplay and auto hidden"
+  },
+  "enemyReticleRevision": {
+    "user": "2026-10-25 金圈小箭頭不明顯，要求恢復準星且武俠風",
+    "implementation": "one stationary54px targeting seal in original art: four sword points, bronze concentric/segmented rings, cinnabar centre; authored inline SVG background, no raster/sprite replacement",
+    "retired": "enemy thin foot circle and arrow CSS/node removed; targetable/target authority unchanged",
+    "unchanged": "manual dark red-white ring,13px blinking caption, caster labels, VFX size/paint1.3225/depth/gameplay",
+    "verification": "16direct + FixedSlot4viewport+cardless/actual blink+build/check PASS; both Boss/object seals display,54px,pointer-eventsnone; exactHead phone pending"
   }
 }

@@ -215,7 +215,9 @@ test("more menu opens only in manual selection and cannot survive utility mode",
 });
 
 
-test("enemy pointer stays below the carrier top instead of covering its preceding HP band",()=>{
- const css=read("css/fixed-slot-battlefield-rendering-v2.css");
- const rule=css.match(/\.v174-target-arrow\{([^}]+)\}/)?.[1];assert.ok(rule);assert.match(rule,/top:10px/);assert.match(rule,/width:16px;height:5px/);assert.match(rule,/pointer-events:none/);
+test("enemy selection uses one noninteractive sword seal without the superseded foot ring or arrow",()=>{
+ const css=read("css/fixed-slot-battlefield-rendering-v2.css"),runtime=read("js/54-v173.51-battle-qa.js");
+ assert.doesNotMatch(css,/v174-target-arrow/);assert.doesNotMatch(runtime,/v174-target-arrow/);
+ const rule=css.match(/\.v174-target-reticle\{([^}]+)\}/)?.[1];assert.ok(rule);assert.match(rule,/width:54px;height:54px/);assert.match(rule,/pointer-events:none/);assert.match(rule,/data:image\/svg\+xml/);
+ assert.match(runtime,/kind==="monster"&&!art.querySelector\(":scope > \.v174-target-reticle"\)/);
 });
