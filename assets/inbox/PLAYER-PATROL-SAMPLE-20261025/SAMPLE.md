@@ -3,9 +3,9 @@
 Work ID: PLAYER-PATROL-SAMPLE-20261025
 Branch: feature/player-patrol-sample-20261025
 Base dev: 4ef6a09cf56d6789d1968481da1ee669b1cafd61
-Status: candidate, independent review and human approval pending. DO NOT MERGE OR DEPLOY.
+Status: male01 human-approved 2026-10-25 22:40 Asia/Taipei; remaining seven pairs in production. Inbox only; runtime wiring requires shared-file handoff.
 
-代表原角色：assets/characters/player_male_01.webp。僅一位正背樣張；其餘七位不生成。此目錄僅 inbox，無正式引用或 manifest 更動。與 #998 主城定位修正分離。戰鬥八圖由原 Owner 負責。
+代表原角色：assets/characters/player_male_01.webp。male01正背樣張已由使用者22:40直接回覆「可以」批准；沿同一方向製作其餘七位正背，仍須分離獨審與84×126檢視。此目錄僅 inbox，無正式引用或 manifest 更動。與 #998 主城定位修正分離。戰鬥八圖由原 Owner 負責。
 
 使用內建 image_gen（非 CLI/API key），原始輸出 PNG 保留，lossless WebP 不裁切、不縮放、不改 Alpha；84×126 PNG 與對照圖僅為顯示尺寸檢視副本。Pillow lossless=True, quality=100, method=6, exact=True；RGBA 解碼逐像素等同原圖。
 

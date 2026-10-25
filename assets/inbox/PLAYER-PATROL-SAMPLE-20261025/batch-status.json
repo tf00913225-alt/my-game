@@ -1,0 +1,40 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "branch": "feature/player-patrol-sample-20261025",
+  "approvedSampleHead": "0bc3eea0f9c8005ab27921ad8c43a92fb4b80fda",
+  "approval": {
+    "time": "2026-10-25T22:40:00+08:00",
+    "answer": "可以",
+    "scope": "male01 style/proportion/pose approved; produce remaining seven front/back"
+  },
+  "status": "FOURTEEN_SOURCES_GENERATED_INDEPENDENT_QA_REVISIONS_PENDING",
+  "runtimeChanges": false,
+  "sharedFilesPendingHandoff": [
+    "exploration character mapping/resolver owner",
+    "asset-manifest.json",
+    "build/asset-manifest.json",
+    "generated runtime bundles if required"
+  ],
+  "boundaries": [
+    "inbox only during asset stage",
+    "no shared CSS changes",
+    "battle #994 owned elsewhere",
+    "UI #955 owned elsewhere",
+    "do not claim #998 or current exploration deployment acceptance"
+  ],
+  "pending": [
+    "14 sources",
+    "lossless pixel/alpha verification",
+    "independent art review",
+    "84x126 clarity",
+    "precise mapping and shared-file handoff before runtime changes"
+  ],
+  "generatedSources": 14,
+  "independentPending": [
+    "male03/back rear boot correction",
+    "male04/back rear boot correction",
+    "female back art review",
+    "all 84x126 review"
+  ],
+  "technicalStatus": "separate processor running; no final PASS yet"
+}
