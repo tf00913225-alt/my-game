@@ -76,5 +76,11 @@
     "retired": "enemy thin foot circle and arrow CSS/node removed; targetable/target authority unchanged",
     "unchanged": "manual dark red-white ring,13px blinking caption, caster labels, VFX size/paint1.3225/depth/gameplay",
     "verification": "16direct + FixedSlot4viewport+cardless/actual blink+build/check PASS; both Boss/object seals display,54px,pointer-eventsnone; exactHead phone pending"
+  },
+  "enemyReticleBlink": {
+    "humanAcceptance": "2026-10-25 martial reticle appearance approved; requests blinking",
+    "change": "same SVG/54px/position: opacity1→.4→1 over1.2s, no rotation/scale; reduced motion steady",
+    "verification": "actual Chrome bright/dim and identical rect,4viewport+16direct+build/check PASS",
+    "unchanged": "manual text blink/red-white ring, caster names,VFX/portrait size/depth/Core"
   }
 }
