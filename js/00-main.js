@@ -4215,7 +4215,17 @@ function firstTutorialContext(identity){
        state.currentNodeId!=='c1_01'||state.completedNodes.c1_01||
        typeof identity.battleId!=='string'||identity.battleId.length<8||identity.battleId.length>100||
        onboarding.battleId!==identity.battleId||getExistingPartyIndexes().length!==1||heroBattleCombatants.length){return null;}
+    if(Object.prototype.hasOwnProperty.call(onboarding,'battleKillReward')){
+        const reward=onboarding.battleKillReward;
+        if(!reward||typeof reward!=='object'||Array.isArray(reward)||Object.keys(reward).length!==4||
+           Object.keys(reward).some(key=>!['uid','battleId','monsterKey','gold'].includes(key))||
+           reward.uid!==uid||reward.battleId!==identity.battleId||reward.monsterKey!=='tutorial.c1_01'||
+           !Number.isSafeInteger(reward.gold)||reward.gold<=0){return null;}
+    }
     return {uid,state,onboarding,sourceProfile:JSON.stringify(profile)};
+}
+function canRestartFirstTutorialBattle(identity){
+    return !!firstTutorialContext(identity)&&!battleActive&&!window.v132ActiveDungeonRun;
 }
 function firstTutorialSafeBoundary(identity){
     const context=firstTutorialContext(identity),run=window.v132ActiveDungeonRun;
@@ -4341,8 +4351,23 @@ function restoreFirstTutorialBattle(value,identity,onComplete){
     }
 }
 
+function firstTutorialKillRewardContext(monster){
+    const run=window.v132ActiveDungeonRun,state=player?.adventureProgress?.chapters?.chapter_v1,onboarding=state?.onboarding;
+    if(!run||run.mode!=='adventure'||!run.tutorial||run.adventureNodeId!=='c1_01'||
+       onboarding?.flowVersion!==3||state.currentNodeId!=='c1_01'||state.completedNodes.c1_01||
+       monster?.monsterKey!=='tutorial.c1_01'){return null;}
+    const identity={uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:onboarding.battleId};
+    const context=firstTutorialContext(identity);
+    // A retained but invalid receipt/checkpoint cannot issue another reward.
+    // Legitimate terminal retries have no DTO but retain the same battle ID
+    // and its once-only receipt in onboarding.
+    return {context:context&&(!Object.prototype.hasOwnProperty.call(onboarding,'battleCheckpoint')||
+        validateFirstTutorialCheckpoint(onboarding.battleCheckpoint,identity))?context:null};
+}
+
 if(typeof window!=="undefined"){
     window.FourSymbolsBattleFlow=Object.freeze({
+        canRestartFirstTutorialBattle:canRestartFirstTutorialBattle,
         checkpointFirstTutorialBattle:checkpointFirstTutorialBattle,
         restoreFirstTutorialBattle:restoreFirstTutorialBattle,
         validateFirstTutorialCheckpoint:validateFirstTutorialCheckpoint,
@@ -22820,15 +22845,29 @@ function killMonster(index){
         bossOwner.onEnemyDeath(index,monster);
     }
 
-    if(!monster.noRewards){
+    const firstTutorialReward=monster.noRewards?null:firstTutorialKillRewardContext(monster);
+    const firstTutorialRewardHandled=firstTutorialReward!==null;
+    const rewardContext=firstTutorialReward?.context;
+    if(!monster.noRewards&&(!firstTutorialRewardHandled||(rewardContext&&!rewardContext.onboarding.battleKillReward))){
         recordMonsterKillForBestiary(monster);
-        awardMonsterGoldDrop(monster);
+        const awardedGold=awardMonsterGoldDrop(monster);
+        if(firstTutorialRewardHandled){
+            // Gold, original kill progress and this battle's receipt share the
+            // original UID main-save. This receipt follows the battle ID,
+            // including a loss/escape retry that consumes the live DTO.
+            window.v141RecordQuestProgress?.('kill10',1,'daily');
+            window.v141RecordQuestProgress?.('kill30',1,'commission');
+            rewardContext.onboarding.battleKillReward={uid:rewardContext.uid,
+                battleId:rewardContext.onboarding.battleId,monsterKey:monster.monsterKey,gold:awardedGold};
+        }
         /* 怪物掉落與擊殺進度一起即時存檔，避免中途戰敗/切背景遺失。 */
         saveGame();
     }
 
 
     updateMonsterUI(index);
+
+    if(firstTutorialRewardHandled){return {firstTutorialRewardHandled:true};}
 
 }
 

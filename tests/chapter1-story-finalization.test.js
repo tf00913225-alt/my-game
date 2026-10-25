@@ -53,12 +53,12 @@ test("canonical Hero qualification seals the same twenty-node Chapter 1 route",(
 // Unit boundary: production Adventure Owner, explicit simulated battle callback.
 // These tests verify state transitions and never claim real combat coverage.
 function runtime(saved,initialSave=true){
-    let callback,saveMode=initialSave,stored,roster,options,launches=0,skillEvent;
+    let callback,saveMode=initialSave,stored,roster,options,launches=0,skillEvent,openingHolds=0,openingReleases=0;
     const potionCounts={hpPotion10:3,spPotion10:3};
     const player={id:"QA",element:"fire",level:1,hp:100,sp:40,adventureProgress:saved||{schemaVersion:3,pendingStoryOpening:true,activeChapterId:"chapter_v1",chapters:{}}};
     const c={window:null,console,Math,Date,Number,String,Boolean,Object,Array,Set,Map,Promise,JSON,
         document:{hidden:false,addEventListener(){},dispatchEvent(){},getElementById(){return null;}},CustomEvent:function(){},
-        player,player2:null,player3:null,gold:100,sharedExp:0,battleActive:false,inventoryItems:[],
+        player,player2:null,player3:null,gold:100,sharedExp:0,battleActive:false,inventoryItems:[],heroBattleCombatants:[],
         characterSkillLoadouts:{fire:{skillLevels:{},equippedSkills:[]}},characterEquipment:{fire:{}},
         setTimeout(){},clearTimeout(){},setInterval(){return 1;},clearInterval(){},addEventListener(){},alert(){},
         saveGame(){if(saveMode==="throw")throw Error("save denied");if(!saveMode)return false;stored=JSON.parse(JSON.stringify(player.adventureProgress));return true;},
@@ -74,17 +74,22 @@ function runtime(saved,initialSave=true){
         v132AddItemToInventory(item){c.inventoryItems.push(item);return true;},
         v132RunInventoryTransaction(fn){const before=JSON.parse(JSON.stringify(c.inventoryItems)),potions={...potionCounts};const restore=()=>{c.inventoryItems=before;Object.assign(potionCounts,potions);};try{const ok=fn();if(!ok)restore();return ok;}catch(error){restore();throw error;}},
         getPotionCount:id=>potionCounts[id]||0,addPotionToInventory:(id,n)=>{potionCounts[id]=(potionCounts[id]||0)+n;return true;},
-        v132LaunchDungeonBattle(enemies,fn,opts){roster=enemies;callback=fn;options=opts;launches++;c.battleActive=true;return true;}};
+        v132LaunchDungeonBattle(enemies,fn,opts){roster=enemies;callback=fn;options=opts;launches++;c.battleActive=true;c.turn=1;return true;}};
     c.window=c;vm.createContext(c);
     const mainSource=fs.readFileSync('js/00-main.js','utf8');
-    for(const name of ['getPartyCharacterKey','getSkillCharacterObject']){
+    for(const name of ['getPartyCharacterKey','getSkillCharacterObject','firstTutorialContext','canRestartFirstTutorialBattle']){
         const declaration=mainSource.match(new RegExp('function '+name+'\\([^)]*\\)\\{[\\s\\S]*?\\n\\}'));
         assert.ok(declaration,'canonical character identity Owner exists: '+name);
         vm.runInContext(declaration[0],c);
     }
+    c.FourSymbolsBattleFlow={
+        canRestartFirstTutorialBattle:c.canRestartFirstTutorialBattle,
+        acquireInputGuideHold(){openingHolds++;let held=true;return ()=>{if(held){held=false;openingReleases++;}};}
+    };
     for(const path of ["js/adventure/adventure-content-v1-20260915.js","js/adventure/adventure-runtime-v1-20260915.js"])vm.runInContext(fs.readFileSync(path,"utf8"),c);
     return {c,api:c.FourSymbolsAdventure,state:()=>c.player.adventureProgress.chapters.chapter_v1,
         save:value=>{saveMode=value;},stored:()=>structuredClone(stored),roster:()=>roster,options:()=>options,launches:()=>launches,
+        openingHolds:()=>({acquired:openingHolds,released:openingReleases}),
         finish:result=>{c.battleActive=false;callback({result});},useSkill:()=>skillEvent({actor:player,actualSpent:1}),
         potions:potionCounts,consumePotion:id=>{assert.ok(potionCounts[id]>0);potionCounts[id]--;}};
 }
@@ -514,6 +519,29 @@ for(const flow of ['legacy','first-v3'])test(`guide ${flow} requires the real at
     h.frame();assert.deepEqual(h.holds(),{acquired:1,released:1},'release executes once');
 });
 
+test('first battle and retry block real input before the first guide frame until a checkpoint exists',()=>{
+    for(const step of ['attack-intro','finish-battle']){
+        const h=guideHarness(),attack=h.element();let attacks=0;
+        attack.action=()=>{attacks++;};h.targets.set('#mainBattleMenu button[onclick*="normal"]',[attack]);
+        h.view.firstLesson={step,battleActive:true,hasCheckpoint:false};
+        for(const type of ['pointerdown','click','keydown']){
+            assert.equal(h.dispatch(type,attack,'Enter').stopped,true,step+' blocks input without waiting for rAF');
+        }
+        assert.equal(attacks,0);h.frame();
+        assert.equal(h.children.get('.adventure-guide-next').disabled,true);
+        assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
+        assert.deepEqual(h.holds(),{acquired:1,released:0});
+        h.view.firstLesson.hasCheckpoint=true;h.frame();
+        if(step==='finish-battle'){
+            assert.deepEqual(h.holds(),{acquired:1,released:1});
+            assert.equal(h.dispatch('click',attack).stopped,false);assert.equal(attacks,1);
+        }else{
+            assert.equal(h.children.get('.adventure-guide-next').disabled,false);
+            assert.equal(h.dispatch('click',attack).stopped,true,'initial introduction is still required');
+        }
+    }
+});
+
 test('tutorial return button opts into pointer input under the original noninteractive UI host',()=>{
     const main=fs.readFileSync('css/00-main.css','utf8'),css=fs.readFileSync('css/adventure-v1-20260915.css','utf8');
     assert.match(main.match(/#game-ui\{[\s\S]*?\}/)[0],/pointer-events\s*:\s*none/);
@@ -792,13 +820,10 @@ test("a genuine retained mission objective turns in and claims once after story 
 
 // Story transaction boundary uses an explicit Core double. The real Core DTO,
 // ledger and rollback are independently exercised in chapter1-battle-checkpoint.
-function firstLessonHarness(){
-    const h=runtime();h.api.getView();
-    assert.equal(h.state().onboarding.flowVersion,3);
-    assert.equal(h.api.startFreshStory(),true);finishDialogue(h);
-    assert.equal(h.launches(),1);
+function installFirstLessonCore(h){
     h.c.turn=1;let restores=0,suspends=0;
     h.c.FourSymbolsBattleFlow={
+        ...h.c.FourSymbolsBattleFlow,
         checkpointFirstTutorialBattle(identity,commit,suspend){
             const dto={version:1,battleId:identity.battleId,sequence:h.c.turn,turn:h.c.turn,startedAt:123};
             if(!commit(dto))return false;
@@ -810,6 +835,13 @@ function firstLessonHarness(){
         }
     };
     return Object.assign(h,{restores:()=>restores,suspends:()=>suspends});
+}
+function firstLessonHarness(){
+    const h=runtime();h.api.getView();
+    assert.equal(h.state().onboarding.flowVersion,3);
+    assert.equal(h.api.startFreshStory(),true);finishDialogue(h);
+    assert.equal(h.launches(),1);
+    return installFirstLessonCore(h);
 }
 function finishNormalPractice(h){
     assert.equal(h.api.advanceFirstLesson(),false,'no input before initial safe checkpoint');
@@ -862,13 +894,181 @@ test('fresh creation entry retains the versioned first battle identity and retai
     assert.equal(reloaded.state().rewardClaims.c1_01,'claimed');
     assert.equal(reloaded.api.startFreshStory(),false,'already consumed creation intent cannot start a second first battle');
 });
+
+function pendingFirstLessonOpening(kind){
+    const h=firstLessonHarness();
+    if(kind==='retry'){
+        finishNormalPractice(h);h.c.player.level=2;
+        h.c.characterSkillLoadouts.fire={skillLevels:{lessonSkill:1},equippedSkills:['lessonSkill']};
+        h.state().onboarding.firstBattleStep='return';assert.equal(h.api.returnFromTutorial(),true);
+        h.state().onboarding.battleKillReward={uid:'chapter-qa',battleId:h.state().onboarding.battleId,monsterKey:'tutorial.c1_01',gold:25};h.c.gold=125;
+        h.finish('lose');assert.equal(h.state().onboarding.phase,'retry');
+        assert.equal(h.api.startStory('c1_01'),true);finishDialogue(h);
+    }
+    return h;
+}
+for(const kind of ['fresh','retry'])test(`${kind} launch retains its safe entry until its first checkpoint commits and reload can continue natively`,()=>{
+    const h=pendingFirstLessonOpening(kind),phase=kind==='fresh'?'story':'retry',saved=h.stored();
+    assert.equal(h.state().onboarding.phase,phase);assert.equal(saved.chapters.chapter_v1.onboarding.phase,phase);
+    assert.equal(Object.hasOwn(saved.chapters.chapter_v1.onboarding,'battleCheckpoint'),false);
+    assert.equal(h.api.getView().firstLesson.hasCheckpoint,false,'an active retry exposes the same waiting guide');
+    const held=h.openingHolds();assert.equal(held.acquired-held.released,1,'launch obtains its own hold before any guide frame');
+    const reloaded=installFirstLessonCore(runtime(saved));
+    reloaded.c.player.level=h.c.player.level;reloaded.c.gold=h.c.gold;reloaded.c.sharedExp=h.c.sharedExp;
+    reloaded.c.player.hp=81;reloaded.c.player.sp=29;
+    assert.equal(reloaded.api.open({story:true}),true);assert.equal(reloaded.launches(),0,'the original story/retry entry remains visible');
+    assert.ok(reloaded.state().dialogue);finishDialogue(reloaded);
+    assert.equal(reloaded.launches(),1);assert.equal(reloaded.c.battleActive,true);
+    assert.equal(reloaded.state().onboarding.phase,phase);
+    assert.equal(reloaded.state().onboarding.battleId,h.state().onboarding.battleId);
+    assert.equal(reloaded.c.player.hp,81);assert.equal(reloaded.c.player.sp,29);
+    assert.equal(reloaded.c.gold,h.c.gold);assert.equal(reloaded.c.sharedExp,h.c.sharedExp);
+    assert.deepEqual(reloaded.openingHolds(),{acquired:1,released:0});
+    assert.equal(reloaded.api.syncFirstLesson(),true);
+    assert.equal(reloaded.state().onboarding.phase,'battle');assert.ok(reloaded.state().onboarding.battleCheckpoint);
+    assert.equal(reloaded.stored().chapters.chapter_v1.onboarding.phase,'battle');
+    assert.ok(reloaded.stored().chapters.chapter_v1.onboarding.battleCheckpoint,'battle phase and first DTO share one accepted save');
+    assert.deepEqual(reloaded.openingHolds(),{acquired:1,released:1});
+    assert.equal(reloaded.c.gold,h.c.gold);assert.equal(reloaded.c.sharedExp,h.c.sharedExp);
+});
+for(const kind of ['fresh','retry'])for(const failure of [false,'throw'])test(`${kind} initial checkpoint save ${failure} retains the timer hold and prior durable entry until retry succeeds`,()=>{
+    const h=pendingFirstLessonOpening(kind),saved=h.stored(),phase=h.state().onboarding.phase,holds=h.openingHolds();
+    const gold=h.c.gold,exp=h.c.sharedExp;h.save(failure);
+    assert.equal(h.api.syncFirstLesson(),false);assert.equal(h.c.battleActive,true);
+    assert.equal(h.state().onboarding.phase,phase);assert.equal(h.state().onboarding.battleCheckpoint,undefined);
+    assert.deepEqual(h.stored(),saved);assert.deepEqual(h.openingHolds(),holds);
+    assert.equal(h.c.gold,gold);assert.equal(h.c.sharedExp,exp);
+    h.save(true);assert.equal(h.api.syncFirstLesson(),true);assert.equal(h.state().onboarding.phase,'battle');
+    assert.equal(h.openingHolds().released,holds.released+1);
+    h.api.syncFirstLesson();assert.equal(h.openingHolds().released,holds.released+1,'successful opening releases exactly once');
+});
+test('launch refusal and terminal before the first checkpoint leave no opening timer hold or unreachable battle phase',()=>{
+    const h=runtime(),launch=h.c.v132LaunchDungeonBattle;h.api.startFreshStory();
+    h.c.v132LaunchDungeonBattle=()=>false;
+    while(h.state().dialogue.lineIndex<h.c.FourSymbolsAdventureContent.chapters.chapter_v1.nodes[0].dialogue.length-1){assert.equal(h.api.advanceDialogue(),true);}
+    assert.equal(h.api.advanceDialogue(),false);assert.equal(h.state().onboarding.phase,'story');
+    assert.deepEqual(h.openingHolds(),{acquired:0,released:0});
+    h.c.v132LaunchDungeonBattle=launch;assert.equal(h.api.open({story:true}),true);finishDialogue(h);
+    assert.deepEqual(h.openingHolds(),{acquired:1,released:0});h.finish('escape');
+    assert.deepEqual(h.openingHolds(),{acquired:1,released:1});assert.equal(h.state().onboarding.phase,'retry');
+    assert.equal(h.api.open({story:true}),true);assert.ok(h.state().dialogue);
+});
+test('pre-checkpoint story and retry entries reject lesson steps belonging to later live battle state',()=>{
+    for(const [phase,steps] of [['story',['attack','cast','finish-battle','complete']],['retry',['attack','cast','return','complete']]]){
+        for(const step of steps){
+            const h=runtime(savedFirstBattleOpening());
+            h.state().onboarding.phase=phase;h.state().onboarding.firstBattleStep=step;
+            const before=JSON.stringify(h.c.player.adventureProgress);
+            assert.equal(h.api.beginBattle('c1_01'),false,phase+'/'+step);
+            assert.equal(h.launches(),0);assert.equal(h.c.battleActive,false);
+            assert.equal(JSON.stringify(h.c.player.adventureProgress),before);assert.equal(h.stored(),undefined);
+            assert.deepEqual(h.openingHolds(),{acquired:0,released:0});
+        }
+    }
+});
+
+// Use the actual Core identity guard for pre-checkpoint recovery. Battle launch
+// and persistence remain the explicit Story doubles above; browser acceptance
+// separately covers the original UID save codec and real declaration/DTO.
+function installOpeningRecoveryCore(h){
+    const source=fs.readFileSync('js/00-main.js','utf8');
+    for(const name of ['firstTutorialContext','canRestartFirstTutorialBattle']){
+        const start=source.indexOf('function '+name+'('),end=source.indexOf('\nfunction ',start+1);
+        assert.ok(start>=0&&end>start,'original Core recovery guard exists: '+name);
+        vm.runInContext(source.slice(start,end),h.c);
+    }
+    h.c.heroBattleCombatants=[];
+    h.c.FourSymbolsBattleFlow.canRestartFirstTutorialBattle=h.c.canRestartFirstTutorialBattle;
+}
+function savedFirstBattleOpening(legacyPhase=false){
+    const h=runtime();assert.equal(h.api.startFreshStory(),true);finishDialogue(h);
+    assert.equal(h.launches(),1);assert.equal(h.state().onboarding.phase,'story');
+    assert.equal(h.state().onboarding.firstBattleStep,'attack-intro');
+    assert.equal(Object.hasOwn(h.state().onboarding,'battleCheckpoint'),false);
+    const saved=h.stored();
+    // Explicit compatibility fixture for the former writer's phase. All
+    // other fields came from the original creation/dialogue/launch path.
+    if(legacyPhase){saved.chapters.chapter_v1.onboarding.phase='battle';}
+    return saved;
+}
+test('retained pre-checkpoint battle phase reopens through the original launch without grants or refill',()=>{
+    const saved=savedFirstBattleOpening(true),battleId=saved.chapters.chapter_v1.onboarding.battleId;
+    for(let attempt=0;attempt<2;attempt++){
+        const h=runtime(structuredClone(saved));installOpeningRecoveryCore(h);
+        h.c.player.hp=81;h.c.player.sp=29;
+        const expected=structuredClone(saved);expected.chapters.chapter_v1.onboarding.phase='story';
+        assert.equal(h.api.open({story:true}),true);assert.equal(h.launches(),1);
+        assert.equal(h.state().onboarding.battleId,battleId);assert.equal(h.c.battleActive,true);
+        assert.equal(h.c.player.hp,81);assert.equal(h.c.player.sp,29);
+        assert.equal(h.c.gold,100);assert.equal(h.c.sharedExp,0);
+        assert.deepEqual(JSON.parse(JSON.stringify(h.c.player.adventureProgress)),expected);
+        assert.deepEqual(h.stored(),expected,'uncommitted battle phase retires back to its safe story entry');
+        assert.equal(h.api.advanceFirstLesson(),false,'recovery still cannot open inputs before a committed DTO');
+        assert.equal(h.api.beginBattle('c1_01'),false,'the same active battle cannot launch twice');
+        assert.equal(h.launches(),1);
+    }
+});
+for(const failure of [false,'throw'])test(`pre-checkpoint recovery save ${failure} preserves the opening and can retry`,()=>{
+    const saved=savedFirstBattleOpening(true),h=runtime(structuredClone(saved));installOpeningRecoveryCore(h);
+    assert.equal(h.c.saveGame(),true);const before=JSON.stringify(h.c.player.adventureProgress);
+    h.c.player.hp=81;h.c.player.sp=29;h.save(failure);
+    assert.equal(h.api.open({story:true}),false);assert.equal(h.launches(),0);assert.equal(h.c.battleActive,false);
+    assert.equal(JSON.stringify(h.c.player.adventureProgress),before);assert.deepEqual(h.stored(),saved);
+    assert.equal(h.c.player.hp,81);assert.equal(h.c.player.sp,29);assert.equal(h.c.gold,100);assert.equal(h.c.sharedExp,0);
+    h.save(true);assert.equal(h.api.open({story:true}),true);assert.equal(h.launches(),1);
+    assert.equal(h.state().onboarding.battleId,saved.chapters.chapter_v1.onboarding.battleId);
+});
+test('missing or invalid checkpoint outside the exact pre-input opening never relaunches or rewrites progress',()=>{
+    const saved=savedFirstBattleOpening(true);
+    const cases=[
+        ['later input',h=>{h.state().onboarding.firstBattleStep='attack';}],
+        ['later cast',h=>{h.state().onboarding.firstBattleStep='cast';}],
+        ['null checkpoint',h=>{h.state().onboarding.battleCheckpoint=null;}],
+        ['undefined checkpoint field',h=>{h.state().onboarding.battleCheckpoint=undefined;}],
+        ['false checkpoint',h=>{h.state().onboarding.battleCheckpoint=false;}],
+        ['prior kill receipt',h=>{h.state().onboarding.battleKillReward={uid:'chapter-qa',battleId:h.state().onboarding.battleId,monsterKey:'tutorial.c1_01',gold:25};}],
+        ['null kill receipt',h=>{h.state().onboarding.battleKillReward=null;}],
+        ['undefined kill receipt field',h=>{h.state().onboarding.battleKillReward=undefined;}],
+        ['claimed reward',h=>{h.state().rewardClaims.c1_01='claimed';}],
+        ['ready reward',h=>{h.state().rewardClaims.c1_01='ready';}],
+        ['completed node',h=>{h.state().completedNodes.c1_01=true;}],
+        ['wrong lesson node',h=>{h.state().onboarding.nodeId='c1_02';}],
+        ['wrong battle node',h=>{h.state().onboarding.battleNodeId='c1_02';}],
+        ['unconsumed opening',h=>{h.c.player.adventureProgress.pendingStoryOpening=true;}],
+        ['missing opening fact',h=>{delete h.c.player.adventureProgress.pendingStoryOpening;}],
+        ['later level',h=>{h.c.player.level=2;}],
+        ['later lesson action',h=>{h.state().onboarding.requiredAction='skill';}],
+        ['completed basics',h=>{h.state().onboarding.basicComplete=true;}],
+        ['pending buff',h=>{h.state().pendingAdventureBuff={type:'sp-start',percent:10};}],
+        ['wrong UID',h=>{h.c.FourSymbolsStartupPolicy.getUid=()=> 'other';}],
+        ['missing UID',h=>{h.c.FourSymbolsAccountSave.getActiveUid=()=>null;}],
+        ['multiple characters',h=>{h.c.getExistingPartyIndexes=()=>[0,1];}],
+        ['Hero active',h=>{h.c.heroBattleCombatants=[{}];}],
+        ['another run',h=>{h.c.v132ActiveDungeonRun={mode:'adventure'};}],
+        ['Core refusal',h=>{h.c.FourSymbolsBattleFlow.canRestartFirstTutorialBattle=()=>false;}],
+        ['Core unavailable',h=>{delete h.c.FourSymbolsBattleFlow.canRestartFirstTutorialBattle;}]
+    ];
+    for(const [label,mutate] of cases){
+        const h=runtime(structuredClone(saved));installOpeningRecoveryCore(h);mutate(h);
+        const before=JSON.stringify(h.c.player.adventureProgress);
+        assert.equal(h.api.open({story:true}),false,label);
+        assert.equal(h.api.beginBattle('c1_01'),false,'direct entry must keep the same recovery gate: '+label);
+        assert.equal(h.launches(),0,label);assert.equal(h.c.battleActive,false,label);
+        assert.equal(JSON.stringify(h.c.player.adventureProgress),before,label);assert.equal(h.stored(),undefined,label);
+        assert.equal(h.c.gold,100,label);assert.equal(h.c.sharedExp,0,label);
+    }
+});
 for(const outcome of ['win','lose','escape'])for(const saveMode of [true,false,'throw'])test(`first battle ${outcome} terminal with save ${saveMode} preserves receipt and honest continuation`,()=>{
     const h=firstLessonHarness();finishNormalPractice(h);
+    const killReceipt={uid:'chapter-qa',battleId:h.state().onboarding.battleId,monsterKey:'tutorial.c1_01',gold:25};
+    h.state().onboarding.battleKillReward=structuredClone(killReceipt);h.c.gold+=killReceipt.gold;
     h.c.player.level=2;h.c.characterSkillLoadouts.fire={skillLevels:{lessonSkill:1},equippedSkills:['lessonSkill']};
     h.state().onboarding.firstBattleStep='return';assert.equal(h.api.returnFromTutorial(),true);
     const durable=h.stored();h.save(saveMode);h.finish(outcome);
     assert.equal(h.c.sharedExp,300,'terminal cannot award the first teaching source again');
     assert.equal(h.state().rewardClaims.c1_01,'claimed');
+    assert.equal(h.c.gold,125);
+    assert.deepEqual(JSON.parse(JSON.stringify(h.state().onboarding.battleKillReward)),killReceipt,'terminal cannot erase the same battleId kill receipt');
     if(saveMode!==true){
         assert.equal(h.state().completedNodes.c1_01,undefined,'refused save never claims completion');
         assert.deepEqual(h.stored(),durable,'the last accepted checkpoint is the only durable continuation');
@@ -879,6 +1079,7 @@ for(const outcome of ['win','lose','escape'])for(const saveMode of [true,false,'
     const reopened=runtime(h.stored());reopened.c.player.level=2;reopened.c.sharedExp=300;
     assert.equal(reopened.api.open({story:true}),true,'accepted terminal always has an original visible continuation');
     assert.equal(reopened.launches(),0,'reopen never silently launches another battle');assert.equal(reopened.c.sharedExp,300);
+    assert.deepEqual(JSON.parse(JSON.stringify(reopened.state().onboarding.battleKillReward)),killReceipt,'receipt survives accepted terminal checkpoint disposal and reload');
     if(outcome==='win'){
         assert.equal(reopened.state().currentNodeId,'c1_02');assert.equal(reopened.state().onboarding.basicComplete,true);
     }else{

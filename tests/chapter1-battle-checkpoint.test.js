@@ -59,6 +59,19 @@ function suspend(h){
     assert.equal(h.flow.checkpointFirstTutorialBattle(h.identity,value=>{h.onboarding.battleCheckpoint=value;return true;},true),true);
     return h.onboarding.battleCheckpoint;
 }
+test('first tutorial opening restart reuses the original UID/profile/party gate and requires no active battle',()=>{
+    const h=harness();
+    assert.equal(h.flow.canRestartFirstTutorialBattle(h.identity),false);
+    h.c.battleActive=false;
+    assert.equal(h.flow.canRestartFirstTutorialBattle(h.identity),false,'a retained dungeon runtime cannot be replaced');
+    h.c.v132ActiveDungeonRun=null;
+    assert.equal(h.flow.canRestartFirstTutorialBattle(h.identity),true);
+    for(const mutate of [c=>c.FourSymbolsStartupPolicy.getUid=()=> 'other',c=>c.getExistingPartyIndexes=()=>[0,1],
+        c=>c.heroBattleCombatants=[{}],c=>c.FourSymbolsAdventureContent.tutorialEncounters.tutorial_1=null]){
+        const bad=harness();bad.c.battleActive=false;bad.c.v132ActiveDungeonRun=null;mutate(bad.c);
+        assert.equal(bad.flow.canRestartFirstTutorialBattle(bad.identity),false);
+    }
+});
 test('safe first-tutorial suspension persists first, preserves original roster/ledger and returns world without ending',()=>{
     const h=harness();let during;
     assert.equal(h.flow.checkpointFirstTutorialBattle(h.identity,value=>{
@@ -179,4 +192,189 @@ test('original presentation adoption refuses inactive, stale or transitioning re
     assert.equal(refused.flow.restoreFirstTutorialBattle(dto,refused.identity,()=>{}),false);
     assert.equal(refused.c.battleActive,false);assert.equal(refused.c.monsters,refused.world);
     assert.deepEqual(refused.onboarding.battleCheckpoint,dto,'presentation refusal retains the committed checkpoint');
+});
+
+// Keep the original main-save writer, gold policy/multiplier and kill quest
+// adapters in the reload regression; only the account I/O and visual sinks are
+// replaced. A successful write captures the complete original save payload.
+function installRewardOwners(h,startingSave){
+    const c=h.c;
+    Object.assign(c,{
+        deleteAllCharactersInProgress:false,SAVE_KEY:'four_symbols_save:'+h.identity.uid,
+        heroAccountState:{},player2:null,player3:null,sharedExp:0,gold:300,
+        dailyQuestState:{progress:{},claimed:{}},commissionQuestState:{progress:{},claimed:{}},bestiaryData:{},achievementState:{},
+        dailyQuestDefinitions:[{id:'killMonsters',goal:99},{id:'kill10',goal:10}],
+        commissionQuestDefinitions:[{id:'killMonsters',goal:99},{id:'kill30',goal:30}],ensureDailyQuestsCurrent(){},
+        selectedCreationElement:'wind',characterEquipment:{},characterSkillLoadouts:{},
+        autoConfig:{enabled:false},autoConfig2:{enabled:false},autoConfig3:{enabled:false},inventoryItems:[],
+        normalizeInventoryStacks(){},updateGoldDisplay(){},addBattleLog(){},updateMonsterUI(){},getMonsterRank:monster=>monster.rank,
+        recordElementBoxMonsterGold(){},audioEngine:{play(){}},COMBAT_FEEDBACK_VOLUME_SCALE:1,
+        FourSymbolsHeroCore:{normalizeAccountState:value=>value}
+    });
+    let durable=startingSave?JSON.parse(JSON.stringify(startingSave)):null,refused=false,writes=0;
+    c.FourSymbolsAccountSave.saveKey=()=>c.SAVE_KEY;
+    c.FourSymbolsAccountSave.readForUid=()=>durable?{status:'ready',save:durable}:{status:'missing'};
+    c.FourSymbolsAccountSave.writeForUid=(_uid,value)=>{
+        if(refused){throw Error('injected account write refusal');}
+        durable=JSON.parse(JSON.stringify(value));writes++;
+    };
+    if(startingSave){
+        for(const key of ['player','gold','sharedExp','bestiaryData','dailyQuestState','commissionQuestState']){
+            c[key]=JSON.parse(JSON.stringify(startingSave[key]));
+        }
+        c.getPartyCharacterByIndex=()=>c.player;
+        h.onboarding=c.player.adventureProgress.chapters.chapter_v1.onboarding;
+    }
+    vm.runInContext(fs.readFileSync('functions/src/patrol-reward-policy.js','utf8'),c);
+    c.rewardPolicy=c.FourSymbolsPatrolRewardPolicy;
+    const saveStart=main.indexOf('function saveGame(options={}'),goldStart=main.indexOf('function getMonsterGoldDrop(');
+    const recordStart=main.indexOf('function recordMonsterKillForBestiary(');
+    vm.runInContext(main.slice(saveStart,main.indexOf('\n/* =====================================================\n   ★ 舊存檔修復 / 讀檔',saveStart))+
+        main.slice(goldStart,main.indexOf('\nconst BATTLE_RENDER_HOOK_ORDER=',goldStart))+
+        main.slice(recordStart,main.indexOf('\nfunction getTotalMonsterKills()',recordStart)),c);
+    const goldAdapter=fs.readFileSync('js/25-v131-fix-batch.js','utf8');
+    vm.runInContext(goldAdapter.slice(goldAdapter.indexOf('    if(typeof awardMonsterGoldDrop==='),
+        goldAdapter.indexOf('    const originalConfirmAutoBattleSettings=')),c);
+    const dungeon=fs.readFileSync('js/27-v132-content-expansion.js','utf8');
+    vm.runInContext(dungeon.slice(dungeon.indexOf('    function awardMonsterMaterialDrop('),
+        dungeon.indexOf('    /* =====================================================\n       9. 符咒使用')),c);
+    const quests=fs.readFileSync('js/34-v141-core-systems.js','utf8');
+    vm.runInContext(quests.slice(quests.indexOf('    function recordQuestProgress('),
+        quests.indexOf('    /* =====================================================\n       Expanded quests and achievements')),c);
+    vm.runInContext('Math.random=()=>0.5;',c);
+    return {saved:()=>durable,refuse:value=>{refused=value;},writes:()=>writes};
+}
+function rewardReload(saved){
+    const h=harness(),store=installRewardOwners(h,saved);
+    h.c.battleActive=false;h.c.battleToken=0;h.c.monsters=h.world;h.c.currentZone='forest';h.c.v132ActiveDungeonRun=null;
+    assert.equal(h.flow.restoreFirstTutorialBattle(h.onboarding.battleCheckpoint,h.identity,()=>{}),true);
+    return {h,store};
+}
+test('kill reward and live checkpoint commit together; reload and another safe checkpoint cannot grant again',()=>{
+    const first=harness();
+    assert.equal(first.flow.checkpointFirstTutorialBattle(first.identity,value=>{first.onboarding.battleCheckpoint=value;return true;}),true);
+    const store=installRewardOwners(first);
+    first.c.killMonster(0);
+    const saved=store.saved(),receipt=saved.player.adventureProgress.chapters.chapter_v1.onboarding.battleKillReward;
+    assert.deepEqual(receipt,{uid:first.identity.uid,battleId:first.identity.battleId,monsterKey:'tutorial.c1_01',gold:25});
+    assert.equal(saved.gold,325);assert.equal(saved.bestiaryData['攔路惡徒'].kills,1);
+    assert.equal(saved.dailyQuestState.progress.kill10,1);assert.equal(saved.commissionQuestState.progress.kill30,1);
+    assert.equal(first.c.dailyQuestState.progress.kill10,1,'original quest adapter must not apply the same kill twice');
+    assert.equal(saved.player.adventureProgress.chapters.chapter_v1.onboarding.battleCheckpoint.roster[0].alive,true);
+    const reloaded=rewardReload(saved),h=reloaded.h;
+    const oldSequence=h.onboarding.battleCheckpoint.sequence;
+    h.c.turn=3;
+    h.c.battleRoundBoundaryKeys.add('1:round_end:2');h.c.battleRoundBoundaryKeys.add('1:round_start:3');
+    assert.equal(h.flow.checkpointFirstTutorialBattle(h.identity,value=>{h.onboarding.battleCheckpoint=value;return h.c.saveGame();}),true);
+    assert.equal(h.onboarding.battleCheckpoint.sequence,oldSequence+1);
+    assert.deepEqual(JSON.parse(JSON.stringify(h.onboarding.battleKillReward)),receipt);
+    h.c.killMonster(0);assert.equal(h.c.monsters[0].alive,false);
+    assert.equal(h.c.gold,325);assert.equal(h.c.bestiaryData['攔路惡徒'].kills,1);
+    assert.equal(h.c.dailyQuestState.progress.kill10,1);assert.equal(h.c.commissionQuestState.progress.kill30,1);
+    assert.equal(h.c.saveGame(),true);assert.equal(reloaded.store.saved().gold,325);
+});
+test('refused kill write retains a coherent retry pair; reload of old durable bytes still permits exactly one award',()=>{
+    const first=harness(),store=installRewardOwners(first);
+    assert.equal(first.flow.checkpointFirstTutorialBattle(first.identity,value=>{first.onboarding.battleCheckpoint=value;return first.c.saveGame();}),true);
+    const before=JSON.parse(JSON.stringify(store.saved()));
+    store.refuse(true);first.c.killMonster(0);
+    assert.deepEqual(store.saved(),before,'failed original account write changes no durable state');
+    assert.equal(first.c.gold,325);assert.equal(first.onboarding.battleKillReward.gold,25);
+    store.refuse(false);assert.equal(first.c.saveGame(),true);
+    const accepted=store.saved();assert.equal(accepted.gold,325);
+    assert.equal(accepted.player.adventureProgress.chapters.chapter_v1.onboarding.battleKillReward.gold,25);
+    const retry=rewardReload(accepted);retry.h.c.killMonster(0);
+    assert.equal(retry.h.c.gold,325,'a later original save commits the pair without reroll/regrant');
+    const interrupted=rewardReload(before);interrupted.h.c.killMonster(0);
+    assert.equal(interrupted.store.saved().gold,325,'reload before any accepted reward save can still earn its first kill');
+});
+test('malformed or foreign kill receipts never restore or reopen a first-tutorial reward',()=>{
+    const valid={uid:'tutorial-qa',battleId:'first-battle-identity',monsterKey:'tutorial.c1_01',gold:25};
+    const badReceipts=[null,undefined,false,{},[],{...valid,monsterKey:'other'},
+        {...valid,uid:'other'},{...valid,battleId:'other-battle'},
+        {...valid,gold:0},{...valid,gold:-1},{...valid,gold:NaN},{...valid,extra:true}];
+    for(const receipt of badReceipts){
+        const h=harness(),dto=suspend(h);h.onboarding.battleKillReward=receipt;
+        assert.equal(h.flow.restoreFirstTutorialBattle(dto,h.identity,()=>{}),false);
+        h.c.battleActive=true;h.c.monsters=JSON.parse(JSON.stringify(dto.roster));
+        h.c.v132ActiveDungeonRun={mode:'adventure',tutorial:true,adventureNodeId:'c1_01'};
+        const store=installRewardOwners(h);h.c.killMonster(0);
+        assert.equal(h.c.gold,300);assert.equal(store.writes(),0);
+        assert.equal(h.c.dailyQuestState.progress.kill10,undefined);
+    }
+});
+test('ordinary dungeon kill keeps its original reward path without a teaching receipt',()=>{
+    const h=harness(),store=installRewardOwners(h);h.c.v132ActiveDungeonRun.adventureNodeId='c1_02';
+    h.c.killMonster(0);
+    assert.equal(store.saved().gold,325);assert.equal(h.c.gold,325);
+    assert.equal(h.c.bestiaryData['攔路惡徒'].kills,1);assert.equal(h.c.dailyQuestState.progress.kill10,1);
+    assert.equal(h.onboarding.battleCheckpoint,undefined);
+    const replay=harness(),replayStore=installRewardOwners(replay);
+    replay.c.player.adventureProgress.chapters.chapter_v1.completedNodes.c1_01={completedAt:123};
+    replay.onboarding.battleKillReward={...replay.identity,monsterKey:'tutorial.c1_01',gold:25};
+    replay.c.killMonster(0);
+    assert.equal(replayStore.saved().gold,325,'an ordinary replay of a completed node remains outside the fresh first battle');
+});
+
+function installFirstTutorialTerminalRetry(h){
+    const c=h.c,source=fs.readFileSync('js/adventure/adventure-runtime-v1-20260915.js','utf8');
+    const node={id:'c1_01',stage:1,type:'battle',tutorialEncounterId:'tutorial_1'},chapter={id:'chapter_v1',nodes:[node]};
+    const retryRoster=JSON.parse(JSON.stringify(c.monsters));
+    Object.assign(c,{
+        runtime:{activeAdventureBattle:{nodeId:node.id,replay:false}},
+        chapterDefinition:()=>chapter,chapterState:()=>c.player.adventureProgress.chapters.chapter_v1,
+        playerOwner:()=>c.player,nodeById:()=>node,nodeStatus:()=> 'available',
+        clone:value=>JSON.parse(JSON.stringify(value)),captureResources:()=>[],
+        dispatchStateChange(){},render(){},updateUI(){},showMessage(){},stopBattleResourceMonitor(){},restoreLastBattleResources(){},
+        consumePendingAdventureBuff(){},startBattleResourceMonitor(){},hideOverlay(){},now:()=>123,
+        buildTutorialEncounter:()=>JSON.parse(JSON.stringify(retryRoster)),hasTutorialAction:()=>true,
+        v132LaunchDungeonBattle(roster,onComplete){
+            c.monsters=roster;c.battleActive=true;c.v132ActiveDungeonRun={mode:'adventure',tutorial:true,onComplete};return true;
+        }
+    });
+    c.chapterState().rewardClaims={c1_01:'claimed'};
+    Object.assign(h.onboarding,{phase:'battle',firstBattleStep:'finish-battle',nodeId:'c1_01'});
+    vm.runInContext(source.slice(source.indexOf('    function persist('),source.indexOf('    function getPartyIndexes('))+
+        source.slice(source.indexOf('    function firstLessonState('),source.indexOf('    function firstLessonIdentity('))+
+        source.slice(source.indexOf('    function releaseFirstLessonOpeningHold('),source.indexOf('    function commitFirstLesson('))+
+        source.slice(source.indexOf('    function beginBattle('),source.indexOf('    function unlockedZoneProfiles(')),c);
+}
+for(const outcome of ['lose','escape'])for(const alreadyPaid of [true,false])
+test(`same first battle ${outcome} retry ${alreadyPaid?'retains its paid receipt':'can earn its unpaid reward'} after DTO removal`,()=>{
+    const first=harness(),store=installRewardOwners(first);
+    assert.equal(first.flow.checkpointFirstTutorialBattle(first.identity,value=>{first.onboarding.battleCheckpoint=value;return first.c.saveGame();}),true);
+    if(alreadyPaid){first.c.killMonster(0);}
+    const {h,store:reloadedStore}=rewardReload(store.saved());
+    installFirstTutorialTerminalRetry(h);
+    h.c.battleActive=false;h.c.v132ActiveDungeonRun=null;
+    h.c.finishAdventureBattle('c1_01',{result:outcome});
+    assert.equal(h.onboarding.battleCheckpoint,undefined,'the original terminal consumes only the live DTO');
+    assert.equal(h.onboarding.battleId,h.identity.battleId);
+    const terminalReceipt=alreadyPaid?JSON.stringify(h.onboarding.battleKillReward):undefined;
+    assert.equal(h.onboarding.phase,'retry');
+    assert.equal(h.c.beginBattle('c1_01'),true,'the original retry launcher remains usable');
+    assert.equal(h.onboarding.battleId,h.identity.battleId);
+    assert.equal(h.onboarding.battleCheckpoint,undefined,'exercise the retry before a new DTO');
+    assert.equal(h.c.battleInputGuideHolds.size,1,'the actual Core timer hold remains until the new checkpoint commits');
+    h.c.killMonster(0);assert.equal(h.c.gold,325);
+    assert.equal(h.c.bestiaryData['攔路惡徒'].kills,1);
+    assert.equal(h.c.dailyQuestState.progress.kill10,1);assert.equal(h.c.commissionQuestState.progress.kill30,1);
+    assert.equal(h.onboarding.battleKillReward.battleId,h.identity.battleId);
+    if(alreadyPaid){assert.equal(JSON.stringify(h.onboarding.battleKillReward),terminalReceipt);}
+    assert.equal(h.c.saveGame(),true);assert.equal(reloadedStore.saved().gold,325);
+});
+test('quest presentation failures cannot split gold, kill progress and the same-battle receipt',()=>{
+    for(const hook of ['v17361RefreshOpenQuestPage','v148SyncQuestNoticeDots']){
+        const first=harness(),store=installRewardOwners(first);
+        assert.equal(first.flow.checkpointFirstTutorialBattle(first.identity,value=>{first.onboarding.battleCheckpoint=value;return first.c.saveGame();}),true);
+        first.c[hook]=()=>{throw Error('injected quest presentation failure');};
+        assert.doesNotThrow(()=>first.c.killMonster(0));
+        const saved=store.saved();
+        assert.equal(saved.gold,325);assert.equal(saved.bestiaryData['攔路惡徒'].kills,1);
+        assert.equal(saved.dailyQuestState.progress.kill10,1);assert.equal(saved.commissionQuestState.progress.kill30,1);
+        assert.equal(saved.player.adventureProgress.chapters.chapter_v1.onboarding.battleKillReward.gold,25);
+        const reload=rewardReload(saved);reload.h.c.killMonster(0);
+        assert.equal(reload.h.c.gold,325);assert.equal(reload.h.c.dailyQuestState.progress.kill10,1);
+        assert.equal(reload.h.c.commissionQuestState.progress.kill30,1);
+    }
 });

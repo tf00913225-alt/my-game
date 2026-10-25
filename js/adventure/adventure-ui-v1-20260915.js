@@ -269,6 +269,9 @@
     }
     function firstLessonGuide(view){
         const f=view.firstLesson,step=(selector,text)=>({target:visibleGuideTarget(selector),text,battle:f.battleActive});
+        if(f.battleActive&&!f.hasCheckpoint){
+            return {target:null,text:'正在準備戰鬥，請稍候。',intro:true,battle:true,waiting:true};
+        }
         const introductions={
             'attack-intro':'這裡是戰場，先練習普通攻擊。接著要親自選擇敵人，才會出招。',
             'city-intro':'普攻實戰完成了。主城可以整理角色與準備裝備，先從角色入口開始。',

@@ -32,7 +32,8 @@
         pendingBattleTimer:null,
         dialogue:null,
         tutorialSkillUsed:false,
-        firstLessonCommitting:false
+        firstLessonCommitting:false,
+        firstLessonOpeningRelease:null
     };
 
     function numeric(value,fallback=0){
@@ -498,7 +499,7 @@
         if(firstLessonState()&&state.onboarding.battleCheckpoint&&!state.dialogue){return restoreFirstLessonPage();}
         if(firstLessonState()&&state.onboarding.phase==='battle'&&!state.onboarding.battleCheckpoint&&
            !(typeof battleActive!=='undefined'&&battleActive)){
-            showMessage('尚無可安全續接的戰鬥紀錄，請保留原存檔。');return false;
+            return beginBattle('c1_01');
         }
         if(state?.onboarding?.active&&state.onboarding.requiredAction==="recovery"&&state.currentNodeId==="c1_05"&&!state.rewardClaims.c1_05){
             if(!commitChange(()=>{markRewardReady(state,nodeById(chapterDefinition(),"c1_05"));})){return false;}
@@ -657,10 +658,32 @@
     }
     function firstLessonState(){
         const state=chapterState(),o=state?.onboarding;
-        return o?.active&&o.flowVersion===3&&o.phase!=='retry'&&state.currentNodeId==='c1_01'&&o.firstBattleStep!=='complete'?o:null;
+        const activeRetry=o?.phase==='retry'&&runtime.activeAdventureBattle?.nodeId==='c1_01'&&
+            typeof battleActive!=='undefined'&&battleActive;
+        return o?.active&&o.flowVersion===3&&(o.phase!=='retry'||activeRetry)&&state.currentNodeId==='c1_01'&&o.firstBattleStep!=='complete'?o:null;
     }
     function firstLessonIdentity(){
         const o=firstLessonState();return o?{uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:o.battleId}:null;
+    }
+    function canRestartFirstLessonOpening(){
+        const root=rootState(),state=chapterState(),o=firstLessonState(),owner=playerOwner();
+        // The initial declaration is saved before its first safe checkpoint.
+        // No input can advance attack-intro until that checkpoint commits, so
+        // only this exact pre-input state may use the original launch again.
+        // A present-but-invalid checkpoint or any later lesson remains closed.
+        return !!(o&&root.pendingStoryOpening===false&&root.activeChapterId===DEFAULT_CHAPTER_ID&&
+            o.source==='new-character'&&o.phase==='battle'&&o.firstBattleStep==='attack-intro'&&
+            o.nodeId==='c1_01'&&o.battleNodeId==='c1_01'&&!o.requiredAction&&!o.basicComplete&&
+            !Object.prototype.hasOwnProperty.call(o,'battleCheckpoint')&&
+            !Object.prototype.hasOwnProperty.call(o,'battleKillReward')&&
+            !state.dialogue&&!state.chapterCompleted&&!state.chapterRewardClaimed&&!state.pendingAdventureBuff&&
+            !Object.keys(state.completedNodes).length&&!Object.keys(state.rewardClaims).length&&
+            owner.level===o.startingLevel&&
+            window.FourSymbolsBattleFlow?.canRestartFirstTutorialBattle?.(firstLessonIdentity())===true);
+    }
+    function releaseFirstLessonOpeningHold(){
+        const release=runtime.firstLessonOpeningRelease;runtime.firstLessonOpeningRelease=null;
+        if(release){release();}
     }
     function commitFirstLesson(change){
         if(runtime.firstLessonCommitting||!firstLessonState()){return false;}
@@ -728,10 +751,12 @@
            typeof window.FourSymbolsBattleFlow?.checkpointFirstTutorialBattle!=='function'){return false;}
         const round=typeof turn==='number'?turn:0;
         if(o.battleCheckpoint&&round<=o.battleCheckpoint.turn){return false;}
+        const opening=!o.battleCheckpoint;
         const leaving=o.firstBattleStep==='attack'&&!!o.battleCheckpoint&&round>o.battleCheckpoint.turn;
         const accepted=window.FourSymbolsBattleFlow.checkpointFirstTutorialBattle(firstLessonIdentity(),checkpoint=>
             commitFirstLesson((state,current)=>{
                 current.battleCheckpoint=checkpoint;
+                if(opening){current.phase='battle';}
                 if(leaving){
                     // The existing unique source/receipt commits together with
                     // the pre-upgrade checkpoint, not after the later cast.
@@ -745,6 +770,7 @@
                     current.firstBattleStep='city-intro';current.phase='system';current.requiredAction='skill';
                 }else if(current.firstBattleStep==='cast'&&runtime.tutorialSkillUsed){current.firstBattleStep='finish-battle';}
             }),leaving);
+        if(accepted&&opening){releaseFirstLessonOpeningHold();}
         if(accepted&&leaving){stopBattleResourceMonitor();runtime.activeAdventureBattle=null;hideOverlay();showPage('home');}
         return accepted;
     }
@@ -982,18 +1008,37 @@
         const node=nodeById(chapter,nodeId);
         if(!state||!node||!["battle","elite","boss"].includes(node.type)){ return false; }
         if(nodeId==='c1_01'&&firstLessonState()?.battleCheckpoint){return restoreFirstLessonPage();}
+        if(nodeId==='c1_01'&&firstLessonState()?.phase==='battle'&&!state.onboarding.battleCheckpoint&&
+           !(typeof battleActive!=='undefined'&&battleActive)&&!canRestartFirstLessonOpening()){
+            showMessage('尚無可安全續接的戰鬥紀錄，請保留原存檔。');return false;
+        }
         const status=nodeStatus(chapter,state,node.id);
         const replay=state.completedNodes[node.id]===true||!!state.completedNodes[node.id];
         if(status==="locked"||(!replay&&!state.chapterCompleted&&node.id!==state.currentNodeId)){ return false; }
         if(typeof battleActive!=="undefined"&&battleActive){ showMessage("目前正在戰鬥中，無法開始新的冒險戰鬥。");return false; }
         if(typeof window.v132LaunchDungeonBattle!=="function"){ showMessage("正式戰鬥 Runtime 尚未就緒。");return false; }
+        const firstOpening=node.id==='c1_01'&&state.currentNodeId===node.id&&!state.completedNodes[node.id]&&
+            state.onboarding.active&&state.onboarding.flowVersion===3;
+        if(firstOpening&&(!['story','retry','battle'].includes(state.onboarding.phase)||
+           (state.onboarding.phase==='retry'?!['attack-intro','finish-battle'].includes(state.onboarding.firstBattleStep):
+               state.onboarding.firstBattleStep!=='attack-intro')||
+           Object.prototype.hasOwnProperty.call(state.onboarding,'battleCheckpoint')||
+           typeof window.FourSymbolsBattleFlow?.acquireInputGuideHold!=='function'||
+           window.FourSymbolsBattleFlow?.canRestartFirstTutorialBattle?.({uid:window.FourSymbolsAccountSave?.getActiveUid?.(),battleId:state.onboarding.battleId})!==true)){
+            showMessage('尚無可安全續接的戰鬥紀錄，請保留原存檔。');return false;
+        }
         if(node.requiresStoryKey&&!state.storyKeys?.[node.requiresStoryKey]){return false;}
         if(state.onboarding?.active&&state.onboarding.nodeId===node.id&&state.onboarding.requiredAction&&!hasTutorialAction(state.onboarding.requiredAction)&&!recoveryNeedsPractice()){
             runtime.activePanel="tutorial";render();return false;
         }
         const roster=node.tutorialEncounterId?buildTutorialEncounter(node):buildEncounter(node.encounterId);
         if(!roster||!roster.length){ showMessage("此節點的敵人編成無法建立。");return false; }
-        if(state.onboarding.active&&!commitChange(()=>{state.onboarding.phase="battle";state.onboarding.battleNodeId=node.id;})){return false;}
+        if(state.onboarding.active&&!commitChange(()=>{
+            // Until the first DTO commits, a reload must retain the original
+            // story/retry entry. This also retires old pre-DTO battle writes.
+            state.onboarding.phase=firstOpening?(state.onboarding.phase==='retry'?'retry':'story'):'battle';
+            state.onboarding.battleNodeId=node.id;
+        })){return false;}
 
         consumePendingAdventureBuff();
         runtime.activeAdventureBattle={chapterId:chapter.id,nodeId:node.id,replay:replay,startedAt:now()};
@@ -1005,9 +1050,16 @@
         const started=window.v132LaunchDungeonBattle(roster,outcome=>finishAdventureBattle(node.id,outcome),
             {mode:"adventure",normalizeFailureResources:false,tutorial:!!node.tutorialEncounterId&&state.onboarding?.active===true});
         if(!started){
+            releaseFirstLessonOpeningHold();
             stopBattleResourceMonitor();runtime.activeAdventureBattle=null;runtime.visible=true;
             if(window.FourSymbolsAdventureUI&&typeof window.FourSymbolsAdventureUI.show==="function"){ window.FourSymbolsAdventureUI.show(); }
             return false;
+        }
+        if(firstOpening){
+            releaseFirstLessonOpeningHold();
+            // Launch is synchronous and uses manual tutorial controls. Hold
+            // its original timer before yielding, even if rAF is suspended.
+            runtime.firstLessonOpeningRelease=window.FourSymbolsBattleFlow.acquireInputGuideHold('chapter1-opening');
         }
         try{
             if(window.v132ActiveDungeonRun){window.v132ActiveDungeonRun.adventure=true;window.v132ActiveDungeonRun.adventureNodeId=node.id;}
@@ -1020,6 +1072,7 @@
             const chapter=chapterDefinition(),state=chapterState(),node=nodeById(chapter,nodeId);
             if(!state||!node){return;}
             const battleInfo=runtime.activeAdventureBattle;
+            releaseFirstLessonOpeningHold();
             stopBattleResourceMonitor();
             runtime.activeAdventureBattle=null;
             if(!battleInfo){ return; }
