@@ -1,0 +1,131 @@
+{
+  "schemaVersion": 1,
+  "chapterId": "chapter_v1",
+  "startNodeId": "c1_01",
+  "endNodeId": "c1_20",
+  "nodes": [
+    {
+      "id": "c1_01",
+      "type": "battle",
+      "next": "c1_02",
+      "branches": []
+    },
+    {
+      "id": "c1_02",
+      "type": "battle",
+      "next": "c1_03",
+      "branches": []
+    },
+    {
+      "id": "c1_03",
+      "type": "battle",
+      "next": "c1_04",
+      "branches": []
+    },
+    {
+      "id": "c1_04",
+      "type": "battle",
+      "next": "c1_05",
+      "branches": []
+    },
+    {
+      "id": "c1_05",
+      "type": "battle",
+      "next": "c1_06",
+      "branches": []
+    },
+    {
+      "id": "c1_06",
+      "type": "event",
+      "next": "c1_07",
+      "branches": []
+    },
+    {
+      "id": "c1_07",
+      "type": "battle",
+      "next": "c1_08",
+      "branches": []
+    },
+    {
+      "id": "c1_08",
+      "type": "chest",
+      "next": "c1_09",
+      "branches": []
+    },
+    {
+      "id": "c1_09",
+      "type": "rest",
+      "next": "c1_10",
+      "branches": []
+    },
+    {
+      "id": "c1_10",
+      "type": "battle",
+      "next": "c1_11",
+      "branches": []
+    },
+    {
+      "id": "c1_11",
+      "type": "event",
+      "next": "c1_12",
+      "branches": []
+    },
+    {
+      "id": "c1_12",
+      "type": "battle",
+      "next": "c1_13",
+      "branches": []
+    },
+    {
+      "id": "c1_13",
+      "type": "rest",
+      "next": "c1_14",
+      "branches": []
+    },
+    {
+      "id": "c1_14",
+      "type": "event",
+      "next": "c1_15",
+      "branches": []
+    },
+    {
+      "id": "c1_15",
+      "type": "elite",
+      "next": "c1_16",
+      "branches": []
+    },
+    {
+      "id": "c1_16",
+      "type": "event",
+      "next": "c1_17",
+      "branches": []
+    },
+    {
+      "id": "c1_17",
+      "type": "battle",
+      "next": "c1_18",
+      "branches": []
+    },
+    {
+      "id": "c1_18",
+      "type": "elite",
+      "next": "c1_19",
+      "branches": []
+    },
+    {
+      "id": "c1_19",
+      "type": "event",
+      "next": "c1_20",
+      "branches": []
+    },
+    {
+      "id": "c1_20",
+      "type": "finish",
+      "next": null,
+      "branches": []
+    }
+  ],
+  "sourcePath": "js/adventure/adventure-content-v1-20260915.js",
+  "sourceSha256": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+  "outcomeVerified": false
+}

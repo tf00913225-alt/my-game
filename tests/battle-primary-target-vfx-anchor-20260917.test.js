@@ -130,13 +130,15 @@ function loadRuntime(){
     return {context,body};
 }
 
-function currentSprite(runtime){
+function currentSprites(runtime,expectedCount=1){
     const stage=runtime.body.children.find(node=>node.id==="v143-skill-stage");
     assert.ok(stage,"the formal VFX stage must exist");
     const sprites=stage.children.filter(node=>String(node.className).includes("v143-vfx-sprite"));
-    assert.equal(sprites.length,1,"the skill must own one formal Sprite");
-    return sprites[0];
+    assert.equal(sprites.length,expectedCount,"exactly one Sprite per formal recipient (or one original shared source)");
+    return sprites;
 }
+
+function currentSprite(runtime){return currentSprites(runtime)[0];}
 
 {
     const runtime=loadRuntime();
@@ -158,12 +160,12 @@ function currentSprite(runtime){
         version:"battle-target-contract-v1",side:"monster",targetSide:"player",targetType:"tri",actorIndex:0,targetId:2,targetIds:[0,1,2]
     });
     const current=runtime.context.v143SkillAnimationState.current;
-    const sprite=currentSprite(runtime);
+    const sprites=currentSprites(runtime,3);
     assert.equal(current.targetId,2);
     assert.deepEqual(Array.from(current.targetIds),[0,1,2]);
-    assert.equal(sprite.dataset.geometrySlot,"PLAYER_2","tri VFX must retain the selected primary slot");
-    assert.equal(sprite.style.left,"200px","tri artwork centers on its canonical footprint while the selected primary slot remains authoritative");
-    assert.notEqual(sprite.style.left,"320px","an edge primary must not collapse all three painted strikes onto one card");
+    assert.deepEqual(sprites.map(n=>n.dataset.geometrySlot),['PLAYER_0','PLAYER_1','PLAYER_2'],"each approved independent strike uses its own formal recipient slot");
+    assert.deepEqual(sprites.map(n=>n.style.left),['80px','200px','320px'],"edge primary cannot collapse all three strikes onto itself");
+    assert.deepEqual(sprites.map(n=>n.dataset.targetIndexes),['0','1','2'],"no duplicated or inferred recipient");
 }
 
 {
@@ -173,7 +175,12 @@ function currentSprite(runtime){
     });
     const sprite=currentSprite(runtime);
     assert.equal(sprite.dataset.geometrySlot,"PLAYER_2");
-    assert.equal(sprite.style.width,"320px","one survivor must not collapse a three-slot footprint");
+    assert.equal(runtime.context.v143SkillAnimationState.current.targetType,"tri","presentation never rewrites the gameplay range");
+    assert.equal(sprite.dataset.targetIndexes,"2","one survivor does not invent adjacent recipients");
+    assert.equal(sprite.dataset.placement,"single");
+    assert.equal(sprite.style.left,"320px","independent strike centers on the surviving formal recipient");
+    assert.equal(sprite.style.clipPath,"inset(0 33.333333%)","legacy paired source exposes exactly its authored middle strike");
+    assert.ok(parseFloat(sprite.style.width)/3>=96&&parseFloat(sprite.style.width)/3<=184,"visible strike retains its authored single-recipient size budget");
 }
 
 {

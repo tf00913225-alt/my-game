@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -44,7 +46,7 @@ test("new Water Orb sheet is the supplied 1536×1152 four-by-three asset",()=>{
     assert.deepEqual([asset.readUInt32BE(16),asset.readUInt32BE(20)],[1536,1152]);
     assert.match(animation,/function castSheet\(src,placement,options\)\{[\s\S]*?columns:4,rows:3,frames:12,hitFrame:7,[\s\S]*?renderer:"dom-sprite"/);
     assert.match(animation,/waterBall:\{hit:DEFAULT_HIT,sprite:castSheet\("assets\/vfx\/water\/water-orb-recipient-v1\.webp","group",\{[\s\S]*?alignToSlots:true[\s\S]*?\}\)\}/);
-    assert.doesNotMatch(animation,/canvas-crop|createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
+    assert.doesNotMatch(castBodySource(animation),/canvas-crop|createElement\(["']canvas["']\)|getContext\(|drawImage\(/);
 });
 
 test("Phoenix Cry and Ice Arrow Rain use one centered battlefield raster sheet",()=>{

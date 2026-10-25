@@ -160,7 +160,7 @@ assert.ok(
     "battlefield dimming must precede target reveal"
 );
 assert.match(relicCinematic,/revealRelicTargets\(target\)/,"target reveal remains part of the serialized relic cinematic");
-assert.match(geometry,/function unitGeometry\(side,index\)[\s\S]*artworkProjection[\s\S]*hpProjection[\s\S]*hudSafeRect[\s\S]*feedbackAnchor/,
+assert.match(geometry,/function unitGeometry\(side,index,purpose\)[\s\S]*artworkProjection[\s\S]*hudSafeRect[\s\S]*hpProjection[\s\S]*feedbackAnchor/,
     "one geometry adapter must expose projection, HUD-safe feedback and canonical anchors");
 assert.match(feedback,/function contextFor\(side,index\)[\s\S]*function laneMetrics\(context\)[\s\S]*capacity:[\s\S]*function freeLane\(context,metrics\)[\s\S]*context\.queue\.push\(request\)/,
     "floating feedback must size target-scoped lanes from canonical geometry and queue overflow");

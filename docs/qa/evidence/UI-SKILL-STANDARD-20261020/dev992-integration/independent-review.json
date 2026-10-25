@@ -1,0 +1,24 @@
+{
+  "source": {
+    "reviewer": "/root/ci_player_flow_review",
+    "result": "PASS bounded merge delta; Story final safety cases retained, Hero policy blobs identical dev, other policy only source digests."
+  },
+  "art": {
+    "reviewer": "/root/dev992_art_review",
+    "result": "PASS four-size real PNGs/formal battle/readable full and insufficient skills/item timer/static footer/resumed battle. No blocker.",
+    "notes": [
+      "412 growth button wraps but is scrollable",
+      "first-row potion icon absence attribution unconfirmed"
+    ]
+  },
+  "input": {
+    "reviewer": "/root/dev992_input_review",
+    "result": "PASS real images plus true touch/wheel/hit/end/disabled/restore evidence; 393 first lesson original footer and same-round restore.",
+    "limits": [
+      "not full chapter",
+      "not hardware",
+      "not natural combat",
+      "not deployed"
+    ]
+  }
+}

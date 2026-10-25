@@ -3715,6 +3715,23 @@
     pointer-events:none;
 }
 
+/* Same authoritative icon, no additional slot or turn-count timer. */
+.v143-status-icon[data-remaining-turns]::after{
+    content:attr(data-remaining-turns);
+    position:absolute;right:0;bottom:0;
+    min-width:9px;padding:1px;
+    font:700 10px/1 sans-serif;color:#fff;
+    background:#171923d9;border-radius:2px;
+    pointer-events:none;
+}
+.v143-feedback-dot{animation:v143FeedbackDot 1s ease-out infinite;mix-blend-mode:screen;}
+@keyframes v143FeedbackDot{
+    0%{transform:translateY(0) scale(.6);opacity:0;}
+    25%{opacity:.6;}
+    100%{transform:translateY(var(--v143-dot-rise,-18px)) scale(1);opacity:0;}
+}
+@media(prefers-reduced-motion:reduce){.v143-feedback-dot{display:none;animation:none;}}
+
 /* Document battle planes: cast 16000 < direct impact 16010 < real unit HUD
    16015 < skill name 16020. Floating Feedback retains its own text plane. */
 .v143-hit-feedback-overlay{
@@ -3731,6 +3748,11 @@
     filter:brightness(0) invert(1);
     opacity:0;
 }
+.v143-field-portrait-plane{position:fixed;inset:0;z-index:15999;overflow:hidden;pointer-events:none;}
+.v143-field-portrait-front{z-index:16005;}
+.v143-field-portrait{position:fixed;display:block;pointer-events:none;transform-origin:center bottom;}
+body.v174-battle-reading-open .v143-field-portrait-plane{display:none!important;}
+body.v174-battle-reading-open .v143-field-source-hidden{opacity:1!important;}
 
 .v143-vfx-sprite{
     position:fixed;
@@ -3748,8 +3770,14 @@
 
 .v143-vfx-sprite.v143-vfx-sprite-active{
     animation:
-        v143RasterCastFrames var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
+        var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both,
         v143RasterCastEnvelope var(--v143-sprite-duration,1200ms) linear var(--v143-sprite-delay,0ms) 1 both;
+}
+
+/* The recipe owns carrier transform/opacity; sheet selection keeps its own
+   child track. Do not run the historical envelope over the same properties. */
+.v143-vfx-sprite.v143-vfx-sprite-active[data-choreography]{
+    animation:var(--v143-frame-animation,v143RasterCastFrames) var(--v143-sprite-duration,1200ms) steps(1,end) var(--v143-sprite-delay,0ms) 1 both;
 }
 
 .v143-vfx-sprite.v143-vfx-sprite-active[data-travel="true"]{
@@ -7890,7 +7918,12 @@ body > .v169-rpg-dialog-layer{
     /* Geometry, depth and grounded shadow stay on this stationary frame.
        Only its inner paint breathes; no permanent will-change/filter loop. */
     animation:none !important;
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52));
+    --battle-shadow-y:7px;
+    --battle-shadow-blur:4px;
+    --battle-shadow-color:rgba(0,0,0,.52);
+    --battle-focus-blur:7px;
+    --battle-ground-filter:drop-shadow(0 var(--battle-shadow-y) var(--battle-shadow-blur) var(--battle-shadow-color));
+    filter:var(--battle-ground-filter);
     pointer-events:none !important;
 }
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{
@@ -8192,7 +8225,9 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .battle-monster.v174-cardless-unit.target > .v174-battle-art{
-    filter:drop-shadow(0 7px 4px rgba(0,0,0,.52)) drop-shadow(0 0 7px var(--v138-element-glow,rgba(255,220,120,.7)));
+    --battle-focus-color:var(--v138-element-glow,rgba(255,220,120,.7));
+    --battle-ground-filter:drop-shadow(0 var(--battle-shadow-y) var(--battle-shadow-blur) var(--battle-shadow-color)) drop-shadow(0 0 var(--battle-focus-blur) var(--battle-focus-color));
+    filter:var(--battle-ground-filter);
 }
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-up,
 #game-stage > #app > #game-content #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.attacker-lunge-down{animation:none !important;}
@@ -8326,6 +8361,20 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 
 #game-stage #battlePage.v-fixed-slot-render-v2 .v143-unit-stealthed > .v174-battle-art{
     opacity:.35 !important;
+}
+
+/* During Wind casts, cache the shadow with the moving bitmap rather than
+   rerasterizing a filtered parent around its breathing child every frame.
+   Inverse paint scale keeps the approved screen-space shadow dimensions. */
+#game-stage #battlePage[data-vfx-shadow-cache] .v174-battle-art:not(.v174-generic-portrait){
+    filter:none !important;
+}
+#game-stage #battlePage[data-vfx-shadow-cache] .v174-battle-art:not(.v174-generic-portrait) .v174-portrait-paint{
+    filter:drop-shadow(0 calc(var(--battle-shadow-y) / var(--battle-paint-scale,1)) calc(var(--battle-shadow-blur) / var(--battle-paint-scale,1)) var(--battle-shadow-color)) drop-shadow(0 0 calc(var(--battle-focus-blur) / var(--battle-paint-scale,1)) var(--battle-focus-color,transparent));
+}
+#game-stage #battlePage[data-vfx-shadow-cache] .v174-battle-art:not(.v174-generic-portrait)::after,
+#game-stage #battlePage[data-vfx-shadow-cache] .v174-battle-art:not(.v174-generic-portrait) > .v174-manual-turn-arrow{
+    filter:var(--battle-ground-filter);
 }
 
 

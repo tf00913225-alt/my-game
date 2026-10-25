@@ -1,0 +1,31 @@
+{
+  "head": "9053c5a7599ad209bb1e7a463348eb43c46ade20",
+  "mergedDev": "3a9283467b0b663af7314993da6066e2e223c971",
+  "snapshot": "uncommitted normal merge, hashes bind actual runtime",
+  "hashes": {
+    "js/00-main.js": "aab1c884be1dc45fdb986bbcd37da73936c54991a8bfabccd38c338392dadcc4",
+    "js/35-v141-ui-battle.js": "c4f5c5f0f69bf2ad6da3ed9a4ef7f5bd73476b09b53aea7419f0f3a3b2e2c4dc",
+    "js/adventure/adventure-runtime-v1-20260915.js": "5b13b7dc4b4e9fa60c149e3263e91d1009786e8947f3464457cc8a8d33c6e1d3",
+    "js/adventure/adventure-ui-v1-20260915.js": "8e08ab53eaa3e34ab90fbc088bd1c6c49736b2d2a584523fd33c7439a53722dd",
+    "css/fixed-slot-battlefield-rendering-v2.css": "34cad502f9d71e9c281ba3a300800187fea599eb0e1ce605fde8eb13418a71a1",
+    "functions/src/generated/restricted-forest-instance-policy.json": "b2c7ebd7b6bd6c7375d9eafcfc58b8c4b37f4f8b3fd80a9a943123d380113d8c",
+    "functions/src/generated/hero-chapter-qualification.json": "41612f69c5833e0674d5f174d9a540849787f0ffe7cf362022dae2921bd63e62",
+    "functions/src/generated/hero-chapter-qualification-v2-20261023.json": "24f9c3cf8fb17c3c9fc6e7b8991a7adf99d33efef5cb7bb2cb341f9afc1c2e32",
+    "asset-manifest.json": "006a72c275041596b971859ad9d255716062373b7e9d284632d2fdff2742d2f7"
+  },
+  "focused": {
+    "pass": 129,
+    "fail": 0
+  },
+  "limitations": [
+    "static battle synthetic no-reward paused timer; no attack/settlement acceptance",
+    "393 original first lesson only, not all five lessons or full chapter",
+    "physical mobile/PWA and full UI ledger remain unverified"
+  ],
+  "excludedAttempts": [
+    "probe missing explicit Windows Chrome path",
+    "sandbox localhost DevTools EACCES; corrected by scoped execution permission, no product repair"
+  ],
+  "automation": "PAUSED",
+  "exploration": "product paused; no dedicated interface work"
+}

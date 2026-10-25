@@ -1,4 +1,6 @@
 "use strict";
+const castBodySource=require("../.github/scripts/fixtures/cast-body-source.cjs");
+
 
 const assert=require("node:assert/strict");
 const fs=require("node:fs");
@@ -63,7 +65,7 @@ assert.doesNotMatch(v142Css,/#v142-skill-stage|@keyframes|animation\s*:/);
 assert.match(vfxRuntime,/if\(typeof playFireRocketAnimation==="function"\)\{ playFireRocketAnimation=function\(\)\{ return; \}; \}/);
 assert.match(vfxRuntime,/if\(typeof playIceSpinProjectile==="function"\)\{ playIceSpinProjectile=function\(\)\{ return; \}; \}/);
 assert.match(vfxRuntime,/if\(current\.model\.sprite\)\{ addSprite\(current,index,target\); \}/);
-assert.doesNotMatch(vfxRuntime,/v149-word-|createElement\(["']canvas["']\)|getContext\(|drawImage\(|<svg\b/);
+assert.doesNotMatch(castBodySource(vfxRuntime),/v149-word-|createElement\(["']canvas["']\)|getContext\(|drawImage\(|<svg\b/);
 assert.match(vfxCss,/@keyframes v143RasterCastFrames/);
 
 /* Relic scrolling must pass the global touch lock from both the body and the

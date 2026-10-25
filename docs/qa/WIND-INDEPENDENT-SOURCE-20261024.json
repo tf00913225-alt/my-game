@@ -1,0 +1,206 @@
+{
+  "tool": "built-in imagegen",
+  "rows": [
+    {
+      "id": "windSpell",
+      "file": "assets\\vfx\\wind\\wind-spell-recipient-v3.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "cells": [
+        4,
+        3
+      ],
+      "alphaPixelExact": true,
+      "paintBounds": [
+        0.013812154696132596,
+        0.0,
+        0.9640883977900553,
+        0.9806629834254144
+      ],
+      "frameBounds": [
+        [
+          127,
+          132,
+          248,
+          253
+        ],
+        [
+          89,
+          114,
+          269,
+          293
+        ],
+        [
+          54,
+          81,
+          290,
+          304
+        ],
+        [
+          28,
+          43,
+          332,
+          340
+        ],
+        [
+          28,
+          40,
+          337,
+          333
+        ],
+        [
+          10,
+          25,
+          345,
+          337
+        ],
+        [
+          5,
+          0,
+          349,
+          355
+        ],
+        [
+          19,
+          28,
+          340,
+          336
+        ],
+        [
+          28,
+          43,
+          339,
+          314
+        ],
+        [
+          65,
+          54,
+          329,
+          281
+        ],
+        [
+          59,
+          60,
+          309,
+          300
+        ],
+        [
+          72,
+          100,
+          276,
+          278
+        ]
+      ],
+      "sha256": "d37b924a5b95b21ed29b1b145b8abeea8132bdbf7897e6ab8541d01517c6afc3"
+    },
+    {
+      "id": "stormCircle",
+      "file": "assets\\vfx\\wind\\storm-circle-recipient-v3.webp",
+      "size": [
+        1448,
+        1086
+      ],
+      "cells": [
+        4,
+        3
+      ],
+      "alphaPixelExact": true,
+      "paintBounds": [
+        0.0856353591160221,
+        0.16298342541436464,
+        0.9226519337016574,
+        0.914364640883978
+      ],
+      "frameBounds": [
+        [
+          136,
+          158,
+          263,
+          276
+        ],
+        [
+          115,
+          132,
+          277,
+          284
+        ],
+        [
+          106,
+          124,
+          267,
+          291
+        ],
+        [
+          77,
+          89,
+          312,
+          304
+        ],
+        [
+          70,
+          86,
+          309,
+          320
+        ],
+        [
+          45,
+          61,
+          330,
+          331
+        ],
+        [
+          31,
+          63,
+          334,
+          326
+        ],
+        [
+          40,
+          59,
+          314,
+          319
+        ],
+        [
+          61,
+          61,
+          321,
+          304
+        ],
+        [
+          87,
+          80,
+          299,
+          301
+        ],
+        [
+          111,
+          106,
+          275,
+          271
+        ],
+        [
+          122,
+          128,
+          255,
+          257
+        ]
+      ],
+      "sha256": "524849b26cdd396a60c59d366f89dfefded97f9463a2ec2bf8226bc5eec831df"
+    }
+  ],
+  "sourceDirectory": "artifacts/wind-independent-source-20261024",
+  "inspection": "4x3 locked-center single-target sources inspected; full alpha/pixels and dimensions retained through exact lossless conversion. Runtime combined phone visual acceptance remains pending.",
+  "prompts": [
+    {
+      "asset": "wind-spell-recipient-v3.webp",
+      "prompt": "Use case: stylized-concept. Asset type: production 2D fantasy RPG VFX sprite sheet. Generate one transparent RGBA sprite sheet, exactly FOUR columns by THREE rows, 12 equal SQUARE cells, read left to right top to bottom, overall canvas aspect ratio 4:3. Every cell contains ONE SINGLE centered aqua-green and pale-white wind spiral impact on ONE target, no characters. NOT a horizontal group or multiple tornadoes. Consistent locked center, identical padding, leave 12 percent transparent margin on every side of each cell. Hand-painted premium game VFX, luminous curved wind blades and sparse small leaf wisps, crisp readable silhouette, moderate glow with transparent fading edges. 12 temporal frames: 1 tiny dim gathered air, 2-3 compressing curved flow, 4-5 expanding fast circular cutting gust, 6 building peak, 7 strongest bright clean spiral impact, 8-9 continued swirl dissolving, 10-11 thinning wisps, 12 very faint dissipated remnants. The same wind spiral evolves continuously, not twelve unrelated icons. No ground, background, black matte, checkerboard, text, cell borders, labels or watermarks. Real transparent background. Stable center and single-target composition in ALL12 cells."
+    },
+    {
+      "asset": "storm-circle-recipient-v3.webp",
+      "prompt": "Production fantasy RPG single-target WIND RING animation sprite sheet. Exactly4 columns x3 rows of equal square frames, transparent RGBA background, canvas4:3. CRITICAL: each effect occupies ONLY the CENTRAL HALF of each cell; minimum25% EMPTY transparent padding EACH SIDE of EVERY cell, absolutely no glow, leaves or particles in the gutters or outside that central half. Keep every frame center identical. Thin luminous turquoise-white crescent gusts turning around a hollow center, a sparse few leaf flecks, one wind ring per frame, NOT a tornado cluster. Stylish hand-painted effects, clear readable arcs, not dense opaque fog. Sequential12frames: tiny air crescent, gathering, tighter whirl, expand, accelerate, bright forming ring, strongest sharp double crescent impact at7, opening ring at8, fading streak9, sparse wisp10, faint wisp11, almost vanished12. Maintain one evolving coherent shape, original frame center and plenty of transparent padding even at strongest frame. NO text labels, gridlines, borders, floor, background scene, characters, checkerboard or black background. Real transparent image."
+    }
+  ],
+  "promptLimitations": "Generated padding is smaller than requested at peak; imported without crop/resize or pretending literal padding compliance. Actual alpha bounds are measured and used by fit/motion safety; handset readability/continuity still requires batch acceptance."
+}

@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：8c4自然CI兩首錯已最小修正，95回歸與限定實畫獨審通過；新Head CI待完成，非全UI完成",
+  "status": "施工中：正常吸收dev3a928346，129針對性回歸、四尺寸限定實畫及393首關返回通過；新HeadCI與未驗台帳仍待完成",
   "devices": [
     {
       "id": "360x640",
@@ -27933,6 +27933,29 @@
         "自然倒數/真結算/硬體不在此次限定驗收"
       ],
       "automation": "PAUSED"
+    },
+    {
+      "segment": "dev992-integration",
+      "parent": "9053c5a7599ad209bb1e7a463348eb43c46ade20",
+      "dev": "3a9283467b0b663af7314993da6066e2e223c971",
+      "report": "docs/qa/UI-SKILL-STANDARD-20261020-dev992-integration.md",
+      "focusedPass": 129,
+      "viewports": [
+        "360x640",
+        "393x873",
+        "412x915",
+        "1280x800"
+      ],
+      "firstLesson": "393 original trusted touch only",
+      "pending": [
+        "new Head required CI",
+        "all original unverified ledger states",
+        "physical/PWA",
+        "creation element control widths",
+        "apparently blank potion artwork attribution unconfirmed"
+      ],
+      "automation": "PAUSED",
+      "exploration": "product-paused"
     }
   ]
 }
