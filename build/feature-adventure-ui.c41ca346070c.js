@@ -212,7 +212,7 @@
         const presentation=CONTENT().storyPresentation;
         const playerActive=line.speaker==="player";
         let portrait="",name="少俠";
-        try{if(typeof player!=="undefined"){portrait=getCharacterBattleArtworkPath(player);name=player.id||name;}}catch(_){}
+        try{if(typeof player!=="undefined"){portrait=getCharacterArtworkPath(player);name=player.id||name;}}catch(_){}
         const portraitKey=presentation.npcs[line.npcAssetId||node.npc];
         const npc=window.v154ResolveMonsterPortraitRecord?.({portraitKey})?.path||"";
         if(!npc&&ui.storyPortraitAttempted!==portraitKey){

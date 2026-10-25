@@ -223,7 +223,7 @@ test('Hero updates preserve native map browsing only for the same rendered chapt
     h.c.FourSymbolsHeroAcquisition={getRequiredStoryNode:()=>required,beginChapter(){},observeChapterNode(){}};
     h.c.document.addEventListener=(name,callback)=>listeners.set(name,callback);
     h.c.v154ResolveMonsterPortraitRecord=()=>({path:'assets/ready-npc.webp'});
-    h.c.getCharacterBattleArtworkPath=()=> 'assets/player.webp';
+    h.c.getCharacterArtworkPath=()=> 'assets/player.webp';
     installUi(h,body);h.api.open({panel:'map',focusNodeId:'c1_12'});
     const notify=()=>listeners.get('four-symbols:hero-acquisition-state')();
     const browse=()=>{picker.open=true;picker.querySelector('.adventure-stage-list').scrollTop=437;};
@@ -253,7 +253,7 @@ function formalMapAt(id){
     h.state().currentNodeId=id;h.state().completedNodes=Object.fromEntries(nodes.slice(0,index).map(n=>[n.id,true]));
     h.state().onboarding={active:false,phase:'complete'};h.c.player.adventureProgress.pendingStoryOpening=false;
     if(index>=13)h.state().storyKeys.blackPineToken={sourceNodeId:'c1_11'};
-    h.c.v154ResolveMonsterPortraitRecord=()=>({path:'assets/ready-npc.webp'});h.c.getCharacterBattleArtworkPath=()=> 'assets/player.webp';
+    h.c.v154ResolveMonsterPortraitRecord=()=>({path:'assets/ready-npc.webp'});h.c.getCharacterArtworkPath=()=> 'assets/player.webp';
     const html=installUi(h);assert.equal(h.api.open({panel:'map',focusNodeId:id}),true);return {...h,html};
 }
 
@@ -356,7 +356,7 @@ test("refused first reward save keeps the reward action and cannot select the ne
 
 test("pending story portrait requests once and rerenders the same cursor when the registry becomes ready",async()=>{
     const h=runtime();let ready=false,calls=0,resolve;
-    h.c.getCharacterBattleArtworkPath=()=>"assets/player.webp";
+    h.c.getCharacterArtworkPath=()=>"assets/player.webp";
     h.c.v154ResolveMonsterPortraitRecord=()=>ready?{path:"assets/monsters/shared/npc-shared-029.webp"}:null;
     h.c.v154RequestMonsterPortraitRegistry=()=>{calls++;return new Promise(done=>{resolve=done;});};
     const html=installUi(h);assert.equal(h.api.startFreshStory(),true);
@@ -372,7 +372,7 @@ test("pending story portrait requests once and rerenders the same cursor when th
 
 test("failed story portrait exposes a presentation retry and its success never advances the dialogue",async()=>{
     const h=runtime();let ready=false,calls=0,reject,resolve;
-    h.c.getCharacterBattleArtworkPath=()=>"assets/player.webp";
+    h.c.getCharacterArtworkPath=()=>"assets/player.webp";
     h.c.v154ResolveMonsterPortraitRecord=()=>ready?{path:"assets/retried-npc.webp"}:null;
     h.c.v154RequestMonsterPortraitRegistry=()=>{calls++;return new Promise((done,fail)=>{resolve=done;reject=fail;});};
     const html=installUi(h);h.api.startFreshStory();const cursor=JSON.stringify(h.api.getView().dialogue);

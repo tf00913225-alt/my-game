@@ -2,7 +2,8 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：完整證據已遠端保存；創角inline提示已最小修復及四尺寸獨審，新HeadCI/部署與其他台帳未完",
+  "status": "施工中：創角inline提示及四尺寸獨審保留；最小正常吸收dev632立繪相依，114項focused通過、兩尺寸主城及角色靜態獨審通過；新HeadCI及其餘台帳未完，未部署",
+  "latestDependencyEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev632-integration/README.md",
   "devices": [
     {
       "id": "360x640",
