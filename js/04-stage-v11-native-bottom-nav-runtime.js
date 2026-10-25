@@ -96,6 +96,7 @@
        never expose the main navigation first and replace it later. */
     function foregroundSuppressionReason(){
         const app=document.getElementById("app");
+        if(document.getElementById('explorationPage')?.classList?.contains('active'))return 'hidden-exploration';
         if(document.getElementById("adventurePage")?.classList?.contains("active")){
             return "hidden-adventure";
         }
