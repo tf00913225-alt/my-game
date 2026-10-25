@@ -800,9 +800,9 @@ button:disabled{
 .home-party-scene::after{content:"";position:absolute;inset:65% 0 0;background:linear-gradient(transparent,#090806b3);z-index:7;}
 .home-party-portrait{position:absolute;bottom:180px;left:28%;width:44%;height:65%;margin:0;z-index:5;}
 .home-party-portrait img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;filter:drop-shadow(0 12px 18px #0009);}
-/* Equal rear-row elevation keeps both faces above the foreground hair/ribbons. */
-.home-party-portrait[data-city-position="1"]{left:10%;width:36%;height:54%;bottom:444px;z-index:4;}
-.home-party-portrait[data-city-position="2"]{left:54%;width:36%;height:54%;bottom:444px;z-index:4;}
+/* Rear figures are 54% high: keep 24 native pixels below the roster while retaining depth. */
+.home-party-portrait[data-city-position="1"]{left:10%;width:36%;height:54%;bottom:min(312px,calc(46% - 24px));z-index:4;}
+.home-party-portrait[data-city-position="2"]{left:54%;width:36%;height:54%;bottom:min(312px,calc(46% - 24px));z-index:4;}
 .home-party-scene[data-party-size="2"] .home-party-portrait{left:14%;width:40%;height:60%;bottom:210px;}
 .home-party-scene[data-party-size="2"] .home-party-portrait[data-city-position="1"]{left:46%;}
 
