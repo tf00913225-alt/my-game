@@ -1,0 +1,69 @@
+{
+  "workId": "PLAYER-PORTRAIT-REPLACEMENT-20261025",
+  "branch": "fix/player-portrait-static-replacement-20261025",
+  "baseDev": "3a9283467b0b663af7314993da6066e2e223c971",
+  "predecessor": 986,
+  "status": "IMPLEMENTED_LOCAL_TARGETED_QA_PASS_REMOTE_GATES_PENDING",
+  "symptom": "DEV main city and existing normal player displays still showed old art after creation-only PR986",
+  "cause": {
+    "normalResolver": "getCharacterArtworkPath still returned gender_element.jpg",
+    "incorrectBattleConsumers": [
+      "main city",
+      "inventory portrait",
+      "formation player preview",
+      "story dialogue player"
+    ]
+  },
+  "change": "Existing normal resolver maps all gender/element combinations to original approved8 player_* WebP; nonbattle consumers use it; creation already matches. Existing characters need no recreation or save migration.",
+  "retained": [
+    "Actual combat resolver/callers and battle PNGs",
+    "Hero/NPC art",
+    "All original PNG masters and8lossless WebP hashes",
+    "UI/CSS geometry, character data, skills, rewards and save schema"
+  ],
+  "deletedAssets": [],
+  "verification": {
+    "focusedTests": {
+      "pass": 102,
+      "fail": 0,
+      "files": 4
+    },
+    "originalBuilder": "PASS",
+    "originalBuildCheck": "PASS",
+    "independentCodeAudit": "Separate QA found no direct function/scope blocker; battle helper/hero branches unchanged; sourceDigest-only generated policy delta verified",
+    "browser": {
+      "environment": "local production bundles, original isolated read-only account transport; synthetic appearance changes only",
+      "mobile": [
+        360,
+        640
+      ],
+      "desktop": [
+        1440,
+        900
+      ],
+      "choicesPerViewport": 8,
+      "surfaces": [
+        "main city deployed player",
+        "inventory full portrait",
+        "character selection avatar",
+        "formation player preview"
+      ],
+      "result": "both completed scenarios PASS; expected normal WebP and unchanged battle PNG resolved for every appearance",
+      "physicalPhone": "pending/not claimed",
+      "story": "existing story renderer tests and shared8mapping assertions PASS; actual story screen not yet claimed"
+    },
+    "limits": [
+      "Initial existing release notice intercepted clicks; acknowledged via actual normal control, retained diagnostic evidence",
+      "Inventory is a modal overlay; use its actual close button, not hidden underlying nav",
+      "Second navigation after synthetic local fixture mutations required migration; preserved gate, did not bypass. PC used fresh isolated profile; no trueCloud/save-reload certification"
+    ]
+  },
+  "generated": "Original builder regenerated app-shell/adventure-ui/gameplay-core-primary and manifests; restricted-forest-instance-policy only changes whole-main sourceDigest, no readiness/authority values. Original LF preserved to avoid unrelated rules digest drift.",
+  "evidence": "C:/Users/User/.codex/visualizations/2026/10/23/01a1672c-506c-7a70-99ba-acf09e547ed6/portrait-static-replacement-20261025",
+  "pending": [
+    "Independent output visual review",
+    "Latest Head natural Required CI",
+    "Normal dev merge and exact deployed-SHA symptom acceptance",
+    "Safe cleanup under original retention instructions"
+  ]
+}
