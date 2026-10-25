@@ -27,7 +27,10 @@ assert.match(boss,/unitKind:"boss-object"[\s\S]*?canAct:false[\s\S]*?noRewards:t
 assert.match(boss,/if\(targetType==="all"\|\|targetType==="enemyAll"\)\{ return alive; \}[\s\S]*?return alive\.includes\(primaryIndex\)\?\[primaryIndex\]:\[\]/);
 assert.match(boss,/Math\.min\(afterReduction,[\s\S]*?shield\.current[\s\S]*?health=Math\.max\(0,health-hpDamage\)/);
 assert.match(core,/monsters\[i\]\.canAct!==false/);
-assert.match(core,/if\(!monster\.noRewards\)\{[\s\S]*?recordMonsterKillForBestiary/);
+const killMonsterSource=core.match(/^function killMonster\(index\)\{[\s\S]*?^\}/m);
+assert.ok(killMonsterSource,"the original Core death owner must remain present");
+assert.match(killMonsterSource[0],/if\(!monster\.noRewards&&\(!firstTutorialRewardHandled\|\|\(rewardContext&&!rewardContext\.onboarding\.battleKillReward\)\)\)\{\s*recordMonsterKillForBestiary\(monster\);/,
+    "Boss noRewards exclusion must remain mandatory before the additional tutorial once-only condition and kill reward mutation");
 assert.match(core,/bossRoundOwner\.processRound\(\)/);
 assert.match(core,/getOutgoingDamageMultiplier/);
 assert.match(core,/getHealingMultiplier/);

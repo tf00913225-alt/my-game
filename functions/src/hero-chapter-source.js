@@ -5,10 +5,12 @@ const catalog=require("./generated/hero-chapter-qualification.json");
 const retainedV1=require("./generated/hero-chapter-qualification-v1.json");
 // Exact twenty-node policy published by dev@190d249e, retained without edits.
 const retainedStoryV2=require("./generated/hero-chapter-qualification-v2-20261020.json");
+// Exact published twenty-node policy from dev@8fdf52af, before first lesson EXP.
+const retainedStory20261023=require("./generated/hero-chapter-qualification-v2-20261023.json");
 // Issued tickets retain their immutable route and receipts across story edits.
 // Only these policies may advance or renew. Historical evidence reads keep
 // their original receipt/digest validation. Never rewrite an existing ticket.
-const acceptedPolicies=new Set([digest(catalog),digest(retainedV1),digest(retainedStoryV2)]);
+const acceptedPolicies=new Set([digest(catalog),digest(retainedV1),digest(retainedStoryV2),digest(retainedStory20261023)]);
 const acceptsPolicy=policy=>!!policy&&acceptedPolicies.has(digest(policy));
 const Core=require("./hero-core");
 const HERO="divineDogHongbao",CLAIM="hero-v1-"+HERO,TTL=7*86400000;

@@ -600,8 +600,11 @@
         const after=Math.min(quest.goal,before+Math.max(0,Number(amount)||0));
         if(after===before){ return; }
         state.progress[id]=after;
-        if(typeof window.v17361RefreshOpenQuestPage==="function"){ window.v17361RefreshOpenQuestPage(); }
-        if(typeof window.v148SyncQuestNoticeDots==="function"){ window.v148SyncQuestNoticeDots(); }
+        // Presentation must not interrupt the already-applied progress or the
+        // caller's remaining reward/receipt transaction. Mutation errors above
+        // still propagate; only these optional UI refreshes are isolated.
+        try{window.v17361RefreshOpenQuestPage?.();}catch(error){console.error('任務進度已更新；頁面刷新未完成。',error);}
+        try{window.v148SyncQuestNoticeDots?.();}catch(error){console.error('任務進度已更新；提示刷新未完成。',error);}
     }
     window.v141RecordQuestProgress=recordQuestProgress;
 
@@ -622,7 +625,7 @@
             try{ result=originalKillMonster.apply(this,arguments); }
             finally{ window.v132ActiveDungeonRun=previousDungeonRun; }
 
-            if(wasAlive){
+            if(wasAlive&&!result?.firstTutorialRewardHandled){
                 recordQuestProgress("kill10",1,"daily");
                 recordQuestProgress("kill30",1,"commission");
                 if(getMonsterRank(monster)==="elite"){
@@ -631,8 +634,8 @@
                     persistAccountProgress();
                 }
                 if(isWildElite){ addEliteSpecialDrop(monster); }
-                audioEngine.play("death",COMBAT_FEEDBACK_VOLUME_SCALE);
             }
+            if(wasAlive){audioEngine.play("death",COMBAT_FEEDBACK_VOLUME_SCALE);}
             return result;
         };
     }

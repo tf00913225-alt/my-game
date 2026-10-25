@@ -250,9 +250,11 @@
         return panelShell(copy[0],"初入江湖",'<p class="adventure-lead">'+copy[1]+'</p>'+resources,actions,"tutorial-panel");
     }
     function syncTutorialReturn(page){
-        const state=runtimeView()?.tutorial,host=document.getElementById("game-ui");if(!host){return;}
+        const state=runtimeView()?.tutorial,modal=document.getElementById('homeFeatureModal');
+        const host=['skill','status','expPool'].includes(page)&&modal?.classList.contains('show')?modal:document.getElementById("game-ui");if(!host){return;}
         let button=document.getElementById("adventureTutorialReturn");
         if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
+        else if(button.parentElement!==host){host.appendChild(button);}
         button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
     }
 
@@ -265,6 +267,55 @@
             return rect.width>0&&rect.height>0&&!el.disabled&&getComputedStyle(el).visibility!=="hidden";
         })||null;
     }
+    function firstLessonGuide(view){
+        const f=view.firstLesson,step=(selector,text)=>({target:visibleGuideTarget(selector),text,battle:f.battleActive});
+        if(f.battleActive&&!f.hasCheckpoint){
+            return {target:null,text:'正在準備戰鬥，請稍候。',intro:true,battle:true,waiting:true};
+        }
+        const introductions={
+            'attack-intro':'這裡是戰場，先練習普通攻擊。接著要親自選擇敵人，才會出招。',
+            'city-intro':'普攻實戰完成了。主城可以整理角色與準備裝備，先從角色入口開始。',
+            'character-intro':'角色視窗可以查看能力、分配經驗與管理技能。先認識經驗池分配。',
+            'exp-intro':'戰鬥所得會進入共用經驗池。先預覽升級，再親自按「確定」完成。',
+            'status-intro':'每升一級可獲得 5 點能力點，分配方式由你決定。這次不用花點，之後記得回來分配。',
+            'skill-intro':'這裡可以學習並裝備技能。學會後還要裝上，戰鬥中才能使用。',
+            'cast-intro':'已接回剛才同一場戰鬥。這次選擇剛裝好的技能，再點擊敵人施放。'
+        };
+        if(introductions[f.step]){
+            return {target:guide.overlay?.querySelector('.adventure-guide-next')||null,text:introductions[f.step],
+                intro:true,battle:f.battleActive,waiting:f.step==='attack-intro'&&!f.hasCheckpoint};
+        }
+        if(f.step==='finish-battle'){return null;}
+        if(f.step==='city'){return step('#homePage.active [onclick="openHomeFeature(\'character\')"]','點「角色」，從平常的入口開啟角色視窗。');}
+        if(f.step==='exp-tab'){return step('#characterTabBtnExpPool','點「經驗池分配」。');}
+        if(f.step==='upgrade'){
+            const confirm=visibleGuideTarget('#expDistributeList .v131-exp-confirm:not(:disabled)');
+            return confirm?{target:confirm,text:'點「確定」，完成這次升級。'}:
+                step('#expDistributeList .v131-exp-preview-btn:not(:disabled)','點「點擊預覽升級」，看看這次的成長。');
+        }
+        if(f.step==='status-tab'){return step('#characterTabBtnStatus','升級完成。點「能力值」，看看新得到的能力點。');}
+        if(f.step==='skill-tab'){return step('#characterTabBtnSkill','點「技能」，認識技能頁面。');}
+        if(f.step==='return'){return step('#adventureTutorialReturn','技能已裝好，接回剛才的戰鬥。');}
+        if(f.step==='skill'){
+            const native=visibleGuideTarget('#skillElementTabs [onclick="selectSkillElementTab(\''+CSS.escape(f.nativeElement)+'\')"]');
+            if(native?.getAttribute('aria-selected')!=='true'){return {target:native,text:'點本命元素分類，找到自己的招式。'};}
+            const learned=Object.keys(view.tutorialProgress?.loadout?.skillLevels||{}).find(id=>
+                view.tutorialProgress.loadout.skillLevels[id]>0&&visibleGuideTarget('.skill-row[data-skill-id="'+CSS.escape(id)+'"] [data-skill-action="equip"]'));
+            return learned?step('.skill-row[data-skill-id="'+CSS.escape(learned)+'"] [data-skill-action="equip"]','點「裝備」，把招式放進戰鬥技能欄。'):
+                step('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)','點「學習」，學會第一個招式。');
+        }
+        if(f.step==='attack'||f.step==='cast'){
+            if(f.battleActive&&typeof battlePhase!=='undefined'&&battlePhase==='declare'&&
+               typeof pendingAction!=='undefined'&&pendingAction){return step('#battleMonsterArea [id^="battleMonster"]','點擊敵人，確認這次出招。');}
+            if(!f.battleActive||typeof battlePhase==='undefined'||battlePhase!=='declare'||
+               (typeof actionReady!=='undefined'&&actionReady)){return {target:null,text:'出招中，看看這一回合的結果。',battle:true,waiting:true};}
+            if(f.step==='attack'){return step('#mainBattleMenu button[onclick*="normal"]','點「普通攻擊」。');}
+            const skill=visibleGuideTarget('#skillQuickBar.show .skill-quick-button[data-skill-id]:not(:disabled)');
+            return skill?{target:skill,text:'點剛裝好的技能，準備施放。',battle:true}:
+                step('#mainBattleMenu button[onclick*="toggleSkillQuickBar"]','點「技能」。');
+        }
+        return {target:null,text:'正在準備下一步，請稍候。',waiting:true};
+    }
     function guideStep(view){
         if(!view?.tutorial?.active){return null;}
         // Account/startup owners must finish before game input can be guided.
@@ -274,9 +325,13 @@
             const location=window.v141LocateInventoryItem?.(identity);
             return location?.direction?step('#v141InventoryPager button[onclick="v141ChangeInventoryPage('+location.direction+')"]','先翻到補品或護具所在的那一頁。'):step(selector,text);
         };
-        const dialog=visibleGuideTarget('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button');
+        const upgrading=view.firstLesson?.step==='upgrade'&&
+            document.getElementById('v169RpgDialogTitle')?.textContent==='確認經驗池升級';
+        const dialog=visibleGuideTarget('.v169-rpg-dialog-layer.show .v169-rpg-dialog-actions button'+(upgrading?':last-child':''));
         if(dialog){return {target:dialog,text:"讀完提示後，點這裡繼續。"};}
+        if(view.firstLesson&&!view.dialogue){return firstLessonGuide(view);}
         const o=view.tutorial,p=view.tutorialProgress||{};
+        if(o.flowVersion===3&&o.basicComplete&&['c1_02','c1_03'].includes(view.state.currentNodeId)){return null;}
         if(o.requiredAction==="equipment"&&visibleGuideTarget('#homeFeatureModal.show')){
             if(!view.state.grantedEquipmentUid&&!visibleGuideTarget('#homeFeatureModal.show .v17345-equipment-shop')){
                 return step("#homeFeatureModal [onclick=\"v169SwitchShopPage('equipment')\"]",'先點「裝備」分類，找到護具。');
@@ -318,7 +373,7 @@
             }
             return step('#v17342InventoryPotionUse','點「使用」，恢復角色資源。');
         }
-        if(visibleGuideTarget('#skillPage.active')){
+        if(visibleGuideTarget('#skillPage.active')||visibleGuideTarget('#homeFeatureModal.show[data-character-tab="skill"] #skillPage')){
             if(p.skillReady){return step('#adventureTutorialReturn','技能已裝好，返回故事再挑戰。');}
             const nativeTab=p.nativeElement&&visibleGuideTarget('#skillElementTabs [onclick="selectSkillElementTab(\''+CSS.escape(p.nativeElement)+'\')"]');
             if(nativeTab&&nativeTab.getAttribute('aria-selected')!=='true'){
@@ -366,12 +421,26 @@
         guide.battle=null;
     }
     function syncGuide(){
-        const view=runtimeView(),step=guideStep(view);
+        API()?.syncFirstLesson?.();
+        let view=runtimeView();
+        if(view?.firstLesson){
+            const modal=visibleGuideTarget('#homeFeatureModal.show #characterTabContent');
+            if(modal){
+                const step=view.firstLesson.step;
+                const page=step==='city'?'character':
+                    visibleGuideTarget('#homeFeatureModal.show[data-character-tab="expPool"] #homeExpPoolCard')?'expPool':
+                    visibleGuideTarget('#homeFeatureModal.show[data-character-tab="status"] #statusPage')?'status':
+                    visibleGuideTarget('#homeFeatureModal.show[data-character-tab="skill"] #skillPage')?'skill':null;
+                if(page){API()?.observeFirstLessonPage?.(page);syncTutorialReturn(page);view=runtimeView();}
+            }
+        }
+        const step=guideStep(view);
         if(!step){clearGuide();return;}
         const host=document.getElementById('game-ui');if(!host){return;}
         if(!guide.overlay){
             const overlay=document.createElement('div');overlay.id='adventureInputGuide';
-            overlay.innerHTML='<div class="adventure-guide-shade top"></div><div class="adventure-guide-shade left"></div><div class="adventure-guide-shade right"></div><div class="adventure-guide-shade bottom"></div><div class="adventure-guide-ring"></div><p class="adventure-guide-copy" role="status" aria-live="polite"></p><div class="adventure-guide-recovery" hidden><p>目前操作尚未就緒，請重試引導。</p><button type="button">重試目前引導</button></div>';
+            overlay.innerHTML='<div class="adventure-guide-shade top"></div><div class="adventure-guide-shade left"></div><div class="adventure-guide-shade right"></div><div class="adventure-guide-shade bottom"></div><div class="adventure-guide-ring"></div><div class="adventure-guide-copy" role="status" aria-live="polite"><p class="adventure-guide-text"></p><button type="button" class="adventure-button primary adventure-guide-next" hidden>下一步</button></div><div class="adventure-guide-recovery" hidden><p>目前操作尚未就緒，請重試引導。</p><button type="button">重試目前引導</button></div>';
+            overlay.querySelector('.adventure-guide-next').onclick=()=>API()?.advanceFirstLesson?.();
             overlay.querySelector('.adventure-guide-recovery button').onclick=()=>{
                 if(typeof battleActive!=="undefined"&&battleActive){window.location.reload();}
                 else if(runtimeView()?.tutorial?.requiredAction){API()?.returnFromTutorial();}
@@ -383,8 +452,14 @@
         guide.overlay.classList.toggle('is-reading',!!step.reading);
         const target=step.target;
         const recovery=guide.overlay.querySelector('.adventure-guide-recovery');
-        recovery.hidden=!!target||!!step.waiting||(!!step.reading&&!!ui.storyPortraitPending);
-        if(target&&target!==guide.target){target.scrollIntoView({block:'nearest',inline:'nearest'});}
+        recovery.hidden=!!target||!!step.intro||!!step.waiting||(!!step.reading&&!!ui.storyPortraitPending);
+        // The original EXP Owner restores its viewport over two animation
+        // frames after preview. Recheck the same target after that restoration;
+        // its identity alone does not prove that the next action is visible.
+        const scroller=target?.closest?.('#characterTabContent');
+        const targetBox=target?.getBoundingClientRect(),scrollBox=scroller?.getBoundingClientRect();
+        const clipped=scrollBox&&targetBox&&(targetBox.top<scrollBox.top||targetBox.bottom>scrollBox.bottom);
+        if(target&&(target!==guide.target||clipped)){target.scrollIntoView({block:'nearest',inline:'nearest'});}
         guide.target=target;
         const inBattle=step.battle&&typeof battleActive!=="undefined"&&battleActive;
         if(inBattle&&!guide.release){guide.release=window.FourSymbolsBattleFlow?.acquireInputGuideHold('adventure');}
@@ -399,14 +474,16 @@
         const boxes={top:[0,0,width,y],left:[0,y,x,bottom-y],right:[right,y,width-right,bottom-y],bottom:[0,bottom,width,height-bottom]};
         for(const [name,b] of Object.entries(boxes)){guide.overlay.querySelector('.'+name).style.cssText='left:'+b[0]+'px;top:'+b[1]+'px;width:'+b[2]+'px;height:'+b[3]+'px';}
         const ring=guide.overlay.querySelector('.adventure-guide-ring');
-        ring.hidden=!target;ring.style.cssText='left:'+x+'px;top:'+y+'px;width:'+(right-x)+'px;height:'+(bottom-y)+'px';
+        ring.hidden=!target||!!step.intro;ring.style.cssText='left:'+x+'px;top:'+y+'px;width:'+(right-x)+'px;height:'+(bottom-y)+'px';
         const copy=guide.overlay.querySelector('.adventure-guide-copy');
         copy.hidden=!recovery.hidden;
-        if(copy.textContent!==step.text){copy.textContent=step.text;}
+        const text=guide.overlay.querySelector('.adventure-guide-text'),next=guide.overlay.querySelector('.adventure-guide-next');
+        if(text.textContent!==step.text){text.textContent=step.text;}
+        next.hidden=!step.intro;next.disabled=!!step.waiting;
         const sheet=visibleGuideTarget('#adventurePage.active[data-panel="map"] .adventure-node-sheet');
         const sheetTop=sheet?(sheet.getBoundingClientRect().top-base.top)/scale:null;
         const copyHeight=copy.offsetHeight||180;
-        copy.style.top=(sheetTop!==null?Math.max(25,sheetTop-copyHeight-28):y>height*.52?Math.max(25,y-copyHeight-28):Math.min(height-copyHeight-28,bottom+28))+'px';
+        copy.style.top=(step.intro?height*.12:sheetTop!==null?Math.max(25,sheetTop-copyHeight-28):y>height*.52?Math.max(25,y-copyHeight-28):Math.min(height-copyHeight-28,bottom+28))+'px';
     }
     function installGuide(){
         const block=event=>{
