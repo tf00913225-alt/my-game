@@ -12,6 +12,8 @@
         "height": 873,
         "firstLoop": true,
         "storyEntry": true,
+        "actualStoryEntry": true,
+        "storyCursorPreserved": true,
         "reload": true,
         "repeatNoGrant": true,
         "storyUnchanged": true,
@@ -22,6 +24,8 @@
         "height": 1080,
         "firstLoop": true,
         "storyEntry": true,
+        "actualStoryEntry": true,
+        "storyCursorPreserved": true,
         "reload": true,
         "repeatNoGrant": true,
         "storyUnchanged": true,
@@ -41,10 +45,10 @@
         "scripts": [
           "build/feature-adventure-content.79628452fab4.js",
           "build/feature-adventure-runtime.cbc1c29d58c7.js",
-          "build/feature-adventure-ui.091d2401cca0.js"
+          "build/feature-adventure-ui.a9a25dbcf4be.js"
         ],
         "styles": [
-          "build/feature-adventure.1ae88fdaf19f.css"
+          "build/feature-adventure.4e5b95c843fc.css"
         ],
         "dependencies": [
           "gameplay-core"
@@ -67,7 +71,7 @@
           "assets/exploration/taoxi-v1/world-map.webp"
         ]
       },
-      "evidence": "completed full 393x873 pointer run; console terminal captured before result-file instrumentation"
+      "head": "1257984c6a1864184e62ef0e166a84d5f68868b9"
     },
     "appearances": {
       "eightAppearances": true,
@@ -125,10 +129,10 @@
     "scripts": [
       "build/feature-adventure-content.79628452fab4.js",
       "build/feature-adventure-runtime.cbc1c29d58c7.js",
-      "build/feature-adventure-ui.a9a25dbcf4be.js"
+      "build/feature-adventure-ui.6dae9290698f.js"
     ],
     "styles": [
-      "build/feature-adventure.4e5b95c843fc.css"
+      "build/feature-adventure.170bb326fdf2.css"
     ],
     "dependencies": [
       "gameplay-core"
@@ -166,12 +170,14 @@
     "docs/qa/taoxi-exploration-20261025/393-appearance-female-fire.png",
     "docs/qa/taoxi-exploration-20261025/393-appearance-female-water.png",
     "docs/qa/taoxi-exploration-20261025/393-appearance-female-wind.png",
-    "docs/qa/taoxi-exploration-20261025/393-appearance-female-earth.png"
+    "docs/qa/taoxi-exploration-20261025/393-appearance-female-earth.png",
+    "docs/qa/taoxi-exploration-20261025/393-story-entry.png",
+    "docs/qa/taoxi-exploration-20261025/1920-story-entry.png"
   ],
   "limits": [
     "Auth/Cloud transport and earned chapter progress are QA fixtures; no real-account or physical-phone evidence",
     "Authoritative-cloud plus local-dirty reload remains MIGRATION_REQUIRED; local receipt retained. No bypass or Cloud entitlement.",
-    "Full content run precedes cosmetic label/clip cleanup and current-dev portrait merge; two-size first loop and eight four-direction appearances reverified after merge. Latest full run/CI belongs to PR current checkpoint.",
+    "Full five-house run passed fixed Head1257984c; subsequent Story-entry presentation-only change passed two-size real Story cursor/return checks. Latest required CI belongs to current PR Head.",
     "No dev merge/deployment or main release claimed."
   ],
   "cleanup": "Keep active #985 branch/worktree; no unabsorbed content deleted."

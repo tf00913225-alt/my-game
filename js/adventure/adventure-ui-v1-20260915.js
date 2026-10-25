@@ -39,8 +39,9 @@
                 '<header class="adventure-header">'+
                     '<button type="button" class="adventure-back-button" onclick="FourSymbolsAdventure.closeToCity()" aria-label="返回主城">←</button>'+
                     '<div class="adventure-heading"><span>出城冒險</span><strong id="adventureHeaderTitle">章節</strong><small>踏出城門 · 初入山關 · 前路未明，江湖自此展開</small></div>'+
-                    '<button type="button" id="taoxiStoryEntry" class="adventure-button" onclick="openTaoxiExploration(\'adventure\')">探索</button><div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
+                    '<div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
                 '</header>'+
+                '<button type="button" id="taoxiStoryEntry" class="adventure-button" onclick="openTaoxiExploration(\'adventure\')">探索</button>'+
                 '<div class="adventure-view" id="adventureView"></div>';
             stage.appendChild(root);
         }

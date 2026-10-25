@@ -49,7 +49,7 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     await tap('#taoxiHomeEntry');await wait(`document.querySelector('#explorationPage [data-village]')`,'world map');
     assert.equal(await c.eval(`document.querySelector('[data-village]').disabled`),true,'not unlocked prematurely');await capture('locked-map');
     await tap('#explorationPage [data-back]');
-    await c.eval(`(()=>{FourSymbolsAdventure.getView();const s=player.adventureProgress.chapters.chapter_v1;s.onboarding={active:false,phase:'complete',source:'qa-fixture'};for(let i=1;i<=5;i++)s.completedNodes['c1_0'+i]=true;if(saveGame()!==true)throw Error('fixture save');})()`);
+    await c.eval(`(()=>{FourSymbolsAdventure.getView();const s=player.adventureProgress.chapters.chapter_v1;s.currentNodeId='c1_06';s.onboarding={active:false,phase:'complete',source:'qa-fixture'};for(let i=1;i<=5;i++)s.completedNodes['c1_0'+i]=true;if(saveGame()!==true)throw Error('fixture save');})()`);
     await tap('#taoxiHomeEntry');await tap('[data-village]');
     await wait(`document.getElementById('explorationPage').dataset.scene==='village'`,'village');await capture('village');
     const before=await c.eval(`JSON.stringify(player.adventureProgress)`);
@@ -72,6 +72,10 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
     await wait(`window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')`,'reload boot');if(await c.eval("document.getElementById('homeFeatureModal')?.classList.contains('show')"))await tap('#homeFeatureModal [onclick="closeHomeFeature()"]');await c.eval(`FourSymbolsFeatures.ensure('adventure','taoxi-reload')`);
     assert.equal(await c.eval(`player.explorationProgress.searched['a-chest']`),true,'reload retained receipt');assert.equal(await c.eval(`getPotionCount('hpPotion10')`),count,'reload retained inventory');
     await c.eval(`FourSymbolsAdventure.open()`);await tap('#taoxiStoryEntry');await wait(`document.getElementById('explorationPage').dataset.scene==='map'&&!document.getElementById('explorationPage').hidden`,'story entry');await tap('#explorationPage [data-back]');assert.equal(await c.eval(`document.getElementById('adventurePage').classList.contains('active')`),true);
+    await c.eval(`FourSymbolsAdventure.startStory('c1_06')`);await wait(`document.getElementById('adventurePage').dataset.panel==='story'`,'actual Story panel');
+    const storyCursor=await c.eval(`JSON.stringify(player.adventureProgress.chapters.chapter_v1.dialogue)`);await capture('story-entry');
+    await tap('#taoxiStoryEntry');await wait(`document.getElementById('explorationPage').dataset.scene==='map'&&!document.getElementById('explorationPage').hidden`,'actual Story exploration entry');await tap('#explorationPage [data-back]');
+    assert.equal(await c.eval(`document.getElementById('adventurePage').dataset.panel`),'story');assert.equal(await c.eval(`JSON.stringify(player.adventureProgress.chapters.chapter_v1.dialogue)`),storyCursor,'return preserves the actual Story cursor');
     if(width===393&&process.argv.includes('--appearances')){
       await tap('#taoxiStoryEntry');
       const originals=await c.eval(`({gender:player.gender,element:player.element})`);
@@ -148,7 +152,7 @@ try{for(const [width,height] of (cloudConflict?[[393,873]]:[[393,873],[1920,1080
       fs.writeFileSync(path.join(out,'full-content.json'),JSON.stringify(fullEvidence,null,2));console.log(JSON.stringify(fullEvidence));
     }
     const exceptions=c.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(exceptions,[]);
-    results.push({width,height,firstLoop:true,storyEntry:true,reload:true,repeatNoGrant:true,storyUnchanged:true,transport:'isolated Auth/Cloud; explicit earned-progress fixture; local save only'});
+    results.push({width,height,firstLoop:true,storyEntry:true,actualStoryEntry:true,storyCursorPreserved:true,reload:true,repeatNoGrant:true,storyUnchanged:true,transport:'isolated Auth/Cloud; explicit earned-progress fixture; local save only'});
     fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(results.at(-1)));
   }catch(error){if(c){fs.writeFileSync(path.join(out,`${width}-failure.json`),JSON.stringify(await collectStartupFailure(c,{message:error.message}),null,2));const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,`${width}-failure.png`),Buffer.from(shot.data,'base64'));}throw error;}
   finally{c?.close();proc.kill();}

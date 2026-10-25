@@ -33,3 +33,5 @@ Browser QA 使用正式 index／build／Display／導航／Inventory／AccountSa
 完整 393×873 Browser 流程已實際走完五戶十點、按固定線索與主線 fixture 解鎖 C/D/E、六份補給僅各一包、四線索可重讀、兩種操作接管／取消、注入真實 Storage 寫入拒絕後的 rollback／重試，以及 UID 切換拒絕。1920×1080 另跑完整第一段與重載。後續只調整標籤位置／圖集 clip，並吸收最新 dev 立繪更新，補跑兩尺寸第一段、主城全部控制命中與八款各四向輸入。這些為隔離 Browser fixture，非真手機或雲端接受。最新快照與截圖索引在 `docs/qa/TAOXI-EXPLORATION-20261025.json`。
 
 施工 checkpoint CI `40191709119` 在舊 Head `56b4dc1c` 找到新入口遮住公告、測試腳本分類問題；前者在原入口區改雙欄，後者移至既有 `.github/scripts` QA 目錄，沒有降低檢查。最新必要 CI 以 PR 即時紀錄為準，舊 Head 的成功或失敗都不充當新 Head 結果。
+
+固定 `1257984c` 已再次走完五戶十點與雙尺寸循環。另補齊真正 Story 對話面板的同一探索按鈕：從 header 移至原 Adventure root 共用層，章節地圖與 Story 都可見。兩尺寸實際點擊探索並返回後，原 node／line／phase cursor 完全相同；不自動 advance。相關 Story 截圖與結果已加入 QA 索引。
