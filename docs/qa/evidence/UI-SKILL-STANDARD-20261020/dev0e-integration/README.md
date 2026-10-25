@@ -1,0 +1,17 @@
+# #955 minimal normal integration of delivered dev0e73
+
+Work ID UI-SKILL-STANDARD-20261020; original branch fix/ui-skill-standard-polish-20261020, PR955. Parents: 08e51affa2200f883ec2cb35d0aee4e6df728567 and 0e73f817acc5e852b1df6a200272657be934bd51.
+
+998 Owner final turn01a1740f-275a-7300-a8d5-1131d87f05c2/message0fa2d5cecfa60cd6016ade3b1b5cdc8191ad6efaf829733914 was read completed/idle before writing. It explicitly stopped shared-file writing and conditionally handed the original UI writer window back. Its physical-phone GAP remains unresolved, not waived. 999 approval lock,994 leased battle hunks and996 cost/data/device restrictions retained.
+
+Normal merge only. Source JS/CSS/config automatically combined. Original builder resolved two manifests, four bundle/CSS rename groups, restricted policy digest and index critical stylesheet link. No whole-file parent choice or new product feature. Preserve998 rear bottom min(312px,calc(46% - 24px)),985 exploration entries/UID/navigation/lifecycle/transient dialogue/build assets,955 inline creation feedback/Story readability/static footer. Policy substantive values and leased battle source unchanged per independent source review.
+
+123 focused tests PASS: character-creation-feedback, auth-before-character-creation, chapter1-story-finalization, adventure-panel-scroll-transition, taoxi-exploration, v173.28-main-city-lobby. Original build and build:check PASS; staged diff check PASS.
+
+Evidence ZIP SHA256 bc3375c5bd57bc4cadd0c0b065faf607bd08c79e745cf95a269caf9f3c470a9b. ZIP retains the initial rejected early-login-overlay probe, corrected runner, focused log and final16PNG/report. Early probe's not-hittable return was caused by still-visible original account overlay; fixed QA wait only, not a product repair.
+
+Final v2: synthetic local account transport; three-person presentation fixture. At360x640 actual emulated touch,1280x800 actual mouse: each9 inputs/8 screenshots, two entrances, exploration return to home and Story origin, Story back to home, character modal and original return. Three-party heads/feet/HUD/dual CTA shown. Runtime exceptions0 in these runs; source hashes unchanged before/after. Character presentation edits are explicit synthetic fixtures; not a proof of zero background saves. No rewards/search/true Cloud/player data operations. No phone, keyboard, all48appearance cases, all Story panels, successful creation or full gameplay acceptance. Existing unchanged creation four-size and prior Story/footer evidence retained, not rerun.
+
+Independent actual-picture art review inspected all16 PNGs and passed representative presentation. Input review inspected16 PNGs/runner/report and passed navigation only. It found unresolved touch-size failures inherited from the delivered dependency:360 exploration back38.67px; Story exploration button360 height30.86px,1280 height38.57px. These are not44px-compliant and are not accepted by this checkpoint; no cross-scope product correction or UI-complete claim. Map is locked; no village entry tested. EXP changed453->956 in background; no zero-save/domain-unchanged claim.
+
+New merge Head requires natural latest-Head CI; old08e51aff green is not its Gate. No deployment or complete-game acceptance yet. Remaining master-ledger states/devices, observed touch-size gaps and998 phone gap stay open. 2D feature expansion/automation remain paused; dependency preservation is not new exploration work. Main prohibited.

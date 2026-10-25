@@ -49,6 +49,14 @@
         }
     }
     window.openAdventureMap=openAdventureMap;
+    window.openTaoxiExploration=async function(source){
+        try{const uid=window.FourSymbolsAccountSave?.getActiveUid();const route=source==='adventure'?'adventure':'home';
+            if(!uid||!document.getElementById(route+'Page')?.classList.contains('active'))return false;
+            await window.FourSymbolsFeatures.ensure('adventure','taoxi-entry');
+            if(window.FourSymbolsAccountSave?.getActiveUid()!==uid||!document.getElementById(route+'Page')?.classList.contains('active'))return false;
+            return window.FourSymbolsTaoxi.open(source);}
+        catch(error){console.error('[exploration] entry refused',error);if(typeof showMessage==='function')showMessage('探索載入失敗，請重試。');return false;}
+    };
 
     function ensureEntry(){
         if(typeof document==="undefined"){ return null; }
@@ -61,10 +69,11 @@
             axis.className="adventure-home-axis";
             axis.innerHTML=
                 '<button id="adventureHomeEntry" type="button" class="adventure-home-entry" data-feature="adventure" aria-label="出城冒險，江湖主線章節推進" onclick="openAdventureMap()">'+
-                    '<strong>出城冒險　›</strong>'+
-                    '<span class="adventure-home-kicker">江湖主線 · 章節推進</span>'+
+                    '<strong>出城冒險</strong>'+
+                    '<span class="adventure-home-kicker">主線故事</span>'+
                     '<span id="adventureHomeNotice" class="adventure-home-notice" hidden aria-hidden="true"></span>'+
                 '</button>';
+            const explore=document.createElement('button');explore.id='taoxiHomeEntry';explore.type='button';explore.className='taoxi-home-entry';explore.setAttribute('aria-label','江湖探索');explore.innerHTML='<strong>探索</strong><span>桃溪村</span>';explore.addEventListener('click',()=>window.openTaoxiExploration('home'));axis.append(explore);
             home.appendChild(axis);
         }
         syncAttention();

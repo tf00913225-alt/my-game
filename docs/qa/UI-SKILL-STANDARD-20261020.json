@@ -2,8 +2,8 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：創角inline提示及四尺寸獨審保留；最小正常吸收dev632立繪相依，114項focused通過、兩尺寸主城及角色靜態獨審通過；新HeadCI及其餘台帳未完，未部署",
-  "latestDependencyEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev632-integration/README.md",
+  "status": "施工中：正常吸收dev0e73探索與後排定位；123 focused及兩尺寸16圖導航/呈現獨審通過，部分探索按鈕實際高度不足44px仍未通過；創角既有四尺寸證據保留，新HeadCI及其餘台帳未完，未部署",
+  "latestDependencyEvidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev0e-integration/README.md",
   "devices": [
     {
       "id": "360x640",
