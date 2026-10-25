@@ -142,4 +142,3 @@ test('retained published twenty-node policy closes unchanged original history af
  assert.notEqual(digest(policy),digest(require('../functions/src/generated/hero-chapter-qualification.json')));
  for(const [,row] of f.h.data)if(row.kind==='hero-chapter-ticket'&&row.policy)assert.deepEqual(row.policy,policy);
 });
-
