@@ -46,3 +46,10 @@ for(const file of ["js/16-stage-v54-main-city-runtime.js","js/25-v131-fix-batch.
 }
 assert.match(main,/return "assets\/characters\/battle_"\+gender\+"_"\+element\+"\.png";/,"actual battle resolver retains independent assets");
 console.log("✓ shared normal portraits replace old city/inventory/formation/story art; battle stays separate");
+
+const heroArtworkSource=main.slice(main.indexOf("function getCharacterBattleArtworkPath("),main.indexOf("function getCharacterDisplayNameByIndex("));
+vm.runInNewContext(heroArtworkSource,generalContext);
+for(const [heroId,path] of [["divineDogHongbao","assets/heroes/divine-dog-hongbao.webp"],["vajraHeavenlyKing","assets/heroes/vajra-heavenly-king.webp"]]){
+    assert.equal(generalContext.resolve({combatantKind:"heroNpc",heroId}),path,"hero inventory keeps its dedicated artwork: "+heroId);
+}
+assert.equal(generalContext.resolve({combatantKind:"heroNpc",heroId:"unknown"}),"","unknown hero is not silently rendered as a normal female character");

@@ -6104,6 +6104,9 @@ if(window.FourSymbolsCombatEvents){
 
 function getCharacterArtworkPath(character){
     if(!character){ return ""; }
+    if(character.combatantKind==="heroNpc"){
+        return getCharacterBattleArtworkPath(character);
+    }
 
     const gender=character.gender==="male" ? "male" : "female";
     const element=elementDatabase[character.element]
