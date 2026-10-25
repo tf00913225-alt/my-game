@@ -39,7 +39,7 @@
                 '<header class="adventure-header">'+
                     '<button type="button" class="adventure-back-button" onclick="FourSymbolsAdventure.closeToCity()" aria-label="返回主城">←</button>'+
                     '<div class="adventure-heading"><span>出城冒險</span><strong id="adventureHeaderTitle">章節</strong><small>踏出城門 · 初入山關 · 前路未明，江湖自此展開</small></div>'+
-                    '<div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
+                    '<button type="button" id="taoxiStoryEntry" class="adventure-button" onclick="openTaoxiExploration(\'adventure\')">探索</button><div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
                 '</header>'+
                 '<div class="adventure-view" id="adventureView"></div>';
             stage.appendChild(root);
@@ -732,7 +732,17 @@
             '<em>'+(inBattle?'戰鬥結束後可返回':objective.ready?'返回章節':'返回冒險')+'</em></button>';
     }
 
-    window.FourSymbolsAdventureUI=Object.freeze({show:show,hide:hide,render:render,syncTracker:syncTracker,syncTutorialReturn:syncTutorialReturn,
+    // Pure presentation: transient exploration dialogue never obtains a story cursor.
+    function presentDialogue(host,options){
+        const box=document.createElement('section');box.className='adventure-transient-dialogue';
+        box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label',options.name);
+        let index=0,closed=false;
+        const dispose=()=>{if(closed)return;closed=true;box.remove();};
+        const renderLine=()=>{box.innerHTML='<h2>'+esc(options.name)+'</h2><p>'+esc(options.lines[index])+'</p><button type="button">'+(index<options.lines.length-1?'下一句':'繼續探索')+'</button>';const button=box.querySelector('button');button.addEventListener('click',()=>{if(index<options.lines.length-1){index++;renderLine();}else{dispose();options.onClose();}});button.focus({preventScroll:true});};
+        box.addEventListener('keydown',event=>{if(event.key==='Tab'){event.preventDefault();box.querySelector('button').focus();}});
+        host.append(box);renderLine();return dispose;
+    }
+    window.FourSymbolsAdventureUI=Object.freeze({presentDialogue,show:show,hide:hide,render:render,syncTracker:syncTracker,syncTutorialReturn:syncTutorialReturn,
         retryStoryPortrait:function(){ui.storyPortraitAttempted=null;render();}});
 
     if(typeof document!=="undefined"){

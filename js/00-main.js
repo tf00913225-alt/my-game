@@ -7104,6 +7104,7 @@ async function createCharacter(){
     selectedCreationElement=selection.element;
     Object.keys(creationStats).forEach(key=>{ creationStats[key]=selection.attributes[key]; });
     creationPoints=0;
+    delete player.explorationProgress;
     player.id=id;
     player.gender=selection.gender;
 
@@ -7609,6 +7610,8 @@ function loadGame(){
                 window.FourSymbolsHeroCore.listHeroDefinitions().map(hero=>hero.heroId));
         } // Structural cache validation only; the protected reader supplies authority.
         heroAccountState=hydratedHeroAccount;
+        // An absent optional field in the next UID must not retain the previous UID cache.
+        delete player.explorationProgress;
         Object.assign(
             player,
             data.player
@@ -8566,6 +8569,8 @@ function showPage(page,options={}){
     });
 
 
+    const explorationPage=$('explorationPage');
+    if(explorationPage){explorationPage.hidden=page!=='exploration';if(page!=='exploration')window.FourSymbolsTaoxi?.leave();}
     // Adventure is a route, not an overlay above whichever page was last active.
     // Project its visibility here alongside the same .page.active authority.
     const adventurePage=$("adventurePage");
@@ -8644,6 +8649,7 @@ function showPage(page,options={}){
         "skill",
         "home",
         "adventure",
+        "exploration",
         "training",
         "dungeon",
         "gameplay",

@@ -1,0 +1,156 @@
+[
+  {
+    "name": "world-map",
+    "size": [
+      941,
+      1672
+    ],
+    "mode": "RGB",
+    "sourceSha256": "958e24c96452ad9028105830841a705e5906aaec180e7aaf694703040f24da04",
+    "webpSha256": "a62823bd488a1903e1956abff9ed720c70e0a6f3a5a819037946f51d382df553",
+    "exactRgba": true
+  },
+  {
+    "name": "house",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "8a66c4f33c3cf4f8604cd572c412386b35a6aaff5f71249cce1076f3a539cb23",
+    "webpSha256": "4a5c40e508988049c48517384e23cb55614069e829260242100e1179693db9f0",
+    "exactRgba": true
+  },
+  {
+    "name": "player_male_01",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "379d6fda993167c43ea9b79e4492cdfc38b256129c2b70a4cc12994885519ae3",
+    "webpSha256": "9530671ce5f0a0c152e5d3502712068c08de9cf8c60f0718ceb17625eff514ee",
+    "exactRgba": true
+  },
+  {
+    "name": "props",
+    "size": [
+      1261,
+      1247
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "6df48a64c1e5d4537af940a397092a4931519ba49d261739f9d2b3e1f4ff1d16",
+    "webpSha256": "a1bab6488167a610cf78fb712110c4c91660eeef0e812fba4c3d6f526527c5c6",
+    "exactRgba": true
+  },
+  {
+    "name": "interior",
+    "size": [
+      1095,
+      1436
+    ],
+    "mode": "RGB",
+    "sourceSha256": "4771b0c917a9ef0aa4e179424c9cbf07b6aee045b4572cef7dd0a8152293b74c",
+    "webpSha256": "99e6b6a28b670c5546486954ffcbe91435f518460344993a6a9eb0520d3865d4",
+    "exactRgba": true
+  },
+  {
+    "name": "player_male_02",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "6282b8708739998129c79c170de2e2029f7043220dc11be9d7512389fa0a0c86",
+    "webpSha256": "2db20a6e43d95d62959eb015a3c967e1147f782948134e83127dddf124a6c35e",
+    "exactRgba": true
+  },
+  {
+    "name": "player_male_03",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "07ab20c062442ef05c2ae678cfc25ffee6341d9813af4f55ceb0234a509dd92f",
+    "webpSha256": "dd5ccf21ea9dc32c9d0ce5645b91b69d2bdcd2a8c338e480bb5efbb690d2657d",
+    "exactRgba": true
+  },
+  {
+    "name": "player_male_04",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "cdcd4ca208db2bcbd4c22109ef0feb20490025e11820676b4589a17e67325625",
+    "webpSha256": "705af108721c1d90ffaab3918357c78f15d6e5700eb3635e60dd1669d1cf4bf9",
+    "exactRgba": true
+  },
+  {
+    "name": "player_female_01",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "c8f55414d33c46353dfd09da1d568b766950f234cef30c2075b368433a761acc",
+    "webpSha256": "8a0f10b6915c3d395fc32cc3762369774d879dc9cdb190be1b0ce9fe861994ce",
+    "exactRgba": true
+  },
+  {
+    "name": "player_female_02",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "2318977fb1d7cb2dd8dafb88a5cba7daaefb2e52b2876dba6ffc65521986b787",
+    "webpSha256": "3fae4e421281c4306f7cecb0f33a7d7cc23591c9ec8c411734a5dfa8d7ae29e3",
+    "exactRgba": true
+  },
+  {
+    "name": "player_female_03",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "7f2da53fea522bb5af6eb28f716c09d3ff08011daaa43458960e4ad7b701fd33",
+    "webpSha256": "aa58c3fe73ad8d5fd02d5eda90995ab8a0fdf5577c396a3d1493f7428f9264c5",
+    "exactRgba": true
+  },
+  {
+    "name": "player_female_04",
+    "size": [
+      1086,
+      1448
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "7603217ccf9334a298a9ec0a075cddc02bb3d83abdbf6f7ca9118ca828a31b50",
+    "webpSha256": "5e54fcd5189b0221aba2ad4fa9a9aeeff7193ebc72798182de5c1128d02769be",
+    "exactRgba": true
+  },
+  {
+    "name": "ground",
+    "size": [
+      955,
+      1647
+    ],
+    "mode": "RGB",
+    "sourceSha256": "a590c61a09034742c56664a3e16c052719864d3158a3afea14adce71a0d861ca",
+    "webpSha256": "c51c0185475de234c4c0e65d1faf43ce476144e6fab84932ffb681e614638ca0",
+    "exactRgba": true
+  },
+  {
+    "name": "villagers",
+    "size": [
+      2172,
+      724
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "d7d15e74746f91f684183c3d4c42a2529a7291504843a54f3a390814e2edc163",
+    "webpSha256": "39817e56d7952ca215d1c0b8b7a2893b821f404832f7707abf4575f0151d8b0e",
+    "exactRgba": true
+  }
+]

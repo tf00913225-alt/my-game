@@ -16,6 +16,7 @@ function canStand(x,y,data=scene){
   const r=data.radius;
   if(x<r||y<r||x>data.width-r||y>data.height-r)return false;
   return !data.objects.some(({solid:b})=>{
+    if(!b)return false;
     const nx=Math.max(b.x,Math.min(x,b.x+b.width)),ny=Math.max(b.y,Math.min(y,b.y+b.height));
     return Math.hypot(x-nx,y-ny)<r;
   });
@@ -58,6 +59,7 @@ function segmentDistance(a,b,c,d){
 function clearSegment(a,b,data){
   if(!canStand(a.x,a.y,data)||!canStand(b.x,b.y,data))return false;
   return !data.objects.some(({solid:r})=>{
+    if(!r)return false;
     const points=[{x:r.x,y:r.y},{x:r.x+r.width,y:r.y},{x:r.x+r.width,y:r.y+r.height},{x:r.x,y:r.y+r.height}];
     return points.some((p,i)=>segmentDistance(a,b,p,points[(i+1)%4])<data.radius-1e-8);
   });

@@ -1,3 +1,5 @@
+
+/* bundled source: js/adventure/adventure-ui-v1-20260915.js */
 /* =====================================================
    出城冒險 V1 — shared UI renderer owner
    One renderer for map/events/objective/merchant/reward views.
@@ -39,7 +41,7 @@
                 '<header class="adventure-header">'+
                     '<button type="button" class="adventure-back-button" onclick="FourSymbolsAdventure.closeToCity()" aria-label="返回主城">←</button>'+
                     '<div class="adventure-heading"><span>出城冒險</span><strong id="adventureHeaderTitle">章節</strong><small>踏出城門 · 初入山關 · 前路未明，江湖自此展開</small></div>'+
-                    '<div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
+                    '<button type="button" id="taoxiStoryEntry" class="adventure-button" onclick="openTaoxiExploration(\'adventure\')">探索</button><div class="adventure-header-meta" id="adventureHeaderMeta"></div>'+
                 '</header>'+
                 '<div class="adventure-view" id="adventureView"></div>';
             stage.appendChild(root);
@@ -732,7 +734,17 @@
             '<em>'+(inBattle?'戰鬥結束後可返回':objective.ready?'返回章節':'返回冒險')+'</em></button>';
     }
 
-    window.FourSymbolsAdventureUI=Object.freeze({show:show,hide:hide,render:render,syncTracker:syncTracker,syncTutorialReturn:syncTutorialReturn,
+    // Pure presentation: transient exploration dialogue never obtains a story cursor.
+    function presentDialogue(host,options){
+        const box=document.createElement('section');box.className='adventure-transient-dialogue';
+        box.setAttribute('role','dialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-label',options.name);
+        let index=0,closed=false;
+        const dispose=()=>{if(closed)return;closed=true;box.remove();};
+        const renderLine=()=>{box.innerHTML='<h2>'+esc(options.name)+'</h2><p>'+esc(options.lines[index])+'</p><button type="button">'+(index<options.lines.length-1?'下一句':'繼續探索')+'</button>';const button=box.querySelector('button');button.addEventListener('click',()=>{if(index<options.lines.length-1){index++;renderLine();}else{dispose();options.onClose();}});button.focus({preventScroll:true});};
+        box.addEventListener('keydown',event=>{if(event.key==='Tab'){event.preventDefault();box.querySelector('button').focus();}});
+        host.append(box);renderLine();return dispose;
+    }
+    window.FourSymbolsAdventureUI=Object.freeze({presentDialogue,show:show,hide:hide,render:render,syncTracker:syncTracker,syncTutorialReturn:syncTutorialReturn,
         retryStoryPortrait:function(){ui.storyPortraitAttempted=null;render();}});
 
     if(typeof document!=="undefined"){
@@ -743,3 +755,522 @@
         document.addEventListener("four-symbols:hero-acquisition-state",()=>{ render(); });
     }
 })();
+
+
+/* bundled source: prototypes/exploration-corner/scene.js */
+// Single geometry source shared by the prototype and future classic production bundle.
+(function(scope){
+'use strict';
+// EXPLORATION-CORNER-20261023: temporary sample data, no gameplay/save identity.
+const scene = Object.freeze({
+  width:1400,height:2600,viewWidth:1080,viewHeight:1320,
+  spawn:{x:720,y:1250},speed:320,radius:23,
+  objects:[
+    {id:'house',art:'house',x:880,y:1030,width:760,height:700,solid:{x:580,y:780,width:580,height:250}},
+    {id:'tree',art:'tree',x:330,y:1420,width:650,height:750,solid:{x:298,y:1365,width:64,height:70}},
+    {id:'npc',art:'npc',x:1060,y:1350,width:120,height:180,solid:{x:1035,y:1320,width:50,height:50}}
+  ]
+});
+
+function canStand(x,y,data=scene){
+  const r=data.radius;
+  if(x<r||y<r||x>data.width-r||y>data.height-r)return false;
+  return !data.objects.some(({solid:b})=>{
+    if(!b)return false;
+    const nx=Math.max(b.x,Math.min(x,b.x+b.width)),ny=Math.max(b.y,Math.min(y,b.y+b.height));
+    return Math.hypot(x-nx,y-ny)<r;
+  });
+}
+function move(state,direction,seconds,data=scene){
+  const vector=typeof direction==='object'&&direction?direction:{up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[direction];
+  const length=vector?Math.hypot(...vector):0;
+  if(!Number.isFinite(length)||!length)return {...state,moving:false};
+  const delta=vector.map(n=>n/length);
+  const facing=Math.abs(delta[0])>Math.abs(delta[1])?(delta[0]>0?'right':'left'):(delta[1]>0?'down':'up');
+  const next={...state,facing,moving:false};
+  // Small bounded spatial steps prevent tunnelling even after a slow frame.
+  let distance=data.speed*Math.max(0,Math.min(seconds,.05));
+  while(distance>0){
+    const step=Math.min(distance,4),x=next.x+delta[0]*step,y=next.y+delta[1]*step;
+    if(!clearSegment(next,{x,y},data))break;
+    next.x=x;next.y=y;next.moving=true;distance-=step;
+  }
+  return next;
+}
+function cameraFor(state,data=scene){
+  return {x:Math.max(0,Math.min(data.width-data.viewWidth,state.x-data.viewWidth/2)),
+    y:Math.max(0,Math.min(data.height-data.viewHeight,state.y-data.viewHeight*.72))};
+}
+const nearNpc=state=>Math.hypot(state.x-1060,state.y-1350)<165;
+
+// The bounded grid is planning only. Movement and route smoothing share an exact
+// swept-circle clearance check, so diagonal segments cannot cut solid corners.
+function pointSegmentDistance(p,a,b){
+  const dx=b.x-a.x,dy=b.y-a.y,length=dx*dx+dy*dy;
+  const t=length?Math.max(0,Math.min(1,((p.x-a.x)*dx+(p.y-a.y)*dy)/length)):0;
+  return Math.hypot(p.x-a.x-t*dx,p.y-a.y-t*dy);
+}
+function segmentDistance(a,b,c,d){
+  const cross=(p,q,r)=>(q.x-p.x)*(r.y-p.y)-(q.y-p.y)*(r.x-p.x);
+  const overlap=Math.max(Math.min(a.x,b.x),Math.min(c.x,d.x))<=Math.min(Math.max(a.x,b.x),Math.max(c.x,d.x))&&Math.max(Math.min(a.y,b.y),Math.min(c.y,d.y))<=Math.min(Math.max(a.y,b.y),Math.max(c.y,d.y));
+  if(overlap&&cross(a,b,c)*cross(a,b,d)<=0&&cross(c,d,a)*cross(c,d,b)<=0)return 0;
+  return Math.min(pointSegmentDistance(a,c,d),pointSegmentDistance(b,c,d),pointSegmentDistance(c,a,b),pointSegmentDistance(d,a,b));
+}
+function clearSegment(a,b,data){
+  if(!canStand(a.x,a.y,data)||!canStand(b.x,b.y,data))return false;
+  return !data.objects.some(({solid:r})=>{
+    if(!r)return false;
+    const points=[{x:r.x,y:r.y},{x:r.x+r.width,y:r.y},{x:r.x+r.width,y:r.y+r.height},{x:r.x,y:r.y+r.height}];
+    return points.some((p,i)=>segmentDistance(a,b,p,points[(i+1)%4])<data.radius-1e-8);
+  });
+}
+function connect(a,b,data){
+  return clearSegment(a,b,data)?[b]:null;
+}
+function smoothRoute(start,route,data){
+  const result=[];let anchor=start,index=0;
+  while(index<route.length){
+    let next=route.length-1;while(next>index&&!clearSegment(anchor,route[next],data))next--;
+    if(Math.hypot(route[next].x-anchor.x,route[next].y-anchor.y)>.01)result.push(route[next]);
+    anchor=route[next];index=next+1;
+  }
+  return result;
+}
+function findRoute(start,target,data=scene){
+  if(!canStand(start.x,start.y,data)||!canStand(target.x,target.y,data))return null;
+  const direct=connect(start,target,data);
+  if(direct)return smoothRoute(start,direct,data);
+  const cell=40,cols=Math.floor(data.width/cell),rows=Math.floor(data.height/cell);
+  const nodes=Array.from({length:cols*rows},(_,i)=>({x:(i%cols+.5)*cell,y:(Math.floor(i/cols)+.5)*cell}));
+  const nearest=point=>nodes.map((p,i)=>({p,i,d:Math.hypot(p.x-point.x,p.y-point.y)})).filter(n=>n.d<=cell*1.5&&canStand(n.p.x,n.p.y,data)).sort((a,b)=>a.d-b.d);
+  const starts=nearest(start).map(n=>({...n,link:connect(start,n.p,data)})).filter(n=>n.link);
+  const ends=new Map(nearest(target).map(n=>[n.i,connect(n.p,target,data)]).filter(([,link])=>link));
+  const queue=[],parents=new Map(),links=new Map();
+  for(const n of starts){queue.push(n.i);parents.set(n.i,null);links.set(n.i,n.link);}
+  for(let cursor=0;cursor<queue.length;cursor++){
+    const id=queue[cursor],p=nodes[id];
+    if(ends.has(id)){
+      const chain=[];let key=id;while(parents.get(key)!==null){chain.unshift(nodes[key]);key=parents.get(key);}
+      const route=[...links.get(key),...chain,...ends.get(id)];
+      return smoothRoute(start,route,data);
+    }
+    for(const next of [id-cols,id+cols,id%cols? id-1:-1,id%cols<cols-1?id+1:-1]){
+      if(next<0||next>=nodes.length||parents.has(next)||!clearSegment(p,nodes[next],data))continue;
+      parents.set(next,id);queue.push(next);
+    }
+  }
+  return null;
+}
+function followRoute(state,route,seconds,data=scene){
+  let next={...state,moving:false},remaining=data.speed*Math.max(0,Math.min(seconds,.05)),moved=false;
+  while(route.length&&remaining>.001){
+    const target=route[0],dx=target.x-next.x,dy=target.y-next.y;
+    if(Math.hypot(dx,dy)<.01){route.shift();continue;}
+    const distance=Math.min(remaining,Math.hypot(dx,dy));
+    const step=move(next,[dx,dy],distance/data.speed,data),actual=Math.hypot(step.x-next.x,step.y-next.y);
+    next=step;moved=moved||actual>0;remaining-=distance;
+    if(actual<distance-.01){route.length=0;break;}
+    if(Math.hypot(target.x-next.x,target.y-next.y)<.01)route.shift();
+  }
+  return {...next,moving:moved};
+}
+function npcRoute(start,data=scene){
+  const npc=data.objects.find(o=>o.id==='npc');
+  const candidates=[[0,120],[-120,0],[120,0],[0,-120]].map(([x,y])=>({x:npc.x+x,y:npc.y+y}));
+  return candidates.map(p=>findRoute(start,p,data)).filter(Boolean).sort((a,b)=>{
+    const length=r=>r.reduce((n,p,i)=>n+Math.hypot(p.x-(i?r[i-1]:start).x,p.y-(i?r[i-1]:start).y),0);
+    return length(a)-length(b);
+  })[0]||null;
+}
+
+scope.FourSymbolsExplorationGeometry=Object.freeze({scene,canStand,move,cameraFor,nearNpc,findRoute,followRoute,npcRoute});
+})(globalThis);
+
+
+/* bundled source: prototypes/exploration-corner/runtime.js */
+// Single runtime source. UI owns routing/Display; services never mutate gameplay here.
+(function(scope){
+'use strict';
+const {scene,move,cameraFor,nearNpc,findRoute,followRoute,npcRoute}=scope.FourSymbolsExplorationGeometry;
+let mounted=null;
+
+// One instance owns input, frame, camera, interaction and cleanup. No globals
+// from Adventure, Patrol, Player, Save or Economy are accessed.
+function mount(root,services={}){
+  if(mounted){if(mounted.root===root)return mounted.controller;throw new Error('Exploration already mounted');}
+  if(!root?.isConnected)throw new Error('Exploration requires a connected root');
+  const eventToPoint=services.eventToPoint||scope.eventToGamePoint;
+  if(typeof eventToPoint!=='function')throw new Error('Exploration requires the existing Display coordinate service');
+  const data=services.scene||scene;
+  const nearby=position=>services.scene?data.objects.filter(o=>o.interaction&&Math.hypot(position.x-o.approach.x,position.y-o.approach.y)<(o.range||145)).sort((a,b)=>Math.hypot(position.x-a.approach.x,position.y-a.approach.y)-Math.hypot(position.x-b.approach.x,position.y-b.approach.y))[0]:nearNpc(position)?{id:'npc',label:'與村民招呼 · E'}:null;
+  let analog=null;
+  const world=root.querySelector('[data-world]'),actor=root.querySelector('[data-player]');
+  const sprites=[...actor.querySelectorAll('[data-pose]')];
+  const prompt=root.querySelector('[data-interact]');
+  const viewport=root.querySelector('.explore-viewport'),marker=root.querySelector('[data-destination]'),status=root.querySelector('[data-status]');
+  const directions=new Map(),captures=new Map();
+  let abort=null,active=false,generation=0,interactionGeneration=0,interactionCleanup=null;
+  let state={...data.spawn,facing:'up',moving:false},frame=0,last=0,opened=false,disposed=false;
+  let route=[],destination=null,gesture=null,walkTime=0;
+
+  for(const item of data.objects){
+    const el=document.createElement('div');el.className='explore-object';el.dataset.object=item.id;
+    Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.y)});
+    el.innerHTML=services.renderObject?services.renderObject(item):`<svg viewBox="0 0 ${item.width} ${item.height}" aria-hidden="true"><use href="/prototypes/exploration-corner/art.svg#${item.art}"/></svg>`;
+    world.append(el);
+  }
+  function cancelRoute(){route=[];destination=null;gesture=null;}
+  function clearInput(){
+    for(const [id,el] of captures){if(el.hasPointerCapture(id))el.releasePointerCapture(id);}
+    captures.clear();directions.clear();analog=null;cancelRoute();state.moving=false;last=0;render();
+  }
+  function endInteraction(){
+    interactionGeneration++;
+    const cleanup=interactionCleanup;interactionCleanup=null;opened=false;
+    cleanup?.();
+  }
+  function closeInteraction(){
+    try{endInteraction();}finally{clearInput();if(active)root.focus({preventScroll:true});}
+  }
+  function interact(){
+    if(!active||opened||!nearby(state))return;
+    if(typeof services.onInteract!=='function'){status.textContent='對話尚未接通';return;}
+    opened=true;clearInput();const token=generation,interactionToken=++interactionGeneration;
+    const close=()=>{
+      if(!active||token!==generation||interactionToken!==interactionGeneration||!opened)return;
+      closeInteraction();
+    };
+    try{
+      const cleanup=services.onInteract({npcId:nearby(state).id,close});
+      if(cleanup!=null&&typeof cleanup!=='function')throw new TypeError('Interaction must return synchronous cleanup');
+      if(!active||token!==generation||interactionToken!==interactionGeneration||!opened)cleanup?.();else interactionCleanup=cleanup;
+    }catch(error){
+      if(active&&token===generation&&interactionToken===interactionGeneration){endInteraction();status.textContent='對話載入失敗，請重試';}
+      throw error;
+    }
+  }
+  function requestExit(){
+    if(!active)return;
+    clearInput();services.requestExit?.();
+  }
+  function bindInput(){
+  const signal=abort.signal;
+  const keys={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'};
+  root.addEventListener('keydown',e=>{
+    if(keys[e.key]){e.preventDefault();if(!opened&&!e.repeat){cancelRoute();analog=null;directions.set('key:'+e.code,keys[e.key]);status.textContent='方向控制中';}}
+    if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();interact();}
+    if(e.key==='Escape'){e.preventDefault();if(opened)closeInteraction();else requestExit();}
+  },{signal});
+  window.addEventListener('keyup',e=>{directions.delete('key:'+e.code);},{signal});
+  for(const button of root.querySelectorAll('[data-direction]')){
+    button.addEventListener('pointerdown',e=>{
+      e.preventDefault();if(opened)return;
+      cancelRoute();status.textContent='方向控制中';
+      // Touch uses one directional pad; most recent held direction wins.
+      button.setPointerCapture(e.pointerId);captures.set(e.pointerId,button);directions.set('pointer:'+e.pointerId,button.dataset.direction);
+    },{signal});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])button.addEventListener(type,e=>{captures.delete(e.pointerId);directions.delete('pointer:'+e.pointerId);},{signal});
+  }
+  viewport.addEventListener('pointerdown',e=>{
+    if(opened||!e.isPrimary||e.button!==0)return;
+    gesture={id:e.pointerId};viewport.setPointerCapture(e.pointerId);captures.set(e.pointerId,viewport);
+    // Commit at contact, using the current position/camera. Release must not
+    // replay a stale target after the character and camera have moved.
+    e.preventDefault();directions.clear();analog=null;
+    let point;
+    try{
+      point=eventToPoint(e);
+      if(!Number.isFinite(point?.x)||!Number.isFinite(point?.y))throw new TypeError('Invalid Display point');
+    }catch(_){clearInput();status.textContent='座標尚未就緒，請重試';return;}
+    const camera=cameraFor(state,data);
+    const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
+    const npc=services.scene?data.objects.find(o=>o.interaction&&target.x>=o.x-o.width/2&&target.x<=o.x+o.width/2&&target.y>=o.y-o.height&&target.y<=o.y):data.objects.find(o=>o.id==='npc');
+    const npcHit=npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
+    const planned=npcHit?(services.scene?findRoute(state,npc.approach,data):npcRoute(state,data)):findRoute(state,target,data);route=planned||[];
+    destination=route.at(-1)||null;
+    status.textContent=destination?(npcHit?'走近村民後，按招呼確認':'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
+    root.focus({preventScroll:true});render();
+  },{signal});
+  viewport.addEventListener('pointerup',e=>{captures.delete(e.pointerId);if(gesture?.id===e.pointerId)gesture=null;},{signal});
+  viewport.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)clearInput();},{signal});
+  const joystick=root.querySelector('[data-joystick]');
+  if(joystick){
+    let stickId=null;
+    const point=e=>{const p=eventToPoint(e);return [p.x-joystick.offsetLeft-joystick.offsetWidth/2,p.y-(joystick.parentElement.offsetTop||0)-joystick.offsetTop-joystick.offsetHeight/2];};
+    const update=e=>{if(e.pointerId!==stickId)return;e.preventDefault();const [x,y]=point(e);analog=Math.hypot(x,y)>18?[x,y]:null;};
+    joystick.addEventListener('pointerdown',e=>{if(opened||stickId!==null||!e.isPrimary)return;e.preventDefault();stickId=e.pointerId;cancelRoute();directions.clear();joystick.setPointerCapture(e.pointerId);captures.set(e.pointerId,joystick);update(e);},{signal});
+    joystick.addEventListener('pointermove',update,{signal});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{if(e.pointerId===stickId){stickId=null;analog=null;captures.delete(e.pointerId);}},{signal});
+  }
+  prompt.addEventListener('click',interact,{signal});
+  root.querySelector('[data-exit]')?.addEventListener('click',requestExit,{signal});
+  window.addEventListener('blur',clearInput,{signal});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)clearInput();},{signal});
+  window.addEventListener('pagehide',leave,{signal});
+  }
+  function render(){
+    const camera=cameraFor(state,data);
+    world.style.transform=`translate(${-camera.x}px,${-camera.y}px)`;
+    actor.style.left=state.x+'px';actor.style.top=state.y+'px';actor.style.zIndex=String(Math.round(state.y));
+    actor.dataset.facing=state.facing;actor.classList.toggle('is-walking',state.moving);
+    const pose=state.moving?(Math.floor(walkTime/.16)%4===0?1:Math.floor(walkTime/.16)%4===2?2:0):0;
+    // Keep external SVG instances stable: changing href briefly clears their
+    // geometry in Chrome. The same render owner selects one preloaded pose.
+    const activePose=`${state.facing}-${pose}`;
+    for(const sprite of sprites){
+      const visibility=sprite.dataset.pose===activePose?'visible':'hidden';
+      if(sprite.getAttribute('visibility')!==visibility)sprite.setAttribute('visibility',visibility);
+    }
+    marker.hidden=!destination;if(destination){marker.style.left=destination.x+'px';marker.style.top=destination.y+'px';}
+    const interaction=nearby(state);prompt.disabled=!active||opened||!interaction;prompt.textContent=interaction?(interaction.label||'交談'):(services.scene?'靠近可互動':'靠近村民可招呼');
+    services.onRender?.({state,camera,walkTime,pose});
+    for(const button of root.querySelectorAll('[data-direction]'))button.classList.toggle('is-held',[...directions.values()].at(-1)===button.dataset.direction);
+    // Read-only observable sample state for QA; not a setter or save surface.
+    root.dataset.position=`${state.x.toFixed(2)},${state.y.toFixed(2)}`;
+    root.dataset.camera=`${camera.x.toFixed(2)},${camera.y.toFixed(2)}`;
+    root.dataset.destination=destination?`${destination.x.toFixed(2)},${destination.y.toFixed(2)}`:'';
+  }
+  function tick(now){
+    if(disposed||!active)return;
+    const seconds=last?(now-last)/1000:0;last=now;
+    if(document.hidden||opened){state.moving=false;last=0;}
+    else if(analog){state=move(state,analog,seconds,data);}
+    else if(directions.size){
+      const pointer=[...directions].filter(([key])=>key.startsWith('pointer:')).at(-1);
+      const held=new Set(directions.values());
+      state=move(state,pointer?pointer[1]:[Number(held.has('right'))-Number(held.has('left')),Number(held.has('down'))-Number(held.has('up'))],seconds,data);
+    }
+    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){destination=null;status.textContent=nearNpc(state)?'已走近，按招呼確認':'已抵達；點地面繼續走';}}
+    else state={...state,moving:false};
+    walkTime=state.moving?walkTime+Math.min(seconds,.05):0;
+    render();frame=requestAnimationFrame(tick);
+  }
+  function enter(){
+    if(disposed)throw new Error('Exploration instance destroyed');
+    if(active)return;
+    generation++;state={...data.spawn,facing:'up',moving:false};walkTime=0;
+    active=true;abort=new AbortController();bindInput();clearInput();
+    frame=requestAnimationFrame(tick);root.focus({preventScroll:true});
+  }
+  function leave(){
+    if(!active)return;
+    active=false;generation++;cancelAnimationFrame(frame);frame=0;abort.abort();
+    try{endInteraction();}finally{clearInput();}
+  }
+  function destroy(){
+    if(disposed)return;
+    try{leave();}finally{
+      disposed=true;world.querySelectorAll('[data-object]').forEach(el=>el.remove());
+      if(mounted?.root===root)mounted=null;
+    }
+  }
+  const controller=Object.freeze({enter,leave,destroy});
+  mounted={root,controller};render();return controller;
+}
+scope.FourSymbolsExploration=Object.freeze({mount});
+})(globalThis);
+
+
+/* bundled source: js/exploration/taoxi-content.js */
+/* EXPLORATION-CORNER-20261023: reversible Taoxi v1 content; no main-story writes. */
+(function(scope){
+'use strict';
+const houses=[
+  {id:'a',name:'桃枝居',x:470,y:2350,condition:'open',hint:'村口民宅，歡迎歇腳。'},
+  {id:'b',name:'溪畔居',x:1330,y:2300,condition:'open',hint:'溪邊人家，門常開著。'},
+  {id:'c',name:'藥農居',x:420,y:1530,condition:'clue',hint:'先與阿芸交談，並讀桃枝居的書信。'},
+  {id:'d',name:'織戶居',x:1330,y:1450,condition:'c1_06',hint:'完成主線第 6 關「村民求援」後開放。'},
+  {id:'e',name:'守望居',x:900,y:650,condition:'mixed',hint:'完成主線第 16 關「寨前情報」，並讀藥農居的手記。'}
+];
+const npcs=[
+  {id:'elder',name:'周伯',x:840,y:2470,lines:['少俠，桃溪村就在前頭。村口的桃枝居與溪畔居都可進去歇腳。','各家留的補給只取一回。走累了，也可沿原路返回。']},
+  {id:'ayun',name:'阿芸',x:940,y:1840,lines:['藥農託我照看門戶。讀過桃枝居桌上的書信，就能知道他留下的線索。','村中傳聞，還得回主線向當事人查證；閒聊不會替你完成關卡。']},
+  {id:'woodworker',name:'陳叔',x:850,y:1060,lines:['山路的事，就依你親身走過的經歷來。','織戶等村民求援的事告一段落才開門；守望居還得等寨前情報。']}
+];
+const points=[
+  {id:'a-chest',house:'a',name:'旅途補給',kind:'reward',item:'hpPotion10',count:1,text:'主人留下一包回春散，供過路人應急。'},
+  {id:'a-letter',house:'a',name:'桌上書信',kind:'clue',text:'藥農留書：若阿芸已認得你，便可來藥農居翻閱手記。'},
+  {id:'b-chest',house:'b',name:'竹籃補給',kind:'reward',item:'spPotion10',count:1,text:'竹籃裡留著一包凝氣散。'},
+  {id:'b-note',house:'b',name:'溪畔舊記',kind:'clue',text:'溪水年年流過桃枝。紙上的舊事，只是村人的生活記錄。'},
+  {id:'c-chest',house:'c',name:'藥箱',kind:'reward',item:'hpPotion10',count:1,text:'藥農留下的一包回春散。'},
+  {id:'c-journal',house:'c',name:'藥農手記',kind:'clue',text:'手記：守望居的人關心寨前道路。知曉第十六關的情報後，可持此線索前往。'},
+  {id:'d-chest',house:'d',name:'窗邊布包',kind:'reward',item:'spPotion10',count:1,text:'布包內有一包凝氣散。'},
+  {id:'d-box',house:'d',name:'木櫃補給',kind:'reward',item:'hpPotion10',count:1,text:'一包收好的回春散。'},
+  {id:'e-chest',house:'e',name:'守望補給',kind:'reward',item:'spPotion10',count:1,text:'守望人留下一包凝氣散。'},
+  {id:'e-record',house:'e',name:'村中紀事',kind:'clue',text:'村中紀事：行走江湖，記得來處。你已走遍桃溪村五戶人家。'}
+];
+function unlocked(house,chapter,state){
+  const done=id=>!!chapter?.completedNodes?.[id];
+  if(house.condition==='open')return true;
+  if(house.condition==='clue')return state.talked.ayun===true&&state.searched['a-letter']===true;
+  if(house.condition==='mixed')return done('c1_16')&&state.searched['c-journal']===true;
+  return done(house.condition);
+}
+function available(chapter){return [1,2,3,4,5].every(n=>!!chapter?.completedNodes?.['c1_'+String(n).padStart(2,'0')])&&chapter?.onboarding?.active===false&&chapter.onboarding.phase==='complete';}
+function appearance(player){const index=['fire','water','wind','earth'].indexOf(player?.element);if(index<0)throw Error('無法辨識創角外觀');return 'player_'+(player.gender==='male'?'male':'female')+'_0'+(index+1);}
+function village(spawn){
+  return {id:'village',name:'桃溪村',width:1800,height:3100,viewWidth:1080,viewHeight:1420,radius:23,speed:320,spawn:spawn||{x:900,y:2800},objects:[
+    ...houses.map(h=>({...h,art:'house',width:660,height:660,solid:{x:h.x-260,y:h.y-370,width:520,height:305},approach:{x:h.x-30,y:h.y+40},interaction:'house',label:'進入 '+h.name})),
+    ...npcs.map(n=>({...n,art:'npc',width:200,height:200,solid:{x:n.x-22,y:n.y-38,width:44,height:38},approach:{x:n.x,y:n.y+100},interaction:'talk',label:'交談 · '+n.name})),
+    ...[[110,2810],[1690,2750],[130,1890],[1690,1710],[150,830],[1640,650]].map(([x,y],i)=>({id:'peach-'+i,art:'peach',x,y,width:480,height:600,solid:{x:x-23,y:y-50,width:46,height:50}}))
+  ]};
+}
+function interior(id){
+  const h=houses.find(h=>h.id===id);if(!h)throw Error('未知民宅');
+  const flip=['b','d'].includes(id),positions=flip?[[310,950],[760,570]]:[[790,950],[330,570]];
+  return {id,name:h.name,width:1080,height:1420,viewWidth:1080,viewHeight:1420,radius:23,speed:300,spawn:{x:540,y:1220},objects:[
+    {id:'wall-back',art:'solid',x:0,y:0,width:0,height:0,solid:{x:0,y:0,width:1080,height:300}},
+    {id:'wall-left',art:'solid',x:0,y:0,width:0,height:0,solid:{x:0,y:0,width:80,height:1420}},
+    {id:'wall-right',art:'solid',x:0,y:0,width:0,height:0,solid:{x:1000,y:0,width:80,height:1420}},
+    {id:'wall-front-left',art:'solid',x:0,y:0,width:0,height:0,solid:{x:0,y:1110,width:350,height:310}},
+    {id:'wall-front-right',art:'solid',x:0,y:0,width:0,height:0,solid:{x:730,y:1110,width:350,height:310}},
+    {id:'bed',art:'bed',x:flip?820:230,y:540,width:430,height:430,solid:{x:flip?700:110,y:210,width:240,height:330}},
+    ...points.filter(p=>p.house===id).map((p,i)=>({...p,art:i?'desk':'chest',x:positions[i][0],y:positions[i][1],width:i?300:200,height:i?295:223,solid:{x:positions[i][0]-(i?115:70),y:positions[i][1]-(i?100:75),width:i?230:140,height:i?100:75},approach:{x:positions[i][0],y:positions[i][1]+85},interaction:'search',label:'搜尋 · '+p.name})),
+    {id:'door',art:'door',x:540,y:1390,width:220,height:125,approach:{x:540,y:1250},interaction:'exit',label:'出屋'}
+  ]};
+}
+scope.FourSymbolsTaoxiContent=Object.freeze({houses,npcs,points,unlocked,available,appearance,village,interior});
+})(globalThis);
+
+
+/* bundled source: js/exploration/taoxi-progress.js */
+/* Local provisional play uses the existing UID main-save and Inventory Owner.
+   This module never creates Cloud entitlement or calls a story progression API. */
+(function(scope){
+'use strict';
+const C=scope.FourSymbolsTaoxiContent;
+function read(player,uid){
+  const raw=player?.explorationProgress;
+  if(raw===undefined)return {version:1,ownerUid:uid,talked:{},searched:{}};
+  const record=v=>v&&typeof v==='object'&&!Array.isArray(v);
+  if(!record(raw)||raw.version!==1||raw.ownerUid!==uid||!record(raw.talked)||!record(raw.searched)||
+    Object.entries(raw.talked).some(([k,v])=>!C.npcs.some(n=>n.id===k)||v!==true)||
+    Object.entries(raw.searched).some(([k,v])=>!C.points.some(p=>p.id===k)||v!==true))throw Error('探索紀錄無法驗證，請保留存檔並聯絡支援。');
+  return JSON.parse(JSON.stringify(raw));
+}
+function create(services){
+  let busy=false;
+  function snapshot(){const uid=services.uid(),player=services.player();if(!uid||!player?.id)throw Error('請先登入並載入角色');return {uid,player,state:read(player,uid),chapter:player.adventureProgress?.chapters?.chapter_v1};}
+  function commit(kind,id){
+    if(busy)return {ok:false,message:'正在保存，請稍候'};
+    busy=true;
+    try{
+      const s=snapshot();if(!C.available(s.chapter))return {ok:false,message:'完成前五關與新手教學後開放'};
+      const field=kind==='talk'?'talked':'searched',definition=(kind==='talk'?C.npcs:C.points).find(p=>p.id===id);
+      if(!definition)return {ok:false,message:'未知互動'};
+      if(kind!=='talk'&&!C.unlocked(C.houses.find(h=>h.id===definition.house),s.chapter,s.state))return {ok:false,message:'民宅尚未開放'};
+      if(s.state[field][id]===true)return {ok:true,repeated:true,message:kind==='talk'?'已交談':definition.kind==='reward'?'此處補給已領取':definition.text};
+      const old=s.player.explorationProgress,next=JSON.parse(JSON.stringify(s.state));next[field][id]=true;
+      let ok=false;
+      try{ok=services.transaction(()=>{
+        // Source/UID checks occur again immediately before this synchronous commit.
+        if(services.uid()!==s.uid||services.player()!==s.player)return false;
+        if(definition.kind==='reward'&&services.addItem(definition.item,definition.count)!==true)return false;
+        s.player.explorationProgress=next;
+        return services.save()===true;
+      })===true;}finally{if(!ok){if(old===undefined)delete s.player.explorationProgress;else s.player.explorationProgress=old;}}
+      return {ok,message:ok?(definition.text||'已記下村民的話'):'保存失敗或背包已滿，紀錄與獎勵未提交，請重試'};
+    }catch(error){return {ok:false,message:error.message};}finally{busy=false;}
+  }
+  return Object.freeze({snapshot,talk:id=>commit('talk',id),search:id=>commit('search',id)});
+}
+scope.FourSymbolsTaoxiProgress=Object.freeze({read,create});
+})(globalThis);
+
+
+/* bundled source: js/exploration/taoxi-ui.js */
+(function(scope){
+'use strict';
+const C=scope.FourSymbolsTaoxiContent;
+const progress=scope.FourSymbolsTaoxiProgress.create({
+  uid:()=>scope.FourSymbolsAccountSave?.getActiveUid(),
+  player:()=>typeof player!=='undefined'?player:null,
+  transaction:fn=>scope.v132RunInventoryTransaction?scope.v132RunInventoryTransaction(fn):false,
+  addItem:(id,n)=>typeof addPotionToInventory==='function'&&addPotionToInventory(id,n)===true,
+  save:()=>typeof saveGame==='function'&&saveGame({source:'taoxi-local-provisional'})===true
+});
+let root=null,controller=null,origin='home',ownerUid=null,ownerPlayer=null,ownerCharacterId=null,current='map',returnPoint=null,opening=0,dialogCleanup=null;
+const escape=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const asset=name=>'assets/exploration/taoxi-v1/'+name+'.webp';
+function ensureRoot(){
+  if(root?.isConnected)return root;
+  root=document.createElement('section');root.id='explorationPage';root.className='page taoxi-page game-native-ui';root.hidden=true;root.tabIndex=0;root.setAttribute('aria-label','四象江湖探索');
+  document.getElementById('game-overlay-layer').append(root);return root;
+}
+function sameOwner(){return ownerUid&&scope.FourSymbolsAccountSave?.getActiveUid()===ownerUid&&typeof player!=='undefined'&&player===ownerPlayer&&player.id===ownerCharacterId;}
+function stop(){controller?.destroy();controller=null;dialogCleanup?.();dialogCleanup=null;}
+function leave(){opening++;stop();if(root){root.hidden=true;root.classList.remove('active');}ownerUid=null;ownerPlayer=null;ownerCharacterId=null;}
+function close(){const destination=origin;leave();if(destination==='adventure')scope.FourSymbolsAdventure?.open();else if(typeof showPage==='function')showPage('home');document.getElementById(destination==='home'?'taoxiHomeEntry':'taoxiStoryEntry')?.focus();}
+function header(title){return '<header class="taoxi-heading"><button type="button" data-back aria-label="返回">←</button><div><small>四象江湖傳</small><h1>'+escape(title)+'</h1></div></header>';}
+function bindBack(fn){root.querySelector('[data-back]').addEventListener('click',fn);}
+function notify(message){root.querySelector('[data-status]').textContent=message;}
+function map(){
+  if(!sameOwner()){leave();return;}
+  stop();current='map';root.dataset.scene='map';
+  let s;try{s=progress.snapshot();}catch(error){root.innerHTML=header('探索紀錄待確認')+'<p class="taoxi-error">'+escape(error.message)+'</p>';bindBack(close);return;}
+  const available=C.available(s.chapter);
+  root.innerHTML='<div class="taoxi-map-art" role="img" aria-label="雲山溪谷與桃花村落"></div>'+header('四象江湖大地圖')+
+    '<div class="taoxi-map-lock lock-one">尚未開放</div><div class="taoxi-map-lock lock-two">尚未開放</div><div class="taoxi-map-lock lock-three">黑松林 · 規劃中</div>'+
+    '<button type="button" class="taoxi-region" data-village '+(!available?'disabled':'')+'><span aria-hidden="true">◇</span><strong>桃溪村</strong><small>'+(available?'進入探索':'完成前 5 關及新手教學後開放')+'</small></button>'+
+    '<p class="taoxi-map-caption">點選亮起的區域，踏入江湖。</p>';
+  bindBack(close);root.querySelector('[data-village]').addEventListener('click',()=>scene('village'));root.focus({preventScroll:true});
+}
+function objectMarkup(object){
+  if(object.art==='solid')return '';
+  if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>';
+  if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
+  if(object.art==='door')return '<span class="taoxi-door">出口</span>';
+  const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
+  const frame=frames[object.art];
+  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><image href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
+}
+function scene(id,spawn){
+  if(!sameOwner()){leave();return;}
+  const s=progress.snapshot();if(!C.available(s.chapter)){map();return;}
+  if(id!=='village'&&!C.unlocked(C.houses.find(h=>h.id===id),s.chapter,s.state)){map();return;}
+  stop();current=id;root.dataset.scene=id;
+  const data=id==='village'?C.village(spawn):C.interior(id),appearance=C.appearance(s.player);
+  root.innerHTML=header(id==='village'?'桃溪村':data.name)+
+    '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
+    '<div class="taoxi-ground '+(id==='village'?'taoxi-village-ground':'taoxi-room-ground')+'"></div>'+
+    '<div class="explore-player taoxi-player" data-player><span class="explore-shadow"></span><span class="taoxi-character" style="background-image:url('+asset(appearance)+')"></span></div><span class="explore-destination" data-destination hidden></span></div></div>'+
+    '<footer class="taoxi-controls"><div data-joystick class="taoxi-joystick" aria-label="虛擬搖桿"><span aria-hidden="true">✥</span></div><div><button type="button" data-interact disabled>靠近可互動</button><p data-status role="status">點地移動，也可拖動左側搖桿。</p></div></footer>'+
+    '<p class="taoxi-save-note">本機探索紀錄 · 尚非雲端同步</p>';
+  const character=root.querySelector('.taoxi-character');
+  controller=scope.FourSymbolsExploration.mount(root,{
+    scene:data,eventToPoint:event=>scope.eventToGamePoint(event),renderObject:objectMarkup,
+    requestExit:()=>id==='village'?map():scene('village',returnPoint),
+    onRender({state,pose}){
+      if(!sameOwner()){queueMicrotask(leave);return;}
+      const rows=appearance==='player_male_03'?{down:0,left:2,right:1,up:3}:{down:0,left:1,right:2,up:3};
+      const row=rows[state.facing];character.style.backgroundPosition=(pose*50)+'% '+(row*100/3)+'%';
+      character.style.transform=appearance==='player_female_03'&&state.facing==='left'&&pose>0?'scaleX(-1)':'';
+    },
+    onInteract({npcId,close:resume}){
+      const object=data.objects.find(o=>o.id===npcId);if(!object||!sameOwner()){resume();return;}
+      if(object.interaction==='house'){
+        const state=progress.snapshot();
+        if(!C.unlocked(object,state.chapter,state.state)){
+          return scope.FourSymbolsAdventureUI.presentDialogue(root,{name:object.name,lines:[object.hint],onClose:resume});
+        }
+        returnPoint={x:object.approach.x,y:object.approach.y+85};resume();queueMicrotask(()=>scene(object.id));return;
+      }
+      if(object.interaction==='exit'){resume();queueMicrotask(()=>scene('village',returnPoint));return;}
+      const result=object.interaction==='talk'?progress.talk(object.id):progress.search(object.id);
+      notify(result.ok?'已保存至本機探索紀錄。':result.message);
+      const lines=result.ok?(object.interaction==='talk'?object.lines:[result.message]):[result.message];
+      return scope.FourSymbolsAdventureUI.presentDialogue(root,{name:object.name,lines,onClose:resume});
+    }
+  });
+  bindBack(()=>id==='village'?map():scene('village',returnPoint));controller.enter();
+}
+async function open(source){
+  if(typeof battleActive!=='undefined'&&battleActive)return false;
+  const token=++opening;const s=progress.snapshot();
+  origin=source==='adventure'?'adventure':'home';ownerUid=s.uid;ownerPlayer=s.player;ownerCharacterId=s.player.id;
+  ensureRoot();if(token!==opening)return false;
+  if(typeof showPage!=='function')return false;showPage('exploration');root.hidden=false;map();return true;
+}
+window.addEventListener('pageshow',event=>{if(event.persisted&&root?.classList.contains('active')&&sameOwner()){if(current==='map')map();else scene(current);}});
+scope.FourSymbolsTaoxi=Object.freeze({open,leave});
+})(globalThis);
