@@ -36,18 +36,19 @@ function map(){
 }
 function objectMarkup(object){
   if(object.art==='solid')return '';
+  if(object.art==='gate')return '<img src="'+asset('gate')+'" alt=""><span class="taoxi-object-label">村口</span>';
   if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>';
   if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
   if(object.art==='door')return '<span class="taoxi-door">出口</span>';
   const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
-  const frame=frames[object.art];
-  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><image href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
+  const frame=frames[object.art],clip='taoxi-frame-'+object.id;
+  return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>'+(object.interaction?'<span class="taoxi-object-label">'+escape(object.name)+'</span>':'');
 }
 function scene(id,spawn){
   if(!sameOwner()){leave();return;}
   const s=progress.snapshot();if(!C.available(s.chapter)){map();return;}
   if(id!=='village'&&!C.unlocked(C.houses.find(h=>h.id===id),s.chapter,s.state)){map();return;}
-  stop();current=id;root.dataset.scene=id;
+  stop();current=id;root.dataset.scene=id;delete root.dataset.area;
   const data=id==='village'?C.village(spawn):C.interior(id),appearance=C.appearance(s.player);
   root.innerHTML=header(id==='village'?'桃溪村':data.name)+
     '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
@@ -62,6 +63,11 @@ function scene(id,spawn){
     onRender({state,pose}){
       if(!sameOwner()){queueMicrotask(leave);return;}
       const rows=appearance==='player_male_03'?{down:0,left:2,right:1,up:3}:{down:0,left:1,right:2,up:3};
+      if(id==='village'){
+        root.dataset.gateCutaway=String(Math.abs(state.x-900)<270&&state.y>2470&&state.y<3070);
+        const area=state.y>2520?'村口':state.y>1680?'廣場':'民宅周圍';
+        if(root.dataset.area!==area){root.dataset.area=area;root.querySelector('h1').textContent='桃溪村 · '+area;}
+      }
       const row=rows[state.facing];character.style.backgroundPosition=(pose*50)+'% '+(row*100/3)+'%';
       character.style.transform=appearance==='player_female_03'&&state.facing==='left'&&pose>0?'scaleX(-1)':'';
     },
@@ -74,6 +80,7 @@ function scene(id,spawn){
         }
         returnPoint={x:object.approach.x,y:object.approach.y+85};resume();queueMicrotask(()=>scene(object.id));return;
       }
+      if(object.interaction==='exit-map'){resume();queueMicrotask(map);return;}
       if(object.interaction==='exit'){resume();queueMicrotask(()=>scene('village',returnPoint));return;}
       const result=object.interaction==='talk'?progress.talk(object.id):progress.search(object.id);
       notify(result.ok?'已保存至本機探索紀錄。':result.message);

@@ -94,7 +94,7 @@ function mount(root,services={}){
     }catch(_){clearInput();status.textContent='座標尚未就緒，請重試';return;}
     const camera=cameraFor(state,data);
     const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
-    const npc=services.scene?data.objects.find(o=>o.interaction&&target.x>=o.x-o.width/2&&target.x<=o.x+o.width/2&&target.y>=o.y-o.height&&target.y<=o.y):data.objects.find(o=>o.id==='npc');
+    const npc=services.scene?data.objects.find(o=>{if(!o.interaction)return false;const b=o.hitbox||{x:o.x-o.width/2,y:o.y-o.height,width:o.width,height:o.height};return target.x>=b.x&&target.x<=b.x+b.width&&target.y>=b.y&&target.y<=b.y+b.height;}):data.objects.find(o=>o.id==='npc');
     const npcHit=npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
     const planned=npcHit?(services.scene?findRoute(state,npc.approach,data):npcRoute(state,data)):findRoute(state,target,data);route=planned||[];
     destination=route.at(-1)||null;

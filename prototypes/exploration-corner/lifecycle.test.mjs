@@ -32,6 +32,19 @@ function fixture(){
   return {api:context.FourSymbolsExploration,root,world,viewport,prompt,exit,pads,frames,window,document,emit,step,services:{eventToPoint:e=>({x:e.x,y:e.y})}};
 }
 
+test('transparent scene-object padding cannot redirect ground taps to an interaction',()=>{
+  const f=fixture();
+  const data={width:1080,height:1420,viewWidth:1080,viewHeight:1420,radius:23,speed:320,spawn:{x:540,y:1000},objects:[
+    {id:'gate',art:'gate',x:500,y:600,width:500,height:500,hitbox:{x:400,y:500,width:200,height:80},approach:{x:500,y:650},interaction:'exit',label:'離開'}
+  ]};
+  const c=f.api.mount(f.root,{...f.services,scene:data,renderObject:()=>''});c.enter();
+  f.emit(f.viewport,'pointerdown',{pointerId:1,isPrimary:true,button:0,x:350,y:300});
+  assert.equal(f.root.dataset.destination,'350.00,300.00');
+  f.emit(f.viewport,'pointerup',{pointerId:1});
+  f.emit(f.viewport,'pointerdown',{pointerId:2,isPrimary:true,button:0,x:500,y:540});
+  assert.equal(f.root.dataset.destination,'500.00,650.00');c.destroy();
+});
+
 test('classic single owner mounts dormant, enters once, leaves without input/RAF, reenters and destroys',()=>{
   const f=fixture(),c=f.api.mount(f.root,f.services);
   assert.equal(f.frames.size,0);assert.equal(f.world.children.length,3);

@@ -152,5 +152,16 @@
     "sourceSha256": "d7d15e74746f91f684183c3d4c42a2529a7291504843a54f3a390814e2edc163",
     "webpSha256": "39817e56d7952ca215d1c0b8b7a2893b821f404832f7707abf4575f0151d8b0e",
     "exactRgba": true
+  },
+  {
+    "name": "gate",
+    "size": [
+      1254,
+      1254
+    ],
+    "mode": "RGBA",
+    "sourceSha256": "c143d1f6632ee85a687e7da9b1f05c6bd479c5689b7e4bcf5d04787016cfb353",
+    "webpSha256": "580857d7a15bd04cb9522e802988b1d92a05d9d42bceca4ce07a1aae7a10833e",
+    "exactRgba": true
   }
 ]

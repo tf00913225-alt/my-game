@@ -110,6 +110,7 @@
         "gameplay-core"
       ],
       "assets": [
+        "assets/exploration/taoxi-v1/gate.webp",
         "assets/exploration/taoxi-v1/ground.webp",
         "assets/exploration/taoxi-v1/house.webp",
         "assets/exploration/taoxi-v1/interior.webp",
