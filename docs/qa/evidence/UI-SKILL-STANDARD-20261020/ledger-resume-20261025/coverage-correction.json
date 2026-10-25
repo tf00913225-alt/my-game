@@ -1,0 +1,8 @@
+{
+  "correction": "Previous reward-lifetime run duplicated already accepted shared.toast stateEvidence; do not count as new ledger coverage or replace earlier valid proof.",
+  "originalOwner": "docs/qa/UI-SKILL-STANDARD-20261020.json shared.toast.stateEvidence",
+  "originalReport": "docs/qa/UI-SKILL-STANDARD-20261020-toast-relic-followup.md",
+  "originalProbe": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/shared-toast-relic-followup/followup-probe.mjs.txt:102-105",
+  "preserve": "Existing four-size short/long/hide/manual dismiss/replacement proof remains authoritative for its scope. New redundant run is supplemental only, not a new acceptance requirement.",
+  "next": "Prior evidence must be checked before selecting every remaining state. Cold-start creation pending/failure/retry new evidence retained; previously accepted stable creation geometry is not recertified."
+}

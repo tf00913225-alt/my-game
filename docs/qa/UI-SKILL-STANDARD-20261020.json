@@ -2,7 +2,7 @@
   "workId": "UI-SKILL-STANDARD-20261020",
   "base": "ed8d5a0fc03f4a838a34bba48a87cb5c56c289c3",
   "createdDate": "2026-10-20",
-  "status": "施工中：正常吸收dev3a928346，129針對性回歸、四尺寸限定實畫及393首關返回通過；新HeadCI與未驗台帳仍待完成",
+  "status": "施工中：完整證據checkpoint；創角原生提示已證問題待最小修正；五代表mid/max限定補驗通過，其他台帳未完",
   "devices": [
     {
       "id": "360x640",
@@ -3515,6 +3515,59 @@
             "合法mid/max技能等級狀態",
             "角色全組合",
             "學習/升級/裝備/施放/真交易/實機"
+          ]
+        },
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "fireRocket": [
+              5,
+              10
+            ],
+            "healSpell": [
+              3,
+              5
+            ],
+            "bloodBurnArt": [
+              3,
+              5
+            ],
+            "barrier": [
+              3,
+              5
+            ],
+            "dinghaishenzhen": [
+              3,
+              5
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
           ]
         }
       ],
@@ -15335,7 +15388,7 @@
       "label": "創角 submit",
       "entry": "openCharacterCreation(slot); 正式創角操作",
       "owner": "index.html; js/00-main.js; css/49-v169-rpg-ui.css",
-      "status": "未檢查",
+      "status": "有問題",
       "states": [
         "首次角色",
         "新增角色",
@@ -15384,12 +15437,44 @@
           "interaction": null
         }
       },
-      "stateEvidence": [],
+      "stateEvidence": [
+        {
+          "state": "Cold-start initial submit: empty/short-name validation, pending, refusal/retry/back retaining name/points",
+          "status": "部分已實際驗證；原生alert呈現缺口未修",
+          "head": "046bd8e93af8c76f8c251b427b877fbfc4f0784a",
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/creation-notifications-046.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-creation-submit-v3-046bd8e9/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-creation-submit-v3-046bd8e9/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-creation-submit-v3-046bd8e9/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-creation-submit-v3-046bd8e9/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/original-046-checkpoint.json",
+          "limits": [
+            "Native alerts auto-accepted, screenshot not their visual approval",
+            "No successful/additional creation, real backend/cloud, pending doubletap/back or unallocated submit test",
+            "Prior stable creation geometry is not recertified"
+          ]
+        }
+      ],
       "reviews": {
         "art": null,
         "interaction": null,
         "scope": null
-      }
+      },
+      "notes": "Cold-start native browser alerts observed; original RPG dialog Owner not initialized before gameplay feature ensure. Unfixed at evidence checkpoint."
     },
     {
       "id": "creation.cancel",
@@ -23099,6 +23184,45 @@
         "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
         "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
         "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ],
+      "stateEvidence": [
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "fireRocket": [
+              5,
+              10
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
+          ]
+        }
       ]
     },
     {
@@ -23554,7 +23678,46 @@
         },
         "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/independent-reviews.json",
         "scope": "只4display字串；原base布局/48項證據保留"
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "bloodBurnArt": [
+              3,
+              5
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
+          ]
+        }
+      ]
     },
     {
       "id": "detail.skill.fireEX",
@@ -24175,6 +24338,45 @@
         "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
         "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
         "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ],
+      "stateEvidence": [
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "healSpell": [
+              3,
+              5
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
+          ]
+        }
       ]
     },
     {
@@ -25251,6 +25453,45 @@
         "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
         "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
         "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+      ],
+      "stateEvidence": [
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "dinghaishenzhen": [
+              3,
+              5
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
+          ]
+        }
       ]
     },
     {
@@ -26120,7 +26361,46 @@
         },
         "reviews": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/segment25-copy-delta/independent-reviews.json",
         "scope": "只4display字串；原base布局/48項證據保留"
-      }
+      },
+      "stateEvidence": [
+        {
+          "state": "Legal native mid/max detail presentation, real link/scroll-end/close",
+          "status": "部分已實際驗證",
+          "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+          "cases": {
+            "barrier": [
+              3,
+              5
+            ]
+          },
+          "archive": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/skill-midmax-b80.zip",
+          "devices": [
+            {
+              "device": "360x640",
+              "reportEntry": "ledger-skill-midmax-b80b3168/360x640/report.json"
+            },
+            {
+              "device": "393x873",
+              "reportEntry": "ledger-skill-midmax-b80b3168/393x873/report.json"
+            },
+            {
+              "device": "412x915",
+              "reportEntry": "ledger-skill-midmax-b80b3168/412x915/report.json"
+            },
+            {
+              "device": "1280x800",
+              "reportEntry": "ledger-skill-midmax-b80b3168/1280x800/report.json"
+            }
+          ],
+          "review": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025/midmax-checkpoint.json",
+          "limits": [
+            "Only five specified IDs/levels, not other IDs or all intermediate rows",
+            "All taps touch-emulated; desktop scroll wheel, not native mouse",
+            "Cross-await storage changes retained; not zero save/full domain unchanged",
+            "No actual learn/upgrade/equip/cast, physical devices or Cloud authority"
+          ]
+        }
+      ]
     },
     {
       "id": "detail.skill.earthEX",
@@ -27953,6 +28233,20 @@
         "physical/PWA",
         "creation element control widths",
         "apparently blank potion artwork attribution unconfirmed"
+      ],
+      "automation": "PAUSED",
+      "exploration": "product-paused"
+    },
+    {
+      "segment": "ledger-resume-20261025",
+      "parent": "b80b3168082326b67777a15a6b99d6e9039212a8",
+      "scope": "Evidence-only remote checkpoint BEFORE cold-creation fix",
+      "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/ledger-resume-20261025",
+      "coverageCorrection": "Reward-lifetime recheck duplicates prior shared.toast; NOT new coverage; raw archive and correction sidecar retained.",
+      "pending": [
+        "Cold creation native-alert Owner fix",
+        "Original remaining ledger/devices/PWA",
+        "Latest Head gates; GitHub merge-service external blocker"
       ],
       "automation": "PAUSED",
       "exploration": "product-paused"
