@@ -1,7 +1,7 @@
 run39911255408 / attempt1 / source2b96e1c0672b1218800bf8ab3014387cd61cf184 / job120275618328
 2026-10-23T06:35:48.4483881Z AssertionError [ERR_ASSERTION]: backpack and forge share ordered raw slots without writes
 2026-10-23T06:35:48.4484674Z + actual - expected
-2026-10-23T06:35:48.4484951Z 
+2026-10-23T06:35:48.4484951Z
 2026-10-23T06:35:48.4485174Z   {
 2026-10-23T06:35:48.4485527Z     remaining: 1,
 2026-10-23T06:35:48.4485940Z     rows: [
@@ -17,7 +17,7 @@ run39911255408 / attempt1 / source2b96e1c0672b1218800bf8ab3014387cd61cf184 / job
 2026-10-23T06:35:48.4490370Z     ],
 2026-10-23T06:35:48.4490756Z     unchanged: true
 2026-10-23T06:35:48.4491138Z   }
-2026-10-23T06:35:48.4491361Z 
+2026-10-23T06:35:48.4491361Z
 2026-10-23T06:35:48.4491980Z     at file:///home/runner/work/my-game/my-game/.github/scripts/run-forge-sockets-browser-qa.mjs:174:10 {
 2026-10-23T06:35:48.4492761Z   generatedMessage: false,
 2026-10-23T06:35:48.4493246Z   code: 'ERR_ASSERTION',
@@ -40,9 +40,8 @@ run39911255408 / attempt1 / source2b96e1c0672b1218800bf8ab3014387cd61cf184 / job
 2026-10-23T06:35:48.4500454Z   operator: 'deepStrictEqual',
 2026-10-23T06:35:48.4500868Z   diff: 'simple'
 2026-10-23T06:35:48.4501211Z }
-2026-10-23T06:35:48.4501451Z 
+2026-10-23T06:35:48.4501451Z
 2026-10-23T06:35:48.4501667Z Node.js v24.21.0
 2026-10-23T06:35:48.4642799Z ##[error]Process completed with exit code 1.
 2026-10-23T06:35:48.4726340Z ##[group]Run actions/upload-artifact@v7
 2026-10-23T06:35:48.4726707Z with:
-
