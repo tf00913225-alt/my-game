@@ -7,7 +7,7 @@
       "build/boot-core.bbbaf3175142.js"
     ],
     "styles": [
-      "build/boot-core.3c6f6f5d87d2.css"
+      "build/boot-core.fa69d5eea44b.css"
     ],
     "images": [
       "assets/ui/startup-logo.4631c0bc3f2b.jpg",
@@ -227,19 +227,19 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.3c6f6f5d87d2.css",
-        "sha256": "3c6f6f5d87d2",
-        "bytes": 204305,
-        "priority": "P0",
-        "type": "style",
-        "decode": false
-      },
-      {
         "path": "build/boot-core.bbbaf3175142.js",
         "sha256": "bbbaf3175142",
         "bytes": 69855,
         "priority": "P0",
         "type": "script",
+        "decode": false
+      },
+      {
+        "path": "build/boot-core.fa69d5eea44b.css",
+        "sha256": "fa69d5eea44b",
+        "bytes": 204361,
+        "priority": "P0",
+        "type": "style",
         "decode": false
       },
       {
@@ -843,8 +843,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "120d2e7f6bab",
-    "totalBytes": 29720609,
+    "manifestHash": "63aac49af252",
+    "totalBytes": 29720665,
     "totalResources": 79
   },
   "assets": {
@@ -900,9 +900,9 @@
       "sha256": "232fe02442a6",
       "bytes": 99541
     },
-    "build/boot-core.3c6f6f5d87d2.css": {
-      "sha256": "3c6f6f5d87d2",
-      "bytes": 204305
+    "build/boot-core.fa69d5eea44b.css": {
+      "sha256": "fa69d5eea44b",
+      "bytes": 204361
     },
     "build/app-shell.801bc1a9895d.css": {
       "sha256": "801bc1a9895d",

@@ -35,5 +35,6 @@
   "limits": "Short USB-injected touch samples on one real device, not a sustained-FPS guarantee or a human finger study. Native swipe injection itself affects event frequency. No movement speed, cloud authority or real player progress changed.",
   "regression": "31 focused tests PASS; final production build synchronized; 393x873 and1920x1080 isolated Browser first-loop/Story/reload tests PASS",
   "screenshot": "taoxi-entry-20261025/usb-phone-final.png",
+  "cleanup": "Original live game tab restored; only this QA tab/server, its own ADB forward/reverse ports and test XML removed. Other tabs, Google TV, ADB daemon, real saves and branches retained.",
   "latestCiDeploy": "Owned by PR1000; this file is task-specific physical-device evidence, not deployment or production/main approval"
 }

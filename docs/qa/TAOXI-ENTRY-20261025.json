@@ -1,6 +1,7 @@
 {
   "workId": "TAOXI-ENTRY-20261025",
-  "baseDev": "4ef6a09cf56d6789d1968481da1ee669b1cafd61",
+  "baseDev": "0e73f817acc5e852b1df6a200272657be934bd51",
+  "initialBaseDev": "4ef6a09cf56d6789d1968481da1ee669b1cafd61",
   "scope": "Follow-up to merged PR985: loading feedback, physical house-depth ordering, passable villagers, explicit target approach and one-click doorway portals",
   "diagnosis": {
     "entry": "User confirmed delayed loading, not a dead button. Foreground Adventure loads and decodes its first-screen assets before navigation; previously no pending feedback. Prior QA preloaded Adventure and masked the first-click wait.",
