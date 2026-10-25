@@ -668,6 +668,13 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     color:#fff5f5;background:rgba(62,5,10,.94);font-size:13px;font-weight:700;line-height:16px;
     white-space:nowrap;transform:translateX(-50%);pointer-events:none;z-index:2;
 }
+#game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-text{
+    display:inline-block;animation:v174ManualTurnTextBlink 1.2s ease-in-out infinite;
+}
+@keyframes v174ManualTurnTextBlink{
+    0%,100%{opacity:1;}
+    50%{opacity:.25;}
+}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art > .v174-manual-turn-arrow{display:block;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn::after{
     content:none !important;
@@ -870,6 +877,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     to{opacity:1;filter:brightness(1.3)}
 }
 @media (prefers-reduced-motion:reduce){
+    #game-stage #battlePage.v-fixed-slot-render-v2 .v174-manual-turn-text{animation:none !important;opacity:1;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player.v174-cardless-unit.active-turn > .v174-battle-art::before{animation:none !important;opacity:.65;}
     #game-stage #battlePage .v174-action-motion,
     #game-stage #battlePage .v174-portrait-paint,

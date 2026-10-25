@@ -62,5 +62,12 @@
       "VFX size/paint1.3225/depth/gameplay/auto visibility"
     ],
     "verification": "16direct tests, FixedSlot4viewport, cardless browser and build/check PASS; newHead CI pending"
+  },
+  "manualTextBlink": {
+    "user": "2026-10-25 操作中的字樣要閃爍",
+    "implementation": "existing caption contains one text span, opacity1→.25→1 over1.2s; plate geometry/background remain stable, no timers/turn authority",
+    "accessibility": "prefers-reduced-motion keeps text steady and fully opaque",
+    "verification": "actual Chrome sampled bright1/dim.25, plate1 both, exact same caption rect; 16direct +cardless browser+FixedSlot4viewport+build-check PASS",
+    "unchanged": "darker red-white ring, enlarged13px caption, enemy hints, VFX sizes/depth, gameplay and auto hidden"
   }
 }

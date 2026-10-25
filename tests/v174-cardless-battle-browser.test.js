@@ -120,6 +120,13 @@ window.__qaBefore=qaRects();
     return {element:element,animation:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').animationName,
       border:getComputedStyle(activePlayer.querySelector('.v174-battle-art'),'::before').borderTopColor,arrow:getComputedStyle(activePlayer.querySelector('.v174-manual-turn-arrow')).display,arrowCount:activePlayer.querySelectorAll('.v174-manual-turn-arrow').length};
   });
+  var caption=activePlayer.querySelector('.v174-manual-turn-arrow'),captionText=caption.querySelector('.v174-manual-turn-text');
+  var blinkAnimation=captionText.getAnimations()[0];
+  blinkAnimation.pause();blinkAnimation.currentTime=0;
+  var blink={bright:Number(getComputedStyle(captionText).opacity),plateBright:Number(getComputedStyle(caption).opacity),before:caption.getBoundingClientRect().toJSON()};
+  blinkAnimation.currentTime=600;
+  blink.dim=Number(getComputedStyle(captionText).opacity);blink.plateDim=Number(getComputedStyle(caption).opacity);blink.after=caption.getBoundingClientRect().toJSON();
+  blinkAnimation.play();
   var manualCount=document.querySelectorAll('.battle-player.active-turn').length;
   // The formal declaration path clears before deciding auto/manual. Exercise
   // those same projection functions; automatic characters receive no update.
@@ -150,7 +157,7 @@ window.__qaBefore=qaRects();
     var enemy=document.getElementById('battleMonster0');
     var enemyArt=enemy.querySelector(':scope > .v174-battle-art');
     var result={
-      elementFrames:elementFrames,manualCount:manualCount,autoCount:autoCount,autoFrameAnimation:autoFrameAnimation,autoArrowDisplay:autoArrowDisplay,nextManualIds:nextManualIds,
+      blink:blink,elementFrames:elementFrames,manualCount:manualCount,autoCount:autoCount,autoFrameAnimation:autoFrameAnimation,autoArrowDisplay:autoArrowDisplay,nextManualIds:nextManualIds,
       rows:document.querySelectorAll('#battleMonsterArea > .v-fixed-enemy-row').length,
       enemies:document.querySelectorAll('#battleMonsterArea .battle-monster').length,
       players:document.querySelectorAll('#battlePlayerRow .battle-player').length,
@@ -221,6 +228,9 @@ function runViewport(chrome,width,height){
     assert.ok(match,`V174 browser result missing at ${width}x${height}`);
     const data=JSON.parse(decode(match[1]));
     assert.deepEqual(data.identity,{name:'華辰',level:'Lv.81',reused:true,count:1,element:'fire',enemyLevel:'Lv.85'},'identity reads live entity data and reuses one HUD during repeated updates');
+    assert.ok(data.blink.bright>.9&&data.blink.dim<.4,"only manual text visibly blinks");
+    assert.equal(data.blink.plateBright,1);assert.equal(data.blink.plateDim,1,"caption plate stays stable");
+    assertRectStable(data.blink.before,data.blink.after,"blink caption geometry");
     assert.equal(data.manualCount,1,"one manual current-character indicator");
     assert.equal(data.autoCount,0,"automatic declaration clears the preceding manual frame");
     assert.equal(data.autoFrameAnimation,"none");

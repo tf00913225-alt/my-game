@@ -8095,7 +8095,8 @@ function syncUnitArtwork(card,kind,selectedRecord){
     // the existing active-turn state; no second selection or coordinate owner.
     if(kind==="player"&&!art.querySelector(":scope > .v174-manual-turn-arrow")){
         const arrow=document.createElement("span");arrow.className="v174-manual-turn-arrow";
-        arrow.textContent="操作中";arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
+        const text=document.createElement("span");text.className="v174-manual-turn-text";text.textContent="操作中";
+        arrow.appendChild(text);arrow.setAttribute("aria-hidden","true");art.appendChild(arrow);
     }
     // Enemy selection reuses targetable/target; this node is presentation only.
     if(kind==="monster"&&!art.querySelector(":scope > .v174-target-arrow")){
