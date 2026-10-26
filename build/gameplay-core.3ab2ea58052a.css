@@ -3167,10 +3167,6 @@
 :is(#game-stage,#game-ui) .v141-offline-actions button{border:calc(1 * var(--ui-length-unit,1px)) solid #9d7337;border-radius:calc(8 * var(--ui-length-unit,1px));color:#f7deb0;background:linear-gradient(180deg,#382615,#171009);font-weight:800;}
 :is(#game-stage,#game-ui) .v141-offline-panel section.rested{grid-column:auto;justify-content:center;}
 
-:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v141-compact-element-box{
-    max-height:none !important;
-    overflow:hidden !important;
-}
 :is(#game-stage,#game-ui) .v141-compact-element-box #v131ElementBoxStats{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:calc(7 * var(--ui-length-unit,1px));align-items:center;padding:calc(9 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #7f5e31;border-radius:calc(9 * var(--ui-length-unit,1px));background:#130f0a;}
 :is(#game-stage,#game-ui) .v141-element-box-remaining{display:flex;min-width:0;flex-direction:column;}
 :is(#game-stage,#game-ui) .v141-element-box-remaining span{color:#b6a68b;font-size:calc(13 * var(--ui-length-unit,1px));}
