@@ -2040,6 +2040,7 @@
 
 .v132-reward-modal.show{
     display:flex;
+    pointer-events:auto;
 }
 
 .v132-reward-modal.v132-detail-paused{
