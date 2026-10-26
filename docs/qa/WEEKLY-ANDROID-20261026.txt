@@ -1,0 +1,27 @@
+Work ID: DOCS-WEEKLY-VERIFICATION-20261026
+Evidence Work: ANDROID-FLOW-QA-20261026
+Status: PARTIAL; not full P1-3 PASS; no main release.
+
+Device: Samsung Galaxy Note9 SM-N960F, Android10, Chrome155.0.8059.79.
+Method: USB ADB and real-device Chrome CDP touch input; no viewport emulation, state injection, paid purchase or qualification bypass.
+Target: https://dev.four-symbols-dev.pages.dev/
+Exact tested SHA: 2e2de82eb0c80f4ba24796fd20b033bafcd81f6d; Game/Cache173.73.
+
+2026-10-26 16:59:37–17:28:34 Asia/Taipei: 28.94min,144 input/state records.
+Passed observed routes: cold Chrome launch into existing login/home; first five story battles and natural Taoxi unlock; joystick move/release; NPC dialogue; house entrance/exit; story/home return; inventory/details/skill list scrolling; normal fireRocket learning/equip/cast; equipment purchase/comparison/equip; death and normal recovery. No fresh credential login or FPS/memory benchmark claimed.
+Runtime exceptions/console errors0 in capture. Harness stale/absent control errors are not game errors and are not hidden.
+
+Subsequent bounded non-UI test:74 official BattleFlow observer snapshots.
+Background26.755sec, same battle token17, round5->7, HP57->51, SP40 unchanged. Round6 end and round7 start captured while hidden. No duplicate(token,event,round) boundaries in this sample; not proof of every action or reward exactly-once path. Read-only observers removed afterward.
+Four fireRocket casts consumed SP50->40->30->20->10 across two battles; no successful burn state captured. Burn2-round damage/decrement/expiry remains NOT VERIFIED. An attempted fifth target selection referenced an absent DOM index and did not complete a cast; no probability or status modification.
+The subsequent normal free route was reachable through top Apply/Start despite the blocked bottom ad button: confirmation -> existing3sec simulated ad -> approximately8hours granted -> autoBattle=true. No external ad/payment integration used. Short forest auto battle showed normal attack/round progression; normal toggle/escape stopped battle,autoBattle and patrol. Returned home; final observed gold820,HP94,SP50. No Runtime/console error in this capture. This tests basic acquisition/start/stop, not32hour cap or expiry boundary.
+
+Known UI issue: Element Box body cannot touch-scroll to bottom on original tested build. User decided to skip UI/layout repairs pending redesign. #1004 is saved/unmerged; not FIXED/VERIFIED. #955 stays paused.
+Remaining non-UI qualification gaps:
+- Burn: obtain successful normal proc on a surviving target before checking exactly2round_end ticks/removal; chance is not forced.
+- Buff representative rage: Lv18,10skill points, explosiveFlurry OR flameTornado prerequisite for native learning; account observedLv1. No unauthorized leveling grind or injected qualifications.
+- Reforge: white tier requires50ore at0locks and1000gold, valid unique equipment,unlocked slot,local-authority/transaction/save readiness. Last gold820 leaves180gold short;50white ore still missing. No actual reforge transaction tested. Material dungeon requires any-characterLv10; ore chest outcomes are random/provisional, not an immediate guarantee.
+- Full cross-device restore, authority validation, once-only reward protection, all Buff/Debuff variants and comprehensive background action consistency remain unverified.
+
+Evidence retained locally under ANDROID-NOTE9-20261026: REPORT.txt,summary.json,actions.json,non-ui-live-events.json,NON-UI-RESULT.txt,auto-battle-free-route.json and screenshots. This compact tracked report deliberately excludes large screenshots and account-bearing raw dumps. PR checkpoints and CI links remain their authoritative remote records.
+No combat formula/save schema/Cloud/auth/paid-operation/UI runtime changes in this documentation work. Existing Cloud fail-closed gates remain mandatory.
