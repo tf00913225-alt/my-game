@@ -175,7 +175,7 @@
     .adventure-mist,.adventure-map-fog,.adventure-lantern-glow,.adventure-node.status-current .adventure-node-icon,.adventure-node.status-objective-ready .adventure-node-icon,.adventure-node.status-reward-unclaimed .adventure-node-icon{animation:none!important;}
 }
 
-#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:36px;padding:3px 16px;font-size:16px;line-height:1.25}
+#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:52px;padding:3px 16px;font-size:16px;line-height:1.25}
 
 #adventurePage[data-panel="map"] .adventure-header-meta{top:65%}
 
@@ -185,12 +185,12 @@
 #explorationPage.taoxi-page{position:absolute;inset:0;width:1080px;height:1920px;pointer-events:auto;background:#25251e;color:#f4ead4;font-family:"Noto Serif TC","Microsoft JhengHei",serif;overflow:hidden;outline:none}
 #explorationPage[hidden]{display:none}#explorationPage.active{display:block}
 #explorationPage *{box-sizing:border-box}
-#explorationPage button{font:inherit;color:inherit;font-size:45px;line-height:1.4;border:3px solid #b69865;border-radius:18px;background:linear-gradient(135deg,#53472f,#292820);min-height:116px;padding:16px 28px;cursor:pointer;touch-action:manipulation}
+#explorationPage button{font:inherit;color:inherit;font-size:45px;line-height:1.4;border:3px solid #b69865;border-radius:18px;background:linear-gradient(135deg,#53472f,#292820);min-height:132px;padding:16px 28px;cursor:pointer;touch-action:manipulation}
 #explorationPage button:focus-visible{outline:6px solid #ffe4a0;outline-offset:3px}
 #explorationPage button:disabled{opacity:.65;cursor:default}
 .taoxi-heading{position:absolute;left:0;top:0;right:0;height:180px;display:flex;align-items:center;gap:30px;padding:24px 40px;background:linear-gradient(90deg,#25261fe8,#3d3826c9);z-index:5000;border-bottom:3px solid #a28b5c}
 .taoxi-heading h1{font-size:57px;line-height:1.25;margin:0;letter-spacing:5px}.taoxi-heading small{font-size:39px;color:#d6c39d;letter-spacing:8px}
-#explorationPage .taoxi-heading button{font-size:60px;width:116px;flex-shrink:0;padding:0}
+#explorationPage .taoxi-heading button{font-size:60px;width:132px;flex-shrink:0;padding:0}
 .taoxi-map-art{position:absolute;inset:0;background:url('../assets/exploration/taoxi-v1/world-map.webp') center/cover}
 .taoxi-map-lock{position:absolute;font-size:42px;color:#d5d5cf;padding:25px 35px;background:#16202bd6;border:2px solid #747d7d;border-radius:60px;box-shadow:0 0 80px 45px #101e2a88}
 .lock-one{left:125px;top:430px}.lock-two{right:90px;top:600px}.lock-three{right:70px;top:930px}

@@ -8,13 +8,14 @@ const localCloud=QA_CLOUD_MODULE.replace(/export async function readCurrentCloud
 assert.notEqual(localCloud,QA_CLOUD_MODULE);
 const repoSource=fs.readFileSync('js/startup/account-save-repository.js','utf8');
 const cloudConflict=process.argv.includes('--cloud-conflict-only');
+const touchTargets=process.argv.includes('--touch-targets');
 const server=await startServer(cloudConflict?{}:{cloudModule:localCloud,handleRequest(req,res){
  if(new URL(req.url,'http://localhost').pathname!=='/index.html')return false;
  const seed='<script>'+repoSource+';if(FourSymbolsAccountSave.readActive().status==="empty")FourSymbolsAccountSave.writeForUid("skill-runtime-browser-qa",'+fixtureSource+',{source:"qa-local-fixture"});</script>';
  const html=fs.readFileSync('index.html','utf8').replace('<!-- build:critical-script -->',qaPrelude()+seed+'<!-- build:critical-script -->');res.writeHead(200,{'content-type':'text/html; charset=utf-8','cache-control':'no-store'});res.end(html);return true;
 }}),results=[];
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-only')?[[393,873]]:process.argv.includes('--desktop-only')?[[1920,1080]]:[[393,873],[1920,1080]])){
+try{for(const [width,height] of (touchTargets?[[360,800],[390,844],[412,915],[393,873]]:cloudConflict||process.argv.includes('--mobile-only')?[[393,873]]:process.argv.includes('--desktop-only')?[[1920,1080]]:[[393,873],[1920,1080]])){
   const port=await new Promise(resolve=>{const s=net.createServer();s.listen(0,'127.0.0.1',()=>{const n=s.address().port;s.close(()=>resolve(n));});});
   const profile=fs.mkdtempSync(path.join(os.tmpdir(),'taoxi-qa-'));
   const chrome=process.platform==='win32'?'C:/Program Files/Google/Chrome/Application/chrome.exe':findChrome();
@@ -27,8 +28,15 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
     await c.send('Emulation.setTouchEmulationEnabled',{enabled:width<700,maxTouchPoints:2});
     await c.send('Page.navigate',{url:server.url});
     const wait=async(expression,label,timeout=45000)=>{const end=Date.now()+timeout;while(Date.now()<end){if(await c.eval(expression))return;await sleep(80);}throw Error('Timeout: '+label);};
+    const hitTargets=[];
+    const checkTarget=async selector=>{
+      const row=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)}),r=e.getBoundingClientRect();const points=[[r.x+r.width/2,r.y+r.height/2],[r.x+2,r.y+r.height/2],[r.right-2,r.y+r.height/2],[r.x+r.width/2,r.y+2],[r.x+r.width/2,r.bottom-2]];return {selector:${JSON.stringify(selector)},scene:document.getElementById('explorationPage')?.dataset.scene,panel:document.getElementById('adventurePage')?.dataset.panel,width:r.width,height:r.height,inViewport:r.x>=0&&r.y>=0&&r.right<=innerWidth&&r.bottom<=innerHeight,hit:points.every(([x,y])=>e.contains(document.elementFromPoint(x,y)))};})()`);
+      hitTargets.push(row);
+      assert.ok(row.width>=44-.01&&row.height>=44-.01,'44 CSS px hit area: '+JSON.stringify(row));
+      assert.ok(row.inViewport&&row.hit,'unobscured center and edge hit areas: '+JSON.stringify(row));
+    };
     const input=async(x,y)=>{if(width<700){await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x,y}]});await c.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});}else{await c.send('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1});await c.send('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1});}};
-    const tap=async selector=>{const p=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('missing '+${JSON.stringify(selector)});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(e.disabled||r.width<=0||r.height<=0||!e.contains(hit))throw Error('not actionable '+${JSON.stringify(selector)});return {x,y};})()`);await input(p.x,p.y);await sleep(180);};
+    const tap=async selector=>{if(touchTargets&&/taoxiStoryEntry|taoxiHomeEntry|data-back|data-interact|adventure-transient-dialogue/.test(selector))await checkTarget(selector);const p=await c.eval(`(()=>{const e=document.querySelector(${JSON.stringify(selector)});if(!e)throw Error('missing '+${JSON.stringify(selector)});const r=e.getBoundingClientRect(),x=r.x+r.width/2,y=r.y+r.height/2,hit=document.elementFromPoint(x,y);if(e.disabled||r.width<=0||r.height<=0||!e.contains(hit))throw Error('not actionable '+${JSON.stringify(selector)});return {x,y};})()`);await input(p.x,p.y);await sleep(180);};
     const capture=async label=>{await sleep(180);const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,`${width}-${label}.png`),Buffer.from(shot.data,'base64'));};
     const tapArt=async(selector,rx=.5,ry=.5)=>{const p=await c.eval(`(()=>{const r=document.querySelector(${JSON.stringify(selector)}).getBoundingClientRect();return {x:r.x+r.width*${rx},y:r.y+r.height*${ry}};})()`);await input(p.x,p.y);};
     const walk=async(x,y)=>{
@@ -45,6 +53,7 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
     // Exercise the player's first click without preloading Adventure for the test.
     const homeHits=await c.eval(`[...document.querySelectorAll('#homePage .home-card,#adventureHomeEntry,#taoxiHomeEntry')].map(e=>{const r=e.getBoundingClientRect();const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);return {name:e.getAttribute('aria-label')||e.id,visible:r.width>0&&r.height>0,hit:e===hit||e.contains(hit)};}).filter(e=>e.visible)`);
     for(const row of homeHits)assert.equal(row.hit,true,'home control '+row.name);await capture('home-entry');
+    if(touchTargets){await checkTarget('#adventureHomeEntry');await checkTarget('#taoxiHomeEntry');}
     const stage=await c.eval(`(()=>{const r=document.getElementById('game-stage').getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};})()`);
     assert.ok(Math.abs(stage.width/stage.height-9/16)<.001,'one 9:16 canvas');assert.ok(Math.abs(stage.x+stage.width/2-width/2)<1,'centered canvas');
     await tap('#taoxiHomeEntry');await wait(`document.querySelector('#explorationPage [data-village]')`,'world map');
@@ -53,6 +62,16 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
     await c.eval(`(()=>{FourSymbolsAdventure.getView();const s=player.adventureProgress.chapters.chapter_v1;s.currentNodeId='c1_06';s.onboarding={active:false,phase:'complete',source:'qa-fixture'};for(let i=1;i<=5;i++)s.completedNodes['c1_0'+i]=true;if(saveGame()!==true)throw Error('fixture save');})()`);
     await tap('#taoxiHomeEntry');await tap('[data-village]');
     await wait(`document.getElementById('explorationPage').dataset.scene==='village'`,'village');await capture('village');
+    if(touchTargets){
+      const joy=await c.eval(`(()=>{const r=document.querySelector('[data-joystick]').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
+      const before=await c.eval(`document.getElementById('explorationPage').dataset.position`);
+      await c.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[joy]});
+      await c.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:joy.x+24,y:joy.y-20}]});await sleep(300);
+      await c.send('Input.dispatchTouchEvent',{type:'touchCancel',touchPoints:[]});
+      const stopped=await c.eval(`document.getElementById('explorationPage').dataset.position`);
+      assert.notEqual(stopped,before,'joystick moves after touch-target sizing');await sleep(250);
+      assert.equal(await c.eval(`document.getElementById('explorationPage').dataset.position`),stopped,'touch cancellation stops movement');
+    }
     // Physical front/back depth, including the transparent padding reported by the player.
     const heldKey=async(key,ms)=>{await c.send('Input.dispatchKeyEvent',{type:'keyDown',key,code:key});await sleep(ms);await c.send('Input.dispatchKeyEvent',{type:'keyUp',key,code:key});await sleep(80);};
     assert.equal(await c.eval(`document.querySelectorAll('[data-object] .taoxi-entry-arrow').length`),2,'only unlocked homes show arrows');
@@ -174,7 +193,7 @@ try{for(const [width,height] of (cloudConflict||process.argv.includes('--mobile-
       fs.writeFileSync(path.join(out,'full-content.json'),JSON.stringify(fullEvidence,null,2));console.log(JSON.stringify(fullEvidence));
     }
     const exceptions=c.events.filter(e=>e.method==='Runtime.exceptionThrown');assert.deepEqual(exceptions,[]);
-    results.push({width,height,firstLoop:true,storyEntry:true,actualStoryEntry:true,storyCursorPreserved:true,reload:true,repeatNoGrant:true,storyUnchanged:true,transport:'isolated Auth/Cloud; explicit earned-progress fixture; local save only'});
+    results.push({width,height,hitTargets,firstLoop:true,storyEntry:true,actualStoryEntry:true,storyCursorPreserved:true,reload:true,repeatNoGrant:true,storyUnchanged:true,transport:'isolated Auth/Cloud; explicit earned-progress fixture; local save only'});
     fs.writeFileSync(path.join(out,'results.json'),JSON.stringify(results,null,2));console.log(JSON.stringify(results.at(-1)));
   }catch(error){if(c){fs.writeFileSync(path.join(out,`${width}-failure.json`),JSON.stringify(await collectStartupFailure(c,{message:error.message}),null,2));const shot=await c.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(path.join(out,`${width}-failure.png`),Buffer.from(shot.data,'base64'));}throw error;}
   finally{c?.close();proc.kill();}
