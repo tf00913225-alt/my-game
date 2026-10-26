@@ -140,14 +140,9 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 
 ## Feature manifest
 
-| Bundle | 玩家功能 | Dependency |
-| --- | --- | --- |
-| `app-shell` | 主城 shell、創角、基本導航、既有核心資料 | 無 |
-| `gameplay-core` | 戰鬥共用、背包、裝備、商店、合成、主要副本 runtime | `app-shell` |
-| `feature-patrol` | 巡怪形象與 hashed WebP | `gameplay-core` |
-| `feature-abyss` | 深淵兩層流程 | `gameplay-core` |
-| `gameplay-core` | 戰鬥共用、正式技能 Final Data、Team Relic Catalog／Trigger／Effect Runtime、背包、裝備、商店、主要副本 Runtime | `app-shell` |
-| `feature-boss-relic` | 玩法中心、BOSS、四象塔、秘寶養成；Team Relic Battle Runtime 已由 `gameplay-core` 提供 | `gameplay-core` |
+`config/feature-manifest.json` 是 bundle 清單、依賴關係、feature 對應與 idle preload 的唯一實際來源；本文件不再複製容易過期的完整表格。調整 bundle 或依賴時必須修改該 manifest，並由 production build 與相關架構測試驗證。本節只保留載入行為與責任邊界。
+
+`app-shell` 提供主城 shell、創角、基本導航與既有核心資料；`gameplay-core` 提供戰鬥共用、背包、裝備、商店、合成與主要副本 runtime。巡怪、深淵、BOSS／四象塔／秘寶養成及冒險內容維持各自 feature bundle；Team Relic Battle Runtime 仍由 `gameplay-core` 提供。實際 bundle 名稱與依賴一律以當前 manifest 為準。
 
 `pointerdown`／`touchstart` 只 prefetch 被指向的 feature；click 時若尚未 ready，只把該 control 標為 `aria-busy` 並顯示局部 loading。其他按鈕與全 app 保持可操作。Critical Ready 後由 `requestIdleCallback`（或 800ms fallback）只預抓高機率 bundle；preload 不等於 execute。
 
