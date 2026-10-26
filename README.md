@@ -7,14 +7,14 @@
 ## 一、換對話時從這裡開始
 
 1. 先確認專案為 **tf00913225-alt/my-game**；正式整合分支是 **dev**，正式發布分支是 **main**。
-2. **先讀 [AGENTS.md](AGENTS.md)**：這是唯一工程治理與任務 Routing 入口。依當次任務，只讀相關正式 Owner、規格、程式和測試，不必每次讀遍整個倉庫。
+2. **從 `dev` 分支讀本 [README.md](README.md) 與 [AGENTS.md](AGENTS.md)**：`AGENTS.md` 是唯一工程治理與任務 Routing 入口。依當次任務，只讀相關正式 Owner、規格、程式和測試，不必每次讀遍整個倉庫；不得以 `main` 的舊入口內容代替目前 `dev` 治理。
 3. **設計題先查正式決策；工程續接先查 Work PR。** 使用者指定 PR／Work ID／工作名稱時，依 AGENTS.md 的 Resumable Work Protocol 找該工作最新 Branch、Head、CI、Completed、Pending、Next；不得只因某 PR 最近更新就猜它是本次任務。
 4. 若使用者沒有指定工作，先簡短列出「可續接的候選工作」及其已知限制，**不要直接建立第二條施工線或把設計文件當成開工授權**。
 5. 新對話只需指定簡短任務名稱或 PR 編號，不需重貼數十段舊提示詞；若缺少權威資料或有多個有效候選，明確指出缺口。
 
 **推薦的新對話文字：**
 
-> 請讀取 GitHub tf00913225-alt/my-game 的 README.md 與 AGENTS.md，依現有規格及最新 PR 紀錄，接續「【填任務名稱或 PR 編號】」。先回報已完成、未完成、下一步與必要風險；沿用原 Work ID／Branch，不重複施工。只有在本次任務已授權的範圍內修改。
+> 請讀取 GitHub tf00913225-alt/my-game **dev 分支**的 README.md 與 AGENTS.md，依現有規格及最新 PR 紀錄，接續「【填任務名稱或 PR 編號】」。先回報已完成、未完成、下一步與必要風險；沿用原 Work ID／Branch，不重複施工。只有在本次任務已授權的範圍內修改。
 
 如果目前只是想知道進度，改說「列出目前可續接工作，先不要修改檔案」。
 
