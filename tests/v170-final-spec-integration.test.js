@@ -209,6 +209,21 @@ function makeContext(){
         match=>["--"+match[1],match[2]]
     ));
     const dummy=makeUniversalNode();
+    // renderInventoryCharacterTabs creates these children through innerHTML.
+    // Keep this subtree distinct: the universal node cannot model DOM insertion.
+    const inventoryName={textContent:""};
+    const inventoryLevel={textContent:""};
+    const inventoryTabs={
+        innerHTML:"",
+        querySelector(selector){
+            if(selector===".inventory-character-name span" &&
+                /class="inventory-character-name"[\s\S]*?<span><\/span>/.test(this.innerHTML))return inventoryName;
+            if(selector===".inventory-character-level" &&
+                /class="inventory-character-level"/.test(this.innerHTML))return inventoryLevel;
+            return null;
+        }
+    };
+    const consoleErrors=[];
     const storage=()=>{
         const values=new Map();
         return {
@@ -219,14 +234,18 @@ function makeContext(){
     };
     const document={
         readyState:"loading",baseURI:"https://qa.invalid/game/",hidden:false,body:dummy,head:dummy,documentElement:dummy,
-        activeElement:null,getElementById:()=>dummy,querySelector:()=>null,querySelectorAll:()=>[],
+        activeElement:null,getElementById:id=>id==="inventoryCharacterTabs"?inventoryTabs:dummy,
+        querySelector:()=>null,querySelectorAll:()=>[],
         createElement:()=>dummy,createTextNode:()=>dummy,
         addEventListener:noop,removeEventListener:noop,dispatchEvent:()=>true
     };
     class EmptyObserver{ observe(){} disconnect(){} }
     class EmptyEvent{ constructor(type,options){ this.type=type; Object.assign(this,options||{}); } }
     const context={
-        console,document,navigator:{userAgent:"node-v170-integration",maxTouchPoints:0},
+        console:{...console,error(...args){
+            consoleErrors.push(args.map(value=>String(value)).join(" "));
+            console.error(...args);
+        }},document,navigator:{userAgent:"node-v170-integration",maxTouchPoints:0},
         location:{hash:"",href:"",reload:noop},history:{pushState:noop,replaceState:noop},
         localStorage:storage(),sessionStorage:storage(),
         setTimeout:()=>1,clearTimeout:noop,setInterval:()=>1,clearInterval:noop,
@@ -247,6 +266,11 @@ function makeContext(){
     context.window=context;
     context.self=context;
     context.globalThis=context;
+    context.assertCleanInitialization=()=>{
+        assert.deepEqual(consoleErrors,[],"runtime initialization must not log console errors");
+        assert.notEqual(inventoryName.textContent,"","inventory name child must be populated");
+        assert.notEqual(inventoryLevel.textContent,"","inventory level child must be populated");
+    };
     return vm.createContext(context);
 }
 
@@ -266,6 +290,7 @@ function loadFinalRuntime(){
         vm.runInContext(fs.readFileSync(path,"utf8"),context,{filename:path,timeout:2000});
         loaded.push(path);
     });
+    context.assertCleanInitialization();
     const skills=JSON.parse(vm.runInContext("JSON.stringify(skillDatabase)",context));
     return {context,loaded,skills};
 }
@@ -1732,6 +1757,7 @@ test("Level Suppression V2 after ALL generated production feature bundles",()=>{
         loaded.add(name);
     }
     for(const name of Object.keys(features))load(name);
+    context.assertCleanInitialization();
     const rewards=evaluateJson(context,`(()=>{
         Math.random=()=>.5;
         const ranks=["regular","elite","boss"];

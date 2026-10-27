@@ -179,6 +179,6 @@
     .adventure-mist,.adventure-map-fog,.adventure-lantern-glow,.adventure-node.status-current .adventure-node-icon,.adventure-node.status-objective-ready .adventure-node-icon,.adventure-node.status-reward-unclaimed .adventure-node-icon{animation:none!important;}
 }
 
-#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:36px;padding:3px 16px;font-size:16px;line-height:1.25}
+#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:52px;padding:3px 16px;font-size:16px;line-height:1.25}
 
 #adventurePage[data-panel="map"] .adventure-header-meta{top:65%}

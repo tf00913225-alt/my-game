@@ -78,7 +78,7 @@
 當次使用者明確指令優先。工程治理、讀取路由、分支／生命週期、DEV 整合、並行協作與驗證風險分類由 `AGENTS.md` 唯一控制；本文件控制一般 Bug 的直接調查、證據升級、原症狀驗證與完成判定，完成判定仍須滿足 `AGENTS.md` 的整合與清理條件，不另建自主整合或治理優先序。
 
 - AUTONOMOUS_REPAIR_CONTRACT.md 的 tests-only（純測試）預設限制、正式 Runtime 即硬停止、固定失敗額度與僅草稿 PR 限制，不適用本路徑內已授權的一般 Bug。
-- Owner Convergence Gate 與完整 Lifecycle 審計僅在第四節證據成立、或使用者明確要求架構工程（含「全部／完全收斂」「唯一 Owner」）時啟用；完成判定依 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md` 與 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`，不得只因新 Owner 存在就宣稱全部收斂，也不得恢復所有 Bug 全面稽核。
+- Owner Convergence Gate 與完整 Lifecycle 審計僅在第四節證據成立、或使用者明確要求架構工程（含「全部／完全收斂」、將同一責任的多個 Runtime Owner 收斂為唯一執行 Owner）時啟用；「由一名人員／代理負責協調或施工」只是人員責任分工，不會單獨觸發架構收斂。完成判定依 `docs/BUG_REPAIR_DOD_OWNER_CONVERGENCE_GATE.md` 與 `docs/CHANGE_SAFETY_REPLACEMENT_CONTRACT.md`，不得只因新 Owner 存在就宣稱全部收斂，也不得恢復所有 Bug 全面稽核。
 - Change Safety（變更安全）檢查限本次實際修改責任與直接相依；本路徑不允許新增第二 Owner 或以遮蔽代替必要的舊實作退場。
 - 原有症狀驗證、資料安全、正式玩法規格與最新 Head 必要 CI 不降低。
 - 已明確授權的大型架構工程保留成果與專項要求；本規範不構成重做或丟棄現有工作的理由。
