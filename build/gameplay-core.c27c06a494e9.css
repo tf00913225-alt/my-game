@@ -7008,8 +7008,6 @@ body > .v169-rpg-dialog-layer{
 
 /* Character skin state is owned and cleared by switch/closeHomeFeature. */
 #game-ui #homeFeatureModal[data-character-tab="skill"]{--character-choice-edge:transparent;--character-choice-fill:transparent;--character-choice-shadow:none;--character-avatar-edge:#efc379;--character-avatar-shadow:0 0 0 6px #251c12,0 0 36px #d8953d88;}
-#game-ui #homeFeatureModal .home-feature-modal-box,
-.v132-reward-modal-inner.v141-affix-modal{border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 30px / 0 stretch;background:#151515;box-shadow:0 0 30px #000c;}
 #game-stage #trainingZoneModal{
     /* Training remains on the original 420-unit content plane. */
     --skill-header-height:calc(52 * var(--ui-length-unit,1px));
@@ -7109,7 +7107,6 @@ body > .v169-rpg-dialog-layer{
 #game-stage #battlePage .battle-status-detail-panel,
 #game-stage #battlePage .battle-boss-mechanism-drawer,
 #game-stage #adventurePage .adventure-story-dialogue{
-    border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     border-radius:calc(10 * var(--ui-length-unit,1px));
     color:var(--rpg-window-text,#EEE7D8);
@@ -7123,6 +7120,30 @@ body > .v169-rpg-dialog-layer{
         inset 0 0 0 calc(2 * var(--ui-length-unit,1px)) var(--rpg-window-iron,#0D0C09),
         inset 0 0 0 calc(3 * var(--ui-length-unit,1px)) rgba(115,88,45,.82),
         inset 0 0 calc(30 * var(--ui-length-unit,1px)) rgba(0,0,0,.42);
+}
+
+/* Retain the exact existing artwork on out-of-scope creation, toast, ad and HUD surfaces. */
+#game-stage .creation-skill-detail-box,
+#game-stage .modal-box,
+.v141-reward-toast,
+.v17351-ad-panel,
+#game-stage #battlePage .skill-quick-bar,
+#game-stage #battlePage .battle-item-menu,
+#game-stage #battlePage .battle-target-prompt,
+#game-stage #battlePage .battle-status-detail-panel,
+#game-stage #battlePage .battle-boss-mechanism-drawer,
+#game-stage #adventurePage .adventure-story-dialogue{
+    border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
+}
+
+/* Only the approved character skill window opts into nine-slice framing. */
+#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-box{
+    border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
+    background:#151515;
+    box-shadow:0 0 30px #000c;
+}
+#game-ui #homeFeatureModal[data-character-tab="skill"] .home-feature-modal-title{
+    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
 }
 
 :is(#game-stage,#game-ui) .home-feature-modal-title,
@@ -7142,7 +7163,6 @@ body > .v169-rpg-dialog-layer{
 :is(#game-stage,#game-ui) #homeExpPoolCard .exp-pool-hero,
 :is(#game-stage,#game-ui) #homeExpPoolCard .v173-exp-charge-status,
 #game-stage #adventurePage .adventure-story-chapter{
-    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
     border-color:var(--rpg-window-gold-dark,#73582D);
     color:var(--rpg-window-text,#EEE7D8);
     background:#151515;
@@ -7151,6 +7171,18 @@ body > .v169-rpg-dialog-layer{
         inset 0 calc(-2 * var(--ui-length-unit,1px)) 0 rgba(115,88,45,.8),
         0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(0,0,0,.82);
     text-shadow:0 calc(1 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px)) #000,0 0 calc(6 * var(--ui-length-unit,1px)) rgba(198,154,69,.16);
+}
+
+/* Preserve unrelated backpack, creation, training, toast, ad and HUD title art. */
+#game-ui .inventory-classic-title,
+#game-stage .creation-skill-detail-header,
+#game-stage #trainingZoneModalTitle,
+.v141-reward-toast > strong,
+.v17351-ad-panel h2,
+#game-stage #battlePage .battle-status-detail-panel h3,
+#game-stage #battlePage .battle-boss-mechanism-drawer > header b,
+#game-stage #adventurePage .adventure-story-chapter{
+    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
 }
 
 #game-ui #homeFeatureModalBody,

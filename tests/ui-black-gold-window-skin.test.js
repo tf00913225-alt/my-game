@@ -40,6 +40,17 @@ assert.match(skin,/box-shadow:\s*[\s\S]*?inset 0 0 0 1px[\s\S]*?inset 0 0 0 3px/
 assert.doesNotMatch(skin,/!important/,"visual skin must not use !important");
 assert.doesNotMatch(skin,/::before|::after/,"visual skin must not add pseudo-element geometry");
 
+// Standard modal skins must not silently inherit artwork from a shared rule.
+const sharedWindows=(skin.match(/#game-stage #adventurePage \.adventure-story-dialogue\{([^}]*)\}/)||[])[1];
+const sharedTitles=(skin.match(/#game-stage #adventurePage \.adventure-story-chapter\{([^}]*)\}/)||[])[1];
+assert.ok(sharedWindows&&sharedTitles,"shared window and title owners must exist");
+assert.doesNotMatch(sharedWindows,/\bborder-image\s*:/,"shared window skin must use CSS instead of nine-slice art");
+assert.doesNotMatch(sharedTitles,/\bborder-image\s*:/,"shared title skin must use CSS instead of nine-slice art");
+assert.match(skin,/#game-ui #homeFeatureModal\[data-character-tab="skill"\] \.home-feature-modal-box\{[^}]*border-image:var\(--rpg-window-frame\)/,"skill tab alone must opt into its frame art");
+assert.match(skin,/#game-ui #homeFeatureModal\[data-character-tab="skill"\] \.home-feature-modal-title\{[^}]*border-image:var\(--rpg-window-frame\)/,"skill title artwork must stay intact");
+assert.doesNotMatch(css,/#game-ui #homeFeatureModal \.home-feature-modal-box,\s*\.v132-reward-modal-inner\.v141-affix-modal\{[^}]*border-image/,"legacy broad frame owner must be removed");
+assert.match(skin,/#game-stage #battlePage \.battle-status-detail-panel,\s*#game-stage #battlePage \.battle-boss-mechanism-drawer,\s*#game-stage #adventurePage \.adventure-story-dialogue\{[^}]*border-image/,"out-of-scope HUD art must stay unchanged");
+
 const forbiddenGeometry=new Set([
     "width","height","min-width","min-height","max-width","max-height",
     "top","right","bottom","left","inset","margin","padding","gap",
