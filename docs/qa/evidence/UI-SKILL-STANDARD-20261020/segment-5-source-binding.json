@@ -1,0 +1,69 @@
+{
+  "segment": 5,
+  "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+  "status": "已實際驗證（限定列出呈現路徑）",
+  "devices": [
+    "360x640",
+    "393x873",
+    "412x915",
+    "1280x800"
+  ],
+  "evidence": "artifacts/ui-skill-standard/battle-final-80974cac",
+  "deviceResults": [
+    {
+      "device": "360x640",
+      "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+      "dirty": false,
+      "unchanged": true,
+      "screens": 13,
+      "actionRecords": 21,
+      "taps": 15
+    },
+    {
+      "device": "393x873",
+      "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+      "dirty": false,
+      "unchanged": true,
+      "screens": 13,
+      "actionRecords": 21,
+      "taps": 15
+    },
+    {
+      "device": "412x915",
+      "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+      "dirty": false,
+      "unchanged": true,
+      "screens": 13,
+      "actionRecords": 21,
+      "taps": 15
+    },
+    {
+      "device": "1280x800",
+      "head": "80974cac6fc8c5a938e20e655e52b0b97b7e7d39",
+      "dirty": false,
+      "unchanged": true,
+      "screens": 13,
+      "actionRecords": 21,
+      "taps": 15
+    }
+  ],
+  "reviewers": [
+    "art_review",
+    "interaction_review",
+    "scope_review"
+  ],
+  "states": [
+    "技能空格/四格滿/不足SP",
+    "補品空/滿/真捲末項",
+    "符咒空",
+    "狀態雙方（空buff）",
+    "目標返回",
+    "reward正式API穩定展示"
+  ],
+  "limits": [
+    "未執行真攻擊/補品使用/勝敗結算/交易",
+    "未驗Boss/非空狀態/正式符咒/實體裝置",
+    "未驗reward dismiss",
+    "舊8b before360被trial誤覆，已INVALID；before393與a833360有效"
+  ]
+}

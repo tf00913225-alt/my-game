@@ -1,0 +1,23 @@
+{
+  "uiBase": "615bec78a580c2e51634e0fe5ae6134e9b6903a6",
+  "mergedDev": "6d5e3ba030a0db625e437645346582fae9eda0fd",
+  "upstreamFinal": "b400e8d11e59978e44412d4537984b91a3c0f7f0",
+  "upstreamMergeTreeSame": true,
+  "unresolved": 0,
+  "upstreamFilesExact": 25,
+  "uiProductFilesExact": 326,
+  "helperBlob": "8c27c5d2918b23aad2be32ee27422d9102d1d156",
+  "collectorTestBlob": "2fad22e4d2dec2b41e12b1ee23f9b8b19a9f2560",
+  "validation": "Complete verifier PASS before documentation writes; build/check/helper syntax/two direct focused UI suites PASS",
+  "upstreamRequiredCi": {
+    "run": 39914066251,
+    "attempt": 1,
+    "event": "pull_request",
+    "head": "b400e8d11e59978e44412d4537984b91a3c0f7f0",
+    "result": "success",
+    "necessaryJobs": 13
+  },
+  "ownLatestHeadCi": "pending new merge Head, upstream green not substitution",
+  "noLocalHighCostRepeat": true,
+  "noPlayerUiChange": true
+}

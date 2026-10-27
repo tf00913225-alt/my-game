@@ -1,0 +1,5530 @@
+{
+  "head": "3b80199ccc7c2a409853b4392920f3c6947d1c3e",
+  "viewport": [
+    393,
+    873
+  ],
+  "mode": "equipment",
+  "chosen": {
+    "speaker": "npc",
+    "name": "寨外守衛",
+    "text": "只憑手上的招式，就想闖過這道關？",
+    "i": 0,
+    "length": 16,
+    "last": false,
+    "id": "c1_04",
+    "title": "寨外守衛"
+  },
+  "complete": true,
+  "clean": true,
+  "sourceBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "2329fb9db3f07c0f9f1dca8121eb35531d46cb09f83968df375bcacdb01a6c76",
+    "js/00-main.js": "e543fd1d668947c41e7f7061cad1d9cffd1afcc071310ca18b27b12d6dcf76e9",
+    "css/22-stage-v78-character-inventory-core.css": "12e65a7ce10b48827f11eb47320bd10b1609454f5e60eaf3951d0889d9e235c5",
+    "css/adventure-v1-20260915.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "css/49-v169-rpg-ui.css": "c7aa5d365533feac7bd5cbf1b004f10a40f538f080c3c6aef163442d90507ed0",
+    "js/adventure/adventure-content-v1-20260915.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "js/adventure/adventure-entry-v1-20260915.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "js/adventure/adventure-items-v1-20260915.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "js/adventure/adventure-runtime-v1-20260915.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "js/adventure/adventure-ui-v1-20260915.js": "d01b93b1ff5b1f5e1fe13dc41e7a2c61acdd8bb112c896b3d676835c31063c8b",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.d01b93b1ff5b.js": "d01b93b1ff5b1f5e1fe13dc41e7a2c61acdd8bb112c896b3d676835c31063c8b",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.1987dfab76d6.css": "1987dfab76d6ac85d194d8cffa8325a358ceebe4fee7d7d4e44006c43c156e21"
+  },
+  "scenes": [
+    {
+      "name": "tutorial-first",
+      "panel": "tutorial",
+      "cursor": null,
+      "tutorial": {
+        "active": true,
+        "phase": "guidance",
+        "source": "new-character",
+        "nodeId": "c1_04",
+        "requiredAction": "equipment"
+      },
+      "text": "返回主城出城冒險山關初行建議 Lv.1主線章節初入江湖穿上護具先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。HP 300　SP 120前往背包領取追兵一戰的護具完成準備，原關重試",
+      "activePages": [
+        "adventurePage"
+      ],
+      "buttons": [
+        {
+          "text": "準備完成 · 返回故事",
+          "hidden": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "返回主城",
+          "hidden": false,
+          "rect": {
+            "x": 8.421428680419922,
+            "y": 95.99742889404297,
+            "width": 86.08572387695312,
+            "height": 48.657142639160156,
+            "top": 95.99742889404297,
+            "right": 94.50715255737305,
+            "bottom": 144.65457153320312,
+            "left": 8.421428680419922
+          }
+        },
+        {
+          "text": "前往背包",
+          "hidden": false,
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          }
+        },
+        {
+          "text": "領取追兵一戰的護具",
+          "hidden": false,
+          "rect": {
+            "x": 200.24285888671875,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 545.2864990234375,
+            "left": 200.24285888671875
+          }
+        },
+        {
+          "text": "完成準備，原關重試",
+          "hidden": false,
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 552.772216796875,
+            "width": 331.24285888671875,
+            "height": 48.65716552734375,
+            "top": 552.772216796875,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          }
+        }
+      ]
+    },
+    {
+      "name": "original-system-entry",
+      "panel": "tutorial",
+      "cursor": null,
+      "tutorial": {
+        "active": true,
+        "phase": "guidance",
+        "source": "new-character",
+        "nodeId": "c1_04",
+        "requiredAction": "equipment"
+      },
+      "text": "返回主城出城冒險山關初行建議 Lv.1主線章節初入江湖穿上護具先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。HP 300　SP 120前往背包領取追兵一戰的護具完成準備，原關重試",
+      "activePages": [
+        "inventoryPage"
+      ],
+      "buttons": [
+        {
+          "text": "準備完成 · 返回故事",
+          "hidden": false,
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          }
+        },
+        {
+          "text": "返回主城",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "前往背包",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "領取追兵一戰的護具",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "完成準備，原關重試",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "original-system-end",
+      "panel": "tutorial",
+      "cursor": null,
+      "tutorial": {
+        "active": true,
+        "phase": "guidance",
+        "source": "new-character",
+        "nodeId": "c1_04",
+        "requiredAction": "equipment"
+      },
+      "text": "返回主城出城冒險山關初行建議 Lv.1主線章節初入江湖穿上護具先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。HP 300　SP 120前往背包領取追兵一戰的護具完成準備，原關重試",
+      "activePages": [
+        "inventoryPage"
+      ],
+      "buttons": [
+        {
+          "text": "準備完成 · 返回故事",
+          "hidden": false,
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          }
+        },
+        {
+          "text": "返回主城",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "前往背包",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "領取追兵一戰的護具",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "完成準備，原關重試",
+          "hidden": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "tutorial-returned",
+      "panel": "tutorial",
+      "cursor": null,
+      "tutorial": {
+        "active": true,
+        "phase": "guidance",
+        "source": "new-character",
+        "nodeId": "c1_04",
+        "requiredAction": "equipment"
+      },
+      "text": "返回主城出城冒險山關初行建議 Lv.1主線章節初入江湖穿上護具先領取追兵一戰的護具，從背包穿上，再回來挑戰寨外守衛。HP 300　SP 120前往背包領取追兵一戰的護具完成準備，原關重試",
+      "activePages": [
+        "adventurePage"
+      ],
+      "buttons": [
+        {
+          "text": "準備完成 · 返回故事",
+          "hidden": true,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "top": 0,
+            "right": 0,
+            "bottom": 0,
+            "left": 0
+          }
+        },
+        {
+          "text": "返回主城",
+          "hidden": false,
+          "rect": {
+            "x": 8.421428680419922,
+            "y": 95.99742889404297,
+            "width": 86.08572387695312,
+            "height": 48.657142639160156,
+            "top": 95.99742889404297,
+            "right": 94.50715255737305,
+            "bottom": 144.65457153320312,
+            "left": 8.421428680419922
+          }
+        },
+        {
+          "text": "前往背包",
+          "hidden": false,
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          }
+        },
+        {
+          "text": "領取追兵一戰的護具",
+          "hidden": false,
+          "rect": {
+            "x": 200.24285888671875,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 545.2864990234375,
+            "left": 200.24285888671875
+          }
+        },
+        {
+          "text": "完成準備，原關重試",
+          "hidden": false,
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 552.772216796875,
+            "width": 331.24285888671875,
+            "height": 48.65716552734375,
+            "top": 552.772216796875,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          }
+        }
+      ]
+    }
+  ],
+  "inputs": [
+    {
+      "kind": "true-home-scroll",
+      "step": 0
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventureHomeEntry",
+      "x": 196.49999237060547,
+      "y": 559.9947509765625,
+      "rect": {
+        "x": 87.33333587646484,
+        "y": 531.3214111328125,
+        "width": 218.33331298828125,
+        "height": 57.3466796875,
+        "top": 531.3214111328125,
+        "right": 305.6666488647461,
+        "bottom": 588.6680908203125,
+        "left": 87.33333587646484
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "STRONG",
+        "id": "",
+        "className": "",
+        "rect": {
+          "x": 96.79444122314453,
+          "y": 536.4158935546875,
+          "width": 199.4111328125,
+          "height": 27.5076904296875,
+          "top": 536.4158935546875,
+          "right": 296.20557403564453,
+          "bottom": 563.923583984375,
+          "left": 96.79444122314453
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "adventureHomeEntry",
+        "className": "adventure-home-entry",
+        "rect": {
+          "x": 87.33333587646484,
+          "y": 531.3214111328125,
+          "width": 218.33331298828125,
+          "height": 57.3466796875,
+          "top": 531.3214111328125,
+          "right": 305.6666488647461,
+          "bottom": 588.6680908203125,
+          "left": 87.33333587646484
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureHomeAxis",
+          "className": "adventure-home-axis",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "none",
+          "zIndex": "6",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "STRONG",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 96.79444122314453,
+            "y": 536.4158935546875,
+            "width": 199.4111328125,
+            "height": 27.5076904296875,
+            "top": 536.4158935546875,
+            "right": 296.20557403564453,
+            "bottom": 563.923583984375,
+            "left": 96.79444122314453
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureHomeAxis",
+          "className": "adventure-home-axis",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "none",
+          "zIndex": "6",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "STRONG",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 96.79444122314453,
+            "y": 536.4158935546875,
+            "width": 199.4111328125,
+            "height": 27.5076904296875,
+            "top": 536.4158935546875,
+            "right": 296.20557403564453,
+            "bottom": 563.923583984375,
+            "left": 96.79444122314453
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "home-card-grid",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header no-scroll-page",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventureHomeEntry",
+      "x": 196.49999237060547,
+      "y": 559.9947509765625,
+      "rect": {
+        "x": 87.33333587646484,
+        "y": 531.3214111328125,
+        "width": 218.33331298828125,
+        "height": 57.3466796875,
+        "top": 531.3214111328125,
+        "right": 305.6666488647461,
+        "bottom": 588.6680908203125,
+        "left": 87.33333587646484
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "STRONG",
+        "id": "",
+        "className": "",
+        "rect": {
+          "x": 96.79444122314453,
+          "y": 536.4158935546875,
+          "width": 199.4111328125,
+          "height": 27.5076904296875,
+          "top": 536.4158935546875,
+          "right": 296.20557403564453,
+          "bottom": 563.923583984375,
+          "left": 96.79444122314453
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "adventureHomeEntry",
+        "className": "adventure-home-entry",
+        "rect": {
+          "x": 87.33333587646484,
+          "y": 531.3214111328125,
+          "width": 218.33331298828125,
+          "height": 57.3466796875,
+          "top": 531.3214111328125,
+          "right": 305.6666488647461,
+          "bottom": 588.6680908203125,
+          "left": 87.33333587646484
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureHomeAxis",
+          "className": "adventure-home-axis",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "none",
+          "zIndex": "6",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "STRONG",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 96.79444122314453,
+            "y": 536.4158935546875,
+            "width": 199.4111328125,
+            "height": 27.5076904296875,
+            "top": 536.4158935546875,
+            "right": 296.20557403564453,
+            "bottom": 563.923583984375,
+            "left": 96.79444122314453
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureHomeAxis",
+          "className": "adventure-home-axis",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "none",
+          "zIndex": "6",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "STRONG",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 96.79444122314453,
+            "y": 536.4158935546875,
+            "width": 199.4111328125,
+            "height": 27.5076904296875,
+            "top": 536.4158935546875,
+            "right": 296.20557403564453,
+            "bottom": 563.923583984375,
+            "left": 96.79444122314453
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BUTTON",
+          "id": "adventureHomeEntry",
+          "className": "adventure-home-entry",
+          "rect": {
+            "x": 87.33333587646484,
+            "y": 531.3214111328125,
+            "width": 218.33331298828125,
+            "height": 57.3466796875,
+            "top": 531.3214111328125,
+            "right": 305.6666488647461,
+            "bottom": 588.6680908203125,
+            "left": 87.33333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "home-card-grid",
+          "rect": {
+            "x": 6.550000190734863,
+            "y": 317.9347229003906,
+            "width": 379.9000244140625,
+            "height": 327.5000305175781,
+            "top": 317.9347229003906,
+            "right": 386.45002460479736,
+            "bottom": 645.4347534179688,
+            "left": 6.550000190734863
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "homePage",
+          "className": "page main-city-lobby-ready active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 620.066650390625,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 707.2332763671875,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header no-scroll-page",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventurePage button[onclick=\"FourSymbolsAdventure.openTutorialSystem()\"]",
+      "x": 111.81785583496094,
+      "y": 511.6007843017578,
+      "rect": {
+        "x": 30.878570556640625,
+        "y": 477.9150695800781,
+        "width": 161.87857055664062,
+        "height": 67.37142944335938,
+        "top": 477.9150695800781,
+        "right": 192.75714111328125,
+        "bottom": 545.2864990234375,
+        "left": 30.878570556640625
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "BUTTON",
+        "id": "",
+        "className": "adventure-button primary",
+        "rect": {
+          "x": 30.878570556640625,
+          "y": 477.9150695800781,
+          "width": 161.87857055664062,
+          "height": 67.37142944335938,
+          "top": 477.9150695800781,
+          "right": 192.75714111328125,
+          "bottom": 545.2864990234375,
+          "left": 30.878570556640625
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "",
+        "className": "adventure-button primary",
+        "rect": {
+          "x": 30.878570556640625,
+          "y": 477.9150695800781,
+          "width": 161.87857055664062,
+          "height": 67.37142944335938,
+          "top": 477.9150695800781,
+          "right": 192.75714111328125,
+          "bottom": 545.2864990234375,
+          "left": 30.878570556640625
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventurePage button[onclick=\"FourSymbolsAdventure.openTutorialSystem()\"]",
+      "x": 111.81785583496094,
+      "y": 511.6007843017578,
+      "rect": {
+        "x": 30.878570556640625,
+        "y": 477.9150695800781,
+        "width": 161.87857055664062,
+        "height": 67.37142944335938,
+        "top": 477.9150695800781,
+        "right": 192.75714111328125,
+        "bottom": 545.2864990234375,
+        "left": 30.878570556640625
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "BUTTON",
+        "id": "",
+        "className": "adventure-button primary",
+        "rect": {
+          "x": 30.878570556640625,
+          "y": 477.9150695800781,
+          "width": 161.87857055664062,
+          "height": 67.37142944335938,
+          "top": 477.9150695800781,
+          "right": 192.75714111328125,
+          "bottom": 545.2864990234375,
+          "left": 30.878570556640625
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "",
+        "className": "adventure-button primary",
+        "rect": {
+          "x": 30.878570556640625,
+          "y": 477.9150695800781,
+          "width": 161.87857055664062,
+          "height": 67.37142944335938,
+          "top": 477.9150695800781,
+          "right": 192.75714111328125,
+          "bottom": 545.2864990234375,
+          "left": 30.878570556640625
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "relative",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "BUTTON",
+          "id": "",
+          "className": "adventure-button primary",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 161.87857055664062,
+            "height": 67.37142944335938,
+            "top": 477.9150695800781,
+            "right": 192.75714111328125,
+            "bottom": 545.2864990234375,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-actions",
+          "rect": {
+            "x": 30.878570556640625,
+            "y": 477.9150695800781,
+            "width": 331.24285888671875,
+            "height": 123.51431274414062,
+            "top": 477.9150695800781,
+            "right": 362.1214294433594,
+            "bottom": 601.4293823242188,
+            "left": 30.878570556640625
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "adventure-panel-card",
+          "rect": {
+            "x": 13.100000381469727,
+            "y": 279.86529541015625,
+            "width": 366.79998779296875,
+            "height": 339.34259033203125,
+            "top": 279.86529541015625,
+            "right": 379.8999881744385,
+            "bottom": 619.2078857421875,
+            "left": 13.100000381469727
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "",
+          "className": "adventure-panel tutorial-panel",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 590.2164306640625,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 744.6521301269531,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "adventureView",
+          "className": "adventure-view",
+          "rect": {
+            "x": 0,
+            "y": 154.43569946289062,
+            "width": 393,
+            "height": 631.3878173828125,
+            "top": 154.43569946289062,
+            "right": 393,
+            "bottom": 785.8235168457031,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "2",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "SECTION",
+          "id": "adventurePage",
+          "className": "page adventure-page is-visible active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "210",
+          "position": "absolute",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 0
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 1
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 2
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 3
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 4
+    },
+    {
+      "kind": "true-destination-scroll",
+      "step": 5
+    },
+    {
+      "kind": "attempt",
+      "sel": "#adventureTutorialReturn",
+      "x": 196.49716186523438,
+      "y": 730.1582946777344,
+      "rect": {
+        "x": 98.3978271484375,
+        "y": 706.1416015625,
+        "width": 196.19866943359375,
+        "height": 48.03338623046875,
+        "top": 706.1416015625,
+        "right": 294.59649658203125,
+        "bottom": 754.1749877929688,
+        "left": 98.3978271484375
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "BUTTON",
+        "id": "adventureTutorialReturn",
+        "className": "adventure-tutorial-return",
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "adventureTutorialReturn",
+        "className": "adventure-tutorial-return",
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header on-inventory-page",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    },
+    {
+      "kind": "true-touch",
+      "sel": "#adventureTutorialReturn",
+      "x": 196.49716186523438,
+      "y": 730.1582946777344,
+      "rect": {
+        "x": 98.3978271484375,
+        "y": 706.1416015625,
+        "width": 196.19866943359375,
+        "height": 48.03338623046875,
+        "top": 706.1416015625,
+        "right": 294.59649658203125,
+        "bottom": 754.1749877929688,
+        "left": 98.3978271484375
+      },
+      "hit": true,
+      "hitElement": {
+        "tag": "BUTTON",
+        "id": "adventureTutorialReturn",
+        "className": "adventure-tutorial-return",
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetElement": {
+        "tag": "BUTTON",
+        "id": "adventureTutorialReturn",
+        "className": "adventure-tutorial-return",
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "pointerEvents": "auto",
+        "zIndex": "auto",
+        "position": "static",
+        "display": "block",
+        "visibility": "visible",
+        "opacity": "1"
+      },
+      "targetAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "hitAncestors": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-ui",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "1000",
+          "position": "absolute",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-overlay-layer",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "none",
+          "zIndex": "2147483000",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "paintStack": [
+        {
+          "tag": "BUTTON",
+          "id": "adventureTutorialReturn",
+          "className": "adventure-tutorial-return",
+          "rect": {
+            "x": 98.3978271484375,
+            "y": 706.1416015625,
+            "width": 196.19866943359375,
+            "height": 48.03338623046875,
+            "top": 706.1416015625,
+            "right": 294.59649658203125,
+            "bottom": 754.1749877929688,
+            "left": 98.3978271484375
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "inventory-classic-shell",
+          "rect": {
+            "x": 8.733333587646484,
+            "y": 95.89996337890625,
+            "width": 375.5333251953125,
+            "height": 681.2000122070312,
+            "top": 95.89996337890625,
+            "right": 384.266658782959,
+            "bottom": 777.0999755859375,
+            "left": 8.733333587646484
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "relative",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "static",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "",
+          "className": "content",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-content",
+          "className": "",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6569213867188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8235473632812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "app",
+          "className": "no-header on-inventory-page",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "absolute",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "0",
+          "position": "relative",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "DIV",
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "BODY",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        },
+        {
+          "tag": "HTML",
+          "id": "",
+          "className": "inventory-scroll-active",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          },
+          "pointerEvents": "auto",
+          "zIndex": "auto",
+          "position": "fixed",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1"
+        }
+      ],
+      "display": "block",
+      "visibility": "visible",
+      "hiddenAncestors": []
+    }
+  ],
+  "checks": [
+    {
+      "phase": "original-login-announcement-wait",
+      "step": 0,
+      "state": {
+        "loadedReleaseVersion": "V173.73",
+        "availableReleaseVersion": "V173.73",
+        "noticeId": "release-v17373-20261003",
+        "pendingNormalReload": false,
+        "pendingForcedUpdate": false,
+        "pendingAnnouncement": false,
+        "loginAnnouncementShown": true,
+        "suppressedToday": false,
+        "criticalOperationCount": 0,
+        "unsafeReasons": [],
+        "pollIntervalMs": 240000,
+        "minimumCheckGapMs": 45000,
+        "devPreviewMode": null
+      },
+      "forced": false,
+      "open": false,
+      "release": false
+    },
+    {
+      "phase": "original-login-announcement-settled-no-ack",
+      "state": {
+        "loadedReleaseVersion": "V173.73",
+        "availableReleaseVersion": "V173.73",
+        "noticeId": "release-v17373-20261003",
+        "pendingNormalReload": false,
+        "pendingForcedUpdate": false,
+        "pendingAnnouncement": false,
+        "loginAnnouncementShown": true,
+        "suppressedToday": false,
+        "criticalOperationCount": 0,
+        "unsafeReasons": [],
+        "pollIntervalMs": 240000,
+        "minimumCheckGapMs": 45000,
+        "devPreviewMode": null
+      },
+      "note": "Original announcement settled before fixture; actual modal header taps, if any, are separately recorded. No acknowledgement, checkbox, reload, suppression or timer change."
+    },
+    {
+      "phase": "schema3-before-module-init-fixture",
+      "chosen": {
+        "speaker": "npc",
+        "name": "寨外守衛",
+        "text": "只憑手上的招式，就想闖過這道關？",
+        "i": 0,
+        "length": 16,
+        "last": false,
+        "id": "c1_04",
+        "title": "寨外守衛"
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "tutorial-first",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "前往背包",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "destination-visible-ready",
+      "step": 0,
+      "skill": false,
+      "title": {
+        "text": "背包",
+        "rect": {
+          "x": 136.589111328125,
+          "y": 121.00829315185547,
+          "width": 58.688446044921875,
+          "height": 26.20000457763672,
+          "top": 121.00829315185547,
+          "right": 195.27755737304688,
+          "bottom": 147.2082977294922,
+          "left": 136.589111328125
+        }
+      },
+      "content": {
+        "x": 0,
+        "y": 87.1666259765625,
+        "width": 393,
+        "height": 698.6666870117188,
+        "top": 87.1666259765625,
+        "right": 393,
+        "bottom": 785.8333129882812,
+        "left": 0
+      },
+      "ancestors": [
+        {
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "className": "",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "none",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "className": "",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "none",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        }
+      ],
+      "cardCount": 24,
+      "last": {
+        "x": 234.0487823486328,
+        "y": 824.6329345703125,
+        "width": 66.37562561035156,
+        "height": 66.3756103515625,
+        "top": 824.6329345703125,
+        "right": 300.4244079589844,
+        "bottom": 891.008544921875,
+        "left": 234.0487823486328
+      },
+      "owner": {
+        "rect": {
+          "x": 20.741666793823242,
+          "y": 541.663818359375,
+          "width": 351.51666259765625,
+          "height": 95.70281982421875,
+          "top": 541.663818359375,
+          "right": 372.2583293914795,
+          "bottom": 637.3666381835938,
+          "left": 20.741666793823242
+        },
+        "top": 0,
+        "client": 263,
+        "total": 960,
+        "overflow": "auto"
+      },
+      "return": {
+        "hidden": false,
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "position": "static",
+        "parentCorrect": true,
+        "unit": "3px"
+      },
+      "modalShow": false
+    },
+    {
+      "phase": "original-system-entry",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "formal-destination-last-content",
+      "skill": false,
+      "title": {
+        "text": "背包",
+        "rect": {
+          "x": 136.589111328125,
+          "y": 121.00829315185547,
+          "width": 58.688446044921875,
+          "height": 26.20000457763672,
+          "top": 121.00829315185547,
+          "right": 195.27755737304688,
+          "bottom": 147.2082977294922,
+          "left": 136.589111328125
+        }
+      },
+      "content": {
+        "x": 0,
+        "y": 87.1666259765625,
+        "width": 393,
+        "height": 698.6666870117188,
+        "top": 87.1666259765625,
+        "right": 393,
+        "bottom": 785.8333129882812,
+        "left": 0
+      },
+      "ancestors": [
+        {
+          "id": "inventoryPage",
+          "className": "page inventory-page-classic active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-ui",
+          "className": "",
+          "display": "grid",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "none",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-overlay-layer",
+          "className": "",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "none",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-stage",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 87.1666259765625,
+            "width": 393,
+            "height": 698.6666870117188,
+            "top": 87.1666259765625,
+            "right": 393,
+            "bottom": 785.8333129882812,
+            "left": 0
+          }
+        },
+        {
+          "id": "game-viewport",
+          "className": "inventory-scroll-active",
+          "display": "flex",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        },
+        {
+          "id": "",
+          "className": "inventory-scroll-active",
+          "display": "block",
+          "visibility": "visible",
+          "opacity": "1",
+          "pointerEvents": "auto",
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 393,
+            "height": 873,
+            "top": 0,
+            "right": 393,
+            "bottom": 873,
+            "left": 0
+          }
+        }
+      ],
+      "cardCount": 24,
+      "last": {
+        "x": 234.0487823486328,
+        "y": 571.0023803710938,
+        "width": 66.37562561035156,
+        "height": 66.3756103515625,
+        "top": 571.0023803710938,
+        "right": 300.4244079589844,
+        "bottom": 637.3779907226562,
+        "left": 234.0487823486328
+      },
+      "owner": {
+        "rect": {
+          "x": 20.741666793823242,
+          "y": 541.663818359375,
+          "width": 351.51666259765625,
+          "height": 95.70281982421875,
+          "top": 541.663818359375,
+          "right": 372.2583293914795,
+          "bottom": 637.3666381835938,
+          "left": 20.741666793823242
+        },
+        "top": 697,
+        "client": 263,
+        "total": 960,
+        "overflow": "auto"
+      },
+      "return": {
+        "hidden": false,
+        "rect": {
+          "x": 98.3978271484375,
+          "y": 706.1416015625,
+          "width": 196.19866943359375,
+          "height": 48.03338623046875,
+          "top": 706.1416015625,
+          "right": 294.59649658203125,
+          "bottom": 754.1749877929688,
+          "left": 98.3978271484375
+        },
+        "position": "static",
+        "parentCorrect": true,
+        "unit": "3px"
+      },
+      "modalShow": false,
+      "note": "Natural isolated inventory slots only; populated120/pager matrix not covered here."
+    },
+    {
+      "phase": "original-system-end",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "same-task-click-observation",
+      "events": [
+        {
+          "label": "出城冒險　›",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "前往背包",
+          "sameTaskDomainUnchanged": true
+        },
+        {
+          "label": "準備完成 · 返回故事",
+          "sameTaskDomainUnchanged": true
+        }
+      ]
+    },
+    {
+      "phase": "tutorial-returned",
+      "domain": {
+        "battleActive": false,
+        "battleToken": 0,
+        "timerId": null,
+        "gold": 0,
+        "sharedExp": 0,
+        "inventory": "[]",
+        "characters": [
+          {
+            "hp": 300,
+            "sp": 120,
+            "level": 70,
+            "exp": 0
+          },
+          {
+            "level": 70
+          },
+          null
+        ]
+      }
+    },
+    {
+      "phase": "formal-return-borrow-restored",
+      "parentId": "",
+      "inCharacterContent": false,
+      "insideModal": false,
+      "modalShow": false,
+      "returnHidden": true
+    },
+    {
+      "phase": "tutorial-formal-system-return",
+      "action": "equipment",
+      "noContinueClaimConfirmationLearnEquipUse": true
+    }
+  ],
+  "scope": "Tutorial skill/equipment/recovery presentation and formal system entry/return only. Fresh local schema3 active-guidance fixture, not real tutorial completion. No continue/retry, claim equipment, confirm preparation, learn, equip, use potion, battle, creation or cloud transport change. Original save/lastViewedAt/beginChapter effects retained.",
+  "initial": {
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null,
+    "gold": 0,
+    "sharedExp": 0,
+    "inventory": "[]",
+    "characters": [
+      {
+        "hp": 300,
+        "sp": 120,
+        "level": 70,
+        "exp": 0
+      },
+      {
+        "level": 70
+      },
+      null
+    ]
+  },
+  "loaded": [
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.257e4b6bac5a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.257e4b6bac5a.js",
+      "status": 200
+    },
+    {
+      "url": "/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-secondary.db9536f36042.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core.1987dfab76d6.css",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core-secondary.db9536f36042.js",
+      "status": 200
+    },
+    {
+      "url": "/build/gameplay-core.1987dfab76d6.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200
+    },
+    {
+      "url": "/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200
+    }
+  ],
+  "handlers": [
+    {
+      "label": "出城冒險　›",
+      "sameTaskDomainUnchanged": true
+    },
+    {
+      "label": "前往背包",
+      "sameTaskDomainUnchanged": true
+    },
+    {
+      "label": "準備完成 · 返回故事",
+      "sameTaskDomainUnchanged": true
+    }
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "playerIdExact": true
+  },
+  "sourceAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "2329fb9db3f07c0f9f1dca8121eb35531d46cb09f83968df375bcacdb01a6c76",
+    "js/00-main.js": "e543fd1d668947c41e7f7061cad1d9cffd1afcc071310ca18b27b12d6dcf76e9",
+    "css/22-stage-v78-character-inventory-core.css": "12e65a7ce10b48827f11eb47320bd10b1609454f5e60eaf3951d0889d9e235c5",
+    "css/adventure-v1-20260915.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "css/49-v169-rpg-ui.css": "c7aa5d365533feac7bd5cbf1b004f10a40f538f080c3c6aef163442d90507ed0",
+    "js/adventure/adventure-content-v1-20260915.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "js/adventure/adventure-entry-v1-20260915.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "js/adventure/adventure-items-v1-20260915.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "js/adventure/adventure-runtime-v1-20260915.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "js/adventure/adventure-ui-v1-20260915.js": "d01b93b1ff5b1f5e1fe13dc41e7a2c61acdd8bb112c896b3d676835c31063c8b",
+    "build/app-shell.257e4b6bac5a.js": "257e4b6bac5ab3daa7ab3354beacc3c9979938dbcff587da6aaaff3fabe9a716",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.d01b93b1ff5b.js": "d01b93b1ff5b1f5e1fe13dc41e7a2c61acdd8bb112c896b3d676835c31063c8b",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.1987dfab76d6.css": "1987dfab76d6ac85d194d8cffa8325a358ceebe4fee7d7d4e44006c43c156e21"
+  }
+}

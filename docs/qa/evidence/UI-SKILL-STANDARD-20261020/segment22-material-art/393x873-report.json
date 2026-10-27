@@ -1,0 +1,1634 @@
+{
+  "complete": true,
+  "head": "e58331ecc5427486f2bd18a90ea146eeddf56d98",
+  "dirty": false,
+  "viewport": [
+    393,
+    873
+  ],
+  "sourcesBefore": {
+    "index.html": "821a25dde6255e3b0ddc6782eb4396a6d4e068e36f72c550a937e9326c3ed8bc",
+    "asset-manifest.json": "b90917be94e1c55c41da573d40a6f2c3412861a8c9e89969617513bf8f8475b6",
+    "js/relic-progression-drop-system.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0"
+  },
+  "sourcesAfter": {
+    "index.html": "821a25dde6255e3b0ddc6782eb4396a6d4e068e36f72c550a937e9326c3ed8bc",
+    "asset-manifest.json": "b90917be94e1c55c41da573d40a6f2c3412861a8c9e89969617513bf8f8475b6",
+    "js/relic-progression-drop-system.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.8e6259c4baef.js": "8e6259c4baefa13470f8c4d6ff3e25672de5d30af419a0e96d9b51a4e6670cfe",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.08c8faad4670.js": "08c8faad467089da80571ff62de823e4fe26b7c3f7d8fdd31869f934379d6097",
+    "build/gameplay-core.0b1b33fe5e04.css": "0b1b33fe5e0479e5f5b9d5f58ef364da1671ae01aec67ae490a801d5d48138e0"
+  },
+  "sourceUnchanged": true,
+  "touches": [
+    {
+      "selector": "#inventoryNav",
+      "x": 39.29999923706055,
+      "y": 746.8971862792969,
+      "hit": true,
+      "label": "背包\n背包"
+    },
+    {
+      "selector": "#inventoryCategoryTabs [data-filter=\"material\"]",
+      "x": 239.62083435058594,
+      "y": 504.54718017578125,
+      "hit": true,
+      "label": "材料"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 196.49715423583984,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 196.49715423583984,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+      "x": 196.49715423583984,
+      "y": 641.2243957519531,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 625.9837036132812,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+      "x": 196.49715423583984,
+      "y": 641.2243957519531,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 625.9837036132812,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+      "x": 267.2365951538086,
+      "y": 641.2272338867188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+      "x": 267.2365951538086,
+      "y": 641.2272338867188,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+      "attempt": 0,
+      "up": false
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+      "x": 337.97601318359375,
+      "y": 687.7339782714844,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+      "x": 337.97601318359375,
+      "y": 687.7339782714844,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#v141InventoryPager button[aria-label=\"下一頁\"]",
+      "x": 251.08333587646484,
+      "y": 738.8916015625,
+      "hit": true,
+      "label": "→"
+    },
+    {
+      "kind": "slot-reveal-real-input",
+      "sel": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "attempt": 0,
+      "up": true
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "x": 125.75772476196289,
+      "y": 570.4849853515625,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 625.9837036132812,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+      "x": 125.75772476196289,
+      "y": 570.4849853515625,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 625.9837036132812,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 196.49715423583984,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+      "x": 196.49715423583984,
+      "y": 570.4821472167969,
+      "hit": true,
+      "label": "×3"
+    },
+    {
+      "selector": "#itemModal .close-item-button",
+      "x": 196.49999237060547,
+      "y": 641.210205078125,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "kind": "formal-material-catalog",
+      "formal": [
+        {
+          "id": "relicFragment_qiankun_flask",
+          "name": "乾坤玉壺碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_sun_orb",
+          "name": "烈陽神珠碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_xuanwu_seal",
+          "name": "玄武靈印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_soul_bell",
+          "name": "鎮魂古鐘碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_tiangang_banner",
+          "name": "天罡戰旗碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_nine_dragon_fire",
+          "name": "九龍神火罩碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_cold_spring_jade",
+          "name": "寒泉玉珮碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_qinglan_feather",
+          "name": "青嵐羽符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_rock_mountain_seal",
+          "name": "岩岳鎮印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_returning_wheel",
+          "name": "回天寶輪碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_origin_talisman",
+          "name": "太初聖符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_broken_army_scroll",
+          "name": "破軍殘卷碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_red_sky_war_mark",
+          "name": "赤霄戰紋碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_ice_mirror_heart",
+          "name": "玄冰鏡心碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_wind_chasing_talisman",
+          "name": "追風行符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_mountain_river_cauldron",
+          "name": "山河寶鼎碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_burning_star_mark",
+          "name": "焚星殘印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_spirit_spring_bottle",
+          "name": "靈泉法瓶碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_demon_suppressing_seal",
+          "name": "伏魔金印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_all_returning_array",
+          "name": "萬象歸元盤碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicUniversalFragment",
+          "name": "秘寶通用碎片",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicEssence",
+          "name": "秘寶精華",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicBreakthroughStone",
+          "name": "秘寶突破石",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicChoiceBoxBlue",
+          "name": "藍階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxPurple",
+          "name": "紫階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxOrange",
+          "name": "橙階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "relicChoiceBoxPink",
+          "name": "桃紅階以下秘寶碎片自選箱",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": true
+        },
+        {
+          "id": "gemVitalityI",
+          "name": "體質寶石",
+          "type": "gem",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        }
+      ],
+      "included": [
+        {
+          "id": "relicChoiceBoxPink",
+          "name": "桃紅階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxPink",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 2
+        },
+        {
+          "id": "relicBreakthroughStone",
+          "name": "秘寶突破石",
+          "uid": "qa22-relicBreakthroughStone",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 7
+        },
+        {
+          "id": "relicChoiceBoxOrange",
+          "name": "橙階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxOrange",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 8
+        },
+        {
+          "id": "relicChoiceBoxPurple",
+          "name": "紫階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxPurple",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 19
+        },
+        {
+          "id": "relicEssence",
+          "name": "秘寶精華",
+          "uid": "qa22-relicEssence",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 25
+        },
+        {
+          "id": "relicChoiceBoxBlue",
+          "name": "藍階以下秘寶碎片自選箱",
+          "uid": "qa22-relicChoiceBoxBlue",
+          "type": "material",
+          "count": 3,
+          "sourceIndex": 26
+        }
+      ],
+      "excluded": [
+        {
+          "id": "relicFragment_qiankun_flask",
+          "name": "乾坤玉壺碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_sun_orb",
+          "name": "烈陽神珠碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_xuanwu_seal",
+          "name": "玄武靈印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_soul_bell",
+          "name": "鎮魂古鐘碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_tiangang_banner",
+          "name": "天罡戰旗碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_nine_dragon_fire",
+          "name": "九龍神火罩碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_cold_spring_jade",
+          "name": "寒泉玉珮碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_qinglan_feather",
+          "name": "青嵐羽符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_rock_mountain_seal",
+          "name": "岩岳鎮印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_returning_wheel",
+          "name": "回天寶輪碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_origin_talisman",
+          "name": "太初聖符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_broken_army_scroll",
+          "name": "破軍殘卷碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_red_sky_war_mark",
+          "name": "赤霄戰紋碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_ice_mirror_heart",
+          "name": "玄冰鏡心碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_wind_chasing_talisman",
+          "name": "追風行符碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_mountain_river_cauldron",
+          "name": "山河寶鼎碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_burning_star_mark",
+          "name": "焚星殘印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_spirit_spring_bottle",
+          "name": "靈泉法瓶碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_demon_suppressing_seal",
+          "name": "伏魔金印碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicFragment_all_returning_array",
+          "name": "萬象歸元盤碎片",
+          "type": "material",
+          "relicFragment": true,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "relicUniversalFragment",
+          "name": "秘寶通用碎片",
+          "type": "material",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        },
+        {
+          "id": "gemVitalityI",
+          "name": "體質寶石",
+          "type": "gem",
+          "relicFragment": false,
+          "relicChoiceBox": false
+        }
+      ],
+      "note": "Six changed art IDs only; seed full original27 catalog to preserve bag context and existing fragments as controls. Gem excluded by formal type. No source replay; use22A source proof."
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-choice-box-pink.32e7de00c345.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 170.953857421875,
+          "y": 544.9388427734375,
+          "width": 51.08659362792969,
+          "height": 51.08660888671875,
+          "top": 544.9388427734375,
+          "right": 222.0404510498047,
+          "bottom": 596.0254516601562,
+          "left": 170.953857421875
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPink",
+      "name": "桃紅階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPink",
+      "selected": 2,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxPink-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+        "sourceIndex": 2
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPink",
+      "name": "桃紅階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPink",
+      "selected": 2,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPink",
+      "reopened": true
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-breakthrough-stone.2d2814201552.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 170.953857421875,
+          "y": 615.68115234375,
+          "width": 51.08659362792969,
+          "height": 51.0865478515625,
+          "top": 615.68115234375,
+          "right": 222.0404510498047,
+          "bottom": 666.7677001953125,
+          "left": 170.953857421875
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicBreakthroughStone",
+      "name": "秘寶突破石",
+      "uid": "qa22-relicBreakthroughStone",
+      "selected": 7,
+      "description": "秘寶升級的突破材料。請至主城「秘寶」查看各級需求。\n售價：0 金幣"
+    },
+    {
+      "name": "relicBreakthroughStone-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(8)",
+        "sourceIndex": 7
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicBreakthroughStone",
+      "name": "秘寶突破石",
+      "uid": "qa22-relicBreakthroughStone",
+      "selected": 7,
+      "description": "秘寶升級的突破材料。請至主城「秘寶」查看各級需求。\n售價：0 金幣"
+    },
+    {
+      "id": "relicBreakthroughStone",
+      "reopened": true
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-choice-box-orange.6f30554e90e6.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 241.69044494628906,
+          "y": 615.68115234375,
+          "width": 51.09226989746094,
+          "height": 51.09222412109375,
+          "top": 615.68115234375,
+          "right": 292.78271484375,
+          "bottom": 666.7733764648438,
+          "left": 241.69044494628906
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxOrange",
+      "name": "橙階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxOrange",
+      "selected": 8,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxOrange-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(9)",
+        "sourceIndex": 8
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxOrange",
+      "name": "橙階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxOrange",
+      "selected": 8,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxOrange",
+      "reopened": true
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-choice-box-purple.0cbbe8fd9b70.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 312.4327392578125,
+          "y": 662.190673828125,
+          "width": 51.086578369140625,
+          "height": 51.08660888671875,
+          "top": 662.190673828125,
+          "right": 363.5193176269531,
+          "bottom": 713.2772827148438,
+          "left": 312.4327392578125
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPurple",
+      "name": "紫階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPurple",
+      "selected": 19,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxPurple-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "bagReturn": {
+        "page": 0,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(20)",
+        "sourceIndex": 19
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxPurple",
+      "name": "紫階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxPurple",
+      "selected": 19,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxPurple",
+      "reopened": true
+    },
+    {
+      "id": "relicEssence",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-essence.4c8469805189.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 100.21158599853516,
+          "y": 544.9388427734375,
+          "width": 51.09227752685547,
+          "height": 51.09228515625,
+          "top": 544.9388427734375,
+          "right": 151.30386352539062,
+          "bottom": 596.0311279296875,
+          "left": 100.21158599853516
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicEssence",
+      "name": "秘寶精華",
+      "uid": "qa22-relicEssence",
+      "selected": 25,
+      "description": "秘寶升級材料。請至主城「秘寶」查看升級需求。\n售價：0 金幣"
+    },
+    {
+      "name": "relicEssence-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicEssence",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicEssence",
+      "bagReturn": {
+        "page": 1,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(2)",
+        "sourceIndex": 25
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicEssence",
+      "name": "秘寶精華",
+      "uid": "qa22-relicEssence",
+      "selected": 25,
+      "description": "秘寶升級材料。請至主城「秘寶」查看升級需求。\n售價：0 金幣"
+    },
+    {
+      "id": "relicEssence",
+      "reopened": true
+    },
+    {
+      "id": "relicChoiceBoxBlue",
+      "decoded": {
+        "src": "http://127.0.0.1:54768/assets/relics/materials/relic-choice-box-blue.8a6cfdd5fb40.webp",
+        "width": 1254,
+        "height": 1254,
+        "visible": true,
+        "fit": "contain",
+        "rect": {
+          "x": 170.953857421875,
+          "y": 544.9388427734375,
+          "width": 51.08659362792969,
+          "height": 51.08660888671875,
+          "top": 544.9388427734375,
+          "right": 222.0404510498047,
+          "bottom": 596.0254516601562,
+          "left": 170.953857421875
+        }
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxBlue",
+      "name": "藍階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxBlue",
+      "selected": 26,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "name": "relicChoiceBoxBlue-detail-end",
+      "root": "#itemModal",
+      "end": "not-needed: natural content does not overflow"
+    },
+    {
+      "id": "relicChoiceBoxBlue",
+      "source": "Reused22A exact source/end/return evidence; art-only delta does not rerun text-only source list"
+    },
+    {
+      "id": "relicChoiceBoxBlue",
+      "bagReturn": {
+        "page": 1,
+        "slot": "#inventoryGrid .inventory-item-classic:nth-child(3)",
+        "sourceIndex": 26
+      }
+    },
+    {
+      "kind": "actual-material-identity",
+      "id": "relicChoiceBoxBlue",
+      "name": "藍階以下秘寶碎片自選箱",
+      "uid": "qa22-relicChoiceBoxBlue",
+      "selected": 26,
+      "description": "可自選秘寶專屬碎片。請至主城「秘寶」的「碎片自選箱」查看可選秘寶與數量。\n售價：0 金幣"
+    },
+    {
+      "id": "relicChoiceBoxBlue",
+      "reopened": true
+    }
+  ],
+  "scenes": [
+    {
+      "name": "relicChoiceBoxPink-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxPink-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicBreakthroughStone-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicBreakthroughStone-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxOrange-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxOrange-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxPurple-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxPurple-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicEssence-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicEssence-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxBlue-bag-icon",
+      "controls": [
+        {
+          "label": "關閉",
+          "width": 61.133331298828125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "‹",
+          "width": 48.03333282470703,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "›",
+          "width": 48.0333251953125,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "詳",
+          "width": 48.03334045410156,
+          "height": 48.03334045410156,
+          "overflow": false
+        },
+        {
+          "label": "裝備",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "物品",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "材料",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "功能",
+          "width": 86.24166870117188,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "重新整理",
+          "width": 91.69999694824219,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "←",
+          "width": 48.03333282470703,
+          "height": 48.0333251953125,
+          "overflow": false
+        },
+        {
+          "label": "→",
+          "width": 48.03334045410156,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    },
+    {
+      "name": "relicChoiceBoxBlue-detail-top",
+      "controls": [
+        {
+          "label": "獲取途徑",
+          "width": 98.48880767822266,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "不可裝備",
+          "width": 98.49449157714844,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "售出",
+          "width": 98.48880004882812,
+          "height": 48.03338623046875,
+          "overflow": false
+        },
+        {
+          "label": "返回",
+          "width": 300.57220458984375,
+          "height": 48.0333251953125,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    }
+  ],
+  "scope": "Six art replacements only, full27 canonical bag context, true slot decode/1254/contain and detail/return/reopen. Source lists and other21 materials reused from accepted22A; no use/craft/choose/upgrade/sell/transaction or choice-pool approval. Natural detail end only if needed. First failed gate stops with partial evidence."
+}

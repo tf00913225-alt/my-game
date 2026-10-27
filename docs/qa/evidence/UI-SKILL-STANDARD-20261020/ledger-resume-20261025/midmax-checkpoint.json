@@ -1,0 +1,175 @@
+{
+  "workId": "UI-SKILL-STANDARD-20261020",
+  "head": "b80b3168082326b67777a15a6b99d6e9039212a8",
+  "scope": "Only five native mid/max skill detail fixtures; prior48 unlearned/Lv1 acceptance preserved, not rerun.",
+  "cases": {
+    "fireRocket": [
+      5,
+      10
+    ],
+    "healSpell": [
+      3,
+      5
+    ],
+    "bloodBurnArt": [
+      3,
+      5
+    ],
+    "barrier": [
+      3,
+      5
+    ],
+    "dinghaishenzhen": [
+      3,
+      5
+    ]
+  },
+  "sourceWrites": false,
+  "devices": [
+    {
+      "viewport": "1280x800",
+      "report": "artifacts/ui-skill-standard/ledger-skill-midmax-b80b3168/1280x800/report.json",
+      "reportSha256": "96bd5eb0d08eb1bc5324c64377359ebbe68044c12980d2652bbd4c3a5a40ebce",
+      "screens": 20,
+      "synchronousRecords": 20,
+      "crossAwaitStorageDifferences": [
+        {
+          "id": "healSpell-lv3",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "healSpell-lv5",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "bloodBurnArt-lv3",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "bloodBurnArt-lv5",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "barrier-lv3",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_account:skill-runtime-browser-qa:rested-exp-state",
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "barrier-lv5",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "dinghaishenzhen-lv3",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        },
+        {
+          "id": "dinghaishenzhen-lv5",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_account:skill-runtime-browser-qa:rested-exp-state",
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        }
+      ]
+    },
+    {
+      "viewport": "360x640",
+      "report": "artifacts/ui-skill-standard/ledger-skill-midmax-b80b3168/360x640/report.json",
+      "reportSha256": "daa9d6d22ff0fc058eb456eafe3fb8f7bb7f1f5677603c16fc96fee1274e48f9",
+      "screens": 20,
+      "synchronousRecords": 20,
+      "crossAwaitStorageDifferences": [
+        {
+          "id": "fireRocket-lv10",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_save:skill-runtime-browser-qa",
+            "four_symbols_save_meta:skill-runtime-browser-qa"
+          ]
+        }
+      ]
+    },
+    {
+      "viewport": "393x873",
+      "report": "artifacts/ui-skill-standard/ledger-skill-midmax-b80b3168/393x873/report.json",
+      "reportSha256": "6521061c96c6c7c5106e76309e39a2f5e390bac2c6a17590b3d539284abef287",
+      "screens": 20,
+      "synchronousRecords": 20,
+      "crossAwaitStorageDifferences": []
+    },
+    {
+      "viewport": "412x915",
+      "report": "artifacts/ui-skill-standard/ledger-skill-midmax-b80b3168/412x915/report.json",
+      "reportSha256": "9bf7119cace4d1f1514a68b7fb4e3fa4b42cb2ceb13d9674701ef02b2b6e4063",
+      "screens": 20,
+      "synchronousRecords": 20,
+      "crossAwaitStorageDifferences": [
+        {
+          "id": "bloodBurnArt-lv5",
+          "identityKeys": [],
+          "storageKeys": [
+            "four_symbols_account:skill-runtime-browser-qa:rested-exp-state"
+          ]
+        }
+      ]
+    }
+  ],
+  "reviews": {
+    "art": {
+      "reviewer": "dev992_art_review",
+      "result": "PASS 22 actual representative PNGs across four sizes; titles centered, descriptions/requirements/close complete; normal scroll viewport cuts are not permanent obstruction.",
+      "limits": "Only specified five skills/levels; top/end not proof of visual reading of each intermediate number row; not48 mid/max, hardware or gameplay."
+    },
+    "interaction": {
+      "reviewer": "dev992_input_review",
+      "result": "PASS 4x20PNG,10case,30hittap,20sync handler per size; original list/detail scroll and close; legal required/upgrade eligibility checks.",
+      "limits": "All taps touch-emulated including desktop, desktop scroll wheel. Cross-await storage differences retained; not zero save/full business unchanged."
+    },
+    "scope": {
+      "reviewer": "ci_player_flow_review",
+      "result": "PASS all complete/sourceUnchanged and exact handler restoration; no learn/upgrade/equip/cast/transaction.",
+      "limits": "Only observed synchronous player/loadouts/storage unchanged; not actual progression history/authority."
+    }
+  },
+  "dialogObservation": "artifacts/ui-skill-standard/creation-dialog-owner-b80b3168/report.json",
+  "remaining": [
+    "other43 skills legal mid/max",
+    "all character combinations",
+    "all intermediate data rows visually read",
+    "keyboard/native desktop mouse/physical device",
+    "actual progression/transactions/cloud authority",
+    "original full UI ledger gaps",
+    "tracked evidence/remote source checkpoint waits publication handback"
+  ],
+  "automation": "PAUSED",
+  "exploration": "product-paused"
+}

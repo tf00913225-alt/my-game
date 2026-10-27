@@ -1,0 +1,81 @@
+{
+  "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+  "reports": [
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24b-character-tabs-ccca1b2c\\prepared\\360x640\\report.json",
+      "type": "b",
+      "size": "360x640",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "eaf66ba4a43333a93be393fd5d85da32b3e9e90ac8ac2f879b8705464b3265c1",
+      "complete": true,
+      "restoration": "NOT RECORDED: B cleanup occurs in finally after report; no exact restoration claim"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24b-character-tabs-ccca1b2c\\prepared\\393x873\\report.json",
+      "type": "b",
+      "size": "393x873",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "953ae7469654b1a8d3e4949e645a340c2ddf44ab50de189e26d3c567496733af",
+      "complete": true,
+      "restoration": "NOT RECORDED: B cleanup occurs in finally after report; no exact restoration claim"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24b-character-tabs-ccca1b2c\\prepared\\412x915\\report.json",
+      "type": "b",
+      "size": "412x915",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "9f3ea890d2b328ae6133a24d723eec78db32f0835858689466ab24933d9deaed",
+      "complete": true,
+      "restoration": "NOT RECORDED: B cleanup occurs in finally after report; no exact restoration claim"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment24b-character-tabs-ccca1b2c\\prepared\\1280x800\\report.json",
+      "type": "b",
+      "size": "1280x800",
+      "head": "ccca1b2c97935a586443ada77b2ed76c268bc3cf",
+      "sha256": "6db1f9fcf0f65da593d6f30bf657dfe9278cda8b69bc9edd5e0cb72ba6c8584b",
+      "complete": true,
+      "restoration": "NOT RECORDED: B cleanup occurs in finally after report; no exact restoration claim"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment26-exp-charge-7952d712\\prepared-observe\\360x640\\report.json",
+      "type": "b",
+      "size": "360x640",
+      "head": "7952d712cd8f864132ab693c07add24074de4bee",
+      "sha256": "56bb3974394e07a5236754033baa99886b2b396b442958ed1eddb111946434c1",
+      "role": "charge-only-delta"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment26-exp-charge-7952d712\\prepared-observe\\393x873\\report.json",
+      "type": "b",
+      "size": "393x873",
+      "head": "7952d712cd8f864132ab693c07add24074de4bee",
+      "sha256": "a4fcff425e03e7b42fc4dbd6a4c8ebd23212164e203f517c15122181753f2321",
+      "role": "charge-only-delta"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment26-exp-charge-7952d712\\prepared-observe\\412x915\\report.json",
+      "type": "b",
+      "size": "412x915",
+      "head": "7952d712cd8f864132ab693c07add24074de4bee",
+      "sha256": "e82c7a4ebc83b627bd7cbb5b15a43ab9116a818c1d50d3eedf0fbe2e30ddefa3",
+      "role": "charge-only-delta"
+    },
+    {
+      "file": "artifacts\\ui-skill-standard\\segment26-exp-charge-7952d712\\prepared-observe\\1280x800\\report.json",
+      "type": "b",
+      "size": "1280x800",
+      "head": "7952d712cd8f864132ab693c07add24074de4bee",
+      "sha256": "8fa7fcfa57ab8bbfe6ca29beea04bada9795816832c1ce09cffe6e78b852945b",
+      "role": "charge-only-delta"
+    }
+  ],
+  "files": [],
+  "limits": [
+    "Original ccca B operation plus7952 pure-observe charge delta; extra200ms sync prepared excluded; only actual original4s timer peak/end explanatory separation",
+    "Only isolated canonical3-character legal16-name status/skill/EXP read/end/return and locked/eligible creation entry/cancel",
+    "Original normalization/delegated saves retained; no zero-save claim",
+    "B final API/identity cleanup has no recorded restoration result: do not claim exact restore",
+    "No allocation confirm/learn/upgrade/equip/create submit/drag/cloud transaction/hardware keyboard/real device"
+  ]
+}

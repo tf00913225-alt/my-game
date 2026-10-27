@@ -1,0 +1,15 @@
+{
+  "art": {
+    "reviewer": "remaining_audit_review",
+    "result": "四尺寸實圖限定通過；16字升級名稱/等級與reward長文完整，原黑鐵古銅框；暫遮頂部資源，主要入口/nav無遮擋。"
+  },
+  "interaction": {
+    "reviewer": "relic_input_review",
+    "result": "四尺寸真mouse端點582/0與clamp、active保持全部、真card入口；reward自然hide/dismiss/A-B期限及level自然hide通過。",
+    "limits": "未比對完整owned；toast設備/uid非正式Owner讀值不作證，僅腳本實際序列化欄位同task相同。"
+  },
+  "scope": {
+    "reviewer": "pending_scope_review",
+    "result": "原js00掛載名單及css00 toast原規則；bundle/index/manifest為原builder；generated restricted policy僅main sourceDigest，無政策語意變更。實看360前後圖，其他尺寸由art/input獨審。"
+  }
+}

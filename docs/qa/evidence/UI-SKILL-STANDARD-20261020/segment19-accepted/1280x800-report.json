@@ -1,0 +1,346 @@
+{
+  "sourcesBefore": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "d201c4cfc31fedc2454b5db8f6785d4e2a1d2a88c660a7fba3961bbe96c063e5",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.ec568394fd00.js": "ec568394fd00290c85802827d0aa1941ba42f7fce5e35a226550068cdf0907c1",
+    "build/gameplay-core.699387115cfb.css": "699387115cfbe4ac5169779c104d4f345a00771f6b9a9a37737b7545ed3a29a9"
+  },
+  "sourcesAfter": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "d201c4cfc31fedc2454b5db8f6785d4e2a1d2a88c660a7fba3961bbe96c063e5",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.ec568394fd00.js": "ec568394fd00290c85802827d0aa1941ba42f7fce5e35a226550068cdf0907c1",
+    "build/gameplay-core.699387115cfb.css": "699387115cfbe4ac5169779c104d4f345a00771f6b9a9a37737b7545ed3a29a9"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core-secondary.ec568394fd00.js",
+    "/build/gameplay-core.699387115cfb.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.ec568394fd00.js",
+    "/build/gameplay-core.699387115cfb.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.9eb4fff74856.css"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"3\"]",
+      "x": 452.5,
+      "y": 541.6666412353516,
+      "hit": true,
+      "label": "任務"
+    },
+    {
+      "selector": "#questTabBtnCommission",
+      "x": 735.3938598632812,
+      "y": 135,
+      "hit": true,
+      "label": "委託任務"
+    },
+    {
+      "root": "#questTabBody",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 735.3954925537109,
+      "y": 413.13800048828125,
+      "to": 265,
+      "top": 2633,
+      "client": 476,
+      "height": 3109
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 788.1380004882812,
+      "y": 72.5,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"3\"]",
+      "x": 452.5,
+      "y": 541.6666412353516,
+      "hit": true,
+      "label": "任務"
+    },
+    {
+      "selector": "#questTabBtnCommission",
+      "x": 735.3938598632812,
+      "y": 135,
+      "hit": true,
+      "label": "委託任務"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 788.1380004882812,
+      "y": 72.5,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"7\"]",
+      "x": 827.5,
+      "y": 541.6666412353516,
+      "hit": true,
+      "label": "合成"
+    },
+    {
+      "selector": ".v141-synthesis-tabs button[onclick*=\"material\"]",
+      "x": 772.5,
+      "y": 177.5,
+      "hit": true,
+      "label": "材料合成"
+    },
+    {
+      "root": ".v141-synthesis-body",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 736.875,
+      "y": 643.75,
+      "to": 250,
+      "top": 13,
+      "client": 1065,
+      "height": 1078
+    },
+    {
+      "selector": ".v17363-game-select-trigger",
+      "x": 640,
+      "y": 391.24346923828125,
+      "hit": true,
+      "label": "白階 → 藍階▾"
+    },
+    {
+      "root": ".v17363-game-select-menu",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 730,
+      "y": 654.9934692382812,
+      "to": 448.74346923828125,
+      "top": 117,
+      "client": 609,
+      "height": 726
+    },
+    {
+      "selector": ".v17363-game-select-option:last-child",
+      "x": 640,
+      "y": 633.7434692382812,
+      "hit": true,
+      "label": "桃紅階 → 四象階"
+    },
+    {
+      "root": ".v141-synthesis-body",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 736.875,
+      "y": 643.75,
+      "to": 250,
+      "top": 13,
+      "client": 1065,
+      "height": 1078
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 791.09375,
+      "y": 58.75,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"7\"]",
+      "x": 827.5,
+      "y": 541.6666412353516,
+      "hit": true,
+      "label": "合成"
+    },
+    {
+      "selector": ".v141-synthesis-tabs button[onclick*=\"material\"]",
+      "x": 772.5,
+      "y": 185,
+      "hit": true,
+      "label": "材料合成"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 791.09375,
+      "y": 58.75,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "commission": {
+        "text": "委託：擊敗15隻怪物\n進行中\n今天累計擊敗15隻怪物\n進度\n0 / 15\n獎勵\n金幣 1250\n未達成\n委託：打贏3場戰鬥\n進行中\n今天打贏三場完整戰鬥\n進度\n0 / 3\n獎勵\n金幣 1000　EXP 450\n未達成\n委託：討伐30隻怪物\n進行中\n今天累計擊敗30隻怪物\n進度\n0 / 30\n獎勵\n金幣 1750　EXP 540\n未達成\n委託：五戰告捷\n進行中\n今天打贏5場戰鬥\n進度\n0 / 5\n獎勵\n金幣 1500　EXP 660\n未達成\n委託：精英獵手\n進行中\n今天擊敗2隻精英怪\n進度\n0 / 2\n獎勵\n金幣 1300　EXP 360\n未達成\n委託：招式演練\n進行中\n今天在戰鬥中施放15次技能\n進度\n0 / 15\n獎勵\n金幣 1100　EXP 450\n未達成",
+        "scroll": 2633,
+        "client": 476,
+        "height": 3109
+      }
+    },
+    {
+      "commissionMode": "available",
+      "text": "委託：擊敗15隻怪物\n可領取\n今天累計擊敗15隻怪物\n進度\n15 / 15\n獎勵\n金幣 1250\n領取\n委託：打贏3場戰鬥\n可領取\n今天打贏三場完整戰鬥\n進度\n3 / 3\n獎勵\n金幣 1000　EXP 450\n領取\n委託：討伐30隻怪物\n可領取\n今天累計擊敗30隻怪物\n進度\n30 / 30\n獎勵\n金幣 1750　EXP 540\n領取\n委託：五戰告捷\n可領取\n今天打贏5場戰鬥\n進度\n5 / 5\n獎勵\n金幣 1500　EXP 660\n領取\n委託：精英獵手\n可領取\n今天擊敗2隻精英怪\n進度\n2 / 2\n獎勵\n金幣 1300　EXP 360\n領取\n委託：招式演練\n可領取\n今天在戰鬥中施放15次技能\n進度\n15 / 15\n獎勵\n金幣 1100　EXP 450\n領取"
+    },
+    {
+      "commissionMode": "claimed",
+      "text": "委託：擊敗15隻怪物\n已領取\n今天累計擊敗15隻怪物\n進度\n15 / 15\n獎勵\n金幣 1250\n已領取\n委託：打贏3場戰鬥\n已領取\n今天打贏三場完整戰鬥\n進度\n3 / 3\n獎勵\n金幣 1000　EXP 450\n已領取\n委託：討伐30隻怪物\n已領取\n今天累計擊敗30隻怪物\n進度\n30 / 30\n獎勵\n金幣 1750　EXP 540\n已領取\n委託：五戰告捷\n已領取\n今天打贏5場戰鬥\n進度\n5 / 5\n獎勵\n金幣 1500　EXP 660\n已領取\n委託：精英獵手\n已領取\n今天擊敗2隻精英怪\n進度\n2 / 2\n獎勵\n金幣 1300　EXP 360\n已領取\n委託：招式演練\n已領取\n今天在戰鬥中施放15次技能\n進度\n15 / 15\n獎勵\n金幣 1100　EXP 450\n已領取"
+    },
+    {
+      "materialText": "合成\n金幣 0\n符咒合成\n碎片合成\n材料合成\n礦石升階\n\n同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。\n\n升階路線\n桃紅階 → 四象階\n▾\n桃紅階礦石\n1234 / 50\n→\n四象階礦石\n×10\n合成下一階礦石 ×10"
+    }
+  ],
+  "head": "8b208ab5688a5b97241fd978f0dd346c27651eb6",
+  "dirty": false,
+  "viewport": [
+    1280,
+    800
+  ],
+  "contexts": [
+    "actual city3 quest -> commission tab; actual city7 synthesis -> material tab"
+  ],
+  "scenes": [
+    {
+      "name": "commission-natural-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "commission-natural-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "commission-available",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "commission-claimed",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "commission-reopen",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-insufficient-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-insufficient-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-menu",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-selected-last",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-available-multidigit",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-available-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "material-reopen",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment19 presentation-only commission and material synthesis tabs. Formal city entries and tabs, natural content end/return/reopen and material selector; isolated canonical quest progress/claimed and ore counts1234 fixture without claim/craft/save actions. No talisman/fragment revalidation. Long synthetic pressure not included; natural no-overflow explicitly recorded. Original UI sideeffects retained, no zero-save-call claim."
+}

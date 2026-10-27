@@ -1,0 +1,152 @@
+{
+  "workId": "UI-SKILL-STANDARD-20261020",
+  "head": "046bd8e93af8c76f8c251b427b877fbfc4f0784a",
+  "productWrites": false,
+  "publicationOwner": "01a15893-3f4b-7ab0-88c5-57957e935909",
+  "automation": "PAUSED",
+  "exploration": "product-paused",
+  "reports": [
+    {
+      "group": "ledger-creation-submit-v3-046bd8e9",
+      "vp": "1280x800",
+      "path": "artifacts/ui-skill-standard/ledger-creation-submit-v3-046bd8e9/1280x800/report.json",
+      "sha256": "ab36a571da4a55a7e2523bbaddd0c4f0321e8d01f83e34c0b8fed4019345ed88",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 10,
+      "exceptionCount": 0,
+      "nativeAlerts": [
+        "請先輸入角色 ID。",
+        "ID至少需要2個字元。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。"
+      ]
+    },
+    {
+      "group": "ledger-creation-submit-v3-046bd8e9",
+      "vp": "360x640",
+      "path": "artifacts/ui-skill-standard/ledger-creation-submit-v3-046bd8e9/360x640/report.json",
+      "sha256": "f80d2b3636b3a2192a85feb3cb1d600b26c3f97d734bf1d2a9187b7b790afdfa",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 10,
+      "exceptionCount": 0,
+      "nativeAlerts": [
+        "請先輸入角色 ID。",
+        "ID至少需要2個字元。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。"
+      ]
+    },
+    {
+      "group": "ledger-creation-submit-v3-046bd8e9",
+      "vp": "393x873",
+      "path": "artifacts/ui-skill-standard/ledger-creation-submit-v3-046bd8e9/393x873/report.json",
+      "sha256": "3e867167ca8521d556f6a8ae8840e2d72e4fb260854c1629df66fb18c2d57deb",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 10,
+      "exceptionCount": 0,
+      "nativeAlerts": [
+        "請先輸入角色 ID。",
+        "ID至少需要2個字元。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。"
+      ]
+    },
+    {
+      "group": "ledger-creation-submit-v3-046bd8e9",
+      "vp": "412x915",
+      "path": "artifacts/ui-skill-standard/ledger-creation-submit-v3-046bd8e9/412x915/report.json",
+      "sha256": "b8dd67ec84cf433de91798c2434e80d7efb52375a48ba15fb2fd318bc1049ade",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 10,
+      "exceptionCount": 0,
+      "nativeAlerts": [
+        "請先輸入角色 ID。",
+        "ID至少需要2個字元。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。"
+      ]
+    },
+    {
+      "group": "ledger-reward-lifetime-046bd8e9",
+      "vp": "1280x800",
+      "path": "artifacts/ui-skill-standard/ledger-reward-lifetime-046bd8e9/1280x800/report.json",
+      "sha256": "f22d09cd414324f24622547b6e5519e5215344fb6aab56e0f8d928f686441664",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 5,
+      "exceptionCount": 0
+    },
+    {
+      "group": "ledger-reward-lifetime-046bd8e9",
+      "vp": "360x640",
+      "path": "artifacts/ui-skill-standard/ledger-reward-lifetime-046bd8e9/360x640/report.json",
+      "sha256": "fe99f54df5db8266e9c4bd44322c9b80c325538d69cd6bc57abdd0a0e0bcf6d8",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 5,
+      "exceptionCount": 0
+    },
+    {
+      "group": "ledger-reward-lifetime-046bd8e9",
+      "vp": "393x873",
+      "path": "artifacts/ui-skill-standard/ledger-reward-lifetime-046bd8e9/393x873/report.json",
+      "sha256": "b3ef8b91f1c62b2eb1293a01687c36f2135b878dcb94d1920a2657e6f442afb6",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 5,
+      "exceptionCount": 0
+    },
+    {
+      "group": "ledger-reward-lifetime-046bd8e9",
+      "vp": "412x915",
+      "path": "artifacts/ui-skill-standard/ledger-reward-lifetime-046bd8e9/412x915/report.json",
+      "sha256": "d9afd50a60467bc7e53aa9000c3b604e51e28ef83b5d3f166270061e56e48162",
+      "complete": true,
+      "sourceUnchanged": true,
+      "scenes": 5,
+      "exceptionCount": 0
+    }
+  ],
+  "reviews": {
+    "creation": {
+      "art": "dev992_art_review: four-size pending/retry/back/longname/title actual PNG approved; initial suspected missing heading re-read original PNG and withdrawn as reviewer misread; native alert style remains unverified.",
+      "input": "dev992_input_review: true touch/mouse maxlength16/point exhaustion/pending/refusal/retry/back evidenced. No pending doubleclick or unallocated-submit assertion.",
+      "scope": "ci_player_flow_review: original submit owner untouched; only isolated external transport empty/hold/reject, local empty; no successful creation/cloud write."
+    },
+    "toast": {
+      "art": "dev992_art_review: four-size long names/9-digit values/centered title/reopen/hidden representative images approved.",
+      "input": "dev992_input_review: replacement survives old timer, natural hide/reopen; approximate waits, not exact timing; no manual dismissal.",
+      "scope": "ci_player_flow_review: original presentation API only, no battle/settlement/grant; domain/local equal after fixture preparation."
+    }
+  },
+  "issues": [
+    {
+      "id": "creation-native-alert",
+      "status": "observed-unfixed",
+      "source": "Page.javascriptDialogOpening",
+      "messages": [
+        "請先輸入角色 ID。",
+        "ID至少需要2個字元。",
+        "創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。"
+      ],
+      "ownerCandidate": "js51 original custom alert owner not effective during fresh creation; full loading cause not yet established",
+      "next": "after publication handback inspect necessary original Owner/resource trace, minimum correction with before/after and new Head gates"
+    }
+  ],
+  "excluded": [
+    "v1 four probes waiting for custom dialog incorrectly; own test processes safely stopped, no acceptance",
+    "v2 one bounded probe obtained native event and timed out; no complete acceptance"
+  ],
+  "remaining": [
+    "all original full UI ledger gaps",
+    "creation successful/additional and actual native prompt pixels",
+    "pending repeat input/back and unallocated submit not tested",
+    "real devices/PWA",
+    "battle outcomes/settlement not covered",
+    "remote visual evidence commit waits publication writer handback"
+  ]
+}

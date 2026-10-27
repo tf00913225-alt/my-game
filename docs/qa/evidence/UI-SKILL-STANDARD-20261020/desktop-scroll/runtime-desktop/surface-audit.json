@@ -1,0 +1,1182 @@
+[
+  {
+    "name": "feature-rest",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-hero",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-hero-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-hero-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-hero-tab-2",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-hero-tab-3",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-hero-tab-4",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 0,
+        "y": 830
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "heroPageContent",
+        "classes": "hero-page-content",
+        "axes": "y",
+        "x": 726.875,
+        "y": 624.375,
+        "axis": "y",
+        "max": 830,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-expPool",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 258
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 726.875,
+        "y": 591.25,
+        "axis": "y",
+        "max": 258,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-shop",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "shop-potion-list",
+        "axes": "y",
+        "x": 0,
+        "y": 1730
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "shop-potion-list",
+        "axes": "y",
+        "x": 734.375,
+        "y": 638.3740234375,
+        "axis": "y",
+        "max": 1730,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-shop-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "shop-potion-list",
+        "axes": "y",
+        "x": 0,
+        "y": 1730
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "shop-potion-list",
+        "axes": "y",
+        "x": 734.375,
+        "y": 638.3740234375,
+        "axis": "y",
+        "max": 1730,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-shop-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v17345-equipment-grid",
+        "axes": "y",
+        "x": 0,
+        "y": 1755
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v17345-equipment-grid",
+        "axes": "y",
+        "x": 734.375,
+        "y": 558.125,
+        "axis": "y",
+        "max": 1755,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-character",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 554
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 738.125,
+        "y": 657.5,
+        "axis": "y",
+        "max": 554,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-character-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 871
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 738.125,
+        "y": 657.5,
+        "axis": "y",
+        "max": 871,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-character-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 554
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 738.125,
+        "y": 657.5,
+        "axis": "y",
+        "max": 554,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-character-tab-2",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 7250
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "characterTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 738.125,
+        "y": 657.5,
+        "axis": "y",
+        "max": 7250,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-formation",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-offlineExp",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-quest",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 0,
+        "y": 2570
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 1016,
+        "y": 0
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 735.3954925537109,
+        "y": 408.29100036621094,
+        "axis": "y",
+        "max": 2570,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 729.1454925537109,
+        "y": 697.1419219970703,
+        "axis": "x",
+        "max": 1016,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 132,
+          "top": 0
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-quest-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 0,
+        "y": 2570
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 1016,
+        "y": 0
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 735.3954925537109,
+        "y": 408.29100036621094,
+        "axis": "y",
+        "max": 2570,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 729.1454925537109,
+        "y": 697.1419219970703,
+        "axis": "x",
+        "max": 1016,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 132,
+          "top": 0
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-quest-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 0,
+        "y": 2633
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 1016,
+        "y": 0
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "questTabBody",
+        "classes": "quest-tab-body",
+        "axes": "y",
+        "x": 735.3954925537109,
+        "y": 388.60350036621094,
+        "axis": "y",
+        "max": 2633,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      },
+      {
+        "i": 1,
+        "id": "",
+        "classes": "quest-completion-milestones",
+        "axes": "x",
+        "x": 729.1454925537109,
+        "y": 690.5794219970703,
+        "axis": "x",
+        "max": 1016,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 132,
+          "top": 0
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-achievement",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v17351-achievement-list",
+        "axes": "y",
+        "x": 0,
+        "y": 222
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v17351-achievement-list",
+        "axes": "y",
+        "x": 726.875,
+        "y": 558.125,
+        "axis": "y",
+        "max": 222,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-announcement",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-system",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 23
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 725.625,
+        "y": 593.125,
+        "axis": "y",
+        "max": 23,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 23
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-autoBattleSettings",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 715
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "homeFeatureModalBody",
+        "classes": "",
+        "axes": "y",
+        "x": 728.125,
+        "y": 594.0625,
+        "axis": "y",
+        "max": 715,
+        "from": 23,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 155
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-synthesis",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-synthesis-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-synthesis-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v141-synthesis-body",
+        "axes": "y",
+        "x": 0,
+        "y": 986
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v141-synthesis-body",
+        "axes": "y",
+        "x": 736.875,
+        "y": 557.8125,
+        "axis": "y",
+        "max": 986,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-synthesis-tab-2",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v141-synthesis-body",
+        "axes": "y",
+        "x": 0,
+        "y": 13
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "v141-synthesis-body",
+        "axes": "y",
+        "x": 736.875,
+        "y": 557.8125,
+        "axis": "y",
+        "max": 13,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 13
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "feature-forge",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-forge-tab-0",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-forge-tab-1",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "feature-relic",
+    "rootSelector": "#homeFeatureModal",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "page-home",
+    "rootSelector": "#homePage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "homePage",
+        "classes": "page main-city-lobby-ready active",
+        "axes": "y",
+        "x": 0,
+        "y": 160
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "homePage",
+        "classes": "page main-city-lobby-ready active",
+        "axes": "y",
+        "x": 752.5,
+        "y": 532.5,
+        "axis": "y",
+        "max": 160,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-inventoryPage",
+    "rootSelector": "#inventoryPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "inventoryGridScroll",
+        "classes": "inventory-grid-scroll",
+        "axes": "y",
+        "x": 0,
+        "y": 388
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "inventoryGridScroll",
+        "classes": "inventory-grid-scroll",
+        "axes": "y",
+        "x": 740.625,
+        "y": 650.4166641235352,
+        "axis": "y",
+        "max": 388,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 132
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-trainingPage",
+    "rootSelector": "#trainingPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "training-zone-list",
+        "axes": "y",
+        "x": 0,
+        "y": 51
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "",
+        "classes": "training-zone-list",
+        "axes": "y",
+        "x": 752.5,
+        "y": 532.4915771484375,
+        "axis": "y",
+        "max": 51,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 51
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-dungeonPage",
+    "rootSelector": "#dungeonPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "dungeonTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 0,
+        "y": 988
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "dungeonTabContent",
+        "classes": "",
+        "axes": "y",
+        "x": 747.1428070068359,
+        "y": 564.0987014770508,
+        "axis": "y",
+        "max": 988,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 51
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-gameplayPage",
+    "rootSelector": "#gameplayPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "gameplayHubContent",
+        "classes": "gameplay-panel-scroll gameplay-hub-grid",
+        "axes": "y",
+        "x": 0,
+        "y": 349
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "gameplayHubContent",
+        "classes": "gameplay-panel-scroll gameplay-hub-grid",
+        "axes": "y",
+        "x": 745,
+        "y": 550.860725402832,
+        "axis": "y",
+        "max": 349,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 51
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-bossPage",
+    "rootSelector": "#bossPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "bossTabContent",
+        "classes": "gameplay-panel-scroll",
+        "axes": "y",
+        "x": 0,
+        "y": 408
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "bossTabContent",
+        "classes": "gameplay-panel-scroll",
+        "axes": "y",
+        "x": 745,
+        "y": 569.8785858154297,
+        "axis": "y",
+        "max": 408,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 51
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-towerPage",
+    "rootSelector": "#towerPage",
+    "scrollers": [
+      {
+        "i": 0,
+        "id": "towerPageContent",
+        "classes": "gameplay-panel-scroll",
+        "axes": "y",
+        "x": 0,
+        "y": 116
+      }
+    ],
+    "operations": [
+      {
+        "i": 0,
+        "id": "towerPageContent",
+        "classes": "gameplay-panel-scroll",
+        "axes": "y",
+        "x": 745,
+        "y": 550.860725402832,
+        "axis": "y",
+        "max": 116,
+        "from": 0,
+        "distance": 55,
+        "direction": -1,
+        "after": {
+          "left": 0,
+          "top": 51
+        },
+        "result": "real-pointer-scroll-verified",
+        "syntheticInventoryGoldUnchanged": true
+      }
+    ]
+  },
+  {
+    "name": "page-mapPage",
+    "rootSelector": "#mapPage",
+    "scrollers": [],
+    "operations": []
+  },
+  {
+    "name": "page-statusPage",
+    "rootSelector": "#statusPage",
+    "hidden": true,
+    "operations": []
+  },
+  {
+    "name": "page-skillPage",
+    "rootSelector": "#skillPage",
+    "hidden": true,
+    "operations": []
+  },
+  {
+    "name": "page-adventurePage",
+    "rootSelector": "#adventurePage",
+    "scrollers": [],
+    "operations": []
+  }
+]

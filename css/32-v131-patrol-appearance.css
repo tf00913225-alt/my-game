@@ -51,12 +51,13 @@
 }
 #game-stage #mapPage #v131PatrolAppearancePanel{
     display:none;
-    min-width:128px;
-    max-width:190px;
-    padding:5px;
+    min-width:160px;
+    max-width:220px;
+    padding:10px;
     border:1px solid #8a6a3a;
-    border-radius:8px;
-    background:rgba(12,9,6,.94);
+    border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;
+    border-radius:4px;
+    background:var(--rpg-window-iron,#17130f);
     box-shadow:0 6px 18px rgba(0,0,0,.65);
 }
 #game-stage #mapPage #v131PatrolAppearancePanel.show{
@@ -65,16 +66,17 @@
 }
 #game-stage #mapPage .v131-patrol-choice{
     width:100%;
-    min-height:38px;
-    padding:6px 9px;
+    min-height:52px;
+    padding:8px 10px;
     border:1px solid #66502d;
-    border-radius:6px;
-    background:linear-gradient(180deg,#2c2115,#161009);
+    border-radius:4px;
+    background:linear-gradient(#30291f,#1b1812);
     color:#f2e3bf;
-    font-size:15px;
-    line-height:1.25;
+    font-size:18px;
+    line-height:1.4;
     font-weight:800;
     text-align:left;
+    overflow-wrap:anywhere;
 }
 #game-stage #mapPage .v131-patrol-choice.active{
     border-color:#f0b429;

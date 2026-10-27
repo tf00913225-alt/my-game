@@ -1,0 +1,130 @@
+{
+  "before": {
+    "page": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 568,
+        "top": 0,
+        "right": 360,
+        "bottom": 568,
+        "left": 0
+      },
+      "overflow": "auto",
+      "scrollTop": 0,
+      "scrollHeight": 2123,
+      "clientHeight": 1704
+    },
+    "entry": {
+      "x": 80,
+      "y": 546.5260620117188,
+      "width": 200,
+      "height": 52.53125,
+      "top": 546.5260620117188,
+      "right": 280,
+      "bottom": 599.0573120117188,
+      "left": 80
+    },
+    "nav": {
+      "x": 0,
+      "y": 568,
+      "width": 360,
+      "height": 72,
+      "top": 568,
+      "right": 360,
+      "bottom": 640,
+      "left": 0
+    },
+    "hit": "<button id=\"homeNav\" class=\"nav-button active nav-art-button-wrap\" onclick=\"showPage('home')\" aria-label=\"主城\">\n<span class=\"nav-icon-frame\"><svg viewBox=\"0 0 64 64\" aria-hidden=\"tr",
+    "hitEntry": false
+  },
+  "steps": [
+    {
+      "page": {
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 568,
+          "top": 0,
+          "right": 360,
+          "bottom": 568,
+          "left": 0
+        },
+        "overflow": "auto",
+        "scrollTop": 260,
+        "scrollHeight": 2123,
+        "clientHeight": 1704
+      },
+      "entry": {
+        "x": 80,
+        "y": 459.859375,
+        "width": 200,
+        "height": 52.53125,
+        "top": 459.859375,
+        "right": 280,
+        "bottom": 512.390625,
+        "left": 80
+      },
+      "nav": {
+        "x": 0,
+        "y": 568,
+        "width": 360,
+        "height": 72,
+        "top": 568,
+        "right": 360,
+        "bottom": 640,
+        "left": 0
+      },
+      "hit": "<strong>出城冒險　›</strong>",
+      "hitEntry": true
+    }
+  ],
+  "after": {
+    "page": {
+      "rect": {
+        "x": 0,
+        "y": 0,
+        "width": 360,
+        "height": 568,
+        "top": 0,
+        "right": 360,
+        "bottom": 568,
+        "left": 0
+      },
+      "overflow": "auto",
+      "scrollTop": 260,
+      "scrollHeight": 2123,
+      "clientHeight": 1704
+    },
+    "entry": {
+      "x": 80,
+      "y": 459.859375,
+      "width": 200,
+      "height": 52.53125,
+      "top": 459.859375,
+      "right": 280,
+      "bottom": 512.390625,
+      "left": 80
+    },
+    "nav": {
+      "x": 0,
+      "y": 568,
+      "width": 360,
+      "height": 72,
+      "top": 568,
+      "right": 360,
+      "bottom": 640,
+      "left": 0
+    },
+    "hit": "<strong>出城冒險　›</strong>",
+    "hitEntry": true
+  },
+  "result": {
+    "page": "adventurePage",
+    "adventureLoaded": true,
+    "story": false
+  },
+  "scope": "Original isolated runtime; real wheel and pointer; no product changes, not fullStory acceptance"
+}

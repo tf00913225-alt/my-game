@@ -1,0 +1,1 @@
+First QA Enter keyDown lacked CDP text carriage return, so it did not generate native keypress/click. Qualified native packet adds text/unmodifiedText CR, with trusted keypress/click evidence. No product change. Failed attempt excluded, not PASS.

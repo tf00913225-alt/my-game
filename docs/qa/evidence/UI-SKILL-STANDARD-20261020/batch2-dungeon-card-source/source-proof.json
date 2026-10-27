@@ -1,0 +1,7 @@
+{
+  "base": "f4e32d549f2d98cb68e3e8eb93434a41fc92455a",
+  "onlyOriginalMinHeight38to52": true,
+  "fullSourceExpectedExact": true,
+  "fullGeneratedCssExpectedExact": true,
+  "jsFunctionsConfigUnchanged": true
+}

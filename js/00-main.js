@@ -255,7 +255,7 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
     ui.dataset.presentationDomain="native";
     document.getElementById("game-overlay-layer").appendChild(ui);
     for(const id of ["homePage","inventoryPage","homeFeatureModal","itemModal",
-                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal"]){
+                     "inventoryCharacterDetailModal","skillDetailModal","statusHelpModal","levelUpToast"]){
         const node=document.getElementById(id);
         if(node) ui.appendChild(node);
     }
@@ -1887,6 +1887,9 @@ function battleItemIconMarkup(item){
     if(!raw){ return ""; }
     if(raw.indexOf("<img")>=0||raw.indexOf("<svg")>=0||raw.indexOf("<span")>=0){ return raw; }
     const escaped=raw.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+    if(!/^(?:data:image\/|blob:|https?:\/\/|\/)|\.(?:avif|webp|png|jpe?g|gif|svg)(?:[?#]|$)/i.test(raw)){
+        return '<span aria-hidden="true">'+escaped+'</span>';
+    }
     return '<img src="'+escaped+'" alt="" aria-hidden="true" draggable="false" decoding="async">';
 }
 
@@ -6494,6 +6497,7 @@ function resetSharedCreationForm(){
 
     updateCreationUI();
     updateCreationScreenContext();
+    updateInitialCharacterCreationFeedback();
 }
 
 
@@ -6978,13 +6982,23 @@ function createSecondCharacter(){
 ===================================================== */
 
 let initialCharacterCreationPending=false;
-function updateInitialCharacterCreationFeedback(message){
+function updateInitialCharacterCreationFeedback(message,detail){
+    if(message===undefined&&detail===undefined&&initialCharacterCreationPending){return;}
     const button=$("creationSubmitButton"),label=$("creationSubmitLabel");
     if(button){
         button.disabled=initialCharacterCreationPending;
         button.setAttribute("aria-busy",String(initialCharacterCreationPending));
     }
     if(label){label.textContent=message||(creationTargetSlot===1?"開始冒險":"完成創建");}
+    const feedback=$("creationFeedback");
+    if(feedback){
+        feedback.textContent=detail||"";
+        feedback.hidden=!detail;
+    }
+    if(detail){
+        const explanation=$("creationPage")?.querySelector?.(".creation-stat-details");
+        if(explanation){explanation.open=false;}
+    }
 }
 async function createCharacter(){
 
@@ -7001,9 +7015,7 @@ async function createCharacter(){
 
     if(!id){
 
-        alert(
-            "請先輸入角色 ID。"
-        );
+        updateInitialCharacterCreationFeedback(null,"請先輸入角色 ID。");
 
         return;
 
@@ -7012,9 +7024,7 @@ async function createCharacter(){
 
     if(id.length<2){
 
-        alert(
-            "ID至少需要2個字元。"
-        );
+        updateInitialCharacterCreationFeedback(null,"ID至少需要2個字元。");
 
         return;
 
@@ -7087,11 +7097,10 @@ async function createCharacter(){
         }
     }catch(error){
         initialCharacterCreationPending=false;
-        updateInitialCharacterCreationFeedback("創角未完成，請重試");
         console.error("受保護創角未完成；本機角色尚未建立。",error);
         const oldAccount=String(error&&error.message||"")
             .includes("Existing accounts require the original-device migration path");
-        alert(oldAccount
+        updateInitialCharacterCreationFeedback("創角未完成，請重試",oldAccount
             ?"此帳號需要保留原手機角色並走遷移流程，不能當作全新帳號創角。"
             :"創角尚未完成，請保持原帳號並重試相同的角色選擇。舊手機角色請走遷移流程。");
         return false;
@@ -25610,7 +25619,7 @@ function renderHeroDetailContent(hero,data){
         content=`<div class="hero-profile"><div class="hero-profile-art">${heroPageArtwork(hero)}</div><div class="hero-profile-summary">
             <h3>${escape(hero.definition.name)}</h3><p>${escape(elementDatabase[hero.definition.element]?.name||hero.definition.element)}・${escape(hero.definition.role)}</p>
             <p>等級 ${hero.level===null?"—":"Lv."+hero.level}</p><p>星級 ${hero.account.stars} / ${window.FourSymbolsHeroCore.contract.maxStars}</p><p>專屬碎片 ${hero.account.specificFragments}</p>
-            <small>取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div></div>
+            </div><small class="hero-profile-acquisition">取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div>
             ${!hero.eligible?'<p class="hero-page-note">尚未解鎖；完成取得條件後，需連線確認永久權益。</p>':!hero.owned?'<p class="hero-page-note">DEV 試用英雄，可直接安排出戰。</p>':""}
             <section class="hero-page-section"><h3>永久取得</h3>
                 <p>${data.acquisition.ready?(hero.definition.acquisition.kind==="cumulativeLoginDay"?`累計登入 ${data.acquisition.loginCount} / 7 天（臺北日期，每日一次）`:data.acquisition.chapter?.phase==="completed"?"第一章線上取得資格已完成。":"需以線上章節票券完成第一章取得資格。"):"需連線確認登入與英雄取得紀錄。"}</p>
@@ -25679,7 +25688,7 @@ function renderHeroGrowthControls(hero,data){
         <p>解鎖需 100 碎片；升星依序需 25／50／75／100／150 碎片；洗髓消耗 1 顆洗髓丹，重新分配全部成長點數。</p>
         <p class="hero-page-note">正式資源可由英雄首頁的累計登入獎勵與每日補給取得。${g.testMode?"測試資源與成長不保存，重新載入即消失。":"正式操作需連線確認資源。"}</p>
         ${g.error?`<p role="status">${heroPageHtml(g.error)}</p>`:""}
-        <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>同步成長紀錄</button>
+        <button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.read()" ${g.busy?"disabled":""}>${g.busy?"同步中…":"同步成長紀錄"}</button>
         ${g.devAvailable&&!g.testMode?'<button type="button" class="main-button" onclick="FourSymbolsHeroGrowth.testResources()">啟用 DEV 隔離測試資源</button>':""}
         ${button("unlock","碎片解鎖（100）",d.canUnlockHero(state.heroId))}
         ${button("starUp",state.stars===5?"已達五星":`升星（${d.getHeroStarCost(state.stars)} 碎片）`,d.canStarUpHero(state.heroId))}
@@ -26341,6 +26350,7 @@ function closeHomeFeature(){
     ){
         releaseUpdate.onSharedModalClosed();
     }
+    window.FourSymbolsAdventureUI?.syncTutorialReturn?.("home");
 
 
     if(modal){
@@ -26620,10 +26630,15 @@ function switchCharacterTab(tabName){
         pageEl,
         container
     );
+    // A different tab starts at its heading, never at the previous tab's offset.
+    container.scrollTop=0;
     const characterModal=$("homeFeatureModal");
     if(characterModal){characterModal.dataset.characterTab=tabName;}
     const characterTitle=$("homeFeatureModalTitle");
     if(characterTitle){characterTitle.textContent=tabName==="skill"?"技能":"角色";}
+    if(tabName==="expPool"&&typeof window.v173SyncExpPoolChargeUi==="function"){
+        window.v173SyncExpPoolChargeUi(false);
+    }
 
 
     if(window.v78ApplyCharacterInventoryLayout){
@@ -26871,8 +26886,7 @@ function renderCharacterShowcaseContent(){
                     '\');">'+
                     "</div>"+
 
-                    '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
-                    'white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+
+                    '<div class="character-showcase-name">'+
                     character.id+
                     "</div>"+
 
@@ -26924,9 +26938,7 @@ function renderCharacterShowcaseContent(){
                 html+=
 
                     '<div style="width:calc(66 * var(--ui-length-unit,1px));text-align:center;'+
-                    'cursor:pointer;opacity:'+
-                    (eligible?"1":".55")+
-                    ';" onclick="'+
+                    'cursor:pointer;" onclick="'+
                     (
                         eligible
                         ?
@@ -26944,11 +26956,11 @@ function renderCharacterShowcaseContent(){
                     "</div>"+
 
                     '<div style="font-size:calc(15 * var(--ui-length-unit,1px));font-weight:bold;margin-top:calc(2 * var(--ui-length-unit,1px));'+
-                    'color:#8a8a8a;">'+
+                    'color:#c5bba8;">'+
                     "未解鎖"+
                     "</div>"+
 
-                    '<div style="font-size:calc(13 * var(--ui-length-unit,1px));color:#7a6f5c;">'+
+                    '<div style="font-size:calc(13 * var(--ui-length-unit,1px));color:#b9ad98;">'+
                     (
                         eligible
                         ?
@@ -28243,7 +28255,7 @@ function renderSystemContent(){
                 '<button class="home-feature-buy-btn" onclick="saveGame();alert(\'已完成手動存檔。\')">立即存檔</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
-                '<div><strong>帳號管理</strong><small>查看目前 Firebase UID、登出或切換帳號。</small></div>'+
+                '<div><strong>帳號管理</strong><small>查看帳號資料、登出或切換帳號。</small></div>'+
                 '<button class="home-feature-buy-btn" onclick="window.FourSymbolsStartupPolicy&&window.FourSymbolsStartupPolicy.openAccountManager()">切換帳號／綁定帳號</button>'+
             '</div>'+
             '<div class="system-panel-row">'+
@@ -30637,7 +30649,7 @@ function renderHeroEquipment(hero,data){
     const id=hero.definition.heroId,equipment=characterEquipment['heroNpc:'+id];
     const button=(item,slot)=>`<button type="button" class="hero-equipment-item" data-hero="${heroPageHtml(id)}" data-uid="${heroPageHtml(item?.v141Uid||'')}" data-slot="${slot||''}"
         onclick="openHeroEquipmentItem(this.dataset.hero,this.dataset.uid,this.dataset.slot)" ${!data.editingAllowed?'disabled':''}>
-        ${item?FourSymbolsItemSlot.art(item.icon,item):'<span>＋</span>'}<span>${slot?({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+ '：':''}${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span></button>`;
+        ${item?FourSymbolsItemSlot.art(item.icon,item):'<span>＋</span>'}${slot?'<span class="hero-equipment-slot-label">'+({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+'</span>':''}<span>${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span></button>`;
     return `<section class="hero-page-section hero-equipment-section"><h3>裝備</h3><div class="hero-equipment-slots">${Object.entries(equipment).map(([slot,item])=>button(item,slot)).join('')}</div>
         <h3>共用背包裝備</h3><p>穿戴、替換或脫下均使用同一背包；其他角色已穿戴的裝備需先脫下。</p>
         <div class="hero-equipment-bag">${inventoryItems.filter(item=>getInventoryEquipmentSlot(item.type)).map(item=>button(item,null)).join('')||'<p>背包沒有可穿戴裝備。</p>'}</div></section>`;
@@ -31319,7 +31331,7 @@ function openItemModal(
             "不可裝備";
 
         equipButton.style.opacity =
-            ".4";
+            item.type==="material"?"1":".4";
 
     }
     else{
@@ -31778,10 +31790,6 @@ function showSkillDetail(skillId){
 
     const detailStats=$("skillDetailStats");
 
-    if(detailStats){
-        detailStats.scrollTop=0;
-    }
-
     [
         document.documentElement,
         document.body,
@@ -31796,6 +31804,10 @@ function showSkillDetail(skillId){
     $("skillDetailModal")
         .classList
         .add("show");
+
+    if(detailStats){
+        detailStats.scrollTop=0;
+    }
 
 }
 

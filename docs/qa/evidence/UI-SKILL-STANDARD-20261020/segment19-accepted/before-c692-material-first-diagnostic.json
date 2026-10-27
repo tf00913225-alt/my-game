@@ -1,0 +1,402 @@
+{
+  "head": "c692efa04a227f4c6877663f04dbe90735297967",
+  "dirty": false,
+  "sourcesBefore": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "3ecc25e9ff1a3418116d64395a48766365f7074c5d37a5e1fd66ea3bc0270f30",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.ec568394fd00.js": "ec568394fd00290c85802827d0aa1941ba42f7fce5e35a226550068cdf0907c1",
+    "build/gameplay-core.8af50989ba15.css": "8af50989ba1558f2c61d5ee9680cb2aa0d19700569772adc978bfcf675f0b1d0"
+  },
+  "sourceUnchanged": true,
+  "checks": [
+    {
+      "controlDiagnostic": {
+        "label": "返回",
+        "width": 68.25,
+        "height": 38,
+        "overflow": false
+      }
+    },
+    {
+      "controlDiagnostic": {
+        "label": "符咒合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      }
+    },
+    {
+      "controlDiagnostic": {
+        "label": "碎片合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      }
+    },
+    {
+      "controlDiagnostic": {
+        "label": "材料合成",
+        "width": 98,
+        "height": 44,
+        "overflow": false
+      }
+    },
+    {
+      "controlDiagnostic": {
+        "label": "白階 → 藍階▾",
+        "width": 288,
+        "height": 38,
+        "overflow": false
+      }
+    },
+    {
+      "controlDiagnostic": {
+        "label": "合成下一階礦石 ×10",
+        "width": 288,
+        "height": 38,
+        "overflow": false
+      }
+    },
+    {
+      "body": {
+        "text": "合成\n金幣 0\n符咒合成\n碎片合成\n材料合成\n礦石升階\n\n同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。\n\n升階路線\n白階 → 藍階\n▾\n白階礦石\n0 / 50\n→\n藍階礦石\n×10\n合成下一階礦石 ×10",
+        "buttons": [
+          {
+            "text": "符咒合成",
+            "disabled": false,
+            "rect": {
+              "x": 25,
+              "y": 120,
+              "width": 98,
+              "height": 44,
+              "top": 120,
+              "right": 123,
+              "bottom": 164,
+              "left": 25
+            }
+          },
+          {
+            "text": "碎片合成",
+            "disabled": false,
+            "rect": {
+              "x": 131,
+              "y": 120,
+              "width": 98,
+              "height": 44,
+              "top": 120,
+              "right": 229,
+              "bottom": 164,
+              "left": 131
+            }
+          },
+          {
+            "text": "材料合成",
+            "disabled": false,
+            "rect": {
+              "x": 237,
+              "y": 120,
+              "width": 98,
+              "height": 44,
+              "top": 120,
+              "right": 335,
+              "bottom": 164,
+              "left": 237
+            }
+          },
+          {
+            "text": "白階 → 藍階\n▾",
+            "disabled": false,
+            "rect": {
+              "x": 36,
+              "y": 284.99481201171875,
+              "width": 288,
+              "height": 38,
+              "top": 284.99481201171875,
+              "right": 324,
+              "bottom": 322.99481201171875,
+              "left": 36
+            }
+          },
+          {
+            "text": "白階 → 藍階✓",
+            "disabled": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "藍階 → 紫階",
+            "disabled": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "紫階 → 橙階",
+            "disabled": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "橙階 → 桃紅階",
+            "disabled": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "桃紅階 → 四象階",
+            "disabled": false,
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "text": "合成下一階礦石 ×10",
+            "disabled": true,
+            "rect": {
+              "x": 36,
+              "y": 464.49481201171875,
+              "width": 288,
+              "height": 38,
+              "top": 464.49481201171875,
+              "right": 324,
+              "bottom": 502.49481201171875,
+              "left": 36
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "name": "material-insufficient-top",
+      "rows": [
+        {
+          "text": "合成",
+          "font": 24,
+          "button": false,
+          "primary": false,
+          "selector": "#homeFeatureModalTitle",
+          "parent": "home-feature-modal-title"
+        },
+        {
+          "text": "返回",
+          "font": 15.980487804878049,
+          "button": true,
+          "primary": true,
+          "selector": "button.home-feature-close-btn",
+          "parent": ""
+        },
+        {
+          "text": "合成",
+          "font": 14,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v141-synthesis-wallet"
+        },
+        {
+          "text": "金幣 0",
+          "font": 16.025922309027777,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": "v141-synthesis-wallet"
+        },
+        {
+          "text": "符咒合成",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "button.",
+          "parent": "v141-synthesis-tabs"
+        },
+        {
+          "text": "碎片合成",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "button.",
+          "parent": "v141-synthesis-tabs"
+        },
+        {
+          "text": "材料合成",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "button.active",
+          "parent": "v141-synthesis-tabs"
+        },
+        {
+          "text": "礦石升階",
+          "font": 18,
+          "button": false,
+          "primary": false,
+          "selector": "h4.",
+          "parent": "v17363-material-card"
+        },
+        {
+          "text": "同階礦石 50 個，可合成下一階礦石 10 個；最高可合至四象階。",
+          "font": 15,
+          "button": false,
+          "primary": false,
+          "selector": "p.",
+          "parent": "v17363-material-card"
+        },
+        {
+          "text": "升階路線",
+          "font": 14,
+          "button": false,
+          "primary": false,
+          "selector": "span.v17363-material-field-label",
+          "parent": "v17363-material-field"
+        },
+        {
+          "text": "白階 → 藍階",
+          "font": 14.992088607594935,
+          "button": true,
+          "primary": false,
+          "selector": "span.",
+          "parent": "v17363-game-select-trigger"
+        },
+        {
+          "text": "白階礦石",
+          "font": 16,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": ""
+        },
+        {
+          "text": "0 / 50",
+          "font": 14.029165649414061,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": ""
+        },
+        {
+          "text": "藍階礦石",
+          "font": 16,
+          "button": false,
+          "primary": false,
+          "selector": "b.",
+          "parent": ""
+        },
+        {
+          "text": "×10",
+          "font": 13.94101363621401,
+          "button": false,
+          "primary": false,
+          "selector": "span.",
+          "parent": ""
+        },
+        {
+          "text": "合成下一階礦石 ×10",
+          "font": 15,
+          "button": true,
+          "primary": true,
+          "selector": "button.v17363-craft-button",
+          "parent": "v17363-material-card"
+        }
+      ],
+      "controls": [
+        {
+          "label": "返回",
+          "width": 68.25,
+          "height": 38,
+          "overflow": false
+        },
+        {
+          "label": "符咒合成",
+          "width": 98,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "碎片合成",
+          "width": 98,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "材料合成",
+          "width": 98,
+          "height": 44,
+          "overflow": false
+        },
+        {
+          "label": "白階 → 藍階▾",
+          "width": 288,
+          "height": 38,
+          "overflow": false
+        },
+        {
+          "label": "合成下一階礦石 ×10",
+          "width": 288,
+          "height": 38,
+          "overflow": false
+        }
+      ],
+      "overflow": []
+    }
+  ]
+}

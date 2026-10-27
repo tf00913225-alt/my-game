@@ -1,0 +1,42 @@
+{
+  "base": "b772bd3c67069b7de89b65afe5b925f1e8b00d91",
+  "scope": "ui-black-gold-window-browser.test.js only; product unchanged",
+  "testSha256": "12300ffdac359b2e63c08eb153997f2c70b90eecd4202ab2e1d346e7e8658ba2",
+  "originalFailure": {
+    "run": 40007338007,
+    "attempt": 1,
+    "job": 120600050945,
+    "error": "formal backpack background missing: none vs linear-gradient"
+  },
+  "backpack": {
+    "rect": {
+      "left": 215,
+      "top": 10,
+      "width": 195,
+      "height": 214
+    },
+    "style": {
+      "backgroundImage": "none",
+      "backgroundColor": "rgb(21, 21, 21)",
+      "borderImageSource": "url(\"file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp\")",
+      "borderImageSlice": "115 fill",
+      "boxShadow": "rgba(0, 0, 0, 0.8) 0px 0px 10px 0px",
+      "borderColor": "rgba(0, 0, 0, 0)",
+      "color": "rgb(238, 228, 207)"
+    },
+    "decodedPanel": {
+      "width": 1254,
+      "height": 1254,
+      "complete": true,
+      "sameSource": true
+    }
+  },
+  "focusedResult": "original before/after browser test PASS; geometry/shadow/style isolation/tabs/buttons retained",
+  "limits": [
+    "420x746 synthetic geometry fixture with artificial34px buttons, not fullgame touch acceptance",
+    "first edited capture emptyJSON excluded, then load-event instrumentation fixed",
+    "newHead requiredCI pending",
+    "Story and Chrome otherOwners",
+    "hardware/deploy/allUI unaccepted"
+  ]
+}

@@ -1,0 +1,7 @@
+AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+  assert.ok(q?.hit)
+
+    at tap (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment24c-summary-360.mjs:10:303)
+    at async runFresh360Case (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment24c-summary-case.mjs:16:3)
+    at async file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/segment24c-summary-360.mjs:12:2

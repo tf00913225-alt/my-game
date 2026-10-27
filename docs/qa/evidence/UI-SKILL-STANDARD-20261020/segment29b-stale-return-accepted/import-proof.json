@@ -1,0 +1,137 @@
+{
+  "head": "a078c8bfc9a271666a72cf03fa2289db17146cec",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\360x640\\announcement-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\360x640\\announcement-after-skill-cancel.png",
+      "sha256": "676e6bf080ab0750aabe9233492c3ed5fe7e82cca6a957402642b5cf6ffe8a5b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\360x640\\report.json",
+      "sha256": "0ada0c8e31b4b2f245d76afe3a9ce51c6ac7f0d9f468c97008caea89048903c8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\360x640\\shop-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\360x640\\shop-after-skill-cancel.png",
+      "sha256": "07976c44728ff2b9fc1017e258a285ade4a5744290361337edb737ae91b60183"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\360x640\\skill-before-header-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\360x640\\skill-before-header-cancel.png",
+      "sha256": "297f8b3bcfe7bb47dc89b407d183d73650b4c1bfa90b03883dde1ca653f57802"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\360x640\\tutorial-first.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\393x873\\announcement-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\393x873\\announcement-after-skill-cancel.png",
+      "sha256": "b1823ec334d9b51de8609b4828c5502c3333f1e8f5e89bda7f232ca08eacbde8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\393x873\\report.json",
+      "sha256": "f6e5fc6543fe8519be13f644c166aa62fe36ad109ac9f161dcbe3998a2ea23c2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\393x873\\shop-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\393x873\\shop-after-skill-cancel.png",
+      "sha256": "577a662bbc858fddc87e8c3ac4f9295611ff27ccaf56759b81ba5d38d45202b9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\393x873\\skill-before-header-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\393x873\\skill-before-header-cancel.png",
+      "sha256": "f883cd604019a878de9c76799d73d3eb15a9430591b9e00b3484faaadff3cc90"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\393x873\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\393x873\\tutorial-first.png",
+      "sha256": "176ac91bf6dcf7c006d53897fc89c6fdf2442a89d0d2421cdeeb5222e630006b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\412x915\\announcement-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\412x915\\announcement-after-skill-cancel.png",
+      "sha256": "b8b3e96478fdffd9d354dee54c81b64ecb392f890551551637478d29e49aaa10"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\412x915\\report.json",
+      "sha256": "ec470e0a1b66e014d7251e33a115eda65ea63f90d0581917d77bc7ce253aefcf"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\412x915\\shop-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\412x915\\shop-after-skill-cancel.png",
+      "sha256": "5d51cadace3a091e58d36d3c985aea50521bca5361a5af226254a9860f15d10b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\412x915\\skill-before-header-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\412x915\\skill-before-header-cancel.png",
+      "sha256": "17db1373f5aac21c6a55abb2c1be5dff2f087eac2c2e8f6cf2a4056e428ed233"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\412x915\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\412x915\\tutorial-first.png",
+      "sha256": "2506513b4f5872aad9693dd060b4b01cbb90ecc419b4b8a771819343eb9899d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\1280x800\\announcement-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\1280x800\\announcement-after-skill-cancel.png",
+      "sha256": "812e68ae3be27f20d1745a4f83d6a2cb4a4f05744384bd3ed28e35ea1bb23058"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\1280x800\\report.json",
+      "sha256": "b3e51e71e0e86c744cfbe31a70468bad2a76c83845bdbf1e61d0a3657159cc19"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\1280x800\\shop-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\1280x800\\shop-after-skill-cancel.png",
+      "sha256": "d042c26a8bdce349503432d461e20c91f8cfcfdd6ad0f6b79f644230420d26d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\1280x800\\skill-before-header-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\1280x800\\skill-before-header-cancel.png",
+      "sha256": "65aadf66d69f5efa20dc3974d1fa59365b8a5009c6af494981ef4b01f2d4385e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-a078c8bf\\skill\\1280x800\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\accepted\\1280x800\\tutorial-first.png",
+      "sha256": "3e5cef9d973dafc32a32d1fdf729992c99ba487f6ba129dffda42c7945fc2754"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-810e14a1\\skill\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\excluded-before-810e14a1\\failure.png",
+      "sha256": "0c7e21d7ca3c6df6685138e0c8b78e4ef7b405eb52d6198c118ad3a2363f5fa9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-810e14a1\\skill\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\excluded-before-810e14a1\\report.json",
+      "sha256": "63c190302331c3432ff5ddddc89e31328fa474015a7470fc01be7fc45c637c6c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-810e14a1\\skill\\360x640\\shop-after-skill-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\excluded-before-810e14a1\\shop-after-skill-cancel.png",
+      "sha256": "0c7e21d7ca3c6df6685138e0c8b78e4ef7b405eb52d6198c118ad3a2363f5fa9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-810e14a1\\skill\\360x640\\skill-before-header-cancel.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\excluded-before-810e14a1\\skill-before-header-cancel.png",
+      "sha256": "0444ab6c00ae482bef5f09732168cd51c463578b415f1defb004177cb3de89ce"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment29-stale-return-810e14a1\\skill\\360x640\\tutorial-first.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment29b-stale-return-accepted\\excluded-before-810e14a1\\tutorial-first.png",
+      "sha256": "19e511cc1a79c9056292157dd2741b25597555051586c03ec8435e5c73a4623f"
+    }
+  ],
+  "helperSha256": "cbd5625dd29b5f6c375ead2dcc93d707d50ba0b423887e0a860946a460aae18e",
+  "limits": [
+    "Only skill tutorial header cancellation then true shop/announcement entry; stale tutorial button hidden0x0",
+    "Original two entrance handlers have selected-domain same-task observations; cancel/shop/announcement taps are not covered by that observer",
+    "No purchases/update acknowledgement/learning/equipment/claim/combat; original open save effects retained",
+    "Full120/pager and other cancellation routes remain unverified; no general tutorial completion acceptance"
+  ]
+}

@@ -281,17 +281,7 @@
         }
         const oldReturn=document.getElementById("v141DungeonReturn");
         if(oldReturn){ oldReturn.remove(); }
-        let topReturn=document.getElementById("v146AbyssReturn");
-        if(abyssMapActive&&!topReturn){
-            topReturn=document.createElement("button");
-            topReturn.id="v146AbyssReturn";
-            topReturn.type="button";
-            topReturn.className="v146-abyss-return";
-            topReturn.setAttribute("aria-label","返回副本列表");
-            topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
-            topReturn.onclick=window.v146ExitAbyssMap;
-            page.appendChild(topReturn);
-        }else if(!abyssMapActive&&topReturn){ topReturn.remove(); }
+
     }
 
     if(typeof switchDungeonTab==="function"){

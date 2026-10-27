@@ -2,7 +2,13 @@
   "sourceHead": "34334c9256e004b88cefe600be92b4d53a6c7c4f",
   "fullRuntime": {
     "cases": 600,
-    "sha256": "a2c2fbb876816a91cab6eaecc54c538c41722ba1919eeff079c229c9db37547e"
+    "sha256": "f7a048648dbe25d613a253338d7d7bef7b7ed6a94a7aa9d03e63d902540b046a"
+  },
+  "fullRuntimeUiProvenance": {
+    "sourceHead": "89ec4b167df6482f7509451b64072150acb0d3ac",
+    "originalSha256": "a2c2fbb876816a91cab6eaecc54c538c41722ba1919eeff079c229c9db37547e",
+    "reason": "Segment25 accepted Chinese skill display literals only; all600 domain/event records unchanged, full rows byte-equal after exact accepted display-literal reversal.",
+    "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/skill-parity-ui-copy-dependency"
   },
   "learningPolicySha256": "08c643b8a0a147b604c1eb8d5102b97cae51eaed277cfb7b2ce303b3cb62100a",
   "sources": {
@@ -22,5 +28,35 @@
   "retiredStormRuntime": {
     "cases": 600,
     "sha256": "0b68b6ae5bf901ebf9198b9247dff88f8e394e4c4ab59b556eea35f367e33ce8"
+  },
+  "retiredStormUiRuntime": {
+    "cases": 600,
+    "sha256": "9c8a23d971a5162a2de84a863debedf62e8c9bca748fccf1d472e7e9b6b44d06"
+  },
+  "retiredStormUiProvenance": {
+    "dev": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+    "uiParent": "d0053d958bd1b160f9e15fc0dae99269e4ff6969",
+    "domainDifferences": 0,
+    "eventDifferences": 0,
+    "displayChangedCases": 400,
+    "reversalPairs": [
+      [
+        "%；不強化DoT；免費追擊沿用本次加成但不額外消耗次數",
+        "%；不強化持續傷害；免費追擊沿用本次加成但不額外消耗次數"
+      ],
+      [
+        "立即清除所有可解除的臨時Buff、Debuff、Shield、Barrier與異常狀態；",
+        "立即清除所有可解除的臨時增益、減益、護盾、結界與異常狀態；"
+      ],
+      [
+        "不清除永久被動、EX、裝備效果、Boss固有機制、HP／SP或死亡狀態",
+        "不清除永久被動、EX、裝備效果、首領固有機制、HP／SP或死亡狀態"
+      ],
+      [
+        "回合；免疫一般直接傷害、DoT與反傷，",
+        "回合；免疫一般直接傷害、持續傷害與反傷，"
+      ]
+    ],
+    "evidence": "docs/qa/evidence/UI-SKILL-STANDARD-20261020/dev8fdf-integration"
   }
 }

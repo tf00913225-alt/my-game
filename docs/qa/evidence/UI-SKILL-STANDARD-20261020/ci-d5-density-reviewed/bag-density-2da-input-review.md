@@ -1,0 +1,13 @@
+# Bag density independent input/reading review
+
+Reviewed necessary geometry/reading/report/cleanup fields for four sizes at artifacts/ui-skill-standard/ci-d5-bag-density-verified-2da64051 and helper artifacts/bag-density-reading.mjs. Viewed actual360 long-gold,393 native-end,412 native-end,1280 long-gold PNGs via view_image. Head2da64051499d7a2d7e8384d1bc3011208f41a611. No Chrome/product/tracked writes.
+
+All four density records: logical height572,slot182,gap12,populated24,equipment slots6. Original three-row gate is unchanged:572 >=3*182+2*12-1=569. Visible images retain5 columns and full three-row reading region, original portrait and controls. Source scope supplied is wallet moved into original header and two spacing recoveries; no portrait/slot/font/control-size replacement is qualified here.
+
+All native ends: scroll388+client572=total960. Last item bottom is within0.014px of grid bottom (original1px tolerance) and above footer. Helper scrolls phones through native touchStart/move/end; desktop through mouseWheel; no programmatic scroll assignment in that path. Original close is clicked with mouse on desktop/touch on phones; helper asserts homePage active then captures returned-home. Controls measured in normal/long-gold/end states all EFP=true and >=44 both dimensions. Min W/H:36044/44,39348.03/48.03,41250.36/50.36,128055/55px. This is target geometry/hit evidence, not activation of every control.
+
+Long display-only gold9,999,999,999 is fully visible and horizontally separated from title/close in actual images. At360 gold Range ink top29.67,bottom56,height26.33 lies inside real header top21,bottom65,height44. Other sizes likewise contain ink within header; helper checks horizontal gold box and actual header vertical boundary plus title/gold/close separation. Initial one-off helper used the b element's18px line box as clipping boundary; that failure is excluded, not counted as a passing run. Replacing that invalid diagnostic boundary does not change product or the original three-row Gate. Long text is temporary DOM-only and reverted in finally; not a wallet value mutation claim.
+
+Reports all dirty=false, initial/final status empty, manifestUnchanged=true; source Head/status/manifest guarded at completion. profileRemoved=true; runtimeRestoreExact=false. Isolated fixture and DOM display checks do not establish exact save/raw/runtime restoration, real transactions or hardware operation. No reward/sell/equip or full gameplay action acceptance.
+
+No narrow blocker in this three-row/long-header/end-scroll/original-close evidence. Latest-Head required CI and broader product gates remain separate.

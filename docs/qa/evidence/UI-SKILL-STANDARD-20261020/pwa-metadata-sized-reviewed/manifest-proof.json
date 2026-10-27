@@ -1,0 +1,98 @@
+{
+  "manifestResult": {
+    "url": "http://127.0.0.1:60195/app.webmanifest",
+    "errors": [],
+    "data": "{\n  \"id\": \"./\",\n  \"name\": \"四象江湖傳\",\n  \"short_name\": \"四象江湖\",\n  \"lang\": \"zh-Hant\",\n  \"start_url\": \"./index.html\",\n  \"scope\": \"./\",\n  \"display\": \"standalone\",\n  \"background_color\": \"#0b0907\",\n  \"theme_color\": \"#0b0907\",\n  \"icons\": [\n    {\n      \"src\": \"assets/ui/pwa/four-symbols-192.webp\",\n      \"sizes\": \"192x192\",\n      \"type\": \"image/webp\",\n      \"purpose\": \"any\"\n    },\n    {\n      \"src\": \"assets/ui/pwa/four-symbols-512.webp\",\n      \"sizes\": \"512x512\",\n      \"type\": \"image/webp\",\n      \"purpose\": \"any\"\n    }\n  ]\n}\n",
+    "parsed": {
+      "scope": "http://127.0.0.1:60195/"
+    },
+    "manifest": {
+      "backgroundColor": "rgba(11,9,7,1)",
+      "display": "kStandalone",
+      "icons": [
+        {
+          "url": "http://127.0.0.1:60195/assets/ui/pwa/four-symbols-192.webp",
+          "sizes": "192x192",
+          "type": "image/webp"
+        },
+        {
+          "url": "http://127.0.0.1:60195/assets/ui/pwa/four-symbols-512.webp",
+          "sizes": "512x512",
+          "type": "image/webp"
+        }
+      ],
+      "id": "http://127.0.0.1:60195/",
+      "name": "四象江湖傳",
+      "orientation": "DEFAULT",
+      "preferRelatedApplications": false,
+      "scope": "http://127.0.0.1:60195/",
+      "startUrl": "http://127.0.0.1:60195/index.html",
+      "themeColor": "rgba(11,9,7,1)"
+    }
+  },
+  "decoded": {
+    "width": 192,
+    "height": 192,
+    "complete": true
+  },
+  "routes": [
+    {
+      "prefix": "",
+      "manifest": "http://127.0.0.1:60195/app.webmanifest",
+      "start": "http://127.0.0.1:60195/index.html",
+      "scope": "http://127.0.0.1:60195/",
+      "id": "http://127.0.0.1:60195/",
+      "icon": "http://127.0.0.1:60195/assets/ui/pwa/four-symbols-192.webp",
+      "status": [
+        200,
+        200,
+        200
+      ],
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    },
+    {
+      "prefix": "my-game/",
+      "manifest": "http://127.0.0.1:60195/my-game/app.webmanifest",
+      "start": "http://127.0.0.1:60195/my-game/index.html",
+      "scope": "http://127.0.0.1:60195/my-game/",
+      "id": "http://127.0.0.1:60195/my-game/",
+      "icon": "http://127.0.0.1:60195/my-game/assets/ui/pwa/four-symbols-192.webp",
+      "status": [
+        200,
+        200,
+        200
+      ],
+      "cacheControl": "no-cache, no-store, must-revalidate"
+    }
+  ],
+  "display": {
+    "viewport": [
+      1280,
+      800
+    ],
+    "stage": {
+      "x": 415,
+      "y": 0,
+      "width": 450,
+      "height": 800,
+      "top": 0,
+      "right": 865,
+      "bottom": 800,
+      "left": 415
+    },
+    "scale": 0.4166666666666667,
+    "dimensions": {
+      "nativeWidth": 1080,
+      "nativeHeight": 1920,
+      "legacyWidth": 420,
+      "legacyHeight": 746.6666666666666
+    },
+    "standalone": false,
+    "serviceWorkers": 0,
+    "startup": "READY"
+  },
+  "installability": {
+    "installabilityErrors": []
+  },
+  "limits": "Desktop ordinary browser; local manifest headers modeled from _headers. No installed mode, Android, OAuth return/save/update reload acceptance."
+}

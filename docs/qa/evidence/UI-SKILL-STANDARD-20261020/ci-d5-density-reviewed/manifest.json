@@ -1,0 +1,82 @@
+[
+  {
+    "viewport": "360x640",
+    "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+    "reportSha256": "5adc7b561859756ab17717759f4e12dcf0f57998c26d290aef20a341967d3154",
+    "density": {
+      "height": 572,
+      "slot": 182,
+      "gap": 12,
+      "populated": 24,
+      "slots": 6
+    },
+    "nativeEnd": {
+      "scroll": 388,
+      "client": 572,
+      "total": 960,
+      "gestures": 1
+    },
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "393x873",
+    "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+    "reportSha256": "dd784b9bc6da3508711d2700a85247ae04cce3d27b19436b9c930621551cb2a8",
+    "density": {
+      "height": 572,
+      "slot": 182,
+      "gap": 12,
+      "populated": 24,
+      "slots": 6
+    },
+    "nativeEnd": {
+      "scroll": 388,
+      "client": 572,
+      "total": 960,
+      "gestures": 1
+    },
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "412x915",
+    "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+    "reportSha256": "5aa0049ef567491bb84fbac22887519b9b84822ddf05f58ab1a16fc977872849",
+    "density": {
+      "height": 572,
+      "slot": 182,
+      "gap": 12,
+      "populated": 24,
+      "slots": 6
+    },
+    "nativeEnd": {
+      "scroll": 388,
+      "client": 572,
+      "total": 960,
+      "gestures": 1
+    },
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "1280x800",
+    "head": "2da64051499d7a2d7e8384d1bc3011208f41a611",
+    "reportSha256": "f2b7597cc2b8bd4f6a5eae7853a7a6e4a7e718f0a9085b49249a036c33d89f8a",
+    "density": {
+      "height": 572,
+      "slot": 182,
+      "gap": 12,
+      "populated": 24,
+      "slots": 6
+    },
+    "nativeEnd": {
+      "scroll": 388,
+      "client": 572,
+      "total": 960,
+      "gestures": 1
+    },
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  }
+]

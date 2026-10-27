@@ -1,0 +1,7 @@
+{
+  "base": "557af41c38bfdc962391be4afb989375f7ae7113",
+  "reverseByteEqual": true,
+  "scope": "Original g.busy display label only; disabled/onclick/read API and transaction guards identical",
+  "before": "onclick=\"FourSymbolsHeroGrowth.read()\" ${g.busy?\"disabled\":\"\"}>同步成長紀錄</button>",
+  "after": "onclick=\"FourSymbolsHeroGrowth.read()\" ${g.busy?\"disabled\":\"\"}>${g.busy?\"同步中…\":\"同步成長紀錄\"}</button>"
+}

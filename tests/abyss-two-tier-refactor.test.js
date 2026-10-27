@@ -31,6 +31,7 @@ function load(options={}){
         style:{},classList:classList()
     }:null;
     const document={
+        baseURI:options.baseURI||"https://dev.four-symbols-dev.pages.dev/",
         readyState:"complete",
         getElementById(id){
             if(id==="v141AbyssPlayer"){ return playerEl; }
@@ -42,7 +43,7 @@ function load(options={}){
     };
     const context={
         console,JSON,Math:Object.create(Math),Date,Number,String,Boolean,Object,Array,Set,Map,Promise,RegExp,Error,TypeError,
-        parseInt,parseFloat,isNaN,localStorage,document,
+        parseInt,parseFloat,isNaN,localStorage,document,URL,
         requestAnimationFrame:fn=>{ if(fn){ fn(); } return 1; },
         setTimeout(fn){ if(options.deferMovement){ timers.push(fn); }else if(fn){ fn(); } return timers.length||1; },clearTimeout:noop,
         alert:noop,confirm:()=>true,player:{id:"qa",level:options.playerLevel||50},player2:null,player3:null,gold:0,sharedExp:0,
@@ -83,6 +84,19 @@ function value(context,expression){ return JSON.parse(vm.runInContext("JSON.stri
 
 let passed=0;
 function test(name,fn){ fn();passed++;console.log("✓ "+name); }
+
+test("map material resolves against the document and cold Abyss executes its shared portrait owner",()=>{
+    const baseURI="https://example.test/game/",{context}=load({baseURI});
+    context.v174AbyssSelectDifficulty(20);
+    const before=JSON.stringify(context.v174AbyssGetRootState()),html=context.v174RenderAbyss();
+    const material=html.match(/--v174-abyss-map:url\('([^']+)'\)/)?.[1];
+    assert.ok(material,"formal map material remains present");
+    assert.equal(new URL(material,baseURI+"build/feature-abyss.css").href,baseURI+"assets/dungeons/abyss/maps/floor-1.png");
+    assert.doesNotMatch(html,/v174-abyss-back/,"top return belongs to the canonical context navigation owner");
+    assert.equal(JSON.stringify(context.v174AbyssGetRootState()),before,"rendering cannot change progression");
+    const manifest=JSON.parse(fs.readFileSync("config/feature-manifest.json","utf8"));
+    assert.ok(manifest.bundles["feature-abyss"].dependencies.includes("feature-patrol"),"prefetching portrait bytes cannot replace execution of its existing Owner");
+});
 
 test("all two-wave profiles retain fixed levels and skills",()=>{
     const {context}=load({playerLevel:80});

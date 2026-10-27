@@ -1,0 +1,8 @@
+{
+  "status": "paused-not-accepted",
+  "beforeHead": "cff3ee03427493aa9f6687aee0f6d7dc0e2312c4",
+  "sourceHead": "a0d8d30779f5e48648a9bd4649a12876d4b3dfef",
+  "authority": "artifacts/ui-skill-standard/segment6-before-cff3ee03/resolved4",
+  "afterVerified": false,
+  "note": "Scripts saved as evidence; imports remain relative to original QA path. Resume only on user instruction."
+}

@@ -580,13 +580,13 @@ button:disabled{
 /* Main city uses the existing native canvas; no viewport-specific layout. */
 #homePage{
     position:relative;height:calc(100% - 216px);min-height:0;
-    padding:0 18px 12px;box-sizing:border-box;overflow:hidden;
+    padding:0 18px 12px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;
     background-image:url(../assets/ui/home-background-v17344.png);background-position:center;background-size:cover;background-repeat:no-repeat;
     isolation:isolate;
 }
 #homePage.active{
     display:grid;grid-template-columns:minmax(0,1fr);
-    grid-template-rows:auto auto minmax(0,1fr) auto;gap:10px;
+    grid-template-rows:max-content max-content minmax(900px,1fr) max-content;gap:10px;
 }
 #homePage .home-city-hud{grid-row:1;}
 #homePage .v146-home-roster{grid-column:1;grid-row:2;}
@@ -665,6 +665,7 @@ button:disabled{
     display:none;
     width:64px;
     height:auto;
+    margin:0 auto;
     pointer-events:none;
 
     filter:drop-shadow(0 2px 5px rgba(0,0,0,.55));
@@ -673,6 +674,31 @@ button:disabled{
 .map-quick-toggle-btn .icon-off{
     display:block;
 }
+
+.map-quick-toggle-btn .map-quick-caption{
+    display:block;
+    min-width:82px;
+    margin-top:4px;
+    padding:4px 4px 3px;
+    border:1px solid #8a6a3a;
+    border-image:var(--rpg-window-frame) 115 fill / 2px / 0 stretch;
+    border-radius:0 0 4px 4px;
+    background:var(--rpg-window-iron,#17130f);
+    color:#f2e3bf;
+    font-size:18px;
+    line-height:1.4;
+    font-weight:700;
+    text-align:center;
+}
+.map-quick-toggle-btn .map-quick-state-off,
+.map-quick-toggle-btn .map-quick-state-on{
+    font-size:16px;
+    color:#d5c39e;
+}
+.map-quick-toggle-btn .map-quick-state-off{display:block;}
+.map-quick-toggle-btn .map-quick-state-on{display:none;}
+.map-quick-toggle-btn.active .map-quick-state-off{display:none;}
+.map-quick-toggle-btn.active .map-quick-state-on{display:block;color:#ffe3a0;}
 
 .map-quick-toggle-btn.active .icon-off{
     display:none;
@@ -738,10 +764,11 @@ button:disabled{
 
 /* City identity and resources remain live text over the existing scene. */
 .home-city-hud{
-    position:relative;z-index:8;display:grid;grid-template-columns:minmax(0,1fr) auto;
+    position:relative;z-index:8;display:grid;grid-template-columns:minmax(0,1fr);
     align-items:center;gap:12px;min-height:110px;margin:0 -18px;padding:15px 30px;
-    border-block:3px solid #aa8246;
-    background:linear-gradient(90deg,rgba(10,9,8,.97),rgba(35,26,16,.94),rgba(10,9,8,.97));
+    border:18px solid transparent;
+    border-image:url('../assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp') 115 fill / 18px / 0 stretch;
+    background:#151515;
     box-shadow:0 8px 24px #0008;
 }
 .home-hud-identity,.home-hud-side{min-width:0;}
@@ -750,17 +777,17 @@ button:disabled{
 #homeBannerName{max-width:100%;font-size:51px;overflow-wrap:anywhere;}
 .home-version-badge{position:static;display:inline-flex;align-items:center;padding:calc(3 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #e0b55c66;border-radius:999px;background:#08070594;color:#bda46d;font-size:calc(13 * var(--ui-length-unit,1px));font-weight:700;line-height:1.3;white-space:nowrap;}
 .home-hud-side{display:grid;gap:6px;}
-.home-hud-resources{display:flex;gap:24px;align-items:center;}
+.home-hud-resources{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 24px;align-items:center;}
 .home-hud-resources>span{display:flex;align-items:baseline;gap:12px;white-space:nowrap;color:#d8c5a1;font-size:39px;line-height:66px;}
 .home-hud-resources b{font-size:42px;color:#ffe5ad;font-variant-numeric:tabular-nums;}
 /* Existing DEV actions are retained; they are not part of the player hierarchy. */
 .home-test-tools{display:flex;align-items:center;justify-content:flex-end;gap:9px;}
 .home-test-label{font:700 calc(13 * var(--ui-length-unit,1px)) Arial,sans-serif;color:#b9ad98;}
-.home-test-button{min-height:calc(28 * var(--ui-length-unit,1px));padding:calc(3 * var(--ui-length-unit,1px));border:1px solid #705b3b;border-radius:3px;background:#120e09;color:#bfae8c;font-size:calc(13 * var(--ui-length-unit,1px));line-height:1.4;}
+.home-test-button{min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(3 * var(--ui-length-unit,1px));border:1px solid #705b3b;border-radius:3px;background:#120e09;color:#bfae8c;font-size:calc(15 * var(--ui-length-unit,1px));line-height:1.4;}
 .home-test-button:active{color:#fff0bd;}
 .home-card-grid{
     position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);
-    grid-template-rows:minmax(0,1fr) 126px;min-height:0;gap:12px;
+    grid-template-rows:minmax(0,1fr) 132px;min-height:0;gap:12px;
 }
 .home-city-entrances{position:absolute;z-index:8;inset:72px 0 162px;pointer-events:none;}
 .home-city-entrances>.home-card{position:absolute;}
@@ -792,7 +819,7 @@ button:disabled{
 .home-card-icon{display:block;width:84px;height:84px;color:#e3bf78;background-size:contain;background-repeat:no-repeat;background-position:center;pointer-events:none;}
 .home-card-label{display:block;text-align:center;font-size:45px;line-height:60px;letter-spacing:.04em;text-shadow:0 3px 6px #000;}
 .home-card-icon svg{display:block;width:100%;height:100%;filter:drop-shadow(0 3px 4px #000);}
-.home-card-tertiary{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:126px;border:0;background:transparent;}
+.home-card-tertiary{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-height:132px;border:0;background:transparent;}
 .home-card-tertiary .home-card-icon{width:63px;height:63px;}
 .home-card-tertiary .home-card-label{font-size:45px;line-height:54px;letter-spacing:0;}
 /* One scene in the original city grid, painted below all hit targets. */
@@ -932,6 +959,11 @@ button:disabled{
 .training-zone-list{
     position:relative;
     z-index:2;
+    /* Native nav 216/1080 projects to 84 units on this 420-unit plane. */
+    height:calc(100% - 84px);
+    overflow-y:auto;
+    overscroll-behavior:contain;
+    touch-action:pan-y;
 
     display:flex;
     flex-direction:column;
@@ -943,7 +975,12 @@ button:disabled{
 }
 
 .training-zone-item{
-    font-size:17px;
+    box-sizing:border-box;
+    display:flex;
+    align-items:center;
+    min-height:52px;
+    font-size:20px;
+    line-height:1.15;
     font-weight:bold;
 
     color:#e8ddc7;
@@ -966,7 +1003,7 @@ button:disabled{
 
     background:rgba(120,110,95,.35);
 
-    padding:4px 10px;
+    padding:6px 14px;
     border-radius:6px;
 
     cursor:pointer;
@@ -1586,6 +1623,7 @@ button:disabled{
 }
 
 .battle-target-prompt-copy{
+    min-width:0;
     display:flex;
     flex-direction:column;
     align-items:center;
@@ -1595,30 +1633,30 @@ button:disabled{
 
 .battle-target-prompt-action{
     color:#ffe27a;
-    font-size:16px;
+    font-size:18px;
     font-weight:900;
-    line-height:20px;
-    white-space:nowrap;
+    line-height:24px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-target-prompt-hint{
     color:#fff4cf;
-    font-size:14px;
+    font-size:16px;
     font-weight:700;
-    line-height:17px;
-    animation:battleTargetPromptFlash .55s ease-in-out infinite;
+    line-height:20px;
 }
 
 .battle-target-back{
     flex:0 0 auto;
-    min-width:52px;
-    height:36px;
+    min-width:68px;
+    height:52px;
     padding:0 9px;
     border:1px solid #a78348;
     border-radius:6px;
     background:#2b2116;
     color:#ffe7a6;
-    font-size:13px;
+    font-size:16px;
     font-weight:900;
 }
 
@@ -1938,8 +1976,8 @@ button:active{
 .skill-quick-button:disabled,
 .skill-quick-button.sp-insufficient{
     background:#151412;
-    color:#77716a;
-    border-color:#4a3f2e;
+    color:#bcb19e;
+    border-color:#756341;
     opacity:1;
 }
 
@@ -1987,8 +2025,9 @@ button:active{
     justify-content:center;
     background:rgba(0,0,0,.62);
     color:#ffcf59;
-    font-size:11px;
-    line-height:13px;
+    font-size:16px;
+    line-height:20px;
+    white-space:nowrap;
     font-weight:900;
     text-shadow:0 1px 2px #000;
     z-index:3;
@@ -2033,7 +2072,7 @@ button:active{
 }
 
 .skill-quick-button.sp-insufficient .sq-cost{
-    color:#8a8177;
+    color:#bcb19e;
 }
 
 .sub-menu{
@@ -2160,12 +2199,13 @@ button:active{
     position:absolute;
     left:10px;
     right:10px;
-    top:-116px;
-    height:auto;
-    max-height:182px;
-    z-index:35;
+    top:auto;
+    bottom:var(--battle-item-menu-bottom,78px);
+    height:var(--battle-item-menu-height,300px);
+    max-height:var(--battle-item-menu-height,300px);
+    z-index:18065;
     overflow:hidden;
-    padding:5px;
+    padding:8px;
     flex-direction:column;
     gap:5px;
     background:linear-gradient(180deg,rgba(10,8,6,.99),rgba(18,13,9,.99));
@@ -2179,8 +2219,8 @@ button:active{
 }
 
 .battle-item-menu-header{
-    flex:0 0 32px;
-    min-height:32px;
+    flex:0 0 52px;
+    min-height:52px;
     display:flex;
     align-items:stretch;
     gap:5px;
@@ -2201,7 +2241,7 @@ button:active{
     border-radius:6px;
     background:#251a10;
     color:#e9dcc4;
-    font-size:12px;
+    font-size:16px;
     font-weight:900;
     line-height:1;
 }
@@ -2214,7 +2254,7 @@ button:active{
 }
 
 .battle-item-close{
-    flex:0 0 58px;
+    flex:0 0 68px;
     color:#ffe7a6;
     background:#2b2116;
 }
@@ -2223,11 +2263,11 @@ button:active{
     flex:1 1 auto;
     min-height:0;
     display:grid;
-    grid-template-columns:repeat(3,minmax(0,1fr));
-    grid-auto-rows:55px;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    grid-auto-rows:minmax(116px,auto);
     align-content:start;
     flex:0 1 auto;
-    max-height:calc(182px - 43px);
+    max-height:227px;
     gap:5px;
     overflow-y:auto;
     overflow-x:hidden;
@@ -2238,8 +2278,9 @@ button:active{
 
 .battle-item-card{
     min-width:0;
-    min-height:55px;
-    padding:5px 4px;
+    min-height:116px;
+    box-sizing:border-box;
+    padding:6px;
     border:1px solid rgba(138,106,58,.78);
     border-radius:7px;
     background:#090807;
@@ -2253,7 +2294,9 @@ button:active{
 }
 
 .battle-item-card:disabled{
-    opacity:.42;
+    opacity:1;
+    color:#bcb19e;
+    border-color:#65563c;
     cursor:not-allowed;
 }
 
@@ -2269,6 +2312,7 @@ button:active{
     width:28px;
     height:28px;
     min-height:28px;
+    flex-shrink:0;
     overflow:hidden;
 }
 .battle-item-icon img,
@@ -2295,30 +2339,31 @@ button:active{
     display:block;
     width:100%;
     color:#ffe7a6;
-    font-size:10px;
+    flex-shrink:0;
+    font-size:16px;
     font-weight:900;
-    line-height:12px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    line-height:20px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-item-effect{
     display:block;
     width:100%;
     color:#d8cbb5;
-    font-size:8px;
-    line-height:10px;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
+    flex-shrink:0;
+    font-size:16px;
+    line-height:20px;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .battle-item-count{
     display:block;
     color:#fff;
-    font-size:9px;
-    line-height:10px;
+    flex-shrink:0;
+    font-size:16px;
+    line-height:20px;
     font-weight:900;
 }
 
@@ -2335,13 +2380,13 @@ button:active{
     border-radius:8px;
     color:#b9aa91;
     text-align:center;
-    font-size:11px;
-    line-height:15px;
+    font-size:16px;
+    line-height:22px;
 }
 
 .battle-item-empty strong{
     color:#ffe27a;
-    font-size:13px;
+    font-size:18px;
 }
 
 /* 戰鬥背包比技能框更高；打開時把回合資訊同步上移，
@@ -3477,7 +3522,8 @@ button:active{
 */
 
 .status-row{
-    display:flex;
+    display:grid;
+    grid-template-columns:minmax(calc(40 * var(--ui-length-unit,1px)),auto) calc(52 * var(--ui-length-unit,1px)) minmax(0,1fr) calc(52 * var(--ui-length-unit,1px));
     align-items:center;
     justify-content:space-between;
     min-height:52px;
@@ -3485,7 +3531,7 @@ button:active{
     padding:4px 0;
     border-bottom:1px solid rgba(200,154,72,.14);
     font-size:13px;
-    gap:8px;
+    gap:calc(8 * var(--ui-length-unit,1px));
 }
 
 /*
@@ -3707,15 +3753,16 @@ button:active{
 }
 
 .status-btn{
-    width:44px;
-    height:44px;
-    flex:0 0 44px;
+    width:calc(52 * var(--ui-length-unit,1px));
+    height:calc(52 * var(--ui-length-unit,1px));
+    min-width:0;
+    padding:0;
     border:1px solid rgba(200,154,72,.38);
     border-radius:9px;
     background:linear-gradient(180deg,#2b2419,#14110d);
     color:#ead9b4;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.04);
-    font-size:20px;
+    font-size:calc(22 * var(--ui-length-unit,1px));
     font-weight:900;
     -webkit-tap-highlight-color:transparent;
     -webkit-touch-callout:none;
@@ -3803,7 +3850,7 @@ button:active{
 
 .status-confirm{
     width:100%;
-    min-height:44px;
+    min-height:calc(44 * var(--ui-length-unit,1px));
     margin-top:8px;
     padding:8px 12px;
     border:1px solid #c89a48;
@@ -3812,7 +3859,7 @@ button:active{
     color:#fff0c2;
     box-shadow:inset 0 1px 0 rgba(255,238,196,.06);
     font-weight:900;
-    font-size:14px;
+    font-size:calc(15 * var(--ui-length-unit,1px));
 }
 
 .status-confirm:disabled{
@@ -5345,23 +5392,30 @@ button:active{
 */
 
 .level-up-toast{
-    position:fixed;
+    position:absolute;
 
     left:50%;
-    top:14px;
+    top:calc(14 * var(--ui-length-unit,1px));
 
     transform:
         translateX(-50%)
-        translateY(-30px);
+        translateY(calc(-30 * var(--ui-length-unit,1px)));
 
-    background:#f0b429;
-    color:#0c0b0a;
+    background:var(--rpg-window-iron,#0D0C09);
+    color:var(--rpg-window-text,#f4ead4);
+    border:calc(6 * var(--ui-length-unit,1px)) solid transparent;
+    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
 
     font-weight:900;
-    font-size:15px;
+    font-size:calc(16 * var(--ui-length-unit,1px));
+    line-height:1.5;
 
-    padding:11px 22px;
-    border-radius:20px;
+    width:calc(320 * var(--ui-length-unit,1px));
+    max-width:calc(100% - 32 * var(--ui-length-unit,1px));
+    box-sizing:border-box;
+    padding:calc(10 * var(--ui-length-unit,1px)) calc(14 * var(--ui-length-unit,1px));
+    border-radius:0;
+    text-align:center;
 
     box-shadow:0 4px 16px rgba(0,0,0,.5);
 
@@ -5374,7 +5428,8 @@ button:active{
         transform .25s ease;
 
     pointer-events:none;
-    white-space:nowrap;
+    white-space:normal;
+    overflow-wrap:anywhere;
 }
 
 .level-up-toast.show{
@@ -5544,8 +5599,7 @@ button:active{
     max-height:96% !important;
 }
 
-#game-stage > #app > #game-content .exp-toast,
-#game-stage > #app > #game-content .level-up-toast{
+#game-stage > #app > #game-content .exp-toast{
     position:absolute !important;
     top:14px !important;
 }
@@ -5553,7 +5607,7 @@ button:active{
 #game-stage > #app > #game-content .autosave-indicator{
     position:absolute !important;
     right:10px !important;
-    bottom:78px !important;
+    bottom:var(--autosave-indicator-bottom,78px) !important;
 }
 
 
@@ -5615,11 +5669,10 @@ button:active{
 }
 
 /* =====================================================
-   V105 — 戰鬥五大指令改用使用者提供的整組圖像面板
-   - 使用原圖，不重新生成、不重畫。
-   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列、元素匣、
-     戰鬥資訊框因 UI 改圖而位移。
-   - 圖像本身向上延伸，五個透明點擊區分別覆蓋：
+   戰鬥五大指令 — 同一黑鐵古銅底軌，保留原五欄與操作
+   - 使用既有技能頁材質，不新增圖片或互動 Owner。
+   - mainBattleMenu 保留原本 66px 文件流高度，避免角色列與元素匣位移。
+   - 共用底軌不接收指標，五個原點擊區分別操作：
      技能／普通攻擊／背包(既有物品功能)／防禦／逃脫。
    - 技能快捷列仍以較高 z-index 覆蓋此面板，原戰鬥函式不變。
 ===================================================== */
@@ -5659,7 +5712,9 @@ button:active{
     bottom:0;
     z-index:1;
     pointer-events:none;
-    background-image:linear-gradient(180deg,#9c7130 0%,#31210d 9%,#120e08 50%,#31210d 91%,#9c7130 100%);
+    border:1px solid #73582d;
+    border-image:var(--rpg-window-frame) 115 fill / 6px / 0 stretch;
+    background:#15130f;
     background-repeat:no-repeat;
     background-position:center center;
     background-size:100% 100%;
@@ -5675,10 +5730,10 @@ button:active{
     min-height:0 !important;
     margin:0 !important;
     padding:0 !important;
-    border:1px solid #b78d45 !important;
-    border-radius:12px !important;
-    background:linear-gradient(180deg,#453016,#171007 48%,#30200d) !important;
-    box-shadow:inset 0 0 0 2px #1c140b !important;
+    border:1px solid transparent !important;
+    border-radius:4px !important;
+    background:transparent !important;
+    box-shadow:none !important;
     color:#ffe3a1 !important;
     font-size:16px !important;
     line-height:22px !important;
@@ -5686,6 +5741,10 @@ button:active{
     z-index:3 !important;
     cursor:pointer;
     -webkit-tap-highlight-color:transparent;
+}
+
+#mainBattleMenu > .menu-button + .menu-button{
+    border-left-color:#73582d !important;
 }
 
 #mainBattleMenu > .menu-button.skill{
@@ -5752,10 +5811,10 @@ button:active{
 #game-stage img[src*="map-return.png"]{background:#050505;border-radius:50%;}
 :is(#game-stage,#game-ui) .quest-batch-actions{display:flex;justify-content:flex-end;padding:calc(8 * var(--ui-length-unit,1px)) calc(10 * var(--ui-length-unit,1px)) calc(4 * var(--ui-length-unit,1px));}
 :is(#game-stage,#game-ui) .quest-claim-all-btn{
-    min-width:calc(108 * var(--ui-length-unit,1px));min-height:calc(36 * var(--ui-length-unit,1px));padding:calc(7 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #b98a42;border-radius:calc(8 * var(--ui-length-unit,1px));
-    background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:calc(12 * var(--ui-length-unit,1px));font-weight:900;
+    min-width:calc(108 * var(--ui-length-unit,1px));min-height:calc(44 * var(--ui-length-unit,1px));padding:calc(7 * var(--ui-length-unit,1px)) calc(12 * var(--ui-length-unit,1px));border:calc(1 * var(--ui-length-unit,1px)) solid #b98a42;border-radius:calc(8 * var(--ui-length-unit,1px));
+    background:linear-gradient(180deg,#4c3316,#211308);color:#ffe0a0;font-size:calc(15 * var(--ui-length-unit,1px));font-weight:900;
 }
-:is(#game-stage,#game-ui) .quest-claim-all-btn:disabled{opacity:.42;filter:grayscale(.35);}
+:is(#game-stage,#game-ui) .quest-claim-all-btn:disabled{opacity:1;color:#b9ad98;filter:grayscale(.35);}
 
 /* Native general UI: one fixed canvas, no local transform or resize writer.
    Shared widgets use a static spacing unit; only the stage performs scaling. */

@@ -1,0 +1,18 @@
+{
+  "refs": [
+    "a199300d9dae288044204fb7eecadf7f6e6fad67",
+    "e5e307122f84edd3fda7d12c6395336c8b2a51c9"
+  ],
+  "sourceDigestsOnly": true,
+  "semanticEqualBothSides": true,
+  "builtPolicyId": "restricted-forest-instance-v1",
+  "combatRulesReady": false,
+  "outcomeVerified": false,
+  "rewardEligible": false,
+  "creditedToCharacter": false,
+  "sourceDigests": {
+    "js/00-main.js": "66fe0c88e87d467e9d15b8585ea0b4bef28db8059becac688b28f2db7a490d02",
+    "js/34-v141-core-systems.js": "0c16a7e90839a6651009bcf14bb16e9e788700d8a0bbb7f9ce1969e475d6870c",
+    "js/40-v144-rules-and-abyss.js": "9c1ea3134a8b7e5aff92a00e35de96b169a0af9b144d72edc1aa64dd780580c3"
+  }
+}

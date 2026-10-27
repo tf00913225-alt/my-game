@@ -58,12 +58,12 @@ assert.match(read('css/00-main.css'), /\.status-number\{[^}]*font-size:15px/, 'a
 // Formal player-facing owners that should contain no sub-13px declarations.
 enforceNoTinyText(owners.elementBox);
 enforceNoTinyText(owners.abyss);
-// INVENTORY is a redundant decorative kicker above the real Chinese heading;
-// exclude only that documented decorative class, never backpack content text.
+// The player-facing title uses the same Chinese label and24UI heading scale.
 const inventoryHtml=read('index.html');
-assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包"[\s\S]*?class="inventory-title-plate-kicker">INVENTORY<\/span>\s*<h2>背包<\/h2>/);
-assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:20px/);
-enforceNoTinyText(owners.inventory, text => text.replace(/#game-stage #inventoryPage \.inventory-title-plate-kicker\{[^}]*\}/, ''));
+assert.match(inventoryHtml, /class="inventory-title-plate" aria-label="背包">\s*<h2>背包<\/h2>/);
+assert.doesNotMatch(inventoryHtml,/class="inventory-title-plate-kicker"/);
+assert.match(inventory, /\.inventory-title-plate h2\{[^}]*font-size:24px/);
+enforceNoTinyText(owners.inventory);
 enforceNoTinyText(owners.abyssLayout);
 enforceNoTinyText(owners.patrol);
 enforceNoTinyText(owners.inventoryBack);
@@ -87,12 +87,13 @@ assert.equal(below13(nonBattlePolish).length, 0, 'V146 non-battle typography mus
 // Hierarchy: 13px is a floor, not a blanket replacement.
 assert.match(homeRoster, /\.v146-home-roster>header\{[^}]*font-size:13px/);
 assert.match(homeRoster, /\.v146-home-character\{[^}]*font-size:13px/);
-assert.match(homeRoster, /\.v146-home-character span\{[^}]*white-space:nowrap/);
+assert.match(homeRoster, /\.v146-home-character>span\{[^}]*white-space:nowrap/,'the direct level label must remain on one line');
+assert.match(homeRoster, /\.v146-home-character b\{[^}]*white-space:normal;[^}]*overflow-wrap:anywhere;/,'long character names must remain readable inside their own card');
 assert.match(homePolish, /\.v173-exp-charge-status b\{[^}]*font-size:16px/);
 assert.match(homePolish, /\.v173-exp-charge-status small\{[^}]*font-size:14px/);
 assert.match(read(owners.skillSkin), /\.skill-loadout-slot-name\{[^}]*font-size:15px/);
 assert.match(homePolish, /\.map-player-name\{[^}]*font-size:13px/);
-assert.match(homePolish, /\.v132-reward-modal \.v17363-preview-group p\{font-size:15px/);
+assert.match(read('css/33-v132-content-expansion.css'), /\.v132-reward-modal \.v17363-preview-group p\{[^}]*font-size:15px/);
 assert.match(detail, /#skillDetailStats \.v17364-progression-hint\{[\s\S]*?font-size:14px/);
 // V177 owns backpack typography in css/22; css/52 must not reclaim it.
 assert.match(inventory, /\.inventory-category-tab\{[^}]*font-size:18px/);
@@ -107,10 +108,12 @@ assert.match(relic, /\.team-relic-tabs button\{[^}]*font-size:15px/);
 assert.match(gameplay, /\.gameplay-mode-copy h3\{[^}]*font-size:22px/);
 assert.match(gameplay, /\.gameplay-fixed-tabs button\{[^}]*font-size:18px/);
 assert.match(gameplay, /\.boss-detail-grid h4\{[^}]*font-size:18px/);
-assert.match(qa, /\.v17346-shop-name\{font-size:16px!important/);
-assert.match(qa, /\.v17346-shop-buy\{[^}]*font-size:15px!important/);
+assert.match(read(owners.skillSkin), /\.v17346-shop-card \.v17346-shop-name\{[^}]*font-size:16px !important/);
+assert.match(read(owners.skillSkin), /\.v17346-shop-card \.v17346-shop-buy\{[^}]*font-size:15px !important/);
+assert.doesNotMatch(qa,/\.v17346-shop-card \.v17346-shop-(?:name|buy)\{[^}]*font-size:/);
 assert.match(read('css/25-stage-v90-quest-interface-core.css'), /\.quest-card-desc\{[^}]*font-size:15px/);
-assert.match(qa, /\.v17363-preview-group p\{font-size:15px!important/);
+assert.doesNotMatch(qa, /\.v17363-preview-group p\{/);
+assert.doesNotMatch(homePolish, /\.v17363-preview-group p\{/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v17363-game-select-option\{[^}]*font-size:15px/);
 assert.match(read('css/38-v141-system-expansion.css'), /\.v141-synthesis-tabs button\{[^}]*font-size:15px!important/);
 

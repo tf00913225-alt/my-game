@@ -1,0 +1,15 @@
+{
+  "ref": "eb5a180b^",
+  "source": {
+    "before": "137a764321bd75383375c733f525291aeef0af00ef85a5fbee5cf5f926cee2fd",
+    "after": "b64c45c51c28ece98b69a4aa5b1bc6ce166200b981e737b9829241117ae4135b",
+    "onlyFourLines": true
+  },
+  "generated": {
+    "beforePath": "build/boot-core.1a331d452911.css",
+    "afterPath": "build/boot-core.aa47a62134df.css",
+    "before": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "after": "aa47a62134df48c43a357ac8259b0ee63e5a12b21c68a1ce8f328111194c1bfe",
+    "onlySameFourLines": true
+  }
+}

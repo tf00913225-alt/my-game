@@ -63,7 +63,9 @@ function runtime(saved,initialSave=true){
         setTimeout(){},clearTimeout(){},setInterval(){return 1;},clearInterval(){},addEventListener(){},alert(){},
         saveGame(){if(saveMode==="throw")throw Error("save denied");if(!saveMode)return false;stored=JSON.parse(JSON.stringify(player.adventureProgress));return true;},
         updateUI(){},updateGoldDisplay(){},rebuildInventorySlots(){},showPage(){},
-        openHomeFeature(type){if(type==='character'){c.renderSkillLoadout?.();}},switchCharacterTab(){},closeHomeFeature(){},
+        openHomeFeature(type){assert.equal(type,'character');c.modalEntrance.push('character');},
+        switchCharacterTab(tab){assert.equal(tab,'skill');c.modalEntrance.push('skill');c.renderSkillLoadout();},
+        closeHomeFeature(){},modalEntrance:[],
         getExistingPartyIndexes:()=>[0],getPartyCharacterByIndex:()=>player,
         getPartyBattleStats:()=>({maxHP:100,maxSP:40,attack:15,magicAttack:10,defense:5}),
         MonsterBalance:{build:spec=>({...spec,hp:50,maxHP:50,sp:0,maxSP:0})},
@@ -112,6 +114,7 @@ for(const element of ['fire','water','wind','earth']){
         assert.equal(h.api.getView().tutorialProgress.skillReady,false,'element placeholder must not authorize readiness');
         assert.equal(h.api.getView().tutorialProgress.nativeElement,element);
         assert.equal(h.api.openTutorialSystem(),true);assert.equal(rendered,1);
+        assert.deepEqual(h.c.modalEntrance,['character','skill'],'formal character modal opens before its skill tab');
         assert.equal(h.c.currentSkillCharacter,h.c.getPartyCharacterKey(0));
         h.c.characterSkillLoadouts.fire.skillLevels.lessonSkill=1;
         assert.equal(h.api.getView().tutorialProgress.skillReady,false,'learning alone is insufficient');
@@ -395,7 +398,7 @@ function guideHarness(){
         CSS:{escape:value=>value},getComputedStyle:()=>({visibility:"visible"}),
         requestAnimationFrame(fn){frames.push(fn);return frames.length;},addEventListener(){},
         document:{readyState:"loading",addEventListener(type,fn,capture){if(capture)listeners.set(type,fn);},
-            querySelectorAll:selector=>targets.get(selector)||[],
+            querySelectorAll:selector=>targets.has(selector)?targets.get(selector):selector.split(',').flatMap(part=>targets.get(part.trim())||[]),
             getElementById:id=>id==="game-ui"?host:null,
             createElement(){return {...element(),querySelector:child};}}};
     c.window=c;vm.createContext(c);vm.runInContext(fs.readFileSync("js/adventure/adventure-ui-v1-20260915.js","utf8"),c);
@@ -418,13 +421,13 @@ test('recovery guide chooses stocked SP when HP has a deficit but no HP potion',
     assert.equal(h.children.get('.adventure-guide-recovery').hidden,true);
 });
 
-for(const element of ['fire','water','wind','earth']){
-    test(`skill guide requires a real ${element} tab click before learning and equipping`,()=>{
+for(const surface of ['standalone','character-modal'])for(const element of ['fire','water','wind','earth']){
+    test(`skill guide requires a real ${element} tab click before learning and equipping in ${surface}`,()=>{
         const h=guideHarness(),page=h.element(),tab=h.element(),growth=h.element(),equip=h.element(),wrong=h.element();
         h.c.battleActive=false;h.view.tutorial.requiredAction='skill';h.view.tutorialProgress.nativeElement=element;
         let selected=false,learned=0,equipped=0;
         tab.getAttribute=()=>selected?'true':'false';tab.action=()=>{selected=true;};growth.action=()=>{learned++;h.view.tutorialProgress.loadout={skillLevels:{lessonSkill:1}};};equip.action=()=>{equipped++;};
-        h.targets.set('#skillPage.active',[page]);
+        h.targets.set(surface==='standalone'?'#skillPage.active':'#homeFeatureModal.show[data-character-tab="skill"] #skillPage',[page]);
         h.targets.set('#skillElementTabs [onclick="selectSkillElementTab(\''+element+'\')"]',[tab]);
         h.targets.set('#skillPage .skill-row [data-skill-action="growth"]:not(:disabled)',[growth]);
         h.targets.set('.skill-row[data-skill-id="lessonSkill"] [data-skill-action="equip"]',[equip]);
@@ -650,6 +653,49 @@ test('forced release update keeps its own input and visibility while the tutoria
     assert.equal(h.dispatch('click',update).stopped,false);assert.equal(updates,1);
     h.targets.delete('#firebaseAuthOverlay,#startupLoader,#homeFeatureModal.release-update-forced.show');h.frame();
     assert.equal(h.overlay().hidden,false);assert.equal(h.dispatch('click',update).stopped,true);assert.equal(h.dispatch('click',attack).stopped,false);
+});
+
+test("story return keeps the onboarding guard and permits an existing-character reader to leave",()=>{
+    const h=runtime();at(h,"c1_01");h.api.startStory("c1_01");
+    assert.equal(h.api.closeToCity(),false,"active onboarding cannot be bypassed by a return control");
+    assert.equal(h.state().onboarding.active,true);
+    assert.equal(h.api.getView().panel,"story");
+    h.state().onboarding.active=false;
+    assert.equal(h.api.closeToCity(),true,"the original runtime allows an existing-character reader to return");
+    assert.equal(h.launches(),0,"reading and returning do not start a battle");
+});
+
+test("tutorial navigation uses the character skill host and closes borrowed UI before returning without starting gameplay",()=>{
+    for(const [id,action,host] of [["c1_02","skill","skill"],["c1_04","equipment","inventory"],["c1_04","equipment","shop"],["c1_05","recovery","inventory"]]){
+        const h=runtime(),calls=[];at(h,id);
+        h.state().onboarding={active:true,phase:"guidance",nodeId:id,requiredAction:action};
+        h.c.currentSkillCharacter="water";
+        // Interface spies verify the production runtime's routing, not rendered DOM.
+        h.c.showPage=page=>calls.push(["page",page]);
+        h.c.openHomeFeature=feature=>calls.push(["modal",feature]);
+        h.c.switchCharacterTab=tab=>calls.push(["tab",tab]);
+        h.c.closeHomeFeature=()=>calls.push(["close-modal"]);
+        h.c.FourSymbolsAdventureUI={hide(){},show(){calls.push(["tutorial"]);},syncTutorialReturn:page=>calls.push(["return-host",page])};
+        const business=()=>JSON.stringify([h.c.gold,h.c.sharedExp,h.c.inventoryItems,h.c.characterEquipment,h.c.characterSkillLoadouts,h.c.player.hp,h.c.player.sp]);
+        if(action==="equipment"&&host==="inventory"){
+            // Retained issued equipment still routes to the original inventory.
+            const armor=h.c.FourSymbolsEquipmentFactory.starter("leatherArmor");
+            h.state().grantedEquipmentUid=armor.v141Uid;h.c.inventoryItems.push(armor);
+        }else if(host==="shop"){
+            const unfunded=business();assert.equal(h.api.openTutorialSystem(),false);
+            assert.deepEqual(calls,[]);assert.equal(business(),unfunded,'missing formal funding never grants a shop route');
+            h.state().rewardClaims.c1_03="ready";assert.equal(h.api.claimNodeReward("c1_03"),true);
+            assert.equal(h.state().equipmentLessonFunding.amount,750);calls.length=0;
+        }
+        const before=business();assert.equal(h.api.openTutorialSystem(),true);
+        assert.deepEqual(calls,host==="skill"?[["page","home"],["modal","character"],["tab","skill"],["return-host","skill"]]:host==="shop"?[["page","home"],["modal","shop"],["return-host","shop"]]:[["page","inventory"],["return-host","inventory"]]);
+        calls.length=0;assert.equal(h.api.returnFromTutorial(),true);
+        assert.deepEqual(calls,[["close-modal"],["tutorial"]]);
+        assert.equal(h.state().onboarding.requiredAction,action);assert.equal(h.state().currentNodeId,id);
+        assert.equal(h.launches(),0);assert.equal(business(),before);
+        h.state().onboarding.active=false;calls.length=0;
+        assert.equal(h.api.openTutorialSystem(),false);assert.deepEqual(calls,[]);
+    }
 });
 
 test("tutorial defeat requires learned equipped skill and equipped starter armor before same-node retry",()=>{

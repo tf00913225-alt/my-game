@@ -1,0 +1,1100 @@
+[
+  {
+    "name": "exp-top",
+    "rows": [
+      {
+        "text": "角色",
+        "font": 27.482946647678773,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 18.28878144054878,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.16666773745888,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.022223221628288,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel0",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.166664725855778,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.60",
+        "font": 16.022220410798724,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel1",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.166661714252673,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.50",
+        "font": 16.02221759996916,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel2",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "經驗池分配",
+        "font": 20.582427751337626,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnExpPool",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "能力值",
+        "font": 20.573177882603236,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnStatus",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "技能",
+        "font": 20.573174612862722,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnSkill",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "角色養成",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-kicker",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "共用經驗池",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-title",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "73",
+        "font": 34.39559391566685,
+        "button": false,
+        "primary": false,
+        "selector": "#sharedExpValue",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "EXP",
+        "font": 16.008618562117867,
+        "button": false,
+        "primary": false,
+        "selector": "span.exp-pool-unit",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "戰鬥與離線獲得的經驗會集中於此，再由你分配給指定角色升級。",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-caption",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "持續充能中",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeTitle",
+        "parent": ""
+      },
+      {
+        "text": "約 79% 等級進度／日",
+        "font": 16.01482101966595,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeRate",
+        "parent": ""
+      },
+      {
+        "text": "自然充能最多累積 72 小時；在線、離線都會計算。",
+        "font": 16.022221156529017,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeText",
+        "parent": "v173ExpPoolChargeStatus"
+      },
+      {
+        "text": "角色分配",
+        "font": 16.0222225189209,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "每次分配剛好升 1 級",
+        "font": 16.028184678819443,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.70",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 9,637,200 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.60",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 5,885,100 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.15",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.50",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 2,960,400 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.30",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "本次分配：0 EXP",
+        "font": 16.022221073223527,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-preview-summary",
+        "parent": "expDistributeList"
+      },
+      {
+        "text": "確定",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-confirm",
+        "parent": "v131-exp-actions"
+      },
+      {
+        "text": "返回",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-back",
+        "parent": "v131-exp-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 78.10833740234375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "經驗池分配",
+        "width": 153.60589599609375,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "能力值",
+        "width": 96.00816345214844,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "技能",
+        "width": 96.00814819335938,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.35546875,
+        "overflow": false
+      },
+      {
+        "label": "確定",
+        "width": 175.09999084472656,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 175.09999084472656,
+        "height": 50.3555908203125,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "exp-end",
+    "rows": [
+      {
+        "text": "角色",
+        "font": 27.482946647678773,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 18.28878144054878,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.16666773745888,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.022223221628288,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel0",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.166664725855778,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.60",
+        "font": 16.022220410798724,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel1",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.166661714252673,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.50",
+        "font": 16.02221759996916,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel2",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "經驗池分配",
+        "font": 20.582427751337626,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnExpPool",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "能力值",
+        "font": 20.573177882603236,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnStatus",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "技能",
+        "font": 20.573174612862722,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnSkill",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "角色養成",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-kicker",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "共用經驗池",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-title",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "73",
+        "font": 34.39559391566685,
+        "button": false,
+        "primary": false,
+        "selector": "#sharedExpValue",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "EXP",
+        "font": 16.008618562117867,
+        "button": false,
+        "primary": false,
+        "selector": "span.exp-pool-unit",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "戰鬥與離線獲得的經驗會集中於此，再由你分配給指定角色升級。",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-caption",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "持續充能中",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeTitle",
+        "parent": ""
+      },
+      {
+        "text": "約 79% 等級進度／日",
+        "font": 16.01482101966595,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeRate",
+        "parent": ""
+      },
+      {
+        "text": "自然充能最多累積 72 小時；在線、離線都會計算。",
+        "font": 16.022221156529017,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeText",
+        "parent": "v173ExpPoolChargeStatus"
+      },
+      {
+        "text": "角色分配",
+        "font": 16.0222225189209,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "每次分配剛好升 1 級",
+        "font": 16.028184678819443,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.70",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 9,637,200 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.60",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 5,885,100 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.15",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.50",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 2,960,400 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.30",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "本次分配：0 EXP",
+        "font": 16.022221073223527,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-preview-summary",
+        "parent": "expDistributeList"
+      },
+      {
+        "text": "確定",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-confirm",
+        "parent": "v131-exp-actions"
+      },
+      {
+        "text": "返回",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-back",
+        "parent": "v131-exp-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 78.10833740234375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "經驗池分配",
+        "width": 153.60589599609375,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "能力值",
+        "width": 96.00816345214844,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "技能",
+        "width": 96.00814819335938,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.355499267578125,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "確定",
+        "width": 175.09999084472656,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 175.09999084472656,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "exp-reopen-top",
+    "rows": [
+      {
+        "text": "角色",
+        "font": 27.482946647678773,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 18.28878144054878,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.16666773745888,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 16.022223221628288,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel0",
+        "parent": "character-showcase-choice is-current-character"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.166664725855778,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.60",
+        "font": 16.022220410798724,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel1",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.166661714252673,
+        "button": true,
+        "primary": false,
+        "selector": "div.character-showcase-name",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "Lv.50",
+        "font": 16.02221759996916,
+        "button": true,
+        "primary": false,
+        "selector": "#characterAvatarLevel2",
+        "parent": "character-showcase-choice"
+      },
+      {
+        "text": "經驗池分配",
+        "font": 20.582427751337626,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnExpPool",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "能力值",
+        "font": 20.573177882603236,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnStatus",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "技能",
+        "font": 20.573174612862722,
+        "button": true,
+        "primary": true,
+        "selector": "#characterTabBtnSkill",
+        "parent": "character-tab-row"
+      },
+      {
+        "text": "角色養成",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-kicker",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "共用經驗池",
+        "font": 20.599999060997597,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-title",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "443",
+        "font": 34.301583555323134,
+        "button": false,
+        "primary": false,
+        "selector": "#sharedExpValue",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "EXP",
+        "font": 16.008618562117867,
+        "button": false,
+        "primary": false,
+        "selector": "span.exp-pool-unit",
+        "parent": "exp-pool-total"
+      },
+      {
+        "text": "戰鬥與離線獲得的經驗會集中於此，再由你分配給指定角色升級。",
+        "font": 14.877777099609375,
+        "button": false,
+        "primary": false,
+        "selector": "div.exp-pool-caption",
+        "parent": "exp-pool-hero"
+      },
+      {
+        "text": "持續充能中",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeTitle",
+        "parent": ""
+      },
+      {
+        "text": "約 79% 等級進度／日",
+        "font": 16.01482101966595,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeRate",
+        "parent": ""
+      },
+      {
+        "text": "自然充能最多累積 72 小時；在線、離線都會計算。",
+        "font": 16.022221156529017,
+        "button": false,
+        "primary": false,
+        "selector": "#v173ExpChargeText",
+        "parent": "v173ExpPoolChargeStatus"
+      },
+      {
+        "text": "角色分配",
+        "font": 16.0222225189209,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "每次分配剛好升 1 級",
+        "font": 16.028184678819443,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "exp-pool-section-head"
+      },
+      {
+        "text": "角色名稱長文測試甲乙丙丁戊己庚辛",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.70",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 9,637,200 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.60",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 5,885,100 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.15",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+        "font": 17.177723012071976,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-name",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "Lv.50",
+        "font": 15.944606323242187,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-level",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "目前 0 / 2,960,400 EXP",
+        "font": 16.022221604438677,
+        "button": false,
+        "primary": false,
+        "selector": "div.v173-exp-row-meta",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "追趕加成 ×1.30",
+        "font": 14.857931648812642,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v173-exp-row-meta"
+      },
+      {
+        "text": "點擊預覽升級",
+        "font": 17.166666004755726,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-preview-btn",
+        "parent": "v131-exp-row"
+      },
+      {
+        "text": "本次分配：0 EXP",
+        "font": 16.022221073223527,
+        "button": false,
+        "primary": false,
+        "selector": "div.v131-exp-preview-summary",
+        "parent": "expDistributeList"
+      },
+      {
+        "text": "確定",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-confirm",
+        "parent": "v131-exp-actions"
+      },
+      {
+        "text": "返回",
+        "font": 17.16666576909084,
+        "button": true,
+        "primary": true,
+        "selector": "button.v131-exp-back",
+        "parent": "v131-exp-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 78.10833740234375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "經驗池分配",
+        "width": 153.60589599609375,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "能力值",
+        "width": 96.00816345214844,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "技能",
+        "width": 96.00814819335938,
+        "height": 59.5111083984375,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "點擊預覽升級",
+        "width": 334.1777648925781,
+        "height": 50.35546875,
+        "overflow": false
+      },
+      {
+        "label": "確定",
+        "width": 175.09999084472656,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "返回",
+        "width": 175.09999084472656,
+        "height": 50.3555908203125,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

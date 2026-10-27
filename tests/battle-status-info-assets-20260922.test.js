@@ -131,8 +131,11 @@ test("battle skill owners keep target scope, duration and presentation aligned",
   assert.doesNotMatch(relic,/team-relic-mask-holes|createElementNS\(namespace,"rect"\)/);
   assert.match(relicCss,/body > \.team-relic-battle-presentation\{[\s\S]*?z-index:18090/);
   assert.match(relicCss,/team-relic-cinematic-active > \.v143-skill-stage\{z-index:18130/);
-  assert.match(fixedCss,/turn-target-row\.skill-picker-open\{[\s\S]*?bottom:calc\(var\(--battle-command-visual-height\) \+ 44px\)/);
-  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:-82px[\s\S]*?bottom:0/);
+  assert.match(fixedCss,/\.turn-target-row\.skill-picker-open\{\s*top:calc\(100% - var\(--battle-command-row-height\) - var\(--battle-skill-menu-top-offset\) \+ 14px\);\s*right:94px;\s*bottom:auto;/,"readable skill picker keeps its timer in the header clear of cards/Return");
+  assert.match(fixedCss,/\.turn-target-row\.skill-picker-open\{[^}]*opacity:1;/);
+  assert.match(fixedCss,/\.turn-target-row\.battle-item-open\{[^}]*opacity:1;/);
+  assert.match(fixedCss,/--battle-skill-menu-top-offset:188px;/);
+  assert.match(fixedCss,/#skillQuickBar\.skill-quick-bar\{[\s\S]*?top:calc\(-1 \* var\(--battle-skill-menu-top-offset\)\)[\s\S]*?bottom:0/);
   assert.doesNotMatch(featureBoundary,/MutationObserver/);
   assert.match(bottomNav,/trainingActive[\s\S]*?\?"training"/);
   assert.match(v148,/FourSymbolsBottomNav\?\.syncContext\(\)/);

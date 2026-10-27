@@ -1,0 +1,79 @@
+{
+  "uiParent": "94593d32f4055cfcde684a7cf01c13bf39a933a8",
+  "devParent": "34c4138524e59a5f970f2677465cd9ee3cb561db",
+  "retained": [
+    {
+      "path": "assets/characters/player_female_01.webp",
+      "gitBlob": "ae43d0c403ad5f4d29c3f7fea513c03c8223d626"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_female_01.png",
+      "gitBlob": "2c90ceddae35c79d2558cb710ae83233f8130a37"
+    },
+    {
+      "path": "assets/characters/player_female_02.webp",
+      "gitBlob": "2f73d1921a2eb501c46db6a176095a6ce9d7d422"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_female_02.png",
+      "gitBlob": "ce1ef2f26083fbdf805fe71347bbb5bac998e773"
+    },
+    {
+      "path": "assets/characters/player_female_03.webp",
+      "gitBlob": "da46d0aff077b770fd795c322ee7d1f6e313e3ee"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_female_03.png",
+      "gitBlob": "e191231e645f6226b54a95a34d4e0a5745e8fb2e"
+    },
+    {
+      "path": "assets/characters/player_female_04.webp",
+      "gitBlob": "813a912f133fa42ace4bb45b06b6c344e6592507"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_female_04.png",
+      "gitBlob": "ad7f39c2073a94d00b73021277aa746c40c2ab68"
+    },
+    {
+      "path": "assets/characters/player_male_01.webp",
+      "gitBlob": "126e7b48451f0848ec05320d0ec5f7e85160d1d8"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_male_01.png",
+      "gitBlob": "c51a6defc20c2b7f0fc4e1a38aa09cdd8423b6c4"
+    },
+    {
+      "path": "assets/characters/player_male_02.webp",
+      "gitBlob": "4d843b938a79a515a68debf295ddba8e7b1e5245"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_male_02.png",
+      "gitBlob": "abcd10d68712856485f3630533715c2c3a594549"
+    },
+    {
+      "path": "assets/characters/player_male_03.webp",
+      "gitBlob": "b507a7a628895f365712ae748cf738e575261144"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_male_03.png",
+      "gitBlob": "f1dafd59475c8ed7e983adf0f3e3be7a972128fc"
+    },
+    {
+      "path": "assets/characters/player_male_04.webp",
+      "gitBlob": "1cd1cb6c7f14298d9df7a0d03ada084b982ef48b"
+    },
+    {
+      "path": "assets/inbox/player-portraits-20261023/player_male_04.png",
+      "gitBlob": "af91bf46c997608d1bb9eb231dca531e30e498f2"
+    }
+  ],
+  "scope": "Only986 native creation portrait mapping/preload and builder slots; original955 main/CSS/input/Story/safety bytes retained",
+  "checks": [
+    "player-creation-portraits.test.js PASS",
+    "build/check PASS",
+    "source identity with merged986 retained; original PNG/WebP decode/lossless evidence reused, not repeated",
+    "two viewport four representative screenshots and four true mouse clicks; no submit/create"
+  ],
+  "automation": "955 PAUSED",
+  "limits": "Not four-size/eight-choice/hardware acceptance; prior986 full QA retained. Existing94575-case evidence not rerun."
+}

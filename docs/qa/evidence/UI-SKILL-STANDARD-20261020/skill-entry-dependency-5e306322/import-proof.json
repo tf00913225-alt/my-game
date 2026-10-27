@@ -1,0 +1,46 @@
+{
+  "head": "5e306322e8bb77da2977f06d8e50cd04f62bf569",
+  "files": [
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/360x640/report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\360x640\\report.json",
+      "sha256": "adc24b97b6de48e155f5f4863afe665a87de99306efb12928df34ed8899f569c"
+    },
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/360x640/skill-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\360x640\\skill-entry.png",
+      "sha256": "29004214683fdf9ef7886a6b646082cde1b13bc5b8f436f2592cd4abe6c1d236"
+    },
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/360x640/skill-scrolled.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\360x640\\skill-scrolled.png",
+      "sha256": "ab7f055d326451e260bf257aa375cc76b0a72b84d0a81612764a75186114024d"
+    },
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/1280x800/report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\1280x800\\report.json",
+      "sha256": "e37bd7cb9379856f5c00e00aa2fd242588ca17f709e7069350a950ca40f6a777"
+    },
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/1280x800/skill-entry.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\1280x800\\skill-entry.png",
+      "sha256": "a15dd7ff7bac5e271a5ca6332a2b309adf482a8e5cc970c3ab0ed057a1393f8e"
+    },
+    {
+      "from": "artifacts/ui-skill-standard/skill-entry-dependency-5e306322/1280x800/skill-scrolled.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\1280x800\\skill-scrolled.png",
+      "sha256": "8da92c201f4ab618be54140e95e5069168efe7d040afdbedd41ada3187224387"
+    },
+    {
+      "from": "artifacts/run-skill-entry-dependency-smoke.cjs",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\skill-entry-dependency-5e306322\\helpers\\run-skill-entry-dependency-smoke.cjs",
+      "sha256": "613ce35f04062fd0652361920bee5ce5f3e4b21e4ad334083584c135435a0218"
+    }
+  ],
+  "helperSha256": "60f14e58e2665c28dea090143401d64bcc9cdb97ecfd7d9324187cbc0a879e88",
+  "limits": [
+    "Post-dev190d dependency smoke: true skill entry and real scroll in isolated local QA,360x640/1280x800 only",
+    "Not all48 details, skill learning/equipping, end-of-list, hardware devices or whole UI approval",
+    "Not Cloud skill-config authority or SDK/backend acceptance; fresh QA transport only"
+  ]
+}

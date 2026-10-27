@@ -1,0 +1,3639 @@
+{
+  "head": "8c4cd1d0cfa34eb6e5ffa9f05c0244a51b9d8316",
+  "viewport": [
+    1280,
+    800
+  ],
+  "complete": true,
+  "clean": false,
+  "sourceBefore": {
+    "index.html": "5e71ff7c24dad22076cbcbaa30c58cd75a7dcd9a2dabc87fe6375191c601eace",
+    "asset-manifest.json": "6c33dae571c050a743c2f1b6f0db6139eb7bed74de97ae59b03901924c86d2cc",
+    "js/00-main.js": "b61c540f80cc4a0a279251111310328e8e259f201e81d12fed9d35e94c784c4d",
+    "build/app-shell.7bc5e1c99233.css": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+    "build/app-shell.b1ac1f4e3eb1.js": "b1ac1f4e3eb1125a4ddaa396dc4b8450ad9d7f3845736a51f3efefe4005113fb",
+    "build/boot-core.17c288641d4c.js": "17c288641d4c7770acdd57f95c08b88f959cac52b94d3560072d75fc99960a05",
+    "build/boot-core.78385a4c589b.css": "78385a4c589b8510d6927cc47b0efe2d8b726bfab8f864511283f4c5636764f8",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.f812f2d9ad9b.js": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.84bbc0a00468.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "build/feature-adventure-ui.d6a77ce5e2dd.js": "d6a77ce5e2dd7f9d687461eb352c4d06772efe69a551bb6bc4890029bf496b40",
+    "build/feature-adventure.c82d45eb0990.css": "c82d45eb0990df11547e8c36e9bb258d8934b7c5253d1f6b28b57d4735f75ad6",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.5d80f0302203.js": "5d80f0302203089771562db8104462b5929b6a61d4d8467df141ac19633350ed",
+    "build/gameplay-core-secondary.78a1364f9a34.js": "78a1364f9a343f9da9e85343b5f6066571f9ad468314f7bdf309572536d639ac",
+    "build/gameplay-core.c7da9ada4cb1.css": "c7da9ada4cb15a02218848b01da8d6f19316966af067c97813ca2fac3bf26741"
+  },
+  "responses": [
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/app-shell.7bc5e1c99233.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/app-shell.b1ac1f4e3eb1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/app-shell.7bc5e1c99233.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/app-shell.b1ac1f4e3eb1.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core-primary.5d80f0302203.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core-secondary.78a1364f9a34.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-patrol.0ea855f358ab.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core.c7da9ada4cb1.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core.c7da9ada4cb1.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core-primary.5d80f0302203.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/gameplay-core-secondary.78a1364f9a34.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200,
+      "mimeType": "text/css"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    },
+    {
+      "url": "http://127.0.0.1:61314/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200,
+      "mimeType": "text/javascript"
+    }
+  ],
+  "inputs": [
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 452.5,
+      "y": 390.91143798828125,
+      "rect": {
+        "x": 422.5,
+        "y": 360.91143798828125,
+        "width": 60,
+        "height": 60,
+        "top": 360.91143798828125,
+        "right": 482.5,
+        "bottom": 420.91143798828125,
+        "left": 422.5
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#characterTabBtnSkill",
+      "x": 783.818359375,
+      "y": 276.25,
+      "rect": {
+        "x": 731.38671875,
+        "y": 243.75,
+        "width": 104.86328125,
+        "height": 65,
+        "top": 243.75,
+        "right": 836.25,
+        "bottom": 308.75,
+        "left": 731.38671875
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "kind": "true-skill-owner-scroll",
+      "owner": {
+        "rect": {
+          "x": 443.75,
+          "y": 316.25,
+          "width": 392.5,
+          "height": 455,
+          "top": 316.25,
+          "right": 836.25,
+          "bottom": 771.25,
+          "left": 443.75
+        },
+        "top": 0,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      }
+    },
+    {
+      "selector": "#mainBattleMenu .skill",
+      "x": 464.41127014160156,
+      "y": 758.1863403320312,
+      "rect": {
+        "x": 429.3973083496094,
+        "y": 730.3292236328125,
+        "width": 70.02792358398438,
+        "height": 55.7142333984375,
+        "top": 730.3292236328125,
+        "right": 499.42523193359375,
+        "bottom": 786.04345703125,
+        "left": 429.3973083496094
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".skill-quick-close",
+      "x": 800.7142944335938,
+      "y": 561.0435180664062,
+      "rect": {
+        "x": 766.4285888671875,
+        "y": 533.1864013671875,
+        "width": 68.5714111328125,
+        "height": 55.7142333984375,
+        "top": 533.1864013671875,
+        "right": 835,
+        "bottom": 588.900634765625,
+        "left": 766.4285888671875
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#mainBattleMenu .skill",
+      "x": 464.41127014160156,
+      "y": 758.1863403320312,
+      "rect": {
+        "x": 429.3973083496094,
+        "y": 730.3292236328125,
+        "width": 70.02792358398438,
+        "height": 55.7142333984375,
+        "top": 730.3292236328125,
+        "right": 499.42523193359375,
+        "bottom": 786.04345703125,
+        "left": 429.3973083496094
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".skill-quick-close",
+      "x": 800.7142944335938,
+      "y": 561.0435180664062,
+      "rect": {
+        "x": 766.4285888671875,
+        "y": 533.1864013671875,
+        "width": 68.5714111328125,
+        "height": 55.7142333984375,
+        "top": 533.1864013671875,
+        "right": 835,
+        "bottom": 588.900634765625,
+        "left": 766.4285888671875
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#mainBattleMenu .item",
+      "x": 609.9916076660156,
+      "y": 758.1863403320312,
+      "rect": {
+        "x": 574.9776611328125,
+        "y": 730.3292236328125,
+        "width": 70.02789306640625,
+        "height": 55.7142333984375,
+        "top": 730.3292236328125,
+        "right": 645.0055541992188,
+        "bottom": 786.04345703125,
+        "left": 574.9776611328125
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".battle-item-close",
+      "x": 796.4285583496094,
+      "y": 419.6149444580078,
+      "rect": {
+        "x": 760,
+        "y": 391.7578125,
+        "width": 72.85711669921875,
+        "height": 55.714263916015625,
+        "top": 391.7578125,
+        "right": 832.8571166992188,
+        "bottom": 447.4720764160156,
+        "left": 760
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": "#mainBattleMenu .item",
+      "x": 609.9916076660156,
+      "y": 758.1863403320312,
+      "rect": {
+        "x": 574.9776611328125,
+        "y": 730.3292236328125,
+        "width": 70.02789306640625,
+        "height": 55.7142333984375,
+        "top": 730.3292236328125,
+        "right": 645.0055541992188,
+        "bottom": 786.04345703125,
+        "left": 574.9776611328125
+      },
+      "hit": true,
+      "disabled": false
+    },
+    {
+      "selector": ".battle-item-close",
+      "x": 796.4285583496094,
+      "y": 419.6149444580078,
+      "rect": {
+        "x": 760,
+        "y": 391.7578125,
+        "width": 72.85711669921875,
+        "height": 55.714263916015625,
+        "top": 391.7578125,
+        "right": 832.8571166992188,
+        "bottom": 447.4720764160156,
+        "left": 760
+      },
+      "hit": true,
+      "disabled": false
+    }
+  ],
+  "checks": [
+    {
+      "phase": "skill-entry",
+      "core": "function",
+      "rules": true,
+      "skill": {
+        "x": 443.75,
+        "y": 316.25,
+        "width": 392.5,
+        "height": 3475.872314453125,
+        "top": 316.25,
+        "right": 836.25,
+        "bottom": 3792.122314453125,
+        "left": 443.75
+      },
+      "display": "block",
+      "list": {
+        "x": 443.75,
+        "y": 689.6223754882812,
+        "width": 392.5,
+        "height": 3087.5,
+        "top": 689.6223754882812,
+        "right": 836.25,
+        "bottom": 3777.1223754882812,
+        "left": 443.75
+      },
+      "count": 12,
+      "title": {
+        "box": {
+          "x": 443.75,
+          "y": 32.5,
+          "width": 274.74609375,
+          "height": 47.5,
+          "top": 32.5,
+          "right": 718.49609375,
+          "bottom": 80,
+          "left": 443.75
+        },
+        "ink": {
+          "x": 573.7890625,
+          "y": 31.66666603088379,
+          "width": 69.60284423828125,
+          "height": 43.75,
+          "top": 31.66666603088379,
+          "right": 643.3919067382812,
+          "bottom": 75.41666603088379,
+          "left": 573.7890625
+        }
+      },
+      "tabs": [
+        {
+          "text": "經驗池分配",
+          "rect": {
+            "x": 443.75,
+            "y": 243.75,
+            "width": 167.7734375,
+            "height": 65,
+            "top": 243.75,
+            "right": 611.5234375,
+            "bottom": 308.75,
+            "left": 443.75
+          }
+        },
+        {
+          "text": "能力值",
+          "rect": {
+            "x": 619.0234375,
+            "y": 243.75,
+            "width": 104.86328125,
+            "height": 65,
+            "top": 243.75,
+            "right": 723.88671875,
+            "bottom": 308.75,
+            "left": 619.0234375
+          }
+        },
+        {
+          "text": "技能",
+          "rect": {
+            "x": 731.38671875,
+            "y": 243.75,
+            "width": 104.86328125,
+            "height": 65,
+            "top": 243.75,
+            "right": 836.25,
+            "bottom": 308.75,
+            "left": 731.38671875
+          }
+        }
+      ],
+      "owner": {
+        "rect": {
+          "x": 443.75,
+          "y": 316.25,
+          "width": 392.5,
+          "height": 455,
+          "top": 316.25,
+          "right": 836.25,
+          "bottom": 771.25,
+          "left": 443.75
+        },
+        "top": 0,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      },
+      "controls": [
+        {
+          "text": "火元素",
+          "rect": {
+            "x": 443.75,
+            "y": 316.25,
+            "width": 94.375,
+            "height": 55,
+            "top": 316.25,
+            "right": 538.125,
+            "bottom": 371.25,
+            "left": 443.75
+          }
+        },
+        {
+          "text": "水元素",
+          "rect": {
+            "x": 543.125,
+            "y": 316.25,
+            "width": 94.375,
+            "height": 55,
+            "top": 316.25,
+            "right": 637.5,
+            "bottom": 371.25,
+            "left": 543.125
+          }
+        },
+        {
+          "text": "風元素",
+          "rect": {
+            "x": 642.5,
+            "y": 316.25,
+            "width": 94.375,
+            "height": 55,
+            "top": 316.25,
+            "right": 736.875,
+            "bottom": 371.25,
+            "left": 642.5
+          }
+        },
+        {
+          "text": "土元素",
+          "rect": {
+            "x": 741.875,
+            "y": 316.25,
+            "width": 94.375,
+            "height": 55,
+            "top": 316.25,
+            "right": 836.25,
+            "bottom": 371.25,
+            "left": 741.875
+          }
+        }
+      ]
+    },
+    {
+      "phase": "skill-scrolled",
+      "core": "function",
+      "rules": true,
+      "skill": {
+        "x": 443.75,
+        "y": -2.0833332538604736,
+        "width": 392.5,
+        "height": 3475.872314453125,
+        "top": -2.0833332538604736,
+        "right": 836.25,
+        "bottom": 3473.7889811992645,
+        "left": 443.75
+      },
+      "display": "block",
+      "list": {
+        "x": 443.75,
+        "y": 371.2890625,
+        "width": 392.5,
+        "height": 3087.5,
+        "top": 371.2890625,
+        "right": 836.25,
+        "bottom": 3458.7890625,
+        "left": 443.75
+      },
+      "count": 12,
+      "title": {
+        "box": {
+          "x": 443.75,
+          "y": 32.5,
+          "width": 274.74609375,
+          "height": 47.5,
+          "top": 32.5,
+          "right": 718.49609375,
+          "bottom": 80,
+          "left": 443.75
+        },
+        "ink": {
+          "x": 573.7890625,
+          "y": 31.66666603088379,
+          "width": 69.60284423828125,
+          "height": 43.75,
+          "top": 31.66666603088379,
+          "right": 643.3919067382812,
+          "bottom": 75.41666603088379,
+          "left": 573.7890625
+        }
+      },
+      "tabs": [
+        {
+          "text": "經驗池分配",
+          "rect": {
+            "x": 443.75,
+            "y": 243.75,
+            "width": 167.7734375,
+            "height": 65,
+            "top": 243.75,
+            "right": 611.5234375,
+            "bottom": 308.75,
+            "left": 443.75
+          }
+        },
+        {
+          "text": "能力值",
+          "rect": {
+            "x": 619.0234375,
+            "y": 243.75,
+            "width": 104.86328125,
+            "height": 65,
+            "top": 243.75,
+            "right": 723.88671875,
+            "bottom": 308.75,
+            "left": 619.0234375
+          }
+        },
+        {
+          "text": "技能",
+          "rect": {
+            "x": 731.38671875,
+            "y": 243.75,
+            "width": 104.86328125,
+            "height": 65,
+            "top": 243.75,
+            "right": 836.25,
+            "bottom": 308.75,
+            "left": 731.38671875
+          }
+        }
+      ],
+      "owner": {
+        "rect": {
+          "x": 443.75,
+          "y": 316.25,
+          "width": 392.5,
+          "height": 455,
+          "top": 316.25,
+          "right": 836.25,
+          "bottom": 771.25,
+          "left": 443.75
+        },
+        "top": 764,
+        "client": 1092,
+        "total": 8342,
+        "overflow": "auto"
+      },
+      "controls": [
+        {
+          "text": "詳情\n›",
+          "rect": {
+            "x": 460,
+            "y": 530.0390625,
+            "width": 60,
+            "height": 55,
+            "top": 530.0390625,
+            "right": 520,
+            "bottom": 585.0390625,
+            "left": 460
+          }
+        },
+        {
+          "text": "學習・4點",
+          "rect": {
+            "x": 705,
+            "y": 530.0390625,
+            "width": 115,
+            "height": 55,
+            "top": 530.0390625,
+            "right": 820,
+            "bottom": 585.0390625,
+            "left": 705
+          }
+        }
+      ]
+    }
+  ],
+  "scope": "Skill entry dependency smoke only. Original PREPARE/isolated QA transport, true character entry and skill TAB, one real scroll; no learn/equip/remove/auto changes or detail matrix. Startup/normalization save side effects retained. Exact restore baseline is immediately before PREPARE actor seed, after startup/skill module initialization; earlier startup private caches not restored. Integrated dev formal24px timer/46px prompt and existing readable skill picker only; synthetic no-reward battle entry, timers stopped for static inspection, no attack/skill/potion/settlement. Full/insufficient SP display fixture only; no natural combat/hardware claim.",
+  "expectedCritical": {
+    "scripts": [
+      "build/boot-core.17c288641d4c.js"
+    ],
+    "styles": [
+      "build/boot-core.78385a4c589b.css"
+    ],
+    "images": [
+      "assets/ui/startup-logo.4631c0bc3f2b.jpg",
+      "assets/ui/startup-main-city.d43e67af1c1c.jpg"
+    ],
+    "firebaseBootstrap": "build/firebase/firebase-bootstrap.f0ce3eda91c9.js"
+  },
+  "battleChecks": [
+    {
+      "name": "battle-formal-layout",
+      "visible": false,
+      "timerDebug": {
+        "rect": {
+          "x": 760,
+          "y": 698.1864013671875,
+          "width": 94.28564453125,
+          "height": 25.7142333984375,
+          "top": 698.1864013671875,
+          "right": 854.28564453125,
+          "bottom": 723.900634765625,
+          "left": 760
+        },
+        "parent": {
+          "x": 425.71429443359375,
+          "y": 698.1864013671875,
+          "width": 428.57135009765625,
+          "height": 87.8570556640625,
+          "top": 698.1864013671875,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "bar": {
+          "x": 0,
+          "y": 0,
+          "width": 0,
+          "height": 0,
+          "top": 0,
+          "right": 0,
+          "bottom": 0,
+          "left": 0
+        },
+        "barParent": {
+          "x": 425.71429443359375,
+          "y": 730.3292236328125,
+          "width": 428.57135009765625,
+          "height": 55.7142333984375,
+          "top": 730.3292236328125,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "top": "0px",
+        "bottom": "58px",
+        "left": "312px",
+        "right": "0px",
+        "z": "18070",
+        "barAncestors": [
+          {
+            "id": "skillQuickBar",
+            "cls": "skill-quick-bar",
+            "z": "18065",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleCommandRow",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "transform": "matrix(2.57143, 0, 0, 2.57143, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "transform": "matrix(0.416667, 0, 0, 0.416667, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "size layout paint",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "strict",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          }
+        ],
+        "barZ": "18065",
+        "barParentZ": "auto",
+        "child": {
+          "x": 780.1729736328125,
+          "y": 696.5792236328125,
+          "width": 53.93975830078125,
+          "height": 28.9285888671875,
+          "top": 696.5792236328125,
+          "right": 834.1127319335938,
+          "bottom": 725.5078125,
+          "left": 780.1729736328125
+        },
+        "childStyle": "",
+        "paintStack": [
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto"
+          }
+        ],
+        "opacity": "1",
+        "visibility": "visible",
+        "ancestors": [
+          {
+            "id": "turnTargetRow",
+            "cls": "turn-target-row",
+            "z": "18070",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "overflow": "hidden",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "overflow": "clip",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "isolate"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          }
+        ],
+        "overflow": "hidden",
+        "display": "flex",
+        "text": "20"
+      },
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 0,
+        "y": 0,
+        "width": 0,
+        "height": 0,
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "cards": []
+    },
+    {
+      "name": "battle-skill-full",
+      "visible": true,
+      "timerDebug": {
+        "rect": {
+          "x": 659.2857055664062,
+          "y": 543.900634765625,
+          "width": 94.28570556640625,
+          "height": 25.71429443359375,
+          "top": 543.900634765625,
+          "right": 753.5714111328125,
+          "bottom": 569.6149291992188,
+          "left": 659.2857055664062
+        },
+        "parent": {
+          "x": 425.71429443359375,
+          "y": 698.1864013671875,
+          "width": 428.57135009765625,
+          "height": 87.8570556640625,
+          "top": 698.1864013671875,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "bar": {
+          "x": 440.71429443359375,
+          "y": 528.900634765625,
+          "width": 398.5714111328125,
+          "height": 257.142822265625,
+          "top": 528.900634765625,
+          "right": 839.2857055664062,
+          "bottom": 786.04345703125,
+          "left": 440.71429443359375
+        },
+        "barParent": {
+          "x": 425.71429443359375,
+          "y": 730.3292236328125,
+          "width": 428.57135009765625,
+          "height": 55.7142333984375,
+          "top": 730.3292236328125,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "top": "-144px",
+        "bottom": "202px",
+        "left": "218px",
+        "right": "94px",
+        "z": "18070",
+        "barAncestors": [
+          {
+            "id": "skillQuickBar",
+            "cls": "skill-quick-bar show",
+            "z": "18065",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleCommandRow",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "transform": "matrix(2.57143, 0, 0, 2.57143, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "transform": "matrix(0.416667, 0, 0, 0.416667, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "size layout paint",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "strict",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          }
+        ],
+        "barZ": "18065",
+        "barParentZ": "auto",
+        "child": {
+          "x": 679.4586791992188,
+          "y": 542.29345703125,
+          "width": 53.93975830078125,
+          "height": 28.9285888671875,
+          "top": 542.29345703125,
+          "right": 733.3984375,
+          "bottom": 571.2220458984375,
+          "left": 679.4586791992188
+        },
+        "childStyle": "",
+        "paintStack": [
+          {
+            "id": "skillQuickBar",
+            "cls": "skill-quick-bar show",
+            "z": "18065"
+          },
+          {
+            "id": "battlePlayerRow",
+            "cls": "v-fixed-ally-formation v-fixed-ally-zone v-fixed-zone-v2",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-ally-region",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto"
+          }
+        ],
+        "opacity": "1",
+        "visibility": "visible",
+        "ancestors": [
+          {
+            "id": "turnTargetRow",
+            "cls": "turn-target-row skill-picker-open",
+            "z": "18070",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "overflow": "hidden",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "overflow": "clip",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "isolate"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          }
+        ],
+        "overflow": "hidden",
+        "display": "flex",
+        "text": "20"
+      },
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 766.4285888671875,
+        "y": 533.1864013671875,
+        "width": 68.5714111328125,
+        "height": 55.7142333984375,
+        "top": 533.1864013671875,
+        "right": 835,
+        "bottom": 588.900634765625,
+        "left": 766.4285888671875
+      },
+      "cards": [
+        {
+          "text": "火箭 Lv.1\n消耗 10 SP\n同排中、左、右最多3名",
+          "disabled": false,
+          "box": {
+            "x": 445,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 539.2857055664062,
+            "bottom": 781.7578125,
+            "left": 445
+          },
+          "parts": [
+            {
+              "text": "火箭 Lv.1",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 662.29345703125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 662.29345703125,
+                "right": 535,
+                "bottom": 683.7220458984375,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 455.7477722167969,
+                "y": 660.150634765625,
+                "width": 72.79019165039062,
+                "height": 25.71429443359375,
+                "top": 660.150634765625,
+                "right": 528.5379638671875,
+                "bottom": 685.8649291992188,
+                "left": 455.7477722167969
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 696.5792236328125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 535,
+                "bottom": 718.0078125,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 451.1104736328125,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 533.1752319335938,
+                "bottom": 720.150634765625,
+                "left": 451.1104736328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 720.6864013671875,
+                "width": 85.71429443359375,
+                "height": 64.28564453125,
+                "top": 720.6864013671875,
+                "right": 535,
+                "bottom": 784.9720458984375,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 449.28570556640625,
+                "y": 718.54345703125,
+                "width": 85.71429443359375,
+                "height": 68.57147216796875,
+                "top": 718.54345703125,
+                "right": 535,
+                "bottom": 787.1149291992188,
+                "left": 449.28570556640625
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火焰斬 Lv.1\n消耗 10 SP\n敵方1名",
+          "disabled": false,
+          "box": {
+            "x": 543.5714111328125,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 637.8571166992188,
+            "bottom": 781.7578125,
+            "left": 543.5714111328125
+          },
+          "parts": [
+            {
+              "text": "火焰斬 Lv.1",
+              "box": {
+                "x": 547.857177734375,
+                "y": 651.5792236328125,
+                "width": 85.7142333984375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 633.5714111328125,
+                "bottom": 694.4364013671875,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 565,
+                "y": 649.4364013671875,
+                "width": 51.4285888671875,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 616.4285888671875,
+                "bottom": 696.5792236328125,
+                "left": 565
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 547.857177734375,
+                "y": 696.5792236328125,
+                "width": 85.7142333984375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 633.5714111328125,
+                "bottom": 718.0078125,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 549.681884765625,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 631.7466430664062,
+                "bottom": 720.150634765625,
+                "left": 549.681884765625
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方1名",
+              "box": {
+                "x": 547.857177734375,
+                "y": 742.1149291992188,
+                "width": 85.7142333984375,
+                "height": 21.42852783203125,
+                "top": 742.1149291992188,
+                "right": 633.5714111328125,
+                "bottom": 763.54345703125,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 559.7767944335938,
+                "y": 739.9720458984375,
+                "width": 61.875,
+                "height": 25.71435546875,
+                "top": 739.9720458984375,
+                "right": 621.6517944335938,
+                "bottom": 765.6864013671875,
+                "left": 559.7767944335938
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火爆亂擊 Lv.1\n消耗 47 SP\n同排中、左、右最多3名",
+          "disabled": false,
+          "box": {
+            "x": 642.142822265625,
+            "y": 592.1149291992188,
+            "width": 94.2857666015625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 736.4285888671875,
+            "bottom": 781.7578125,
+            "left": 642.142822265625
+          },
+          "parts": [
+            {
+              "text": "火爆亂擊 Lv.1",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 651.5792236328125,
+                "width": 85.7142333984375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 732.142822265625,
+                "bottom": 694.4364013671875,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 655,
+                "y": 649.4364013671875,
+                "width": 68.5714111328125,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 723.5714111328125,
+                "bottom": 696.5792236328125,
+                "left": 655
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 47 SP",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 696.5792236328125,
+                "width": 85.7142333984375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 732.142822265625,
+                "bottom": 718.0078125,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 648.2533569335938,
+                "y": 694.4364013671875,
+                "width": 82.064697265625,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 730.3180541992188,
+                "bottom": 720.150634765625,
+                "left": 648.2533569335938
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 720.6864013671875,
+                "width": 85.7142333984375,
+                "height": 64.28564453125,
+                "top": 720.6864013671875,
+                "right": 732.142822265625,
+                "bottom": 784.9720458984375,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 646.4285888671875,
+                "y": 718.54345703125,
+                "width": 85.7142333984375,
+                "height": 68.57147216796875,
+                "top": 718.54345703125,
+                "right": 732.142822265625,
+                "bottom": 787.1149291992188,
+                "left": 646.4285888671875
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "火鳳天鳴 Lv.1\n消耗 60 SP\n敵方全體",
+          "disabled": false,
+          "box": {
+            "x": 740.7142944335938,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 835,
+            "bottom": 781.7578125,
+            "left": 740.7142944335938
+          },
+          "parts": [
+            {
+              "text": "火鳳天鳴 Lv.1",
+              "box": {
+                "x": 745,
+                "y": 651.5792236328125,
+                "width": 85.71429443359375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 830.7142944335938,
+                "bottom": 694.4364013671875,
+                "left": 745
+              },
+              "ink": {
+                "x": 753.5714111328125,
+                "y": 649.4364013671875,
+                "width": 68.5714111328125,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 822.142822265625,
+                "bottom": 696.5792236328125,
+                "left": 753.5714111328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 60 SP",
+              "box": {
+                "x": 745,
+                "y": 696.5792236328125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 830.7142944335938,
+                "bottom": 718.0078125,
+                "left": 745
+              },
+              "ink": {
+                "x": 746.8247680664062,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 828.8895263671875,
+                "bottom": 720.150634765625,
+                "left": 746.8247680664062
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方全體",
+              "box": {
+                "x": 745,
+                "y": 742.1149291992188,
+                "width": 85.71429443359375,
+                "height": 21.42852783203125,
+                "top": 742.1149291992188,
+                "right": 830.7142944335938,
+                "bottom": 763.54345703125,
+                "left": 745
+              },
+              "ink": {
+                "x": 753.5714111328125,
+                "y": 739.9720458984375,
+                "width": 68.5714111328125,
+                "height": 25.71435546875,
+                "top": 739.9720458984375,
+                "right": 822.142822265625,
+                "bottom": 765.6864013671875,
+                "left": 753.5714111328125
+              },
+              "font": "16px"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "battle-skill-insufficient",
+      "visible": true,
+      "timerDebug": {
+        "rect": {
+          "x": 659.2857055664062,
+          "y": 543.900634765625,
+          "width": 94.28570556640625,
+          "height": 25.71429443359375,
+          "top": 543.900634765625,
+          "right": 753.5714111328125,
+          "bottom": 569.6149291992188,
+          "left": 659.2857055664062
+        },
+        "parent": {
+          "x": 425.71429443359375,
+          "y": 698.1864013671875,
+          "width": 428.57135009765625,
+          "height": 87.8570556640625,
+          "top": 698.1864013671875,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "bar": {
+          "x": 440.71429443359375,
+          "y": 528.900634765625,
+          "width": 398.5714111328125,
+          "height": 257.142822265625,
+          "top": 528.900634765625,
+          "right": 839.2857055664062,
+          "bottom": 786.04345703125,
+          "left": 440.71429443359375
+        },
+        "barParent": {
+          "x": 425.71429443359375,
+          "y": 730.3292236328125,
+          "width": 428.57135009765625,
+          "height": 55.7142333984375,
+          "top": 730.3292236328125,
+          "right": 854.28564453125,
+          "bottom": 786.04345703125,
+          "left": 425.71429443359375
+        },
+        "top": "-144px",
+        "bottom": "202px",
+        "left": "218px",
+        "right": "94px",
+        "z": "18070",
+        "barAncestors": [
+          {
+            "id": "skillQuickBar",
+            "cls": "skill-quick-bar show",
+            "z": "18065",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleCommandRow",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "transform": "matrix(2.57143, 0, 0, 2.57143, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "transform": "matrix(0.416667, 0, 0, 0.416667, 0, 0)",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "size layout paint",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "strict",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "transform": "none",
+            "filter": "none",
+            "opacity": "1",
+            "contain": "none",
+            "willChange": "auto",
+            "clip": "none",
+            "content": "visible"
+          }
+        ],
+        "barZ": "18065",
+        "barParentZ": "auto",
+        "child": {
+          "x": 679.4586791992188,
+          "y": 542.29345703125,
+          "width": 53.93975830078125,
+          "height": 28.9285888671875,
+          "top": 542.29345703125,
+          "right": 733.3984375,
+          "bottom": 571.2220458984375,
+          "left": 679.4586791992188
+        },
+        "childStyle": "",
+        "paintStack": [
+          {
+            "id": "skillQuickBar",
+            "cls": "skill-quick-bar show",
+            "z": "18065"
+          },
+          {
+            "id": "battlePlayerRow",
+            "cls": "v-fixed-ally-formation v-fixed-ally-zone v-fixed-zone-v2",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-ally-region",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto"
+          }
+        ],
+        "opacity": "1",
+        "visibility": "visible",
+        "ancestors": [
+          {
+            "id": "turnTargetRow",
+            "cls": "turn-target-row skill-picker-open",
+            "z": "18070",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battleActionRegion",
+            "cls": "v-fixed-action-zone",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-middle",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-center-region",
+            "z": "80",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "battle-wrap",
+            "z": "1",
+            "overflow": "visible",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "battlePage",
+            "cls": "page v-fixed-slot-render-v2 active",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "content",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "gameInterface",
+            "cls": "",
+            "z": "auto",
+            "overflow": "visible",
+            "position": "static",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-content",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "app",
+            "cls": "no-header in-battle",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "absolute",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-stage",
+            "cls": "",
+            "z": "0",
+            "overflow": "hidden",
+            "position": "relative",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "game-viewport",
+            "cls": "",
+            "z": "auto",
+            "overflow": "clip",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "isolate"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          },
+          {
+            "id": "",
+            "cls": "",
+            "z": "auto",
+            "overflow": "hidden",
+            "position": "fixed",
+            "opacity": "1",
+            "isolation": "auto"
+          }
+        ],
+        "overflow": "hidden",
+        "display": "flex",
+        "text": "20"
+      },
+      "turn": "24px",
+      "prompt": "46px",
+      "close": {
+        "x": 766.4285888671875,
+        "y": 533.1864013671875,
+        "width": 68.5714111328125,
+        "height": 55.7142333984375,
+        "top": 533.1864013671875,
+        "right": 835,
+        "bottom": 588.900634765625,
+        "left": 766.4285888671875
+      },
+      "cards": [
+        {
+          "text": "SP不足\n火箭 Lv.1\n消耗 10 SP\n同排中、左、右最多3名",
+          "disabled": true,
+          "box": {
+            "x": 445,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 539.2857055664062,
+            "bottom": 781.7578125,
+            "left": 445
+          },
+          "parts": [
+            {
+              "text": "火箭 Lv.1",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 662.29345703125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 662.29345703125,
+                "right": 535,
+                "bottom": 683.7220458984375,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 455.7477722167969,
+                "y": 660.150634765625,
+                "width": 72.79019165039062,
+                "height": 25.71429443359375,
+                "top": 660.150634765625,
+                "right": 528.5379638671875,
+                "bottom": 685.8649291992188,
+                "left": 455.7477722167969
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 696.5792236328125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 535,
+                "bottom": 718.0078125,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 451.1104736328125,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 533.1752319335938,
+                "bottom": 720.150634765625,
+                "left": 451.1104736328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 449.28570556640625,
+                "y": 720.6864013671875,
+                "width": 85.71429443359375,
+                "height": 64.28564453125,
+                "top": 720.6864013671875,
+                "right": 535,
+                "bottom": 784.9720458984375,
+                "left": 449.28570556640625
+              },
+              "ink": {
+                "x": 449.28570556640625,
+                "y": 718.54345703125,
+                "width": 85.71429443359375,
+                "height": 68.57147216796875,
+                "top": 718.54345703125,
+                "right": 535,
+                "bottom": 787.1149291992188,
+                "left": 449.28570556640625
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火焰斬 Lv.1\n消耗 10 SP\n敵方1名",
+          "disabled": true,
+          "box": {
+            "x": 543.5714111328125,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 637.8571166992188,
+            "bottom": 781.7578125,
+            "left": 543.5714111328125
+          },
+          "parts": [
+            {
+              "text": "火焰斬 Lv.1",
+              "box": {
+                "x": 547.857177734375,
+                "y": 651.5792236328125,
+                "width": 85.7142333984375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 633.5714111328125,
+                "bottom": 694.4364013671875,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 565,
+                "y": 649.4364013671875,
+                "width": 51.4285888671875,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 616.4285888671875,
+                "bottom": 696.5792236328125,
+                "left": 565
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 10 SP",
+              "box": {
+                "x": 547.857177734375,
+                "y": 696.5792236328125,
+                "width": 85.7142333984375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 633.5714111328125,
+                "bottom": 718.0078125,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 549.681884765625,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 631.7466430664062,
+                "bottom": 720.150634765625,
+                "left": 549.681884765625
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方1名",
+              "box": {
+                "x": 547.857177734375,
+                "y": 742.1149291992188,
+                "width": 85.7142333984375,
+                "height": 21.42852783203125,
+                "top": 742.1149291992188,
+                "right": 633.5714111328125,
+                "bottom": 763.54345703125,
+                "left": 547.857177734375
+              },
+              "ink": {
+                "x": 559.7767944335938,
+                "y": 739.9720458984375,
+                "width": 61.875,
+                "height": 25.71435546875,
+                "top": 739.9720458984375,
+                "right": 621.6517944335938,
+                "bottom": 765.6864013671875,
+                "left": 559.7767944335938
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火爆亂擊 Lv.1\n消耗 47 SP\n同排中、左、右最多3名",
+          "disabled": true,
+          "box": {
+            "x": 642.142822265625,
+            "y": 592.1149291992188,
+            "width": 94.2857666015625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 736.4285888671875,
+            "bottom": 781.7578125,
+            "left": 642.142822265625
+          },
+          "parts": [
+            {
+              "text": "火爆亂擊 Lv.1",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 651.5792236328125,
+                "width": 85.7142333984375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 732.142822265625,
+                "bottom": 694.4364013671875,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 655,
+                "y": 649.4364013671875,
+                "width": 68.5714111328125,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 723.5714111328125,
+                "bottom": 696.5792236328125,
+                "left": 655
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 47 SP",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 696.5792236328125,
+                "width": 85.7142333984375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 732.142822265625,
+                "bottom": 718.0078125,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 648.2533569335938,
+                "y": 694.4364013671875,
+                "width": 82.064697265625,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 730.3180541992188,
+                "bottom": 720.150634765625,
+                "left": 648.2533569335938
+              },
+              "font": "16px"
+            },
+            {
+              "text": "同排中、左、右最多3名",
+              "box": {
+                "x": 646.4285888671875,
+                "y": 720.6864013671875,
+                "width": 85.7142333984375,
+                "height": 64.28564453125,
+                "top": 720.6864013671875,
+                "right": 732.142822265625,
+                "bottom": 784.9720458984375,
+                "left": 646.4285888671875
+              },
+              "ink": {
+                "x": 646.4285888671875,
+                "y": 718.54345703125,
+                "width": 85.7142333984375,
+                "height": 68.57147216796875,
+                "top": 718.54345703125,
+                "right": 732.142822265625,
+                "bottom": 787.1149291992188,
+                "left": 646.4285888671875
+              },
+              "font": "16px"
+            }
+          ]
+        },
+        {
+          "text": "SP不足\n火鳳天鳴 Lv.1\n消耗 60 SP\n敵方全體",
+          "disabled": true,
+          "box": {
+            "x": 740.7142944335938,
+            "y": 592.1149291992188,
+            "width": 94.28570556640625,
+            "height": 189.64288330078125,
+            "top": 592.1149291992188,
+            "right": 835,
+            "bottom": 781.7578125,
+            "left": 740.7142944335938
+          },
+          "parts": [
+            {
+              "text": "火鳳天鳴 Lv.1",
+              "box": {
+                "x": 745,
+                "y": 651.5792236328125,
+                "width": 85.71429443359375,
+                "height": 42.857177734375,
+                "top": 651.5792236328125,
+                "right": 830.7142944335938,
+                "bottom": 694.4364013671875,
+                "left": 745
+              },
+              "ink": {
+                "x": 753.5714111328125,
+                "y": 649.4364013671875,
+                "width": 68.5714111328125,
+                "height": 47.142822265625,
+                "top": 649.4364013671875,
+                "right": 822.142822265625,
+                "bottom": 696.5792236328125,
+                "left": 753.5714111328125
+              },
+              "font": "16px"
+            },
+            {
+              "text": "消耗 60 SP",
+              "box": {
+                "x": 745,
+                "y": 696.5792236328125,
+                "width": 85.71429443359375,
+                "height": 21.4285888671875,
+                "top": 696.5792236328125,
+                "right": 830.7142944335938,
+                "bottom": 718.0078125,
+                "left": 745
+              },
+              "ink": {
+                "x": 746.8247680664062,
+                "y": 694.4364013671875,
+                "width": 82.06475830078125,
+                "height": 25.7142333984375,
+                "top": 694.4364013671875,
+                "right": 828.8895263671875,
+                "bottom": 720.150634765625,
+                "left": 746.8247680664062
+              },
+              "font": "16px"
+            },
+            {
+              "text": "敵方全體",
+              "box": {
+                "x": 745,
+                "y": 742.1149291992188,
+                "width": 85.71429443359375,
+                "height": 21.42852783203125,
+                "top": 742.1149291992188,
+                "right": 830.7142944335938,
+                "bottom": 763.54345703125,
+                "left": 745
+              },
+              "ink": {
+                "x": 753.5714111328125,
+                "y": 739.9720458984375,
+                "width": 68.5714111328125,
+                "height": 25.71435546875,
+                "top": 739.9720458984375,
+                "right": 822.142822265625,
+                "bottom": 765.6864013671875,
+                "left": 753.5714111328125
+              },
+              "font": "16px"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "itemChecks": [
+    {
+      "name": "items-empty",
+      "nodes": [
+        {
+          "id": "itemMenu",
+          "rect": {
+            "x": 436.4285583496094,
+            "y": 381.04351806640625,
+            "width": 407.1428527832031,
+            "height": 321.42852783203125,
+            "top": 381.04351806640625,
+            "right": 843.5714111328125,
+            "bottom": 702.4720458984375,
+            "left": 436.4285583496094
+          },
+          "text": "補品\n符咒\n返回\n目前沒有補品\n商店購買的 HP／SP 藥水會直接顯示在這裡。",
+          "bottom": "78px",
+          "height": "300px",
+          "top": "-296px",
+          "scroll": {
+            "pos": 0,
+            "total": 296,
+            "client": 296
+          }
+        },
+        {
+          "id": "turnTargetRow",
+          "rect": {
+            "x": 760,
+            "y": 346.7578125,
+            "width": 94.28564453125,
+            "height": 25.71429443359375,
+            "top": 346.7578125,
+            "right": 854.28564453125,
+            "bottom": 372.47210693359375,
+            "left": 760
+          },
+          "text": "20",
+          "bottom": "386px",
+          "height": "24px",
+          "top": "-328px",
+          "scroll": {
+            "pos": 0,
+            "total": 25,
+            "client": 22
+          }
+        },
+        {
+          "id": "battleTurnIndicator",
+          "rect": {
+            "x": 425.71429443359375,
+            "y": 698.1864013671875,
+            "width": 321.42852783203125,
+            "height": 25.7142333984375,
+            "top": 698.1864013671875,
+            "right": 747.142822265625,
+            "bottom": 723.900634765625,
+            "left": 425.71429443359375
+          },
+          "text": "第1回合",
+          "bottom": "58px",
+          "height": "24px",
+          "top": "0px",
+          "scroll": {
+            "pos": 0,
+            "total": 24,
+            "client": 24
+          }
+        },
+        {
+          "id": "battlePotionList",
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 452.8292236328125,
+            "width": 385.7142639160156,
+            "height": 126.4285888671875,
+            "top": 452.8292236328125,
+            "right": 832.8571166992188,
+            "bottom": 579.2578125,
+            "left": 447.1428527832031
+          },
+          "text": "目前沒有補品\n商店購買的 HP／SP 藥水會直接顯示在這裡。",
+          "bottom": "auto",
+          "height": "118px",
+          "top": "auto",
+          "scroll": {
+            "pos": 0,
+            "total": 118,
+            "client": 118
+          }
+        }
+      ],
+      "controls": [
+        {
+          "text": "補品",
+          "disabled": false,
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 391.7578125,
+            "width": 151.07144165039062,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 598.2142944335938,
+            "bottom": 447.4720764160156,
+            "left": 447.1428527832031
+          }
+        },
+        {
+          "text": "符咒",
+          "disabled": false,
+          "rect": {
+            "x": 603.5714111328125,
+            "y": 391.7578125,
+            "width": 151.0714111328125,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 754.642822265625,
+            "bottom": 447.4720764160156,
+            "left": 603.5714111328125
+          }
+        },
+        {
+          "text": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 760,
+            "y": 391.7578125,
+            "width": 72.85711669921875,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 832.8571166992188,
+            "bottom": 447.4720764160156,
+            "left": 760
+          }
+        }
+      ]
+    },
+    {
+      "name": "items-full",
+      "nodes": [
+        {
+          "id": "itemMenu",
+          "rect": {
+            "x": 436.4285583496094,
+            "y": 381.04351806640625,
+            "width": 407.1428527832031,
+            "height": 321.42852783203125,
+            "top": 381.04351806640625,
+            "right": 843.5714111328125,
+            "bottom": 702.4720458984375,
+            "left": 436.4285583496094
+          },
+          "text": "補品\n符咒\n返回\n養命丹\n回復最大HP的 20%\n×30\n聚氣丹\n回復最大SP的 20%\n×30\n回春散\n恢復 66 HP\n×30\n凝氣散\n恢復 66 SP\n×30\nHP 50%補品\n回復最大HP的 50%\n×30\nSP 50%補品\n回復最大SP的 50%\n×30\nHP 全回復\n回復所有HP\n×30\nSP 全回復\n回復所有SP\n×30\n✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30\n九\n九轉回元丹\n回復所有HP\n×30\n氣\n太清聚氣丹\n回復所有SP\n×30\n大還丹\n回復",
+          "bottom": "78px",
+          "height": "300px",
+          "top": "-296px",
+          "scroll": {
+            "pos": 0,
+            "total": 296,
+            "client": 296
+          }
+        },
+        {
+          "id": "turnTargetRow",
+          "rect": {
+            "x": 760,
+            "y": 346.7578125,
+            "width": 94.28564453125,
+            "height": 25.71429443359375,
+            "top": 346.7578125,
+            "right": 854.28564453125,
+            "bottom": 372.47210693359375,
+            "left": 760
+          },
+          "text": "20",
+          "bottom": "386px",
+          "height": "24px",
+          "top": "-328px",
+          "scroll": {
+            "pos": 0,
+            "total": 25,
+            "client": 22
+          }
+        },
+        {
+          "id": "battleTurnIndicator",
+          "rect": {
+            "x": 425.71429443359375,
+            "y": 698.1864013671875,
+            "width": 321.42852783203125,
+            "height": 25.7142333984375,
+            "top": 698.1864013671875,
+            "right": 747.142822265625,
+            "bottom": 723.900634765625,
+            "left": 425.71429443359375
+          },
+          "text": "第1回合",
+          "bottom": "58px",
+          "height": "24px",
+          "top": "0px",
+          "scroll": {
+            "pos": 0,
+            "total": 24,
+            "client": 24
+          }
+        },
+        {
+          "id": "battlePotionList",
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 452.8292236328125,
+            "width": 385.7142639160156,
+            "height": 238.9285888671875,
+            "top": 452.8292236328125,
+            "right": 832.8571166992188,
+            "bottom": 691.7578125,
+            "left": 447.1428527832031
+          },
+          "text": "養命丹\n回復最大HP的 20%\n×30\n聚氣丹\n回復最大SP的 20%\n×30\n回春散\n恢復 66 HP\n×30\n凝氣散\n恢復 66 SP\n×30\nHP 50%補品\n回復最大HP的 50%\n×30\nSP 50%補品\n回復最大SP的 50%\n×30\nHP 全回復\n回復所有HP\n×30\nSP 全回復\n回復所有SP\n×30\n✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30\n九\n九轉回元丹\n回復所有HP\n×30\n氣\n太清聚氣丹\n回復所有SP\n×30\n大還丹\n回復最大HP的 30%",
+          "bottom": "auto",
+          "height": "223px",
+          "top": "auto",
+          "scroll": {
+            "pos": 0,
+            "total": 844,
+            "client": 223
+          }
+        }
+      ],
+      "controls": [
+        {
+          "text": "補品",
+          "disabled": false,
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 391.7578125,
+            "width": 151.07144165039062,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 598.2142944335938,
+            "bottom": 447.4720764160156,
+            "left": 447.1428527832031
+          }
+        },
+        {
+          "text": "符咒",
+          "disabled": false,
+          "rect": {
+            "x": 603.5714111328125,
+            "y": 391.7578125,
+            "width": 151.0714111328125,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 754.642822265625,
+            "bottom": 447.4720764160156,
+            "left": 603.5714111328125
+          }
+        },
+        {
+          "text": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 760,
+            "y": 391.7578125,
+            "width": 72.85711669921875,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 832.8571166992188,
+            "bottom": 447.4720764160156,
+            "left": 760
+          }
+        },
+        {
+          "text": "養命丹\n回復最大HP的 20%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 453.900634765625,
+            "width": 189.10711669921875,
+            "height": 124.2857666015625,
+            "top": 453.900634765625,
+            "right": 637.3214111328125,
+            "bottom": 578.1864013671875,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "聚氣丹\n回復最大SP的 20%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 453.900634765625,
+            "width": 189.10711669921875,
+            "height": 124.2857666015625,
+            "top": 453.900634765625,
+            "right": 831.7857055664062,
+            "bottom": 578.1864013671875,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "回春散\n恢復 66 HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 583.54345703125,
+            "width": 189.10711669921875,
+            "height": 124.2857666015625,
+            "top": 583.54345703125,
+            "right": 637.3214111328125,
+            "bottom": 707.8292236328125,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "凝氣散\n恢復 66 SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 583.54345703125,
+            "width": 189.10711669921875,
+            "height": 124.2857666015625,
+            "top": 583.54345703125,
+            "right": 831.7857055664062,
+            "bottom": 707.8292236328125,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "HP 50%補品\n回復最大HP的 50%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 713.1864013671875,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 713.1864013671875,
+            "right": 637.3214111328125,
+            "bottom": 837.4720458984375,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "SP 50%補品\n回復最大SP的 50%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 713.1864013671875,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 713.1864013671875,
+            "right": 831.7857055664062,
+            "bottom": 837.4720458984375,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "HP 全回復\n回復所有HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 842.8292236328125,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 842.8292236328125,
+            "right": 637.3214111328125,
+            "bottom": 967.1149291992188,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "SP 全回復\n回復所有SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 842.8292236328125,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 842.8292236328125,
+            "right": 831.7857055664062,
+            "bottom": 967.1149291992188,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 972.4721069335938,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 972.4721069335938,
+            "right": 637.3214111328125,
+            "bottom": 1096.7578125,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "九\n九轉回元丹\n回復所有HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 972.4721069335938,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 972.4721069335938,
+            "right": 831.7857055664062,
+            "bottom": 1096.7578125,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "氣\n太清聚氣丹\n回復所有SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 1102.114990234375,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 1102.114990234375,
+            "right": 637.3214111328125,
+            "bottom": 1226.400634765625,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "大還丹\n回復最大HP的 30%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 1102.114990234375,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 1102.114990234375,
+            "right": 831.7857055664062,
+            "bottom": 1226.400634765625,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "歸元丹\n回復最大SP的 30%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 1231.7578125,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 1231.7578125,
+            "right": 637.3214111328125,
+            "bottom": 1356.04345703125,
+            "left": 448.21429443359375
+          }
+        }
+      ]
+    },
+    {
+      "name": "items-end",
+      "nodes": [
+        {
+          "id": "itemMenu",
+          "rect": {
+            "x": 436.4285583496094,
+            "y": 381.04351806640625,
+            "width": 407.1428527832031,
+            "height": 321.42852783203125,
+            "top": 381.04351806640625,
+            "right": 843.5714111328125,
+            "bottom": 702.4720458984375,
+            "left": 436.4285583496094
+          },
+          "text": "補品\n符咒\n返回\n養命丹\n回復最大HP的 20%\n×30\n聚氣丹\n回復最大SP的 20%\n×30\n回春散\n恢復 66 HP\n×30\n凝氣散\n恢復 66 SP\n×30\nHP 50%補品\n回復最大HP的 50%\n×30\nSP 50%補品\n回復最大SP的 50%\n×30\nHP 全回復\n回復所有HP\n×30\nSP 全回復\n回復所有SP\n×30\n✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30\n九\n九轉回元丹\n回復所有HP\n×30\n氣\n太清聚氣丹\n回復所有SP\n×30\n大還丹\n回復",
+          "bottom": "78px",
+          "height": "300px",
+          "top": "-296px",
+          "scroll": {
+            "pos": 0,
+            "total": 296,
+            "client": 296
+          }
+        },
+        {
+          "id": "turnTargetRow",
+          "rect": {
+            "x": 760,
+            "y": 346.7578125,
+            "width": 94.28564453125,
+            "height": 25.71429443359375,
+            "top": 346.7578125,
+            "right": 854.28564453125,
+            "bottom": 372.47210693359375,
+            "left": 760
+          },
+          "text": "20",
+          "bottom": "386px",
+          "height": "24px",
+          "top": "-328px",
+          "scroll": {
+            "pos": 0,
+            "total": 25,
+            "client": 22
+          }
+        },
+        {
+          "id": "battleTurnIndicator",
+          "rect": {
+            "x": 425.71429443359375,
+            "y": 698.1864013671875,
+            "width": 321.42852783203125,
+            "height": 25.7142333984375,
+            "top": 698.1864013671875,
+            "right": 747.142822265625,
+            "bottom": 723.900634765625,
+            "left": 425.71429443359375
+          },
+          "text": "第1回合",
+          "bottom": "58px",
+          "height": "24px",
+          "top": "0px",
+          "scroll": {
+            "pos": 0,
+            "total": 24,
+            "client": 24
+          }
+        },
+        {
+          "id": "battlePotionList",
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 452.8292236328125,
+            "width": 385.7142639160156,
+            "height": 238.9285888671875,
+            "top": 452.8292236328125,
+            "right": 832.8571166992188,
+            "bottom": 691.7578125,
+            "left": 447.1428527832031
+          },
+          "text": "養命丹\n回復最大HP的 20%\n×30\n聚氣丹\n回復最大SP的 20%\n×30\n回春散\n恢復 66 HP\n×30\n凝氣散\n恢復 66 SP\n×30\nHP 50%補品\n回復最大HP的 50%\n×30\nSP 50%補品\n回復最大SP的 50%\n×30\nHP 全回復\n回復所有HP\n×30\nSP 全回復\n回復所有SP\n×30\n✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30\n九\n九轉回元丹\n回復所有HP\n×30\n氣\n太清聚氣丹\n回復所有SP\n×30\n大還丹\n回復最大HP的 30%",
+          "bottom": "auto",
+          "height": "223px",
+          "top": "auto",
+          "scroll": {
+            "pos": 621,
+            "total": 844,
+            "client": 223
+          }
+        }
+      ],
+      "controls": [
+        {
+          "text": "補品",
+          "disabled": false,
+          "rect": {
+            "x": 447.1428527832031,
+            "y": 391.7578125,
+            "width": 151.07144165039062,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 598.2142944335938,
+            "bottom": 447.4720764160156,
+            "left": 447.1428527832031
+          }
+        },
+        {
+          "text": "符咒",
+          "disabled": false,
+          "rect": {
+            "x": 603.5714111328125,
+            "y": 391.7578125,
+            "width": 151.0714111328125,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 754.642822265625,
+            "bottom": 447.4720764160156,
+            "left": 603.5714111328125
+          }
+        },
+        {
+          "text": "返回",
+          "disabled": false,
+          "rect": {
+            "x": 760,
+            "y": 391.7578125,
+            "width": 72.85711669921875,
+            "height": 55.714263916015625,
+            "top": 391.7578125,
+            "right": 832.8571166992188,
+            "bottom": 447.4720764160156,
+            "left": 760
+          }
+        },
+        {
+          "text": "養命丹\n回復最大HP的 20%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": -211.4564666748047,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": -211.4564666748047,
+            "right": 637.3214111328125,
+            "bottom": -87.17076110839844,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "聚氣丹\n回復最大SP的 20%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": -211.4564666748047,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": -211.4564666748047,
+            "right": 831.7857055664062,
+            "bottom": -87.17076110839844,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "回春散\n恢復 66 HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": -81.81361389160156,
+            "width": 189.10711669921875,
+            "height": 124.28571319580078,
+            "top": -81.81361389160156,
+            "right": 637.3214111328125,
+            "bottom": 42.47209930419922,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "凝氣散\n恢復 66 SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": -81.81361389160156,
+            "width": 189.10711669921875,
+            "height": 124.28571319580078,
+            "top": -81.81361389160156,
+            "right": 831.7857055664062,
+            "bottom": 42.47209930419922,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "HP 50%補品\n回復最大HP的 50%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 47.82923889160156,
+            "width": 189.10711669921875,
+            "height": 124.28572082519531,
+            "top": 47.82923889160156,
+            "right": 637.3214111328125,
+            "bottom": 172.11495971679688,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "SP 50%補品\n回復最大SP的 50%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 47.82923889160156,
+            "width": 189.10711669921875,
+            "height": 124.28572082519531,
+            "top": 47.82923889160156,
+            "right": 831.7857055664062,
+            "bottom": 172.11495971679688,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "HP 全回復\n回復所有HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 177.4720916748047,
+            "width": 189.10711669921875,
+            "height": 124.28572082519531,
+            "top": 177.4720916748047,
+            "right": 637.3214111328125,
+            "bottom": 301.7578125,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "SP 全回復\n回復所有SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 177.4720916748047,
+            "width": 189.10711669921875,
+            "height": 124.28572082519531,
+            "top": 177.4720916748047,
+            "right": 831.7857055664062,
+            "bottom": 301.7578125,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "✦\n還魂丹\n僅戰鬥中手動復活死亡友方，HP 固定35；不恢復SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 307.11492919921875,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 307.11492919921875,
+            "right": 637.3214111328125,
+            "bottom": 431.400634765625,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "九\n九轉回元丹\n回復所有HP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 307.11492919921875,
+            "width": 189.10711669921875,
+            "height": 124.28570556640625,
+            "top": 307.11492919921875,
+            "right": 831.7857055664062,
+            "bottom": 431.400634765625,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "氣\n太清聚氣丹\n回復所有SP\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 436.7578125,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 436.7578125,
+            "right": 637.3214111328125,
+            "bottom": 561.04345703125,
+            "left": 448.21429443359375
+          }
+        },
+        {
+          "text": "大還丹\n回復最大HP的 30%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 642.6785888671875,
+            "y": 436.7578125,
+            "width": 189.10711669921875,
+            "height": 124.28564453125,
+            "top": 436.7578125,
+            "right": 831.7857055664062,
+            "bottom": 561.04345703125,
+            "left": 642.6785888671875
+          }
+        },
+        {
+          "text": "歸元丹\n回復最大SP的 30%\n×30",
+          "disabled": false,
+          "rect": {
+            "x": 448.21429443359375,
+            "y": 566.400634765625,
+            "width": 189.10711669921875,
+            "height": 124.2857666015625,
+            "top": 566.400634765625,
+            "right": 637.3214111328125,
+            "bottom": 690.6864013671875,
+            "left": 448.21429443359375
+          }
+        }
+      ]
+    }
+  ],
+  "loaded": [
+    "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+    "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:61314/build/boot-core.17c288641d4c.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:61314/build/boot-core.78385a4c589b.css",
+    "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-auth.9f8c09942b79.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-bootstrap.f0ce3eda91c9.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:61314/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-cloud-save.91189bffc961.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-config.4314d6321ba1.js",
+    "http://127.0.0.1:61314/build/firebase/firebase-session.877a7842d6bd.js",
+    "http://127.0.0.1:61314/build/firebase/session-client.235aa8b1f47e.js",
+    "http://127.0.0.1:61314/build/app-shell.7bc5e1c99233.css",
+    "http://127.0.0.1:61314/build/app-shell.b1ac1f4e3eb1.js",
+    "http://127.0.0.1:61314/build/app-shell.7bc5e1c99233.css",
+    "http://127.0.0.1:61314/build/app-shell.b1ac1f4e3eb1.js",
+    "http://127.0.0.1:61314/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:61314/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:61314/build/gameplay-core-primary.5d80f0302203.js",
+    "http://127.0.0.1:61314/build/feature-patrol.0ea855f358ab.css",
+    "http://127.0.0.1:61314/build/gameplay-core-secondary.78a1364f9a34.js",
+    "http://127.0.0.1:61314/build/feature-patrol.ab5bd3ce5582.js",
+    "http://127.0.0.1:61314/build/gameplay-core.c7da9ada4cb1.css",
+    "http://127.0.0.1:61314/build/gameplay-core-primary.5d80f0302203.js",
+    "http://127.0.0.1:61314/build/gameplay-core-secondary.78a1364f9a34.js",
+    "http://127.0.0.1:61314/build/gameplay-core.c7da9ada4cb1.css",
+    "http://127.0.0.1:61314/build/feature-adventure-entry.f68f5350eccc.css",
+    "http://127.0.0.1:61314/build/feature-adventure-entry.0f3635335ca7.js",
+    "http://127.0.0.1:61314/build/feature-adventure-items.cf197e72837f.js",
+    "http://127.0.0.1:61314/build/feature-boss-relic.25e704feb9dd.css",
+    "http://127.0.0.1:61314/build/feature-relic-progression.9eb4fff74856.css",
+    "http://127.0.0.1:61314/build/feature-boss-relic.a8ff5e27d0a5.js",
+    "http://127.0.0.1:61314/build/feature-relic-progression.371e66b3317f.js"
+  ],
+  "restore": {
+    "rawExact": true,
+    "metadataExact": true,
+    "actorsExact": true,
+    "inventoryExact": true,
+    "loadoutsExact": true
+  },
+  "sourceAfter": {
+    "index.html": "5e71ff7c24dad22076cbcbaa30c58cd75a7dcd9a2dabc87fe6375191c601eace",
+    "asset-manifest.json": "6c33dae571c050a743c2f1b6f0db6139eb7bed74de97ae59b03901924c86d2cc",
+    "js/00-main.js": "b61c540f80cc4a0a279251111310328e8e259f201e81d12fed9d35e94c784c4d",
+    "build/app-shell.7bc5e1c99233.css": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+    "build/app-shell.b1ac1f4e3eb1.js": "b1ac1f4e3eb1125a4ddaa396dc4b8450ad9d7f3845736a51f3efefe4005113fb",
+    "build/boot-core.17c288641d4c.js": "17c288641d4c7770acdd57f95c08b88f959cac52b94d3560072d75fc99960a05",
+    "build/boot-core.78385a4c589b.css": "78385a4c589b8510d6927cc47b0efe2d8b726bfab8f864511283f4c5636764f8",
+    "build/feature-abyss.132a5339eb78.js": "132a5339eb7818e53e720cde75080934409661bcc4acd89197efdbc20bee9266",
+    "build/feature-abyss.268da2c15e06.css": "268da2c15e06cf6e6d9fac87ce2e9e33135f5ff81421bbfb987d67d51686b8d7",
+    "build/feature-adventure-content.f812f2d9ad9b.js": "f812f2d9ad9bfeaac0db4af128ccafe3a2e36ca21586bd25032a5a6defc62269",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.84bbc0a00468.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "build/feature-adventure-ui.d6a77ce5e2dd.js": "d6a77ce5e2dd7f9d687461eb352c4d06772efe69a551bb6bc4890029bf496b40",
+    "build/feature-adventure.c82d45eb0990.css": "c82d45eb0990df11547e8c36e9bb258d8934b7c5253d1f6b28b57d4735f75ad6",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.0ea855f358ab.css": "0ea855f358abc57c7eab4e5eda8123e5ca5078c5fd73d7f261ca8d296d1303e4",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.5d80f0302203.js": "5d80f0302203089771562db8104462b5929b6a61d4d8467df141ac19633350ed",
+    "build/gameplay-core-secondary.78a1364f9a34.js": "78a1364f9a343f9da9e85343b5f6066571f9ad468314f7bdf309572536d639ac",
+    "build/gameplay-core.c7da9ada4cb1.css": "c7da9ada4cb15a02218848b01da8d6f19316966af067c97813ca2fac3bf26741"
+  },
+  "sourceUnchanged": true
+}

@@ -33,7 +33,7 @@ assert.match(css,/v17342-element-box-use-notice[\s\S]*font-size:42px/);
 assert.match(animation,/fireRocket:\{[\s\S]*?assets\/vfx\/fire\/fire-rocket-cast\.png/);
 assert.doesNotMatch(animation,/config\.id==="fireRocket"[\s\S]{0,260}model\.sprite=null/);
 
-assert.match(inventory,/裝備比較/);
+assert.match(inventory,/<b>裝備對照<\/b>/);
 assert.match(inventory,/目前裝備/);
 assert.match(inventory,/未穿戴此部位裝備/);
 assert.match(inventory,/v17351Locked/);

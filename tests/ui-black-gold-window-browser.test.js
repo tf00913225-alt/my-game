@@ -78,16 +78,19 @@ html,body{margin:0;width:420px;height:746px;overflow:hidden;background:#080706;}
   <h2>確認視窗</h2><div class="v169-rpg-dialog-message">是否執行此操作？</div>
   <div class="v169-rpg-dialog-actions"><button id="smallCancel" class="v169-rpg-dialog-button">取消</button><button id="smallConfirm" class="v169-rpg-dialog-button primary">確認</button></div>
 </section>
+<img id="backpackPanelAsset" src="assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp" hidden alt="">
 <pre id="result"></pre>
 <script>
-(function(){
+window.addEventListener('load',function(){
  const ids=["largeSample","largeTitle","tabIdle","tabActive","largeBody","backpackSample","mediumSample","mediumStats","mediumClose","rewardSample","rewardButton","smallSample","smallCancel","smallConfirm"];
  const rect=el=>{const r=el.getBoundingClientRect();return {left:r.left,top:r.top,width:r.width,height:r.height};};
- const style=el=>{const s=getComputedStyle(el);return {backgroundImage:s.backgroundImage,boxShadow:s.boxShadow,borderColor:s.borderColor,color:s.color};};
+ const style=el=>{const s=getComputedStyle(el);return {backgroundImage:s.backgroundImage,backgroundColor:s.backgroundColor,borderImageSource:s.borderImageSource,borderImageSlice:s.borderImageSlice,boxShadow:s.boxShadow,borderColor:s.borderColor,color:s.color};};
  const out={};
  ids.forEach(id=>{const el=document.getElementById(id);out[id]={rect:rect(el),style:style(el)};});
+ const panelSource=out.backpackSample.style.borderImageSource.split('"')[1],image=document.getElementById('backpackPanelAsset');
+ out.backpackSample.decodedPanel={width:image.naturalWidth,height:image.naturalHeight,complete:image.complete,sameSource:!!panelSource&&new URL(panelSource,document.baseURI).href===image.src};
  document.getElementById("result").textContent=JSON.stringify(out);
-})();
+});
 </script></body></html>`;
 }
 
@@ -117,19 +120,23 @@ try{
     // The scoped backpack composition owner must survive shared window skin.
     assert.deepEqual(after.backpackSample.style,before.backpackSample.style,"shared skin must preserve the formal backpack style");
     assert.notEqual(after.backpackSample.style.boxShadow,"none","formal backpack layered frame missing");
-    assert.match(after.backpackSample.style.backgroundImage,/linear-gradient/,"formal backpack background missing");
-    assert.equal(after.backpackSample.style.borderColor,"rgb(111, 89, 52)","formal backpack metal frame missing");
+    assert.equal(after.backpackSample.style.backgroundColor,"rgb(21, 21, 21)","formal backpack base must remain visible");
+    assert.match(after.backpackSample.style.borderImageSource,/skill-iron-bronze\/panel\.827d9ba9a6f8\.webp/,"formal backpack iron texture and metal frame missing");
+    assert.match(after.backpackSample.style.borderImageSlice,/115.*fill/,"formal backpack artwork must paint the panel interior");
+    assert.ok(after.backpackSample.decodedPanel?.width>0&&after.backpackSample.decodedPanel.height>0&&after.backpackSample.decodedPanel.complete&&after.backpackSample.decodedPanel.sameSource,"formal backpack artwork must actually load from its computed source");
     for(const id of ["largeSample","mediumSample","rewardSample","smallSample"]){
         assert.notEqual(after[id].style.boxShadow,before[id].style.boxShadow,`${id} thick game frame did not change`);
-        assert.notEqual(after[id].style.backgroundImage,before[id].style.backgroundImage,`${id} black-gold panel background did not change`);
+        assert.equal(after[id].style.backgroundColor,"rgb(21, 21, 21)",`${id} black-iron base missing`);
+        assert.equal(after[id].style.borderImageSource,"none",`${id} must retain the CSS-only standard frame`);
         assert.match(after[id].style.boxShadow,/115, 88, 45|240, 211, 138|198, 154, 69/,`${id} is missing bronze/gold layered frame`);
     }
+    assert.equal(after.largeTitle.style.borderImageSource,"none","ordinary function title must use its CSS skin");
     assert.notEqual(after.tabIdle.style.backgroundImage,after.tabActive.style.backgroundImage,"selected tab must be visually distinct");
     assert.notEqual(after.mediumClose.style.backgroundImage,before.mediumClose.style.backgroundImage,"medium popup button skin missing");
     assert.notEqual(after.smallCancel.style.backgroundImage,before.smallCancel.style.backgroundImage,"small confirmation secondary button skin missing");
     assert.match(after.smallConfirm.style.backgroundImage,/241, 206, 122|240, 211, 138|198, 154, 69/,"small confirmation primary button must retain a gold primary treatment");
 
-    console.log("Headless Chrome: large, tabbed, backpack/list, reward/medium and small confirm windows keep identical geometry with black-gold skin active");
+    console.log("Headless Chrome: ordinary windows retain CSS-only frames, backpack retains image art, and all window geometry stays stable");
 }finally{
     for(const file of [baselineCss,baselineHtml,themedHtml]){
         try{fs.unlinkSync(file);}catch(_){ }

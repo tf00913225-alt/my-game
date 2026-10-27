@@ -1,0 +1,18 @@
+{
+  "baseHead": "5dcd47fa59860079ec21e69d792f49fbef79b50e",
+  "head": "adb1bc4517884fbf474f66fd1c58bf04d27cc37a",
+  "reviews": {
+    "art": "art_review：實看adb1四尺寸cloud/corrupt首與retry末12張、5d其餘三尺寸Google首/guest末6張及先前360七張；中文完整、對稱題牌置中、框無回歸、末端無遮擋，debug區不批准玩家流程",
+    "interaction": "interaction_review：實看四尺寸session首末與read-error/重試末；guest fresh首scroll0；geometry可見控制>=44/font16；真retry hit且reads1→2仍ERROR/canCreatefalse/creationnone，corrupt原bytes不變；未實行reauth/signout等按鈕",
+    "scope": "scope_review：實看adb1四尺寸代表首末/重試，完整3074..adb1手寫與生成diff僅js52呈現交接/正式message、Auth一句中文與回歸/正式hash依賴；ERROR/禁止創角/raw診斷/corruptbytes保留，無業務邏輯漂移，identify ENOENT及standalone skip不當通過"
+  },
+  "limits": [
+    "真帳號/Session Authority/重新驗證/登出/權限測試及雲端寫入未驗",
+    "沒有角色創建/資料遷移/恢復/清除或商業交易",
+    "Google與guest session為原UI API加原事件隔離呈現，不是實際失去session重現",
+    "原boot fakeSession刻意unavailable；先拍優先提示，再原no-code事件僅清sessionError以看底層read-error，後端守衛未放寬",
+    "只cloud-read failure與corrupt-local，未涵所有fail callsite、save-write failure或成功恢復",
+    "實體裝置/真軟鍵盤未驗；可見控制的rect不代表已執行其業務",
+    "activeguard暫停時鐘真觸控未完成，整次排除，其他三尺寸未跑"
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "args": [
+    "--test",
+    "tests/chapter1-story-finalization.test.js",
+    "tests/adventure-node-system-v1.test.js",
+    "tests/adventure-panel-scroll-transition.test.js",
+    "tests/battle-input-guide-hold.test.cjs",
+    "tests/adventure-dungeon-route-owner.test.js"
+  ],
+  "status": 0,
+  "logSha256": "da472ab1cb1735db06ed91736f477053d0e998601981806f57b0881ac4815479",
+  "summary": [
+    "ℹ tests 58",
+    "ℹ pass 58",
+    "ℹ fail 0",
+    "ℹ cancelled 0",
+    "ℹ skipped 0"
+  ]
+}

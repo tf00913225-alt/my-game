@@ -1,0 +1,10 @@
+{
+  "sourceHead": "0f5fee0a9a0449b1ee8ece74ec62530214518198",
+  "observedCommand": "node --test tests/battle-patrol-ui-targeting-20260923.test.js tests/monster-balance-owner-phase2d.test.mjs",
+  "tests": 13,
+  "pass": 13,
+  "fail": 0,
+  "skipped": 0,
+  "durationMs": 23249.41,
+  "note": "Observed actual result, no duplicate matrix. Existing minimal-DOM null-textContent and watchdog diagnostics remain disclosed."
+}

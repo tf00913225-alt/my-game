@@ -1,0 +1,15 @@
+{
+  "base": "f9078aed94a90d12e6887ef910eb662cc21295f2",
+  "indexOnlyManifestLink": true,
+  "headersOnlyManifestMimeNoStore": true,
+  "allExistingRuntimeAndIconSourcesUnchanged": true,
+  "icon": "assets/relics/icons/relic_all_returning_array.webp",
+  "iconBlob": "8c69360db323b38196247bbf4ca4a06ddf008541",
+  "iconSha256": "183c2bf9d9473d379d369c50c79eec244d5d949fb6685f90f5dd7c82366d00bd",
+  "newRasterAssets": false,
+  "serviceWorkerAdded": false,
+  "scalerAuthSaveUpdateChanges": false,
+  "staticTests": "2 pass",
+  "buildCheck": "PASS",
+  "desktopAndPhysicalAcceptance": "pending"
+}

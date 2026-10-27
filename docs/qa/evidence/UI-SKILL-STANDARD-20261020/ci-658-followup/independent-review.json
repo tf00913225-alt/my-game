@@ -1,0 +1,5 @@
+{
+  "art":{"reviewer":"/root/map_review","screensViewed":true,"result":"four headers clear; plaque text in safe region, centered with44px return; no new issue","limits":"header only; not reforge art/fullUI"},
+  "input":{"reviewer":"/root/map_input_review","screensViewed":true,"result":"center alignment and >=44 return valid; precise slot labels preserve canonical comparison; no new issue","limits":"not fullskillgameplay/naturalbattle/hardware/allUI"},
+  "scope":{"reviewer":"/root/daily_scope","screensViewed":true,"result":"two tests-only files; all numerical/order/cost/lock/rollback/reload assertions retained; no product/Chrome/Story/PWA changes"}
+}

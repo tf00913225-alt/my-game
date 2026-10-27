@@ -217,7 +217,10 @@
 }
 
 #game-ui #homeFeatureModal.quest-mode .quest-claim-btn:disabled{
-    opacity:.42 !important;
+    opacity:1 !important;
+    color:#b9ad98 !important;
+    border-color:#73582d !important;
+    background:#211b14 !important;
 }
 
 /* ----- V90 enlarged fixed completion reward area ----- */
@@ -309,7 +312,7 @@
     border:3px solid rgba(138,106,58,.55) !important;
     border-radius:18px !important;
     background:rgba(0,0,0,.25) !important;
-    color:#8f8371 !important;
+    color:#d3c3aa !important;
     font-size:45px !important;
 
     height:auto;
@@ -333,7 +336,7 @@
 /* Unavailable and already-claimed chests use the same subdued state. */
 #game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-slot,
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-slot{
-    opacity:.5 !important;
+    opacity:1 !important;
 }
 #game-ui #homeFeatureModal.quest-mode .quest-milestone:not(.reached) .quest-milestone-chest,
 #game-ui #homeFeatureModal.quest-mode .quest-milestone.claimed .quest-milestone-chest{

@@ -1,0 +1,25 @@
+{
+  "base": "501bdc2d",
+  "rows": [
+    {
+      "source": "css/00-main.css",
+      "sourceBefore": "5ce96ebab1a9b3f233a79a21165daeb464c39b5cc0a333498fb7998176a7697b",
+      "sourceAfter": "7fee5b318a4a1ed356c3a396fd2e3f8cbcbaa13a31c6c22944e7bef048033bbb",
+      "sourceExpectedExact": true,
+      "bundleBefore": "build/boot-core.9ef122c72d49.css",
+      "bundleAfter": "build/boot-core.395518a02ff1.css",
+      "bundleExpectedExact": true,
+      "sha256": "395518a02ff102779699efda77a7d6a7afe0456ca026f3ff23e6e76c3567797a"
+    },
+    {
+      "source": "css/01-stage-v8-map-page-fix.css",
+      "sourceBefore": "28461f5ee253a5ca0678067d2e3ec175d30458e8c18a1f1427e8aaa3829d2e50",
+      "sourceAfter": "d71638faf05a015ed94a26241e02b8d597e419439c8ba46e697050ebc4796020",
+      "sourceExpectedExact": true,
+      "bundleBefore": "build/app-shell.725d1d00b39e.css",
+      "bundleAfter": "build/app-shell.984f2e5f2fe4.css",
+      "bundleExpectedExact": true,
+      "sha256": "984f2e5f2fe47b40c389fef50970e598f36241272825b0fe44da858e58b696d0"
+    }
+  ]
+}

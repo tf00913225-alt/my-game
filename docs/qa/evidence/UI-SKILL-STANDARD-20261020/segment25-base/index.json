@@ -1,0 +1,71 @@
+{
+  "head": "be598b486010157f3a707718458ecd2aa255adcf",
+  "reports": {
+    "360x640": {
+      "pictures": 100,
+      "ids": 48,
+      "handlers": 200,
+      "trueTaps": 208,
+      "allSynchronousUnchanged": true,
+      "exactApiRestored": true,
+      "rawReport": {
+        "file": "360x640-report.full.json.gz",
+        "sha256": "303126ebf922163e49a8d3eddf8cd28d685e37f4de23695b87d2396fdb78464f",
+        "uncompressedBytes": 8622433,
+        "compressedBytes": 120957,
+        "notice": "Original complete report losslessly retained; readable summary replaces long exact snapshot strings by hash+length only."
+      }
+    },
+    "393x873": {
+      "pictures": 100,
+      "ids": 48,
+      "handlers": 200,
+      "trueTaps": 208,
+      "allSynchronousUnchanged": true,
+      "exactApiRestored": true,
+      "rawReport": {
+        "file": "393x873-report.full.json.gz",
+        "sha256": "f5420fdf8c0f44929a175b4c11e17338be4f96823ba2dee99f74b0eae24808ee",
+        "uncompressedBytes": 8654397,
+        "compressedBytes": 123589,
+        "notice": "Original complete report losslessly retained; readable summary replaces long exact snapshot strings by hash+length only."
+      }
+    },
+    "412x915": {
+      "pictures": 100,
+      "ids": 48,
+      "handlers": 200,
+      "trueTaps": 208,
+      "allSynchronousUnchanged": true,
+      "exactApiRestored": true,
+      "rawReport": {
+        "file": "412x915-report.full.json.gz",
+        "sha256": "edfe2a5d89d1b8a410284cef6ceb956bd533573553c6181ac9d75ed6ed5d75d1",
+        "uncompressedBytes": 8646515,
+        "compressedBytes": 123824,
+        "notice": "Original complete report losslessly retained; readable summary replaces long exact snapshot strings by hash+length only."
+      }
+    },
+    "1280x800": {
+      "pictures": 100,
+      "ids": 48,
+      "handlers": 200,
+      "trueTaps": 208,
+      "allSynchronousUnchanged": true,
+      "exactApiRestored": true,
+      "rawReport": {
+        "file": "1280x800-report.full.json.gz",
+        "sha256": "d764984c6770d32594be7489b8a490175fa5e2f2427c2a5e2b7952817b1fb593",
+        "uncompressedBytes": 8698732,
+        "compressedBytes": 122945,
+        "notice": "Original complete report losslessly retained; readable summary replaces long exact snapshot strings by hash+length only."
+      }
+    }
+  },
+  "limits": [
+    "語言3ID淨心訣/焚血訣/結界仍有Buff/Debuff/Shield/Barrier/Boss/DoT，未通過，待原supportEffectText4個display字串修復及3ID四尺寸delta。",
+    "已學狀態只fireEX/healSpell/earthShield/dinghaishenzhen四個Lv1隔離fixture；不批准其他合法mid/max等級或學習/升級/裝備/施放/消耗/戰鬥/交易。",
+    "同步show/close同task identity/storage exact無變，跨await仍有背景資料變化完整保留；不按storage key斷定每筆timer來源，不稱零save。",
+    "原PREPARE/seed/normalize與同步handler比對分段，fresh local QA非真帳號雲端；無真實硬體/鍵盤驗收。"
+  ]
+}

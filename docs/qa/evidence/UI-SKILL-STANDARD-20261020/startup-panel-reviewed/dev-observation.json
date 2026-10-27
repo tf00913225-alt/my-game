@@ -1,0 +1,11 @@
+{
+  "url": "https://dev.four-symbols-dev.pages.dev/",
+  "status": 200,
+  "bootCss": "build/boot-core.3c6f6f5d87d2.css",
+  "bootStatus": 200,
+  "headers": {},
+  "panelUnit": false,
+  "diamond": true,
+  "deployedSha": "unknown; response headers do not prove Git SHA",
+  "userRejectedScreenshotVersion": "unknown; provided crop has no URL/SHA/viewport"
+}

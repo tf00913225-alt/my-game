@@ -1,0 +1,591 @@
+{
+  "sourcesBefore": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "4aa65a609e660ee58d779fe03e03ec2716be908cce1e4bd1684b32745011ae77",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.b82b2ac7c9b1.js": "b82b2ac7c9b1d07ca4aed7eb9ba605402a449a46121682015b998852ad48abd9",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.ee5e03209f52.css": "ee5e03209f52e01b3627d98d28f2a15c10eb5a64b8b666ff824e08af72667006",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.5f69124e6b7d.js": "5f69124e6b7db0900a357cd78417fa977bdeafc958e25218a856fb5d57223f07",
+    "build/gameplay-core.f77205f2c295.css": "f77205f2c295c9e00e8a392757b986a1f298eba1b6953e195ea820507e63334b"
+  },
+  "sourcesAfter": {
+    "index.html": "40bcc204de4f7154573cde60c59a2582eaa077a4aadf0f4000ec330a09c0a145",
+    "asset-manifest.json": "4aa65a609e660ee58d779fe03e03ec2716be908cce1e4bd1684b32745011ae77",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.b82b2ac7c9b1.js": "b82b2ac7c9b1d07ca4aed7eb9ba605402a449a46121682015b998852ad48abd9",
+    "build/boot-core.7c85620e671b.css": "7c85620e671bbb3e4d17f9b3a922b7b205b911d4fb0717858cc65ba86558d639",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.ee5e03209f52.css": "ee5e03209f52e01b3627d98d28f2a15c10eb5a64b8b666ff824e08af72667006",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.5f69124e6b7d.js": "5f69124e6b7db0900a357cd78417fa977bdeafc958e25218a856fb5d57223f07",
+    "build/gameplay-core.f77205f2c295.css": "f77205f2c295c9e00e8a392757b986a1f298eba1b6953e195ea820507e63334b"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.92c7957bd528.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.7c85620e671b.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.b82b2ac7c9b1.js",
+    "/build/app-shell.b82b2ac7c9b1.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.5f69124e6b7d.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core.f77205f2c295.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.5f69124e6b7d.js",
+    "/build/gameplay-core.f77205f2c295.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js",
+    "/build/feature-boss-relic.25e704feb9dd.css",
+    "/build/feature-relic-progression.ee5e03209f52.css"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"4\"]",
+      "x": 330,
+      "y": 247.22396850585938,
+      "hit": true,
+      "label": "秘寶"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 180,
+      "y": 610.6666870117188,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 97,
+      "top": 1214,
+      "client": 1650,
+      "height": 2864
+    },
+    {
+      "selector": "[data-relic-source]",
+      "x": 106.5,
+      "y": 346.890625,
+      "hit": true,
+      "label": "獲取途徑"
+    },
+    {
+      "root": "#v132RewardModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 247,
+      "y": 467,
+      "to": 165.09896850585938,
+      "top": 4411,
+      "client": 1056,
+      "height": 5467
+    },
+    {
+      "selector": "#v132RewardModal .v132-reward-actions button",
+      "x": 180,
+      "y": 550,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": ".team-relic-detail-back",
+      "x": 279,
+      "y": 36,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 180,
+      "y": 610.6666870117188,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 97,
+      "top": 1218,
+      "client": 1650,
+      "height": 2868
+    },
+    {
+      "selector": ".team-relic-card-open-overlay[onclick=\"v174OpenRelicDetail('relic_tiangang_banner')\"]",
+      "x": 180,
+      "y": 610.6666870117188,
+      "hit": true,
+      "label": ""
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 97,
+      "top": 1088,
+      "client": 1650,
+      "height": 2738
+    },
+    {
+      "selector": ".relic-progression-box-strip button",
+      "x": 149.87240600585938,
+      "y": 188.5,
+      "hit": true,
+      "label": "桃紅階以下秘寶碎片自選箱 ×1"
+    },
+    {
+      "root": "#homeFeatureModal",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 262,
+      "y": 597,
+      "to": 97,
+      "top": 304,
+      "client": 1650,
+      "height": 1954
+    },
+    {
+      "selector": ".relic-choice-back",
+      "x": 87.24739837646484,
+      "y": 100,
+      "hit": true,
+      "label": "‹ 返回秘寶列表"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 309.7083435058594,
+      "y": 39.5,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "fixture": {
+        "id": "relic_tiangang_banner",
+        "name": "天罡戰旗",
+        "dev": true,
+        "state": {
+          "unlocked": false,
+          "level": 1,
+          "exp": 0,
+          "seen": true
+        }
+      }
+    },
+    {
+      "lockedActual": {
+        "unlocked": false,
+        "level": 1,
+        "exp": 0,
+        "seen": true
+      }
+    }
+  ],
+  "head": "67772d2ab22e476b7554765a5863960bea8adb4d",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "contexts": [
+    "home -> relic actual data-city-entry4"
+  ],
+  "scenes": [
+    {
+      "name": "relic-list",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-locked-detail-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-locked-detail-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-acquisition-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-acquisition-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-list-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-10-top",
+      "small": [
+        {
+          "text": "Lv.10 為目前正式突破門檻；現行上限 Lv.20。",
+          "font": 12.50000050392302,
+          "button": false,
+          "primary": false,
+          "selector": "small.",
+          "parent": "team-relic-upgrade"
+        }
+      ],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-10-end",
+      "small": [
+        {
+          "text": "Lv.10 為目前正式突破門檻；現行上限 Lv.20。",
+          "font": 12.50000050392302,
+          "button": false,
+          "primary": false,
+          "selector": "small.",
+          "parent": "team-relic-upgrade"
+        }
+      ],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-20-top",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-owned-20-end",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "relic-choice-top",
+      "small": [],
+      "overflow": [],
+      "clipped": [
+        {
+          "label": "回天寶輪桃紅階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "山河寶鼎橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "天罡戰旗橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "伏魔金印橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "赤霄戰紋橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "九龍神火罩紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "太初聖符紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "玄冰鏡心紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "岩岳鎮印紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "烈陽神珠紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "破軍殘卷紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "寒泉玉珮紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "焚星殘印紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "鎮魂古鐘紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "玄武靈印藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "青嵐羽符藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "追風行符藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "乾坤玉壺藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "靈泉法瓶藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        }
+      ]
+    },
+    {
+      "name": "relic-choice-end",
+      "small": [],
+      "overflow": [],
+      "clipped": [
+        {
+          "label": "回天寶輪桃紅階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "山河寶鼎橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "天罡戰旗橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "伏魔金印橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "赤霄戰紋橙階・碎片 ×25",
+          "width": 150.5,
+          "height": 38.00001525878906,
+          "overflow": true
+        },
+        {
+          "label": "九龍神火罩紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38.00001525878906,
+          "overflow": true
+        },
+        {
+          "label": "太初聖符紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "玄冰鏡心紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "岩岳鎮印紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "烈陽神珠紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "破軍殘卷紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "寒泉玉珮紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "焚星殘印紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "鎮魂古鐘紫階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "玄武靈印藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "青嵐羽符藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "追風行符藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "乾坤玉壺藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        },
+        {
+          "label": "靈泉法瓶藍階・碎片 ×25",
+          "width": 150.5,
+          "height": 38,
+          "overflow": true
+        }
+      ]
+    },
+    {
+      "name": "relic-city-return",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment16 before UI only: formal production loader and existing isolated skill QA account. Actual relic city entry and card overlay detail, source button to acquisition/end/return, owned Lv10/Lv20 presentation, owned choice-box strip to choice page/end/back without choosing. Transition diagnostic proves scroll carry-over. Canonical owned/material fixtures only. Existing original UI open/list sideeffects, including mark-seen/saveRelics calls, remain; no claim of zero save calls. No equip/upgrade/craft/choice transaction, no save-authority bypass.",
+  "untested": [
+    "other devices beyond360x640",
+    "real production locked card styling: local DEV statusOf forces card unlocked",
+    "unawakened: no runtimeReadyfalse catalog entry found",
+    "real business transactions and cloud settlement",
+    "loading failure/retry"
+  ]
+}

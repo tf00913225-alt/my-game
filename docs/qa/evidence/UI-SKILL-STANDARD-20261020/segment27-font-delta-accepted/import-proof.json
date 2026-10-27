@@ -1,0 +1,66 @@
+{
+  "head": "60293edc1f0d44438f704bcf4d9074c3b32583d5",
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\360x640\\drawer-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\360x640\\drawer-reopened.png",
+      "sha256": "71cf7f5abbcceab8533f96e2ca81fa43fb96c5cd30ca9f2fc7a435f7404039aa"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\360x640\\drawer-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\360x640\\drawer-top.png",
+      "sha256": "71cf7f5abbcceab8533f96e2ca81fa43fb96c5cd30ca9f2fc7a435f7404039aa"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\360x640\\report.json",
+      "sha256": "92fb6e7600519cebee82258c79873149ead51ab99be922dbdc0be4f7e79431da"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\393x873\\drawer-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\393x873\\drawer-reopened.png",
+      "sha256": "894b314787ad5f50694af4d032b679ec34d67970d6ec788768ba123426d5adde"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\393x873\\drawer-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\393x873\\drawer-top.png",
+      "sha256": "894b314787ad5f50694af4d032b679ec34d67970d6ec788768ba123426d5adde"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\393x873\\report.json",
+      "sha256": "cff6fb7b044004177d6daced69772a8422ac438d9350219dc088b6437d1cb791"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\412x915\\drawer-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\412x915\\drawer-reopened.png",
+      "sha256": "efbeb44847ddc780674212559666d78218a9468dee79759adca34658baca898c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\412x915\\drawer-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\412x915\\drawer-top.png",
+      "sha256": "efbeb44847ddc780674212559666d78218a9468dee79759adca34658baca898c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\412x915\\report.json",
+      "sha256": "b34de9645a807620af14c87a697401325cf9b95f1ee84761a6a55cefe24a262b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\1280x800\\drawer-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\1280x800\\drawer-reopened.png",
+      "sha256": "77b996840323349ef35a0a4835ac7bd9868a31cd721221ae9f587d46ff4cb021"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\1280x800\\drawer-top.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\1280x800\\drawer-top.png",
+      "sha256": "77b996840323349ef35a0a4835ac7bd9868a31cd721221ae9f587d46ff4cb021"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment27-boss-title-60293edc\\title-only\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment27-font-delta-accepted\\1280x800\\report.json",
+      "sha256": "9edef3e4e8199dcf4e13ead2326500ca1c4fd134fb2d1e1abc23bc54a68f9819"
+    }
+  ],
+  "helperSha256": "0050807a3b8872eae13925ee655de39de41d336cf18d16f74db75b752c4b54ce"
+}

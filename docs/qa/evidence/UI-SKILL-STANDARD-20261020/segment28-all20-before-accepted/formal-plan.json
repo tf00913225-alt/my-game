@@ -1,0 +1,814 @@
+{
+  "owner": "js/adventure/adventure-content-v1-20260915.js",
+  "chapterId": "chapter_v1",
+  "count": 20,
+  "beforeCount": 76,
+  "inventory": [
+    {
+      "id": "c1_01",
+      "title": "山前初戰",
+      "scene": "road",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "少俠，前頭有個攔路的。先看準敵人，再穩穩出招。",
+          "i": 0,
+          "length": 23,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我初來此地，正想問問山路的情況。",
+          "i": 1,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "先過了眼前這一關。別慌，一招一式來。",
+          "i": 2,
+          "length": 18,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "好，我先替大家探一段路。",
+          "i": 3,
+          "length": 12,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_02",
+      "title": "山道惡徒",
+      "scene": "road",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "山道惡徒",
+          "text": "新來的？這條山道的規矩，你可還沒學會。",
+          "npcAssetId": "traveler",
+          "i": 0,
+          "length": 19,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "放旅人過去，有什麼事衝我來。",
+          "npcAssetId": "traveler",
+          "i": 1,
+          "length": 14,
+          "last": true
+        }
+      ],
+      "guidance": 4
+    },
+    {
+      "id": "c1_03",
+      "title": "追兵",
+      "scene": "road",
+      "npc": "traveler",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "不好，剛才那夥人的追兵來了！",
+          "i": 0,
+          "length": 14,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "別急，退到我身後。新學的招式正好派上用場。",
+          "i": 1,
+          "length": 21,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "這件護具是我帶來備用的。等追兵退了，就交給你防身。",
+          "i": 2,
+          "length": 25,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "先把人護住，其他的戰後再說。",
+          "i": 3,
+          "length": 14,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_04",
+      "title": "寨外守衛",
+      "scene": "road",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "寨外守衛",
+          "text": "只憑手上的招式，就想闖過這道關？",
+          "i": 0,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我會先看清你的架勢。",
+          "i": 1,
+          "length": 10,
+          "last": true
+        }
+      ],
+      "guidance": 4
+    },
+    {
+      "id": "c1_05",
+      "title": "受困旅人",
+      "scene": "road",
+      "npc": "herbalist",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "藥師",
+          "text": "這位旅人被困在前面。救人之前，也得先照看自己。",
+          "i": 0,
+          "length": 23,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "氣血不足會撐不住，真氣不夠也使不出招式。",
+          "i": 1,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "藥師",
+          "text": "看看自己的氣血與真氣，再按需要使用補品。準備妥當才上路。",
+          "i": 2,
+          "length": 28,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "明白。往後每次交手前，我都會先檢查行裝與補給。",
+          "i": 3,
+          "length": 23,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_06",
+      "title": "村民求援",
+      "scene": "village",
+      "npc": "traveler",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "村民",
+          "text": "少俠救回了旅人，可山關還封著。黑松寨強收過路銀，連送米的車都不放。",
+          "i": 0,
+          "length": 33,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "這條山路，是你們進出村子的要道？",
+          "i": 1,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "村民",
+          "text": "正是。再拖下去，藥材與糧食都送不進來了。",
+          "i": 2,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我既然走到了這裡，就替你們把這條路打通。",
+          "i": 3,
+          "length": 20,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_07",
+      "title": "山道巡哨",
+      "scene": "road",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "從這裡往上是黑松寨的巡哨，沒有誰能替你攔下刀劍。",
+          "i": 0,
+          "length": 24,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我已懂得備戰，接下來會自己留神。",
+          "i": 1,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "沿著山道往前，先打散巡哨，別讓他們合圍。",
+          "i": 2,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "好。路要一段一段打通，人也要平安帶回。",
+          "i": 3,
+          "length": 19,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_08",
+      "title": "荒驛舊箱",
+      "scene": "village",
+      "npc": "traveler",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "荒驛還留著一口舊箱，是商隊撤走時留下的路用物資。",
+          "i": 0,
+          "length": 24,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "有主之物，我不能隨便拿。",
+          "i": 1,
+          "length": 12,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "商隊已託我轉交。裡頭是些盤纏、補品和普通材料，正好助你上路。",
+          "i": 2,
+          "length": 30,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "那我收下這份心意，等山路通了，再向大家道謝。",
+          "i": 3,
+          "length": 22,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_09",
+      "title": "落雁驛",
+      "scene": "village",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "落雁驛到了。坐一會兒，把氣血與真氣養回來。",
+          "i": 0,
+          "length": 21,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "一路上的哨卡，比先前密了。",
+          "i": 1,
+          "length": 13,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "石橋附近快換哨了。你可趁他們交接時往前探，切記別急著闖寨。",
+          "i": 2,
+          "length": 29,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "多謝提醒。我歇妥了，就去石橋看看。",
+          "i": 3,
+          "length": 17,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_10",
+      "title": "黑松斥候",
+      "scene": "road",
+      "npc": "traveler",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "前頭那個斥候一直盯著山道，怕是已經發現你了。",
+          "i": 0,
+          "length": 22,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "他正往寨裡傳信。這回避不開了。",
+          "i": 1,
+          "length": 15,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "黑松寨知道有人插手，後面的路只會更難走。",
+          "i": 2,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "那就堂堂正正走下去，先過這一關。",
+          "i": 3,
+          "length": 16,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_11",
+      "title": "寨下石橋",
+      "scene": "bridge",
+      "npc": "herbalist",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "藥師",
+          "text": "你要去側門，得認得他們的信物。這塊黑松腰牌是寨眾往來用的。",
+          "i": 0,
+          "length": 29,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "你怎會留著它？",
+          "i": 1,
+          "length": 7,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "藥師",
+          "text": "先前替一名寨眾治傷，他拿它抵了藥錢。如今交給你，或許能少一道阻攔。",
+          "i": 2,
+          "length": 33,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我會收好。打通山關後，也不能再讓他們拿信物欺壓旅人。",
+          "i": 3,
+          "length": 26,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_12",
+      "title": "石橋伏兵",
+      "scene": "bridge",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "小心橋後！他們把人藏在橋墩兩旁。",
+          "i": 0,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "看來斥候的消息已經送到了。",
+          "i": 1,
+          "length": 13,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "這裡路窄，先穩住腳步，別讓伏兵從身後包上來。",
+          "i": 2,
+          "length": 22,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我來擋住橋頭。你們先退到安全處。",
+          "i": 3,
+          "length": 16,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_13",
+      "title": "旅途整備",
+      "scene": "village",
+      "npc": "merchant",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "旅商",
+          "text": "過了石橋，就是山寨的地界了。少俠可還缺些路用補給？",
+          "i": 0,
+          "length": 25,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "先讓我清點補品，也看看身上的裝備。",
+          "i": 1,
+          "length": 17,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "旅商",
+          "text": "莫急。我在這裡歇腳，你也養養精神，再去走後半程。",
+          "i": 2,
+          "length": 24,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "多謝。準備周全，才能把事情辦到底。",
+          "i": 3,
+          "length": 17,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_14",
+      "title": "寨外側門",
+      "scene": "stockade",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "側門就在前面。藥師交給你的黑松腰牌，可還帶著？",
+          "i": 0,
+          "length": 23,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "帶著。這腰牌正是寨眾通行的憑據。",
+          "i": 1,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "亮出腰牌，趁守衛辨認時越過這道門。進去後仍要留心。",
+          "i": 2,
+          "length": 25,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "好。借它過門，接下來便去找寨主把話說清楚。",
+          "i": 3,
+          "length": 21,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_15",
+      "title": "斷嶺哨所",
+      "scene": "stockade",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "斷嶺哨所駐著寨裡的精銳，出手與山道上的巡哨不同。",
+          "i": 0,
+          "length": 24,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "守住這裡，他們就能隨時封死山路。",
+          "i": 1,
+          "length": 16,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "別被他們的陣勢逼亂。看準空隙，再把哨所拿下。",
+          "i": 2,
+          "length": 22,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "這道關口，我一定要過。",
+          "i": 3,
+          "length": 11,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_16",
+      "title": "寨前情報",
+      "scene": "stockade",
+      "npc": "traveler",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "我替寨裡送過貨。他們沒有什麼遠大圖謀，只是趁道路失守，攔路收銀。",
+          "i": 0,
+          "length": 32,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "所以大家吃的苦，只為了寨主多收幾袋錢？",
+          "i": 1,
+          "length": 19,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "旅人",
+          "text": "是。寨裡的頭目也分一杯羹，誰都不肯先把路障撤下。",
+          "i": 2,
+          "length": 24,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "那便讓他們知道，這條路不是誰家的私產。",
+          "i": 3,
+          "length": 19,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_17",
+      "title": "寨門攻防",
+      "scene": "stockade",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "寨門前的人都聚過來了。他們想把你堵在外頭。",
+          "i": 0,
+          "length": 21,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "山下的商旅還在等。走到這一步，不能退。",
+          "i": 1,
+          "length": 19,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "守驛人",
+          "text": "我在後面接應。你若能破開寨門，山關就有轉機。",
+          "i": 2,
+          "length": 22,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "好，今日便把這道攔路的門打開。",
+          "i": 3,
+          "length": 15,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_18",
+      "title": "寨中頭目",
+      "scene": "stockade",
+      "npc": "guard",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "寨中頭目",
+          "text": "能闖過寨門，倒有幾分本事。可進了寨子，就別想輕易出去。",
+          "i": 0,
+          "length": 27,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我來找寨主，讓他撤掉路障，放商旅通行。",
+          "i": 1,
+          "length": 19,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "寨中頭目",
+          "text": "先過我這一關，再談你的條件！",
+          "i": 2,
+          "length": 14,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "你們攔路欺人，今日也該到頭了。",
+          "i": 3,
+          "length": 15,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_19",
+      "title": "寨主現身",
+      "scene": "stockade",
+      "npc": "chief",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "黑松寨主",
+          "text": "一路打進我的寨子，少俠的手未免伸得太長。",
+          "i": 0,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "你封山收銀，斷了村民與商旅的生路。我只要你撤掉路障。",
+          "i": 1,
+          "length": 26,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "黑松寨主",
+          "text": "這片山道由我守著，要過路，自然得付銀子。",
+          "i": 2,
+          "length": 20,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "山關是大家的路。既然你不肯放行，那就憑本事分個明白。",
+          "i": 3,
+          "length": 26,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    },
+    {
+      "id": "c1_20",
+      "title": "黑松寨主",
+      "scene": "stockade",
+      "npc": "chief",
+      "before": [
+        {
+          "speaker": "npc",
+          "name": "黑松寨主",
+          "text": "哼！想讓我撤障，先勝過我手中這柄斧！",
+          "i": 0,
+          "length": 18,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "我為山下等路的人而來，不會在此退讓。",
+          "i": 1,
+          "length": 18,
+          "last": false
+        },
+        {
+          "speaker": "npc",
+          "name": "黑松寨主",
+          "text": "那就來吧，讓我看看你憑什麼管這樁閒事！",
+          "i": 2,
+          "length": 19,
+          "last": false
+        },
+        {
+          "speaker": "player",
+          "name": "玩家",
+          "text": "這一戰，就把山關還給往來的人。",
+          "i": 3,
+          "length": 15,
+          "last": true
+        }
+      ],
+      "guidance": 0
+    }
+  ],
+  "storyPresentation": {
+    "npcs": {
+      "guard": "NPC_SHARED_029",
+      "traveler": "NPC_SHARED_021",
+      "herbalist": "NPC_SHARED_044",
+      "merchant": "NPC_SHARED_034",
+      "chief": "NPC_SHARED_040"
+    },
+    "scenes": {
+      "road": "assets/story/backgrounds/mountain-road.webp",
+      "village": "assets/ui/home-background.jpg",
+      "bridge": "assets/story/backgrounds/stone-bridge.webp",
+      "stockade": "assets/story/backgrounds/black-pine-stockade.webp"
+    }
+  },
+  "scope": "Formal76 before lines; no guidance/ending, combat or completion. Per-node fresh profile and local schema3 presentation fixture. Last line display only."
+}

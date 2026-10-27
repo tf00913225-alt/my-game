@@ -1,0 +1,178 @@
+[
+  {
+    "viewport": "360x640",
+    "head": "c295393d76bceb1f5648647f02c115574dec7880",
+    "reportSha256": "a52474ad4ec856f44ee2700ba97ca14f8dc77b5cf6aed1af4d89540b1cb270ab",
+    "end": [
+      988,
+      545,
+      1533
+    ],
+    "lastButtons": [
+      {
+        "text": "獎勵預覽",
+        "disabled": false,
+        "rect": {
+          "x": 18,
+          "y": 471.6964111328125,
+          "width": 159.85714721679688,
+          "height": 44.57147216796875,
+          "top": 471.6964111328125,
+          "right": 177.85714721679688,
+          "bottom": 516.2678833007812,
+          "left": 18
+        },
+        "hit": true
+      },
+      {
+        "text": "挑戰",
+        "disabled": false,
+        "rect": {
+          "x": 182.1428680419922,
+          "y": 471.6964111328125,
+          "width": 159.8571319580078,
+          "height": 44.57147216796875,
+          "top": 471.6964111328125,
+          "right": 342,
+          "bottom": 516.2678833007812,
+          "left": 182.1428680419922
+        },
+        "hit": true
+      }
+    ],
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "393x873",
+    "head": "c295393d76bceb1f5648647f02c115574dec7880",
+    "reportSha256": "237ea8bef5c8f0bff3ec22b9229d11eb70438e12193dbe12e16c3342b205118a",
+    "end": [
+      988,
+      545,
+      1533
+    ],
+    "lastButtons": [
+      {
+        "text": "獎勵預覽",
+        "disabled": false,
+        "rect": {
+          "x": 19.649999618530273,
+          "y": 602.1018676757812,
+          "width": 174.51071166992188,
+          "height": 48.65716552734375,
+          "top": 602.1018676757812,
+          "right": 194.16071128845215,
+          "bottom": 650.759033203125,
+          "left": 19.649999618530273
+        },
+        "hit": true
+      },
+      {
+        "text": "挑戰",
+        "disabled": false,
+        "rect": {
+          "x": 198.83929443359375,
+          "y": 602.1018676757812,
+          "width": 174.51071166992188,
+          "height": 48.65716552734375,
+          "top": 602.1018676757812,
+          "right": 373.3500061035156,
+          "bottom": 650.759033203125,
+          "left": 198.83929443359375
+        },
+        "hit": true
+      }
+    ],
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "412x915",
+    "head": "c295393d76bceb1f5648647f02c115574dec7880",
+    "reportSha256": "5eee73e8f60a4fa63283928b1589b26f7c374b25f57a4a02e745d38bc3a78de5",
+    "end": [
+      988,
+      545,
+      1533
+    ],
+    "lastButtons": [
+      {
+        "text": "獎勵預覽",
+        "disabled": false,
+        "rect": {
+          "x": 20.599998474121094,
+          "y": 631.108154296875,
+          "width": 182.94760131835938,
+          "height": 51.009521484375,
+          "top": 631.108154296875,
+          "right": 203.54759979248047,
+          "bottom": 682.11767578125,
+          "left": 20.599998474121094
+        },
+        "hit": true
+      },
+      {
+        "text": "挑戰",
+        "disabled": false,
+        "rect": {
+          "x": 208.45237731933594,
+          "y": 631.108154296875,
+          "width": 182.94761657714844,
+          "height": 51.009521484375,
+          "top": 631.108154296875,
+          "right": 391.3999938964844,
+          "bottom": 682.11767578125,
+          "left": 208.45237731933594
+        },
+        "hit": true
+      }
+    ],
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "1280x800",
+    "head": "c295393d76bceb1f5648647f02c115574dec7880",
+    "reportSha256": "0e04e18707893dc0f3f2a91b0f2bedbc43411a9cef6e91c3e8a5a5b122ff8293",
+    "end": [
+      988,
+      545,
+      1533
+    ],
+    "lastButtons": [
+      {
+        "text": "獎勵預覽",
+        "disabled": false,
+        "rect": {
+          "x": 437.5,
+          "y": 589.6204833984375,
+          "width": 199.8214111328125,
+          "height": 55.71435546875,
+          "top": 589.6204833984375,
+          "right": 637.3214111328125,
+          "bottom": 645.3348388671875,
+          "left": 437.5
+        },
+        "hit": true
+      },
+      {
+        "text": "挑戰",
+        "disabled": false,
+        "rect": {
+          "x": 642.6785888671875,
+          "y": 589.6204833984375,
+          "width": 199.8214111328125,
+          "height": 55.71435546875,
+          "top": 589.6204833984375,
+          "right": 842.5,
+          "bottom": 645.3348388671875,
+          "left": 642.6785888671875
+        },
+        "hit": true
+      }
+    ],
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  }
+]

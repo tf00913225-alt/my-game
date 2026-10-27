@@ -27,11 +27,10 @@
     flex-direction:column;
     overflow:hidden;
     border:2px solid #a77a38;
-    border-radius:13px;
+    border-image:var(--rpg-window-frame) 115 fill / calc(10 * var(--ui-length-unit,1px)) / 0 stretch;
+    border-radius:0;
     color:#eadfc9;
-    background:
-        radial-gradient(circle at 50% -12%,rgba(196,137,47,.22),transparent 38%),
-        linear-gradient(145deg,#24190f 0,#0d0906 52%,#171007 100%);
+    background:#151515;
     box-shadow:
         0 16px 36px rgba(0,0,0,.7),
         inset 0 0 0 1px rgba(255,225,151,.08),
@@ -63,7 +62,16 @@
     gap:10px;
     padding:13px 14px 9px;
     border-bottom:1px solid rgba(190,143,65,.5);
-    background:linear-gradient(180deg,rgba(51,35,18,.96),rgba(19,13,8,.9));
+    background:transparent;
+}
+
+#game-stage .gameplay-panel-header > div{
+    flex:1 1 0;
+    min-width:0;
+    text-align:center;
+    padding:6px 8px;
+    border-image:var(--rpg-window-frame) 115 fill / calc(6 * var(--ui-length-unit,1px)) / 0 stretch;
+    background:#151515;
 }
 
 #game-stage .gameplay-panel-header small{
@@ -307,7 +315,7 @@
 #game-stage .boss-select-card small{ font-size:16px; line-height:1.4; }
 #game-stage .boss-select-card span{ color:#e9b95e; font-weight:900; }
 #game-stage .boss-select-card small{ color:#aa9a80; }
-#game-stage .boss-select-card.locked{ opacity:.47; filter:saturate(.55); }
+#game-stage .boss-select-card.locked{ opacity:1; filter:saturate(.55);border-color:#5f492b; }
 #game-stage .boss-select-card.cleared::after{
     content:"已首通";
     position:absolute;
@@ -599,7 +607,9 @@
 #game-stage .tower-floor-band small{ color:#8f836e;font-size:16px;line-height:1.4; }
 #game-stage .tower-floor-band.done{ border-color:#8c6934;background:#24180d; }
 #game-stage .tower-floor-band.current{ border-color:#d0a151;box-shadow:0 0 8px rgba(214,154,51,.22); }
-#game-stage .tower-floor-band:disabled{ opacity:.4; }
+#game-stage .tower-floor-band:disabled{ opacity:1;border-color:#433c30;cursor:not-allowed; }
+#game-stage .tower-floor-band:disabled b,
+#game-stage .tower-floor-band:disabled small{ color:#b9ad98; }
 
 #game-stage .tower-milestone-choice{
     padding:11px;

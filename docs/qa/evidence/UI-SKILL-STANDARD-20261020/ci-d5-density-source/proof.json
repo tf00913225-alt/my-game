@@ -1,0 +1,18 @@
+{
+  "base": "d5f09731267b1a3ba8374fb451b5557f15d2a92e",
+  "cssOriginalOwner": "css/22-stage-v78-character-inventory-core.css",
+  "fullSourceExpectedExact": true,
+  "htmlOnlySingleExistingWalletMoved": true,
+  "fullGeneratedCssExpectedExact": true,
+  "bundle": "gameplay-core.fb1c53e85193.css",
+  "bundleSha256": "fb1c53e85193e0e1a389366ad9830265894bbad0a4c98b360d6c49592a457f3c",
+  "jsFunctionsConfigUnchanged": true,
+  "sourceCollector": "7af1b8c6ce14106576c684990d5a93486ff7b4f1",
+  "collectorParent": "a268962222f3dc63f6d3233c4eef8834d360db50",
+  "collectorFilesExact": [
+    ".github/scripts/runtime-browser-qa-support.mjs",
+    "tests/ci-startup-resource-evidence.test.mjs"
+  ],
+  "beforeReportDirty": true,
+  "candidateWasIsolatedDomCssOnly": true
+}

@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport"content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover">
 <title>四象江湖傳 V173.73</title>
+<link rel="manifest" href="app.webmanifest">
 
 <link rel="preconnect"href="https://fonts.googleapis.com">
 <link rel="preconnect"href="https://fonts.gstatic.com"crossorigin>
@@ -14,7 +15,7 @@
 <link rel="preload" as="image" href="assets/ui/startup-logo.4631c0bc3f2b.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="assets/ui/startup-main-city.d43e67af1c1c.jpg" fetchpriority="high">
 <!-- build:critical-style -->
-<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.fa69d5eea44b.css">
+<link id="boot-core-style" data-critical-style="true" rel="stylesheet" href="build/boot-core.72ac4efef19f.css">
 <!-- /build:critical-style -->
 </head>
 
@@ -244,6 +245,7 @@
                 maxlength="16"
                 placeholder="輸入 2～16 個字元"
                 autocomplete="off"
+                oninput="updateInitialCharacterCreationFeedback()"
             >
         </section>
 
@@ -286,6 +288,7 @@
                 </div>
             </div>
 
+            <p id="creationFeedback" class="creation-feedback" role="alert" hidden></p>
             <div class="creation-stat-grid">
 
                 <div class="creation-stat" data-stat="attack">
@@ -866,7 +869,7 @@
 >
 
     <div class="exp-pool-hero">
-        <div class="exp-pool-kicker">SHARED EXPERIENCE</div>
+        <div class="exp-pool-kicker">角色養成</div>
         <div class="exp-pool-title">共用經驗池</div>
         <div class="exp-pool-total">
             <span id="sharedExpValue" class="exp-pool-value">0</span>
@@ -1224,6 +1227,7 @@
     >
         <img class="icon-off" src="assets/battle/auto-battle-off.png" alt="自動戰鬥（關閉）" loading="lazy" decoding="async">
         <img class="icon-on" src="assets/battle/auto-battle-on.png" alt="自動戰鬥（開啟中）" loading="lazy" decoding="async">
+        <span class="map-quick-caption" aria-hidden="true">自動戰鬥<span class="map-quick-state-off">關閉</span><span class="map-quick-state-on">開啟</span></span>
     </button>
 
     <button
@@ -1234,6 +1238,7 @@
     >
         <img class="icon-off" src="assets/battle/auto-patrol-off.png" alt="自動巡怪（關閉）" loading="lazy" decoding="async">
         <img class="icon-on" src="assets/battle/auto-patrol-on.png" alt="自動巡怪（開啟中）" loading="lazy" decoding="async">
+        <span class="map-quick-caption" aria-hidden="true">自動巡怪<span class="map-quick-state-off">關閉</span><span class="map-quick-state-on">開啟</span></span>
     </button>
 
 </div>
@@ -1650,7 +1655,7 @@
 
 <div class="auto-premium-status">
     <div class="auto-premium-status-copy">
-        <span class="auto-panel-kicker">AUTO COMBAT</span>
+        <span class="auto-panel-kicker">戰鬥策略</span>
         <strong id="autoBattleLabel">自動戰鬥</strong>
         <small>戰鬥中選擇行動，戰鬥結束後檢查補品</small>
     </div>
@@ -2060,9 +2065,12 @@
 
     <header class="inventory-header" aria-label="背包頁首">
       <div class="inventory-title-plate" aria-label="背包">
-        <span class="inventory-title-plate-kicker">INVENTORY</span>
         <h2>背包</h2>
       </div>
+        <div class="inventory-wallet-bar" aria-label="目前持有金幣">
+            <span class="inventory-wallet-label">金幣</span>
+            <b id="inventoryGoldValue" class="inventory-wallet-value">0</b>
+        </div>
         <button
             type="button"
             id="mapInventoryOverlayClose"
@@ -2107,11 +2115,6 @@
 
     <!-- 下方：四大分類固定，只有102格物品區可上下捲動 -->
     <section class="inventory-right-panel">
-
-        <div class="inventory-wallet-bar" aria-label="目前持有金幣">
-            <span class="inventory-wallet-label">金幣</span>
-            <b id="inventoryGoldValue" class="inventory-wallet-value">0</b>
-        </div>
 
         <div
             class="inventory-category-tabs"
@@ -2571,7 +2574,7 @@
 
 <!-- V136: version the loader itself; otherwise a cached old loader never sees new patch versions. -->
 <!-- build:critical-script -->
-<script id="boot-core-runtime" src="build/boot-core.bbbaf3175142.js"></script>
+<script id="boot-core-runtime" src="build/boot-core.17c288641d4c.js"></script>
 <!-- /build:critical-script -->
 </body>
 </html>

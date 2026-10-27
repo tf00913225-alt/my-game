@@ -288,8 +288,9 @@ async function run(chrome,url,live){
    assert.match(visual.background,/assets\/ui\/home-background-v17344\.png/);
    assert.doesNotMatch(visual.background,/home-background\.jpg/);
    assert.ok(visual.badge,'version badge lost browser owner');
-   // The approved city fits the one native canvas; every control is checked below.
-   assert.equal(visual.scrollOwner,'hidden','home must stay inside its fixed canvas');
+    // The home content owns vertical reading inside the fixed outer canvas;
+    // the existing control clipping/hit checks below still apply after scrolling.
+    assert.equal(visual.scrollOwner,'auto','home must retain its original vertical reading owner');
    assert.equal(visual.oldBackground,false,'retired scrolling background layer returned');
    const composition=await c.eval(`(()=>{
     const box=s=>{const r=document.querySelector(s).getBoundingClientRect();return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:r.width};};

@@ -1,0 +1,15 @@
+{
+  "base": "00ed3d10647d053a2b7ff6e79f8c0d8f2df6bb08",
+  "scope": "Only two exact presentation markup substitutions; acquisition line placement and equipment slot label/value separation",
+  "reverseByteEqual": true,
+  "changes": [
+    [
+      "<small>取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div></div>",
+      "</div><small class=\"hero-profile-acquisition\">取得條件：${escape(heroPageAcquisition(hero.definition))}</small></div>"
+    ],
+    [
+      "<span>${slot?({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+ '：':''}${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span>",
+      "${slot?'<span class=\"hero-equipment-slot-label\">'+({head:'頭',hand:'手',shoulder:'護腕',armor:'衣服',shoes:'鞋子',ring:'戒指'}[slot])+'</span>':''}<span>${item?FourSymbolsItemSlot.name(item.name,item):'未裝備'}</span>"
+    ]
+  ]
+}

@@ -1,0 +1,3094 @@
+{
+  "head": "331f01f0c77525589ac86ce2a0cc4c6286f72299",
+  "selection": [
+    {
+      "nodeId": "c1_01",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_01",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_01",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_01",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_02",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_02\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_02",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_02",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_02",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_03",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_03",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_03",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_03",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_04",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_04\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_04",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_04",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_04",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 2,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_05",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_05",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_05",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_05",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_06",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_06",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_06",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_06",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_07",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_07",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_07",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_07",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_08",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_08",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_08",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_08",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_09",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_09",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_09",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_09",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_10",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_10",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_10",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_10",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_11",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_11",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_11",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_11",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_12",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_12",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_12",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_12",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_13",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_13",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_13",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_13",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_14",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_14",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_14",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_14",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_15",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_15",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_15",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_15",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_16",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_16",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_16",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_16",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_17",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_17",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_17",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_17",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_18",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_18",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_18",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_18",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_19",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_19",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_19",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_19",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_20",
+      "size": "360x640",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\report.json",
+      "resolved": true,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_20",
+      "size": "393x873",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_20",
+      "size": "412x915",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    },
+    {
+      "nodeId": "c1_20",
+      "size": "1280x800",
+      "source": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\report.json",
+      "resolved": false,
+      "lineCount": 4,
+      "observationLimit": "Original same-task observer covers entry/return, NOT Next after DOM replacement"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\line-00.png",
+      "sha256": "d0711fac435e6e1aa0067797b9c90f6e43026a2126a732bab47b62e3bdc870f8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\line-01.png",
+      "sha256": "87e83ce57972d0028e5398431cc4c1724a765d2c52802a4204398e541bfcb666"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\line-02.png",
+      "sha256": "151caa8a3db6e19ca37acd1d9f93394aad91f4442c9c5fa86c606b5f2411b7ab"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\line-03.png",
+      "sha256": "33652a97b9178c8b41240cc0e66fa5e3ef0793debda443d92a16575d52106d9e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\report.json",
+      "sha256": "1c16ef12cf7496a2c5f4cd647b9dff3f5861ff7f9004785c4c318de28f419c02"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\360x640\\story-reopened.png",
+      "sha256": "33652a97b9178c8b41240cc0e66fa5e3ef0793debda443d92a16575d52106d9e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\line-00.png",
+      "sha256": "32a1716a7118f5c6c81ca539476dcd34a8c096b335444fa00e53e5b43d7594d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\line-01.png",
+      "sha256": "87fc325c76c76cea5920d884e36d51894e9dca2fddcbd6b95ccb94045673ebad"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\line-02.png",
+      "sha256": "f61062ab271478e97921b3049050b229ea90da4525b30167b042fcdbc6de3808"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\line-03.png",
+      "sha256": "ee53e1415d2295daf2cf0a2774ce40a21bb6222cfcd2c8b414d3c61a04d5d9dc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\report.json",
+      "sha256": "d1822484927ac30260da427895fb164c57ede7cc2de8c85693279dbcb5ddeb02"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\393x873\\story-reopened.png",
+      "sha256": "1b6fa4c71d02f9d75be12f436de697b923ba943b55297a6a98cb9b7cdadd2624"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\line-00.png",
+      "sha256": "326580b7287d5a05a196e6d9f03e35260c9d46230906b3a16ccf4465e22427b5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\line-01.png",
+      "sha256": "47c9a75188a9906d61839f6139b4eec13dd9db9b6c0529249bb9a72d5aa2b501"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\line-02.png",
+      "sha256": "c9c62d6c89b61aff8976d0cc4b0050dcfefbad450eee7bb5a45bd8ea4ff40bd2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\line-03.png",
+      "sha256": "aba7a58136986debd8e7baf9eba4aa08a60ada49d39c74904414467ea39c0b7b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\report.json",
+      "sha256": "073f7fdc2504aaa6a9fff0f7a0ae2e81e9fdbe33a043f78049b9e29a431c6d21"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\412x915\\story-reopened.png",
+      "sha256": "aba7a58136986debd8e7baf9eba4aa08a60ada49d39c74904414467ea39c0b7b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\line-00.png",
+      "sha256": "cb22b3309414c2679b34c903f094b428844924b172f69cc41291fa3bd9992202"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\line-01.png",
+      "sha256": "163626c38ca8b5ed872bfbb0c10ff9080056ad0a613096705bf4701881c12e8a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\line-02.png",
+      "sha256": "585e176179078a37ccda2052569245f1d6a6def3e709c39c17071ce8aa274a00"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\line-03.png",
+      "sha256": "b7a0e00d9a4f3cc724d30b063dadfd40094b41054575c8d7d25c65982e74ceae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\report.json",
+      "sha256": "a3c9149b283ca686121e33f26f0ba39dd86dd59f6f586bbdf2e6c2f0b1642d50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_01\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_01\\1280x800\\story-reopened.png",
+      "sha256": "b7a0e00d9a4f3cc724d30b063dadfd40094b41054575c8d7d25c65982e74ceae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_02\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\360x640\\line-00.png",
+      "sha256": "c1be5266d4b78c35f9de1ff583c81681b7e7482a26d89863e5fd7b1b11eb08bd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_02\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\360x640\\line-01.png",
+      "sha256": "809a8324bcea1b24b7d414b578a0723631ec605cdf40c5ee0e446bac303170f5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_02\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\360x640\\report.json",
+      "sha256": "5f5ab71e2164d5042598e2333150ca2ede70f18c7df851e6ee80702f3828f9a1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_02\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\360x640\\story-reopened.png",
+      "sha256": "809a8324bcea1b24b7d414b578a0723631ec605cdf40c5ee0e446bac303170f5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\393x873\\line-00.png",
+      "sha256": "9be18f0c21d9baf822800f4d6870bdc7a0366d1e09f73983a3715a310fe6ac51"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\393x873\\line-01.png",
+      "sha256": "d5884ad65e241129cb035ba2174f929458be96dd4d40aa34c16d09c496f392de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\393x873\\report.json",
+      "sha256": "f99bf460bcf9eeeb66bcfe1d5ec1c4a3f6a443cb5c976c3ea9f113e6d20499ef"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\393x873\\story-reopened.png",
+      "sha256": "67daad8ab0fc0929eceeb6b383f40d37ce2a2e2208d31d772c25517af871612e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\412x915\\line-00.png",
+      "sha256": "20ac19d666cddfa1b3e8f1c45a26c40ef15ba488d1fd28335fc8b306c8f86b24"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\412x915\\line-01.png",
+      "sha256": "3ed67ad30cbc7083938b17b66fffb3fe3b1708a4ecdec0081b07442bc1d8ad89"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\412x915\\report.json",
+      "sha256": "a5a52e481574a13327952586ba002faec684f46b2d50025d42d2f445f8622805"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\412x915\\story-reopened.png",
+      "sha256": "3ed67ad30cbc7083938b17b66fffb3fe3b1708a4ecdec0081b07442bc1d8ad89"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\1280x800\\line-00.png",
+      "sha256": "324a75a52ae97817f05d66934f6cc49b573a8751d4a5f36eec992e16e8cae576"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\1280x800\\line-01.png",
+      "sha256": "e875cb1cf78735ac889713988d37e5a2fcd3294a20558ebce1d9db97b7aab659"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\1280x800\\report.json",
+      "sha256": "1099dac367a8679c121dac9ddff0846ce4291364d7d6a0116e811b5f287d8fb8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_02\\1280x800\\story-reopened.png",
+      "sha256": "e875cb1cf78735ac889713988d37e5a2fcd3294a20558ebce1d9db97b7aab659"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\line-00.png",
+      "sha256": "c72fa8c0e2aeb396053c30a42c8d06a2afe734ed560e3a7ec9ba0f365a14ea46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\line-01.png",
+      "sha256": "8596ca34e828d77445b722f958b40f6c0420fc2925688d97f9777065d7513a82"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\line-02.png",
+      "sha256": "f056b18bd4f51c34a99e72f7fe3440d35c46eb9fde0d0ba0bb06b00cbf13ecf0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\line-03.png",
+      "sha256": "636132aac56434a9c9a0794fa826d4b97841071c55ee25292e4bd52b5ff30ab5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\report.json",
+      "sha256": "a9e6708c965af6e9eeb1a747fb808f7f88d1d279bf3c8a6aa4063b62afdbe9d3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_03\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\360x640\\story-reopened.png",
+      "sha256": "636132aac56434a9c9a0794fa826d4b97841071c55ee25292e4bd52b5ff30ab5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\line-00.png",
+      "sha256": "723740d32d5c20142fe0a9ad03285d1db3ed834e2ffd002fbccf3bb012211451"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\line-01.png",
+      "sha256": "ad0b2e1d72730820a59b9f2a56fe45dcf645852dc41181c915f2083a7af68b77"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\line-02.png",
+      "sha256": "4c9763ea9763fa8d10f1f683b3fecfa234c209bbbe4d49e088ac91b3f9a29688"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\line-03.png",
+      "sha256": "71d1dbad23f94300a90d79d98ddf0ad466fb5ec4cbbdb4289c3f595c112f4d3d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\report.json",
+      "sha256": "1c992a74e68a8482c2ba46189a225385e5aec7d0da56560773be186ac67ca765"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\393x873\\story-reopened.png",
+      "sha256": "79cb1d5a24b6956ef358e3d70728a98096b18e337919178e64ed6132bec819f6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\line-00.png",
+      "sha256": "5af69e3ab5cac13856739ace0714da629b69ea131dfc595a020eb8005676a1a2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\line-01.png",
+      "sha256": "490c1be06d12ab28189780a632acb5f3a13a53a0dccd5a1833ea6dadfe3431a7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\line-02.png",
+      "sha256": "5be9f3d865a3e5c2166762acae6490feddab54ed7440acca21bdf7516543d9fc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\line-03.png",
+      "sha256": "bfa8f5fc5f6fed9c22cd7d92eb38cc3ec46c7bc09f404f7dd755ffa28fee1733"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\report.json",
+      "sha256": "58d7b7f9cc04d2d74cb2f4b2090361a0facc62adc67a042ea1f21d907332fb7f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\412x915\\story-reopened.png",
+      "sha256": "bfa8f5fc5f6fed9c22cd7d92eb38cc3ec46c7bc09f404f7dd755ffa28fee1733"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\line-00.png",
+      "sha256": "13625fb7a9bcfe873db68fe6f7bd36d11da8bf26b354e984719cf97f48a1d38d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\line-01.png",
+      "sha256": "c9644dee0e44569c1e898f23fa7021b03db0528e2612ef9602b29abbb226bd03"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\line-02.png",
+      "sha256": "a97f1c193e5cb8ce09fe86993aa216796ef445cff375ba183663655bb1a6e2c3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\line-03.png",
+      "sha256": "c339b3b778d2ed85010e9ea720a67817f3902e707b3879a282bc9f4d8fbb0eef"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\report.json",
+      "sha256": "ee4fc6ed29cdf8ea34936ee70cab2ceb7af40dc1ccd2d2ead003cacf6569919c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_03\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_03\\1280x800\\story-reopened.png",
+      "sha256": "c339b3b778d2ed85010e9ea720a67817f3902e707b3879a282bc9f4d8fbb0eef"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_04\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\360x640\\line-00.png",
+      "sha256": "ef20c7acff1565f08b088e69ff9fb4c2dfe2c6fac242066bf758adadbc3797a3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_04\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\360x640\\line-01.png",
+      "sha256": "affcd85946426120675450e38dfa188851e6537971e065f0320380c1a8c2c395"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_04\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\360x640\\report.json",
+      "sha256": "1c0887e7e587256d5d4b2f48327bf1edf0fe82c6a052b21e2f95ef6d982547be"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_04\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\360x640\\story-reopened.png",
+      "sha256": "affcd85946426120675450e38dfa188851e6537971e065f0320380c1a8c2c395"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\393x873\\line-00.png",
+      "sha256": "ca79c34cedaed857060a044425783ec3f89a2c20c18c4bf6257ea514b8543f5a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\393x873\\line-01.png",
+      "sha256": "19de4a5901c9497e300454b517f1e2deb68e273aed7a9739336da727ed1ee219"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\393x873\\report.json",
+      "sha256": "df0a7c5409bbdf3cf901df598484ba09f4f74b7582ddc35a29ff82f6ab902f65"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\393x873\\story-reopened.png",
+      "sha256": "8f88e99cf2dfca929d36e8accc10543bb26aa432a363157be852e66a1a78e237"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\412x915\\line-00.png",
+      "sha256": "fba212457611cbac2794d6f6f126a2b3375e484aa8c21400942a22e2f3efe8cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\412x915\\line-01.png",
+      "sha256": "80f751be993aa642b3814aa43c7c296acc6bbd564b3a683cdccd8534fc44c461"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\412x915\\report.json",
+      "sha256": "956b80484c1eac568c4b1bfa74fdc02501988102b4f3ca5da42d957f49c3bea0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\412x915\\story-reopened.png",
+      "sha256": "80f751be993aa642b3814aa43c7c296acc6bbd564b3a683cdccd8534fc44c461"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\1280x800\\line-00.png",
+      "sha256": "b1232b9ee13d0434b7d92e6b831d090ca80bfc7bf2ce1c60912ac227126daabc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\1280x800\\line-01.png",
+      "sha256": "615ce6442025fe7d0a6748b82eb7344579aca352169a3f1520171689fb64be05"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\1280x800\\report.json",
+      "sha256": "6a1428c7afaecbe372ccccfff26e3955d580fb8db1fc741b9cf579864ac224a2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_04\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_04\\1280x800\\story-reopened.png",
+      "sha256": "615ce6442025fe7d0a6748b82eb7344579aca352169a3f1520171689fb64be05"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\line-00.png",
+      "sha256": "33083a96cedefba39efb883844ca34274eaabefd928b73cddff1522265a5827e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\line-01.png",
+      "sha256": "6998cf29c197e5231c766d2e1d0f35e7f9878d8279faa1a2f715fff5913f5594"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\line-02.png",
+      "sha256": "6bdab922bf632f7e0adf086f37f6f05dc6ea2bb81ac259a467d7b7625e2691bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\line-03.png",
+      "sha256": "70a9177bbff84cea84c74781b0ff623d4eaec4b7ddcbd73124e7da95d20dce96"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\report.json",
+      "sha256": "7972b1e1694b4eccbfd01eaa9cd0c456862d6ee6d577e4cb32bb78eaa2ae4fc0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_05\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\360x640\\story-reopened.png",
+      "sha256": "70a9177bbff84cea84c74781b0ff623d4eaec4b7ddcbd73124e7da95d20dce96"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\line-00.png",
+      "sha256": "1412d909e018a2ea059108243b5c6f86b40d96205e805ba0d7263cf5d0c540cb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\line-01.png",
+      "sha256": "eff4a38573ca5c01459644297e4e9b7b059fc44d473423b766a9cb9e6c03f3dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\line-02.png",
+      "sha256": "a4b7d176aee5c66bafa2b61b62acc504b6a0401e0ec3c542d1168cd50c35e26c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\line-03.png",
+      "sha256": "7fb7ee3b5e7ea0cf2338cdec50a5874e36c548dd0d2ec9b9053114cb715fc43a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\report.json",
+      "sha256": "bf063be34a6a36919d9de6ee937da5c756718f58ed4f06ba0880320caa050479"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\393x873\\story-reopened.png",
+      "sha256": "c9565d928d499dfda9a48462c346286cab17ed10c80bdd6806917ea243f0fb85"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\line-00.png",
+      "sha256": "14c484c9606035dbbb592a1d15c08ccecf35c4efbe9d2e4a3dacc0b9736b4ed6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\line-01.png",
+      "sha256": "cb03981c2eb41e4a8a34f1824b9ee45191b54e2cec7aaa38d4d21f7ad196c148"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\line-02.png",
+      "sha256": "cf7f04a33e707c8a4f93307fd964734a17ac99ee7fcc3719f6dc99998fe39d2e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\line-03.png",
+      "sha256": "33ed336dceeefe99398bd51b0020572acdda53e404dba32889ad0d5ae1d383af"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\report.json",
+      "sha256": "a3ce485955360009f8f0f814afb4bb49054f6565f842b1d863715e5b90ff4145"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\412x915\\story-reopened.png",
+      "sha256": "33ed336dceeefe99398bd51b0020572acdda53e404dba32889ad0d5ae1d383af"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\line-00.png",
+      "sha256": "a127237779fc2dd2ff11ba70c91b2c1601846975c6a82b23157e0d1f30ad1862"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\line-01.png",
+      "sha256": "97a2fce3a4c6b83e8cc52cc2a079f587f2955b33891278ced941474e2b688785"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\line-02.png",
+      "sha256": "301cd98c3eab1d9b0006f4392ca767c794e666ee60511f259ced93c5c40af151"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\line-03.png",
+      "sha256": "f3eb4d02228df7c2516117d4ed0af0119b6a32e8fec248b1f8ab2027e0d4ce56"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\report.json",
+      "sha256": "5a6546fa1d799e4a273a1bcc9046fdc20afa4656e20a6a0f9b1819ebbe506f7e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_05\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_05\\1280x800\\story-reopened.png",
+      "sha256": "f3eb4d02228df7c2516117d4ed0af0119b6a32e8fec248b1f8ab2027e0d4ce56"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\line-00.png",
+      "sha256": "899c167004de65169c74c3fbfb5efd7837303496e5fdb8b70c26760cf9f5f0ed"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\line-01.png",
+      "sha256": "326452131d1b548ebc04579fe508b5748ea363de64ed8e703a4972b3399bd40a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\line-02.png",
+      "sha256": "8cae78931170766c75bc3b8629403739d95a0eb354182ca9f6a7ce7c33f5f519"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\line-03.png",
+      "sha256": "86b54f5fe16419f92d0693526b25d116be24b40e7dd6996871dc1acf352b4d55"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\report.json",
+      "sha256": "9258293d6d120eab98eea89d5cec90f9f9df19e4c04fe268ae452c069c37efaf"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_06\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\360x640\\story-reopened.png",
+      "sha256": "86b54f5fe16419f92d0693526b25d116be24b40e7dd6996871dc1acf352b4d55"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\line-00.png",
+      "sha256": "a42bc02286e0ae639f4fae4dec02cec2e1fe68a06ef6dd838faffe8f24aeabe3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\line-01.png",
+      "sha256": "21b55c9e4d7d46b758cda8984ae9286889d60e723cd3a9eff1cc7b1aceb01a86"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\line-02.png",
+      "sha256": "d333fd67a11e7c8de358c36a11ae1064e1332902c2bb3b6b51857e3637e16067"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\line-03.png",
+      "sha256": "ed3107603f5814b284bf59c59819086f33dbf79b36ec2cfbfa045301cae7a083"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\report.json",
+      "sha256": "dd0a524fe0b49035c0c7a4330c5e0210ae78d4fe5eb0747580f5244769c2a2a4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\393x873\\story-reopened.png",
+      "sha256": "db5300dfbd35517c7535f1d72968e5c1997ccfa60c847caf96a1ef872e4fcfbc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\line-00.png",
+      "sha256": "3dba8dbe8d9f8eb2c60b82336c245fdd323bf41aa1a884d00089e635ca4a656a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\line-01.png",
+      "sha256": "e75a1203ce37560afa7b77134781ca06d88a594a031dff626e7ecc5b04def716"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\line-02.png",
+      "sha256": "12a6fa813a6317c2b2daf668d5aa3b2d6527b2797d81c5a7e75cfc20061f9791"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\line-03.png",
+      "sha256": "4ef0ac305285fe2408885ff63345a138fad238572a2abb7176deaab86895ffd2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\report.json",
+      "sha256": "384cc8e6d6b43cc34d3872b589a512e30bb50c25ab006a6bba4b24ef4efd9a33"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\412x915\\story-reopened.png",
+      "sha256": "4ef0ac305285fe2408885ff63345a138fad238572a2abb7176deaab86895ffd2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\line-00.png",
+      "sha256": "ab0c62df68a0c2972a0176ff2fe270f6381b92b6137e7891246b122ac9287f2e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\line-01.png",
+      "sha256": "dd8d0381e74ab5f7468a8340dff7c222bc339c45992478afdf081b496f765f8c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\line-02.png",
+      "sha256": "7838a9031935c6a09489ade6c3c69e2d383fbc46e2f42aafeac32a2a8c0383cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\line-03.png",
+      "sha256": "65a3fb262a35b8857f751a9438ba4263e131ebaf1c744581465c05033efa1e42"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\report.json",
+      "sha256": "410ed3612b9a6c4117698e323bca3e15e8a8737b59a90470c8548344059c819a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_06\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_06\\1280x800\\story-reopened.png",
+      "sha256": "65a3fb262a35b8857f751a9438ba4263e131ebaf1c744581465c05033efa1e42"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\line-00.png",
+      "sha256": "2aaccc0cddcb18eb4932cacfdc70ae18ae0c6c999702f14ee6d66fee65f56787"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\line-01.png",
+      "sha256": "da26364827b2088aa2d4db35704b34196628d3888832fe3f91ea65add6f54beb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\line-02.png",
+      "sha256": "c84bc66e8ac6f8c3477f7d44b7660d099cb7ef94333614c13c0388048d1baf8e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\line-03.png",
+      "sha256": "2f1f040677bc3409f506a6fcd7624ffbc3b7c815c597b9920df4bbf03216bfb2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\report.json",
+      "sha256": "926d3ba5233fbda477526cba13e2d987dceaed217ba1998a6961cd3205a68fe5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_07\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\360x640\\story-reopened.png",
+      "sha256": "2f1f040677bc3409f506a6fcd7624ffbc3b7c815c597b9920df4bbf03216bfb2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\line-00.png",
+      "sha256": "86068e61b0be579cae8219a479b1ca3d347c9898ec8158f77b936bd76298cbb5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\line-01.png",
+      "sha256": "84e82680bff3a13a97e82d25e2b23b0178fed8ba522af19e0cfa6fbbfa27862d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\line-02.png",
+      "sha256": "9ee228917daa5470e66755cf95101e8d6cd3d11661d52f09d0930e16f880d6ff"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\line-03.png",
+      "sha256": "d4accfb184fb6a7025f5fc47f570d736874d582994fa5c95cbf20aa6845432e0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\report.json",
+      "sha256": "4e4e5fee8b30078b1a41e0719dd0eaeb5613069a803fcc2893139aa0414834d2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\393x873\\story-reopened.png",
+      "sha256": "0c10b63145cecc2131c95317b9ea8d7374d2c549178667c85f9c6ebeb53614a6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\line-00.png",
+      "sha256": "57f1a2730979604463965b03100bb2ca55d54d4d089829b239d9f92ccd6f442b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\line-01.png",
+      "sha256": "dc421d8b637629552d16e5cfb5b2b1a47c911fa1aa334e39bf32693cfd857225"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\line-02.png",
+      "sha256": "e3f0f4948580dd4ab74de9459aa1aeb98a82ca062e5e28f0155d653d2232bbb0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\line-03.png",
+      "sha256": "e0547eebb9ec686aec67f786b49bdec8dad3c6cb092f419ce1ba7f38d2328b46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\report.json",
+      "sha256": "49f3823172618f81acc383990d90898300c3a816c6dbf60e731a8682da841040"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\412x915\\story-reopened.png",
+      "sha256": "e0547eebb9ec686aec67f786b49bdec8dad3c6cb092f419ce1ba7f38d2328b46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\line-00.png",
+      "sha256": "cc26232184845e0f289ac0fe648ed7fbf9655538bbf733a673093207984302ef"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\line-01.png",
+      "sha256": "dbb86e21559fb76dbaef0091b02f5de878c230a84aa99f2a7d70b5acc48eb401"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\line-02.png",
+      "sha256": "4ecb25b862c7bb3e3070c5398e1d7713ff022ef7bbae4c306dabf40270994a4c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\line-03.png",
+      "sha256": "4b8172158bae2fef615761dd62bc4f0a3796ce711a4640b50e611f29aa2835ae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\report.json",
+      "sha256": "b8c35ffd9e1df3e89628921793abfe09cda55c34740b5495824384cca87b49e6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_07\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_07\\1280x800\\story-reopened.png",
+      "sha256": "4b8172158bae2fef615761dd62bc4f0a3796ce711a4640b50e611f29aa2835ae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\line-00.png",
+      "sha256": "12ddc11b7b96d63c079416c9624ab09ca377a6864e42413546d6bea34e909813"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\line-01.png",
+      "sha256": "3c4355ed7512fe1ded9f84afcf5a31c2d7e83079f00287ac2747a8067c35b45a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\line-02.png",
+      "sha256": "9844d6a26105800c9931b678b7c4cafadcbb6961c141a3e06fa0cde0e76ae5df"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\line-03.png",
+      "sha256": "3978068f1e0ad55dd4eed4ad1f6ad13c96131dc249efb5f6b21f52973e4ccb09"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\report.json",
+      "sha256": "21d7c5174bff6cb07f80012328f184819b2f5c171fb232b95485c52c32f64dfe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_08\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\360x640\\story-reopened.png",
+      "sha256": "3978068f1e0ad55dd4eed4ad1f6ad13c96131dc249efb5f6b21f52973e4ccb09"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\line-00.png",
+      "sha256": "3ca5ba1fc0525782f86eadf17bb7624459e9c838315375262536643a7bf4df83"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\line-01.png",
+      "sha256": "d8066696f40043f9d0986bf12ececb01f18236a60605cfbdd23d350f6e760176"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\line-02.png",
+      "sha256": "725b8c80cbb47a5c5e0a23f99380578e99ba963afb1e5877d7e1278fa3c89d6c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\line-03.png",
+      "sha256": "ed9a4c1cfff6255ea009ae5bfe2c19049ac640acbe413cfa28336d5f5c175df9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\report.json",
+      "sha256": "00621141c75c56f780326bd66f7feccecf0fabd792277262ab5030d27e23396b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\393x873\\story-reopened.png",
+      "sha256": "25927a525d4b1df2b1ea0117c32b3971fbcfb536df1df1ad340a61c92b14557a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\line-00.png",
+      "sha256": "7815f82b40ba49f29a062e5d14d447183a420ce3f64bcabe624492c5464a5f55"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\line-01.png",
+      "sha256": "62eb9abdf873ecfbd79279c5daee92d1e5dd1ea9e167c258c3dd53ceccb5f2e1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\line-02.png",
+      "sha256": "42b54000ac45d1d615c6bca2a36bd7d76a2dca4a7f00f8f3be8eab82d6cd55dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\line-03.png",
+      "sha256": "941614062f72e55f2d96c7adbe8e94ba88c59560bd0a2d7d1c6f8b1eb0111424"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\report.json",
+      "sha256": "bbde8b78569f746687c971213f343227d2c3329e10ea7990867146bd43b3e481"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\412x915\\story-reopened.png",
+      "sha256": "941614062f72e55f2d96c7adbe8e94ba88c59560bd0a2d7d1c6f8b1eb0111424"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\line-00.png",
+      "sha256": "1cd540a3482c0d8d7dda105b01ddd14b9f46bb45ce63937de3d6093cb1fc1da1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\line-01.png",
+      "sha256": "8d9e4f38b47ca4677ee2154f6870195fcf3a6ef6f8d3b7028cfb48122bb523b7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\line-02.png",
+      "sha256": "afc6709d673d23dc5fbd5effacb8c8d4b08cf123e92c480f975685d99856731e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\line-03.png",
+      "sha256": "f597b71e4e34cc5be48c1d5e9e8587cb3b770a1a559f0a80c1b2a32d3d96436e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\report.json",
+      "sha256": "71d07a5e80633fd49d8a8c007044d78d1bd260a97cdc3ad7d6d2462f51aef8a2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_08\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_08\\1280x800\\story-reopened.png",
+      "sha256": "f597b71e4e34cc5be48c1d5e9e8587cb3b770a1a559f0a80c1b2a32d3d96436e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\line-00.png",
+      "sha256": "bfd3f0519e70865f65c4a5be3641c6dac00ceaad23a8341134cc6e4db717a7fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\line-01.png",
+      "sha256": "71366e74f1c36e7c25543583ee5e57d7c0801b1aa58fdae24e12648c4bee3c26"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\line-02.png",
+      "sha256": "21ed216e6a8d4f23071f95cfe1801b3a3d8171c4c70c71ca3a64e62812347825"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\line-03.png",
+      "sha256": "d3cad94d56a5c856c48717ba25731b6362c7d56a59b9f72e1cc26faead15394b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\report.json",
+      "sha256": "aa97fe75c7ce8614b689b8d08061f3c31241509fa64fdadc316c69fc020e3787"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_09\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\360x640\\story-reopened.png",
+      "sha256": "d3cad94d56a5c856c48717ba25731b6362c7d56a59b9f72e1cc26faead15394b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\line-00.png",
+      "sha256": "75df6585d4ee29747f0fe7425048b9c2ac96e042828f6f1d0a0a907d54b95472"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\line-01.png",
+      "sha256": "0c5fc88a2adf74dfe032d753726f1c7c941f087efaffb40f27a36a120d838e71"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\line-02.png",
+      "sha256": "f4cbbe8aa6e51df4f72ee7a79548308688bba7453f122d2bf833a61f3b480a8d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\line-03.png",
+      "sha256": "69bd00094f9fbeb500ac5631a4bae50a150cdef90681a5253269db7ce848b51c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\report.json",
+      "sha256": "0b8195f24cdaf2585315d5649310065ae6d1956f43b66211753914f88d3958c2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\393x873\\story-reopened.png",
+      "sha256": "cbd2d0ff809a50979347ed40ce432b774700106d75e76e6a5ba410299fd16235"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\line-00.png",
+      "sha256": "5361708b524cd559db75445bf7061d9ba920fbaf3a3c0538d0197261accd618c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\line-01.png",
+      "sha256": "2132696978f1f6cce95e7b8d3742984257fe70dd6dfcecdda1fd6625c1603550"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\line-02.png",
+      "sha256": "5245a1b9c75ad978e81b12224aad2ffbc15a98f2f442f56eea2dc7f2f4fd07aa"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\line-03.png",
+      "sha256": "2bff13cda95bac6dce84b5cbc07384fe91d7d9840f080c0dc509d20711f6447e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\report.json",
+      "sha256": "821ca487b708d4bd3b14b9c8c76cf6306cf6aed034a121c2abe0678528fb97b7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\412x915\\story-reopened.png",
+      "sha256": "2bff13cda95bac6dce84b5cbc07384fe91d7d9840f080c0dc509d20711f6447e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\line-00.png",
+      "sha256": "3f49762be26bc15c1dc7da4625d99991e35beb4d999272807148c8d3e3be0d4e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\line-01.png",
+      "sha256": "e9d55f0281240b9546e0071818d7090923654fdbec35632b8701c8e01f11cd52"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\line-02.png",
+      "sha256": "a9826d2574d7e6a3b9e4d7f7072dbabc9e40d278c07bef9b5441df42f1fa2337"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\line-03.png",
+      "sha256": "72b36557867621284f6ab4c936e857d7390edf2fb3704d8717137d41cdfdc81a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\report.json",
+      "sha256": "526749d8d71e5f40e6913ecc4f8bef8bced9c797a47ccffd2e1a8dabc04a08c3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_09\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_09\\1280x800\\story-reopened.png",
+      "sha256": "72b36557867621284f6ab4c936e857d7390edf2fb3704d8717137d41cdfdc81a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\line-00.png",
+      "sha256": "d12d19f2293290fd035e2c9d258ac3787938806ec7f38fcd6345c54c59e4b482"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\line-01.png",
+      "sha256": "a6c669eee998fbcb291c72a51c34b95b9773db43a0adc9a748da531e3107fc50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\line-02.png",
+      "sha256": "faf4521fef0b9faecbf514be45a5a1ea772c20f5aebe508bfca5b41db60a535d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\line-03.png",
+      "sha256": "fc80ebcd153604184090c8fe627601b934716d196d08f2a120f2599cc1c38fd7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\report.json",
+      "sha256": "57453df47b3cd77ecfedac5205efc0adad4c2192d9708a70c446a05019613504"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_10\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\360x640\\story-reopened.png",
+      "sha256": "fc80ebcd153604184090c8fe627601b934716d196d08f2a120f2599cc1c38fd7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\line-00.png",
+      "sha256": "43cbfd5e6fc4826fb05dc8b99d6413c8376b5de581d2595c3f0975d1695fb6b5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\line-01.png",
+      "sha256": "138099292341754eb026090f25e6d2d88dc02c3bc5481585fd885ca463b08bf9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\line-02.png",
+      "sha256": "287f8647522aafa31c92f130b91a6849c41bb9de0fb0c2adb31b1fa121587dc4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\line-03.png",
+      "sha256": "573131e5796d2ca7788470eec20a342dd198acdfc9ae7328572977138223ef43"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\report.json",
+      "sha256": "63012e2f89f91bc0e3efd353b90291c78ddf79cc6f962233a53a65e571fb3001"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\393x873\\story-reopened.png",
+      "sha256": "f33dec924f79d24a09a824bdc880074d37607a0d72e7ac24618dad17212fb468"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\line-00.png",
+      "sha256": "e53ff9c57d2fbbcba013495c0df7821a5e87548c6e9f585b4ec7c2ddcef7bf84"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\line-01.png",
+      "sha256": "d4f53e332043eadaa36eea1c29a7d82af0711888d821c2edb6997a648511f4e8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\line-02.png",
+      "sha256": "d03836a0fd1931b1df2ce0900a7d3c80eefdd7ce616dc2b332a05e6cd15715b3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\line-03.png",
+      "sha256": "049f420766e9ed6840ebee2431c98665118a6b89a569457409cb30661fa6ff1b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\report.json",
+      "sha256": "51f516dd84d57767189dfcb9990ed22bbcbfe7a5e86a0f246045ae7ded299af4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\412x915\\story-reopened.png",
+      "sha256": "049f420766e9ed6840ebee2431c98665118a6b89a569457409cb30661fa6ff1b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\line-00.png",
+      "sha256": "6d6ff13658ae941a47e377f998869eedb4ceb0efe451a2d2d3677dfae3bdf99f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\line-01.png",
+      "sha256": "48812e588f694f700b2f627f677fb12a5f576cdf8624e9c8d55d0dcb03f81246"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\line-02.png",
+      "sha256": "dba7f43d7568df8d06b1561e21c8d9bd76344ed3b2cd8b8d23fe399507a6f5ce"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\line-03.png",
+      "sha256": "0d6d0b1cc7b259c08fc4aeef075cb2500f756d6456c5dcb823c40d92f229578e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\report.json",
+      "sha256": "e98661020b6ea87d6a288d151b707ee4e66d7cd28fb78bc0699bbe051fd3b9fd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_10\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_10\\1280x800\\story-reopened.png",
+      "sha256": "0d6d0b1cc7b259c08fc4aeef075cb2500f756d6456c5dcb823c40d92f229578e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\line-00.png",
+      "sha256": "06cfcdb65e7fce87257bdbf6f77447eeddb883d62848fb3127ab16fed780b0a1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\line-01.png",
+      "sha256": "9a0c356fb10a234312bf7f0509807c912f1bbbbc26033b785c1b8ad8fb942163"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\line-02.png",
+      "sha256": "51b27cb5aa0f62c3ba8d340c51fc7da3e68e56733e779cb4ddf78a3ad86a265f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\line-03.png",
+      "sha256": "d4c26d857fb941a1488dfbc0f2cdd93636fa73824f27d3c082fdf0ff4f0c57cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\report.json",
+      "sha256": "fcf14685d6067e7e6ed11850021be66ba86b10a176d98d3927f2b4fbba2ae54e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_11\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\360x640\\story-reopened.png",
+      "sha256": "d4c26d857fb941a1488dfbc0f2cdd93636fa73824f27d3c082fdf0ff4f0c57cd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\line-00.png",
+      "sha256": "d47eff8d9a5cb99580a99a17cb07a327a7baeefdab47c87f6f20099fc458cc6a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\line-01.png",
+      "sha256": "edb55e3b046d10bf078666e0b52d7380c5d31423572c50539b1f5adaa222b461"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\line-02.png",
+      "sha256": "03bd3c11650b3e5d5d5a0e9e3e7f15a34f9e76ee4143370e4ef0393f543c57da"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\line-03.png",
+      "sha256": "61e67cff86974d684804632c14a52a51219753ca48a598b44c554a6a3425eaad"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\report.json",
+      "sha256": "45f436167c698015d170f265f89418deb2d08b90b35d6a382ff76ede65ac330c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\393x873\\story-reopened.png",
+      "sha256": "be757a8cfe3996398a60a74bad10efb468780393905f65e4ebc98ba28aa14e88"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\line-00.png",
+      "sha256": "732dad255f7d419729957fff2e51e0a1912eb540a0e5e1987a30e37a27601514"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\line-01.png",
+      "sha256": "0d5fed877a5ad276fe0098890dfea75cb37c9528b7bddc4bb5a393f75121d9fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\line-02.png",
+      "sha256": "b4936548a81e17c3110b4e767ddf6ba3b1304406e07d267792df99ecf6d360d7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\line-03.png",
+      "sha256": "bf1f6b8672b98d930562a3258e41122fd9f483609818ff1dff24aacad0407263"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\report.json",
+      "sha256": "5134d3b74dee2e556b7f108577d94c871452f265e27ce0a1ce28225841057db1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\412x915\\story-reopened.png",
+      "sha256": "bf1f6b8672b98d930562a3258e41122fd9f483609818ff1dff24aacad0407263"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\line-00.png",
+      "sha256": "fa712082bce33d3de7efcad934d91ed689b4fb401b72f9be7b6816c01b658597"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\line-01.png",
+      "sha256": "ba61cb8944cab943c8577cddf567520b636f9b43e9142305f2c5370bc8e2cae2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\line-02.png",
+      "sha256": "a7f21f85cac22052e8d2f2f1c16d1da0acfe9a09c840264c69e3fb46cd32350d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\line-03.png",
+      "sha256": "6fe14574be276d17d1ee5fdd0014e2094cbae0118353917f5574c49c6fcab8fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\report.json",
+      "sha256": "ee65d386b4e23d5ee4c5c3a2afed75ca2b45784ebe93dc04303c8f2535a62c5d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_11\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_11\\1280x800\\story-reopened.png",
+      "sha256": "6fe14574be276d17d1ee5fdd0014e2094cbae0118353917f5574c49c6fcab8fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\line-00.png",
+      "sha256": "63715a2a9945fdbf2c510e1957fe990d0a011ab470f5c9a90c2620bb1c2feb4f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\line-01.png",
+      "sha256": "61b438456f86a01e2d93aa526f1ba6376479816021cf6961aabdfe9073350f2a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\line-02.png",
+      "sha256": "5a15dd0c1964d540ba349b7840731321e508ea95fcf16e71be42fba1ec6aeb4b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\line-03.png",
+      "sha256": "e7d219ff4b2d02bff1753ac73eede7d84797ccdf9725bcbfed6a162be6350a4f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\report.json",
+      "sha256": "4405e1cc5d27fcbf09b2ce3f987da919eb0d691006f6e00bd2dae0dd524c37d3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_12\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\360x640\\story-reopened.png",
+      "sha256": "e7d219ff4b2d02bff1753ac73eede7d84797ccdf9725bcbfed6a162be6350a4f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\line-00.png",
+      "sha256": "ba7f706d78d405aa8a065ab45facf27ce3f9418d00cc70c35831dd4bbf0fd041"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\line-01.png",
+      "sha256": "5e312279045317a61e62cf5ea5b7378f384decdf2dfdc0fdf18c3f60ab503df2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\line-02.png",
+      "sha256": "aa07b887de5db42b494db702a1f1a033040d3813ccbff2472c008eb53b42700c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\line-03.png",
+      "sha256": "7f04304a9b1fc3647a5c6d03a00112809b3ee387f5987925303deb4f704c67df"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\report.json",
+      "sha256": "4d94347377c97889daa7971f58d876bc446f9610a87fdc51519bec3e9ff93928"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\393x873\\story-reopened.png",
+      "sha256": "b9b14a3f9e6ce4f6b9d81351aa14804e3f3bff8bd76f7d7ca2425478d506f048"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\line-00.png",
+      "sha256": "df60cf51f6a47f0fbcf0d1307acb706caf7fc0eb3500ffb187789642d4a304d9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\line-01.png",
+      "sha256": "f003ea8118305ee98af3c0531073cff76c180885779bba2661076d84197a0e6c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\line-02.png",
+      "sha256": "2cadd68e10e43b5aae33f8a29755f4b8181b9d49b1dd4e5553d54cf3145c2261"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\line-03.png",
+      "sha256": "9317b1e7f3c0d22b0a0f84618bdb80511881a452f9b39e197e08e2568d5c558c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\report.json",
+      "sha256": "98389822cc5ef47802d1d52f8b2637d597cf371f4d10c1fc863b45b50e49c3e1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\412x915\\story-reopened.png",
+      "sha256": "9317b1e7f3c0d22b0a0f84618bdb80511881a452f9b39e197e08e2568d5c558c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\line-00.png",
+      "sha256": "cf08e822f935d903dd110d7c8a4c325572244d28eeaab52f6a33adf7f777932e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\line-01.png",
+      "sha256": "650fdaa3abd642838b76bf087780e663b132574530d4a293c8d675c5b67c094f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\line-02.png",
+      "sha256": "a4d948c90863e065fe43b970d655baef426a0f270c5e1da502ed7156fe3206d1"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\line-03.png",
+      "sha256": "2b29e7658e145b972845c57f6373809e978577d7302abe64b926867b1bfbfdd6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\report.json",
+      "sha256": "9c625383008c940c3e694ef062b892a64487cf845e64e35d77b033209bc317c4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_12\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_12\\1280x800\\story-reopened.png",
+      "sha256": "2b29e7658e145b972845c57f6373809e978577d7302abe64b926867b1bfbfdd6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\line-00.png",
+      "sha256": "99c3537e8f916ea6a6b756abc53dacc25ecd708f150d6f4f6445ae9e57304cda"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\line-01.png",
+      "sha256": "d381dcc120a3d6ca96855e6a213fcb726ed28cc1726b11199d75a60ad15e9971"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\line-02.png",
+      "sha256": "1d1c2b9eb25c207915a34b26bab60b703bb3c76bbf0e250f121ed90cf89d8c71"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\line-03.png",
+      "sha256": "1aa392668c8d4f18c5b8440f1e242c17c5a534cfbf609abb3277164b7d96fc97"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\report.json",
+      "sha256": "09aa858e82d84b1a32ddea63de3165678358980310be5e88396aaa860463bf6d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_13\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\360x640\\story-reopened.png",
+      "sha256": "1aa392668c8d4f18c5b8440f1e242c17c5a534cfbf609abb3277164b7d96fc97"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\line-00.png",
+      "sha256": "c1a8cb8d28474f8ead08cd94873e5df1a11fe9e82f58de7f2e381712d30727ff"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\line-01.png",
+      "sha256": "8adc144523d445250cbc29dbf013bb87d1487eb17fdeac40fc1123a708dabadb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\line-02.png",
+      "sha256": "05516d5da0a1e29509818f55dc4c667083254396f681fc0da82b10049ca17a72"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\line-03.png",
+      "sha256": "c2ac714c87ad49ca9a9fcd53d842c8bd41c9e5e274e4dc9a155e52f4547c94a8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\report.json",
+      "sha256": "8347b7301068fd0ee9e976958b7b0e38e4a7d0541a6424ef7e0d549b9b25d7b2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\393x873\\story-reopened.png",
+      "sha256": "2790dd1b6356665e42c048cd00addaffbae894adde8fd2767a2ddacb0df00b61"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\line-00.png",
+      "sha256": "d70d95bb2720117b5ec0cc31f6d125f3f3d6d0f8eba6a33c8ec6e72fac72c28c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\line-01.png",
+      "sha256": "21f4e28c55d4189a0d9c078b8fda13543f27fe70f805eeb8b7a284811689c549"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\line-02.png",
+      "sha256": "f3ac63e8be65cdaf82783375a086cdcbc21a27d235d393b9aaae20183f126e53"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\line-03.png",
+      "sha256": "baa3839d12884d99d865bece02286e50f42ef33c98208267479fa95cefac28fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\report.json",
+      "sha256": "b28404baffe7bb913ec8499b92ccd4cc4d14a5b656a9c9a408b08aea1889344e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\412x915\\story-reopened.png",
+      "sha256": "baa3839d12884d99d865bece02286e50f42ef33c98208267479fa95cefac28fe"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\line-00.png",
+      "sha256": "1229130adb1d6c85176395683764ca1654cfd03749f3284f6dc849dce21e11a0"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\line-01.png",
+      "sha256": "d4073fec759fbf2c2c0e8ff133f69be694b58a60e14cb28f1498fd83cc8bae31"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\line-02.png",
+      "sha256": "fca530695f8fb59641715be3b152b85ba87badd2360f5c429731ea65efe573be"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\line-03.png",
+      "sha256": "a2cf85a04c45f5df57af525df87e50c04dbf45eaa7a5ed9bd5db29c2fcd98a17"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\report.json",
+      "sha256": "f434a0c88214d085ac83316ed82f637fe7abbf6f763d76c6bffc51eb3929bfc5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_13\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_13\\1280x800\\story-reopened.png",
+      "sha256": "a2cf85a04c45f5df57af525df87e50c04dbf45eaa7a5ed9bd5db29c2fcd98a17"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\line-00.png",
+      "sha256": "18d7de377c9f0591467e45d84d8ffa3f18026f5c2bea29729c5d0ef89750209e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\line-01.png",
+      "sha256": "a9793709900ca0b9a4091ca133a6bccac28b3dc1cfd7eda572bb76a8b7ac3a68"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\line-02.png",
+      "sha256": "5846f3ee3d788e5b377a6419c3fbebfffc0a488b62198f30ac48c17fd243cf38"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\line-03.png",
+      "sha256": "bc881d437a15e9b7f7eff77b70f801cd723bb864827412d8d0adc73790b503de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\report.json",
+      "sha256": "739f56aa1df30e85141a33cc8c9534ec2ffa042fdc37de6b9d0e67347b84f8bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_14\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\360x640\\story-reopened.png",
+      "sha256": "bc881d437a15e9b7f7eff77b70f801cd723bb864827412d8d0adc73790b503de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\line-00.png",
+      "sha256": "1960fe56ca4512b5e4e30ec79d699bed380e6da3b13c7da8a076d4c7de2ef6c8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\line-01.png",
+      "sha256": "f6ba440b8d4a9a2e66ed40266d6b128b6a78d0f24028c02bbc1f8fc16aea14dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\line-02.png",
+      "sha256": "40c241e2857cde42a6f37a3ea62620ca55fcfbacaa1a89460944a99c39440093"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\line-03.png",
+      "sha256": "12ca60aec502779c28c1312c168bc54748b304c7de6783afce7ce5469f87c02a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\report.json",
+      "sha256": "9f02990e3ffd251a11823f378027349eb033d6126b03c172781e32a9491ee4dd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\393x873\\story-reopened.png",
+      "sha256": "ccb96e67ea403861489b960b3dae3f619ce79b2b1ec2b1cc7d92e044ce0d64bf"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\line-00.png",
+      "sha256": "fbca8476b2d77d8c9715234898765bfe4d122caa1e4f4fdc6a65aa5fea68eb0c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\line-01.png",
+      "sha256": "3d48115e984b1074e0fa08a8905a084ebad73589f55d2426e78b08abe70e63bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\line-02.png",
+      "sha256": "b38ebd63bb2dde0551fec2c501eb195944c6f97c0b196c6683d272c17d47e833"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\line-03.png",
+      "sha256": "81372ce12297c3422f71ba7a3c60777526589cc5c331ce9bcb4182f24369a5d4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\report.json",
+      "sha256": "58048d6a6de12eb59ea59219afbf681518006d19713dd9f2ec67cdddc9ec9d6f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\412x915\\story-reopened.png",
+      "sha256": "81372ce12297c3422f71ba7a3c60777526589cc5c331ce9bcb4182f24369a5d4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\line-00.png",
+      "sha256": "3f071d0590e70096f47ea49c3067f6f0ecbd11c8097e99f80474c57a14392775"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\line-01.png",
+      "sha256": "5af814e958ce4d029ac022e6a4186203d8bb1b7ae4787ff056d16bc26a87b249"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\line-02.png",
+      "sha256": "1406a102880fb10d0a6efcad25fc9df291f0a2b4411be13d4b04d567380be57f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\line-03.png",
+      "sha256": "7b23542f4977464c3fb1c0fb3d06ad90d4871fc37e33df2abf265744e5a91c50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\report.json",
+      "sha256": "e25131ef3945312f131befca7070e5ba89672ea724815a92c42c4e4161c65c73"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_14\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_14\\1280x800\\story-reopened.png",
+      "sha256": "7b23542f4977464c3fb1c0fb3d06ad90d4871fc37e33df2abf265744e5a91c50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\line-00.png",
+      "sha256": "f1856b3c09d8c1a74b0af4bc63b840e0f36bbcfd3eea3613efc9c8ab676ad68b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\line-01.png",
+      "sha256": "a97323665d7f3a4a8f7acd3842c713ec5baef70defce2a259ffa04b89eb47431"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\line-02.png",
+      "sha256": "abd653da3c4d77a7d0e62aa4c62ecd39de96e523821f084c9421c1f276cc4260"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\line-03.png",
+      "sha256": "3e6ed27aa48312a6484956d350cfc59c38cedd71c28f41f24ec3ec53bad42b5b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\report.json",
+      "sha256": "02d55dd472fe96d2b8974e03fe539acf1b96a0b74063756bcd2222b9ba102af6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_15\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\360x640\\story-reopened.png",
+      "sha256": "3e6ed27aa48312a6484956d350cfc59c38cedd71c28f41f24ec3ec53bad42b5b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\line-00.png",
+      "sha256": "9880ada7a533d71de1b79e7b97597e25e88d8dd1e6552055c6322d007bbdead3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\line-01.png",
+      "sha256": "294d15245fc95547d743be081507a01e96a09d23efaad91d28a5c3666759348d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\line-02.png",
+      "sha256": "b5696d90ce7093e80c5866c274a62fb96d32d134ab54709d04a8aeb3a111b8a8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\line-03.png",
+      "sha256": "5fce901aa94e37027d61ccdc5cae61a15d431e38e993962c4a27bbc85b4228a3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\report.json",
+      "sha256": "13a7da57e8c31f410e37ca7d6a8f3e975648cdeeaf17b3a175749d85dbfac4c4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\393x873\\story-reopened.png",
+      "sha256": "8e05bb2253ef65211955494df9bb004adbab7c78036d166f6573dc236ce5b2cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\line-00.png",
+      "sha256": "df550c26b01744f583310cfda71a04f26a4506a84404472823ea3d4dd02418a2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\line-01.png",
+      "sha256": "272f3e3907f6626f6bd17a4f41765d5c23bbda9da3d3a16cc84c2a6f5cc82b6e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\line-02.png",
+      "sha256": "a241029a3e74a9fcf44a952595aa60cd9ea45ae9dcab9782158fc8c718926117"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\line-03.png",
+      "sha256": "291be3eec0c688f15102b5afc28ceb14c2af6d566bfd47a56a5d8fdbc7993677"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\report.json",
+      "sha256": "72cb0b8240a8685fc81251ddbfea9cfd9350f1a65865976b81b0c7d5a178667b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\412x915\\story-reopened.png",
+      "sha256": "291be3eec0c688f15102b5afc28ceb14c2af6d566bfd47a56a5d8fdbc7993677"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\line-00.png",
+      "sha256": "04cefc4632cfc0cc8f246eced15c5315b0cfb05a9898a1900dae803760cabdd9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\line-01.png",
+      "sha256": "103f2368531f58897f9ffc6133e87a5b7512a6edaa95cc9cae93992a542cc08e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\line-02.png",
+      "sha256": "dcd0f822d62d220f3ef924bf322c93d31af19a7b882c12a4efc39e76f21ea649"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\line-03.png",
+      "sha256": "1328d2a5174366ebc3566dd81ba377671a33dba23a1b895df1f02aba1370c5c9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\report.json",
+      "sha256": "59d9f7fd77872a94abcc7a06f00dbfcc8f0dee382c91b54e8dd22902d39a704d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_15\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_15\\1280x800\\story-reopened.png",
+      "sha256": "1328d2a5174366ebc3566dd81ba377671a33dba23a1b895df1f02aba1370c5c9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\line-00.png",
+      "sha256": "9457b4a29851705b0ca3ba86a77dbf8b49362fb79049ab6a1361ecc972dc5517"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\line-01.png",
+      "sha256": "84f33ed1a9cee03a6f2c9c71db3a20c7c5f7eaa54f1fc2d7846d2a72a6daacdc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\line-02.png",
+      "sha256": "a9936ce50274336f71c72dcfeb8a01ba53c7ca444cb6f89692fc89aac3b459e3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\line-03.png",
+      "sha256": "ad98936a3616a93605ede3a122ec8bfa6bad4b14e862667d9b81768dcc55fa90"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\report.json",
+      "sha256": "8a7c634270fd561f5633c524c182e1147adde483824e939a3953815df39d5617"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_16\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\360x640\\story-reopened.png",
+      "sha256": "ad98936a3616a93605ede3a122ec8bfa6bad4b14e862667d9b81768dcc55fa90"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\line-00.png",
+      "sha256": "d561a4c37473e086a593b579cea1b530db6ad0146e33928ed6ac8122e2c8f497"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\line-01.png",
+      "sha256": "47a99a3a7c6bf70c97cba3bafbab1c69478930dda063bc2f7b15966169f7b6ba"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\line-02.png",
+      "sha256": "74e26caeb472995bb8eee08f9e6b87c07f15d218d183b80a525db72f57412c97"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\line-03.png",
+      "sha256": "dfba5dac6373ff91cede97cfeccf6e84ce14ef88e040540b7ac8940f27f69be6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\report.json",
+      "sha256": "5334a3b9b4b401564b025feab118099dfd8f2285f6e3b4babd9b5a65ab0a7d0c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\393x873\\story-reopened.png",
+      "sha256": "87fffa9b8184ec2084f073b9a5cc1e88b54b3e799c1240d326b27afbfb8ca78b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\line-00.png",
+      "sha256": "1051c10dbdcc42caa1b30874ad2afa5a8676a0d309d34a961091132db6325ffc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\line-01.png",
+      "sha256": "2cae686ac1b56a52e1ee78bc9773682adb79fcc2d1402ee43fb8e3bcf6a4c913"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\line-02.png",
+      "sha256": "1688014df676a8e4831d0320abd9ba73f013fa522ae5d3eb2cf7501b72563a9c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\line-03.png",
+      "sha256": "e8c4184bcb1cff806363e4305ba53d33f138c302c7b119068f1079b5bbc6773e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\report.json",
+      "sha256": "23115e757dc312f0249bc4e8e7d5f914f1a7719b2e1fb6633fa2cddc408c00e4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\412x915\\story-reopened.png",
+      "sha256": "e8c4184bcb1cff806363e4305ba53d33f138c302c7b119068f1079b5bbc6773e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\line-00.png",
+      "sha256": "a65c437cf6c7d822d4668b9b59b019a50fb44525c5bdc0ff7baa9a9f1c92a5bb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\line-01.png",
+      "sha256": "2ce44117a689fb60eb95c6032d40b8d3593c2bd2e4cb59915a1e1aab6859d965"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\line-02.png",
+      "sha256": "73de9f1b130ad01fadeee1971484d46ab3dea4bbe47d6e409aaa0accf5c13393"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\line-03.png",
+      "sha256": "42d352be07bec869b75e3fe86560ca36240f81149abdd7414280c12a9eb137d5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\report.json",
+      "sha256": "11244288b752db7175649ea9905e6cfff1beda8870aa33793776fb24f217d079"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_16\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_16\\1280x800\\story-reopened.png",
+      "sha256": "42d352be07bec869b75e3fe86560ca36240f81149abdd7414280c12a9eb137d5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\line-00.png",
+      "sha256": "9250a9dc43b6ae0ec0835c87e377f8b7ece4c20f0f97237d80ce4581cd7b5dae"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\line-01.png",
+      "sha256": "a974bca6859aa6b33b1627940a4cdbc7c80272b9aa7519ec02513fee965f21d4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\line-02.png",
+      "sha256": "c851d4eff7968d84866abd487001bb3974f57743c7f23281654306a28b250a46"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\line-03.png",
+      "sha256": "796bbcd78d639a485b2d7f1660878844981874c58aa294c968b50ddc9f5f7802"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\report.json",
+      "sha256": "2fbf2b94e3895e8d1a22b0c923d055ec19aa059a291359598638b84e22cbc4f8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_17\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\360x640\\story-reopened.png",
+      "sha256": "796bbcd78d639a485b2d7f1660878844981874c58aa294c968b50ddc9f5f7802"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\line-00.png",
+      "sha256": "cae36a486149e6bdff8b61b64f58492b9c7dc5176b332fd8c01f06a892d1a288"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\line-01.png",
+      "sha256": "a3f60400b52235d25e69f1b4c184b79f58830c9e2d042d4e2c189297f3835224"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\line-02.png",
+      "sha256": "645d0d3874a735c5281a08cbb2e2fa8565868e24c1ff3bed8fbf47c11c66d294"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\line-03.png",
+      "sha256": "8308a3def322a3cf01bb44cd3c4d451fbdfe17e8153b9b793d272f5919ddb722"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\report.json",
+      "sha256": "da1d771e1dd5a861eab96f383e17271a014ed6f547f53d66c3e925e046afbde3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\393x873\\story-reopened.png",
+      "sha256": "1e97eee2db096963a0158fdb2e6fb4d7959c7e04ccbb29a815d747e86794010a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\line-00.png",
+      "sha256": "4b3fca6151ff3c82c5bcd8758b4337ff94edff5380611945e71aac2097414252"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\line-01.png",
+      "sha256": "aa70cff5e44a08a00a3a4f10a12a4fa7fa34258f443da11a2ee4793b7e9640db"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\line-02.png",
+      "sha256": "009e8157ee6a893073cee7ffb9dd6c7e41b53b46fa71be229e93b9b64897ffd7"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\line-03.png",
+      "sha256": "df9c704f28cb2f0c2d0b069a51a4a44dae5d8e7b1c1b4cf48ace06e8254b4d50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\report.json",
+      "sha256": "7ab97cb1d1e6fb0fb0f1896302d3b17f58aa18ad9629fabc941f25eac1d25186"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\412x915\\story-reopened.png",
+      "sha256": "df9c704f28cb2f0c2d0b069a51a4a44dae5d8e7b1c1b4cf48ace06e8254b4d50"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\line-00.png",
+      "sha256": "25a3d05d8ee075c3c4f22bb68466530e921903d9612bff6339e3ebd99f57b2c2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\line-01.png",
+      "sha256": "b5cbc247767419570cc96931cb8c6c2532066653b62b44163aad2cdbb5e2547c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\line-02.png",
+      "sha256": "e25f2a2167f2fa51878b9c2a9cd23f143a347ca817239e430a30ff851677351d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\line-03.png",
+      "sha256": "9c3a5bf7a29376044b4e83ead22ca24678501a7cd22c8b2ab849043f0910caf8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\report.json",
+      "sha256": "bcd82807638cbf65922226a0fa1a1e161a4c3f977bf9761cdd6f29f7382cd371"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_17\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_17\\1280x800\\story-reopened.png",
+      "sha256": "9c3a5bf7a29376044b4e83ead22ca24678501a7cd22c8b2ab849043f0910caf8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\line-00.png",
+      "sha256": "26486db1ba7a8b1eb0396f6e7767f3f585c02eb4192369adb17a38f62383b200"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\line-01.png",
+      "sha256": "05489981ac66d6521e284a544ade176cdc31a3a90d2d8769fdafabcaaecb67b8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\line-02.png",
+      "sha256": "7f9574b3e0bc7ca48d6d6520c53877fa3949f37d35e9b36a4d48ccd9a2467dfb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\line-03.png",
+      "sha256": "f73b76de8b8cab95035ef05f46f5162945834359917acbcb72a1208cc0822a01"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\report.json",
+      "sha256": "da32274e545881ecb1c0ef8da05b9bf513c82c98d37cf9e2f86605b0372b0e3c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_18\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\360x640\\story-reopened.png",
+      "sha256": "f73b76de8b8cab95035ef05f46f5162945834359917acbcb72a1208cc0822a01"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\line-00.png",
+      "sha256": "19116b7771804a20bcd69cfbb457ca361d3ee37cb075aabb19369f5c61334dd2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\line-01.png",
+      "sha256": "a475408a4c873c3cb1506b94b0fe2ba25eb48675439cad695adc28a97f96dc24"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\line-02.png",
+      "sha256": "1cfc08c45333e36119fa0862f41193f0bc83e0dcd8f7fd178baa3ee4509ef940"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\line-03.png",
+      "sha256": "ec83587cc97898d9384505174f1306fde8f781b9cd4c9190cd0fbc3638ab9b32"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\report.json",
+      "sha256": "ddf6db8c32319d24975a106c23c88b6fbb80cd887d81189bdc6b67ba2198a0c8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\393x873\\story-reopened.png",
+      "sha256": "a71d1f6a9e469c4089d2e351ba55dff43778077cf502a770725daead4af40406"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\line-00.png",
+      "sha256": "7d775f76064e404f42d542f6de374815b1c6fac1d8d548d13c0eb55224814980"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\line-01.png",
+      "sha256": "63f6a7ff5cd07f2be307c4ecfcd88812b8d88e45e8b51e89f617f2cfd20d46e6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\line-02.png",
+      "sha256": "94c0d6b6201afe58cf34852ec5d01737c35ba9331d1958d44d734b8b6c44d28e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\line-03.png",
+      "sha256": "1c336431f6de24489e81396793356491dd0eebdfb80806a7e40b247f99a6eabb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\report.json",
+      "sha256": "9f86f69adbc13f0ad5fc7dfa368dd249a25735774667d3df5878a646a7ce33d4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\412x915\\story-reopened.png",
+      "sha256": "1c336431f6de24489e81396793356491dd0eebdfb80806a7e40b247f99a6eabb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\line-00.png",
+      "sha256": "60095f563e7abec9d0cf37d13631d9c1dbcf689db50586c7f384b4ed0ae80925"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\line-01.png",
+      "sha256": "feea55e660a1a1933d6220b75a16d22d8b126f6912f86a140f639216da8017c9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\line-02.png",
+      "sha256": "a43a145fbae5f51fe5f07ef18c94dde73783f159c021c54f22aea140ce346001"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\line-03.png",
+      "sha256": "4554b3778b4d1e1b6da61a6f58345e0203162719e5bd128af7a3ac757aafea0e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\report.json",
+      "sha256": "a16a70489e323f88fc72b5a72aa457c05983380d675c6715ef01fa9ea8685b0a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_18\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_18\\1280x800\\story-reopened.png",
+      "sha256": "4554b3778b4d1e1b6da61a6f58345e0203162719e5bd128af7a3ac757aafea0e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\line-00.png",
+      "sha256": "09b19ffa09c97c54ec79f14f4ea3295246dcb09307bd7894d31479c54f653901"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\line-01.png",
+      "sha256": "79310fef6975e3f94a0a799e8b1d9250e91218d39da27ba0fb5a03dc00712723"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\line-02.png",
+      "sha256": "80c73b2d5c642f18271a3a2894d18771f69e8ff2d6440b8ad81bb112407f01c9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\line-03.png",
+      "sha256": "ac7bc04298a0b8cba16b938ffee61feea8afe0491b2916b5c03f82cc69aa18e6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\report.json",
+      "sha256": "f4734385718230d6fc1ee57760cd5498d42d46c239579151b4be229a6dd216f3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_19\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\360x640\\story-reopened.png",
+      "sha256": "ac7bc04298a0b8cba16b938ffee61feea8afe0491b2916b5c03f82cc69aa18e6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\line-00.png",
+      "sha256": "897c0a0e2594f3395f36d7207d66837eb294613b7e0b51c10e7584ed5c198ded"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\line-01.png",
+      "sha256": "30b3dcb86972547d524a737f0b5d6d919d37d0bb953f11ce0c88d205c6acad56"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\line-02.png",
+      "sha256": "11e588fdd0c8fb0b4cd103209ccfa4913667f54bfa983a375901f1e8844cb4fc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\line-03.png",
+      "sha256": "826a8df995e4c5a0b09839def8e12030ae96f2d3110680666f4bcabd7b488dbc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\report.json",
+      "sha256": "fc0ff983bd152716e79f7aa2e1b2f82dd3239d2c4e55f1c6b8fbd6981167704e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\393x873\\story-reopened.png",
+      "sha256": "1dc619c13475ac640b6bd25a02673b4a98bde4365f66ec8bcb931f0c654cdb6f"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\line-00.png",
+      "sha256": "e0fd5efc783165b2f749e7f99a7617730b98b2ca3fc2e9e3147bc34372ded85d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\line-01.png",
+      "sha256": "904db5a9e74faf22bff71f6a96a1c585e58688b4f4c49e329c132b3efdcac622"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\line-02.png",
+      "sha256": "dff08f68ed2773e5fd42f2b1564a4242ef0e395d9cc1c43fd225ed4b402b9220"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\line-03.png",
+      "sha256": "c15f14e85811d843984747a60d6a3110d27424ccf1402e75326c5d39bba60b8d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\report.json",
+      "sha256": "bdd85fdfdf0dfc3fb5532eaf690c70cd23040c3be7af107e01237a60f1bd14de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\412x915\\story-reopened.png",
+      "sha256": "c15f14e85811d843984747a60d6a3110d27424ccf1402e75326c5d39bba60b8d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\line-00.png",
+      "sha256": "546355371b779d1009d4c0d6e5d2b414a5bc12c8a5940dbf5fdde5e628dd1d3a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\line-01.png",
+      "sha256": "374c4496b96dcd0dc13dee743753b46d2885aad0fe642a2cf71584b102c6e3b4"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\line-02.png",
+      "sha256": "b50bb1a690f4cad3bbc8737ba758b044e13ace9d10ed007c2c1682c093848dac"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\line-03.png",
+      "sha256": "fbb5fce03cc71257da742bf091136fba670cc4661583e774bbe144c53a2be90b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\report.json",
+      "sha256": "474c2fe855d07fcb455c3c47904677659664c7532070606466a927733fcefdd6"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_19\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_19\\1280x800\\story-reopened.png",
+      "sha256": "fbb5fce03cc71257da742bf091136fba670cc4661583e774bbe144c53a2be90b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\line-00.png",
+      "sha256": "18c4af50dde2b82f51cfdc37ee5be6c6a2ce6c6353d43b928728562888cb6857"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\line-01.png",
+      "sha256": "1406b814109da23daa4666b08d821748f184278e61b3d75f9ccaa24568a609fb"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\line-02.png",
+      "sha256": "eaa5cb28d8a8f3ab453e85400d1269b9e1b652d0836cb5e6873edb07d22a2c5d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\line-03.png",
+      "sha256": "90b81114de3b1a3677155d0c177cd6430acf66b42d25bd59a00e1010780fe81a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\report.json",
+      "sha256": "3249918df03e552acfbe11dd78ef97392b3a9296d0a98ca3891b14f9e5efaa25"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\resolved\\c1_20\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\360x640\\story-reopened.png",
+      "sha256": "90b81114de3b1a3677155d0c177cd6430acf66b42d25bd59a00e1010780fe81a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\line-00.png",
+      "sha256": "df9aa3ff77e1f3e39be05c03efbd1a3d7f9265cbeb789f203150c29bf057c484"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\line-01.png",
+      "sha256": "1033eee2a5fc2e22ee5683cfdd01d865b9df07193e16fc7d98f6a7978e752722"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\line-02.png",
+      "sha256": "e9b9ff6244b57d462caecadecfc51f8d1eeab7ecb8681d27b3537a7968013c6a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\line-03.png",
+      "sha256": "3f8ca8ed327edbd0453b5120684c708415216659c1dc148c6c2ae5809d39f690"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\report.json",
+      "sha256": "c957de1d65309874faf5cb0c769ffed35a536dbbc36188ae6ab1efa4f8b59095"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\393x873\\story-reopened.png",
+      "sha256": "54200e8f64e0dccbd489877b84ddce73c554682dc92a29d94a782679f40d2143"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\line-00.png",
+      "sha256": "bbe51f0427bbb4c95f3f6e6ddeb61db21998282fff7703b35981568b5204c7ab"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\line-01.png",
+      "sha256": "530ec62fa05cede33a6d0fe49606d34fdd3ae7daf15cb640178eee36a1d4761b"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\line-02.png",
+      "sha256": "3537a7ac034217aa70ae30c08de442af6f1b124be0cf965951e9d9e38f72b509"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\line-03.png",
+      "sha256": "439bdba06b49d712ed0777efef18a4f877631e51a68bf4f57654433b93b694b9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\report.json",
+      "sha256": "69c9b99a159cf4df99020892e713a3a7daae65dd5a3ef62600d3530a67826a37"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\412x915\\story-reopened.png",
+      "sha256": "439bdba06b49d712ed0777efef18a4f877631e51a68bf4f57654433b93b694b9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\line-00.png",
+      "sha256": "f416d63c71afda9b21e6d4b0d8ec1f6a0194d9ae740b4d97789f5b6221917037"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\line-01.png",
+      "sha256": "99feedc0e64db79ba37e6b5b0bc1e9e38516f691a5bed9aa699fb6ba0f6dc1cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\line-02.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\line-02.png",
+      "sha256": "48c3918548d6ad0b81e6c1506c2b45d501a89f2554829806a21eb05d4eb71ea8"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\line-03.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\line-03.png",
+      "sha256": "a4835d9bf320998ad5adf87f81a4b9940539cf1aa9857e9559ebae8edcf7e7f2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\report.json",
+      "sha256": "001f01ba108a3dd3f9cc105d7b9d62d48f3877dcc984705f6c2920b34f724651"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_20\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\c1_20\\1280x800\\story-reopened.png",
+      "sha256": "a4835d9bf320998ad5adf87f81a4b9940539cf1aa9857e9559ebae8edcf7e7f2"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\360x640\\blocked-target.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\excluded-original-node02-release-cover\\blocked-target.png",
+      "sha256": "3704e75d1ef510c6fd9173d57f1c9e14d26825cdb9fd354f1d0705b6aedf8378"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\excluded-original-node02-release-cover\\failure.png",
+      "sha256": "3704e75d1ef510c6fd9173d57f1c9e14d26825cdb9fd354f1d0705b6aedf8378"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\excluded-original-node02-release-cover\\line-00.png",
+      "sha256": "3704e75d1ef510c6fd9173d57f1c9e14d26825cdb9fd354f1d0705b6aedf8378"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\c1_02\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\excluded-original-node02-release-cover\\report.json",
+      "sha256": "614ad66797c2631bbf318b4baf5a3dc12e6a03b6570ddda59b0a62e3785386c1"
+    },
+    {
+      "from": "artifacts/segment28-story-all20.mjs.pre-release-resolution.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\helpers\\segment28-story-all20.mjs.pre-release-resolution.gz",
+      "sha256": "07b1b4c7d3966bd7017b4d1e797b2bf0e4bfb21ef0044687957474e68264465d"
+    },
+    {
+      "from": "artifacts/run28-story-all20.cjs.pre-release-resolution.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\helpers\\run28-story-all20.cjs.pre-release-resolution.gz",
+      "sha256": "6b1f2970fecae83287a5e596282f622eb5500c5713d12958a1187ddfcb14cb57"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\360x640\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\360x640\\line-00.png",
+      "sha256": "c1be5266d4b78c35f9de1ff583c81681b7e7482a26d89863e5fd7b1b11eb08bd"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\360x640\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\360x640\\line-01.png",
+      "sha256": "809a8324bcea1b24b7d414b578a0723631ec605cdf40c5ee0e446bac303170f5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\360x640\\report.json",
+      "sha256": "68016ecd0dd1ac6d227f54fcb1b0ac2ef1a2db2d535ef7aa796faf385c89179a"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\360x640\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\360x640\\story-reopened.png",
+      "sha256": "809a8324bcea1b24b7d414b578a0723631ec605cdf40c5ee0e446bac303170f5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\393x873\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\393x873\\line-00.png",
+      "sha256": "9be18f0c21d9baf822800f4d6870bdc7a0366d1e09f73983a3715a310fe6ac51"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\393x873\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\393x873\\line-01.png",
+      "sha256": "d5884ad65e241129cb035ba2174f929458be96dd4d40aa34c16d09c496f392de"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\393x873\\report.json",
+      "sha256": "b4b1d3d9ab6e5b67a43602702e1feaa427f8c120709194aaa5beb86d443d39ad"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\393x873\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\393x873\\story-reopened.png",
+      "sha256": "67daad8ab0fc0929eceeb6b383f40d37ce2a2e2208d31d772c25517af871612e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\412x915\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\412x915\\line-00.png",
+      "sha256": "20ac19d666cddfa1b3e8f1c45a26c40ef15ba488d1fd28335fc8b306c8f86b24"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\412x915\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\412x915\\line-01.png",
+      "sha256": "3ed67ad30cbc7083938b17b66fffb3fe3b1708a4ecdec0081b07442bc1d8ad89"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\412x915\\report.json",
+      "sha256": "b8a1e0edc2d5d734723ed3406914f1e1753f7e49b286d4da3a734d9dac904b64"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\412x915\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\412x915\\story-reopened.png",
+      "sha256": "3ed67ad30cbc7083938b17b66fffb3fe3b1708a4ecdec0081b07442bc1d8ad89"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\1280x800\\line-00.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\1280x800\\line-00.png",
+      "sha256": "324a75a52ae97817f05d66934f6cc49b573a8751d4a5f36eec992e16e8cae576"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\1280x800\\line-01.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\1280x800\\line-01.png",
+      "sha256": "e875cb1cf78735ac889713988d37e5a2fcd3294a20558ebce1d9db97b7aab659"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\1280x800\\report.json",
+      "sha256": "c27afa6180bebfc1a4094933c42f4532d940e33bdf2c3d86c11be1fe8faa6e42"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation-v2\\c1_02\\1280x800\\story-reopened.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\next-observation-v2\\c1_02\\1280x800\\story-reopened.png",
+      "sha256": "e875cb1cf78735ac889713988d37e5a2fcd3294a20558ebce1d9db97b7aab659"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\segment28-story-all20-331f01f0\\next-observation\\c1_02\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\excluded-next-observation-startup\\report.json",
+      "sha256": "b03c0d78dc187769a9ad9ffa042c4d910c8c3bee90cb7ae5db495f93a27ac771"
+    },
+    {
+      "from": "artifacts/segment28-story-all20.mjs.release-resolved.gz",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment28-all20-before-accepted\\helpers\\segment28-story-all20.mjs.release-resolved.gz",
+      "sha256": "ad5c2e41197abccea797713a4cbd6851ce3951357cbb260ce1beccf747f71120"
+    }
+  ],
+  "limits": [
+    "Only20 before-dialogue nodes/76 formal lines across4 sizes; no guidance/ending or terminal click/outcome",
+    "Next true input/cursor/text/reopen evidence valid; original same-task click capture misses Next because render detaches target. No claim that76 Next have same-task domain observation; separate node02 four-size v2 delta establishes exactly1 safe Next observation each",
+    "Resolved360node02 ordinary announcement already naturally settled at first sample; no actual announcement-header close interaction proven",
+    "Original open lastViewedAt/beginChapter/local saves retained, not zero-save; restore exact local raw/meta/name only",
+    "No tutorial continuation/claim/learn/equip/actualbattle/transaction/physical device acceptance"
+  ]
+}

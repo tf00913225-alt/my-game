@@ -1,0 +1,12 @@
+{
+  "base": "cbe3d595bcb47bde4288e3165a143698de3d3234",
+  "originalOwner": "css/06-stage-v11-native-bottom-nav.css",
+  "fullSourceExpectedExact": true,
+  "fullGeneratedCssExpectedExact": true,
+  "bundle": "app-shell.7bc5e1c99233.css",
+  "bundleSha256": "7bc5e1c99233d3ad6d933de5427ab6c1b1e58a02db043f47cc0f1bf9aa211d24",
+  "jsHtmlFunctionsConfigUnchanged": true,
+  "before": "../batch2-dungeon-end-reviewed/360x640/returned-home.png",
+  "beforeContext": "../batch2-dungeon-end-reviewed/360x640/daily-top.png",
+  "runtimeRasterAdded": false
+}

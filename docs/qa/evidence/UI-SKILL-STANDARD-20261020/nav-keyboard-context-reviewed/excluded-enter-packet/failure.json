@@ -1,0 +1,4 @@
+{
+  "head": "2f685fa79fabbd8a59b707dedcd3c68e8b3fb71a",
+  "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:\n\n'main' !== 'training'\n\n    at state (file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/nav-keyboard-context.mjs:82:660)\n    at async file:///C:/Projects/my-game/.worktrees/ui-skill-standard-20261020/artifacts/nav-keyboard-context.mjs:84:61"
+}

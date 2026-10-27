@@ -1,0 +1,406 @@
+{
+  "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+  "viewport": [
+    393,
+    873
+  ],
+  "complete": true,
+  "clean": true,
+  "sourceBefore": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "d810345e70d94b9a8fa3416df3298f38ffdabbf9f25a51811f5ee98ec29f8bbd",
+    ".github/scripts/run-bottom-nav-runtime-browser-qa.mjs": "8d42ff11f49b5d67f3053bed6ccbbd35c2409fcedf702470833a03dfd308321b",
+    "css/00-main.css": "137a764321bd75383375c733f525291aeef0af00ef85a5fbee5cf5f926cee2fd",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.febd46a25a09.js": "febd46a25a09f4095a88932cf15c1c0dbff82fb597a4d83b963767de9f16db0b",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.553eac9d8410.js": "553eac9d84104e607e3898d32ab79f05c5608050b4b4b13e3b865e1a19584cd6",
+    "build/gameplay-core.c268dc0a7fec.css": "c268dc0a7fec01e630f78dc0c215d71ac62368651f474e547e2e243786db3fe1"
+  },
+  "gateSourceSha256": "50af8a146b9910927ae702835026954aa24f723b51ead63c79c53bd52285ce0c",
+  "swipeSourceSha256": "a814e480ae260e8a6462cacc2487d8bc70d8b661900dbe5622e11cf85766e265",
+  "input": "Exact original runner real touch swipe, touch emulation enabled also at desktop viewport; not native mouse/wheel",
+  "scope": "Home block only; no cold-training/inventory/reload/lifecycle matrix. Fresh isolated QA account and original production loader/PREPARE. No DEV/resource actions.",
+  "identity": {
+    "uid": "skill-runtime-browser-qa",
+    "playerId": "QA 火角色",
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null
+  },
+  "prepareModal": {
+    "classes": "home-feature-modal no-padding show",
+    "releaseState": {
+      "loadedReleaseVersion": "V173.73",
+      "availableReleaseVersion": "V173.73",
+      "noticeId": "release-v17373-20261003",
+      "pendingNormalReload": false,
+      "pendingForcedUpdate": false,
+      "pendingAnnouncement": false,
+      "loginAnnouncementShown": true,
+      "suppressedToday": false,
+      "criticalOperationCount": 0,
+      "unsafeReasons": [],
+      "pollIntervalMs": 240000,
+      "minimumCheckGapMs": 45000,
+      "devPreviewMode": null
+    }
+  },
+  "announcementChecks": [
+    {
+      "step": 0,
+      "state": {
+        "loadedReleaseVersion": "V173.73",
+        "availableReleaseVersion": "V173.73",
+        "noticeId": "release-v17373-20261003",
+        "pendingNormalReload": false,
+        "pendingForcedUpdate": false,
+        "pendingAnnouncement": false,
+        "loginAnnouncementShown": true,
+        "suppressedToday": false,
+        "criticalOperationCount": 0,
+        "unsafeReasons": [],
+        "pollIntervalMs": 240000,
+        "minimumCheckGapMs": 45000,
+        "devPreviewMode": null
+      },
+      "forced": false,
+      "release": false,
+      "open": false
+    }
+  ],
+  "evidence": {
+    "phase": "home",
+    "home": {
+      "clientHeight": 1704,
+      "scrollHeight": 1864,
+      "scrollTop": 0,
+      "overflow": "auto",
+      "rect": {
+        "left": 0,
+        "top": 87.1666259765625,
+        "width": 393,
+        "height": 620.066650390625
+      },
+      "documentScroll": 0
+    },
+    "homeAfterSwipe": {
+      "scrollTop": 160,
+      "documentScroll": 0
+    },
+    "homeEndSamples": [
+      {
+        "top": 160,
+        "client": 1704,
+        "total": 1864,
+        "rect": {
+          "left": 0,
+          "top": 87.1666259765625,
+          "right": 393,
+          "bottom": 707.2332763671875,
+          "width": 393,
+          "height": 620.066650390625
+        },
+        "outerOverflow": "hidden",
+        "outerTop": 0,
+        "documentTop": 0,
+        "last": {
+          "label": "系統",
+          "rect": {
+            "left": 289.8374938964844,
+            "top": 597.77099609375,
+            "right": 383.17498779296875,
+            "bottom": 645.8043212890625,
+            "width": 93.33749389648438,
+            "height": 48.0333251953125
+          },
+          "hit": true
+        },
+        "nav": {
+          "left": 0,
+          "top": 707.2332763671875,
+          "right": 393,
+          "bottom": 785.8333129882812,
+          "width": 393,
+          "height": 78.60003662109375
+        },
+        "sameShell": true
+      }
+    ],
+    "homeEnd": {
+      "top": 160,
+      "client": 1704,
+      "total": 1864,
+      "rect": {
+        "left": 0,
+        "top": 87.1666259765625,
+        "right": 393,
+        "bottom": 707.2332763671875,
+        "width": 393,
+        "height": 620.066650390625
+      },
+      "outerOverflow": "hidden",
+      "outerTop": 0,
+      "documentTop": 0,
+      "last": {
+        "label": "系統",
+        "rect": {
+          "left": 289.8374938964844,
+          "top": 597.77099609375,
+          "right": 383.17498779296875,
+          "bottom": 645.8043212890625,
+          "width": 93.33749389648438,
+          "height": 48.0333251953125
+        },
+        "hit": true
+      },
+      "nav": {
+        "left": 0,
+        "top": 707.2332763671875,
+        "right": 393,
+        "bottom": 785.8333129882812,
+        "width": 393,
+        "height": 78.60003662109375
+      },
+      "sameShell": true
+    }
+  },
+  "loaded": [
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.1a331d452911.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth-ui.4624b380b4b9.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/boot-core.9cdbe69aad4a.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-auth.9f8c09942b79.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-bootstrap.d69ddfb2eff7.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-config.4314d6321ba1.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/firebase-session.877a7842d6bd.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/firebase/session-client.235aa8b1f47e.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/app-shell.febd46a25a09.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/app-shell.725d1d00b39e.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/app-shell.febd46a25a09.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core-secondary.553eac9d8410.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-patrol.ab5bd3ce5582.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core.c268dc0a7fec.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-patrol.1cef20d37f82.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core.c268dc0a7fec.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core-primary.d1e7d90cba12.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/gameplay-core-secondary.553eac9d8410.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-adventure-entry.f68f5350eccc.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-adventure-entry.0f3635335ca7.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-adventure-items.cf197e72837f.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-boss-relic.25e704feb9dd.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-relic-progression.9eb4fff74856.css",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-relic-progression.371e66b3317f.js",
+      "status": 200
+    },
+    {
+      "url": "http://127.0.0.1:61695/build/feature-boss-relic.a8ff5e27d0a5.js",
+      "status": 200
+    }
+  ],
+  "identityAfter": {
+    "uid": "skill-runtime-browser-qa",
+    "playerId": "QA 火角色",
+    "battleActive": false,
+    "battleToken": 0,
+    "timerId": null
+  },
+  "sourceAfter": {
+    "index.html": "3b0feabeeb6d949376b4d3d5a31c17823d06f80f00f4b0050187df2417d2c91f",
+    "asset-manifest.json": "d810345e70d94b9a8fa3416df3298f38ffdabbf9f25a51811f5ee98ec29f8bbd",
+    ".github/scripts/run-bottom-nav-runtime-browser-qa.mjs": "8d42ff11f49b5d67f3053bed6ccbbd35c2409fcedf702470833a03dfd308321b",
+    "css/00-main.css": "137a764321bd75383375c733f525291aeef0af00ef85a5fbee5cf5f926cee2fd",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.febd46a25a09.js": "febd46a25a09f4095a88932cf15c1c0dbff82fb597a4d83b963767de9f16db0b",
+    "build/boot-core.1a331d452911.css": "1a331d452911be0025acb24df0db7cc38361878ef3f0e33c0607b31a28c60220",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.67ea9959e593.js": "67ea9959e5937cd58e4bfcc33ed30e9f9a7ce5d511397b027236fc6c8ed66db9",
+    "build/feature-adventure-entry.0f3635335ca7.js": "0f3635335ca7d615c95c0accdd7f27198fadb690839a2d24f8866552c97438d3",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.dd3870f6010a.js": "dd3870f6010aa1386b62022ab521fb7dbbc7d2d6bb61b165975e352139976b54",
+    "build/feature-adventure-ui.e3d2d8ecf966.js": "e3d2d8ecf966b3c2a6963492d7f9a42ffc69d4f1ce28041b225735163a3b0935",
+    "build/feature-adventure.653b97a18985.css": "653b97a18985a8b79b8c60d7a0843bfdb8110fea915c22fdf94d9f96157c07c2",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.d1e7d90cba12.js": "d1e7d90cba12d0b99ef595e3c217049d672dcaa3557b196f34ad64415fdf15d4",
+    "build/gameplay-core-secondary.553eac9d8410.js": "553eac9d84104e607e3898d32ab79f05c5608050b4b4b13e3b865e1a19584cd6",
+    "build/gameplay-core.c268dc0a7fec.css": "c268dc0a7fec01e630f78dc0c215d71ac62368651f474e547e2e243786db3fe1"
+  }
+}

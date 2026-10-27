@@ -1,0 +1,141 @@
+{
+  "records": [
+    {
+      "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+      "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640"
+    },
+    {
+      "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+      "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873"
+    },
+    {
+      "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+      "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915"
+    },
+    {
+      "state": "Focused exact formal home Gate: real touch scroll/end/footer/native navigation boundaries",
+      "head": "3abc38b3173cb2f42066fcbe7887315f473fb4ae",
+      "evidence": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800"
+    }
+  ],
+  "files": [
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\360x640\\home-before.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640\\home-before.png",
+      "sha256": "4e7f27628e6667b04ec97f1fec8025811ad76e2f15d6aff9c7dd084539b150e3"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\360x640\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640\\home-end.png",
+      "sha256": "289883e099ce77ea1deb979700adfe0efb254a703daa9a175766fe39854e4b09"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\360x640\\report.json",
+      "sha256": "72aa30e4ecc34d84e9a8c5a37909aad0737b3dfa9f2f00a9d75b80260a634311"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\393x873\\home-before.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873\\home-before.png",
+      "sha256": "3984fa5ad2b30a397d165a0df8d6f8f6f0bfad0ff591309c490d8f03e9cf2512"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\393x873\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873\\home-end.png",
+      "sha256": "21762d01f43822caf3b6e01ba9f58c57240a4748c54d648523f32b80380cfe3e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\393x873\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\393x873\\report.json",
+      "sha256": "d63c2c5c9113d2979c9fee9ac74af80aaccec71280dd5193c7e0550ce5838d90"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\412x915\\home-before.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915\\home-before.png",
+      "sha256": "ff0f761be19ac34486dec7126c832c8964de3977815d9dc7c7d89d243d62ae41"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\412x915\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915\\home-end.png",
+      "sha256": "00edf2423147254f65807a6eacb3009f53567775d138122269660b25976c7a9c"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\412x915\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\412x915\\report.json",
+      "sha256": "b0d061add442e3a7ea96eb9ccfd450b45398134703ab1111c5798d3ae92c5da5"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\1280x800\\home-before.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800\\home-before.png",
+      "sha256": "7d58bc60d17f81ce28389a7796b0a8b1f6102dff4a5e39cc87967e9d133a056e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\1280x800\\home-end.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800\\home-end.png",
+      "sha256": "4588d087153c2a6471dd8f4252378c39e17ace178dbf708be77dbd3eec6b5382"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-3abc38b3\\v3\\1280x800\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\1280x800\\report.json",
+      "sha256": "a5c17abd626c7f8a34412043fba7c08da034cf22eb247ad03846665f355b18cc"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-4f741c13\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-4f741c13\\360x640\\failure.png",
+      "sha256": "bb6c88f315abaf143b54acfd06d9b5f5f74046ee8a785315766459c11203d87e"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-4f741c13\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-4f741c13\\360x640\\report.json",
+      "sha256": "71b208d71d8fed343b31a0c45d3f3af0646c7b69c409b0717314b4388c018875"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-31a30660\\v2\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-31a30660\\v2\\360x640\\failure.png",
+      "sha256": "51f2c53757e5966f75641cca27983ba1bbc461f6f8c1b758a2e60887fbb25511"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-31a30660\\v2\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-31a30660\\v2\\360x640\\report.json",
+      "sha256": "168582f75e39b72c75d30840e4a223b0725aca746e10f8d25ae8f8a01b5cf87d"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-31a30660\\v3\\360x640\\failure.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-31a30660\\v3\\360x640\\failure.png",
+      "sha256": "4c4e4330d2d4b5404973c92fda4fc59d1fdb564309b149c8f4d1e766e7c6ed49"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-31a30660\\v3\\360x640\\home-before.png",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-31a30660\\v3\\360x640\\home-before.png",
+      "sha256": "5f88c341529f5d9cfe41e8ef89fb15cd791c33acc8aca3d371bf6cd58fa566a9"
+    },
+    {
+      "from": "artifacts\\ui-skill-standard\\focused-home-nav-31a30660\\v3\\360x640\\report.json",
+      "to": "docs\\qa\\evidence\\UI-SKILL-STANDARD-20261020\\segment31-home-scroll-qa-accepted\\excluded-helper-failures\\focused-home-nav-31a30660\\v3\\360x640\\report.json",
+      "sha256": "b346169dbdff5a9c95a7d8e8337876c6883c59f9cf76afbcabc2c01c0191326e"
+    }
+  ],
+  "helpers": [
+    {
+      "path": "artifacts/focused-home-nav-contract.mjs",
+      "sha256": "8d83a6b2889f736891eee5a725f6530a6e8618b71b1386668637f437b399d178",
+      "gzip": "focused-home-nav-contract.mjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    },
+    {
+      "path": "artifacts/run-home-focused.cjs",
+      "sha256": "e5a15b47440ede5ea8172bd6eef684fc9a7944c871f5cb6d49c53f8a01e296ca",
+      "gzip": "run-home-focused.cjs.current-source.gz",
+      "provenance": "current file bytes at import, not reconstructed earlier failing version"
+    }
+  ],
+  "limits": [
+    "Exact formal home block only; not cold-training/inventory/lifecycle/reload/full navigation matrix",
+    "Original touch swipe also touch-emulated at desktop viewport; not desktop native wheel",
+    "Failure reports unchanged: wrong identity API / PREPARE modal left open / borrowed home not ancestor of outer content are QA failures",
+    "Helper gzip captures current reviewed v3 bytes only; original earlier failing helper bytes were not captured and are not claimed"
+  ]
+}

@@ -1,0 +1,58 @@
+[
+  {
+    "viewport": "360x640",
+    "head": "e4966289d0fdf41580363fb835f301b430d182e3",
+    "reportSha256": "915260929df509f351d89f177b4bbac8fc44a620f88af0acc131ca56507ff3dd",
+    "contexts": [
+      "main",
+      "daily",
+      "main"
+    ],
+    "minimumControlHeight": 72,
+    "minimumControlWidth": 72,
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "393x873",
+    "head": "e4966289d0fdf41580363fb835f301b430d182e3",
+    "reportSha256": "1a053e3dbc25dd9bacd31ae85a7e0b63eab60ebc61b1f73166d73990360de1cc",
+    "contexts": [
+      "main",
+      "daily",
+      "main"
+    ],
+    "minimumControlHeight": 78.60003662109375,
+    "minimumControlWidth": 78.59999084472656,
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "412x915",
+    "head": "e4966289d0fdf41580363fb835f301b430d182e3",
+    "reportSha256": "560cce4d162cc686c9264818be5cb31b66f8fc94ff25c87d5037cf014b25cbaf",
+    "contexts": [
+      "main",
+      "daily",
+      "main"
+    ],
+    "minimumControlHeight": 82.39996337890625,
+    "minimumControlWidth": 82.39997863769531,
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  },
+  {
+    "viewport": "1280x800",
+    "head": "e4966289d0fdf41580363fb835f301b430d182e3",
+    "reportSha256": "f4fa5c3b82ffb3707c88f22fa6eb89b06aca48d1e746461c655ccdcccc6f6ec7",
+    "contexts": [
+      "main",
+      "daily",
+      "main"
+    ],
+    "minimumControlHeight": 90,
+    "minimumControlWidth": 90,
+    "profileRemoved": true,
+    "runtimeRestoreExact": false
+  }
+]

@@ -63,6 +63,28 @@ snapshot=stats.getFinalSnapshot();
 assert.equal(snapshot.result,"win");
 assert.equal(snapshot.combatants.find(item=>item.id==="player:0").damageDealt,321,"final result reuses the same accumulated snapshot");
 
+// Reading position belongs to a newly opened drawer; same-open updates retain it.
+const drawerBody={innerHTML:"",scrollTop:900};
+const drawerClasses=new Set();
+const drawer={classList:{add:key=>drawerClasses.add(key),remove:key=>drawerClasses.delete(key)},
+    querySelector:selector=>selector===".battle-insight-drawer-body"?drawerBody:null};
+const drawerNodes={battlePage:{},battleMechanismAlert:{hidden:true},battleBossMechanismDrawer:drawer};
+const drawerContext={document:{getElementById:id=>drawerNodes[id]||null}};
+drawerContext.window=drawerContext;vm.createContext(drawerContext);vm.runInContext(statsSource,drawerContext);
+const drawerStats=drawerContext.FourSymbolsBattleStatistics;
+assert.equal(drawerStats.openBossMechanisms(),false,"inactive observer cannot open the drawer");
+drawerStats.begin({battleToken:"drawer-read-only",combatants:[]});
+assert.equal(drawerStats.openBossMechanisms(),false,"empty observer cannot open the drawer");
+drawerStats.setBossMechanisms([{id:"reading",name:"閱讀測試",effect:"完整內容"}]);
+assert.equal(drawerStats.openBossMechanisms(),true);
+assert.equal(drawerBody.scrollTop,0,"first opening starts at the title");
+drawerBody.scrollTop=75;
+drawerStats.openBossMechanisms();
+drawerStats.setBossMechanisms([{id:"reading",name:"閱讀測試",effect:"同頁更新"}]);
+assert.equal(drawerBody.scrollTop,75,"same-open observer updates preserve reading position");
+drawerStats.closeDrawer();drawerBody.scrollTop=400;drawerStats.openBossMechanisms();
+assert.equal(drawerBody.scrollTop,0,"reopening cannot inherit an old end offset");
+
 assert.match(battle,/showAutoBattleRoundPrompt\(token\)/);
 assert.match(battle,/battleRoundPromptTimeoutId=setTimeout\([\s\S]*?\},500\)/);
 assert.doesNotMatch(battle,/acquirePresentationLock\("auto-round-prompt"\)/);
@@ -117,7 +139,7 @@ assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrad
 assert.match(synthesisCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art > img\{[\s\S]*?object-fit:contain/);
 assert.doesNotMatch(abyssCss,/#homeFeatureModal\.v141-synthesis-modal \.v141-upgrade-flow \.v169-talisman-art/);
 
-assert.match(mainCss,/#homePage\{[^}]*height:calc\(100% - 216px\);[^}]*overflow:hidden;/);
+assert.match(mainCss,/#homePage\{[^}]*height:calc\(100% - 216px\);[^}]*overflow-x:hidden;overflow-y:auto;/,"the existing main city owns vertical scrolling without a second outer scroller");
 assert.match(homeRosterCss,/\.v146-home-roster\{[^}]*position:relative;[^}]*margin:0 -18px;/,"roster must not reserve a second navigation height");
 
 console.log("Battle statistics / relic / talisman / Boss / Tower focused contracts passed");

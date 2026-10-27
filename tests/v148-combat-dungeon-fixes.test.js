@@ -356,4 +356,21 @@ test("Abyss projects five context buttons into the canonical native shell",()=>{
     assert.doesNotMatch(source,/createElement\("div"\)[\s\S]*?v141DungeonNav/);
 });
 
+test("Abyss top return has one create/reuse/remove owner and retains its Gameplay exit",()=>{
+    let mapActive=false,created=0,exits=0,top=null;
+    const page=element({classList:classList(["active"]),querySelector:selector=>selector===".v141-abyss-shell"&&mapActive?{}:null,
+        appendChild(node){top=node;this.children.push(node);}});
+    const context=baseContext({v146ExitAbyssMap:()=>{exits++;},FourSymbolsBottomNav:{syncContext(){}},
+        document:{readyState:"complete",body:element(),addEventListener(){},querySelector:()=>null,querySelectorAll:()=>[],
+            getElementById:id=>id==="dungeonPage"?page:id==="v146AbyssReturn"?top:null,
+            createElement(){created++;return element({attributes:{},setAttribute(k,v){this.attributes[k]=v;},remove(){this.removed=true;top=null;}});}}});
+    mapActive=true;context.v148SyncContextNavigation();const first=top;
+    assert.equal(created,1);assert.equal(first.id,"v146AbyssReturn");assert.equal(first.attributes["aria-label"],"返回玩法");
+    assert.equal(first.onclick,context.v146ExitAbyssMap);first.onclick();assert.equal(exits,1);
+    context.v148SyncContextNavigation();assert.equal(top,first);assert.equal(created,1,"refresh cannot append a second return");
+    mapActive=false;context.v148SyncContextNavigation();assert.equal(top,null);assert.equal(first.removed,true);
+    page.classList.remove("active");context.v148SyncContextNavigation();assert.equal(created,1);
+    assert.doesNotMatch(fs.readFileSync("js/41-v146-system-polish.js","utf8"),/v146AbyssReturn/,"older shell must not recreate the same control");
+});
+
 console.log("\nV148 combat/dungeon fixes suite: "+passed+" tests passed.");

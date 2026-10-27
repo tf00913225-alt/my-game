@@ -1,0 +1,2288 @@
+{
+  "complete": false,
+  "error": "AssertionError [ERR_ASSERTION]: EXP full name ink clipped",
+  "head": "806599b703a14584b08523db9c2cad890593f06b",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "sourcesBefore": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "055526012ca2a741dc2ba83aab393d739b2a214a33f390ec661517979fdbd982",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "8237207301908dc150243acd02b993599a9212caadce8d9346893bfe47e6c56c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.a927cb1cfa0e.css": "a927cb1cfa0e9d2de63787da46b239878bfa7f7a6feee33be483811722eadc08"
+  },
+  "sourcesAfter": {
+    "index.html": "093d31ad61acc55b12d6a55ab3e5bc6b49bd5bd8f13dc0c34e2f5397779262ac",
+    "asset-manifest.json": "055526012ca2a741dc2ba83aab393d739b2a214a33f390ec661517979fdbd982",
+    "js/41-v146-system-polish.js": "51e3c5bb6d9592300b094c118ecaeb6e8e4aaf25435ef974841b6184d5bbd881",
+    "css/49-v169-rpg-ui.css": "8237207301908dc150243acd02b993599a9212caadce8d9346893bfe47e6c56c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "7b772375de00f38e7fa9309af581b9cc8202f5922dccc26b9b5c32650f813875",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.725d1d00b39e.css": "725d1d00b39eba7a26c64d58eb67db792778c360412b88f053fe984504f45816",
+    "build/app-shell.aa32fb8e818d.js": "aa32fb8e818d080ae0ed4a8662244dbe7d1962c1e200a88b12c2fa7f7a2490d9",
+    "build/boot-core.9cdbe69aad4a.js": "9cdbe69aad4afffb6b12accbca974315b83573322f59d03526824a960dacd553",
+    "build/boot-core.e7a5c8849782.css": "e7a5c8849782b12ec2358f1a1cbe3af19e182d6b45c0c3ed489ab69bee287886",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.371e66b3317f.js": "371e66b3317f5effac989ecae263652f6390c3f6e5b88c33478ea65383d398bd",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.a90218b9da1c.js": "a90218b9da1cb0a2fec25bce064a62b35523392553087560b1cec025ac110115",
+    "build/gameplay-core-secondary.db9536f36042.js": "db9536f3604254a38eaef8f99b738cb531e18b798818c5d9f0b664bfd5f230a3",
+    "build/gameplay-core.a927cb1cfa0e.css": "a927cb1cfa0e9d2de63787da46b239878bfa7f7a6feee33be483811722eadc08"
+  },
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"0\"]",
+      "x": 30,
+      "y": 296.72918701171875,
+      "width": 48,
+      "height": 48,
+      "hit": true,
+      "label": "角色"
+    },
+    {
+      "selector": ".character-showcase-choice[onclick=\"selectCharacterForTabs(0);\"]",
+      "x": 84,
+      "y": 163.5,
+      "width": 86,
+      "height": 173,
+      "hit": true,
+      "label": "角色名稱長文測試甲乙丙丁戊己庚辛Lv.70"
+    },
+    {
+      "selector": "#characterTabBtnStatus",
+      "x": 205.1640625,
+      "y": 284,
+      "width": 83.890625,
+      "height": 52,
+      "hit": true,
+      "label": "能力值"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 307,
+      "y": 346,
+      "to": 587
+    },
+    {
+      "root": "#characterTabContent",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 258.5,
+      "y": 592,
+      "to": 341,
+      "top": 743,
+      "client": 903,
+      "height": 1646
+    },
+    {
+      "selector": "#characterTabBtnSkill",
+      "x": 295.0546875,
+      "y": 284,
+      "width": 83.890625,
+      "height": 52,
+      "hit": true,
+      "label": "技能"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 307,
+      "y": 346,
+      "to": 587
+    },
+    {
+      "root": "#characterTabContent",
+      "scroll": "[data-qa-scroll=active]",
+      "x": 258.5,
+      "y": 592,
+      "to": 341,
+      "top": 7439,
+      "client": 903,
+      "height": 8342
+    },
+    {
+      "selector": "#characterTabBtnExpPool",
+      "x": 90.109375,
+      "y": 284,
+      "width": 134.21875,
+      "height": 52,
+      "hit": true,
+      "label": "經驗池分配"
+    },
+    {
+      "kind": "pane-real-top",
+      "owner": "#characterTabContent",
+      "top": 0,
+      "x": 307,
+      "y": 346,
+      "to": 587
+    }
+  ],
+  "checks": [
+    {
+      "phase": "before-local-fixture",
+      "state": {
+        "stage": "before-local-fixture",
+        "characters": [
+          {
+            "i": 0,
+            "id": "QA 火角色",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "QA 水角色",
+            "level": 70
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "fixture": {
+        "names": [
+          "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "子丑寅卯辰巳午未申酉戌亥甲乙丙丁"
+        ],
+        "levels": [
+          70,
+          60,
+          50
+        ],
+        "isolatedOnly": true,
+        "notCharacterCreation": true
+      }
+    },
+    {
+      "phase": "after-fixture-formal-exp-render",
+      "state": {
+        "stage": "after-fixture-formal-exp-render",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "after-fixture-before-entry",
+      "state": {
+        "stage": "after-fixture-before-entry",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "phase": "after-formal-entry-normalization",
+      "state": {
+        "stage": "after-formal-entry-normalization",
+        "characters": [
+          {
+            "i": 0,
+            "id": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "level": 70,
+            "expNext": 9637200,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 1,
+            "id": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "level": 60,
+            "expNext": 5885100,
+            "hp": 300,
+            "sp": 120
+          },
+          {
+            "i": 2,
+            "id": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "level": 50,
+            "expNext": 2960400,
+            "hp": 300,
+            "sp": 120
+          }
+        ],
+        "saveCalls": 0
+      }
+    },
+    {
+      "selectedBinding": {
+        "statusCharacterIndex": 0,
+        "inventoryCharacterIndex": 0,
+        "currentSkillCharacter": "fire",
+        "expectedSkillKey": "fire",
+        "tab": "status",
+        "content": {
+          "rect": {
+            "x": 23,
+            "y": 316,
+            "width": 314,
+            "height": 301,
+            "top": 316,
+            "right": 337,
+            "bottom": 617,
+            "left": 23
+          },
+          "top": 0,
+          "height": 1646,
+          "client": 903,
+          "overflow": "auto"
+        },
+        "title": {
+          "x": 23,
+          "y": 26,
+          "width": 199.75,
+          "height": 38,
+          "top": 26,
+          "right": 222.75,
+          "bottom": 64,
+          "left": 23
+        },
+        "choices": [
+          {
+            "i": 0,
+            "selected": true,
+            "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "nameBox": {
+              "x": 46,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 122,
+              "bottom": 226,
+              "left": 46
+            },
+            "nameInk": {
+              "x": 46.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 121.5,
+              "bottom": 226.33334350585938,
+              "left": 46.5
+            },
+            "level": "Lv.70",
+            "levelRect": {
+              "x": 46,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 122,
+              "bottom": 244,
+              "left": 46
+            },
+            "rect": {
+              "x": 41,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 127,
+              "bottom": 250,
+              "left": 41
+            }
+          },
+          {
+            "i": 1,
+            "selected": false,
+            "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "nameBox": {
+              "x": 142,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 218,
+              "bottom": 226,
+              "left": 142
+            },
+            "nameInk": {
+              "x": 142.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 217.5,
+              "bottom": 226.33334350585938,
+              "left": 142.5
+            },
+            "level": "Lv.60",
+            "levelRect": {
+              "x": 142,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 218,
+              "bottom": 244,
+              "left": 142
+            },
+            "rect": {
+              "x": 137,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 223,
+              "bottom": 250,
+              "left": 137
+            }
+          },
+          {
+            "i": 2,
+            "selected": false,
+            "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "nameBox": {
+              "x": 238,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 314,
+              "bottom": 226,
+              "left": 238
+            },
+            "nameInk": {
+              "x": 238.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 313.5,
+              "bottom": 226.33334350585938,
+              "left": 238.5
+            },
+            "level": "Lv.50",
+            "levelRect": {
+              "x": 238,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 314,
+              "bottom": 244,
+              "left": 238
+            },
+            "rect": {
+              "x": 233,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 319,
+              "bottom": 250,
+              "left": 233
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "characterTabBtnExpPool",
+            "text": "經驗池分配",
+            "rect": {
+              "x": 23,
+              "y": 258,
+              "width": 134.21875,
+              "height": 52,
+              "top": 258,
+              "right": 157.21875,
+              "bottom": 310,
+              "left": 23
+            }
+          },
+          {
+            "id": "characterTabBtnStatus",
+            "text": "能力值",
+            "rect": {
+              "x": 163.21875,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 247.109375,
+              "bottom": 310,
+              "left": 163.21875
+            }
+          },
+          {
+            "id": "characterTabBtnSkill",
+            "text": "技能",
+            "rect": {
+              "x": 253.109375,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 337,
+              "bottom": 310,
+              "left": 253.109375
+            }
+          }
+        ]
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-0-status-top",
+        "controls": [
+          {
+            "label": "？",
+            "width": 44,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "確認加點",
+            "width": 305.3333435058594,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "selectedBindingEnd": {
+        "statusCharacterIndex": 0,
+        "inventoryCharacterIndex": 0,
+        "currentSkillCharacter": "fire",
+        "expectedSkillKey": "fire",
+        "tab": "status",
+        "content": {
+          "rect": {
+            "x": 23,
+            "y": 316,
+            "width": 314,
+            "height": 301,
+            "top": 316,
+            "right": 337,
+            "bottom": 617,
+            "left": 23
+          },
+          "top": 743,
+          "height": 1646,
+          "client": 903,
+          "overflow": "auto"
+        },
+        "title": {
+          "x": 23,
+          "y": 26,
+          "width": 199.75,
+          "height": 38,
+          "top": 26,
+          "right": 222.75,
+          "bottom": 64,
+          "left": 23
+        },
+        "choices": [
+          {
+            "i": 0,
+            "selected": true,
+            "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "nameBox": {
+              "x": 46,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 122,
+              "bottom": 226,
+              "left": 46
+            },
+            "nameInk": {
+              "x": 46.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 121.5,
+              "bottom": 226.33334350585938,
+              "left": 46.5
+            },
+            "level": "Lv.70",
+            "levelRect": {
+              "x": 46,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 122,
+              "bottom": 244,
+              "left": 46
+            },
+            "rect": {
+              "x": 41,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 127,
+              "bottom": 250,
+              "left": 41
+            }
+          },
+          {
+            "i": 1,
+            "selected": false,
+            "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "nameBox": {
+              "x": 142,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 218,
+              "bottom": 226,
+              "left": 142
+            },
+            "nameInk": {
+              "x": 142.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 217.5,
+              "bottom": 226.33334350585938,
+              "left": 142.5
+            },
+            "level": "Lv.60",
+            "levelRect": {
+              "x": 142,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 218,
+              "bottom": 244,
+              "left": 142
+            },
+            "rect": {
+              "x": 137,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 223,
+              "bottom": 250,
+              "left": 137
+            }
+          },
+          {
+            "i": 2,
+            "selected": false,
+            "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "nameBox": {
+              "x": 238,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 314,
+              "bottom": 226,
+              "left": 238
+            },
+            "nameInk": {
+              "x": 238.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 313.5,
+              "bottom": 226.33334350585938,
+              "left": 238.5
+            },
+            "level": "Lv.50",
+            "levelRect": {
+              "x": 238,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 314,
+              "bottom": 244,
+              "left": 238
+            },
+            "rect": {
+              "x": 233,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 319,
+              "bottom": 250,
+              "left": 233
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "characterTabBtnExpPool",
+            "text": "經驗池分配",
+            "rect": {
+              "x": 23,
+              "y": 258,
+              "width": 134.21875,
+              "height": 52,
+              "top": 258,
+              "right": 157.21875,
+              "bottom": 310,
+              "left": 23
+            }
+          },
+          {
+            "id": "characterTabBtnStatus",
+            "text": "能力值",
+            "rect": {
+              "x": 163.21875,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 247.109375,
+              "bottom": 310,
+              "left": 163.21875
+            }
+          },
+          {
+            "id": "characterTabBtnSkill",
+            "text": "技能",
+            "rect": {
+              "x": 253.109375,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 337,
+              "bottom": 310,
+              "left": 253.109375
+            }
+          }
+        ]
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-0-status-end",
+        "controls": [
+          {
+            "label": "？",
+            "width": 44,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "-",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "+",
+            "width": 52,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "確認加點",
+            "width": 305.3333435058594,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "selectedBinding": {
+        "statusCharacterIndex": 0,
+        "inventoryCharacterIndex": 0,
+        "currentSkillCharacter": "fire",
+        "expectedSkillKey": "fire",
+        "tab": "skill",
+        "content": {
+          "rect": {
+            "x": 23,
+            "y": 316,
+            "width": 314,
+            "height": 301,
+            "top": 316,
+            "right": 337,
+            "bottom": 617,
+            "left": 23
+          },
+          "top": 0,
+          "height": 8342,
+          "client": 903,
+          "overflow": "auto"
+        },
+        "title": {
+          "x": 23,
+          "y": 26,
+          "width": 219.796875,
+          "height": 38,
+          "top": 26,
+          "right": 242.796875,
+          "bottom": 64,
+          "left": 23
+        },
+        "choices": [
+          {
+            "i": 0,
+            "selected": true,
+            "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "nameBox": {
+              "x": 46,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 122,
+              "bottom": 226,
+              "left": 46
+            },
+            "nameInk": {
+              "x": 46.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 121.5,
+              "bottom": 226.33334350585938,
+              "left": 46.5
+            },
+            "level": "Lv.70",
+            "levelRect": {
+              "x": 46,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 122,
+              "bottom": 244,
+              "left": 46
+            },
+            "rect": {
+              "x": 41,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 127,
+              "bottom": 250,
+              "left": 41
+            }
+          },
+          {
+            "i": 1,
+            "selected": false,
+            "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "nameBox": {
+              "x": 142,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 218,
+              "bottom": 226,
+              "left": 142
+            },
+            "nameInk": {
+              "x": 142.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 217.5,
+              "bottom": 226.33334350585938,
+              "left": 142.5
+            },
+            "level": "Lv.60",
+            "levelRect": {
+              "x": 142,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 218,
+              "bottom": 244,
+              "left": 142
+            },
+            "rect": {
+              "x": 137,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 223,
+              "bottom": 250,
+              "left": 137
+            }
+          },
+          {
+            "i": 2,
+            "selected": false,
+            "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "nameBox": {
+              "x": 238,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 314,
+              "bottom": 226,
+              "left": 238
+            },
+            "nameInk": {
+              "x": 238.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 313.5,
+              "bottom": 226.33334350585938,
+              "left": 238.5
+            },
+            "level": "Lv.50",
+            "levelRect": {
+              "x": 238,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 314,
+              "bottom": 244,
+              "left": 238
+            },
+            "rect": {
+              "x": 233,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 319,
+              "bottom": 250,
+              "left": 233
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "characterTabBtnExpPool",
+            "text": "經驗池分配",
+            "rect": {
+              "x": 23,
+              "y": 258,
+              "width": 134.21875,
+              "height": 52,
+              "top": 258,
+              "right": 157.21875,
+              "bottom": 310,
+              "left": 23
+            }
+          },
+          {
+            "id": "characterTabBtnStatus",
+            "text": "能力值",
+            "rect": {
+              "x": 163.21875,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 247.109375,
+              "bottom": 310,
+              "left": 163.21875
+            }
+          },
+          {
+            "id": "characterTabBtnSkill",
+            "text": "技能",
+            "rect": {
+              "x": 253.109375,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 337,
+              "bottom": 310,
+              "left": 253.109375
+            }
+          }
+        ]
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-0-skill-top",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "火元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "水元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "風元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "土元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・4點",
+            "width": 92,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・12點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・32點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・4點",
+            "width": 92,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・12點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・16點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・28點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・36點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "本命元素限定",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "selectedBindingEnd": {
+        "statusCharacterIndex": 0,
+        "inventoryCharacterIndex": 0,
+        "currentSkillCharacter": "fire",
+        "expectedSkillKey": "fire",
+        "tab": "skill",
+        "content": {
+          "rect": {
+            "x": 23,
+            "y": 316,
+            "width": 314,
+            "height": 301,
+            "top": 316,
+            "right": 337,
+            "bottom": 617,
+            "left": 23
+          },
+          "top": 7439,
+          "height": 8342,
+          "client": 903,
+          "overflow": "auto"
+        },
+        "title": {
+          "x": 23,
+          "y": 26,
+          "width": 219.796875,
+          "height": 38,
+          "top": 26,
+          "right": 242.796875,
+          "bottom": 64,
+          "left": 23
+        },
+        "choices": [
+          {
+            "i": 0,
+            "selected": true,
+            "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "nameBox": {
+              "x": 46,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 122,
+              "bottom": 226,
+              "left": 46
+            },
+            "nameInk": {
+              "x": 46.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 121.5,
+              "bottom": 226.33334350585938,
+              "left": 46.5
+            },
+            "level": "Lv.70",
+            "levelRect": {
+              "x": 46,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 122,
+              "bottom": 244,
+              "left": 46
+            },
+            "rect": {
+              "x": 41,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 127,
+              "bottom": 250,
+              "left": 41
+            }
+          },
+          {
+            "i": 1,
+            "selected": false,
+            "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "nameBox": {
+              "x": 142,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 218,
+              "bottom": 226,
+              "left": 142
+            },
+            "nameInk": {
+              "x": 142.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 217.5,
+              "bottom": 226.33334350585938,
+              "left": 142.5
+            },
+            "level": "Lv.60",
+            "levelRect": {
+              "x": 142,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 218,
+              "bottom": 244,
+              "left": 142
+            },
+            "rect": {
+              "x": 137,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 223,
+              "bottom": 250,
+              "left": 137
+            }
+          },
+          {
+            "i": 2,
+            "selected": false,
+            "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "nameBox": {
+              "x": 238,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 314,
+              "bottom": 226,
+              "left": 238
+            },
+            "nameInk": {
+              "x": 238.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 313.5,
+              "bottom": 226.33334350585938,
+              "left": 238.5
+            },
+            "level": "Lv.50",
+            "levelRect": {
+              "x": 238,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 314,
+              "bottom": 244,
+              "left": 238
+            },
+            "rect": {
+              "x": 233,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 319,
+              "bottom": 250,
+              "left": 233
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "characterTabBtnExpPool",
+            "text": "經驗池分配",
+            "rect": {
+              "x": 23,
+              "y": 258,
+              "width": 134.21875,
+              "height": 52,
+              "top": 258,
+              "right": 157.21875,
+              "bottom": 310,
+              "left": 23
+            }
+          },
+          {
+            "id": "characterTabBtnStatus",
+            "text": "能力值",
+            "rect": {
+              "x": 163.21875,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 247.109375,
+              "bottom": 310,
+              "left": 163.21875
+            }
+          },
+          {
+            "id": "characterTabBtnSkill",
+            "text": "技能",
+            "rect": {
+              "x": 253.109375,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 337,
+              "bottom": 310,
+              "left": 253.109375
+            }
+          }
+        ]
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "character-0-skill-end",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "經驗池分配",
+            "width": 134.21875,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "能力值",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "技能",
+            "width": 83.890625,
+            "height": 52,
+            "overflow": false
+          },
+          {
+            "label": "火元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "水元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "風元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "土元素",
+            "width": 75.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・4點",
+            "width": 92,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・12點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・32點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・4點",
+            "width": 92,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・12點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・16點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・20點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・28點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "學習・36點",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          },
+          {
+            "label": "詳情 ›",
+            "width": 48,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "本命元素限定",
+            "width": 92,
+            "height": 58,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "selectedBinding": {
+        "statusCharacterIndex": 0,
+        "inventoryCharacterIndex": 0,
+        "currentSkillCharacter": "fire",
+        "expectedSkillKey": "fire",
+        "tab": "expPool",
+        "content": {
+          "rect": {
+            "x": 23,
+            "y": 316,
+            "width": 314,
+            "height": 301,
+            "top": 316,
+            "right": 337,
+            "bottom": 617,
+            "left": 23
+          },
+          "top": 0,
+          "height": 2008,
+          "client": 903,
+          "overflow": "auto"
+        },
+        "title": {
+          "x": 23,
+          "y": 26,
+          "width": 219.796875,
+          "height": 38,
+          "top": 26,
+          "right": 242.796875,
+          "bottom": 64,
+          "left": 23
+        },
+        "choices": [
+          {
+            "i": 0,
+            "selected": true,
+            "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+            "nameBox": {
+              "x": 46,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 122,
+              "bottom": 226,
+              "left": 46
+            },
+            "nameInk": {
+              "x": 46.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 121.5,
+              "bottom": 226.33334350585938,
+              "left": 46.5
+            },
+            "level": "Lv.70",
+            "levelRect": {
+              "x": 46,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 122,
+              "bottom": 244,
+              "left": 46
+            },
+            "rect": {
+              "x": 41,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 127,
+              "bottom": 250,
+              "left": 41
+            }
+          },
+          {
+            "i": 1,
+            "selected": false,
+            "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+            "nameBox": {
+              "x": 142,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 218,
+              "bottom": 226,
+              "left": 142
+            },
+            "nameInk": {
+              "x": 142.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 217.5,
+              "bottom": 226.33334350585938,
+              "left": 142.5
+            },
+            "level": "Lv.60",
+            "levelRect": {
+              "x": 142,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 218,
+              "bottom": 244,
+              "left": 142
+            },
+            "rect": {
+              "x": 137,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 223,
+              "bottom": 250,
+              "left": 137
+            }
+          },
+          {
+            "i": 2,
+            "selected": false,
+            "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+            "nameBox": {
+              "x": 238,
+              "y": 142,
+              "width": 76,
+              "height": 84,
+              "top": 142,
+              "right": 314,
+              "bottom": 226,
+              "left": 238
+            },
+            "nameInk": {
+              "x": 238.5,
+              "y": 141.6666717529297,
+              "width": 75,
+              "height": 84.66667175292969,
+              "top": 141.6666717529297,
+              "right": 313.5,
+              "bottom": 226.33334350585938,
+              "left": 238.5
+            },
+            "level": "Lv.50",
+            "levelRect": {
+              "x": 238,
+              "y": 226,
+              "width": 76,
+              "height": 18,
+              "top": 226,
+              "right": 314,
+              "bottom": 244,
+              "left": 238
+            },
+            "rect": {
+              "x": 233,
+              "y": 77,
+              "width": 86,
+              "height": 173,
+              "top": 77,
+              "right": 319,
+              "bottom": 250,
+              "left": 233
+            }
+          }
+        ],
+        "tabs": [
+          {
+            "id": "characterTabBtnExpPool",
+            "text": "經驗池分配",
+            "rect": {
+              "x": 23,
+              "y": 258,
+              "width": 134.21875,
+              "height": 52,
+              "top": 258,
+              "right": 157.21875,
+              "bottom": 310,
+              "left": 23
+            }
+          },
+          {
+            "id": "characterTabBtnStatus",
+            "text": "能力值",
+            "rect": {
+              "x": 163.21875,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 247.109375,
+              "bottom": 310,
+              "left": 163.21875
+            }
+          },
+          {
+            "id": "characterTabBtnSkill",
+            "text": "技能",
+            "rect": {
+              "x": 253.109375,
+              "y": 258,
+              "width": 83.890625,
+              "height": 52,
+              "top": 258,
+              "right": 337,
+              "bottom": 310,
+              "left": 253.109375
+            }
+          }
+        ]
+      }
+    },
+    {
+      "phase": "canonical-exp-rows",
+      "stage": "top",
+      "index": 0,
+      "rows": [
+        {
+          "i": 0,
+          "name": "角色名稱長文測試甲乙丙丁戊己庚辛",
+          "level": "Lv.70",
+          "rect": {
+            "x": 23,
+            "y": 615.28125,
+            "width": 154,
+            "height": 157.046875,
+            "top": 615.28125,
+            "right": 177,
+            "bottom": 772.328125,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 629.546875,
+            "width": 90.828125,
+            "height": 23.25,
+            "top": 629.546875,
+            "right": 124.828125,
+            "bottom": 652.796875,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 630.2135620117188,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 630.2135620117188,
+            "right": 274,
+            "bottom": 651.8802490234375,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 9,637,200 EXP",
+            "rect": {
+              "x": 34,
+              "y": 664.328125,
+              "width": 132,
+              "height": 39.19793701171875,
+              "top": 664.328125,
+              "right": 166,
+              "bottom": 703.5260620117188,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 663.6614990234375,
+              "width": 112.84375,
+              "height": 39.9322509765625,
+              "top": 663.6614990234375,
+              "right": 146.84375,
+              "bottom": 703.59375,
+              "left": 34
+            }
+          },
+          "badge": {
+            "rect": null,
+            "ink": null
+          }
+        },
+        {
+          "i": 1,
+          "name": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "level": "Lv.60",
+          "rect": {
+            "x": 183,
+            "y": 615.28125,
+            "width": 154,
+            "height": 157.046875,
+            "top": 615.28125,
+            "right": 337,
+            "bottom": 772.328125,
+            "left": 183
+          },
+          "nameBox": {
+            "x": 194,
+            "y": 626.28125,
+            "width": 90.828125,
+            "height": 23.25,
+            "top": 626.28125,
+            "right": 284.828125,
+            "bottom": 649.53125,
+            "left": 194
+          },
+          "nameInk": {
+            "x": 194,
+            "y": 626.9479370117188,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 626.9479370117188,
+            "right": 434,
+            "bottom": 648.6146240234375,
+            "left": 194
+          },
+          "meta": {
+            "text": "目前 0 / 5,885,100 EXP\n追趕加成 ×1.15",
+            "rect": {
+              "x": 194,
+              "y": 654.53125,
+              "width": 132,
+              "height": 58.796875,
+              "top": 654.53125,
+              "right": 326,
+              "bottom": 713.328125,
+              "left": 194
+            },
+            "ink": {
+              "x": 194,
+              "y": 653.8646240234375,
+              "width": 177.36459350585938,
+              "height": 59.53125,
+              "top": 653.8646240234375,
+              "right": 371.3645935058594,
+              "bottom": 713.3958740234375,
+              "left": 194
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.15",
+            "rect": {
+              "x": 262.1770935058594,
+              "y": 672.4271240234375,
+              "width": 109.1875,
+              "height": 23,
+              "top": 672.4271240234375,
+              "right": 371.3645935058594,
+              "bottom": 695.4271240234375,
+              "left": 262.1770935058594
+            },
+            "ink": {
+              "x": 269.1770935058594,
+              "y": 674.4271240234375,
+              "width": 95.1875,
+              "height": 18.6666259765625,
+              "top": 674.4271240234375,
+              "right": 364.3645935058594,
+              "bottom": 693.09375,
+              "left": 269.1770935058594
+            }
+          }
+        },
+        {
+          "i": 2,
+          "name": "子丑寅卯辰巳午未申酉戌亥甲乙丙丁",
+          "level": "Lv.50",
+          "rect": {
+            "x": 23,
+            "y": 778.328125,
+            "width": 154,
+            "height": 157.046875,
+            "top": 778.328125,
+            "right": 177,
+            "bottom": 935.375,
+            "left": 23
+          },
+          "nameBox": {
+            "x": 34,
+            "y": 789.328125,
+            "width": 90.828125,
+            "height": 23.25,
+            "top": 789.328125,
+            "right": 124.828125,
+            "bottom": 812.578125,
+            "left": 34
+          },
+          "nameInk": {
+            "x": 34,
+            "y": 789.9948120117188,
+            "width": 240,
+            "height": 21.66668701171875,
+            "top": 789.9948120117188,
+            "right": 274,
+            "bottom": 811.6614990234375,
+            "left": 34
+          },
+          "meta": {
+            "text": "目前 0 / 2,960,400 EXP\n追趕加成 ×1.30",
+            "rect": {
+              "x": 34,
+              "y": 817.578125,
+              "width": 132,
+              "height": 58.796875,
+              "top": 817.578125,
+              "right": 166,
+              "bottom": 876.375,
+              "left": 34
+            },
+            "ink": {
+              "x": 34,
+              "y": 816.9114990234375,
+              "width": 177.36459350585938,
+              "height": 59.53125,
+              "top": 816.9114990234375,
+              "right": 211.36459350585938,
+              "bottom": 876.4427490234375,
+              "left": 34
+            }
+          },
+          "badge": {
+            "text": "追趕加成 ×1.30",
+            "rect": {
+              "x": 102.17708587646484,
+              "y": 835.4739990234375,
+              "width": 109.18750762939453,
+              "height": 23,
+              "top": 835.4739990234375,
+              "right": 211.36459350585938,
+              "bottom": 858.4739990234375,
+              "left": 102.17708587646484
+            },
+            "ink": {
+              "x": 109.17708587646484,
+              "y": 837.4739990234375,
+              "width": 95.18750762939453,
+              "height": 18.6666259765625,
+              "top": 837.4739990234375,
+              "right": 204.36459350585938,
+              "bottom": 856.140625,
+              "left": 109.17708587646484
+            }
+          }
+        }
+      ],
+      "footer": {
+        "x": 23,
+        "y": 941.375,
+        "width": 154,
+        "height": 44,
+        "top": 941.375,
+        "right": 177,
+        "bottom": 985.375,
+        "left": 23
+      },
+      "owner": {
+        "x": 23,
+        "y": 316,
+        "width": 314,
+        "height": 301,
+        "top": 316,
+        "right": 337,
+        "bottom": 617,
+        "left": 23
+      }
+    }
+  ],
+  "scenes": [
+    "character-0-status-top",
+    "character-0-status-end",
+    "character-0-skill-top",
+    "character-0-skill-end"
+  ]
+}

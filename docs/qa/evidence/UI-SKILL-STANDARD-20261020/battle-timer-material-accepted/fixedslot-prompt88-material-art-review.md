@@ -1,0 +1,9 @@
+# prompt88 timer material visual review
+
+Source0093671975423b85d4b1cbb464567ea15a71c9b2. Actually viewed all12 HUD/prompt/cancelled PNGs at four viewports under `fixedslot-prompt88-00936719/natural-entry-qualified/`; four reports complete=true with this Head. The prior c002 rejection remains unchanged as historical evidence.
+
+Limited PASS for timer skin delta. The timer now visibly uses a dark iron surface and restrained carved bronze edges, matching the existing prompt/skill-family language without overdecorating a compact HUD indicator. Numeral20 and the single round label remain complete and separated from the action row; target instruction/return/crosshairs remain readable, and cancellation restores the normal controls. Naturally varying enemy counts do not affect this visual conclusion. No new geometry/reading blocker seen compared with c002.
+
+Concrete next pending family: the five main command buttons still appear as large smooth brown gradients, ordinary thin gold outlines and rounded corners across the viewport width. Their text is readable, but their collective visual weight dominates the HUD and lacks the iron/bronze workmanship now present in timer/prompt. Inspect and improve the original command-row/button presentation Owner only, retaining the proven five-column layout/targets/text and state semantics. A shared restrained carved rail or same-source iron button surfaces is more suitable than adding five large window frames. No claim that an original raster asset was removed: this observation concerns the actual current gradient buttons.
+
+This does not approve the entire battle interface, command states, timer expiry, targeting beyond the sampled ordinary attack/cancel route, actual attacks, settlement/rewards or physical devices. No Chrome or tracked-source edits during review.

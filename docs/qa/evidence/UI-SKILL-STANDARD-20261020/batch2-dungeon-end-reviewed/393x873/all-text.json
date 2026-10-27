@@ -1,0 +1,1376 @@
+[
+  {
+    "name": "daily-top",
+    "rows": [
+      {
+        "text": "副本",
+        "font": 20.58571560864378,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "dungeonPage"
+      },
+      {
+        "text": "日常副本",
+        "font": 16.842856709082522,
+        "button": true,
+        "primary": true,
+        "selector": "#dungeonTabBtnDaily",
+        "parent": ""
+      },
+      {
+        "text": "經驗副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "材料副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "金幣副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "裝備副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "難度：與一般副本相同",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card v17346-equipment-dungeon-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "日常副本",
+        "width": 372.4142761230469,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.6571044921875,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.6571044921875,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.6572265625,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.6572265625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "daily-end-observed",
+    "rows": [
+      {
+        "text": "副本",
+        "font": 20.58571560864378,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "dungeonPage"
+      },
+      {
+        "text": "日常副本",
+        "font": 16.842856709082522,
+        "button": true,
+        "primary": true,
+        "selector": "#dungeonTabBtnDaily",
+        "parent": ""
+      },
+      {
+        "text": "經驗副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "材料副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "金幣副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "裝備副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "難度：與一般副本相同",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card v17346-equipment-dungeon-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "日常副本",
+        "width": 372.4142761230469,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "daily-true-end",
+    "rows": [
+      {
+        "text": "副本",
+        "font": 20.58571560864378,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "dungeonPage"
+      },
+      {
+        "text": "日常副本",
+        "font": 16.842856709082522,
+        "button": true,
+        "primary": true,
+        "selector": "#dungeonTabBtnDaily",
+        "parent": ""
+      },
+      {
+        "text": "經驗副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "材料副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "金幣副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "裝備副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "難度：與一般副本相同",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card v17346-equipment-dungeon-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "日常副本",
+        "width": 372.4142761230469,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "returned-home",
+    "rows": [
+      {
+        "text": "江湖旗號",
+        "font": 14.232584135872978,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-banner-label",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 18.553540411074298,
+        "button": false,
+        "primary": false,
+        "selector": "#homeBannerName",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "V173.73",
+        "font": 14.190523993108691,
+        "button": false,
+        "primary": false,
+        "selector": "#homeVersionBadge",
+        "parent": "home-hud-kicker"
+      },
+      {
+        "text": "金幣",
+        "font": 14.164671159827192,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "0",
+        "font": 15.14960174560547,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudGoldValue",
+        "parent": ""
+      },
+      {
+        "text": "經驗池",
+        "font": 14.21569929451778,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-hud-resources"
+      },
+      {
+        "text": "413",
+        "font": 15.354323928420607,
+        "button": false,
+        "primary": false,
+        "selector": "#homeHudExpValue",
+        "parent": ""
+      },
+      {
+        "text": "DEV",
+        "font": 14.227701187133789,
+        "button": false,
+        "primary": false,
+        "selector": "span.home-test-label",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "金幣",
+        "font": 16.392939381053967,
+        "button": true,
+        "primary": false,
+        "selector": "#testGoldMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+100萬",
+        "font": 16.397031064065086,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testGoldMillionButton"
+      },
+      {
+        "text": "經驗池",
+        "font": 16.360882463126345,
+        "button": true,
+        "primary": false,
+        "selector": "#testExpTenMillionButton",
+        "parent": "homeTestTools"
+      },
+      {
+        "text": "+10億",
+        "font": 16.32996826171875,
+        "button": true,
+        "primary": false,
+        "selector": "b.",
+        "parent": "testExpTenMillionButton"
+      },
+      {
+        "text": "角色 2 人",
+        "font": 14.203038215637207,
+        "button": false,
+        "primary": false,
+        "selector": "span.v146-home-roster-count",
+        "parent": ""
+      },
+      {
+        "text": "佈陣",
+        "font": 16.375003390842014,
+        "button": true,
+        "primary": true,
+        "selector": "button.v-fixed-formation-entry",
+        "parent": ""
+      },
+      {
+        "text": "QA 火角色",
+        "font": 16.375000211927624,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.191666850337274,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 14.191665840148927,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 14.191665840148927,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 16.374999152289497,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "Lv.70",
+        "font": 14.19166593198423,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v146-home-character"
+      },
+      {
+        "text": "HP",
+        "font": 14.191663360595703,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "SP",
+        "font": 14.191663360595703,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "home-status-meter"
+      },
+      {
+        "text": "角色",
+        "font": 16.306952415628636,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "英雄",
+        "font": 16.306952415628636,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "商店",
+        "font": 16.306952415628636,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-primary"
+      },
+      {
+        "text": "任務",
+        "font": 16.306952415628636,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "秘寶",
+        "font": 16.3069542418135,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-relic-home-entry"
+      },
+      {
+        "text": "元素匣",
+        "font": 16.422520228794642,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-utility team-element-box-home-entry"
+      },
+      {
+        "text": "鍛造",
+        "font": 16.3069542418135,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "合成",
+        "font": 16.3069542418135,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-secondary"
+      },
+      {
+        "text": "成就",
+        "font": 16.375,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "公告",
+        "font": 16.375,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "離線經驗",
+        "font": 16.375003814697266,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "系統",
+        "font": 16.375,
+        "button": true,
+        "primary": false,
+        "selector": "span.home-card-label",
+        "parent": "home-card home-card-tertiary"
+      },
+      {
+        "text": "出城冒險　›",
+        "font": 22.9250024948677,
+        "button": true,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "江湖主線 · 章節推進",
+        "font": 14.191668211108578,
+        "button": true,
+        "primary": false,
+        "selector": "span.adventure-home-kicker",
+        "parent": "adventureHomeEntry"
+      },
+      {
+        "text": "隊伍秘寶",
+        "font": 14.19166660308838,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "尚未裝備",
+        "font": 15.283333032152804,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "team-relic-loadout-slot"
+      },
+      {
+        "text": "選擇",
+        "font": 16.374993896484373,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "team-relic-loadout-slot"
+      }
+    ],
+    "controls": [
+      {
+        "label": "金幣 +100萬",
+        "width": 98.721923828125,
+        "height": 48.0333251953125,
+        "overflow": false
+      },
+      {
+        "label": "經驗池 +10億",
+        "width": 105.43679809570312,
+        "height": 48.0333251953125,
+        "overflow": false
+      },
+      {
+        "label": "佈陣",
+        "width": 58.95001220703125,
+        "height": 48.033355712890625,
+        "overflow": false
+      },
+      {
+        "label": "角色",
+        "width": 52.400001525878906,
+        "height": 52.399993896484375,
+        "overflow": false
+      },
+      {
+        "label": "英雄",
+        "width": 52.400001525878906,
+        "height": 52.399993896484375,
+        "overflow": false
+      },
+      {
+        "label": "商店",
+        "width": 52.400001525878906,
+        "height": 52.39996337890625,
+        "overflow": false
+      },
+      {
+        "label": "任務",
+        "width": 52.400001525878906,
+        "height": 52.4000244140625,
+        "overflow": false
+      },
+      {
+        "label": "秘寶",
+        "width": 52.4000244140625,
+        "height": 52.399993896484375,
+        "overflow": false
+      },
+      {
+        "label": "元素匣",
+        "width": 52.4000244140625,
+        "height": 52.399993896484375,
+        "overflow": false
+      },
+      {
+        "label": "鍛造",
+        "width": 52.4000244140625,
+        "height": 52.39996337890625,
+        "overflow": false
+      },
+      {
+        "label": "合成",
+        "width": 52.4000244140625,
+        "height": 52.4000244140625,
+        "overflow": false
+      },
+      {
+        "label": "成就",
+        "width": 93.3375015258789,
+        "height": 48.03338623046875,
+        "overflow": false
+      },
+      {
+        "label": "公告",
+        "width": 93.3375015258789,
+        "height": 48.03338623046875,
+        "overflow": false
+      },
+      {
+        "label": "離線經驗",
+        "width": 93.33749389648438,
+        "height": 48.03338623046875,
+        "overflow": false
+      },
+      {
+        "label": "系統",
+        "width": 93.33749389648438,
+        "height": 48.03338623046875,
+        "overflow": false
+      },
+      {
+        "label": "出城冒險　›江湖主線 · 章節推進",
+        "width": 218.33331298828125,
+        "height": 57.3466796875,
+        "overflow": false
+      },
+      {
+        "label": "選擇",
+        "width": 54.58331298828125,
+        "height": 48.0333251953125,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "daily-reopened",
+    "rows": [
+      {
+        "text": "副本",
+        "font": 20.58571560864378,
+        "button": false,
+        "primary": false,
+        "selector": "h2.",
+        "parent": "dungeonPage"
+      },
+      {
+        "text": "日常副本",
+        "font": 16.842856709082522,
+        "button": true,
+        "primary": true,
+        "selector": "#dungeonTabBtnDaily",
+        "parent": ""
+      },
+      {
+        "text": "經驗副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "材料副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "金幣副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "開放：任一角色達到10級",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card"
+      },
+      {
+        "text": "裝備副本",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "難度：與一般副本相同",
+        "font": 14.971427755152925,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-dungeon-cover-info"
+      },
+      {
+        "text": "獎勵預覽",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "挑戰",
+        "font": 16.79782251368232,
+        "button": true,
+        "primary": true,
+        "selector": "button.",
+        "parent": "v141-dungeon-cover-actions"
+      },
+      {
+        "text": "可挑戰",
+        "font": 14.971428073182398,
+        "button": false,
+        "primary": false,
+        "selector": "div.v141-dungeon-remaining",
+        "parent": "v141-dungeon-cover-card v17346-equipment-dungeon-card"
+      }
+    ],
+    "controls": [
+      {
+        "label": "日常副本",
+        "width": 372.4142761230469,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.657135009765625,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65715026855469,
+        "overflow": false
+      },
+      {
+        "label": "獎勵預覽",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      },
+      {
+        "label": "挑戰",
+        "width": 174.51071166992188,
+        "height": 48.65716552734375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]

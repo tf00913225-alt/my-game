@@ -1,0 +1,1186 @@
+{
+  "complete": true,
+  "sourcesBefore": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "0656aaa1e984440d41509db945ac283029cba6ce32c988109475e22dbaf54a7c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "3d1f7498bd342f468cab595016281c78058a2fdb67cce29a0c34a313f3f77562",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.ec568394fd00.js": "ec568394fd00290c85802827d0aa1941ba42f7fce5e35a226550068cdf0907c1",
+    "build/gameplay-core.e981e271013d.css": "e981e271013d2780199a32b799d7f65717b4496725dbfc3a93bbd511cb4948b2"
+  },
+  "sourcesAfter": {
+    "index.html": "976f49902a687680d4a1edfeda694693a1620baa4083ebb5a0c4b2d66ecd391d",
+    "asset-manifest.json": "0656aaa1e984440d41509db945ac283029cba6ce32c988109475e22dbaf54a7c",
+    "js/49-v169-element-box-settings.js": "bc3f067e6e51ca46dacf72404702f95a190d7b53ac86df0919e3629a79d817b6",
+    "js/25-v131-fix-batch.js": "962d3f3a289a97540b7aaa1f8b91805190cbf8a32f3b5d40540cc304dbaee9ce",
+    "js/00-main.js": "3d1f7498bd342f468cab595016281c78058a2fdb67cce29a0c34a313f3f77562",
+    "css/48-v169-element-box-settings.css": "1af0440eb987708e4fb8c4b8c59d3a518fda7cf9b6d5197570310c243c04f21f",
+    "build/app-shell.058b860fa3fc.css": "058b860fa3fcbfa3dfab72086ca1b8ceb3e651c48d64784292de056d9bef092b",
+    "build/app-shell.201a0fc6b9da.js": "201a0fc6b9da8ac1fbd68268439b148e1c8f63e92df7e7c5f258f5a1e5bc6d33",
+    "build/boot-core.1775eab1cc99.css": "1775eab1cc99d533cf875312088be14505e6ea92befa08f5ce36c91029fb0234",
+    "build/boot-core.92c7957bd528.js": "92c7957bd52849d20132b524c3b207e7226cc86b56257be7070b43e86446f066",
+    "build/feature-abyss.56786ed25f03.js": "56786ed25f038047f92d296b2c1c705199e763f004222908f77ebc44c0f10ac5",
+    "build/feature-abyss.8fc5913c1e94.css": "8fc5913c1e9405b1e1dc0aa6ffc12e3dba8cb20a65827f2283f9ad74470f466c",
+    "build/feature-adventure-content.6cc9644cc366.js": "6cc9644cc366031ad9adf3adf89a236c864efec54ef44d854a3ee8878b7fb826",
+    "build/feature-adventure-entry.8215d893d208.js": "8215d893d20891b4fbe4fcf1dfe8059d8a1488d43f1bf2890396b8681569b1af",
+    "build/feature-adventure-entry.f68f5350eccc.css": "f68f5350eccc3fdbe89f026f7247efb3fea61595dffe2aee123a92407ced9cee",
+    "build/feature-adventure-items.cf197e72837f.js": "cf197e72837f2062fedfa15276178abc2d3d088dbd2977feabb870fc51d22c89",
+    "build/feature-adventure-runtime.314d8cda083e.js": "314d8cda083e8a4e0ba10a08de942e77ba5f7f7b66a23a2f7a1fedf0958fe81b",
+    "build/feature-adventure-ui.9bcdf1d2545b.js": "9bcdf1d2545b134443cdb5feefc024705a31123d27de5d26510d49d01815d00e",
+    "build/feature-adventure.69c0692917da.css": "69c0692917dac95859190c2ed7af49410f0e5dcfe271e3ee0447cccdf61b0bce",
+    "build/feature-boss-relic.25e704feb9dd.css": "25e704feb9ddb443b2660c188eb364de5646101629781023b65e4eeddffb1af4",
+    "build/feature-boss-relic.a8ff5e27d0a5.js": "a8ff5e27d0a575c2151ce900f8eb2e0945045733953b973c9ce5f8c6cae991a3",
+    "build/feature-patrol.1cef20d37f82.css": "1cef20d37f8208a0b363a0f6d91e57183ae08d4297c7d2a25a059de3178aa6fb",
+    "build/feature-patrol.ab5bd3ce5582.js": "ab5bd3ce5582ac7434f8e096872ca074963872dbdd93e1f5e6834c9a4e64a13f",
+    "build/feature-relic-progression.464cd8f702a6.js": "464cd8f702a6f26ad9a1bb7979488861d207d292f6ebad93ca64e15d7454715b",
+    "build/feature-relic-progression.9eb4fff74856.css": "9eb4fff7485661e1526dcf0623e83e857bb4db45ea0df6ac6e73948acd1cf8e0",
+    "build/gameplay-core-primary.7b75ca5e1c88.js": "7b75ca5e1c88ce7a9ef66db46ba2afb18ad3c7b004a89b7451dc4c7ee656f941",
+    "build/gameplay-core-secondary.ec568394fd00.js": "ec568394fd00290c85802827d0aa1941ba42f7fce5e35a226550068cdf0907c1",
+    "build/gameplay-core.e981e271013d.css": "e981e271013d2780199a32b799d7f65717b4496725dbfc3a93bbd511cb4948b2"
+  },
+  "sourceUnchanged": true,
+  "loaded": [
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-auth-ui.e5124ef5fef1.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/boot-core.92c7957bd528.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/boot-core.1775eab1cc99.css",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/firebase-auth.9f8c09942b79.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-bootstrap.c4f4143606ed.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/firebase-cloud-save.dbb8d71d026f.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/firebase/firebase-config.4314d6321ba1.js",
+    "/build/firebase/firebase-session.877a7842d6bd.js",
+    "/build/firebase/session-client.235aa8b1f47e.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/app-shell.058b860fa3fc.css",
+    "/build/app-shell.201a0fc6b9da.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.ec568394fd00.js",
+    "/build/feature-patrol.1cef20d37f82.css",
+    "/build/gameplay-core.e981e271013d.css",
+    "/build/feature-patrol.ab5bd3ce5582.js",
+    "/build/gameplay-core-primary.7b75ca5e1c88.js",
+    "/build/gameplay-core-secondary.ec568394fd00.js",
+    "/build/gameplay-core.e981e271013d.css",
+    "/build/feature-adventure-entry.f68f5350eccc.css",
+    "/build/feature-adventure-entry.8215d893d208.js",
+    "/build/feature-adventure-items.cf197e72837f.js"
+  ],
+  "touches": [
+    {
+      "selector": "[data-city-entry=\"5\"]",
+      "x": 330,
+      "y": 309.2552185058594,
+      "hit": true,
+      "label": "元素匣"
+    },
+    {
+      "selector": "#autoSettingsHP_customUI .custom-dropdown-label",
+      "x": 112.75,
+      "y": 361.46356201171875,
+      "hit": true,
+      "label": "50%▾"
+    },
+    {
+      "selector": "[data-qa21-for=\"autoSettingsHP\"] .custom-dropdown-item:nth-child(3)",
+      "x": 112.75,
+      "y": 225.46875,
+      "hit": true,
+      "label": "75%"
+    },
+    {
+      "selector": "#autoSettingsSP_customUI .custom-dropdown-label",
+      "x": 247.25,
+      "y": 361.46356201171875,
+      "hit": true,
+      "label": "25%▾"
+    },
+    {
+      "selector": "[data-qa21-for=\"autoSettingsSP\"] .custom-dropdown-item:nth-child(2)",
+      "x": 247.25,
+      "y": 182.46875,
+      "hit": true,
+      "label": "50%"
+    },
+    {
+      "selector": "#autoSettingsCharacterSelect_customUI .custom-dropdown-label",
+      "x": 245,
+      "y": 310,
+      "hit": true,
+      "label": "QA 火角色▾"
+    },
+    {
+      "selector": "[data-qa21-for=\"autoSettingsCharacterSelect\"] .custom-dropdown-item:nth-child(2)",
+      "x": 245,
+      "y": 403,
+      "hit": true,
+      "label": "QA 水角色"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 284.875,
+      "y": 129,
+      "hit": true,
+      "label": "返回"
+    },
+    {
+      "selector": "[data-city-entry=\"5\"]",
+      "x": 330,
+      "y": 309.2552185058594,
+      "hit": true,
+      "label": "元素匣"
+    },
+    {
+      "selector": "#autoBattleButton",
+      "x": 251,
+      "y": 220,
+      "hit": true,
+      "label": "套用並啟動"
+    },
+    {
+      "selector": "#v169RpgDialogLayer .v169-rpg-dialog-actions button:first-child",
+      "x": 106.75,
+      "y": 430,
+      "hit": true,
+      "label": "稍後再說"
+    },
+    {
+      "selector": "#homeFeatureModal .home-feature-close-btn:not(#statusHelpButton)",
+      "x": 284.875,
+      "y": 129,
+      "hit": true,
+      "label": "返回"
+    }
+  ],
+  "checks": [
+    {
+      "entryResolution": {
+        "visibleCity": true,
+        "trainingEntry": []
+      }
+    },
+    {
+      "preflight": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 50,
+            "sp": 25,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 50,
+            "sp": 25,
+            "returnToCityWhenEmpty": false
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496986694,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496986695}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      },
+      "autoScope": {
+        "owner": "js/49-v169-element-box-settings.js",
+        "controls": [
+          "#autoSettingsHP",
+          "#autoSettingsSP",
+          "#autoSettingsCharacterSelect"
+        ],
+        "effects": "change/character switch/close call original saveGame; apply also persists before confirm",
+        "limits": "No real account, hours grant, ad, battle, activate, or guard bypass"
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "auto-entry",
+        "controls": [
+          {
+            "label": "返回",
+            "width": 68.25,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "套用並啟動",
+            "width": 118,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 火角色▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "普通攻擊▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "25%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告 ＋8小時",
+            "width": 137.57290649414062,
+            "height": 48,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "autoSettingsHP-menu",
+        "controls": [
+          {
+            "label": "25%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "90%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "100%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "nativeValue": {
+        "id": "#autoSettingsHP",
+        "previous": "50",
+        "selected": "75"
+      }
+    },
+    {
+      "nativeSelection": "#autoSettingsHP",
+      "state": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 25,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 25,
+            "returnToCityWhenEmpty": false
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496989161,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":25,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":25,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496989161}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "autoSettingsHP-selected",
+        "controls": [
+          {
+            "label": "套用並啟動",
+            "width": 118,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 火角色▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "普通攻擊▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "25%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告 ＋8小時",
+            "width": 137.57290649414062,
+            "height": 48.000030517578125,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "autoSettingsSP-menu",
+        "controls": [
+          {
+            "label": "25%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "90%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "100%",
+            "width": 105.5,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "nativeValue": {
+        "id": "#autoSettingsSP",
+        "previous": "25",
+        "selected": "50"
+      }
+    },
+    {
+      "nativeSelection": "#autoSettingsSP",
+      "state": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496991578,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496991578}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "autoSettingsSP-selected",
+        "controls": [
+          {
+            "label": "套用並啟動",
+            "width": 118,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 火角色▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "普通攻擊▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告 ＋8小時",
+            "width": 137.57290649414062,
+            "height": 48.000030517578125,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "autoSettingsCharacterSelect-menu",
+        "controls": [
+          {
+            "label": "QA 火角色",
+            "width": 128,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 水角色",
+            "width": 128,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "角色3（尚未創建）",
+            "width": 128,
+            "height": 61,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "characterSwitch": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496994077,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496994077}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "auto-character-selected",
+        "controls": [
+          {
+            "label": "套用並啟動",
+            "width": 118,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 水角色▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "普通攻擊▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告 ＋8小時",
+            "width": 137.57290649414062,
+            "height": 48,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "reopened": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496995677,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496995677}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "auto-reopen",
+        "controls": [
+          {
+            "label": "套用並啟動",
+            "width": 118,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "QA 火角色▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "普通攻擊▾",
+            "width": 130,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "75%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "50%▾",
+            "width": 107.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告 ＋8小時",
+            "width": 137.57290649414062,
+            "height": 48,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "captureAttempt": {
+        "name": "zero-hours-confirm",
+        "controls": [
+          {
+            "label": "稍後再說",
+            "width": 137.5,
+            "height": 44,
+            "overflow": false
+          },
+          {
+            "label": "觀看廣告",
+            "width": 137.5,
+            "height": 44,
+            "overflow": false
+          }
+        ],
+        "overflow": []
+      }
+    },
+    {
+      "afterCancel": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496996913,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496996913}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      }
+    },
+    {
+      "activeGuard": "UNVERIFIED: excluded getter fixture drives formal recovery timer; no activation simulated"
+    },
+    {
+      "afterFinalClose": {
+        "origin": "http://127.0.0.1:51304",
+        "active": {
+          "active": false,
+          "remainingMs": 0
+        },
+        "battle": false,
+        "primary": "v169SaveElementBoxSettings()",
+        "hp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "sp": [
+          "25",
+          "50",
+          "75",
+          "90",
+          "100"
+        ],
+        "configs": [
+          {
+            "i": 0,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          },
+          {
+            "i": 1,
+            "enabled": false,
+            "skill": "normal",
+            "hp": 75,
+            "sp": 50,
+            "returnToCityWhenEmpty": false,
+            "v136ActionIntent": "normal"
+          }
+        ],
+        "storage": {
+          "four_symbols_account:skill-runtime-browser-qa:rested-exp-state": "{\"battles\":0,\"progressMs\":0,\"lastSeenAt\":1792496986146,\"blockedByElementBox\":false}",
+          "four_symbols_save:skill-runtime-browser-qa": "{\"version\":6,\"heroAccount\":{\"schemaVersion\":1,\"heroes\":{\"divineDogHongbao\":{\"heroId\":\"divineDogHongbao\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1},\"vajraHeavenlyKing\":{\"heroId\":\"vajraHeavenlyKing\",\"unlocked\":false,\"specificFragments\":0,\"stars\":0,\"allocationSeed\":1,\"allocationVersion\":1}}},\"player\":{\"id\":\"QA 火角色\",\"element\":\"fire\",\"level\":70,\"exp\":0,\"expNext\":9637200,\"attack\":10,\"vitality\":10,\"energy\":10,\"intelligence\":10,\"defensePoints\":0,\"agility\":10,\"bonusHP\":0,\"bonusSP\":0,\"hp\":300,\"sp\":120,\"attributePoints\":10,\"skillPoints\":999,\"activeBuffs\":[],\"statusEffects\":[],\"isDefending\":false,\"gender\":\"male\",\"relicProgression\":{\"version\":1,\"initialized\":true,\"ownershipMigration\":\"preserved-existing\",\"firstCharacterLevel20Grant\":true,\"legacyTowerChoiceHandled\":true,\"majorMilestoneClaims\":{},\"pending\":null}},\"player2\":{\"id\":\"QA 水角色\",\"element\":\"water\",\"level\":70,\"skillPoints\":999},\"player3\":null,\"sharedExp\":0,\"gold\":0,\"dailyQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"checkin\":0,\"killMonsters\":0,\"winBattle\":0,\"kill10\":0,\"win3\":0,\"skills5\":0},\"claimed\":{\"checkin\":false,\"killMonsters\":false,\"winBattle\":false,\"kill10\":false,\"win3\":false,\"skills5\":false}},\"commissionQuestState\":{\"date\":\"2026-10-20\",\"progress\":{\"killMonsters\":0,\"winBattle\":0,\"kill30\":0,\"win5\":0,\"elite2\":0,\"skills15\":0},\"claimed\":{\"killMonsters\":false,\"winBattle\":false,\"kill30\":false,\"win5\":false,\"elite2\":false,\"skills15\":false}},\"bestiaryData\":{},\"achievementState\":{},\"lastSaveTimestamp\":1792496998529,\"selectedCreationElement\":\"fire\",\"characterEquipment\":{\"fire\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-equipped-armor\",\"v141Uid\":\"reading-equipped-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"銀羽戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},\"shoes\":null,\"ring\":null},\"water\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"wind\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:divineDogHongbao\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null},\"heroNpc:vajraHeavenlyKing\":{\"head\":null,\"hand\":null,\"shoulder\":null,\"armor\":null,\"shoes\":null,\"ring\":null}},\"characterSkillLoadouts\":{\"fire\":{\"skillLevels\":{\"fireRocket\":1},\"equippedSkills\":[]},\"water\":{\"name\":\"水戰士\",\"skillLevels\":{},\"equippedSkills\":[]},\"wind\":{\"name\":\"風弓手\",\"skillLevels\":{},\"equippedSkills\":[]},\"earth\":{\"name\":\"土騎士\",\"skillLevels\":{},\"equippedSkills\":[]}},\"autoConfig\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig2\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":75,\"sp\":50,\"returnToCityWhenEmpty\":false,\"v136ActionIntent\":\"normal\"},\"autoConfig3\":{\"enabled\":false,\"skill\":\"normal\",\"hp\":50,\"sp\":25,\"returnToCityWhenEmpty\":false},\"allyFormation\":{\"version\":1,\"characterIndexToSlot\":{\"0\":\"ALLY_F2\"}},\"playerRelics\":{\"relic_qiankun_flask\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_sun_orb\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_xuanwu_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_soul_bell\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_tiangang_banner\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_nine_dragon_fire\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_cold_spring_jade\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_qinglan_feather\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_rock_mountain_seal\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_returning_wheel\":{\"unlocked\":true,\"level\":1,\"exp\":0,\"seen\":false},\"relic_origin_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_broken_army_scroll\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_red_sky_war_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_ice_mirror_heart\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_wind_chasing_talisman\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_mountain_river_cauldron\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_burning_star_mark\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_spirit_spring_bottle\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_demon_suppressing_seal\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false},\"relic_all_returning_array\":{\"unlocked\":false,\"level\":1,\"exp\":0,\"seen\":false}},\"teamLoadout\":{\"relicId\":null,\"subRelicId\":null},\"gameplayProgress\":{\"version\":1,\"personal\":{\"personal-20\":{\"firstClear\":false,\"clears\":0},\"personal-30\":{\"firstClear\":false,\"clears\":0},\"personal-40\":{\"firstClear\":false,\"clears\":0},\"personal-50\":{\"firstClear\":false,\"clears\":0},\"personal-60\":{\"firstClear\":false,\"clears\":0},\"personal-70\":{\"firstClear\":false,\"clears\":0},\"personal-80\":{\"firstClear\":false,\"clears\":0},\"personal-90\":{\"firstClear\":false,\"clears\":0},\"personal-100\":{\"firstClear\":false,\"clears\":0}},\"world\":{\"world-40\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-60\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-80\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0},\"world-100\":{\"completedStages\":0,\"firstClear\":false,\"clears\":0}},\"tower\":{\"weekKey\":\"2026-10-19\",\"element\":\"wind\",\"completedFloor\":0,\"highestThisWeek\":0,\"claimedFloors\":{},\"historicalHighest\":0,\"pendingRelicChoice\":false}},\"inventoryItems\":[{\"rarityKey\":\"orange\",\"classType\":\"warrior\",\"type\":\"armor\",\"assetPath\":\"assets/equipment/warrior/catalog-012.webp\",\"stats\":{\"vitality\":28},\"icon\":\"<span class=\\\"v169-item-art v169-equipment-art\\\"><img src=\\\"assets/equipment/warrior/catalog-012.webp\\\" alt=\\\"\\\" draggable=\\\"false\\\" onerror=\\\"this.parentElement.dataset.assetState='broken';this.parentElement.setAttribute('role','img');this.parentElement.setAttribute('aria-label','裝備圖片無法載入');this.parentElement.textContent='◇'\\\"></span>\",\"v17346GeneratedEquipment\":true,\"id\":\"reading-bag-armor\",\"v141Uid\":\"reading-bag-armor\",\"definitionId\":\"ordinary_1we00jt\",\"count\":1,\"equipmentCombatPercentUnitVersion\":2,\"equipmentFactoryVersion\":1,\"ordinaryEquipment\":true,\"quality\":\"orange\",\"reforgeStats\":null,\"reforgeUsed\":0,\"reforgeAffixes\":[null,null],\"reforgeVersion\":1,\"name\":\"赤霄戰甲\",\"reforgeSlots\":2,\"shopPrice\":11000,\"price\":2200},{\"id\":\"hpPotion10\",\"name\":\"回春散\",\"shortName\":\"回春散\",\"icon\":\"<span class=\\\"v169-item-art v169-potion-art\\\"><img src=\\\"assets/items/potions/hp-potion-10-huichun.webp\\\" alt=\\\"\\\" aria-hidden=\\\"true\\\" draggable=\\\"false\\\" decoding=\\\"async\\\" onerror=\\\"this.hidden=true\\\"></span>\",\"type\":\"potion\",\"resource\":\"hp\",\"recoveryMode\":\"flat\",\"recoveryValue\":66,\"price\":20,\"stats\":{},\"count\":30}]}",
+          "four_symbols_first_play_ready": "{\"gameVersion\":\"173.73\",\"manifestVersion\":\"2026-09-20.1\",\"assetPackVersion\":\"2026-09-20.1\",\"manifestHash\":\"1adc353bc400\",\"completedAt\":\"2026-10-20T11:49:45.548Z\",\"assets\":{\"assets/ui/startup-logo.4631c0bc3f2b.jpg\":\"4631c0bc3f2b\",\"assets/ui/startup-main-city.d43e67af1c1c.jpg\":\"d43e67af1c1c\",\"build/boot-core.1775eab1cc99.css\":\"1775eab1cc99\",\"build/boot-core.92c7957bd528.js\":\"92c7957bd528\",\"build/firebase/firebase-auth-ui.e5124ef5fef1.js\":\"e5124ef5fef1\",\"build/firebase/firebase-auth.9f8c09942b79.js\":\"9f8c09942b79\",\"build/firebase/firebase-bootstrap.c4f4143606ed.js\":\"c4f4143606ed\",\"build/firebase/firebase-cloud-save.dbb8d71d026f.js\":\"dbb8d71d026f\",\"build/firebase/firebase-config.4314d6321ba1.js\":\"4314d6321ba1\",\"build/firebase/firebase-session.877a7842d6bd.js\":\"877a7842d6bd\",\"build/firebase/session-client.235aa8b1f47e.js\":\"235aa8b1f47e\",\"privacy-consent.html\":\"eb18ce6de373\",\"privacy.html\":\"bbf42a364b43\",\"assets/characters/female_earth.jpg\":\"263cdadc095c\",\"assets/characters/female_fire.jpg\":\"9bf0580e1c04\",\"assets/characters/female_water.jpg\":\"d1a903b2cbd6\",\"assets/characters/female_wind.jpg\":\"6600198db569\",\"assets/characters/male_earth.jpg\":\"3fc06609e539\",\"assets/characters/male_fire.jpg\":\"a269c72a396d\",\"assets/characters/male_water.jpg\":\"31696971afef\",\"assets/characters/male_wind.jpg\":\"6f5127957346\",\"assets/ui/home-achievement.png\":\"9d77024c2fe9\",\"assets/ui/home-announcement.png\":\"d4d06b9405cb\",\"assets/ui/home-background-v17344.png\":\"f3a448df2058\",\"assets/ui/home-bestiary.png\":\"9631707e882a\",\"assets/ui/home-character.png\":\"fb72a8ab72d1\",\"assets/ui/home-element-box-v174.webp\":\"ddfc5cbd6012\",\"assets/ui/home-offline-exp.png\":\"88c0e7411f06\",\"assets/ui/home-quest.png\":\"2f9b27f3230b\",\"assets/ui/home-relic-v174.eed14e806044.webp\":\"eed14e806044\",\"assets/ui/home-rest.png\":\"e07d0d493a8b\",\"assets/ui/home-shop.png\":\"a71615a15b05\",\"assets/ui/home-synthesis.png\":\"bef0960124ff\",\"assets/ui/home-system.png\":\"c635d5034a57\",\"assets/ui/map-return.png\":\"76ddbda2af53\",\"assets/ui/nav-backpack.png\":\"b844fbc20b91\",\"assets/ui/nav-boss.png\":\"fc2901eceb74\",\"assets/ui/nav-character.png\":\"37d272be0dd7\",\"assets/ui/nav-dungeon.png\":\"2cbc2354ffc5\",\"assets/ui/nav-element-box.png\":\"862a6bfbcd6d\",\"assets/ui/nav-gameplay.png\":\"86180b48962f\",\"assets/ui/nav-home.png\":\"692c58ebc556\",\"assets/ui/nav-quest.png\":\"5bdcf6f56ace\",\"assets/ui/nav-relic-v175.webp\":\"2b1a365ae746\",\"assets/ui/nav-training.png\":\"1c9a6cd6847a\",\"assets/ui/patrol-appearance-switch-icon.png\":\"69d9f711bb31\",\"build/app-shell.058b860fa3fc.css\":\"058b860fa3fc\",\"build/app-shell.201a0fc6b9da.js\":\"201a0fc6b9da\",\"assets/battle/moonlit-sanctuary-depth-20261018.webp\":\"eb9a4a09d8d8\",\"assets/characters/battle_female_earth.png\":\"7add06d9c47c\",\"assets/characters/battle_female_fire.png\":\"cf43645eb6fd\",\"assets/characters/battle_female_water.png\":\"cd8f1b74be9f\",\"assets/characters/battle_female_wind.png\":\"ef5be3d2f6cb\",\"assets/characters/battle_male_earth.png\":\"2f120e082c78\",\"assets/characters/battle_male_fire.png\":\"058712570f01\",\"assets/characters/battle_male_water.png\":\"3ef9a794f903\",\"assets/characters/battle_male_wind.png\":\"07454a11ee08\",\"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp\":\"18f5c279c47f\",\"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp\":\"cc9b1898e7c0\",\"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp\":\"c12817139add\",\"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp\":\"6cb6c8d514b1\",\"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp\":\"67b1492aecc7\",\"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp\":\"5269ab380524\",\"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp\":\"bf0f5c5067c9\",\"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp\":\"75dc64898d71\",\"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp\":\"a421cb635062\",\"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp\":\"0677960124f5\",\"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp\":\"e987b7a8e45f\",\"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp\":\"e8288d5dfe71\",\"assets/characters/patrol/patrol-male-water-back.db1078669837.webp\":\"db1078669837\",\"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp\":\"67d1d8aebfc8\",\"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp\":\"cb339ccc0db5\",\"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp\":\"ee42171e1658\",\"assets/ui/training-background.jpg\":\"46a37ac81760\",\"build/feature-patrol.1cef20d37f82.css\":\"1cef20d37f82\",\"build/feature-patrol.ab5bd3ce5582.js\":\"ab5bd3ce5582\",\"build/gameplay-core-primary.7b75ca5e1c88.js\":\"7b75ca5e1c88\",\"build/gameplay-core-secondary.ec568394fd00.js\":\"ec568394fd00\",\"build/gameplay-core.e981e271013d.css\":\"e981e271013d\"}}",
+          "four_symbols_account:skill-runtime-browser-qa:element-box-state": "{\"remainingMs\":0}",
+          "four_symbols_active_uid": "skill-runtime-browser-qa",
+          "four_symbols_save_meta:skill-runtime-browser-qa": "{\"schemaVersion\":2,\"ownerUid\":\"skill-runtime-browser-qa\",\"source\":\"team-relic\",\"cloudBaseFingerprint\":\"v1:249:72181a45e5c7319c21b8951dc0d4abac\",\"localDirty\":true,\"updatedAt\":1792496998529}",
+          "four_symbols_privacy_consent": "{\"privacyPolicyVersion\":\"2026-09-11-v2\",\"acceptedAt\":\"2026-09-30T00:00:00.000Z\"}",
+          "four_symbols_account:skill-runtime-browser-qa:exp-pool-growth-state": "{\"initialized\":true,\"unlocked\":true,\"lastAt\":1792496986145,\"noticeShown\":false,\"lastCapped\":false,\"newcomerRewards\":{}}"
+        }
+      },
+      "delegatedSaveCalls": [
+        {
+          "time": 4186.39999999851,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 25,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 25,
+              "returnToCityWhenEmpty": false
+            }
+          ]
+        },
+        {
+          "time": 6603.39999999851,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false
+            }
+          ]
+        },
+        {
+          "time": 9103,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false
+            }
+          ]
+        },
+        {
+          "time": 10320.29999999702,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            }
+          ]
+        },
+        {
+          "time": 10702.70000000298,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            }
+          ]
+        },
+        {
+          "time": 11938.29999999702,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            }
+          ]
+        },
+        {
+          "time": 13554.70000000298,
+          "configs": [
+            {
+              "i": 0,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            },
+            {
+              "i": 1,
+              "enabled": false,
+              "skill": "normal",
+              "hp": 75,
+              "sp": 50,
+              "returnToCityWhenEmpty": false,
+              "v136ActionIntent": "normal"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "head": "0584b5d066e5d2a5a34d1bc1b360cf5372246ca2",
+  "dirty": false,
+  "viewport": [
+    360,
+    640
+  ],
+  "contexts": [
+    "visible city element-box entry, actual visible custom HP/SP and character dropdowns, local save sideeffects, zero-hours cancel only; active guard unverified"
+  ],
+  "scenes": [
+    {
+      "name": "auto-entry",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "autoSettingsHP-menu",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "autoSettingsHP-selected",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "autoSettingsSP-menu",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "autoSettingsSP-selected",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "autoSettingsCharacterSelect-menu",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "auto-character-selected",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "auto-reopen",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    },
+    {
+      "name": "zero-hours-confirm",
+      "small": [],
+      "overflow": [],
+      "clipped": []
+    }
+  ],
+  "scope": "Segment21 isolated presentation and native settings interactions only. Actual visible city5 entry, training entry availability recorded. Original saveGame delegated and calls/storage recorded, not zero-save claim. remaining0 apply cancels original refill confirm; no ad/hours grant/start/battle/stop/real account. Active guard unverified: prior getter fixture drove recovery timer and is excluded; no active fixture in this run."
+}

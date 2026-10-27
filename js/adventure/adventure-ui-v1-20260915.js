@@ -202,7 +202,7 @@
             choices='<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">返回章節地圖</button>';
         }
         const body='<div class="adventure-event-layout">'+portrait+'<div class="adventure-dialogue"><b>'+esc(event.speaker||"旅人")+'</b>'+paragraphs+'</div></div>';
-        return panelShell(event.title,"NPC／劇情事件",body,choices,"event-panel scene-"+esc(event.background||"road"));
+        return panelShell(event.title,"江湖事件",body,choices,"event-panel scene-"+esc(event.background||"road"));
     }
 
     function renderStory(view){
@@ -251,12 +251,22 @@
         return panelShell(copy[0],"初入江湖",'<p class="adventure-lead">'+copy[1]+'</p>'+resources,actions,"tutorial-panel");
     }
     function syncTutorialReturn(page){
-        const state=runtimeView()?.tutorial,modal=document.getElementById('homeFeatureModal');
-        const host=['skill','status','expPool'].includes(page)&&modal?.classList.contains('show')?modal:document.getElementById("game-ui");if(!host){return;}
+        const host=document.getElementById("game-ui");if(!host){return;}
         let button=document.getElementById("adventureTutorialReturn");
+        if(!["inventory","skill","status","shop"].includes(page)){
+            if(button){button.hidden=true;}
+            return;
+        }
+        const state=runtimeView()?.tutorial;
+        if(!button&&!(state?.active&&state.requiredAction)){return;}
         if(!button){button=document.createElement("button");button.id="adventureTutorialReturn";button.type="button";button.className="adventure-tutorial-return";button.textContent="準備完成 · 返回故事";button.onclick=()=>API()?.returnFromTutorial();host.appendChild(button);}
-        else if(button.parentElement!==host){host.appendChild(button);}
-        button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status"].includes(page));
+        button.hidden=!(state?.active&&state.requiredAction&&["inventory","skill","status","shop"].includes(page));
+        if(!button.hidden){
+            const destination=page==="inventory"?document.querySelector("#inventoryPage .inventory-classic-shell"):
+                document.querySelector("#homeFeatureModal.show .home-feature-modal-box");
+            if(destination){destination.appendChild(button);}
+            else{button.hidden=true;}
+        }
     }
 
     // One presentation of the existing onboarding state. This never clicks,
@@ -374,7 +384,7 @@
             }
             return step('#v17342InventoryPotionUse','點「使用」，恢復角色資源。');
         }
-        if(visibleGuideTarget('#skillPage.active')||visibleGuideTarget('#homeFeatureModal.show[data-character-tab="skill"] #skillPage')){
+        if(visibleGuideTarget('#skillPage.active,#homeFeatureModal.show[data-character-tab="skill"] #skillPage')){
             if(p.skillReady){return step('#adventureTutorialReturn','技能已裝好，返回故事再挑戰。');}
             const nativeTab=p.nativeElement&&visibleGuideTarget('#skillElementTabs [onclick="selectSkillElementTab(\''+CSS.escape(p.nativeElement)+'\')"]');
             if(nativeTab&&nativeTab.getAttribute('aria-selected')!=='true'){
@@ -529,7 +539,7 @@
                 (isSelected?'<small>首次已選</small>':locked?'<small>章節通關後可回溯</small>':'<small>選擇此路線</small>')+'</button>';
         }).join("");
         const actions='<button type="button" class="adventure-button secondary" onclick="FourSymbolsAdventure.setPanel(\'map\')">先看看地圖</button>';
-        return panelShell("山路分岔","第一次有選擇，長期沒有遺憾",'<p class="adventure-lead">兩條路最後都會回到主線。首次推進選定後不能立刻回頭；章節通關後可直接回溯另一條。</p><div class="adventure-route-grid">'+cards+'</div>',actions,"branch-panel");
+        return panelShell("山路分岔","路線選擇",'<p class="adventure-lead">兩條路最後都會回到主線。首次推進選定後不能立刻回頭；章節通關後可直接回溯另一條。</p><div class="adventure-route-grid">'+cards+'</div>',actions,"branch-panel");
     }
 
     function progressDots(current,target){
@@ -659,10 +669,14 @@
         const root=ensureRoot(),view=runtimeView();
         if(!root||!view||!view.chapter||!view.state){ return; }
         root.dataset.panel=view.panel;
+        const back=root.querySelector(".adventure-back-button");
+        if(back){back.hidden=view.panel==="story"&&!!view.tutorial?.active;}
         const title=root.querySelector("#adventureHeaderTitle"),meta=root.querySelector("#adventureHeaderMeta");
         if(title){ title.textContent="第一章 · "+view.chapter.title; }
         if(meta){ meta.innerHTML='<span>建議 Lv.'+esc(view.chapter.suggestedLevel)+'</span><span>'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+' / 20 關</span><progress max="20" value="'+view.chapter.nodes.filter(n=>view.state.completedNodes[n.id]).length+'" aria-label="章節進度"></progress>'; }
         if(ui.body){
+            const samePanel=ui.renderedPanel===view.panel;
+            const panelScrollTop=ui.body.scrollTop;
             const selected=view.chapter.nodes.find(node=>node.id===view.selectedNodeId)||view.chapter.nodes.find(node=>node.id===view.state.currentNodeId);
             const mapKey=view.visible&&view.panel==='map'?JSON.stringify([view.chapter.id,selected?.id]):null;
             const picker=ui.body.querySelector('#adventureStagePicker');
@@ -671,6 +685,8 @@
             // Preserve only this same map selection's native disclosure state.
             const browsing=mapKey&&mapKey===ui.lastMapKey&&picker?{open:picker.open,scrollTop:list?.scrollTop||0}:null;
             ui.body.innerHTML=renderPanel(view);
+            ui.body.scrollTop=view.panel==="map"?0:(samePanel?panelScrollTop:0);
+            ui.renderedPanel=view.panel;
             ui.lastMapKey=mapKey;
             if(browsing){
                 const nextPicker=ui.body.querySelector('#adventureStagePicker');

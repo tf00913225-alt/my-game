@@ -1,0 +1,97 @@
+{
+  "frames": [
+    [
+      18.311111450195312,
+      109.58894348144531,
+      375.37774658203125,
+      695.8222045898438
+    ],
+    [
+      18.311111450195312,
+      109.58894348144531,
+      375.37774658203125,
+      695.8222045898438
+    ],
+    [
+      18.311111450195312,
+      109.58894348144531,
+      375.37774658203125,
+      695.8222045898438
+    ],
+    [
+      18.311111450195312,
+      109.58894348144531,
+      375.37774658203125,
+      695.8222045898438
+    ]
+  ],
+  "chrome": [
+    "http://127.0.0.1:49819/assets/ui/skill-iron-bronze/panel.827d9ba9a6f8.webp",
+    "http://127.0.0.1:49819/assets/ui/skill-iron-bronze/title-short.bb578519c9f4.webp"
+  ],
+  "art": [
+    "http://127.0.0.1:49819/assets/characters/male_fire.jpg",
+    "http://127.0.0.1:49819/assets/characters/female_water.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-knife.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-frost-punch.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-ice-spin.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-frost-crush.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-ball.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-flood-beast.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-ice-arrow-rain.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-heal.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-revive.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-freeze.jpg",
+    "http://127.0.0.1:49819/assets/skills/water-purify-mind.webp",
+    "http://127.0.0.1:49819/assets/skills/water-ex.jpg"
+  ],
+  "scroll": {
+    "content": "auto",
+    "page": "visible",
+    "list": "visible"
+  },
+  "selected": "skill",
+  "cleared": true,
+  "header": {
+    "title": {
+      "x": 26.322221755981445,
+      "y": 121.03338623046875,
+      "w": 251.54530334472656,
+      "h": 43.4888916015625
+    },
+    "back": {
+      "x": 307.5694274902344,
+      "y": 117.60005187988281,
+      "w": 78.10833740234375,
+      "h": 50.35554504394531
+    },
+    "row": {
+      "x": 26.322221755981445,
+      "y": 117.60005187988281,
+      "w": 359.35552978515625,
+      "h": 50.35554504394531
+    },
+    "tracks": [
+      197.812,
+      395.625,
+      65.9375
+    ],
+    "gap": 0,
+    "direction": "ltr",
+    "center": 177.33509711729522,
+    "rangeCenter": 177.2428436279297,
+    "centerError": 0.09225348936553246,
+    "text": {
+      "left": 145.3802032470703,
+      "right": 209.10548400878906,
+      "top": 128.66799092039534,
+      "bottom": 155.00581479108752
+    },
+    "safe": {
+      "left": 104.30126579284668,
+      "right": 227.5584644317627,
+      "top": 124.48362815163352,
+      "bottom": 160.15732571688565
+    }
+  }
+}

@@ -1,0 +1,11 @@
+# Settings reading / float visibility — independent image review
+
+Head 8938e239. Actually viewed four requested images under artifacts/ui-skill-standard/settings-reading-8938e239/modal-native-close-qualified: 360x640 and 1280x800 settings-newborn.png / settings-closed-restored.png. Also viewed the designated natural symptom reference C:/Projects/my-game/.vfx-work/fire-polish/artifacts/fire-natural-desktop/frame-0065.png. No Chrome launched or product file written.
+
+Verdict: 限定通過設定閱讀遮蔽子項。Both newborn settings screenshots show a clean automatic-battle settings title, return control, strategy/actor/action rows and shared HP/SP settings. No red damage / green heal / MISS floating text is visible across the settings surface. This addresses the reference image's visible -216HP/-217HP/-208HP intrusion over the automation panel.
+
+After original modal close, battle art and controls reappear and the red -216HP / green +208HP text is visible and recognizable in both sizes; desktop also shows MISS over the enemy region. Settings panel typography/art remains intact in these images. Desktop restored screenshot contains multiple closely stacked duplicate damage/heal and MISS labels; this review does not certify simultaneous-label collision avoidance or per-event readability in that stack. It establishes restored float visibility and identifiable glyphs after modal close, not comprehensive floating-text polish.
+
+Evidence boundary: both reports complete=true and sourceUnchanged=true. Their scope explicitly says pure original float emit for presentation, with no actual damage/heal/MISS settlement and no VFX timing/auto preference/timer changes. The ordinary forest fixture's original battle clock observation does not convert injected API floats into natural skill-event evidence. runtimeRestoreExact=false in both reports; the filename 'restored' refers to float visibility on settings close, not full runtime state restoration.
+
+Not approved: #983 natural skill VFX acceptance, full natural damage/heal/MISS timing or settlement, all-modal behavior, complete settings scroll content, real-device/browser chrome behavior, blanket clipping or whole-UI quality. The supplied natural symptom image establishes the reported defect appearance only; it is not a post-fix natural-skill PASS.

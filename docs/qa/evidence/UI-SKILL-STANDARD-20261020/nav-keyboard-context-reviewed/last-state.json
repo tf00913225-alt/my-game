@@ -1,0 +1,600 @@
+{
+  "expected": "main",
+  "data": {
+    "page": "homePage",
+    "context": "main",
+    "shells": 1,
+    "parent": "game-overlay-layer",
+    "hidden": false,
+    "battleActive": false,
+    "buttons": [
+      {
+        "label": "背包",
+        "handler": "showPage('inventory')",
+        "rect": {
+          "x": 415,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 505,
+          "bottom": 800,
+          "left": 415
+        },
+        "hit": true
+      },
+      {
+        "label": "野怪區",
+        "handler": "showPage('training')",
+        "rect": {
+          "x": 505,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 595,
+          "bottom": 800,
+          "left": 505
+        },
+        "hit": true
+      },
+      {
+        "label": "主城",
+        "handler": "showPage('home')",
+        "rect": {
+          "x": 595,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 685,
+          "bottom": 800,
+          "left": 595
+        },
+        "hit": true
+      },
+      {
+        "label": "副本",
+        "handler": "openDungeonHub()",
+        "rect": {
+          "x": 685,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 775,
+          "bottom": 800,
+          "left": 685
+        },
+        "hit": true
+      },
+      {
+        "label": "玩法",
+        "handler": "showPage('gameplay')",
+        "rect": {
+          "x": 775,
+          "y": 710,
+          "width": 90,
+          "height": 90,
+          "top": 710,
+          "right": 865,
+          "bottom": 800,
+          "left": 775
+        },
+        "hit": true
+      }
+    ]
+  },
+  "events": [
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "inventoryNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "inventoryNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "inventoryNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "inventoryNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "trainingNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "homeNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "homeNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "dungeonNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "dungeonNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "bossNav"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "bossNav"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "bossNav"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "bossNav"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "角色"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "背包"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "秘寶"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keydown",
+      "key": "Tab",
+      "trusted": true,
+      "target": "元素匣"
+    },
+    {
+      "type": "keyup",
+      "key": "Tab",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keydown",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "keypress",
+      "key": "Enter",
+      "trusted": true,
+      "target": "返回"
+    },
+    {
+      "type": "click",
+      "trusted": true,
+      "target": "返回"
+    }
+  ]
+}

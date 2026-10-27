@@ -1,0 +1,35 @@
+{
+  "uiParent": "d0053d958bd1b160f9e15fc0dae99269e4ff6969",
+  "devParent": "8fdf52af6b2a4dea1257f471a10adcbe35dc0129",
+  "hashes": {
+    "js/00-main.js": "b61c540f80cc4a0a279251111310328e8e259f201e81d12fed9d35e94c784c4d",
+    "js/01-stage-v8-touch-lock.js": "c977d1fd9a6424b4f3db7b16f0704e94b276913932c73f0121114d4859183ae5",
+    "js/adventure/adventure-runtime-v1-20260915.js": "84bbc0a00468e00ce7c00079bf11a0aad8918152f8bc690b7414b21486d6dd07",
+    "css/00-main.css": "f958713c79672c0b4cbae4bcf37b7d126b88380451e69a6368e3f89ef48f4b73",
+    "css/fixed-slot-battlefield-rendering-v2.css": "c65c459c83e05d6e7e86b2b96f959a5774ca1fd70551506653ab7ed5d3544c90",
+    "tests/fixtures/skill-loadout-runtime-v1.json": "a1ba7f46913eaed2639943814316eb2f12d6e74afc803d4eb5d694205d1f43c1",
+    ".github/scripts/fixtures/skill-loadout-parity.mjs": "e64c9263418af3e73b77c80c617b3921098ed4b824947c58ce6a4c163a5314e6",
+    "asset-manifest.json": "36f75e7ca827b1dbb9a5a4aa0b511637ad4743d91ab689fca20dd07d8d9f1f32"
+  },
+  "ownerHandoffs": {
+    "story": "原Owner確認canonicalkey+955modal及VM doubles/順序斷言；不吸991。",
+    "battle": "原Owner確認正式dev幾何為準、quickbar可讀性獨立保留補驗，無待寫CSS；不吸989或做名稱/操作提示。",
+    "safety": "P4確認保留退役baseline與歷史、原builder重建digest；原600record領域/事件不動，四既有文案限DOM逆轉雙斷言窄同步。"
+  },
+  "targeted": {
+    "pass": 75,
+    "fail": 0
+  },
+  "buildCheck": "PASS",
+  "unmergedEntries": 0,
+  "parity": {
+    "cases": 600,
+    "domainDifferences": 0,
+    "eventDifferences": 0,
+    "displayDifferences": 400,
+    "rawSha": "9c8a23d971a5162a2de84a863debedf62e8c9bca748fccf1d472e7e9b6b44d06",
+    "reversedSha": "0b68b6ae5bf901ebf9198b9247dff88f8e394e4c4ab59b556eea35f367e33ce8"
+  },
+  "automation": "955 PAUSED",
+  "ci": "new merged Head natural CI pending push; no rerun/cancel/dispatch"
+}

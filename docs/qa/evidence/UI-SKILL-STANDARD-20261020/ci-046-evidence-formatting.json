@@ -1,0 +1,73 @@
+{
+  "purpose": "CI-required whitespace normalization of seven readable historical evidence copies; no substantive token or runtime change",
+  "originalCommit": "046bd8e93af8c76f8c251b427b877fbfc4f0784a",
+  "rawArchive": "ci-046-original-evidence.zip",
+  "archiveSha256": "6959f2875b5894862ae2dc6a6daeacf09db60dbbd669858ac6b382596cb6115c",
+  "historicalHashInterpretation": "Root entries are exact git show originalCommit:path bytes. worktree-before-normalization/ entries separately retain the actual working-tree bytes before formatting. Four worktree files differ from Git only in end whitespace; no cause is inferred. Historical hashes must be matched to the explicitly named source, never treat the two raw representations as identical. Current text paths are normalized readable copies. Git history and both raw forms remain intact.",
+  "files": [
+    {
+      "path": "ci-2b-string-contracts/job-120275618328-first-failure.txt",
+      "gitBlobEntry": "ci-2b-string-contracts/job-120275618328-first-failure.txt",
+      "rawSha256": "c91fd0a903bb70393de59b71eee642045c05df2caf565bb8cb89c01bef400060",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/ci-2b-string-contracts/job-120275618328-first-failure.txt",
+      "worktreeBeforeNormalizationSha256": "c91fd0a903bb70393de59b71eee642045c05df2caf565bb8cb89c01bef400060",
+      "normalizedSha256": "ea86878eac5737a6d877207d91e97333656f5b9d9dd997bee0bc4b6abb40abee",
+      "gitAndWorktreeRawEqual": true
+    },
+    {
+      "path": "ci-2b-string-contracts/job-120275618344-first-failure.txt",
+      "gitBlobEntry": "ci-2b-string-contracts/job-120275618344-first-failure.txt",
+      "rawSha256": "e8317f882d394f94904110a5dd2a3a61fe135f87812c93f8c56d88e2f6922bb1",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/ci-2b-string-contracts/job-120275618344-first-failure.txt",
+      "worktreeBeforeNormalizationSha256": "e8317f882d394f94904110a5dd2a3a61fe135f87812c93f8c56d88e2f6922bb1",
+      "normalizedSha256": "b888b2384feffabd507855aa6fed33ac881b74266cd51df8266d18902df53dc7",
+      "gitAndWorktreeRawEqual": true
+    },
+    {
+      "path": "segment6-accepted/qa-source.mjs.txt",
+      "gitBlobEntry": "segment6-accepted/qa-source.mjs.txt",
+      "rawSha256": "2af832857a18037800ada2ac9dbd8f1877762747873626ba4999da3f665063c4",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/segment6-accepted/qa-source.mjs.txt",
+      "worktreeBeforeNormalizationSha256": "7155135de8e1603301080efe1eedc45bfa580dd015c25117bf8a6f1e45570ef7",
+      "normalizedSha256": "bc6e280903495394606c5e3628db96e0ff195e4115c489a108cd485f14311c88",
+      "gitAndWorktreeRawEqual": false
+    },
+    {
+      "path": "segment6-paused/after-qa.mjs.txt",
+      "gitBlobEntry": "segment6-paused/after-qa.mjs.txt",
+      "rawSha256": "25965c67b9d2fd13792e178789b0884db8979c6db36a9a878aa5126d3b36d82b",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/segment6-paused/after-qa.mjs.txt",
+      "worktreeBeforeNormalizationSha256": "b0434678c8eaa339c4ea7783c67cb27bda55532c67f7f38f810a103e0b864422",
+      "normalizedSha256": "ff90d1920af5779d2fc05efdc369acd80cdbe5e43652c48e0e422cc82f536049",
+      "gitAndWorktreeRawEqual": false
+    },
+    {
+      "path": "segment6-paused/before-qa.mjs.txt",
+      "gitBlobEntry": "segment6-paused/before-qa.mjs.txt",
+      "rawSha256": "6fb9b71101ad8688d96f6409d8969577881f1cb5e82f1f662ed0344aa9a58bc5",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/segment6-paused/before-qa.mjs.txt",
+      "worktreeBeforeNormalizationSha256": "83cc3ef631fa1e5ba765a4a17230f1c701a3d7be48b8b0f05aa498f0a5ffcd7e",
+      "normalizedSha256": "d6a9584351abee78e9f8c4c0998087a26fd8c4c9db93dc488664cbe8f8d0173c",
+      "gitAndWorktreeRawEqual": false
+    },
+    {
+      "path": "shared-toast-relic-followup/followup-probe.mjs.txt",
+      "gitBlobEntry": "shared-toast-relic-followup/followup-probe.mjs.txt",
+      "rawSha256": "462ac9bdba018ab0389c1f9dcbd96f4cfea6bbccc528a2ee2cd8b7f555e1ed8a",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/shared-toast-relic-followup/followup-probe.mjs.txt",
+      "worktreeBeforeNormalizationSha256": "462ac9bdba018ab0389c1f9dcbd96f4cfea6bbccc528a2ee2cd8b7f555e1ed8a",
+      "normalizedSha256": "aa4049a8ff602174ca19b9be9a4641ccae3427c74a44bc4524ecd0c136024d72",
+      "gitAndWorktreeRawEqual": true
+    },
+    {
+      "path": "shared-toast-relic-followup/relic-probe.mjs.txt",
+      "gitBlobEntry": "shared-toast-relic-followup/relic-probe.mjs.txt",
+      "rawSha256": "1d882dce4ee305e50ba55f5da0bceb0b3d02046ef6605040931e5077dcdaf0e0",
+      "worktreeBeforeNormalizationEntry": "worktree-before-normalization/shared-toast-relic-followup/relic-probe.mjs.txt",
+      "worktreeBeforeNormalizationSha256": "8b8265ed67aa0caaebc2452bbb5ee8de65415e5e7e6ace8726942aa28ccc541e",
+      "normalizedSha256": "aaf95df1fee69888672119c5858b2584e6e197c47a1d82f7748374886b127c6b",
+      "gitAndWorktreeRawEqual": false
+    }
+  ],
+  "archiveEntries": 14
+}

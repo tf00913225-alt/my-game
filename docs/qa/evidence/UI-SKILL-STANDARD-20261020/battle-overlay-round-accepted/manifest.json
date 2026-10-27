@@ -1,0 +1,98 @@
+[
+  {
+    "kind": "skill",
+    "device": "360x640",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "skill/360x640/report.json.gz",
+    "uncompressedSha256": "81c30ce1e4fef907fec1fc725e0faea9585f12651fd3222d00e6cea3011f35bd"
+  },
+  {
+    "kind": "skill",
+    "device": "393x873",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "skill/393x873/report.json.gz",
+    "uncompressedSha256": "c7c672167c3df1612fb6be4fcb50c5d5c1c3c5617ba097d49d3e2ed0b681d235"
+  },
+  {
+    "kind": "skill",
+    "device": "412x915",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "skill/412x915/report.json.gz",
+    "uncompressedSha256": "72388a547885e78a93a4fdd42d9ea3a44936b48bd4cc5f2a8903f6987d6cbec8"
+  },
+  {
+    "kind": "skill",
+    "device": "1280x800",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "skill/1280x800/report.json.gz",
+    "uncompressedSha256": "fac5c506006f325c3e040f7534e967062d2ca77f2de4ac99030736c48c4d0125"
+  },
+  {
+    "kind": "item",
+    "device": "360x640",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "item/360x640/report.json.gz",
+    "uncompressedSha256": "757e6e7af9928e3a97f53be55206141035c5bfac1744737e0cde4be9d38f6088"
+  },
+  {
+    "kind": "item",
+    "device": "393x873",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "item/393x873/report.json.gz",
+    "uncompressedSha256": "33c148cc8d23b1989fefeb8c4f886e5247eb52feb12a3a7771628575bb416345"
+  },
+  {
+    "kind": "item",
+    "device": "412x915",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "item/412x915/report.json.gz",
+    "uncompressedSha256": "9fdace9783817987a1c7ab173480bcf5dfb978b1b0a6245f31fba42aa1045ef0"
+  },
+  {
+    "kind": "item",
+    "device": "1280x800",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "item/1280x800/report.json.gz",
+    "uncompressedSha256": "45f5ed2430992b8f92c4a3c4230a569d5de0e3caae5b421fabe0336a9e17bb69"
+  },
+  {
+    "kind": "normal",
+    "device": "360x640",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "normal/360x640/report.json.gz",
+    "uncompressedSha256": "3e9c28adbadf2c85e6b469bcefd7538472e7414f01e01e08cfc73d7f37ee7554"
+  },
+  {
+    "kind": "normal",
+    "device": "393x873",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "normal/393x873/report.json.gz",
+    "uncompressedSha256": "2d87bd49ed576c2a6597b60388c0fb2efd5a6dd284f07816853d41cba41cb42b"
+  },
+  {
+    "kind": "normal",
+    "device": "412x915",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "normal/412x915/report.json.gz",
+    "uncompressedSha256": "4f5d5bb9dcda133da9f04dcecd7357e483a7a19564c0fbc1dfb00b71de456549"
+  },
+  {
+    "kind": "normal",
+    "device": "1280x800",
+    "head": "cc22476683818b433179762b4e9b0e5f2b7eec4f",
+    "complete": true,
+    "report": "normal/1280x800/report.json.gz",
+    "uncompressedSha256": "e004ec87d2c548c7670374ea49cd1c07c166b33d128ea0ec623e894b69ff2441"
+  }
+]

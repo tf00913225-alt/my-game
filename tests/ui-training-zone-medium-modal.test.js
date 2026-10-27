@@ -11,8 +11,20 @@ const touchLock=fs.readFileSync("js/01-stage-v8-touch-lock.js","utf8");
 
 assert.match(css,/#trainingZoneModal \.home-feature-modal-box\{[\s\S]*?max-width:var\(--ui-medium-modal-max-width,360px\) !important;[\s\S]*?height:min\(var\(--ui-medium-modal-height,540px\),calc\(100% - var\(--ui-medium-modal-safe-space,28px\)\)\) !important;[\s\S]*?overflow:hidden !important;/);
 assert.match(css,/#trainingZoneModal #trainingZoneModalBody\{[\s\S]*?flex:1 1 auto !important;[\s\S]*?overflow-y:auto !important;[\s\S]*?touch-action:pan-y !important;[\s\S]*?scrollbar-gutter:stable !important;/);
+assert.match(css,/#trainingZoneModal \.home-feature-buy-btn\{[^}]*min-height:52px !important;/,"420-unit training controls must retain a 44px touch target at 360px viewport");
 assert.match(touchLock,/data-scroll-owner="x\|y\|both"/);
 assert.doesNotMatch(runtime,/box\.style\.setProperty\("width"|box\.style\.setProperty\("max-height"|box\.style\.setProperty\("overflow-y"/);
+assert.doesNotMatch(runtime,/enforceTrainingRender|\.style\.setProperty\(/,"training list geometry must remain with its CSS Owner, without startup inline overrides");
+const trainingListCss=fs.readFileSync("css/00-main.css","utf8").match(/\.training-zone-item\{([^}]+)\}/)[1];
+assert.match(trainingListCss,/min-height:52px;/,"training zone entries must retain a 44px projected touch target at 360px");
+assert.match(trainingListCss,/font-size:20px;/);
+assert.match(trainingListCss,/line-height:1\.15;/);
+assert.match(trainingListCss,/padding:6px 14px;/);
+const trainingScrollCss=fs.readFileSync("css/00-main.css","utf8").match(/\.training-zone-list\{([^}]+)\}/)[1];
+assert.match(trainingScrollCss,/height:calc\(100% - 84px\);/);
+assert.match(trainingScrollCss,/overflow-y:auto;/);
+assert.match(trainingScrollCss,/touch-action:pan-y;/);
+assert.doesNotMatch(fs.readFileSync("css/01-stage-v8-map-page-fix.css","utf8"),/#trainingPage\{[^}]*touch-action:none/,"the training ancestor must not suppress its list's vertical pan");
 
 function findChrome(){
     const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;

@@ -1,0 +1,11 @@
+{
+  "base": "b389e184f07a2de2ff1969f437f7e1e806ed5a10",
+  "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+  "authoredCssOnly": true,
+  "fullFeatureCssSourceReplacementExact": true,
+  "oldBundle": "build/feature-adventure.b232e21508bc.css",
+  "newBundle": "build/feature-adventure.c82d45eb0990.css",
+  "jsFunctionsConfigScriptsReleaseUnchanged": true,
+  "skillDependency758ToE5Changed": [],
+  "limits": "Source only, no after visual approval"
+}

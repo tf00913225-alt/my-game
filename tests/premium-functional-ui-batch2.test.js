@@ -23,7 +23,7 @@ assert.match(growth,/characterTabBtnSkill/);
 assert.match(growth,/homeExpPoolCard/);
 assert.match(growth,/statusPage/);
 assert.match(growth,/skillPage/);
-assert.match(base,/\.status-btn\{[\s\S]*?width:44px;[\s\S]*?height:44px/);
+assert.match(base,/\.status-btn\{[^}]*width:52px;[^}]*height:52px/);
 assert.match(base,/\.status-confirm\{[\s\S]*?min-height:44px/);
 assert.match(read("css/49-v169-rpg-ui.css"),/\.skill-action-card\{[^}]*min-height:44px/);
 assert.match(exp,/\.v131-exp-preview-btn\{[\s\S]*?min-height:44px/);

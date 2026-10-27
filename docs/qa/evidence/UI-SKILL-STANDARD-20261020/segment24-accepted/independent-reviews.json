@@ -1,0 +1,24 @@
+{
+  "head": "51d7116c3baa2cfa058e79c55fd1e79bbd56f98b",
+  "status": "三類獨立實畫限定通過",
+  "art": {
+    "agent": "/root/art_review",
+    "actualPictures": 22,
+    "scope": "四尺寸長名/資源/主城末端/角色TAB/佈陣前後排/最後說明完整；保留場景與原圖，summary跨頁一致性排除"
+  },
+  "interaction": {
+    "agent": "/root/interaction_review",
+    "scope": "四尺寸報告22圖31操作，實看各尺寸代表畫面；唯一home真scroll/祖先不動/5種anchor返回/精確資源純委派取樣與原API還原/通知DOM/save-meta還原"
+  },
+  "scope": {
+    "agent": "/root/scope_review",
+    "scope": "實看四尺寸代表圖與source/report；原markup可逆byteexact、policy只js00摘要，原drag/選角/保存/交易handler未改，無過修證據"
+  },
+  "limits": [
+    "摘要fixture在relic owner init之後寫canonical local save；主城summary讀新值，秘寶頁私有hydrate仍舊runtime。只批准空/loaded摘要呈現與真導航返回，不批准跨頁loaded資料一致性，不判產品存檔故障。",
+    "角色0/1/2跨能力/技能/經驗TAB選角、未創建可建/鎖定、完整英雄編隊、真拖曳/移出/同步成功、pending第三按鈕仍未驗。",
+    "DEV控制28px、主城footer工具42px未列44px通過，仍待修。",
+    "本機canonical fixture與原UI可能有mark-seen/save副作用，僅原save/meta bytes已精確還原，不能稱零副作用、裝備/交易或雲端驗收。",
+    "無實體手機/鍵盤/載入拒絕重試/戰鬥/創角/獎勵/交易驗收。"
+  ]
+}

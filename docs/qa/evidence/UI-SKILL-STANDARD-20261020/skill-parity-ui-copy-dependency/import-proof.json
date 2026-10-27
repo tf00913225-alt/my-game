@@ -1,0 +1,61 @@
+{
+  "files": [
+    {
+      "from": "artifacts/parity-dev190-records.json",
+      "to": "parity-dev190-records.json.gz",
+      "sha256": "bcad4851a7fd4624267aa1893b36e4a6ce1561be1935998aa03deba935793c9d",
+      "gzip": true,
+      "storedSha256": "e195ff7c5d51be5ec5331e8b5dffbf8645507fd6e71afecb9020cd408f40a3a7"
+    },
+    {
+      "from": "artifacts/parity-ui89-records.json",
+      "to": "parity-ui89-records.json.gz",
+      "sha256": "5fbf831a3a02b84e1d0b491a96264d8d906cf16ff7eaceac29fd10787af871eb",
+      "gzip": true,
+      "storedSha256": "13d26d90184254c05fb44523d05d17de134ddbfb913810599d5025e7f9a7797f"
+    },
+    {
+      "from": "artifacts/parity-ui89-vs-dev190-proof.json",
+      "to": "parity-ui89-vs-dev190-proof.json",
+      "sha256": "016e5a365562581fac07d85be532856a362684f09cf193805487dd8500acc828",
+      "gzip": false,
+      "storedSha256": "016e5a365562581fac07d85be532856a362684f09cf193805487dd8500acc828"
+    },
+    {
+      "from": "artifacts/parity-diff-classification.json",
+      "to": "parity-diff-classification.json",
+      "sha256": "fbd5f1580bc55c566c229327809be0273b07a43b6f9f044325b65d0e5f23fd24",
+      "gzip": false,
+      "storedSha256": "fbd5f1580bc55c566c229327809be0273b07a43b6f9f044325b65d0e5f23fd24"
+    },
+    {
+      "from": "artifacts/record-loadout-parity.mjs",
+      "to": "record-loadout-parity.mjs",
+      "sha256": "942d3854b89c8eedab303bb41b548e2955c8fd33f599338429c2da929afaa88e",
+      "gzip": false,
+      "storedSha256": "942d3854b89c8eedab303bb41b548e2955c8fd33f599338429c2da929afaa88e"
+    },
+    {
+      "from": "artifacts/compare-loadout-parity-records.cjs",
+      "to": "compare-loadout-parity-records.cjs",
+      "sha256": "662b2f6efca0eb8f309e986c57c6d268f2c8588245c9388daf3de7bda34c09cd",
+      "gzip": false,
+      "storedSha256": "662b2f6efca0eb8f309e986c57c6d268f2c8588245c9388daf3de7bda34c09cd"
+    },
+    {
+      "from": "artifacts/segment25-copy-byte-proof.json",
+      "to": "segment25-copy-byte-proof.json",
+      "sha256": "8be5087bc7d8c0b7c159055fdeef44363f69cb4442ece4027a993d5301298717",
+      "gzip": false,
+      "storedSha256": "8be5087bc7d8c0b7c159055fdeef44363f69cb4442ece4027a993d5301298717"
+    },
+    {
+      "from": "artifacts/skill-parity-update-scope-review.md",
+      "to": "skill-parity-update-scope-review.md",
+      "sha256": "096814741851921e35c56057264fa278005b76f18be70bcb8607f7fa3eb9aef3",
+      "gzip": false,
+      "storedSha256": "096814741851921e35c56057264fa278005b76f18be70bcb8607f7fa3eb9aef3"
+    }
+  ],
+  "note": "Original JSON records exact after gunzip; no reconstruction or edited records"
+}

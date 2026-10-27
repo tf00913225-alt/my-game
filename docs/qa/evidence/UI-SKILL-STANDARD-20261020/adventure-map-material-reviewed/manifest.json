@@ -1,0 +1,50 @@
+[
+  {
+    "kind": "map",
+    "device": "360x640",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "map/360x640/report.json.gz",
+    "uncompressedSha256": "6ececdff33862b66f37059c46971f47067c160c701697af10127e280b429d17e"
+  },
+  {
+    "kind": "map",
+    "device": "393x873",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "map/393x873/report.json.gz",
+    "uncompressedSha256": "f29630b9ba0dc5b6cb1dd04f48011fa1fcfb3290e4e4dc4864614c5725402d92"
+  },
+  {
+    "kind": "map",
+    "device": "412x915",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "map/412x915/report.json.gz",
+    "uncompressedSha256": "fa23798804cc7cd8c2ffce2e98cf955262551d0a3cf873f5724e63fbcf1e9e32"
+  },
+  {
+    "kind": "map",
+    "device": "1280x800",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "map/1280x800/report.json.gz",
+    "uncompressedSha256": "1af223003a96eec040de7e5f265db0d42d43e10918d2b694fee773f59f09bfa9"
+  },
+  {
+    "kind": "ordinary-battle-dependency",
+    "device": "360x640",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "ordinary-battle-dependency/360x640/report.json.gz",
+    "uncompressedSha256": "95eb00de330b5a47a713fd780bc855601d3e7b65bcfc6a80dbd847e3d317222b"
+  },
+  {
+    "kind": "ordinary-battle-dependency",
+    "device": "1280x800",
+    "head": "8fb31a9488e4cec111490cb9800126af950811c4",
+    "complete": true,
+    "report": "ordinary-battle-dependency/1280x800/report.json.gz",
+    "uncompressedSha256": "4879fb178023a457a517c290554d2dc621bb24c6a56a651ae069c6877269dcc9"
+  }
+]

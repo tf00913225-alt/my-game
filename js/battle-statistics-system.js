@@ -141,6 +141,8 @@
         const drawer=ui.bossDrawer;
         drawer.classList.add("open");
         renderBossDrawer();
+        const body=drawer.querySelector(".battle-insight-drawer-body");
+        if(body){ body.scrollTop=0; }
         if(typeof window.syncBattleUiPriorityLayer==="function"){ window.syncBattleUiPriorityLayer(); }
         return true;
     }

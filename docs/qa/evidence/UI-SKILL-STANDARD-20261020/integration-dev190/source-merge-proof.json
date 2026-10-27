@@ -1,0 +1,157 @@
+{
+  "head": "636b1119590736034191e8f25ad9955cda9b518f",
+  "dev": "190d249ed2dc56b73fac1e50d65e1b794d703645",
+  "base": "102cfe2e3dc7b3bac5706444733e90a4c9ea18b7",
+  "merges": [
+    {
+      "path": "js/00-main.js",
+      "exit": 0,
+      "stagedSha256": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+      "expectedSha256": "4eff07c99bd607a7314b95d563615c200eb38b90f08ce7390b46662bcb2b4a6e",
+      "exact": true
+    },
+    {
+      "path": "js/60-v173.64-skill-progression-rebalance.js",
+      "exit": 0,
+      "stagedSha256": "fa08c27b513b742f5a0539f148df7802c836fe6002e1f9fbbd2b30ab94fc502d",
+      "expectedSha256": "fa08c27b513b742f5a0539f148df7802c836fe6002e1f9fbbd2b30ab94fc502d",
+      "exact": true
+    },
+    {
+      "path": ".github/scripts/run-bottom-nav-runtime-browser-qa.mjs",
+      "exit": 0,
+      "stagedSha256": "9e02ad97c2e97d25022b940b71bb39b44ce15bed8b6c2e6c4a8cc54d3de01da9",
+      "expectedSha256": "9e02ad97c2e97d25022b940b71bb39b44ce15bed8b6c2e6c4a8cc54d3de01da9",
+      "exact": true
+    }
+  ],
+  "unchanged": [
+    {
+      "path": "css/49-v169-rpg-ui.css",
+      "exact": true
+    },
+    {
+      "path": "css/53-v173.51-qa.css",
+      "exact": true
+    },
+    {
+      "path": "css/31-v131-fix-batch.css",
+      "exact": true
+    },
+    {
+      "path": "js/adventure/adventure-content-v1-20260915.js",
+      "exact": true
+    },
+    {
+      "path": "js/adventure/adventure-entry-v1-20260915.js",
+      "exact": true
+    },
+    {
+      "path": "js/adventure/adventure-items-v1-20260915.js",
+      "exact": true
+    },
+    {
+      "path": "js/adventure/adventure-runtime-v1-20260915.js",
+      "exact": true
+    },
+    {
+      "path": "js/adventure/adventure-ui-v1-20260915.js",
+      "exact": true
+    }
+  ],
+  "upstream": [
+    {
+      "path": "functions/src/canonical-current-recovery.js",
+      "exact": true
+    },
+    {
+      "path": "functions/src/canonical-operation-classifier.js",
+      "exact": true
+    },
+    {
+      "path": "functions/src/canonical-skill-loadout.js",
+      "exact": true
+    },
+    {
+      "path": "functions/src/canonical-snapshot.js",
+      "exact": true
+    },
+    {
+      "path": "functions/src/cloud-preferences.js",
+      "exact": true
+    },
+    {
+      "path": "functions/src/skill-loadout-policy-v1.json",
+      "exact": true
+    },
+    {
+      "path": "functions/src/skill-progression-core.js",
+      "exact": true
+    },
+    {
+      "path": "js/firebase/firebase-bootstrap.js",
+      "exact": true
+    },
+    {
+      "path": "js/firebase/firebase-cloud-save.js",
+      "exact": true
+    },
+    {
+      "path": "scripts/build-production.mjs",
+      "exact": true
+    },
+    {
+      "path": "scripts/lib/player-skill-config-catalog.mjs",
+      "exact": true
+    },
+    {
+      "path": "scripts/lib/skill-learning-policy.mjs",
+      "exact": true
+    },
+    {
+      "path": "scripts/test-session-authority-emulator.mjs",
+      "exact": true
+    }
+  ],
+  "policies": [
+    {
+      "path": "functions/src/generated/plain-player-normal-attack-policy.json",
+      "excludedSourceDigestFields": [
+        "compatibilityDigests"
+      ],
+      "withoutSourceDigestMetadataEqual": true
+    },
+    {
+      "path": "functions/src/generated/restricted-forest-instance-policy.json",
+      "excludedSourceDigestFields": [
+        "sourceDigests"
+      ],
+      "withoutSourceDigestMetadataEqual": true
+    }
+  ],
+  "index": {
+    "onlyGeneratedCriticalChanged": true
+  },
+  "explicitDependencies": [
+    {
+      "path": "functions/src/skill-progression-core.js",
+      "exactDev": true
+    },
+    {
+      "path": "js/52-v173.20-startup-loader.js",
+      "exactDev": false
+    },
+    {
+      "path": "js/startup/feature-loader.js",
+      "exactDev": true
+    },
+    {
+      "path": "js/startup/first-play-resource-loader.js",
+      "exactDev": true
+    },
+    {
+      "path": "scripts/build-production.mjs",
+      "exactDev": true
+    }
+  ]
+}

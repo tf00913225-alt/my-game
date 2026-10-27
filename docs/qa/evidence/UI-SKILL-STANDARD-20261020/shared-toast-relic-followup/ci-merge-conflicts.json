@@ -1,0 +1,12 @@
+{
+  "base": "6d5e3ba030a0db625e437645346582fae9eda0fd",
+  "conflicts": [
+    "asset-manifest.json",
+    "build/asset-manifest.json",
+    "css/fixed-slot-battlefield-rendering-v2.css",
+    "functions/src/generated/restricted-forest-instance-policy.json",
+    "js/adventure/adventure-runtime-v1-20260915.js",
+    "tests/cloud-save-skill-loadout-policy.test.mjs",
+    "tests/fixed-slot-battlefield-rendering-v2.test.js"
+  ]
+}

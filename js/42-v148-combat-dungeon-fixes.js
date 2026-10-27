@@ -1358,7 +1358,7 @@
   topReturn.id="v146AbyssReturn";
   topReturn.type="button";
   topReturn.className="v146-abyss-return";
-  topReturn.setAttribute("aria-label","返回上一層");
+  topReturn.setAttribute("aria-label","返回玩法");
   topReturn.innerHTML='<img src="assets/ui/map-return.png" alt="">';
   topReturn.onclick=window.v146ExitAbyssMap;
   page.appendChild(topReturn);

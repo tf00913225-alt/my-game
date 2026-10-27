@@ -1,0 +1,31 @@
+{
+  "sources": [
+    [
+      "detail-final-efb2cff9/360x640/preview-ticket-return.png",
+      "ticket-return-after.png"
+    ],
+    [
+      "auth-title-before-a276dc2f/360x640/auth-required.png",
+      "auth-before.png"
+    ],
+    [
+      "auth-final-a83339b0/360x640/auth-required.png",
+      "auth-after.png"
+    ],
+    [
+      "auth-final-a83339b0/360x640/support.png",
+      "support-after.png"
+    ],
+    [
+      "auth-final-a83339b0/360x640/startup-error.png",
+      "startup-error-after.png"
+    ],
+    [
+      "auth-final-a83339b0/360x640/privacy-bottom-enabled.png",
+      "privacy-bottom-after.png"
+    ]
+  ],
+  "segment3Head": "efb2cff919349d6250634f5faca8b12db4b363f9",
+  "segment4Head": "a83339b03905758a01a7d7702f26d9444bfa6d3c",
+  "limits": "Representative real desktop Chrome touch-emulated360 captures; reports retain per-source/bundle hashes. No real accounts/cloud/transactions/consent acceptance/hardware claim."
+}

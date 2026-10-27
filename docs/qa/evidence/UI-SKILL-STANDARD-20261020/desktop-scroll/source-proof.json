@@ -1,0 +1,22 @@
+{
+  "base": "4f971647f0c4d414b247b9253125b1766823fb01",
+  "sourceHash": "c977d1fd9a6424b4f3db7b16f0704e94b276913932c73f0121114d4859183ae5",
+  "counts": {
+    "entries": 261,
+    "groups": 24,
+    "runtimeContexts": 43,
+    "actualScrolls": 32
+  },
+  "productSourceFiles": [
+    "js/01-stage-v8-touch-lock.js"
+  ],
+  "unchangedOwners": [
+    "js/00-main.js",
+    "js/35-v141-ui-battle.js",
+    "js/20-anonymous-20.js"
+  ],
+  "runtimeProvenance": "43-context probe used earlier same pan implementation; later reset/unregister completion guards validated by final32-case browser test, not claimed as full replay",
+  "before": "HEAD original gesture source via optional baseline fixture; no left-mouse panning",
+  "after": "current source hash bound by synthetic-boundary/evidence.json",
+  "scope": "No true account/reward/save operations; only isolated QA transports and counters"
+}

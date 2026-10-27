@@ -1,0 +1,541 @@
+{
+  "count": 10,
+  "first": {
+    "text": "新手森林　Lv.1～10",
+    "rect": {
+      "x": 12,
+      "y": 13.714285850524902,
+      "width": 180.42857360839844,
+      "height": 36,
+      "top": 13.714285850524902,
+      "right": 192.42857360839844,
+      "bottom": 49.7142858505249,
+      "left": 12
+    },
+    "hit": true,
+    "hitElement": {
+      "id": "",
+      "className": "training-zone-item"
+    },
+    "inline": "font-size: 20px !important; padding: 6px 14px !important; min-height: 42px !important; line-height: 1.15 !important; box-sizing: border-box !important;",
+    "minHeightPriority": "important",
+    "computed": {
+      "height": "42px",
+      "minHeight": "42px",
+      "maxHeight": "none",
+      "padding": "6px 14px",
+      "boxSizing": "border-box",
+      "font": "700 20px / 23px \"Noto Sans TC\", Arial, sans-serif",
+      "fontSize": "20px",
+      "lineHeight": "23px",
+      "display": "flex",
+      "alignItems": "center",
+      "transform": "none",
+      "uiLengthUnit": ""
+    },
+    "scale": 0.8551117232625518,
+    "matchedCandidates": [
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 2,
+        "selector": "*",
+        "cssText": "box-sizing: border-box;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 3,
+        "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+        "cssText": "scrollbar-width: none !important;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 129,
+        "selector": ".training-zone-item",
+        "cssText": "box-sizing: border-box; display: flex; align-items: center; min-height: 52px; font-size: 17px; font-weight: bold; color: rgb(232, 221, 199); text-shadow: rgba(0, 0, 0, 0.8) 0px 2px 4px; background: rgba(120, 110, 95, 0.35); padding: 4px 10px; border-radius: 6px; cursor: pointer; width: fit-content; -webkit-tap-highlight-color: transparent; transition: transform 0.12s;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+        "order": 2055,
+        "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+        "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+        "conditions": []
+      }
+    ],
+    "ancestors": [
+      {
+        "id": "",
+        "className": "training-zone-item",
+        "overflow": "visible",
+        "rect": {
+          "x": 12,
+          "y": 13.714285850524902,
+          "width": 180.42857360839844,
+          "height": 36,
+          "top": 13.714285850524902,
+          "right": 192.42857360839844,
+          "bottom": 49.7142858505249,
+          "left": 12
+        },
+        "top": 0,
+        "client": 42,
+        "total": 42
+      },
+      {
+        "id": "",
+        "className": "training-zone-list",
+        "overflow": "visible",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 526.2857666015625,
+          "top": 0,
+          "right": 360,
+          "bottom": 526.2857666015625,
+          "left": 0
+        },
+        "top": 0,
+        "client": 614,
+        "total": 614
+      },
+      {
+        "id": "trainingPage",
+        "className": "page active",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "",
+        "className": "content",
+        "overflow": "auto",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "gameInterface",
+        "className": "",
+        "overflow": "visible",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 0,
+          "left": 0
+        },
+        "top": 0,
+        "client": 0,
+        "total": 0
+      },
+      {
+        "id": "game-content",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "app",
+        "className": "no-header v148-context-nav-active",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 1920,
+        "total": 1920
+      },
+      {
+        "id": "game-stage",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 1920,
+        "total": 1920
+      },
+      {
+        "id": "game-viewport",
+        "className": "",
+        "overflow": "clip",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      },
+      {
+        "id": "",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      },
+      {
+        "id": "",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      }
+    ]
+  },
+  "last": {
+    "text": "終焉之境　Lv.91～100",
+    "rect": {
+      "x": 12,
+      "y": 476.5714111328125,
+      "width": 200.6517791748047,
+      "height": 36,
+      "top": 476.5714111328125,
+      "right": 212.6517791748047,
+      "bottom": 512.5714111328125,
+      "left": 12
+    },
+    "hit": true,
+    "hitElement": {
+      "id": "trainingZoneItem_zone10",
+      "className": "training-zone-item locked"
+    },
+    "inline": "font-size: 20px !important; padding: 6px 14px !important; min-height: 42px !important; line-height: 1.15 !important; box-sizing: border-box !important;",
+    "minHeightPriority": "important",
+    "computed": {
+      "height": "42px",
+      "minHeight": "42px",
+      "maxHeight": "none",
+      "padding": "6px 14px",
+      "boxSizing": "border-box",
+      "font": "700 20px / 23px \"Noto Sans TC\", Arial, sans-serif",
+      "fontSize": "20px",
+      "lineHeight": "23px",
+      "display": "flex",
+      "alignItems": "center",
+      "transform": "none",
+      "uiLengthUnit": ""
+    },
+    "scale": 0.8574862357897636,
+    "matchedCandidates": [
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 2,
+        "selector": "*",
+        "cssText": "box-sizing: border-box;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 3,
+        "selector": ":is(#game-stage, #game-ui), :is(#game-stage, #game-ui) *",
+        "cssText": "scrollbar-width: none !important;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 129,
+        "selector": ".training-zone-item",
+        "cssText": "box-sizing: border-box; display: flex; align-items: center; min-height: 52px; font-size: 17px; font-weight: bold; color: rgb(232, 221, 199); text-shadow: rgba(0, 0, 0, 0.8) 0px 2px 4px; background: rgba(120, 110, 95, 0.35); padding: 4px 10px; border-radius: 6px; cursor: pointer; width: fit-content; -webkit-tap-highlight-color: transparent; transition: transform 0.12s;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/boot-core.aa47a62134df.css",
+        "order": 131,
+        "selector": ".training-zone-item.locked",
+        "cssText": "color: rgb(201, 191, 168); opacity: 0.7;",
+        "conditions": []
+      },
+      {
+        "file": "http://127.0.0.1:58143/build/gameplay-core.af5892190f1c.css",
+        "order": 2055,
+        "selector": "#game-stage, :is(#game-stage, #game-ui) *",
+        "cssText": "-webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;",
+        "conditions": []
+      }
+    ],
+    "ancestors": [
+      {
+        "id": "trainingZoneItem_zone10",
+        "className": "training-zone-item locked",
+        "overflow": "visible",
+        "rect": {
+          "x": 12,
+          "y": 476.5714111328125,
+          "width": 200.6517791748047,
+          "height": 36,
+          "top": 476.5714111328125,
+          "right": 212.6517791748047,
+          "bottom": 512.5714111328125,
+          "left": 12
+        },
+        "top": 0,
+        "client": 42,
+        "total": 42
+      },
+      {
+        "id": "",
+        "className": "training-zone-list",
+        "overflow": "visible",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 526.2857666015625,
+          "top": 0,
+          "right": 360,
+          "bottom": 526.2857666015625,
+          "left": 0
+        },
+        "top": 0,
+        "client": 614,
+        "total": 614
+      },
+      {
+        "id": "trainingPage",
+        "className": "page active",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "",
+        "className": "content",
+        "overflow": "auto",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "gameInterface",
+        "className": "",
+        "overflow": "visible",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 0,
+          "top": 0,
+          "right": 360,
+          "bottom": 0,
+          "left": 0
+        },
+        "top": 0,
+        "client": 0,
+        "total": 0
+      },
+      {
+        "id": "game-content",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 639.9910888671875,
+          "top": 0,
+          "right": 360,
+          "bottom": 639.9910888671875,
+          "left": 0
+        },
+        "top": 0,
+        "client": 747,
+        "total": 747
+      },
+      {
+        "id": "app",
+        "className": "no-header v148-context-nav-active",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 1920,
+        "total": 1920
+      },
+      {
+        "id": "game-stage",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 1920,
+        "total": 1920
+      },
+      {
+        "id": "game-viewport",
+        "className": "",
+        "overflow": "clip",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      },
+      {
+        "id": "",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      },
+      {
+        "id": "",
+        "className": "",
+        "overflow": "hidden",
+        "rect": {
+          "x": 0,
+          "y": 0,
+          "width": 360,
+          "height": 640,
+          "top": 0,
+          "right": 360,
+          "bottom": 640,
+          "left": 0
+        },
+        "top": 0,
+        "client": 640,
+        "total": 640
+      }
+    ]
+  },
+  "errors": []
+}

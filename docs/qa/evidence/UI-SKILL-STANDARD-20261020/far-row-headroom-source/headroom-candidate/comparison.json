@@ -1,0 +1,17 @@
+{
+  "head": "bd003a9fe5827abf983b499c99129249795b4d8d",
+  "factor": "Only ephemeral far-row overhang7→9, countdown64 retained; candidate diagnosis, not acceptance",
+  "baseline": {
+    "artHeight": 90.0836181640625,
+    "unitHeight": 118.18942260742188,
+    "allyZone": 244.24179077148438,
+    "center": 160.87619018554688
+  },
+  "counterfactual": {
+    "artHeight": 92.24169921875,
+    "unitHeight": 118.18942260742188,
+    "allyZone": 244.24179077148438,
+    "center": 160.87619018554688
+  },
+  "scope": "Static original fixture read to actual completion; no Gate bypass or gameplay claim"
+}

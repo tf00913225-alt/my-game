@@ -1,0 +1,57 @@
+{
+  "before": {
+    "candidate": {
+      "x": 37,
+      "y": 472.44793701171875,
+      "width": 140,
+      "height": 76.19793701171875,
+      "top": 472.44793701171875,
+      "right": 177,
+      "bottom": 548.6458740234375,
+      "left": 37
+    },
+    "scroll": 0,
+    "scrollHeight": 1155,
+    "clientHeight": 1008,
+    "viewport": {
+      "x": 37,
+      "y": 163.6666717529297,
+      "width": 286,
+      "height": 336.11981201171875,
+      "top": 163.6666717529297,
+      "right": 323,
+      "bottom": 499.78648376464844,
+      "left": 37
+    },
+    "hit": "<div class=\"formation-footer\"><button type=\"button\" class=\"formation-remove\" data-remove=\"true\">移出英雄</button><p role=\"status\">已確認保存的佈陣。</p><button type=\"button\" class=\"main-button\" onclick=\"FourSymbolsTeamFormation.read()\">同步佈陣</button></div>",
+    "hitCandidate": false
+  },
+  "after": {
+    "candidate": {
+      "x": 37,
+      "y": 423.44793701171875,
+      "width": 140,
+      "height": 76.19790649414062,
+      "top": 423.44793701171875,
+      "right": 177,
+      "bottom": 499.6458435058594,
+      "left": 37
+    },
+    "scroll": 147,
+    "scrollHeight": 1155,
+    "clientHeight": 1008,
+    "viewport": {
+      "x": 37,
+      "y": 163.6666717529297,
+      "width": 286,
+      "height": 336.11981201171875,
+      "top": 163.6666717529297,
+      "right": 323,
+      "bottom": 499.78648376464844,
+      "left": 37
+    },
+    "hit": "<img src=\"assets/heroes/vajra-heavenly-king.webp\" alt=\"金剛天王立繪\" draggable=\"false\">",
+    "hitCandidate": true
+  },
+  "scope": "Original isolated hero QA; diagnostic scrolling only, no product change"
+}

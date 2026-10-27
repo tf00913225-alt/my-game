@@ -1,0 +1,97 @@
+
+/* bundled source: css/32-v131-patrol-appearance.css */
+/* V131 — 巡怪形象切換與透明 Q 版 sprite。 */
+#game-stage #mapPage #v131PatrolAppearanceSwitchWrap{
+    position:absolute;
+    right:12px;
+    top:12px;
+    z-index:96;
+    display:flex;
+    flex-direction:column;
+    align-items:flex-end;
+    gap:6px;
+    pointer-events:auto;
+}
+#game-stage #mapPage #v131PatrolAppearanceSwitch{
+    width:68px;
+    height:68px;
+    padding:0;
+    border:0;
+    border-radius:50%;
+    background:transparent;
+    box-shadow:none;
+    overflow:hidden;
+}
+#game-stage #mapPage .v131-switch-icon-viewport{
+    position:relative;
+    display:block;
+    width:68px;
+    height:68px;
+    overflow:hidden;
+    border-radius:50%;
+    filter:drop-shadow(0 3px 5px rgba(0,0,0,.72));
+}
+#game-stage #mapPage .v131-switch-icon-image{
+    display:block;
+    width:100%;
+    height:100%;
+    object-fit:contain;
+    object-position:center;
+}
+#game-stage #mapPage #v131PatrolAppearanceSwitch.v131-switch-icon-failed .v131-switch-icon-viewport::after{
+    content:"換";
+    position:absolute;
+    inset:0;
+    display:grid;
+    place-items:center;
+    border:1px solid #9d7539;
+    border-radius:50%;
+    background:radial-gradient(circle,#3a2815,#120d08 72%);
+    color:#f0cf82;
+    font-size:28px;
+    font-weight:900;
+}
+#game-stage #mapPage #v131PatrolAppearancePanel{
+    display:none;
+    min-width:160px;
+    max-width:220px;
+    padding:10px;
+    border:1px solid #8a6a3a;
+    border-image:var(--rpg-window-frame) 115 fill / 4px / 0 stretch;
+    border-radius:4px;
+    background:var(--rpg-window-iron,#17130f);
+    box-shadow:0 6px 18px rgba(0,0,0,.65);
+}
+#game-stage #mapPage #v131PatrolAppearancePanel.show{
+    display:grid;
+    gap:4px;
+}
+#game-stage #mapPage .v131-patrol-choice{
+    width:100%;
+    min-height:52px;
+    padding:8px 10px;
+    border:1px solid #66502d;
+    border-radius:4px;
+    background:linear-gradient(#30291f,#1b1812);
+    color:#f2e3bf;
+    font-size:18px;
+    line-height:1.4;
+    font-weight:800;
+    text-align:left;
+    overflow-wrap:anywhere;
+}
+#game-stage #mapPage .v131-patrol-choice.active{
+    border-color:#f0b429;
+    color:#fff1b8;
+    box-shadow:0 0 0 1px rgba(240,180,41,.25) inset;
+}
+#game-stage #mapPage #patrolCharacterImg.v131-patrol-q-art{
+    width:84px !important;
+    height:126px !important;
+    display:block !important;
+    margin:0 auto !important;
+    object-fit:contain !important;
+    object-position:center bottom !important;
+    background-color:transparent !important;
+    filter:drop-shadow(0 4px 5px rgba(0,0,0,.6));
+}

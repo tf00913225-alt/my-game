@@ -1,0 +1,2262 @@
+[
+  {
+    "name": "auto-entry",
+    "rows": [
+      {
+        "text": "自動戰鬥設定",
+        "font": 27.466666022650628,
+        "button": false,
+        "primary": false,
+        "selector": "#homeFeatureModalTitle",
+        "parent": "home-feature-modal-title"
+      },
+      {
+        "text": "返回",
+        "font": 18.28878144054878,
+        "button": true,
+        "primary": true,
+        "selector": "button.home-feature-close-btn",
+        "parent": ""
+      },
+      {
+        "text": "戰鬥策略",
+        "font": 14.877776174834281,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-panel-kicker",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "自動戰鬥",
+        "font": 18.311109138257578,
+        "button": false,
+        "primary": false,
+        "selector": "#autoBattleLabel",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "戰鬥中選擇行動，戰鬥結束後檢查補品",
+        "font": 16.02222049597538,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "套用並啟動",
+        "font": 17.166667227017676,
+        "button": true,
+        "primary": true,
+        "selector": "#autoBattleButton",
+        "parent": "auto-premium-status"
+      },
+      {
+        "text": "角",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "控制對象",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "設定角色",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.161506139315094,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "式",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "主要策略",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "自動行動",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166667938232422,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "防禦",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "共用設定",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "三名角色共用",
+        "font": 16.02222188313802,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "HP",
+        "font": 14.87777732400333,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "生命補給",
+        "font": 17.123747634887696,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982164459228516,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "50%",
+        "font": 17.244898080825806,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "SP",
+        "font": 14.877780241124771,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "能量補給",
+        "font": 17.123744201660156,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982161254882811,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "25%",
+        "font": 17.24489450454712,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "城",
+        "font": 14.877778879801433,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-return-emblem",
+        "parent": "auto-return-card"
+      },
+      {
+        "text": "補品耗盡時返回主城",
+        "font": 17.16666539510091,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "無可用 HP／SP 補品時自動結束巡練",
+        "font": 16.022221035427517,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "元素匣剩餘時間",
+        "font": 14.87777600969587,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "0小時 0分鐘",
+        "font": 20.598896810453233,
+        "button": false,
+        "primary": false,
+        "selector": "#v131EbRemaining",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "觀看廣告 ＋8小時",
+        "font": 17.15497679629568,
+        "button": true,
+        "primary": true,
+        "selector": "button.v141-element-box-ad",
+        "parent": "v131ElementBoxStats"
+      },
+      {
+        "text": "最多可累積32小時，可隨時增加。",
+        "font": 16.02222149188702,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "v131ElementBoxStats"
+      }
+    ],
+    "controls": [
+      {
+        "label": "返回",
+        "width": 78.10833740234375,
+        "height": 50.35554504394531,
+        "overflow": false
+      },
+      {
+        "label": "套用並啟動",
+        "width": 135.04444885253906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "QA 火角色▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "普通攻擊▾",
+        "width": 148.77777099609375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "50%▾",
+        "width": 123.02777099609375,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "25%▾",
+        "width": 123.02775573730469,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告 ＋8小時",
+        "width": 157.44456481933594,
+        "height": 54.93328857421875,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "autoSettingsHP-menu",
+    "rows": [
+      {
+        "text": "25%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "50%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "75%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "90%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "100%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      }
+    ],
+    "controls": [
+      {
+        "label": "25%",
+        "width": 120.73292541503906,
+        "height": 50.35557556152344,
+        "overflow": false
+      },
+      {
+        "label": "50%",
+        "width": 120.73292541503906,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "75%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "90%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "100%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "autoSettingsHP-selected",
+    "rows": [
+      {
+        "text": "戰鬥策略",
+        "font": 14.877776174834281,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-panel-kicker",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "自動戰鬥",
+        "font": 18.311109138257578,
+        "button": false,
+        "primary": false,
+        "selector": "#autoBattleLabel",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "戰鬥中選擇行動，戰鬥結束後檢查補品",
+        "font": 16.02222049597538,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "套用並啟動",
+        "font": 17.166667227017676,
+        "button": true,
+        "primary": true,
+        "selector": "#autoBattleButton",
+        "parent": "auto-premium-status"
+      },
+      {
+        "text": "角",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "控制對象",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "設定角色",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.161506139315094,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "式",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "主要策略",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "自動行動",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166667938232422,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "防禦",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "共用設定",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "三名角色共用",
+        "font": 16.02222188313802,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "HP",
+        "font": 14.87777732400333,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "生命補給",
+        "font": 17.123747634887696,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982164459228516,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "75%",
+        "font": 17.244898080825806,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "SP",
+        "font": 14.877780241124771,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "能量補給",
+        "font": 17.123744201660156,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982161254882811,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "25%",
+        "font": 17.24489450454712,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "城",
+        "font": 14.877778879801433,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-return-emblem",
+        "parent": "auto-return-card"
+      },
+      {
+        "text": "補品耗盡時返回主城",
+        "font": 17.16666539510091,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "無可用 HP／SP 補品時自動結束巡練",
+        "font": 16.022221035427517,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "元素匣剩餘時間",
+        "font": 14.87777600969587,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "0小時 0分鐘",
+        "font": 20.598896810453233,
+        "button": false,
+        "primary": false,
+        "selector": "#v131EbRemaining",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "觀看廣告 ＋8小時",
+        "font": 17.15497679629568,
+        "button": true,
+        "primary": true,
+        "selector": "button.v141-element-box-ad",
+        "parent": "v131ElementBoxStats"
+      },
+      {
+        "text": "最多可累積32小時，可隨時增加。",
+        "font": 16.02222149188702,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "v131ElementBoxStats"
+      }
+    ],
+    "controls": [
+      {
+        "label": "套用並啟動",
+        "width": 135.04444885253906,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "QA 火角色▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "普通攻擊▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "75%▾",
+        "width": 123.02777099609375,
+        "height": 50.355499267578125,
+        "overflow": false
+      },
+      {
+        "label": "25%▾",
+        "width": 123.02775573730469,
+        "height": 50.355499267578125,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告 ＋8小時",
+        "width": 157.44456481933594,
+        "height": 54.933349609375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "autoSettingsSP-menu",
+    "rows": [
+      {
+        "text": "25%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "50%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "75%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "90%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "100%",
+        "font": 17.19297988505303,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      }
+    ],
+    "controls": [
+      {
+        "label": "25%",
+        "width": 120.73292541503906,
+        "height": 50.35557556152344,
+        "overflow": false
+      },
+      {
+        "label": "50%",
+        "width": 120.73292541503906,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "75%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "90%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "100%",
+        "width": 120.73292541503906,
+        "height": 50.355560302734375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "autoSettingsSP-selected",
+    "rows": [
+      {
+        "text": "戰鬥策略",
+        "font": 14.877776174834281,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-panel-kicker",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "自動戰鬥",
+        "font": 18.311109138257578,
+        "button": false,
+        "primary": false,
+        "selector": "#autoBattleLabel",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "戰鬥中選擇行動，戰鬥結束後檢查補品",
+        "font": 16.02222049597538,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "套用並啟動",
+        "font": 17.166667227017676,
+        "button": true,
+        "primary": true,
+        "selector": "#autoBattleButton",
+        "parent": "auto-premium-status"
+      },
+      {
+        "text": "角",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "控制對象",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "設定角色",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.161506139315094,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "式",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "主要策略",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "自動行動",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166667938232422,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "防禦",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "共用設定",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "三名角色共用",
+        "font": 16.02222188313802,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "HP",
+        "font": 14.87777732400333,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "生命補給",
+        "font": 17.123747634887696,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982164459228516,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "75%",
+        "font": 17.244898080825806,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "SP",
+        "font": 14.877780241124771,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "能量補給",
+        "font": 17.123744201660156,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982161254882811,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "50%",
+        "font": 17.24489450454712,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "城",
+        "font": 14.877778879801433,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-return-emblem",
+        "parent": "auto-return-card"
+      },
+      {
+        "text": "補品耗盡時返回主城",
+        "font": 17.16666539510091,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "無可用 HP／SP 補品時自動結束巡練",
+        "font": 16.022221035427517,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "元素匣剩餘時間",
+        "font": 14.87777600969587,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "0小時 0分鐘",
+        "font": 20.598896810453233,
+        "button": false,
+        "primary": false,
+        "selector": "#v131EbRemaining",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "觀看廣告 ＋8小時",
+        "font": 17.15497679629568,
+        "button": true,
+        "primary": true,
+        "selector": "button.v141-element-box-ad",
+        "parent": "v131ElementBoxStats"
+      },
+      {
+        "text": "最多可累積32小時，可隨時增加。",
+        "font": 16.02222149188702,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "v131ElementBoxStats"
+      }
+    ],
+    "controls": [
+      {
+        "label": "套用並啟動",
+        "width": 135.04444885253906,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "QA 火角色▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "普通攻擊▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "75%▾",
+        "width": 123.02777099609375,
+        "height": 50.355499267578125,
+        "overflow": false
+      },
+      {
+        "label": "50%▾",
+        "width": 123.02775573730469,
+        "height": 50.355499267578125,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告 ＋8小時",
+        "width": 157.44456481933594,
+        "height": 54.933349609375,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "autoSettingsCharacterSelect-menu",
+    "rows": [
+      {
+        "text": "QA 火角色",
+        "font": 17.165966033935547,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.165966033935547,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.165966033935547,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list open"
+      }
+    ],
+    "controls": [
+      {
+        "label": "QA 火角色",
+        "width": 146.48291015625,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "QA 水角色",
+        "width": 146.48291015625,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "角色3（尚未創建）",
+        "width": 146.48291015625,
+        "height": 69.81103515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "auto-character-selected",
+    "rows": [
+      {
+        "text": "戰鬥策略",
+        "font": 14.877776174834281,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-panel-kicker",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "自動戰鬥",
+        "font": 18.311109138257578,
+        "button": false,
+        "primary": false,
+        "selector": "#autoBattleLabel",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "戰鬥中選擇行動，戰鬥結束後檢查補品",
+        "font": 16.02222049597538,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "套用並啟動",
+        "font": 17.166667227017676,
+        "button": true,
+        "primary": true,
+        "selector": "#autoBattleButton",
+        "parent": "auto-premium-status"
+      },
+      {
+        "text": "角",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "控制對象",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "設定角色",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.161506139315094,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "式",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "主要策略",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "自動行動",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166667938232422,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "防禦",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "共用設定",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "三名角色共用",
+        "font": 16.02222188313802,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "HP",
+        "font": 14.87777732400333,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "生命補給",
+        "font": 17.123747634887696,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982164459228516,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "75%",
+        "font": 17.244898080825806,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "SP",
+        "font": 14.877780241124771,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "能量補給",
+        "font": 17.123744201660156,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982161254882811,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "50%",
+        "font": 17.24489450454712,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "城",
+        "font": 14.877778879801433,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-return-emblem",
+        "parent": "auto-return-card"
+      },
+      {
+        "text": "補品耗盡時返回主城",
+        "font": 17.16666539510091,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "無可用 HP／SP 補品時自動結束巡練",
+        "font": 16.022221035427517,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "元素匣剩餘時間",
+        "font": 14.87777600969587,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "0小時 0分鐘",
+        "font": 20.598896810453233,
+        "button": false,
+        "primary": false,
+        "selector": "#v131EbRemaining",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "觀看廣告 ＋8小時",
+        "font": 17.15497679629568,
+        "button": true,
+        "primary": true,
+        "selector": "button.v141-element-box-ad",
+        "parent": "v131ElementBoxStats"
+      },
+      {
+        "text": "最多可累積32小時，可隨時增加。",
+        "font": 16.02222149188702,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "v131ElementBoxStats"
+      }
+    ],
+    "controls": [
+      {
+        "label": "套用並啟動",
+        "width": 135.04444885253906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "QA 水角色▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "普通攻擊▾",
+        "width": 148.77777099609375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "75%▾",
+        "width": 123.02777099609375,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "50%▾",
+        "width": 123.02775573730469,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告 ＋8小時",
+        "width": 157.44456481933594,
+        "height": 54.93328857421875,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "auto-reopen",
+    "rows": [
+      {
+        "text": "戰鬥策略",
+        "font": 14.877776174834281,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-panel-kicker",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "自動戰鬥",
+        "font": 18.311109138257578,
+        "button": false,
+        "primary": false,
+        "selector": "#autoBattleLabel",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "戰鬥中選擇行動，戰鬥結束後檢查補品",
+        "font": 16.02222049597538,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-premium-status-copy"
+      },
+      {
+        "text": "套用並啟動",
+        "font": 17.166667227017676,
+        "button": true,
+        "primary": true,
+        "selector": "#autoBattleButton",
+        "parent": "auto-premium-status"
+      },
+      {
+        "text": "角",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "控制對象",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "設定角色",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.161506139315094,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "QA 火角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "QA 水角色",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "角色3（尚未創建）",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "式",
+        "font": 14.877775573730469,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-setting-emblem",
+        "parent": "auto-setting-card"
+      },
+      {
+        "text": "主要策略",
+        "font": 16.022221183776853,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "自動行動",
+        "font": 18.311109924316405,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-setting-meta"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166667938232422,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "普通攻擊",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "防禦",
+        "font": 17.166666984558105,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "共用設定",
+        "font": 18.311111450195312,
+        "button": false,
+        "primary": false,
+        "selector": "b.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "三名角色共用",
+        "font": 16.02222188313802,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v17342-element-box-shared-head"
+      },
+      {
+        "text": "HP",
+        "font": 14.87777732400333,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "生命補給",
+        "font": 17.123747634887696,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982164459228516,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "75%",
+        "font": 17.244898080825806,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.139589207405546,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "SP",
+        "font": 14.877780241124771,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-threshold-emblem",
+        "parent": "auto-threshold-head"
+      },
+      {
+        "text": "能量補給",
+        "font": 17.123744201660156,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": ""
+      },
+      {
+        "text": "低於門檻時自動使用補品",
+        "font": 15.982161254882811,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": ""
+      },
+      {
+        "text": "50%",
+        "font": 17.24489450454712,
+        "button": true,
+        "primary": false,
+        "selector": "span.",
+        "parent": "custom-dropdown-label"
+      },
+      {
+        "text": "25%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "50%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item.selected",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "75%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "90%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "100%",
+        "font": 17.13958812436847,
+        "button": true,
+        "primary": false,
+        "selector": "div.custom-dropdown-item",
+        "parent": "custom-dropdown-list auto-premium-dropdown-list"
+      },
+      {
+        "text": "城",
+        "font": 14.877778879801433,
+        "button": false,
+        "primary": false,
+        "selector": "span.auto-return-emblem",
+        "parent": "auto-return-card"
+      },
+      {
+        "text": "補品耗盡時返回主城",
+        "font": 17.16666539510091,
+        "button": false,
+        "primary": false,
+        "selector": "strong.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "無可用 HP／SP 補品時自動結束巡練",
+        "font": 16.022221035427517,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "auto-return-copy"
+      },
+      {
+        "text": "元素匣剩餘時間",
+        "font": 14.87777600969587,
+        "button": false,
+        "primary": false,
+        "selector": "span.",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "0小時 0分鐘",
+        "font": 20.598896810453233,
+        "button": false,
+        "primary": false,
+        "selector": "#v131EbRemaining",
+        "parent": "v141-element-box-remaining"
+      },
+      {
+        "text": "觀看廣告 ＋8小時",
+        "font": 17.15497679629568,
+        "button": true,
+        "primary": true,
+        "selector": "button.v141-element-box-ad",
+        "parent": "v131ElementBoxStats"
+      },
+      {
+        "text": "最多可累積32小時，可隨時增加。",
+        "font": 16.02222149188702,
+        "button": false,
+        "primary": false,
+        "selector": "small.",
+        "parent": "v131ElementBoxStats"
+      }
+    ],
+    "controls": [
+      {
+        "label": "套用並啟動",
+        "width": 135.04444885253906,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "QA 火角色▾",
+        "width": 148.77777099609375,
+        "height": 50.355560302734375,
+        "overflow": false
+      },
+      {
+        "label": "普通攻擊▾",
+        "width": 148.77777099609375,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "75%▾",
+        "width": 123.02777099609375,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "50%▾",
+        "width": 123.02775573730469,
+        "height": 50.3555908203125,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告 ＋8小時",
+        "width": 157.44456481933594,
+        "height": 54.93328857421875,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  },
+  {
+    "name": "zero-hours-confirm",
+    "rows": [
+      {
+        "text": "補充元素匣時數",
+        "font": 22.888888506822184,
+        "button": false,
+        "primary": false,
+        "selector": "#v169RpgDialogTitle",
+        "parent": "v169-rpg-dialog"
+      },
+      {
+        "text": "元素匣目前沒有可用時數。\n觀看廣告可獲得 8 小時元素匣啟動時數。\n\n要觀看廣告嗎？",
+        "font": 17.166666380116638,
+        "button": false,
+        "primary": false,
+        "selector": "#v169RpgDialogMessage",
+        "parent": "v169-rpg-dialog"
+      },
+      {
+        "text": "稍後再說",
+        "font": 17.145882484121994,
+        "button": true,
+        "primary": true,
+        "selector": "button.v169-rpg-dialog-button.secondary",
+        "parent": "v169-rpg-dialog-actions"
+      },
+      {
+        "text": "觀看廣告",
+        "font": 17.145884146701913,
+        "button": true,
+        "primary": true,
+        "selector": "button.v169-rpg-dialog-button.secondary",
+        "parent": "v169-rpg-dialog-actions"
+      }
+    ],
+    "controls": [
+      {
+        "label": "稍後再說",
+        "width": 157.36109924316406,
+        "height": 50.35552978515625,
+        "overflow": false
+      },
+      {
+        "label": "觀看廣告",
+        "width": 157.36111450195312,
+        "height": 50.35552978515625,
+        "overflow": false
+      }
+    ],
+    "overflow": []
+  }
+]
