@@ -53,12 +53,19 @@ try{
         const tail=(value,limit)=>String(value||"").slice(-limit);
         const diagnostic={status:result.status,signal:result.signal,error:result.error?String(result.error):null,
             stdoutTail:tail(result.stdout,16384),stderrTail:tail(result.stderr,16384),http:null,serverLogTail:null};
+        const controller=new AbortController();let deadline;
         try{
-            const response=await fetch(base+"/.daily-dungeon-webp-browser-qa.html",{signal:AbortSignal.timeout(2000)});
-            const reader=response.body?.getReader();let chunk=null;
-            if(reader){try{chunk=await reader.read();}finally{await reader.cancel();}}
-            diagnostic.http={status:response.status,contentType:response.headers.get("content-type"),bodyPrefix:chunk?.value?Buffer.from(chunk.value).subarray(0,4096).toString("utf8"):""};
+            diagnostic.http=await Promise.race([
+                (async()=>{
+                    const response=await fetch(base+"/.daily-dungeon-webp-browser-qa.html",{signal:controller.signal});
+                    const reader=response.body?.getReader();let chunk=null;
+                    if(reader){try{chunk=await reader.read();}finally{void reader.cancel().catch(()=>{});}}
+                    return {status:response.status,contentType:response.headers.get("content-type"),bodyPrefix:chunk?.value?Buffer.from(chunk.value).subarray(0,4096).toString("utf8"):""};
+                })(),
+                new Promise(resolve=>{deadline=setTimeout(()=>{controller.abort();resolve({error:"diagnostic HTTP deadline exceeded"});},2000);})
+            ]);
         }catch(error){ diagnostic.http={error:String(error)}; }
+        finally{clearTimeout(deadline);}
         try{
             const file="/tmp/four-symbols-daily-dungeon-qa-server.log",size=fs.statSync(file).size,fd=fs.openSync(file,"r");
             try{const length=Math.min(size,8192),buffer=Buffer.alloc(length);fs.readSync(fd,buffer,0,length,size-length);diagnostic.serverLogTail=buffer.toString("utf8");}finally{fs.closeSync(fd);}
