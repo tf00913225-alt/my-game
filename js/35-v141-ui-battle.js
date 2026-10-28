@@ -689,20 +689,24 @@
             const releaseEntryLock=window.FourSymbolsBattleFlow.acquirePresentationLock("battle-entry");
             if(overlay){ overlay.classList.add("show"); }
             setTimeout(()=>{
+                if(!battleActive||token!==battleToken){
+                    if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                    return;
+                }
                 if(overlay){ overlay.classList.remove("show"); }
                 if(page){
                     page.classList.remove("v141-preparing-entry");
                     page.classList.add("v141-entry-moving");
                 }
                 setTimeout(()=>{
+                    if(!battleActive||token!==battleToken){
+                        if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                        return;
+                    }
                     if(page){ page.classList.remove("v141-entry-moving"); }
                     transitionRunning=false;
-                    if(battleActive&&token===battleToken){
-                        try{ originalStartTurn.call(this,token); }
-                        finally{ releaseEntryLock(); }
-                    }else if(!battleActive){
-                        releaseEntryLock();
-                    }
+                    try{ originalStartTurn.call(this,token); }
+                    finally{ releaseEntryLock(); }
                 },720);
             },1000);
         };
