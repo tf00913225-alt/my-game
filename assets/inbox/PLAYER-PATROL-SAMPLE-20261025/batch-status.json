@@ -7,7 +7,7 @@
     "answer": "可以",
     "scope": "male01 style/proportion/pose approved; produce remaining seven front/back"
   },
-  "status": "ASSET_PHASE_COMPLETE_HUMAN_REVIEW_AND_SHARED_RUNTIME_HANDOFF_PENDING",
+  "status": "ALL_EIGHT_HUMAN_APPROVED_V4_TECHNICAL_AND_INDEPENDENT_QA_PASS_RUNTIME_HANDOFF_PENDING",
   "runtimeChanges": false,
   "sharedFilesPendingHandoff": [
     "exploration character mapping/resolver owner",
@@ -23,15 +23,19 @@
     "do not claim #998 or current exploration deployment acceptance"
   ],
   "pending": [
-    "remaining seven human candidate review",
-    "coordinate shared-file and deployment window",
-    "runtime implementation and latest Head CI after handoff",
-    "exact dev deployment and mobile/PC/physical runtime acceptance"
+    "shared-file coordination",
+    "runtime integration and latest Head CI",
+    "deployed acceptance"
   ],
   "generatedSources": 14,
   "independentPending": [],
   "technicalStatus": "16 lossless WebP exact RGBA/Alpha PASS, source-sized1024x1536",
   "canonicalTotalSources": 16,
   "independentStatus": "All8 pairs final84x126 independently accepted as candidates",
-  "next": "Present final contact sheet and precise runtime-handoff-plan.json; keep current inbox-only branch unmerged until coordinated integration stage"
+  "next": "Present final contact sheet and precise runtime-handoff-plan.json; keep current inbox-only branch unmerged until coordinated integration stage",
+  "humanApproval": {
+    "male01": "previously approved",
+    "otherSix": "user: 其餘我覺得可以",
+    "female02BackV4": "user: 採用"
+  }
 }

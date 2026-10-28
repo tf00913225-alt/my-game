@@ -1,0 +1,89 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "status": "USER_ADOPTED_V4_LOSSLESS_EXACT_VERIFIED_RUNTIME_UNCHANGED",
+  "revision": "female02 back v4",
+  "approvedInput": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\female02-patrol-back-review-v4.png",
+  "approvedSourceSha256": "02f0492980984a287d59140cf21a270959d523b562705923cdb1dcd116811718",
+  "backupDirectory": "rejected-female_02-back-v3-superseded",
+  "supersededFiles": [
+    {
+      "file": "player_female_02_patrol_back_source.png",
+      "sha256": "0971155463b7bfaff5cd107339fc6723f209fe3cd9a268fe7e8617bd66f9cc59"
+    },
+    {
+      "file": "player_female_02_patrol_back.webp",
+      "sha256": "47bad9891733c53f2130e87e3ea7845b42429e7cf79a68eadabf1b64706d9ae8"
+    },
+    {
+      "file": "player_female_02_patrol_back_preview_84x126.png",
+      "sha256": "5dd38b0fffa6aed4057977af852b32b1e2be0b20dca6dfb9347473b3c1c40206"
+    }
+  ],
+  "otherCanonicalFilesBefore": {
+    "player_female_01_patrol_back.webp": "71074afbf83427d15a2cdd58072b084fd8b2ee959eb490f35b3654d3f50d6d3c",
+    "player_female_01_patrol_back_source.png": "63f3b4a9e31d5bdfde4b565c6ba850d807a65629811b7b02c442fb386d8278bf",
+    "player_female_01_patrol_front.webp": "21e88afe70194b14da300d21f6398f9de9f19ba636fa3aa7113d491283e8f2a2",
+    "player_female_01_patrol_front_source.png": "bb80ea0d167361915dbb37da136458fc4304b8c310087d0fae0e270bd21377a3",
+    "player_female_02_patrol_front.webp": "08e5b5b0b6af4f02e52995ba44276f3fb3fe0a5883e00175eb0da196c46f90f9",
+    "player_female_02_patrol_front_source.png": "069eea1f5e0c8da718f36c2905943f63821cd654c82da49f9fe9cf1121cb4c58",
+    "player_female_03_patrol_back.webp": "2acdd4187eef44639b1800b02395d7b7c9373d7649368e9888c170f39b8ca222",
+    "player_female_03_patrol_back_source.png": "9f2411b6bec42062e87f6d70a7cb9b1be1f9d9ae0d8a2e504f99eb833e7c5576",
+    "player_female_03_patrol_front.webp": "7b6ed6170a8b1a08fd65a6b0d91c63317bef8ff266accd8da0fa63d920f4c172",
+    "player_female_03_patrol_front_source.png": "93acac62018e349048f801f52e7892c4d6b6065d11a829551a4e7815b647a8ba",
+    "player_female_04_patrol_back.webp": "6c2247042c3d8e4e7a4a736e4de0b442c60977160a27af35b99176e01bdc973d",
+    "player_female_04_patrol_back_source.png": "0a3f6d3408e0b3fc4ac6812045ae2cd630ec202c101baf1b16b13d504b8e0b6b",
+    "player_female_04_patrol_front.webp": "a658b6c0799ae4b327eea17ae7b027fa617eb7a4be09d6d761bfd4f612edf4c8",
+    "player_female_04_patrol_front_source.png": "132d9eb7feda229bd8537c993472bc5ec40adbbc79cb42cc838455923a9ad1d8",
+    "player_male_01_patrol_back.webp": "792c3e9357deb20d7aa6b4d58d7517e76ec14b4e9832e1be99692844ef699325",
+    "player_male_01_patrol_back_source.png": "8ce47e546526c8e9b863643f6e29f35c909b0ad00820399b8004708fdbc5e4aa",
+    "player_male_01_patrol_front.webp": "2fbe777afadaa0177979c395bdb680e7e94a7a8911b9c278aa61adc098a83c9a",
+    "player_male_01_patrol_front_source.png": "30f682f044136262424da5ba51912ce33dbd8d409b55f61c5c7a189f5e0a5469",
+    "player_male_02_patrol_back.webp": "37000310182cefd26a9c5eeaa261138ab291cb7a851d9a179243a1d65d4fd700",
+    "player_male_02_patrol_back_source.png": "90606cdd8b57107a8dab447c44798ecff645ebdcfd6b82e052f096f76776f7e0",
+    "player_male_02_patrol_front.webp": "32868ccf02dc7b5a8d124cf72e69deba1e8eb7d4a79fe4b98ff81ed62b5140da",
+    "player_male_02_patrol_front_source.png": "55a6c4f79b4d88d94b1dc5fed93546d0cfd78daa9931530063b9d94408e85914",
+    "player_male_03_patrol_back.webp": "baa78526987bb4db7dacd50692935995b43f977195e99f8b86a86b599de96f43",
+    "player_male_03_patrol_back_source.png": "49d134a4d639eab1fb17a5543f4eb5727234b3fde84162bdb16f3d32d73cc31f",
+    "player_male_03_patrol_front.webp": "68581fa853a8a394a1cedb38dbae5bdf5cde6b72fe71f36b4c025d4c5620d710",
+    "player_male_03_patrol_front_source.png": "d8aee3d183a83952d81f5e5a09e9b32c951d946ed27b509f99f6dc044ff87331",
+    "player_male_04_patrol_back.webp": "1e2a5ed85bb8d4b7875ebb81216bb0401c7110a92f27e25f2923807a2484ced1",
+    "player_male_04_patrol_back_source.png": "8227c629b595f0ca16bc8798237c8127d81f85c8d15d9eaf9fae89f77f7876fa",
+    "player_male_04_patrol_front.webp": "cb5f2a79d88001bddaf5356b450b8d65191b77cccdf7f2772527ab1aae7b18b1",
+    "player_male_04_patrol_front_source.png": "3b3adfa52a77d2478df9922e1f226a997aa1f8747c33a2af62ee168c7bb4810b"
+  },
+  "humanApproval": {
+    "source": "Parent relayed direct user confirmation in current chat",
+    "allEightAccepted": true,
+    "female02BackV4Quote": "採用"
+  },
+  "independentReview": {
+    "status": "PASS",
+    "scope": "female02 v4 front/back 84x126 and light/dark alpha composites",
+    "findings": "no dark edge/rectangle/haze, identity/weapon/feet readable and placement consistent",
+    "limits": "not runtime/deployment acceptance",
+    "reviewer": "separate QA agent"
+  },
+  "runtimeChanges": false,
+  "sourceSha256": "02f0492980984a287d59140cf21a270959d523b562705923cdb1dcd116811718",
+  "webpSha256": "b83a62120431d9beff967b4dbbc382c8e05f1361b83c846f3a0c1787016727d7",
+  "proposedRuntimePath": "assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp",
+  "size": [
+    1024,
+    1536
+  ],
+  "alphaExtrema": [
+    0,
+    254
+  ],
+  "corner24MaxAlpha": [
+    0,
+    0,
+    0,
+    0
+  ],
+  "rgbaPixelExact": true,
+  "other15CanonicalSourceAndWebpUnchanged": true,
+  "qaNote": "Parent confirms v4 QA review and direct user adoption; no new art approval inferred from conversion",
+  "webpBytes": 1151830,
+  "generationPrompt": "Image1 back pose target, Image2 authoritative front identity and color. Match subdued burgundy-red and black cloth, muted antique bronze armor, restrained contrast; reduce excess saturation/gold. Preserve bob, right hairpin, left shoulder feather armor/left patterned panel, right hand sheathed saber, plain rear boots, subtle full-body walking pose, adult illustrated wuxia style. Direct back, full 2:3 canvas, transparent alpha, no background/glow/text/new accessories."
+}

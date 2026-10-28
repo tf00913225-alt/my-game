@@ -1,6 +1,6 @@
 {
   "workId": "PLAYER-PATROL-SAMPLE-20261025",
-  "status": "ASSET_PHASE_ONLY_RUNTIME_HANDOFF_PENDING",
+  "status": "ALL_EIGHT_HUMAN_APPROVED_ASSETS_ONLY_RUNTIME_HANDOFF_PENDING",
   "mappingOwner": "js/26-v131-patrol-appearance.js const ART",
   "unchangedSelection": "existing gender/element fallback, party selection and facingBack boolean; up=back, all other directions/idle=front",
   "mapping": [
@@ -109,8 +109,9 @@
       "appearanceId": "player_female_02",
       "facing": "back",
       "inboxWebp": "player_female_02_patrol_back.webp",
-      "sha256": "47bad9891733c53f2130e87e3ea7845b42429e7cf79a68eadabf1b64706d9ae8",
-      "proposedRuntimePath": "assets/characters/patrol/player_female_02_patrol_back.47bad9891733.webp"
+      "sourceSha256": "02f0492980984a287d59140cf21a270959d523b562705923cdb1dcd116811718",
+      "sha256": "b83a62120431d9beff967b4dbbc382c8e05f1361b83c846f3a0c1787016727d7",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp"
     },
     {
       "gender": "female",
@@ -191,7 +192,7 @@
     "normal dev merge only after all gates; natural exact SHA deploy; mobile/PC/physical QA in coordinated window"
   ],
   "performanceRisk": {
-    "newWebpTotalBytes": 20192630,
+    "newWebpTotalBytes": 20168232,
     "oldPatrol16WebpTotalBytes": 223598,
     "note": "New high-quality lossless source-sized runtime candidates total about19.3MiB; runtime loading/cache/mobile performance unverified. Preserve lossless/source size; no unsolicited lossy conversion or resizing."
   },

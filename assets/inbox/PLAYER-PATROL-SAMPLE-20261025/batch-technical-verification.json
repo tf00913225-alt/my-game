@@ -1,6 +1,6 @@
 {
   "workId": "PLAYER-PATROL-SAMPLE-20261025",
-  "updatedAt": "2026-10-25T15:03:20.519048+00:00",
+  "updatedAt": "2026-10-28T11:51:53.926070+00:00",
   "status": "pass",
   "scope": "Inbox-only technical verification; NOT art approval, runtime, animation or deployment acceptance",
   "sourcePolicy": "No trim/crop/resize/rotate/alpha changes; only labeled 84x126 review copies resized",
@@ -440,8 +440,8 @@
           "side": "back",
           "source": "player_female_02_patrol_back_source.png",
           "webp": "player_female_02_patrol_back.webp",
-          "sourceSha256": "0971155463b7bfaff5cd107339fc6723f209fe3cd9a268fe7e8617bd66f9cc59",
-          "webpSha256": "47bad9891733c53f2130e87e3ea7845b42429e7cf79a68eadabf1b64706d9ae8",
+          "sourceSha256": "02f0492980984a287d59140cf21a270959d523b562705923cdb1dcd116811718",
+          "webpSha256": "b83a62120431d9beff967b4dbbc382c8e05f1361b83c846f3a0c1787016727d7",
           "sourceMode": "RGBA",
           "sourceSize": [
             1024,

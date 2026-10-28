@@ -23,3 +23,5 @@ Status: male01 human-approved 2026-10-25 22:40 Asia/Taipei; remaining seven pair
 背面v2獨審：先前阻塞解除，可交人工審樣，非正式採用通過。左右衣襬/劍/羽肩一致，後腰後靴合理，正背同角色、雙腳完整、84×126可辨。人工仍須確認細長身形在巡怪畫面的比例，以及步態強度；未驗runtime/動畫/點擊。Status: INDEPENDENT_REVIEW_READY_FOR_HUMAN_SAMPLE_APPROVAL.
 
 全批素材段完成：16張1024×1536 RGBA母圖與lossless WebP精確一致，84×126全8對照獨審通過候選。男03/04後靴v2、女02後靴/透明v3為canonical，拒件留於rejected-*不可導入。女02背略較亮/飽和，人工審樣注意。只有男01已有人審批准，其餘7位候選待呈現；未驗正式接入/互動/實景/部署/真機效能。精確新mapping、16新hash檔名、舊16保留及共享manifest序列見runtime-handoff-plan.json。新16WebP合計20,192,630bytes（約19.3MiB），接線階段須驗載入/快取/手機，不擅自改有損或尺寸。
+
+2026-10-28：使用者確認其餘六位，並採用女02背v4；八位均已人審。v4母圖/WebP hash及舊v3備份詳見female02-v4-adoption.json。16張無損WebP合計20,168,232 bytes；正式巡怪接線與共檔協調仍待辦。
