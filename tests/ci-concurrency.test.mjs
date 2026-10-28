@@ -1,6 +1,10 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import os from 'node:os';
+import path from 'node:path';
+import {pathToFileURL} from 'node:url';
+import {execFileSync} from 'node:child_process';
 const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
 const group=ci.match(/  group: ci-\$\{\{ (.+) \}\}/)[1];
 const cancel=ci.match(/  cancel-in-progress: \$\{\{ (.+) \}\}/)[1];
@@ -47,8 +51,49 @@ test('targeted integration cannot publish full regression health and stale dev i
 });
 test('classifier alone receives complete ancestry and exact PR head',()=>{
   const job=ci.split('\n  classify:')[1].split('\n  core_checks:')[0];
-  assert.match(job,/fetch-depth: 0/);
+  assert.match(job,/fetch-depth: 1/);
+  assert.match(job,/Fetch exact classifier comparison ancestry/);
+  assert.match(job,/ancestry_options\+=\(--unshallow\)/);
+  assert.match(job,/test "\$\(git rev-parse --is-shallow-repository\)" = false/);
   assert.match(job,/ref: \$\{\{ inputs.candidate_sha \|\| github.event.pull_request.head.sha \|\| github.sha \}\}/);
+});
+
+test('classifier scoped fetch preserves divergent ancestry without unrelated refs and refuses unavailable commits',()=>{
+  const directory=fs.mkdtempSync(path.join(os.tmpdir(),'classifier-ancestry-'));
+  const git=(cwd,...args)=>execFileSync('git',args,{cwd,encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+  const source=path.join(directory,'source'),target=path.join(directory,'target');
+  const script=ci.split('      - name: Fetch exact classifier comparison ancestry\n')[1]
+    .split('      - name: Confirm exact regression source snapshot')[0].split('        run: |\n')[1]
+    .split('\n').filter(line=>line.startsWith('          ')).map(line=>line.slice(10)).join('\n');
+  const bash=process.platform==='win32'?path.join(process.env.ProgramFiles||'C:/Program Files','Git/bin/bash.exe'):'bash';
+  try{
+    fs.mkdirSync(source);git(source,'init','-b','main');
+    git(source,'config','user.name','isolated fixture');git(source,'config','user.email','fixture@example.invalid');
+    const commit=(name,value)=>{fs.writeFileSync(path.join(source,name),value);git(source,'add',name);git(source,'commit','-m',value);return git(source,'rev-parse','HEAD');};
+    const ancestor=commit('base.md','ancestor');
+    git(source,'checkout','-b','feature');const head=commit('feature.md','feature');
+    git(source,'checkout','main');const base=commit('base.md','advanced base');
+    git(source,'checkout','--orphan','unrelated');git(source,'rm','-rf','.');
+    const unrelated=commit('unrelated.md','unrelated');git(source,'tag','unrelated-tag');
+    git(directory,'clone','--no-tags','--depth=1','--branch','feature',pathToFileURL(source).href,target);
+    assert.equal(git(target,'rev-parse','--is-shallow-repository'),'true');
+    const run=(comparisonBase,comparisonHead=head)=>execFileSync(bash,['-c',script],{cwd:target,
+      env:{...process.env,CI_BASE_SHA:comparisonBase,CI_HEAD_SHA:comparisonHead},stdio:['ignore','pipe','pipe']});
+    run(base);
+    assert.equal(git(target,'rev-parse','HEAD'),head);
+    assert.equal(git(target,'rev-parse','--is-shallow-repository'),'false');
+    assert.equal(git(target,'merge-base',base,head),ancestor);
+    assert.equal(git(target,'diff','--name-only',base+'...'+head),'feature.md');
+    assert.equal(git(target,'diff','--name-only',ancestor+'..'+base),'base.md');
+    assert.equal(git(target,'show',ancestor+':base.md'),'ancestor');
+    assert.equal(git(target,'tag','--list'),'');
+    assert.doesNotMatch(git(target,'branch','-r'),/unrelated/);
+    assert.throws(()=>git(target,'cat-file','-e',unrelated+'^{commit}'));
+    run(unrelated);
+    assert.throws(()=>git(target,'merge-base',unrelated,head),'unrelated histories remain fail-closed');
+    assert.throws(()=>run('f'.repeat(40)),'unavailable exact base cannot silently fall back');
+    assert.throws(()=>run(base,'invalid'),'invalid head cannot start fetch');
+  }finally{fs.rmSync(directory,{recursive:true,force:true});}
 });
 test('affected live QA never starts after failed publication; manual dispatch remains full',()=>{
   const workflow=fs.readFileSync(new URL('../.github/workflows/deploy-dev-cloudflare.yml',import.meta.url),'utf8');
