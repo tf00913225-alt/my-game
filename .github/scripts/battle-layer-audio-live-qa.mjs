@@ -226,7 +226,9 @@ if(process.env.BOSS_MONSTER_BALANCE_QA==='1'){
     process.exit(0);
 }
 
-const baseUrl=String(process.env.DEV_BASE_URL||"https://dev.four-symbols-dev.pages.dev").replace(/\/$/,"");
+const fireIsolation=process.env.FIRE_TARGET_ISOLATED_QA==='1';
+const fireServer=fireIsolation?await startServer():null;
+const baseUrl=fireIsolation?new URL(fireServer.url).origin:String(process.env.DEV_BASE_URL||"https://dev.four-symbols-dev.pages.dev").replace(/\/$/,"");
 const expectedSha=String(process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"");
 const qaUrl=`${baseUrl}/?battle-layer-audio-live-qa=${encodeURIComponent(expectedSha||Date.now())}`;
 const artifactDir=path.resolve("artifacts/browser-qa");
@@ -863,9 +865,10 @@ async function runRelicPresentationModeMatrix(client){
 const evidence={status:"RUNNING",expectedSha,devUrl:baseUrl,checks:{}};
 const chrome=chromeBinary();
 const debugPort=9223;
-const profile=path.join("/tmp",`four-symbols-battle-layer-qa-${process.pid}`);
+const profile=fireIsolation?fs.mkdtempSync(path.join(os.tmpdir(),"fire-target-qa-")):path.join("/tmp",`four-symbols-battle-layer-qa-${process.pid}`);
 const child=spawn(chrome,[
     "--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--hide-scrollbars",
+    ...(fireIsolation?["--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1"]:[]),
     `--remote-debugging-port=${debugPort}`,`--user-data-dir=${profile}`,"--window-size=412,915","about:blank"
 ],{stdio:["ignore","pipe","pipe"]});
 let chromeStderr="";
@@ -882,11 +885,32 @@ try{
     await client.send("Runtime.enable");
     await client.send("Network.enable");
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
+    const fireRequests={local:[],blocked:[],errors:[],webSockets:[]};
+    if(fireIsolation){
+        client.socket.addEventListener('message',event=>{
+            let message;try{message=JSON.parse(String(event.data));}catch{return;}
+            if(message.method==='Network.webSocketCreated'){fireRequests.webSockets.push(message.params.url);return;}
+            if(message.method!=='Fetch.requestPaused')return;
+            const url=message.params.request.url;
+            let local=false;try{local=new URL(url).origin===baseUrl;}catch{}
+            (local?fireRequests.local:fireRequests.blocked).push(url);
+            client.send(local?'Fetch.continueRequest':'Fetch.failRequest',local?{requestId:message.params.requestId}:{requestId:message.params.requestId,errorReason:'BlockedByClient'}).catch(error=>fireRequests.errors.push(String(error.message)));
+        });
+        await client.send('Fetch.enable',{patterns:[{urlPattern:'*',requestStage:'Request'}]});
+    }
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");
     await client.send("Performance.enable");
     await client.eval("(()=>{window.__relicQaLongTasks=[];try{window.__relicQaTaskObserver=new PerformanceObserver(list=>{for(const entry of list.getEntries()){window.__relicQaLongTasks.push({startTime:entry.startTime,duration:entry.duration,name:entry.name});}window.__relicQaLongTasks.splice(0,Math.max(0,window.__relicQaLongTasks.length-20));});window.__relicQaTaskObserver.observe({type:'longtask',buffered:true});}catch(error){window.__relicQaLongTaskCaptureError=String(error.message);}return true;})()");
     const accountState=await prepareAccountFirstRuntime(client,["abyss","boss-tower"]);
+    if(fireIsolation){
+        const proof=await client.eval(`({uid:window.FourSymbolsFirebase?.getUser?.()?.uid||null,controller:navigator.serviceWorker?.controller?.scriptURL||null})`);
+        assert.equal(proof.uid,'skill-runtime-browser-qa','isolated QA must use the existing synthetic UID');
+        assert.equal(proof.controller,null,'isolated QA must not use a pre-existing service worker');
+        for(const name of ['firebase-auth.','firebase-cloud-save.','firebase-session.'])assert.ok(fireRequests.local.some(url=>url.includes(name)),'missing mocked '+name);
+        evidence.checks.fireIsolation={syntheticUid:true,controller:null,localRequests:fireRequests.local.length,blockedRequests:fireRequests.blocked.length};
+    }
+    if(fireIsolation)await waitFor(client,"document.getElementById('firebaseAuthOverlay')?.classList.contains('show')===false","isolated account resume prompt closes",15000);
     evidence.checks.accountState=accountState;
     await waitFor(client,"window.__v174TwoTierAbyssInstalled===true&&typeof window.v174AbyssBuildRoster==='function'","two-tier Abyss runtime");
     try{
@@ -1018,6 +1042,19 @@ try{
         const diagnostic=await client.eval(`(()=>{const page=document.getElementById('battlePage');const rect=page?.getBoundingClientRect();return {startup:FourSymbolsStartupPolicy.getState(),pageClass:page?.className||null,pageRect:rect&&{width:rect.width,height:rect.height},battleActive:typeof battleActive==='undefined'?null:battleActive,battleToken:typeof battleToken==='undefined'?null:battleToken,playerCard:!!document.getElementById('battlePlayerCard0'),playerBar:!!document.querySelector('#battlePlayerCard0 .hp-bar'),monsterBar:!!document.querySelector('#battleMonster0 .monster-hp'),outcome:window.__battleLayerQaDungeonOutcome,playerHp:player.hp,playerId:player.id,events:performance.getEntriesByType('mark').slice(-12).map(item=>item.name)};})()`);
         error.message+=" Diagnostic="+JSON.stringify(diagnostic)+" CDP="+JSON.stringify(client.events.slice(-10));
         throw error;
+    }
+
+    if(fireIsolation){
+        evidence.checks.skillTouchFlood=await battleSkillTouchFloodQa(client,artifactDir,{fireOnly:true});
+        assert.deepEqual(fireRequests.errors,[],'isolation request interception must succeed');
+        assert.deepEqual(fireRequests.webSockets,[],'isolated QA must not create WebSockets');
+        evidence.checks.fireIsolation.localRequests=fireRequests.local.length;
+        evidence.checks.fireIsolation.blockedRequests=fireRequests.blocked.length;
+        evidence.checks.fireIsolation.mockedModules=['firebase-auth','firebase-cloud-save','firebase-session'];
+        evidence.checks.fireIsolation.webSockets=fireRequests.webSockets.length;
+        evidence.status='PASS';evidence.finishedAt=new Date().toISOString();
+        fs.writeFileSync(path.join(artifactDir,'fire-target-isolated-qa.json'),JSON.stringify(evidence,null,2)+'\n');
+        throw Object.assign(new Error('isolated fire QA complete'),{code:'FIRE_QA_COMPLETE'});
     }
 
     const layout=await client.eval(`(()=>{
@@ -1879,6 +1916,8 @@ try{
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
+    if(error.code==='FIRE_QA_COMPLETE'){console.log('Isolated fire target QA: PASS');}
+    else {
     // Failure evidence only: never alter the scene or release a production lock.
     evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},waves:window.FourSymbolsBattleWaves?.getState?.(),run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
     evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
@@ -1905,7 +1944,15 @@ try{
     console.error("Battle layer/audio live mobile QA: FAIL");
     console.error(error);
     process.exitCode=1;
+    }
 } finally{
     client?.close();
     child.kill("SIGTERM");
+    if(fireServer){
+        await new Promise(resolve=>fireServer.server.close(resolve));
+        if(child.exitCode===null&&child.signalCode===null)await Promise.race([new Promise(resolve=>child.once("exit",resolve)),sleep(2000)]);
+        const resolved=path.resolve(profile),temp=path.resolve(os.tmpdir());
+        if(path.dirname(resolved)!==temp||!path.basename(resolved).startsWith("fire-target-qa-"))throw new Error("Unsafe isolated profile path");
+        try{fs.rmSync(resolved,{recursive:true,force:true});}catch(error){console.error("Isolated profile cleanup failed:",error.message);process.exitCode=1;}
+    }
 }
