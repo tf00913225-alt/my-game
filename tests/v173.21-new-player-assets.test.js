@@ -60,14 +60,20 @@ test("quest milestones keep claimable chests bright while unavailable and claime
     assert.match(questCss,/\.quest-milestone\.reached:not\(\.claimed\) \.quest-milestone-slot::after\{/);
 });
 
-test("male patrol art switches front and back images for every element",()=>{
-    ["fire","water","wind","earth"].forEach(element=>{
-        ["front","back"].forEach(facing=>{
-            const prefix="assets/characters/patrol/patrol-male-"+element+"-"+facing+".";
-            const path=assetManifest.featureManifest.bundles["feature-patrol"].assets.find(value=>value.startsWith(prefix));
-            assert.ok(path,"manifest maps "+prefix);
-            assertAsset(path,"RIFF");
-            assert.match(patrol,new RegExp(element+':[\\s\\S]*?'+facing+':"'+path.replaceAll(".","\\.")+'"'));
+test("all player patrol appearances map front and back to supplied WebP assets",()=>{
+    const groups=Object.fromEntries([...patrol.matchAll(/^        (female|male):\{([\s\S]*?)^        \}/gm)].map(m=>[m[1],m[2]]));
+    ["female","male"].forEach(gender=>{
+        assert.ok(groups[gender],"patrol gender group "+gender);
+        ["fire","water","wind","earth"].forEach((element,index)=>{
+            const row=groups[gender].match(new RegExp(element+':\\{front:"([^\"]+)",back:"([^\"]+)"\\}'));
+            assert.ok(row,"patrol mapping "+gender+"/"+element);
+            ["front","back"].forEach((facing,side)=>{
+                const path=row[side+1];
+                const prefix="assets/characters/patrol/player_"+gender+"_0"+(index+1)+"_patrol_"+facing+".";
+                assert.ok(path.startsWith(prefix),"appearance mapping "+path);
+                assert.ok(assetManifest.featureManifest.bundles["feature-patrol"].assets.includes(path),"manifest maps "+path);
+                assertAsset(path,"RIFF");
+            });
         });
     });
     assert.match(patrol,/function artFor\(character,facing\)[\s\S]*?ART\[gender\]\[element\]/);

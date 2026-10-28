@@ -1,0 +1,40 @@
+{
+  "fullFiveHouses": true,
+  "tenSearchPoints": true,
+  "eightAppearances": true,
+  "dualControl": true,
+  "cancel": true,
+  "storageRefusalAndRetry": true,
+  "uidIsolationFixture": true,
+  "transport": "existing UID-local Boot mode; external Auth/Cloud and earned main progress are explicit QA fixtures",
+  "build": {
+    "scripts": [
+      "build/feature-adventure-content.79628452fab4.js",
+      "build/feature-adventure-runtime.cbc1c29d58c7.js",
+      "build/feature-adventure-ui.33215dbd46ce.js"
+    ],
+    "styles": [
+      "build/feature-adventure.c6ac385f9aad.css"
+    ],
+    "dependencies": [
+      "gameplay-core"
+    ],
+    "assets": [
+      "assets/exploration/taoxi-v1/gate.webp",
+      "assets/exploration/taoxi-v1/ground.webp",
+      "assets/exploration/taoxi-v1/house.webp",
+      "assets/exploration/taoxi-v1/interior.webp",
+      "assets/exploration/taoxi-v1/player_female_01.webp",
+      "assets/exploration/taoxi-v1/player_female_02.webp",
+      "assets/exploration/taoxi-v1/player_female_03.webp",
+      "assets/exploration/taoxi-v1/player_female_04.webp",
+      "assets/exploration/taoxi-v1/player_male_01.webp",
+      "assets/exploration/taoxi-v1/player_male_02.webp",
+      "assets/exploration/taoxi-v1/player_male_03.webp",
+      "assets/exploration/taoxi-v1/player_male_04.webp",
+      "assets/exploration/taoxi-v1/props.webp",
+      "assets/exploration/taoxi-v1/villagers.webp",
+      "assets/exploration/taoxi-v1/world-map.webp"
+    ]
+  }
+}

@@ -49,13 +49,20 @@
         }
     }
     window.openAdventureMap=openAdventureMap;
+    let taoxiEntryLoading=false;
     window.openTaoxiExploration=async function(source){
+        if(taoxiEntryLoading)return false;
+        const buttons=[...document.querySelectorAll('#taoxiHomeEntry,#taoxiStoryEntry')];
+        const labels=buttons.map(button=>button.innerHTML);
         try{const uid=window.FourSymbolsAccountSave?.getActiveUid();const route=source==='adventure'?'adventure':'home';
             if(!uid||!document.getElementById(route+'Page')?.classList.contains('active'))return false;
+            taoxiEntryLoading=true;
+            buttons.forEach(button=>{button.disabled=true;button.setAttribute('aria-busy','true');button.innerHTML=button.id==='taoxiHomeEntry'?'<strong>載入</strong><span>請稍候</span>':'載入';});
             await window.FourSymbolsFeatures.ensure('adventure','taoxi-entry');
             if(window.FourSymbolsAccountSave?.getActiveUid()!==uid||!document.getElementById(route+'Page')?.classList.contains('active'))return false;
             return window.FourSymbolsTaoxi.open(source);}
         catch(error){console.error('[exploration] entry refused',error);if(typeof showMessage==='function')showMessage('探索載入失敗，請重試。');return false;}
+        finally{taoxiEntryLoading=false;buttons.forEach((button,index)=>{button.disabled=false;button.removeAttribute('aria-busy');button.innerHTML=labels[index];});}
     };
 
     function ensureEntry(){

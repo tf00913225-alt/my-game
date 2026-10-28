@@ -903,27 +903,29 @@ function mount(root,services={}){
   const eventToPoint=services.eventToPoint||scope.eventToGamePoint;
   if(typeof eventToPoint!=='function')throw new Error('Exploration requires the existing Display coordinate service');
   const data=services.scene||scene;
-  const nearby=position=>services.scene?data.objects.filter(o=>o.interaction&&Math.hypot(position.x-o.approach.x,position.y-o.approach.y)<(o.range||145)).sort((a,b)=>Math.hypot(position.x-a.approach.x,position.y-a.approach.y)-Math.hypot(position.x-b.approach.x,position.y-b.approach.y))[0]:nearNpc(position)?{id:'npc',label:'與村民招呼 · E'}:null;
-  let analog=null;
+  const distance=(position,object)=>{const point=object.interactionPoint||object.approach;return Math.hypot(position.x-point.x,position.y-point.y);};
+  const nearby=position=>services.scene?data.objects.filter(o=>o.interaction&&distance(position,o)<(o.range||145)).sort((a,b)=>distance(position,a)-distance(position,b))[0]:nearNpc(position)?{id:'npc',label:'與村民招呼 · E'}:null;
+  let analog=null,stickVector=null,thumbTransform=null;
   const world=root.querySelector('[data-world]'),actor=root.querySelector('[data-player]');
   const sprites=[...actor.querySelectorAll('[data-pose]')];
   const prompt=root.querySelector('[data-interact]');
   const viewport=root.querySelector('.explore-viewport'),marker=root.querySelector('[data-destination]'),status=root.querySelector('[data-status]');
+  const stick=root.querySelector('[data-joystick]'),thumb=stick?.querySelector('[data-stick-thumb]');
   const directions=new Map(),captures=new Map();
   let abort=null,active=false,generation=0,interactionGeneration=0,interactionCleanup=null;
   let state={...data.spawn,facing:'up',moving:false},frame=0,last=0,opened=false,disposed=false;
-  let route=[],destination=null,gesture=null,walkTime=0;
+  let route=[],destination=null,gesture=null,walkTime=0,arrivalTarget=null;
 
   for(const item of data.objects){
     const el=document.createElement('div');el.className='explore-object';el.dataset.object=item.id;
-    Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.y)});
+    Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.sortY??item.y)});
     el.innerHTML=services.renderObject?services.renderObject(item):`<svg viewBox="0 0 ${item.width} ${item.height}" aria-hidden="true"><use href="/prototypes/exploration-corner/art.svg#${item.art}"/></svg>`;
     world.append(el);
   }
-  function cancelRoute(){route=[];destination=null;gesture=null;}
+  function cancelRoute(){route=[];destination=null;gesture=null;arrivalTarget=null;}
   function clearInput(){
     for(const [id,el] of captures){if(el.hasPointerCapture(id))el.releasePointerCapture(id);}
-    captures.clear();directions.clear();analog=null;cancelRoute();state.moving=false;last=0;render();
+    captures.clear();directions.clear();analog=null;stickVector=null;cancelRoute();state.moving=false;last=0;render();
   }
   function endInteraction(){
     interactionGeneration++;
@@ -933,8 +935,9 @@ function mount(root,services={}){
   function closeInteraction(){
     try{endInteraction();}finally{clearInput();if(active)root.focus({preventScroll:true});}
   }
-  function interact(){
-    if(!active||opened||!nearby(state))return;
+  function interact(targetId){
+    const target=typeof targetId==='string'?data.objects.find(o=>o.id===targetId&&o.interaction&&distance(state,o)<(o.range||145)):nearby(state);
+    if(!active||opened||!target)return;
     if(typeof services.onInteract!=='function'){status.textContent='對話尚未接通';return;}
     opened=true;clearInput();const token=generation,interactionToken=++interactionGeneration;
     const close=()=>{
@@ -942,7 +945,7 @@ function mount(root,services={}){
       closeInteraction();
     };
     try{
-      const cleanup=services.onInteract({npcId:nearby(state).id,close});
+      const cleanup=services.onInteract({npcId:target.id,close});
       if(cleanup!=null&&typeof cleanup!=='function')throw new TypeError('Interaction must return synchronous cleanup');
       if(!active||token!==generation||interactionToken!==interactionGeneration||!opened)cleanup?.();else interactionCleanup=cleanup;
     }catch(error){
@@ -958,7 +961,7 @@ function mount(root,services={}){
   const signal=abort.signal;
   const keys={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'};
   root.addEventListener('keydown',e=>{
-    if(keys[e.key]){e.preventDefault();if(!opened&&!e.repeat){cancelRoute();analog=null;directions.set('key:'+e.code,keys[e.key]);status.textContent='方向控制中';}}
+    if(keys[e.key]){e.preventDefault();if(!opened&&!e.repeat){cancelRoute();analog=null;stickVector=null;directions.set('key:'+e.code,keys[e.key]);status.textContent='方向控制中';}}
     if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();interact();}
     if(e.key==='Escape'){e.preventDefault();if(opened)closeInteraction();else requestExit();}
   },{signal});
@@ -977,7 +980,7 @@ function mount(root,services={}){
     gesture={id:e.pointerId};viewport.setPointerCapture(e.pointerId);captures.set(e.pointerId,viewport);
     // Commit at contact, using the current position/camera. Release must not
     // replay a stale target after the character and camera have moved.
-    e.preventDefault();directions.clear();analog=null;
+    e.preventDefault();directions.clear();analog=null;stickVector=null;
     let point;
     try{
       point=eventToPoint(e);
@@ -986,22 +989,24 @@ function mount(root,services={}){
     const camera=cameraFor(state,data);
     const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
     const npc=services.scene?data.objects.find(o=>{if(!o.interaction)return false;const b=o.hitbox||{x:o.x-o.width/2,y:o.y-o.height,width:o.width,height:o.height};return target.x>=b.x&&target.x<=b.x+b.width&&target.y>=b.y&&target.y<=b.y+b.height;}):data.objects.find(o=>o.id==='npc');
-    const npcHit=npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
+    const npcHit=services.scene?!!npc:npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
     const planned=npcHit?(services.scene?findRoute(state,npc.approach,data):npcRoute(state,data)):findRoute(state,target,data);route=planned||[];
+    arrivalTarget=planned&&npcHit&&npc.autoInteract===true?npc.id:null;
     destination=route.at(-1)||null;
-    status.textContent=destination?(npcHit?'走近村民後，按招呼確認':'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
+    status.textContent=destination?(npcHit?(npc.autoInteract?'走向入口，到達後自動進出':npc.interaction==='talk'?'走近村民後，按交談':'走近目標後，按互動'):'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
     root.focus({preventScroll:true});render();
+    if(arrivalTarget&&!route.length){const id=arrivalTarget;arrivalTarget=null;interact(id);}
   },{signal});
   viewport.addEventListener('pointerup',e=>{captures.delete(e.pointerId);if(gesture?.id===e.pointerId)gesture=null;},{signal});
   viewport.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)clearInput();},{signal});
-  const joystick=root.querySelector('[data-joystick]');
+  const joystick=stick;
   if(joystick){
     let stickId=null;
     const point=e=>{const p=eventToPoint(e);return [p.x-joystick.offsetLeft-joystick.offsetWidth/2,p.y-(joystick.parentElement.offsetTop||0)-joystick.offsetTop-joystick.offsetHeight/2];};
-    const update=e=>{if(e.pointerId!==stickId)return;e.preventDefault();const [x,y]=point(e);analog=Math.hypot(x,y)>18?[x,y]:null;};
+    const update=e=>{if(e.pointerId!==stickId)return;e.preventDefault();const [x,y]=point(e);stickVector=[x,y];analog=Math.hypot(x,y)>18?stickVector:null;};
     joystick.addEventListener('pointerdown',e=>{if(opened||stickId!==null||!e.isPrimary)return;e.preventDefault();stickId=e.pointerId;cancelRoute();directions.clear();joystick.setPointerCapture(e.pointerId);captures.set(e.pointerId,joystick);update(e);},{signal});
     joystick.addEventListener('pointermove',update,{signal});
-    for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{if(e.pointerId===stickId){stickId=null;analog=null;captures.delete(e.pointerId);}},{signal});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{if(e.pointerId===stickId){stickId=null;analog=null;stickVector=null;captures.delete(e.pointerId);}},{signal});
   }
   prompt.addEventListener('click',interact,{signal});
   root.querySelector('[data-exit]')?.addEventListener('click',requestExit,{signal});
@@ -1014,6 +1019,12 @@ function mount(root,services={}){
     world.style.transform=`translate(${-camera.x}px,${-camera.y}px)`;
     actor.style.left=state.x+'px';actor.style.top=state.y+'px';actor.style.zIndex=String(Math.round(state.y));
     actor.dataset.facing=state.facing;actor.classList.toggle('is-walking',state.moving);
+    if(stick){
+      stick.classList.toggle('is-held',[...captures.values()].includes(stick));
+      if(thumb){const length=stickVector?Math.hypot(...stickVector):0,max=Math.max(0,(stick.offsetWidth-thumb.offsetWidth)/2-10),scale=length?Math.min(1,max/length):0;
+        const x=stickVector?stickVector[0]*scale:0,y=stickVector?stickVector[1]*scale:0,value=`translate(calc(-50% + ${x.toFixed(1)}px),calc(-50% + ${y.toFixed(1)}px))`;
+        if(thumbTransform!==value){thumb.style.transform=value;thumbTransform=value;}}
+    }
     const pose=state.moving?(Math.floor(walkTime/.16)%4===0?1:Math.floor(walkTime/.16)%4===2?2:0):0;
     // Keep external SVG instances stable: changing href briefly clears their
     // geometry in Chrome. The same render owner selects one preloaded pose.
@@ -1041,7 +1052,7 @@ function mount(root,services={}){
       const held=new Set(directions.values());
       state=move(state,pointer?pointer[1]:[Number(held.has('right'))-Number(held.has('left')),Number(held.has('down'))-Number(held.has('up'))],seconds,data);
     }
-    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){destination=null;status.textContent=nearNpc(state)?'已走近，按招呼確認':'已抵達；點地面繼續走';}}
+    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){const id=arrivalTarget;arrivalTarget=null;destination=null;status.textContent=nearby(state)?'已走近，可按互動':'已抵達；點地面繼續走';if(id&&data.objects.some(o=>o.id===id&&Math.hypot(state.x-o.approach.x,state.y-o.approach.y)<1))interact(id);}}
     else state={...state,moving:false};
     walkTime=state.moving?walkTime+Math.min(seconds,.05):0;
     render();frame=requestAnimationFrame(tick);
@@ -1114,8 +1125,8 @@ function village(spawn){
     {id:'village-exit',name:'桃溪村口',art:'gate',x:900,y:3070,width:600,height:600,approach:{x:900,y:2960},hitbox:{x:800,y:2990,width:200,height:80},interaction:'exit-map',label:'離開桃溪村'},
     {id:'gate-left',art:'solid',x:0,y:0,width:0,height:0,solid:{x:680,y:2910,width:65,height:65}},
     {id:'gate-right',art:'solid',x:0,y:0,width:0,height:0,solid:{x:1060,y:2980,width:70,height:70}},
-    ...houses.map(h=>({...h,art:'house',width:660,height:660,solid:{x:h.x-260,y:h.y-370,width:520,height:305},approach:{x:h.x-30,y:h.y+40},hitbox:{x:h.x-260,y:h.y-580,width:520,height:590},interaction:'house',label:'進入 '+h.name})),
-    ...npcs.map(n=>({...n,art:'npc',width:200,height:200,solid:{x:n.x-22,y:n.y-38,width:44,height:38},approach:{x:n.x,y:n.y+100},hitbox:{x:n.x-45,y:n.y-185,width:90,height:185},interaction:'talk',label:'交談 · '+n.name})),
+    ...houses.map(h=>({...h,art:'house',width:660,height:660,sortY:h.y-65,solid:{x:h.x-260,y:h.y-370,width:520,height:305},approach:{x:h.x-80,y:h.y+40},hitbox:{x:h.x-120,y:h.y-240,width:240,height:350},interaction:'house',label:'進入 '+h.name})),
+    ...npcs.map(n=>({...n,art:'npc',width:200,height:200,approach:{x:n.x,y:n.y+100},interactionPoint:{x:n.x,y:n.y},hitbox:{x:n.x-45,y:n.y-185,width:90,height:185},interaction:'talk',label:'交談 · '+n.name})),
     ...[[280,2810],[1520,2750],[130,1890],[1690,1710],[150,830],[1640,650]].map(([x,y],i)=>({id:'peach-'+i,art:'peach',x,y,width:480,height:600,solid:{x:x-23,y:y-50,width:46,height:50}}))
   ]};
 }
@@ -1131,7 +1142,7 @@ function interior(id){
     {id:'wall-front-right',art:'solid',x:0,y:0,width:0,height:0,solid:{x:730,y:1110,width:350,height:310}},
     {id:'bed',art:'bed',x:layout.bed[0],y:layout.bed[1],width:430,height:430,solid:{x:layout.bed[0]-120,y:layout.bed[1]-330,width:240,height:330}},
     ...points.filter(p=>p.house===id).map((p,i)=>({...p,art:i?'desk':'chest',x:positions[i][0],y:positions[i][1],width:i?300:200,height:i?295:223,solid:{x:positions[i][0]-(i?115:70),y:positions[i][1]-(i?100:75),width:i?230:140,height:i?100:75},approach:{x:positions[i][0],y:positions[i][1]+85},interaction:'search',label:'搜尋 · '+p.name})),
-    {id:'door',art:'door',x:540,y:1390,width:220,height:125,approach:{x:540,y:1250},interaction:'exit',label:'出屋'}
+    {id:'door',art:'door',x:540,y:1390,width:220,height:125,approach:{x:540,y:1250},autoInteract:true,interaction:'exit',label:'出屋'}
   ]};
 }
 scope.FourSymbolsTaoxiContent=Object.freeze({houses,npcs,points,unlocked,available,appearance,village,interior});
@@ -1221,11 +1232,12 @@ function map(){
   bindBack(close);root.querySelector('[data-village]').addEventListener('click',()=>scene('village'));root.focus({preventScroll:true});
 }
 function objectMarkup(object){
+  const arrow=object.autoInteract?'<span class="taoxi-entry-arrow" aria-hidden="true"><svg viewBox="0 0 64 96" focusable="false"><g stroke="#a56108" stroke-width="2" stroke-linejoin="round"><path fill="#fff5a0" d="M4 10 32 2 60 10 32 23Z"/><path fill="#ffe73e" d="M4 10 32 23 32 36 9 25Z"/><path fill="#ffb81f" d="M32 23 60 10 55 25 32 36Z"/><path fill="#fff388" d="M7 46 32 37 57 46 32 59Z"/><path fill="#ffe132" d="M7 46 32 59 32 93Z"/><path fill="#f5a714" d="M32 59 57 46 32 93Z"/></g><path d="M9 10 32 5 54 11M12 46 32 40 51 46" fill="none" stroke="#fffce0" stroke-width="3" stroke-linecap="round"/></svg></span>':'';
   if(object.art==='solid')return '';
   if(object.art==='gate')return '<img src="'+asset('gate')+'" alt="">';
-  if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>';
+  if(object.art==='house')return '<img src="'+asset('house')+'" alt=""><span class="taoxi-object-label">'+escape(object.name)+'</span>'+arrow;
   if(object.art==='npc')return '<span class="taoxi-npc-sprite" style="background-position:'+({elder:0,ayun:50,woodworker:100}[object.id])+'% 0"></span><span class="taoxi-object-label">'+escape(object.name)+'</span>';
-  if(object.art==='door')return '<span class="taoxi-door">出口</span>';
+  if(object.art==='door')return '<span class="taoxi-door">出口</span>'+arrow;
   const frames={bed:[0,0,620,624],desk:[640,0,621,610],chest:[0,624,560,623],peach:[560,610,701,637]};
   const frame=frames[object.art],clip='taoxi-frame-'+object.id;
   return '<svg class="taoxi-prop" viewBox="'+frame.join(' ')+'" style="overflow:hidden" aria-hidden="true"><defs><clipPath id="'+clip+'"><rect x="'+frame[0]+'" y="'+frame[1]+'" width="'+frame[2]+'" height="'+frame[3]+'"/></clipPath></defs><image clip-path="url(#'+clip+')" href="'+asset('props')+'" width="1261" height="1247"/></svg>';
@@ -1236,11 +1248,12 @@ function scene(id,spawn){
   if(id!=='village'&&!C.unlocked(C.houses.find(h=>h.id===id),s.chapter,s.state)){map();return;}
   stop();current=id;root.dataset.scene=id;delete root.dataset.area;
   const data=id==='village'?C.village(spawn):C.interior(id),appearance=C.appearance(s.player);
+  for(const object of data.objects)if(object.interaction==='house')object.autoInteract=C.unlocked(object,s.chapter,s.state);
   root.innerHTML=header(id==='village'?'桃溪村':data.name)+
     '<div class="explore-viewport taoxi-viewport"><div class="explore-world taoxi-world" data-world style="width:'+data.width+'px;height:'+data.height+'px">'+
     '<div class="taoxi-ground '+(id==='village'?'taoxi-village-ground':'taoxi-room-ground')+'"></div>'+
     '<div class="explore-player taoxi-player" data-player><span class="explore-shadow"></span><span class="taoxi-character" style="background-image:url('+asset(appearance)+')"></span></div><span class="explore-destination" data-destination hidden></span></div></div>'+
-    '<footer class="taoxi-controls"><div data-joystick class="taoxi-joystick" aria-label="虛擬搖桿"><span aria-hidden="true">✥</span></div><div><button type="button" data-interact disabled>靠近可互動</button><p data-status role="status">點地移動，也可拖動左側搖桿。</p></div></footer>'+
+    '<footer class="taoxi-controls"><div data-joystick class="taoxi-joystick" aria-label="虛擬搖桿"><span data-stick-thumb aria-hidden="true">✥</span></div><div><button type="button" data-interact disabled>靠近可互動</button><p data-status role="status">點地移動，也可拖動左側搖桿。</p></div></footer>'+
     '<p class="taoxi-save-note">本機探索紀錄 · 尚非雲端同步</p>';
   const character=root.querySelector('.taoxi-character');
   controller=scope.FourSymbolsExploration.mount(root,{

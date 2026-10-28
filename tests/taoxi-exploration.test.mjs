@@ -64,3 +64,35 @@ test('all five houses, NPC approaches, exits and ten points have collision-safe 
   for(const object of v.objects.filter(o=>o.interaction))assert.ok(G.findRoute(v.spawn,object.approach,v),'village '+object.id);
   for(const h of C.houses){const data=C.interior(h.id);for(const object of data.objects.filter(o=>o.interaction))assert.ok(G.findRoute(data.spawn,object.approach,data),'interior '+object.id);}
 });
+
+test('houses sort at their solid front edge; passable villagers do not stop either movement mode',()=>{
+  const {C,G}=setup(),data=C.village();
+  for(const h of data.objects.filter(o=>o.art==='house')){
+    assert.equal(h.sortY,h.solid.y+h.solid.height);
+    const front={x:h.x,y:h.sortY+data.radius+1},back={x:h.x,y:h.solid.y-data.radius-1};
+    assert.equal(G.canStand(front.x,front.y,data),true);assert.ok(front.y>h.sortY);
+    assert.equal(G.canStand(back.x,back.y,data),true);assert.ok(back.y<h.sortY);
+    assert.equal(G.canStand(h.x,h.solid.y+100,data),false,'building remains solid');
+  }
+  for(const npc of data.objects.filter(o=>o.interaction==='talk')){
+    assert.equal(npc.solid,undefined);assert.equal(G.canStand(npc.x,npc.y,data),true);
+    let state={x:npc.x,y:npc.y+100},target={x:npc.x,y:npc.y-100};
+    const route=G.findRoute(state,target,data);assert.ok(route);
+    for(let i=0;i<30;i++)state=G.followRoute(state,route,.05,data);
+    assert.ok(Math.abs(state.y-target.y)<.01,'point movement passes through NPC');
+    state={x:npc.x,y:npc.y+100};for(let i=0;i<20;i++)state=G.move(state,[0,-1],.05,data);
+    assert.ok(state.y<npc.y-100,'continuous input passes through NPC');
+  }
+});
+
+test('entry immediately shows loading, ignores repeated clicks and restores controls on failure or UID change',async()=>{
+  let resolveLoad,rejectLoad,uid='alice',opens=0,loads=0;
+  const button={id:'taoxiHomeEntry',innerHTML:'探索桃溪村',disabled:false,attrs:{},setAttribute(k,v){this.attrs[k]=v;},removeAttribute(k){delete this.attrs[k];}};
+  const context=vm.createContext({console:{error(){}},document:{readyState:'loading',addEventListener(){},querySelectorAll:()=>[button],getElementById:()=>({classList:{contains:()=>true}})},window:{FourSymbolsAccountSave:{getActiveUid:()=>uid},FourSymbolsFeatures:{ensure(){loads++;return new Promise((yes,no)=>{resolveLoad=yes;rejectLoad=no;});}},FourSymbolsTaoxi:{open(){opens++;return true;}}}});
+  vm.runInContext(fs.readFileSync(new URL('js/adventure/adventure-entry-v1-20260915.js',root),'utf8'),context);
+  const open=context.window.openTaoxiExploration;
+  let pending=open('home');assert.equal(button.disabled,true);assert.equal(button.attrs['aria-busy'],'true');assert.match(button.innerHTML,/載入/);
+  assert.equal(await open('home'),false);assert.equal(loads,1);resolveLoad();assert.equal(await pending,true);assert.equal(opens,1);assert.equal(button.innerHTML,'探索桃溪村');assert.equal(button.disabled,false);
+  pending=open('home');rejectLoad(Error('network'));assert.equal(await pending,false);assert.equal(button.disabled,false);assert.equal(button.attrs['aria-busy'],undefined);
+  pending=open('home');uid='bob';resolveLoad();assert.equal(await pending,false);assert.equal(opens,1,'late load cannot open another UID');assert.equal(button.innerHTML,'探索桃溪村');
+});

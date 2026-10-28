@@ -12,27 +12,29 @@ function mount(root,services={}){
   const eventToPoint=services.eventToPoint||scope.eventToGamePoint;
   if(typeof eventToPoint!=='function')throw new Error('Exploration requires the existing Display coordinate service');
   const data=services.scene||scene;
-  const nearby=position=>services.scene?data.objects.filter(o=>o.interaction&&Math.hypot(position.x-o.approach.x,position.y-o.approach.y)<(o.range||145)).sort((a,b)=>Math.hypot(position.x-a.approach.x,position.y-a.approach.y)-Math.hypot(position.x-b.approach.x,position.y-b.approach.y))[0]:nearNpc(position)?{id:'npc',label:'與村民招呼 · E'}:null;
-  let analog=null;
+  const distance=(position,object)=>{const point=object.interactionPoint||object.approach;return Math.hypot(position.x-point.x,position.y-point.y);};
+  const nearby=position=>services.scene?data.objects.filter(o=>o.interaction&&distance(position,o)<(o.range||145)).sort((a,b)=>distance(position,a)-distance(position,b))[0]:nearNpc(position)?{id:'npc',label:'與村民招呼 · E'}:null;
+  let analog=null,stickVector=null,thumbTransform=null;
   const world=root.querySelector('[data-world]'),actor=root.querySelector('[data-player]');
   const sprites=[...actor.querySelectorAll('[data-pose]')];
   const prompt=root.querySelector('[data-interact]');
   const viewport=root.querySelector('.explore-viewport'),marker=root.querySelector('[data-destination]'),status=root.querySelector('[data-status]');
+  const stick=root.querySelector('[data-joystick]'),thumb=stick?.querySelector('[data-stick-thumb]');
   const directions=new Map(),captures=new Map();
   let abort=null,active=false,generation=0,interactionGeneration=0,interactionCleanup=null;
   let state={...data.spawn,facing:'up',moving:false},frame=0,last=0,opened=false,disposed=false;
-  let route=[],destination=null,gesture=null,walkTime=0;
+  let route=[],destination=null,gesture=null,walkTime=0,arrivalTarget=null;
 
   for(const item of data.objects){
     const el=document.createElement('div');el.className='explore-object';el.dataset.object=item.id;
-    Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.y)});
+    Object.assign(el.style,{left:item.x+'px',top:item.y+'px',width:item.width+'px',height:item.height+'px',zIndex:String(item.sortY??item.y)});
     el.innerHTML=services.renderObject?services.renderObject(item):`<svg viewBox="0 0 ${item.width} ${item.height}" aria-hidden="true"><use href="/prototypes/exploration-corner/art.svg#${item.art}"/></svg>`;
     world.append(el);
   }
-  function cancelRoute(){route=[];destination=null;gesture=null;}
+  function cancelRoute(){route=[];destination=null;gesture=null;arrivalTarget=null;}
   function clearInput(){
     for(const [id,el] of captures){if(el.hasPointerCapture(id))el.releasePointerCapture(id);}
-    captures.clear();directions.clear();analog=null;cancelRoute();state.moving=false;last=0;render();
+    captures.clear();directions.clear();analog=null;stickVector=null;cancelRoute();state.moving=false;last=0;render();
   }
   function endInteraction(){
     interactionGeneration++;
@@ -42,8 +44,9 @@ function mount(root,services={}){
   function closeInteraction(){
     try{endInteraction();}finally{clearInput();if(active)root.focus({preventScroll:true});}
   }
-  function interact(){
-    if(!active||opened||!nearby(state))return;
+  function interact(targetId){
+    const target=typeof targetId==='string'?data.objects.find(o=>o.id===targetId&&o.interaction&&distance(state,o)<(o.range||145)):nearby(state);
+    if(!active||opened||!target)return;
     if(typeof services.onInteract!=='function'){status.textContent='對話尚未接通';return;}
     opened=true;clearInput();const token=generation,interactionToken=++interactionGeneration;
     const close=()=>{
@@ -51,7 +54,7 @@ function mount(root,services={}){
       closeInteraction();
     };
     try{
-      const cleanup=services.onInteract({npcId:nearby(state).id,close});
+      const cleanup=services.onInteract({npcId:target.id,close});
       if(cleanup!=null&&typeof cleanup!=='function')throw new TypeError('Interaction must return synchronous cleanup');
       if(!active||token!==generation||interactionToken!==interactionGeneration||!opened)cleanup?.();else interactionCleanup=cleanup;
     }catch(error){
@@ -67,7 +70,7 @@ function mount(root,services={}){
   const signal=abort.signal;
   const keys={ArrowUp:'up',w:'up',W:'up',ArrowDown:'down',s:'down',S:'down',ArrowLeft:'left',a:'left',A:'left',ArrowRight:'right',d:'right',D:'right'};
   root.addEventListener('keydown',e=>{
-    if(keys[e.key]){e.preventDefault();if(!opened&&!e.repeat){cancelRoute();analog=null;directions.set('key:'+e.code,keys[e.key]);status.textContent='方向控制中';}}
+    if(keys[e.key]){e.preventDefault();if(!opened&&!e.repeat){cancelRoute();analog=null;stickVector=null;directions.set('key:'+e.code,keys[e.key]);status.textContent='方向控制中';}}
     if((e.key==='e'||e.key==='E')&&!e.repeat){e.preventDefault();interact();}
     if(e.key==='Escape'){e.preventDefault();if(opened)closeInteraction();else requestExit();}
   },{signal});
@@ -86,7 +89,7 @@ function mount(root,services={}){
     gesture={id:e.pointerId};viewport.setPointerCapture(e.pointerId);captures.set(e.pointerId,viewport);
     // Commit at contact, using the current position/camera. Release must not
     // replay a stale target after the character and camera have moved.
-    e.preventDefault();directions.clear();analog=null;
+    e.preventDefault();directions.clear();analog=null;stickVector=null;
     let point;
     try{
       point=eventToPoint(e);
@@ -95,22 +98,24 @@ function mount(root,services={}){
     const camera=cameraFor(state,data);
     const target={x:point.x-viewport.offsetLeft+camera.x,y:point.y-viewport.offsetTop+camera.y};
     const npc=services.scene?data.objects.find(o=>{if(!o.interaction)return false;const b=o.hitbox||{x:o.x-o.width/2,y:o.y-o.height,width:o.width,height:o.height};return target.x>=b.x&&target.x<=b.x+b.width&&target.y>=b.y&&target.y<=b.y+b.height;}):data.objects.find(o=>o.id==='npc');
-    const npcHit=npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
+    const npcHit=services.scene?!!npc:npc&&target.x>=npc.x-npc.width/2&&target.x<=npc.x+npc.width/2&&target.y>=npc.y-npc.height&&target.y<=npc.y;
     const planned=npcHit?(services.scene?findRoute(state,npc.approach,data):npcRoute(state,data)):findRoute(state,target,data);route=planned||[];
+    arrivalTarget=planned&&npcHit&&npc.autoInteract===true?npc.id:null;
     destination=route.at(-1)||null;
-    status.textContent=destination?(npcHit?'走近村民後，按招呼確認':'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
+    status.textContent=destination?(npcHit?(npc.autoInteract?'走向入口，到達後自動進出':npc.interaction==='talk'?'走近村民後，按交談':'走近目標後，按互動'):'前往落點；再點可更改'):planned?'已在落點附近':'此處無法抵達，請另選落點';
     root.focus({preventScroll:true});render();
+    if(arrivalTarget&&!route.length){const id=arrivalTarget;arrivalTarget=null;interact(id);}
   },{signal});
   viewport.addEventListener('pointerup',e=>{captures.delete(e.pointerId);if(gesture?.id===e.pointerId)gesture=null;},{signal});
   viewport.addEventListener('pointercancel',e=>{if(gesture?.id===e.pointerId)clearInput();},{signal});
-  const joystick=root.querySelector('[data-joystick]');
+  const joystick=stick;
   if(joystick){
     let stickId=null;
     const point=e=>{const p=eventToPoint(e);return [p.x-joystick.offsetLeft-joystick.offsetWidth/2,p.y-(joystick.parentElement.offsetTop||0)-joystick.offsetTop-joystick.offsetHeight/2];};
-    const update=e=>{if(e.pointerId!==stickId)return;e.preventDefault();const [x,y]=point(e);analog=Math.hypot(x,y)>18?[x,y]:null;};
+    const update=e=>{if(e.pointerId!==stickId)return;e.preventDefault();const [x,y]=point(e);stickVector=[x,y];analog=Math.hypot(x,y)>18?stickVector:null;};
     joystick.addEventListener('pointerdown',e=>{if(opened||stickId!==null||!e.isPrimary)return;e.preventDefault();stickId=e.pointerId;cancelRoute();directions.clear();joystick.setPointerCapture(e.pointerId);captures.set(e.pointerId,joystick);update(e);},{signal});
     joystick.addEventListener('pointermove',update,{signal});
-    for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{if(e.pointerId===stickId){stickId=null;analog=null;captures.delete(e.pointerId);}},{signal});
+    for(const type of ['pointerup','pointercancel','lostpointercapture'])joystick.addEventListener(type,e=>{if(e.pointerId===stickId){stickId=null;analog=null;stickVector=null;captures.delete(e.pointerId);}},{signal});
   }
   prompt.addEventListener('click',interact,{signal});
   root.querySelector('[data-exit]')?.addEventListener('click',requestExit,{signal});
@@ -123,6 +128,12 @@ function mount(root,services={}){
     world.style.transform=`translate(${-camera.x}px,${-camera.y}px)`;
     actor.style.left=state.x+'px';actor.style.top=state.y+'px';actor.style.zIndex=String(Math.round(state.y));
     actor.dataset.facing=state.facing;actor.classList.toggle('is-walking',state.moving);
+    if(stick){
+      stick.classList.toggle('is-held',[...captures.values()].includes(stick));
+      if(thumb){const length=stickVector?Math.hypot(...stickVector):0,max=Math.max(0,(stick.offsetWidth-thumb.offsetWidth)/2-10),scale=length?Math.min(1,max/length):0;
+        const x=stickVector?stickVector[0]*scale:0,y=stickVector?stickVector[1]*scale:0,value=`translate(calc(-50% + ${x.toFixed(1)}px),calc(-50% + ${y.toFixed(1)}px))`;
+        if(thumbTransform!==value){thumb.style.transform=value;thumbTransform=value;}}
+    }
     const pose=state.moving?(Math.floor(walkTime/.16)%4===0?1:Math.floor(walkTime/.16)%4===2?2:0):0;
     // Keep external SVG instances stable: changing href briefly clears their
     // geometry in Chrome. The same render owner selects one preloaded pose.
@@ -150,7 +161,7 @@ function mount(root,services={}){
       const held=new Set(directions.values());
       state=move(state,pointer?pointer[1]:[Number(held.has('right'))-Number(held.has('left')),Number(held.has('down'))-Number(held.has('up'))],seconds,data);
     }
-    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){destination=null;status.textContent=nearNpc(state)?'已走近，按招呼確認':'已抵達；點地面繼續走';}}
+    else if(route.length){state=followRoute(state,route,seconds,data);if(!route.length){const id=arrivalTarget;arrivalTarget=null;destination=null;status.textContent=nearby(state)?'已走近，可按互動':'已抵達；點地面繼續走';if(id&&data.objects.some(o=>o.id===id&&Math.hypot(state.x-o.approach.x,state.y-o.approach.y)<1))interact(id);}}
     else state={...state,moving:false};
     walkTime=state.moving?walkTime+Math.min(seconds,.05):0;
     render();frame=requestAnimationFrame(tick);

@@ -175,7 +175,7 @@
     .adventure-mist,.adventure-map-fog,.adventure-lantern-glow,.adventure-node.status-current .adventure-node-icon,.adventure-node.status-objective-ready .adventure-node-icon,.adventure-node.status-reward-unclaimed .adventure-node-icon{animation:none!important;}
 }
 
-#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:36px;padding:3px 16px;font-size:16px;line-height:1.25}
+#taoxiStoryEntry{position:absolute;z-index:9;right:3%;top:10px;min-height:52px;padding:3px 16px;font-size:16px;line-height:1.25}
 
 #adventurePage[data-panel="map"] .adventure-header-meta{top:65%}
 
@@ -185,12 +185,12 @@
 #explorationPage.taoxi-page{position:absolute;inset:0;width:1080px;height:1920px;pointer-events:auto;background:#25251e;color:#f4ead4;font-family:"Noto Serif TC","Microsoft JhengHei",serif;overflow:hidden;outline:none}
 #explorationPage[hidden]{display:none}#explorationPage.active{display:block}
 #explorationPage *{box-sizing:border-box}
-#explorationPage button{font:inherit;color:inherit;font-size:45px;line-height:1.4;border:3px solid #b69865;border-radius:18px;background:linear-gradient(135deg,#53472f,#292820);min-height:116px;padding:16px 28px;cursor:pointer;touch-action:manipulation}
+#explorationPage button{font:inherit;color:inherit;font-size:45px;line-height:1.4;border:3px solid #b69865;border-radius:18px;background:linear-gradient(135deg,#53472f,#292820);min-height:132px;padding:16px 28px;cursor:pointer;touch-action:manipulation}
 #explorationPage button:focus-visible{outline:6px solid #ffe4a0;outline-offset:3px}
 #explorationPage button:disabled{opacity:.65;cursor:default}
 .taoxi-heading{position:absolute;left:0;top:0;right:0;height:180px;display:flex;align-items:center;gap:30px;padding:24px 40px;background:linear-gradient(90deg,#25261fe8,#3d3826c9);z-index:5000;border-bottom:3px solid #a28b5c}
 .taoxi-heading h1{font-size:57px;line-height:1.25;margin:0;letter-spacing:5px}.taoxi-heading small{font-size:39px;color:#d6c39d;letter-spacing:8px}
-#explorationPage .taoxi-heading button{font-size:60px;width:116px;flex-shrink:0;padding:0}
+#explorationPage .taoxi-heading button{font-size:60px;width:132px;flex-shrink:0;padding:0}
 .taoxi-map-art{position:absolute;inset:0;background:url('../assets/exploration/taoxi-v1/world-map.webp') center/cover}
 .taoxi-map-lock{position:absolute;font-size:42px;color:#d5d5cf;padding:25px 35px;background:#16202bd6;border:2px solid #747d7d;border-radius:60px;box-shadow:0 0 80px 45px #101e2a88}
 .lock-one{left:125px;top:430px}.lock-two{right:90px;top:600px}.lock-three{right:70px;top:930px}
@@ -217,8 +217,9 @@
 .taoxi-villager{width:100%;height:100%}.taoxi-villager.elder{filter:sepia(.6)}.taoxi-villager.ayun{filter:hue-rotate(15deg)}
 .taoxi-controls{position:absolute;left:0;right:0;top:1600px;height:320px;display:flex;gap:55px;align-items:center;padding:20px 65px 50px;background:linear-gradient(0deg,#25251ffb,#373d2fe8);border-top:3px solid #a28b5c;z-index:5000}
 .taoxi-controls>div:last-child{flex:1;min-width:0}.taoxi-controls button{width:100%}.taoxi-controls p{font-size:39px;line-height:1.4;margin:12px 0;color:#d6c9ae}
-.taoxi-joystick{position:relative;width:235px;height:235px;flex-shrink:0;border:4px solid #e0cc9b;border-radius:50%;background:radial-gradient(circle,#b3b298 0 27%,#686e5bd9 28% 32%,#303c32cc 33%);box-shadow:inset 0 0 0 12px #596349;touch-action:none;text-align:center}
-.taoxi-joystick span{font-size:160px;line-height:220px;color:#f2dfb5aa;pointer-events:none}
+.taoxi-joystick{position:relative;width:235px;height:235px;flex-shrink:0;border:4px solid #e0cc9b;border-radius:50%;background:radial-gradient(circle,#56624ed9,#303c32ee 70%);box-shadow:inset 0 0 0 12px #596349;touch-action:none;text-align:center}
+.taoxi-joystick span{position:absolute;left:50%;top:50%;width:104px;height:104px;border:3px solid #d9c591;border-radius:50%;background:radial-gradient(circle at 35% 25%,#e2d6b0,#a79a73);box-shadow:0 8px 14px #1118,inset 0 2px 5px #fff6;font-size:76px;line-height:98px;color:#4a4c37;transform:translate(-50%,-50%);pointer-events:none}
+.taoxi-joystick.is-held{border-color:#fff0bb;box-shadow:inset 0 0 0 12px #687755,0 0 18px #e0cc9b55}
 .taoxi-save-note{position:absolute;bottom:3px;left:0;right:0;margin:0;text-align:center;font-size:39px;color:#cfbd95;z-index:5001;pointer-events:none}
 .adventure-transient-dialogue{position:absolute;left:55px;right:55px;bottom:380px;padding:42px;background:#25251ff5;border:4px solid #c5a265;box-shadow:0 15px 50px #0008;z-index:6000;color:#f4ead4;font-family:"Noto Serif TC",serif}
 .adventure-transient-dialogue h2{font-size:50px;margin:0;color:#e8c98a}.adventure-transient-dialogue p{font-size:46px;line-height:1.6;margin:22px 0 32px}.adventure-transient-dialogue button{width:100%}
@@ -226,3 +227,7 @@
 .taoxi-npc-sprite{display:block;width:100%;height:100%;background:url('../assets/exploration/taoxi-v1/villagers.webp') 0 0/300% 100% no-repeat}
 
 #explorationPage[data-gate-cutaway="true"] [data-object="village-exit"]{opacity:.25}
+.taoxi-entry-arrow{position:absolute;left:38%;bottom:130px;width:56px;height:84px;opacity:.9;filter:drop-shadow(0 3px 2px #573407aa) drop-shadow(0 0 5px #ffdf38);pointer-events:none;transform:translateX(-50%);animation:taoxi-entry-float 1.2s ease-in-out infinite alternate}
+[data-object="door"] .taoxi-entry-arrow{bottom:30px;left:50%}
+@keyframes taoxi-entry-float{from{transform:translate(-50%,-10px)}to{transform:translate(-50%,4px)}}
+@media(prefers-reduced-motion:reduce){.taoxi-entry-arrow{animation:none}}
