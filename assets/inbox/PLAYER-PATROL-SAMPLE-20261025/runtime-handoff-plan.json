@@ -1,0 +1,200 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "status": "ALL_EIGHT_HUMAN_APPROVED_ASSETS_ONLY_RUNTIME_HANDOFF_PENDING",
+  "mappingOwner": "js/26-v131-patrol-appearance.js const ART",
+  "unchangedSelection": "existing gender/element fallback, party selection and facingBack boolean; up=back, all other directions/idle=front",
+  "mapping": [
+    {
+      "gender": "male",
+      "element": "fire",
+      "appearanceId": "player_male_01",
+      "facing": "front",
+      "inboxWebp": "player_male_01_patrol_front.webp",
+      "sha256": "2fbe777afadaa0177979c395bdb680e7e94a7a8911b9c278aa61adc098a83c9a",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_01_patrol_front.2fbe777afada.webp"
+    },
+    {
+      "gender": "male",
+      "element": "fire",
+      "appearanceId": "player_male_01",
+      "facing": "back",
+      "inboxWebp": "player_male_01_patrol_back.webp",
+      "sha256": "792c3e9357deb20d7aa6b4d58d7517e76ec14b4e9832e1be99692844ef699325",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_01_patrol_back.792c3e9357de.webp"
+    },
+    {
+      "gender": "male",
+      "element": "water",
+      "appearanceId": "player_male_02",
+      "facing": "front",
+      "inboxWebp": "player_male_02_patrol_front.webp",
+      "sha256": "32868ccf02dc7b5a8d124cf72e69deba1e8eb7d4a79fe4b98ff81ed62b5140da",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_02_patrol_front.32868ccf02dc.webp"
+    },
+    {
+      "gender": "male",
+      "element": "water",
+      "appearanceId": "player_male_02",
+      "facing": "back",
+      "inboxWebp": "player_male_02_patrol_back.webp",
+      "sha256": "37000310182cefd26a9c5eeaa261138ab291cb7a851d9a179243a1d65d4fd700",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_02_patrol_back.37000310182c.webp"
+    },
+    {
+      "gender": "male",
+      "element": "wind",
+      "appearanceId": "player_male_03",
+      "facing": "front",
+      "inboxWebp": "player_male_03_patrol_front.webp",
+      "sha256": "68581fa853a8a394a1cedb38dbae5bdf5cde6b72fe71f36b4c025d4c5620d710",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_03_patrol_front.68581fa853a8.webp"
+    },
+    {
+      "gender": "male",
+      "element": "wind",
+      "appearanceId": "player_male_03",
+      "facing": "back",
+      "inboxWebp": "player_male_03_patrol_back.webp",
+      "sha256": "baa78526987bb4db7dacd50692935995b43f977195e99f8b86a86b599de96f43",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_03_patrol_back.baa78526987b.webp"
+    },
+    {
+      "gender": "male",
+      "element": "earth",
+      "appearanceId": "player_male_04",
+      "facing": "front",
+      "inboxWebp": "player_male_04_patrol_front.webp",
+      "sha256": "cb5f2a79d88001bddaf5356b450b8d65191b77cccdf7f2772527ab1aae7b18b1",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_04_patrol_front.cb5f2a79d880.webp"
+    },
+    {
+      "gender": "male",
+      "element": "earth",
+      "appearanceId": "player_male_04",
+      "facing": "back",
+      "inboxWebp": "player_male_04_patrol_back.webp",
+      "sha256": "1e2a5ed85bb8d4b7875ebb81216bb0401c7110a92f27e25f2923807a2484ced1",
+      "proposedRuntimePath": "assets/characters/patrol/player_male_04_patrol_back.1e2a5ed85bb8.webp"
+    },
+    {
+      "gender": "female",
+      "element": "fire",
+      "appearanceId": "player_female_01",
+      "facing": "front",
+      "inboxWebp": "player_female_01_patrol_front.webp",
+      "sha256": "21e88afe70194b14da300d21f6398f9de9f19ba636fa3aa7113d491283e8f2a2",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_01_patrol_front.21e88afe7019.webp"
+    },
+    {
+      "gender": "female",
+      "element": "fire",
+      "appearanceId": "player_female_01",
+      "facing": "back",
+      "inboxWebp": "player_female_01_patrol_back.webp",
+      "sha256": "71074afbf83427d15a2cdd58072b084fd8b2ee959eb490f35b3654d3f50d6d3c",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_01_patrol_back.71074afbf834.webp"
+    },
+    {
+      "gender": "female",
+      "element": "water",
+      "appearanceId": "player_female_02",
+      "facing": "front",
+      "inboxWebp": "player_female_02_patrol_front.webp",
+      "sha256": "08e5b5b0b6af4f02e52995ba44276f3fb3fe0a5883e00175eb0da196c46f90f9",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_02_patrol_front.08e5b5b0b6af.webp"
+    },
+    {
+      "gender": "female",
+      "element": "water",
+      "appearanceId": "player_female_02",
+      "facing": "back",
+      "inboxWebp": "player_female_02_patrol_back.webp",
+      "sourceSha256": "02f0492980984a287d59140cf21a270959d523b562705923cdb1dcd116811718",
+      "sha256": "b83a62120431d9beff967b4dbbc382c8e05f1361b83c846f3a0c1787016727d7",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp"
+    },
+    {
+      "gender": "female",
+      "element": "wind",
+      "appearanceId": "player_female_03",
+      "facing": "front",
+      "inboxWebp": "player_female_03_patrol_front.webp",
+      "sha256": "7b6ed6170a8b1a08fd65a6b0d91c63317bef8ff266accd8da0fa63d920f4c172",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_03_patrol_front.7b6ed6170a8b.webp"
+    },
+    {
+      "gender": "female",
+      "element": "wind",
+      "appearanceId": "player_female_03",
+      "facing": "back",
+      "inboxWebp": "player_female_03_patrol_back.webp",
+      "sha256": "2acdd4187eef44639b1800b02395d7b7c9373d7649368e9888c170f39b8ca222",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_03_patrol_back.2acdd4187eef.webp"
+    },
+    {
+      "gender": "female",
+      "element": "earth",
+      "appearanceId": "player_female_04",
+      "facing": "front",
+      "inboxWebp": "player_female_04_patrol_front.webp",
+      "sha256": "a658b6c0799ae4b327eea17ae7b027fa617eb7a4be09d6d761bfd4f612edf4c8",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_04_patrol_front.a658b6c0799a.webp"
+    },
+    {
+      "gender": "female",
+      "element": "earth",
+      "appearanceId": "player_female_04",
+      "facing": "back",
+      "inboxWebp": "player_female_04_patrol_back.webp",
+      "sha256": "6c2247042c3d8e4e7a4a736e4de0b442c60977160a27af35b99176e01bdc973d",
+      "proposedRuntimePath": "assets/characters/patrol/player_female_04_patrol_back.6c2247042c3d.webp"
+    }
+  ],
+  "runtimeAdditionsPlanned": 16,
+  "oldAssetsRetainNoDeletion": [
+    "assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",
+    "assets/characters/patrol/patrol-female-fire-back.c12817139add.webp",
+    "assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",
+    "assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp",
+    "assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",
+    "assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp",
+    "assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",
+    "assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp",
+    "assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",
+    "assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp",
+    "assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
+    "assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
+    "assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp",
+    "assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
+    "assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",
+    "assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp"
+  ],
+  "sharedFilesOnlyAfterHandoff": [
+    "asset-manifest.json",
+    "build/asset-manifest.json",
+    "build/feature-patrol.<new-hash>.js",
+    "index.html only if existing builder changes references"
+  ],
+  "builderOwner": "scripts/build-production.mjs; existing patrol directory enumeration includes all hashed WebP, do not hand-edit generated outputs",
+  "cssOwnerUnchanged": "css/32-v131-patrol-appearance.css remains84x126 contain bottom; no CSS changes planned",
+  "notInScope": [
+    "js/exploration/taoxi-ui.js and its sprite sheets",
+    "battle resolvers/8 normal battle references owned by #994",
+    "UI #955",
+    "main publication",
+    "player saves/statistics"
+  ],
+  "sequence": [
+    "confirm #998 and existing exploration deployment window with coordinator before shared writes",
+    "fresh dev and existing branch/PR scope check; normal merge only if necessary, never rebase/force",
+    "copy only listed16 WebP, update existing ART table, run original production builder/check",
+    "targeted original direction/selection/decode/84x126 and cache QA, latest Head required CI",
+    "normal dev merge only after all gates; natural exact SHA deploy; mobile/PC/physical QA in coordinated window"
+  ],
+  "performanceRisk": {
+    "newWebpTotalBytes": 20168232,
+    "oldPatrol16WebpTotalBytes": 223598,
+    "note": "New high-quality lossless source-sized runtime candidates total about19.3MiB; runtime loading/cache/mobile performance unverified. Preserve lossless/source size; no unsolicited lossy conversion or resizing."
+  },
+  "runtimeValidation": "NOT RUN; no runtime mapping/manifest/assets destination changed"
+}

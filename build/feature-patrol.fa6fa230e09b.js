@@ -6,16 +6,16 @@
 
     const ART={
         female:{
-            fire:{front:"assets/characters/patrol/patrol-female-fire-front.6cb6c8d514b1.webp",back:"assets/characters/patrol/patrol-female-fire-back.c12817139add.webp"},
-            water:{front:"assets/characters/patrol/patrol-female-water-front.5269ab380524.webp",back:"assets/characters/patrol/patrol-female-water-back.67b1492aecc7.webp"},
-            wind:{front:"assets/characters/patrol/patrol-female-wind-front.75dc64898d71.webp",back:"assets/characters/patrol/patrol-female-wind-back.bf0f5c5067c9.webp"},
-            earth:{front:"assets/characters/patrol/patrol-female-earth-front.cc9b1898e7c0.webp",back:"assets/characters/patrol/patrol-female-earth-back.18f5c279c47f.webp"}
+            fire:{front:"assets/characters/patrol/player_female_01_patrol_front.21e88afe7019.webp",back:"assets/characters/patrol/player_female_01_patrol_back.71074afbf834.webp"},
+            water:{front:"assets/characters/patrol/player_female_02_patrol_front.08e5b5b0b6af.webp",back:"assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp"},
+            wind:{front:"assets/characters/patrol/player_female_03_patrol_front.7b6ed6170a8b.webp",back:"assets/characters/patrol/player_female_03_patrol_back.2acdd4187eef.webp"},
+            earth:{front:"assets/characters/patrol/player_female_04_patrol_front.a658b6c0799a.webp",back:"assets/characters/patrol/player_female_04_patrol_back.6c2247042c3d.webp"}
         },
         male:{
-            fire:{front:"assets/characters/patrol/patrol-male-fire-front.e8288d5dfe71.webp",back:"assets/characters/patrol/patrol-male-fire-back.e987b7a8e45f.webp"},
-            water:{front:"assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",back:"assets/characters/patrol/patrol-male-water-back.db1078669837.webp"},
-            wind:{front:"assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp",back:"assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp"},
-            earth:{front:"assets/characters/patrol/patrol-male-earth-front.0677960124f5.webp",back:"assets/characters/patrol/patrol-male-earth-back.a421cb635062.webp"}
+            fire:{front:"assets/characters/patrol/player_male_01_patrol_front.2fbe777afada.webp",back:"assets/characters/patrol/player_male_01_patrol_back.792c3e9357de.webp"},
+            water:{front:"assets/characters/patrol/player_male_02_patrol_front.32868ccf02dc.webp",back:"assets/characters/patrol/player_male_02_patrol_back.37000310182c.webp"},
+            wind:{front:"assets/characters/patrol/player_male_03_patrol_front.68581fa853a8.webp",back:"assets/characters/patrol/player_male_03_patrol_back.baa78526987b.webp"},
+            earth:{front:"assets/characters/patrol/player_male_04_patrol_front.cb5f2a79d880.webp",back:"assets/characters/patrol/player_male_04_patrol_back.1e2a5ed85bb8.webp"}
         }
     };
     const SWITCH_ICON="assets/ui/patrol-appearance-switch-icon.png";
