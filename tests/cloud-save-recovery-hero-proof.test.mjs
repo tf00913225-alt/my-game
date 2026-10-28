@@ -310,6 +310,46 @@ test('full Hero raw proof closes cancelled legacy audit and current versioned au
     assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
 });
 
+test('same-cut original login reward closes claims read-only and rejects missing orphan or altered cut binding',async t=>{
+    const errors={'missing-claim':'Original retained Hero transition is incomplete or inconsistent.',
+        'orphan-claim':'Independent claims differ from the recovery archive.',
+        'cross-cut-binding':'Complete raw capture run differs.'};
+    for(const fault of [null,...Object.keys(errors)])await t.test(fault||'complete',async()=>{
+        const operationId='hero-login-reward-v1-day3';
+        const {h,deps,material}=await completeHeroRawCapture(async({h,deps,request,refreshSession})=>{
+            const acquisition=createHeroAcquisition({...deps,now:()=>h.clock,seed:()=>1});
+            for(let day=2;day<=3;day++){
+                h.advance(86400000);await refreshSession();
+                await acquisition.observeLogin({...request(),data:{...request().data,expectedRevision:h.revision}});
+            }
+            const growth=createHeroGrowth({...deps,acquisition,now:()=>h.clock});
+            await growth.claimLoginReward({...request(),data:{...request().data,
+                operationId,expectedRevision:h.revision,milestoneDay:3}});
+            const claim=h.root+'/uniqueClaims/'+operationId;
+            if(fault==='missing-claim')h.data.delete(claim);
+            if(fault==='orphan-claim')h.data.set(h.root+'/uniqueClaims/hero-orphan-reward-0001',copy(h.data.get(claim)));
+        });
+        const revision=h.revision,archive=h.data.get(h.root+'/recoveryArchives/'+revision);
+        assert.equal(material.binding.canonicalRevision,revision);
+        assert.equal(material.binding.sourceRevision,revision);
+        assert.equal(archive.sourceRecords.claimRecords.length,0,'reward uniqueClaims are not canonical claimRecords');
+        if(fault==='cross-cut-binding')material.binding.canonicalRevision=2;
+        const before=copy([...h.data]),writes=h.writes;
+        const verify=()=>proofOwnerForTest({...deps,db:queryDb(h.dependencies.db),now:()=>h.clock})
+            .verifySegmentedRawRecoveryProof(material);
+        if(fault)await assert.rejects(verify(),error=>error.code==='data-loss'&&error.message===errors[fault]);
+        else{
+            const result=await verify();
+            assert.equal(result.segmentedProofValid,true);
+            assert.equal(result.canonicalRevision,revision);assert.equal(result.sourceRevision,revision);
+            for(const key of ['authoritativeStateReady','candidateProofValid','trustedCaptureVerified','restoreAuthorized'])assert.equal(result[key],false);
+        }
+        assert.equal(archive.readyForRestore,false);
+        assert.equal(h.data.get(h.save).authoritativeStateReady,false);
+        assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+    });
+});
+
 test('extra orphan Hero ledger or claim cannot acquire rights through a valid raw seal',async()=>{
     for(const collection of ['ledgerEntries','uniqueClaims']){
         const {h,deps,material}=await completeHeroRawCapture(async({h})=>{
