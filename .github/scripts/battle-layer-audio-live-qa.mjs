@@ -4,7 +4,8 @@ import path from "node:path";
 import {spawn,spawnSync} from "node:child_process";
 import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 import os from 'node:os';
-import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
+import {createHash} from 'node:crypto';
+import {startServer,waitJson,Cdp,findChrome,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
 
 // Match the formal portrait QA's authored alpha projection, not the larger
 // depth-scaled carrier. getBoundingClientRect includes the current motion.
@@ -233,6 +234,8 @@ const expectedSha=String(process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA
 const qaUrl=`${baseUrl}/?battle-layer-audio-live-qa=${encodeURIComponent(expectedSha||Date.now())}`;
 const artifactDir=path.resolve("artifacts/browser-qa");
 fs.mkdirSync(artifactDir,{recursive:true});
+const fireEvidencePath=path.join(artifactDir,"fire-target-isolated-qa.json");
+if(fireIsolation)fs.rmSync(fireEvidencePath,{force:true});
 const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 
 function chromeBinary(){
@@ -885,16 +888,23 @@ try{
     await client.send("Runtime.enable");
     await client.send("Network.enable");
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
-    const fireRequests={local:[],blocked:[],errors:[],webSockets:[]};
+    const fireRequests={local:[],blocked:[],errors:[],webSockets:[],mockResponses:[]};
+    const fireMocks=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
     if(fireIsolation){
         client.socket.addEventListener('message',event=>{
             let message;try{message=JSON.parse(String(event.data));}catch{return;}
             if(message.method==='Network.webSocketCreated'){fireRequests.webSockets.push(message.params.url);return;}
             if(message.method!=='Fetch.requestPaused')return;
             const url=message.params.request.url;
-            let local=false;try{local=new URL(url).origin===baseUrl;}catch{}
+            let parsed;try{parsed=new URL(url);}catch{}
+            const local=parsed?.origin===baseUrl,mock=local?fireMocks.get(parsed.pathname):null;
             (local?fireRequests.local:fireRequests.blocked).push(url);
-            client.send(local?'Fetch.continueRequest':'Fetch.failRequest',local?{requestId:message.params.requestId}:{requestId:message.params.requestId,errorReason:'BlockedByClient'}).catch(error=>fireRequests.errors.push(String(error.message)));
+            let method,params;
+            if(mock&&message.params.resourceType==='Script'){
+                method='Fetch.fulfillRequest';params={requestId:message.params.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript; charset=utf-8'}],body:Buffer.from(mock).toString('base64')};
+            }else if(local){method='Fetch.continueRequest';params={requestId:message.params.requestId};}
+            else{method='Fetch.failRequest';params={requestId:message.params.requestId,errorReason:'BlockedByClient'};}
+            client.send(method,params).then(()=>{if(mock&&method==='Fetch.fulfillRequest')fireRequests.mockResponses.push({path:parsed.pathname,sha256:createHash('sha256').update(mock).digest('hex')});}).catch(error=>fireRequests.errors.push(String(error.message)));
         });
         await client.send('Fetch.enable',{patterns:[{urlPattern:'*',requestStage:'Request'}]});
     }
@@ -907,7 +917,7 @@ try{
         const proof=await client.eval(`({uid:window.FourSymbolsFirebase?.getUser?.()?.uid||null,controller:navigator.serviceWorker?.controller?.scriptURL||null})`);
         assert.equal(proof.uid,'skill-runtime-browser-qa','isolated QA must use the existing synthetic UID');
         assert.equal(proof.controller,null,'isolated QA must not use a pre-existing service worker');
-        for(const name of ['firebase-auth.','firebase-cloud-save.','firebase-session.'])assert.ok(fireRequests.local.some(url=>url.includes(name)),'missing mocked '+name);
+        for(const [mockPath,mockBody] of fireMocks){const hash=createHash('sha256').update(mockBody).digest('hex');assert.ok(fireRequests.mockResponses.some(item=>item.path===mockPath&&item.sha256===hash),'missing delivered mock '+mockPath);}
         evidence.checks.fireIsolation={syntheticUid:true,controller:null,localRequests:fireRequests.local.length,blockedRequests:fireRequests.blocked.length};
     }
     if(fireIsolation)await waitFor(client,"document.getElementById('firebaseAuthOverlay')?.classList.contains('show')===false","isolated account resume prompt closes",15000);
@@ -1050,10 +1060,9 @@ try{
         assert.deepEqual(fireRequests.webSockets,[],'isolated QA must not create WebSockets');
         evidence.checks.fireIsolation.localRequests=fireRequests.local.length;
         evidence.checks.fireIsolation.blockedRequests=fireRequests.blocked.length;
-        evidence.checks.fireIsolation.mockedModules=['firebase-auth','firebase-cloud-save','firebase-session'];
+        evidence.checks.fireIsolation.mockResponses=fireRequests.mockResponses;
         evidence.checks.fireIsolation.webSockets=fireRequests.webSockets.length;
         evidence.status='PASS';evidence.finishedAt=new Date().toISOString();
-        fs.writeFileSync(path.join(artifactDir,'fire-target-isolated-qa.json'),JSON.stringify(evidence,null,2)+'\n');
         throw Object.assign(new Error('isolated fire QA complete'),{code:'FIRE_QA_COMPLETE'});
     }
 
@@ -1916,7 +1925,7 @@ try{
     fs.writeFileSync(path.join(artifactDir,"battle-layer-audio-live-qa.json"),JSON.stringify(evidence,null,2)+"\n");
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
-    if(error.code==='FIRE_QA_COMPLETE'){console.log('Isolated fire target QA: PASS');}
+    if(error.code==='FIRE_QA_COMPLETE'){}
     else {
     // Failure evidence only: never alter the scene or release a production lock.
     evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},waves:window.FourSymbolsBattleWaves?.getState?.(),run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
@@ -1954,5 +1963,11 @@ try{
         const resolved=path.resolve(profile),temp=path.resolve(os.tmpdir());
         if(path.dirname(resolved)!==temp||!path.basename(resolved).startsWith("fire-target-qa-"))throw new Error("Unsafe isolated profile path");
         try{fs.rmSync(resolved,{recursive:true,force:true});}catch(error){console.error("Isolated profile cleanup failed:",error.message);process.exitCode=1;}
+        if(evidence.status==='PASS'&&process.exitCode!==1){
+            evidence.checks.fireIsolation.profileCleaned=!fs.existsSync(resolved);
+            if(!evidence.checks.fireIsolation.profileCleaned){process.exitCode=1;throw new Error('Isolated profile remains after cleanup');}
+            fs.writeFileSync(fireEvidencePath,JSON.stringify(evidence,null,2)+'\n');
+            console.log('Isolated fire target QA: PASS');
+        }
     }
 }
