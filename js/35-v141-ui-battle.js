@@ -685,6 +685,7 @@
             const overlay=ensureBattleTransitionOverlay();
             const page=document.getElementById("battlePage");
             transitionRunning=true;
+            const releaseEntryLock=window.FourSymbolsBattleFlow.acquirePresentationLock("battle-entry");
             if(overlay){ overlay.classList.add("show"); }
             setTimeout(()=>{
                 if(overlay){ overlay.classList.remove("show"); }
@@ -695,7 +696,10 @@
                 setTimeout(()=>{
                     if(page){ page.classList.remove("v141-entry-moving"); }
                     transitionRunning=false;
-                    if(battleActive&&token===battleToken){ originalStartTurn.call(this,token); }
+                    if(battleActive&&token===battleToken){
+                        try{ originalStartTurn.call(this,token); }
+                        finally{ releaseEntryLock(); }
+                    }
                 },720);
             },1000);
         };
