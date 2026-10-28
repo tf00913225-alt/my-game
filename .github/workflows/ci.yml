@@ -688,6 +688,7 @@ jobs:
         with:
           name: daily-dungeon-webp-browser-qa-${{ inputs.candidate_sha || github.sha }}
           path: |
+            artifacts/browser-qa/daily-dungeon-webp-failure-diagnostics.json
             artifacts/browser-qa/daily-dungeon-webp-browser-qa.json
             artifacts/browser-qa/daily-dungeon-portrait-runtime-qa.json
             artifacts/browser-qa/daily-dungeon-exp-*.png
