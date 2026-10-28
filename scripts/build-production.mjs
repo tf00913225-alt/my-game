@@ -277,7 +277,7 @@ const scriptOutputs={
     adventureItems:target("feature-adventure-items","js",read(adventureItemsScripts[0])),
     adventureContent:target("feature-adventure-content","js",read(adventureScripts[0])),
     adventureRuntime:target("feature-adventure-runtime","js",read(adventureScripts[1])),
-    adventureUi:target("feature-adventure-ui","js",read(adventureScripts[2]))
+    adventureUi:target("feature-adventure-ui","js",combineScripts([adventureScripts[2],"prototypes/exploration-corner/scene.js","prototypes/exploration-corner/runtime.js","js/exploration/taoxi-content.js","js/exploration/taoxi-progress.js","js/exploration/taoxi-ui.js"]))
 };
 const styleOutputs={
     critical:target("boot-core","css",combineStyles(criticalStyles)),
@@ -288,7 +288,7 @@ const styleOutputs={
     bossRelic:target("feature-boss-relic","css",combineStyles(bossRelicStyles)),
     relicProgression:target("feature-relic-progression","css",read(relicProgressionStyles[0])),
     adventureEntry:target("feature-adventure-entry","css",read(adventureEntryStyles[0])),
-    adventure:target("feature-adventure","css",read(adventureStyles[0]))
+    adventure:target("feature-adventure","css",combineStyles([adventureStyles[0],"css/taoxi-exploration.css"]))
 };
 Object.values(scriptOutputs).forEach(writeTarget); Object.values(styleOutputs).forEach(writeTarget);
 

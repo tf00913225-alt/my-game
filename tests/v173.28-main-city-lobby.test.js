@@ -28,7 +28,7 @@ test('all twelve city features, story route, formation and resource identities r
  }
  for(const id of ['homeHudGoldValue','homeHudExpValue','homeBannerName'])assert.equal(html.split('id="'+id+'"').length-1,1,id);
  assert.match(source,/openSharedFormation/);assert.match(read('js/adventure/adventure-entry-v1-20260915.js'),/onclick="openAdventureMap\(\)"/);
- assert.match(source,/rosterEscape\(character.id/);assert.match(source,/getCharacterBattleArtworkPath\(character\)/);
+ assert.match(source,/rosterEscape\(character.id/);assert.match(source,/getCharacterArtworkPath\(character\)/);
 });
 test('city remains under the original first-screen renderer and refresh bridge',()=>{
  assert.match(source,/prepareFirstScreenVisuals/);assert.match(source,/firstScreenVisualReadyPromise=null/);
@@ -39,14 +39,14 @@ test('city remains under the original first-screen renderer and refresh bridge',
 test('renderer follows sparse player counts, real artwork selectors and clamped resource fractions without mutations',()=>{
  const f=partyFixture(),count={},scene={dataset:{}},roster={dataset:{},querySelector:()=>count,querySelectorAll:()=>[],insertAdjacentHTML:(_,html)=>roster.html=html};
  Object.assign(f.context,{firstScreenVisualReadyPromise:null,ensureHomeRosterShell:()=>roster,syncRosterResource:()=>{},syncHomeRelicSummary:()=>{},rosterNumber:n=>Number(n)||0,rosterEscape:s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;'),document:{getElementById:id=>id==='homePartyScene'?scene:null},elementDatabase:{fire:{},water:{},wind:{}}});
- const main=read('js/00-main.js');vm.runInContext(main.slice(main.indexOf('function getCharacterBattleArtworkPath('),main.indexOf('function getCharacterDisplayNameByIndex(')),f.context);
+ const main=read('js/00-main.js');vm.runInContext(main.slice(main.indexOf('function getCharacterArtworkPath('),main.indexOf('function getCharacterDisplayNameByIndex(')),f.context);
  vm.runInContext(source.slice(source.indexOf('    function renderHomeRoster(){'),source.indexOf('    window.v54RenderHomeRoster=')),f.context);
  Object.assign(f.players[0],{id:'甲<"',gender:'male',element:'fire',hp:300,sp:120,level:40});
  Object.assign(f.players[1],{gender:'female',element:'water',hp:900,sp:-5});
  Object.assign(f.players[2],{gender:'male',element:'wind',hp:600,sp:200});
  const before=JSON.stringify(f.players);f.context.renderHomeRoster();
  assert.equal(scene.dataset.partySize,'3');assert.equal(count.textContent,'角色 3 人');
- for(const path of ['male_fire','female_water','male_wind'])assert.ok(scene.innerHTML.includes('battle_'+path+'.png'));
+ for(const path of ['player_male_01','player_female_02','player_male_03'])assert.ok(scene.innerHTML.includes(path+'.webp'));assert.doesNotMatch(scene.innerHTML,/battle_(?:male|female)_/);
  assert.equal((scene.innerHTML.match(/<figure/g)||[]).length,3);assert.doesNotMatch(scene.innerHTML,/assets\/heroes/);
  assert.match(roster.html,/aria-valuenow="300" aria-valuetext="HP 300 \/ 600"/);assert.match(roster.html,/width:50%/);
  assert.match(roster.html,/aria-valuenow="0" aria-valuetext="SP 0 \/ 200"/);assert.match(roster.html,/甲&lt;&quot;/);

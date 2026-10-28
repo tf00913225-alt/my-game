@@ -12,6 +12,13 @@
 
 ## 施工狀態與續接入口
 
+### 2026-10-26 週報驗收界線
+
+- 已發布 main 仍為上列 V173.73／`f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`；本週工作沒有正式發布。dev 文件整理基線為 `3d74c4aae68c9dcf21df4319d7bea1f4d3dc16aa`；Note9 實測及已完成部署驗收僅對應 `2e2de82eb0c80f4ba24796fd20b033bafcd81f6d`，不得用其結果替新 SHA 背書。
+- CI 初始化 fixture 修正 #1002、桃溪／Story 觸控修正 #1003 已合入 dev。後續使用者決定 UI／版面問題略過待整體改版；元素匣捲動 #1004 只保存成果，不合併或部署，#955 仍暫停。
+- Android：Note9 SM-N960F／Android 10／Chrome 155.0.8059.79，28.94 分鐘流程及短程補驗完成部分項目；自動戰鬥透過既有免費模擬廣告正常取得時數、出手與停止。燃燒完整持續時間、專用 Buff 與實際冶煉交易仍未驗證；完整記錄與條件見 [本週證據](docs/qa/WEEKLY-ANDROID-20261026.txt)。不得標記 P1-3 全過。
+- 不建立發布候選：大型 UI／戰鬥 UI／Cloud 工作尚未收斂，仍缺固定候選及其完整 CI、main-target、exact-SHA 部署、正式網址／快取讀回與完整 Android 驗收。Cloud Save 完整跨裝置恢復、權威驗證與一次性獎勵保護仍依原 Gate，維持 fail-closed。
+
 即時 Work ID／Branch／PR／Latest Head／CI／Next 由各工作 PR 管理；依 `AGENTS.md` 續接，不把本文件或舊 Open PR 表當成有效施工清單。2026-10-05 的 #806 與治理瘦身施工索引已是歷史觀測，其紀錄保留於 Git history／原 PR。
 
 DEV 固定驗證站：`https://dev.four-symbols-dev.pages.dev`。部署 SHA、必要 checks 及驗收查對應 workflow／Work PR，不從版本字串或本文件推定。main/dev 歷史分叉與提交數不能單獨證明有正式內容尚未吸收；回流需核對實際有效 diff。
