@@ -8563,6 +8563,7 @@
     if(typeof startTurn==="function"){
         const originalStartTurn=startTurn;
         startTurn=function(token){
+            if(token!==battleToken){ return; }
             if(!battleActive||startedEntryTokens.has(token)){
                 return originalStartTurn.apply(this,arguments);
             }
@@ -8584,6 +8585,8 @@
                     if(battleActive&&token===battleToken){
                         try{ originalStartTurn.call(this,token); }
                         finally{ releaseEntryLock(); }
+                    }else if(!battleActive){
+                        releaseEntryLock();
                     }
                 },720);
             },1000);
