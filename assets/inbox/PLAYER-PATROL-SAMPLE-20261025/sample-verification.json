@@ -1,0 +1,63 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "reference": "assets/characters/player_male_01.webp",
+  "status": "INDEPENDENT_REVIEW_READY_FOR_HUMAN_SAMPLE_APPROVAL",
+  "runtimeChanges": false,
+  "assets": [
+    {
+      "side": "front",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "source": "player_male_01_patrol_front_source.png",
+      "webp": "player_male_01_patrol_front.webp",
+      "rgbaExact": true,
+      "sourceSha256": "30f682f044136262424da5ba51912ce33dbd8d409b55f61c5c7a189f5e0a5469",
+      "webpSha256": "2fbe777afadaa0177979c395bdb680e7e94a7a8911b9c278aa61adc098a83c9a"
+    },
+    {
+      "side": "back",
+      "size": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "source": "player_male_01_patrol_back_source.png",
+      "webp": "player_male_01_patrol_back.webp",
+      "rgbaExact": true,
+      "sourceSha256": "8ce47e546526c8e9b863643f6e29f35c909b0ad00820399b8004708fdbc5e4aa",
+      "webpSha256": "792c3e9357deb20d7aa6b4d58d7517e76ec14b4e9832e1be99692844ef699325",
+      "revision": 2
+    }
+  ],
+  "previewNote": "84x126 copies only; original sources and WebP dimensions/pixels unchanged",
+  "independentReview": {
+    "reviewer": "separate QA agent",
+    "result": "back v2 blockers resolved; ready for human sample review only",
+    "verified": [
+      "same character identity",
+      "crane panel, sword and feather shoulder on character left across front/back",
+      "rear waist and boot construction corrected",
+      "full-body feet visible",
+      "84x126 front/back recognizable"
+    ],
+    "humanDecisions": [
+      "slender proportions at actual patrol size",
+      "walking posture strength"
+    ],
+    "notVerified": [
+      "formal runtime",
+      "animation",
+      "interaction",
+      "deployment"
+    ]
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "status": "IMPLEMENTED_SOURCE_QA_PASS_BROWSER_STARTUP_BLOCKED_LATEST_HEAD_CI_PENDING",
+  "baseDev": "120434d0d56d26cb6d2a30b37eb0110ab7a82531",
+  "priorHead": "d9f4d757f64a990ebe01a668b515722b0dc81547",
+  "scope": "A asset/mapping, B synthetic isolated browser; no C cloud/account or real player data",
+  "windowEvidence": "UI Owner conditionally released patrol mapping/manifests/bundles; #955 has no patrol JS diff but retains own manifest/CSS differences; #996 test-only merged, #1012 test-only, VFX paused. Integrate both owners with original builder; no UI branch overwrite.",
+  "change": "Existing js/26-v131-patrol-appearance.js ART 8x2 uses16 new hashed lossless WebP; original gender/element selection, facing/movement wrapper, CSS and old16 assets retained.",
+  "sourceSha256": "dbaf4d626714b7ba7ee4830c836f5dae430670083e4df2d3d1cf3d94a5d34344",
+  "manifestSha256": "bda92b908da3332d5a3772f0c5efa2ec5fb71f33a14bc521d04efb9f8200d7d2",
+  "bundle": "build/feature-patrol.fa6fa230e09b.js",
+  "newAssetCount": 16,
+  "newAssetBytes": 20168232,
+  "totalCatalogAssetCount": 32,
+  "totalCatalogBytes": 20391830,
+  "assetPolicy": "Lossless 1024x1536 pixel/alpha exact; approved PNG sources retained; female02 back v4 explicitly adopted, hash b83a62120431d9beff967b4dbbc382c8e05f1361b83c846f3a0c1787016727d7.",
+  "tests": {
+    "productionBuildAndCheck": "PASS",
+    "updatedExistingAssetTest": "5 PASS, both genders 8x2 exact mapping/manifest/WebP assertion",
+    "focusedPatrolBattleAndBalance": "PASS (separate existing targeted cases)",
+    "startupLoader": "NOT PASSED: spawnSync identify ENOENT before product assertion; existing CI installs ImageMagick; no install or rerun",
+    "isolatedBrowser": "NOT PASSED: Chrome DevToolsActivePort absent after 15s, before page navigation; no screenshot, direction or runtime decode/size/performance evidence; first error in task artifact patrol-runtime-20261028/result.json; no rerun"
+  },
+  "independentSourceReview": "separate QA checked16 mapping/plan/hash/manifest, original logic unchanged, old assets retained, strengthened test, no source scope blocker; visual runtime QA pending",
+  "restrictionBreach": "Browser QA agent additionally queried previously restricted CIM; Windows denied access. Stopped, no further CIM query or alternate bypass.",
+  "notVerified": [
+    "browser actual 8x2 direction and load",
+    "mobile/PC runtime visual",
+    "initial load performance and decoded memory",
+    "physical phone",
+    "latest Head natural CI",
+    "deployment"
+  ],
+  "pending": [
+    "save normal-merge checkpoint and allow natural CI",
+    "coordinate browser startup infrastructure owner; first failure only, no blind rerun",
+    "A/B acceptance and independent visual QA",
+    "retain Draft; no dev merge or deployment under current instruction"
+  ],
+  "mainOrRealDataChanged": false
+}

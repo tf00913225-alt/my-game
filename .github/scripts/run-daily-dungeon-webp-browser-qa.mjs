@@ -47,8 +47,33 @@ try{
     const base=String(process.env.DEV_BASE_URL||"").trim();
     if(!base){ throw new Error("DEV_BASE_URL is required."); }
     const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--window-size=412,915","--virtual-time-budget=15000","--dump-dom",base+"/.daily-dungeon-webp-browser-qa.html"],{encoding:"utf8",timeout:40000,maxBuffer:32*1024*1024});
+    const match=String(result.stdout||"").match(/<pre id="result">([\s\S]*?)<\/pre>/);
+    if(result.status!==0||!match){
+        // Failure-only, bounded evidence: preserve the original launch and assertion.
+        const tail=(value,limit)=>String(value||"").slice(-limit);
+        const diagnostic={status:result.status,signal:result.signal,error:result.error?String(result.error):null,
+            stdoutTail:tail(result.stdout,16384),stderrTail:tail(result.stderr,16384),http:null,serverLogTail:null};
+        const controller=new AbortController();let deadline;
+        try{
+            diagnostic.http=await Promise.race([
+                (async()=>{
+                    const response=await fetch(base+"/.daily-dungeon-webp-browser-qa.html",{signal:controller.signal});
+                    const reader=response.body?.getReader();let chunk=null;
+                    if(reader){try{chunk=await reader.read();}finally{void reader.cancel().catch(()=>{});}}
+                    return {status:response.status,contentType:response.headers.get("content-type"),bodyPrefix:chunk?.value?Buffer.from(chunk.value).subarray(0,4096).toString("utf8"):""};
+                })(),
+                new Promise(resolve=>{deadline=setTimeout(()=>{controller.abort();resolve({error:"diagnostic HTTP deadline exceeded"});},2000);})
+            ]);
+        }catch(error){ diagnostic.http={error:String(error)}; }
+        finally{clearTimeout(deadline);}
+        try{
+            const file="/tmp/four-symbols-daily-dungeon-qa-server.log",size=fs.statSync(file).size,fd=fs.openSync(file,"r");
+            try{const length=Math.min(size,8192),buffer=Buffer.alloc(length);fs.readSync(fd,buffer,0,length,size-length);diagnostic.serverLogTail=buffer.toString("utf8");}finally{fs.closeSync(fd);}
+        }catch(error){diagnostic.serverLogTail="unavailable: "+String(error.code||error.message);}
+        try{fs.writeFileSync(path.join(ARTIFACT_DIR,"daily-dungeon-webp-failure-diagnostics.json"),JSON.stringify(diagnostic,null,2)+"\n");}
+        catch(error){console.error("Daily WebP failure diagnostics unavailable:",error);}
+    }
     if(result.status!==0){ throw new Error(result.stderr||"Chrome exited with "+result.status); }
-    const match=result.stdout.match(/<pre id="result">([\s\S]*?)<\/pre>/);
     assert.ok(match,"Daily Dungeon WebP browser QA did not produce a result.");
     const evidence=JSON.parse(match[1]);
     fs.writeFileSync(path.join(ARTIFACT_DIR,"daily-dungeon-webp-browser-qa.json"),JSON.stringify(evidence,null,2)+"\n");

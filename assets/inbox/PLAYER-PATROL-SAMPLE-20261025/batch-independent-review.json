@@ -1,0 +1,40 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "reviewer": "separate /root/qa agent, read-only",
+  "status": "ALL_EIGHT_PAIRS_READY_FOR_HUMAN_REVIEW_NOT_RUNTIME_ACCEPTANCE",
+  "humanApproved": [
+    "male_01"
+  ],
+  "remainingHumanCandidates": [
+    "male_02",
+    "male_03",
+    "male_04",
+    "female_01",
+    "female_02",
+    "female_03",
+    "female_04"
+  ],
+  "verified": [
+    "all original identities, hairstyle/color/costume/weapon preserved",
+    "front/back anatomical sides and asymmetric panels consistent",
+    "full head and both feet, natural small walking pose",
+    "all-eight final84x126 comparison readable",
+    "clean alpha composition without dark rectangles or visible fringe"
+  ],
+  "rejectedAndCorrected": [
+    "male03/back v1 copied front shin guard onto rear calf; v2 plain rear boot accepted",
+    "male04/back v1 copied front knee/shin ornaments onto rear calf; v2 plain rear boot accepted",
+    "female02/back v1 front shin armor copied; v2 boot fixed but background dark corner artifacts rejected; v3 alpha clean accepted"
+  ],
+  "reviewNote": "female02/back v3 slightly brighter and more saturated than front; same red/black/gold identity and painting system, not a regeneration blocker; disclose in human review",
+  "notVerified": [
+    "formal runtime integration",
+    "real patrol scene scale",
+    "direction/selection interaction",
+    "animation",
+    "deployed environment",
+    "physical-phone runtime performance"
+  ],
+  "technicalEvidence": "batch-technical-verification.json",
+  "visualEvidence": "all-eight-patrol-84x126-comparison.png"
+}
