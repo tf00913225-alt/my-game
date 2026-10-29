@@ -1,0 +1,19 @@
+{
+  "workId": "PATROL-BLACK-AREA-20261029",
+  "baseDevSha": "7c0029c21859f93d4b16871a2064aeb800909ee2",
+  "branch": "fix/patrol-black-area-20261029",
+  "status": "IMPLEMENTED; independent candidate QA and latest-head CI pending",
+  "symptom": "Note9 patrol character compositing produces a black area over the forest/navigation",
+  "diagnosis": {
+    "deployedSourceSha": "5e55e45a8cacf309e51d6d27f0e4c3fae38c1bd5",
+    "cacheVersion": "173.73",
+    "evidenceDirectory": "C:/Users/User/.codex/visualizations/2026/10/26/01a176d3-f9f3-7cb2-a3a4-aa7e4c2e92b6/ANDROID-NOTE9-20261026",
+    "evidenceFiles": ["phone-999-surface-promotion-evidence.json", "phone-999-surface-control-evidence.json"],
+    "capture": "Two independent fromSurface:false fixed-geometry comparisons; client 411x718, scale 0.373958; no resize, toast hidden",
+    "comparison": "Permanent image will-change:transform black; auto normal forest/navigation; restore transform black. Same-value transform write control remained black."
+  },
+  "change": "Remove only the permanent will-change:transform from the patrol image's existing css/38 owner. Preserve translateZ(0), backface-visibility, walking animation, wrapper movement hints and all runtime/data logic.",
+  "validation": ["production build", "deterministic build --check", "v173.21-new-player-assets: 5 passed", "battle-patrol-ui-targeting: 5 passed", "focused image owner and walking animation preservation assertion", "git diff --check"],
+  "coordination": "PR #1016 released the manifest/bundle write window at head de9edf93e5358d556c87e18a3b3711afae1c588b and will normally merge updated dev after this integration.",
+  "limits": ["Candidate native Note9 rendering has not been validated yet", "Static checks/build do not prove the black area is resolved", "No player data, real account state, gameplay values, release or cache version modified"]
+}
