@@ -3,7 +3,8 @@ import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 import {inflateSync} from "node:zlib";
-import {spawnSync} from "node:child_process";
+import {spawn,spawnSync} from "node:child_process";
+import {Cdp,waitJson} from "./runtime-browser-qa-support.mjs";
 
 const ROOT=process.cwd();
 const ARTIFACT_DIR=path.join(ROOT,"artifacts/browser-qa");
@@ -296,13 +297,36 @@ function readChromePng(file){
 }
 
 function close(a,b,label,tolerance=.5){assert.ok(Math.abs(a-b)<=tolerance,`${label}: ${a} != ${b}`);}
-function runViewport(chrome,width,height){
+async function runViewport(chrome,width,height){
     fs.writeFileSync(FIXTURE,fixtureHtml(width,height),"utf8");
     const fileUrl="file://"+FIXTURE.replace(/\\/g,"/");
     const browserProfile=fs.mkdtempSync(path.join(os.tmpdir(),"fixed-slot-qa-"));
-    const result=spawnSync(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,"--virtual-time-budget=1200","--dump-dom",fileUrl],{encoding:"utf8",timeout:30000,maxBuffer:24*1024*1024});
-    assert.equal(result.status,0,result.stderr||String(result.error||`browser fixture failed ${width}x${height}`));
-    const match=result.stdout.match(/<pre id="result"[^>]*>([\s\S]*?)<\/pre>/);assert.ok(match,`missing QA result ${width}x${height}`);const data=JSON.parse(decode(match[1]));assert.ok(!data.fixtureError,data.fixtureError);
+    let fixtureFailure;
+    try {
+    const port=12000+Math.floor(Math.random()*30000);
+    const browser=spawn(chrome,["--headless=new",`--user-data-dir=${browserProfile}`,"--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--allow-file-access-from-files","--force-device-scale-factor=1",`--window-size=${width},${height}`,`--remote-debugging-port=${port}`,"about:blank"],{stdio:"ignore"});
+    let client,raw="",browserFailure;
+    try {
+        const tabs=await waitJson(`http://127.0.0.1:${port}/json/list`,{chromeProcess:browser});
+        client=new Cdp(tabs.find(tab=>tab.type==="page").webSocketDebuggerUrl);
+        const deadline=Date.now()+30000;
+        const withinDeadline=promise=>Promise.race([promise,new Promise((_,reject)=>{const timer=setTimeout(()=>reject(new Error("CDP fixture response timed out")),Math.max(1,deadline-Date.now()));timer.unref();})]);
+        await withinDeadline(client.send("Page.enable"));
+        await withinDeadline(client.send("Page.navigate",{url:fileUrl}));
+        while(Date.now()<deadline){
+            try { raw=await withinDeadline(client.eval("location.href.startsWith('file:') ? document.getElementById('result')?.textContent || '' : ''")); } catch(error) { if(!/context|navigation|session/i.test(String(error)))throw error; }
+            if(raw)break;
+            await new Promise(resolve=>setTimeout(resolve,50));
+        }
+        assert.ok(raw,`missing QA result ${width}x${height} after waiting for fixture completion`);
+    } catch(error) { browserFailure=error; throw error; } finally {
+        if(client)client.close();
+        if(browser.exitCode===null && browser.signalCode===null){
+            try { const closed=new Promise(resolve=>browser.once("exit",resolve));browser.kill();await Promise.race([closed,new Promise((_,reject)=>setTimeout(()=>reject(new Error("Chrome did not exit after termination")),2000))]); }
+            catch(error) { if(!browserFailure)throw error; console.error("Chrome termination failed:",error); }
+        }
+    }
+    const data=JSON.parse(raw);assert.ok(!data.fixtureError,data.fixtureError);
     allyPortraitProbeMetadata=data.allyPortraitMetadata.map(sample=>({...sample,data:allyPortraitSamples.find(p=>p.path===sample.path).data}));
     fs.writeFileSync(FIXTURE,fixtureHtml(width,height),"utf8");
     if(width===412&&height===915){
@@ -476,12 +500,12 @@ function runViewport(chrome,width,height){
     assert.equal(data.boss.reticles.boss.content,'""');assert.equal(data.boss.reticles.object.content,'""');assert.equal(data.boss.reticles.boss.border,"3px");assert.equal(data.boss.reticles.object.border,"3px");assert.equal(data.boss.reticles.boss.animation,"none");assert.equal(data.boss.reticles.object.animation,"none");
     for(const phase of [data.bossLifecycle.initial,data.bossLifecycle.afterF1,data.bossLifecycle.afterF5]){assert.equal(phase.sameSnapshot,true,"Boss lifecycle must preserve snapshot identity");assert.equal(phase.bossSlot,"ENEMY_B3");assert.deepEqual(phase.reinforcementSlots,["ENEMY_B1","ENEMY_B5"]);assert.ok(phase.reinforcements.every(function(item,index){return item.holderSlot===["ENEMY_B1","ENEMY_B5"][index]&&item.artworkClear;}),"Boss reinforcements must remain outside the central artwork footprint");}
     assert.deepEqual(data.bossLifecycle.initial.objectSlots,["ENEMY_F1","ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF1.objectSlots,[null,"ENEMY_F5"]);assert.deepEqual(data.bossLifecycle.afterF5.objectSlots,[null,null]);assert.ok(data.bossLifecycle.afterF5.roster.includes(3)&&data.bossLifecycle.afterF5.roster.includes(4),"dead Boss objects remain in the lifecycle roster without forcing compaction");
-    assert.ok(data.pageScroll.width<=data.pageScroll.clientWidth+1,`horizontal page scroll ${width}x${height}`);assert.ok(data.pageScroll.height<=data.pageScroll.clientHeight+1,`vertical page scroll ${width}x${height}`);return data;
+    assert.ok(data.pageScroll.width<=data.pageScroll.clientWidth+1,`horizontal page scroll ${width}x${height}`);assert.ok(data.pageScroll.height<=data.pageScroll.clientHeight+1,`vertical page scroll ${width}x${height}`);return data; } catch(error) { fixtureFailure=error; throw error; } finally { try { fs.rmSync(browserProfile,{recursive:true,force:true}); } catch(error) { if(!fixtureFailure)throw error; console.error("Chrome profile cleanup failed:",error); } }
 }
 
 fs.mkdirSync(ARTIFACT_DIR,{recursive:true});
 try{
-    const chrome=findChrome();const results=VIEWPORTS.map(([width,height])=>runViewport(chrome,width,height));
+    const chrome=findChrome();const results=[];for(const [width,height] of VIEWPORTS)results.push(await runViewport(chrome,width,height));
     const evidence={suite:"fixed-slot-battlefield-rendering-v2",passed:true,viewports:results.map(item=>item.viewport),checks:{threeStructuralRegions:true,centerControlsIsolated:true,centerBackgroundRemoved:true,battleLogRemoved:true,currentRoundVisible:true,largeElementBox:true,enemyCounts:[1,3,5,6,8,10],allyCounts:[1,2,3,4,5,6],manualActiveCharacterFlash:true,manualActiveCharacterUnique:true,autoHasNoManualFlash:true,equalEnemyCardGeometry:true,equalAllyCardGeometry:true,sixAllyNoOverlap:true,enlargedUnitCards:true,splitAllyFormation:true,deathDoesNotCompress:true,bossSingleEntity:true,bossSixSlotFootprint:true,bossHudAnchored:true,bossSnapshotIdentityStableAfterObjectDeath:true,bossObjectDeathDoesNotCompact:true,bossSideUnits:["ENEMY_B1","ENEMY_B5","ENEMY_F1","ENEMY_F5"],bossSideUnitsDoNotOverlap:true,bossSideArtworkSeparated:true,bossSideArtworkShiftedOutward:true,bossAndObjectReticles:true,dynamicCardlessImmediate:true,vfxShapes:["single","tri","row","column","all"],vfxCenterUsesGeometry:true,vfxScaleStable:true,artworkKinds:["player","regular","elite","boss","abyss"],artworkNoBattlefieldClip:true,popupKinds:["damage","critical","status","shield","miss","heal","sp"],popupUsesCanonicalUnitGeometry:true,popupCollisionFree:true,popupHudSafe:true,unifiedTypography:true,legacyRuntimeGeometryNeutralized:true,noPageScroll:true},results};
     fs.writeFileSync(path.join(ARTIFACT_DIR,"fixed-slot-battlefield-rendering-v2.json"),JSON.stringify(evidence,null,2)+"\n","utf8");console.log("Fixed Slot Battlefield Rendering V2 mobile browser QA passed:",VIEWPORTS.map(v=>v.join("x")).join(", "));
 }finally{try{fs.unlinkSync(FIXTURE);}catch(_){}}
