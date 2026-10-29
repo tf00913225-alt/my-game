@@ -40,7 +40,8 @@ assert.match(startup,/enterReady\(selectedSave,false,token\)\.catch\(error=>fail
     "hydration failure must reach the fail-closed state for the same resolution token");
 assert.match(startup,/Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\)/,
     "automatic session restore must not hydrate before the DOM is ready");
-assert.match(startup,/await Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\);[\s\S]{0,100}activateGameplaySaveOwner\(\);[\s\S]{0,180}FourSymbolsGameSave\.hydrate\(save\)/,
+const readyPath=startup.slice(startup.indexOf('    async function enterReady('),startup.indexOf('    async function enterCreation('));
+assert.match(readyPath,/await Promise\.all\(\[requireAppShell\(\),domReady\(\)\]\);\s*if\(token!==transitionToken\)\{ return; \}\s*if\(isCurrentSession&&!isCurrentSession\(\)\)\{throw new Error\("Session changed before cloud hydration\."\);\}\s*activateGameplaySaveOwner\(\);[\s\S]{0,180}FourSymbolsGameSave\.hydrate\(save\)/,
     "the resolved Firebase UID must activate the gameplay save owner after app-shell installation and hydrate the already-resolved save payload");
 assert.match(startup,/async function enterCreation\(token=transitionToken\)[\s\S]{0,220}activateGameplaySaveOwner\(\);[\s\S]{0,100}transition\(STATES\.NEED_CHARACTER/,
     "new-character persistence must bind the gameplay save owner before creation is exposed");

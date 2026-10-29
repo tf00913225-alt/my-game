@@ -135,6 +135,7 @@ function adoptionFixture(uid){
     const firebase={getUser:()=>user,getGameSessionState:()=>session,resolveCloudSave:async()=>typeof response==='function'?response():response,
         setUiState:noop,closeAuth:noop};
     const payload=source.slice(source.indexOf('    function cloudPayload('),source.indexOf('    function domReady('));
+    const empty=source.slice(source.indexOf('    function safeCloudEmpty('),source.indexOf('    function cloudPayload('));
     const resolver=source.slice(source.indexOf('    async function resolveSaveFor('),source.indexOf('    function requireAuth('));
     const enter=source.slice(source.indexOf('    async function enterReady('),source.indexOf('    async function enterCreation('));
     const make=new Function('global','firebase','ready','errors',`
@@ -145,8 +146,8 @@ function adoptionFixture(uid){
         const document=global.document,CustomEvent=global.CustomEvent,emit=(name,detail)=>{if(name==='four-symbols:startup-ready')ready.push(detail);};
         const sessionView=()=>JSON.stringify(firebase.getGameSessionState());
         const fail=error=>{errors.push(error);return {blocked:true,error};};
-        const migration=()=>({blocked:true});const safeCloudEmpty=()=>false;
-        ${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
+        const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
+        ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
     const resolve=make(context,firebase,ready,errors);
     return {repo,values,ready,errors,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
@@ -255,4 +256,15 @@ test('actual enterReady refuses Session takeover across app-shell and visual awa
         if(stage==='app-shell')assert.deepEqual(f.runtime.player,{},'takeover before app-shell completion must not hydrate');
         assert.match(f.errors.at(-1).message,/Session changed before cloud/);
     }
+});
+
+test('legacy empty-envelope resolution tolerates initial Session activation without weakening bundle guards',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);let deliver;
+    f.session({uid:h.uid,status:'pending'});
+    const pending=f.load(cuts[0],{waiting:()=>new Promise(resolve=>{deliver=resolve;})});
+    f.session({uid:h.uid,status:'active',sessionId:'initial-session'});
+    deliver({uid:h.uid,exists:true,data:{ownerUid:h.uid,authoritativeStateReady:false,
+        status:'awaiting_authoritative_migration',migrationCandidateStatus:'none'}});
+    assert.equal((await pending).creation,true);assert.equal(f.errors.length,0);
+    assert.equal(f.values.has(f.repo.saveKey(h.uid)),false,'destination resolution never creates a real character');
 });

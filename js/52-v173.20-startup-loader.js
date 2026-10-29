@@ -323,7 +323,8 @@
             return fail(error,"雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",token);
         }
         if(token!==transitionToken){ return; }
-        if(sessionView()!==sessionBefore||firebase.getUser?.()?.uid!==user.uid||repo.getActiveUid()!==user.uid){
+        if(cloud?.data?.authoritativeStateReady===true&&Object.prototype.hasOwnProperty.call(cloud.data,"cloudBundle")&&
+           (sessionView()!==sessionBefore||firebase.getUser?.()?.uid!==user.uid||repo.getActiveUid()!==user.uid)){
             return fail(new Error("Cloud read session changed."),"帳號或 Session 已變更；未採納雲端資料。",token);
         }
         cloudResult=cloud;
