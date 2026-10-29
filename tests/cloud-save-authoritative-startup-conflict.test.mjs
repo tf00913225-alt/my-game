@@ -7,6 +7,76 @@ import {storeHarness,selection,copy} from "../scripts/test-helpers/canonical-sto
 const require=createRequire(import.meta.url);
 const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot");
 
+function deferredMigration(){
+    const values=new Map([['battle_full_version_save_v5',JSON.stringify({player:{id:'legacy-original'}})]]),writes=[];
+    const store={getItem:key=>values.get(key)??null,setItem:(key,value)=>{writes.push(key);values.set(key,String(value));},
+        removeItem:key=>{writes.push(key);values.delete(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
+    const global={localStorage:store};global.window=global;vm.createContext(global);
+    vm.runInContext(readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8'),global);
+    const repo=global.FourSymbolsAccountSave;repo.activate('migration-a');writes.length=0;
+    let resume,reject;const shell=new Promise((yes,no)=>{resume=yes;reject=no;});
+    const operations=readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0];
+    const branch=source.slice(source.indexOf('                if(action==="confirm-migration"'),source.indexOf('                if(action==="cancel-migration"'));
+    const failSource=source.slice(source.indexOf('    function fail('),source.indexOf('    function reloadForAccountTransition('));
+    const make=new Function('global','shell','install',`
+        let activeUser={uid:'migration-a'},transitionToken=1,state='MIGRATION_REQUIRED',cloudResult={data:{authoritativeStateReady:false}},saveResolved=false,lastError=null;
+        let session={uid:'migration-a',status:'active',sessionId:'first'};
+        const STATES={MIGRATION_REQUIRED:'MIGRATION_REQUIRED',ERROR:'ERROR'},errors=[],ready=[];
+        const firebase={getUser:()=>activeUser,getGameSessionState:()=>session};
+        const sessionView=()=>JSON.stringify(session),requireAppShell=()=>shell.then(install);
+        const showCity=()=>{},showLoader=()=>{},status=()=>{},accountUi=()=>{};
+        const transition=value=>{state=value;},emit=(name)=>{if(name==='four-symbols:startup-error')errors.push(lastError);};
+        const enterReady=async save=>{ready.push(save);};
+        ${failSource}
+        return {run:async()=>{const action='confirm-migration';${branch}},
+            cancel:()=>{++transitionToken;state='AUTH_REQUIRED';activeUser=null;},
+            switchUid:()=>{++transitionToken;state='SAVE_LOADING';activeUser={uid:'migration-b'};},
+            changeSession:()=>{session={uid:'migration-a',status:'blocked',sessionId:'replaced'};},
+            state:()=>state,errors,ready};
+    `);
+    const f=make(global,shell,()=>vm.runInContext(operations,global));
+    return {...f,repo,global,values,writes,resume,reject};
+}
+
+test('deferred original writer refuses unloaded migration and save before any writes',()=>{
+    const f=deferredMigration(),before=JSON.stringify([...f.values]);
+    assert.throws(()=>f.repo.writeForUid('migration-a',{player:{id:'a'}}),e=>e.code==='account-writer-unavailable');
+    assert.throws(()=>f.repo.migrateLegacyToUid('migration-a',{confirmed:true}),e=>e.code==='account-writer-unavailable');
+    assert.deepEqual(f.writes,[]);assert.equal(JSON.stringify([...f.values]),before);
+});
+
+test('actual confirmed-migration action waits for shell and rejects changed identity or bytes without writes',async()=>{
+    for(const change of ['none','cancel','uid','session','legacy','local','shell-failure']){
+        const f=deferredMigration(),pending=f.run();assert.deepEqual(f.writes,[]);
+        if(change==='cancel')f.cancel();
+        if(change==='uid')f.switchUid();
+        if(change==='session')f.changeSession();
+        if(change==='legacy')f.values.set('battle_full_version_save_v5',JSON.stringify({player:{id:'changed-legacy'}}));
+        if(change==='local'){
+            f.values.set(f.repo.saveKey('migration-a'),JSON.stringify({player:{id:'changed-local'}}));
+            f.values.set(f.repo.metadataKey('migration-a'),JSON.stringify({ownerUid:'migration-a'}));
+        }
+        const before=JSON.stringify([...f.values]);
+        if(change==='shell-failure')f.reject(Error('app-shell unavailable'));else f.resume();
+        await pending;
+        if(change==='none'){
+            assert.equal(f.repo.readForUid('migration-a').save.player.id,'legacy-original');
+            assert.equal(f.ready.length,1);assert.equal(f.errors.length,0);
+        }else{
+            assert.deepEqual(f.writes,[],change);assert.equal(JSON.stringify([...f.values]),before,change);assert.equal(f.ready.length,0,change);
+        }
+    }
+});
+
+test('late shell rejection after cancel or UID replacement cannot overwrite the new startup state',async()=>{
+    for(const change of ['cancel','uid']){
+        const f=deferredMigration(),pending=f.run();
+        if(change==='cancel')f.cancel();else f.switchUid();
+        const before=f.state();f.reject(Error('late old app-shell failure'));await pending;
+        assert.equal(f.state(),before);assert.deepEqual(f.errors,[]);assert.deepEqual(f.writes,[]);
+    }
+});
+
 // Execute the real decision branch without booting the browser or Firebase.
 const source=readFileSync(new URL("../js/52-v173.20-startup-loader.js",import.meta.url),"utf8");
 const start=source.indexOf("        let selectedSave=authoritative;");
@@ -127,7 +197,7 @@ function adoptionFixture(uid){
         'hydrateEquipmentReforge','normalizePotionInventoryFromLegacy','rebuildInventorySlots','updatePlayerHeader','showPage',
         'updateUI','renderInventory','renderSkillLoadout','normalizeInventoryStacks'])context[name]=noop;
     context.window=context;vm.createContext(context);
-    vm.runInContext(readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8'),context);
+    vm.runInContext((readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8')+readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]),context);
     const main=readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8'),ownerStart=main.indexOf('let SAVE_KEY=null;');
     vm.runInContext(main.slice(ownerStart,main.indexOf('\n});',ownerStart)+4),context);
     vm.runInContext(main.slice(main.indexOf('function saveGame(options={}){'),main.indexOf('function showCreation(){',main.indexOf('function loadGame(){'))),context);
@@ -255,6 +325,23 @@ test('actual enterReady refuses Session takeover across app-shell and visual awa
         assert.equal((await pending).blocked,true);assert.equal(f.ready.length,0);
         if(stage==='app-shell')assert.deepEqual(f.runtime.player,{},'takeover before app-shell completion must not hydrate');
         assert.match(f.errors.at(-1).message,/Session changed before cloud/);
+    }
+});
+
+test('legacy published bare payload still uses the original writer after shell, with current Session',async()=>{
+    const {h,cuts}=await lawfulCuts();
+    for(const blocked of [false,true]){
+        const f=adoptionFixture(h.uid);let resume;
+        f.runtime.__appShellWait=new Promise(resolve=>{resume=resolve;});
+        const pending=f.load(cuts[0],{mutate:response=>{
+            response.data.gameSave=response.data.cloudBundle.gameSave;delete response.data.cloudBundle;
+        }});
+        for(let i=0;i<15;i++)await Promise.resolve();
+        const before=JSON.stringify([...f.values]);assert.equal(f.repo.readForUid(h.uid).status,'empty');
+        if(blocked)f.session({uid:h.uid,status:'blocked',sessionId:'replaced'});
+        resume();const result=await pending;
+        if(blocked){assert.equal(result.blocked,true);assert.equal(JSON.stringify([...f.values]),before);assert.equal(f.ready.length,0);}
+        else {assert.equal(result.ready,true);assert.equal(f.repo.readForUid(h.uid).save.player.id,cuts[0].gameSave.player.id);}
     }
 });
 

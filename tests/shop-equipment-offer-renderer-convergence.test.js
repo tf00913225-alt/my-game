@@ -2,7 +2,7 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 const gear=fs.readFileSync('js/equipment-progression.js','utf8');
 const ui=fs.readFileSync('js/51-v169-rpg-ui.js','utf8');
-const repoSource=fs.readFileSync('js/startup/account-save-repository.js','utf8');
+const repoSource=(fs.readFileSync('js/startup/account-save-repository.js','utf8')+fs.readFileSync('js/00-main.js','utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const content=fs.readFileSync('js/27-v132-content-expansion.js','utf8');
 const inventoryEnd='    window.v132RunInventoryTransaction=runInventoryTransaction;';
 const inventoryOwner=content.slice(content.indexOf('    function getItemInventoryCapacity('),content.indexOf(inventoryEnd)+inventoryEnd.length);

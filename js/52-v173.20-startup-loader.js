@@ -71,11 +71,7 @@
                    cloud.data?.ownerUid!==uid||!Number.isSafeInteger(revision)||revision<1||revision>=Number.MAX_SAFE_INTEGER)throw Error("Unconfirmed");
                 const save=cloudPayload(cloud);if(!save)throw Error("Unconfirmed");
                 if(cloud.data.cloudBundle){
-                    const base=local.metadata?.cloudState;
-                    const matches=base?.serverRevision===revision&&local.metadata.localDirty===false&&
-                        local.cloudSidecarsFingerprint===base.sidecarsFingerprint&&
-                        base.bundleFingerprint===repo.fingerprint({gameSave:save,sidecars:cloud.data.cloudBundle.sidecars})&&
-                        repo.fingerprint(local.save)===(base.normalizedMainFingerprint||local.metadata.cloudBaseFingerprint);
+                    const matches=global.FourSymbolsCloudBundle.matches(repo,local,cloud,save,revision);
                     reportRead(matches?"confirmed":"conflict",revision);return;
                 }
                 reportRead(repo.fingerprint(save)===repo.fingerprint(local.save)?"confirmed":"conflict",revision);
@@ -180,20 +176,8 @@
             data.status==="awaiting_authoritative_migration"&&(data.migrationCandidateStatus||"none")==="none");
     }
     function cloudPayload(result){
-        const data=result&&result.data;
-        if(!data||data.authoritativeStateReady!==true){ return null; }
-        if(Object.prototype.hasOwnProperty.call(data,"cloudBundle")){
-            const bundle=global.FourSymbolsAccountSave.inspectCloudBundle(result.uid,data.cloudBundle);
-            if(result.serverConfirmed!==true||data.ownerUid!==result.uid||data.serverRevision!==bundle.serverRevision){
-                throw Object.assign(new Error("Cloud bundle transport/cut is unconfirmed."),{code:"cloud-authoritative-payload-invalid"});
-            }
-            return bundle.gameSave;
-        }
-        const payload=data.gameSave||data.save||data.authoritativeSave||null;
-        if(!payload||typeof payload!=="object"||Array.isArray(payload)||!payload.player||!payload.player.id){
-            const error=new Error("Authoritative cloud metadata has no valid game-save payload."); error.code="cloud-authoritative-payload-invalid"; throw error;
-        }
-        return payload;
+        if(result?.data?.authoritativeStateReady!==true)return null;
+        return global.FourSymbolsCloudBundle.payload(result);
     }
     function domReady(){
         if(document.readyState!=="loading"){ return Promise.resolve(); }
@@ -249,7 +233,7 @@
         showLoader(); status("載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
-        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud hydration.");}
+        global.FourSymbolsCloudBundle.assertSession(isCurrentSession);
         activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
@@ -261,14 +245,14 @@
         status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
         await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
         if(token!==transitionToken){ return; }
-        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud READY.");}
+        global.FourSymbolsCloudBundle.assertSession(isCurrentSession);
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.setUiState({mode:state,migration:null});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
         if(token!==transitionToken){ return; }
-        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud ready event.");}
+        global.FourSymbolsCloudBundle.assertSession(isCurrentSession);
         mark("four-symbols:main-city-interactive");
         emit("four-symbols:startup-ready",{uid:resolvedUid,offline});
         document.dispatchEvent(new CustomEvent("v173.20:startup-entered"));
@@ -323,9 +307,10 @@
             return fail(error,"雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",token);
         }
         if(token!==transitionToken){ return; }
-        if(cloud?.data?.authoritativeStateReady===true&&Object.prototype.hasOwnProperty.call(cloud.data,"cloudBundle")&&
-           (sessionView()!==sessionBefore||firebase.getUser?.()?.uid!==user.uid||repo.getActiveUid()!==user.uid)){
-            return fail(new Error("Cloud read session changed."),"帳號或 Session 已變更；未採納雲端資料。",token);
+        if(cloud?.data?.authoritativeStateReady===true){
+            try{await requireAppShell();if(token!==transitionToken)return;
+                global.FourSymbolsCloudBundle.checkContext(repo,user,firebase,local);
+            }catch(error){return fail(error,"雲端資料未採納；原資料保留。",token);}
         }
         cloudResult=cloud;
         let authoritative=null;
@@ -343,12 +328,7 @@
         }
         if(authoritative&&cloud.data&&Object.prototype.hasOwnProperty.call(cloud.data,"cloudBundle")){
             try{
-                const session=firebase.getGameSessionState?.();
-                if(session?.status!=="active"||session.uid!==user.uid||typeof session.sessionId!=="string"||!session.sessionId){
-                    throw new Error("Cloud bundle requires an active same-UID session.");
-                }
-                if(JSON.stringify(repo.readForUid(user.uid))!==JSON.stringify(local))throw new Error("Local save changed during cloud read.");
-                repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read",cloudBundle:cloud.data.cloudBundle});
+                global.FourSymbolsCloudBundle.adopt({repo,user,cloud,local,authoritative,firebase,sessionBefore,sessionView});
             }catch(error){return fail(error,"完整雲端資料未採納；原資料與備份保留。",token);}
             saveResolved=true;mark("four-symbols:save-resolved");
             return enterReady(authoritative,false,token,()=>sessionView()===sessionBefore&&
@@ -488,18 +468,22 @@
             firebase=global.FourSymbolsFirebaseLifecycle;
             if(!firebase){ throw new Error("Firebase lifecycle owner did not install."); }
             global.addEventListener("four-symbols:firebase-auth-state",event=>onAuth(event.detail));
-            global.addEventListener("four-symbols:account-ui-action",event=>{
+            global.addEventListener("four-symbols:account-ui-action",async event=>{
                 const action=event.detail&&event.detail.action;
                 if(action==="retry"&&activeUser){ void retrySave(); }
                 if(action==="confirm-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){
+                    const user=activeUser,token=transitionToken;
                     try{
+                        const repo=global.FourSymbolsAccountSave,before=JSON.stringify([repo.readForUid(user.uid),repo.inspectLegacy()]),session=sessionView();
+                        await requireAppShell();
+                        if(token!==transitionToken||activeUser!==user||state!==STATES.MIGRATION_REQUIRED)return;
+                        global.FourSymbolsCloudBundle.checkMigration(repo,user,firebase,before,session);
                         const data=cloudResult&&cloudResult.data;
                         const cloudHas=!!(data&&data.authoritativeStateReady===true);
                         global.FourSymbolsAccountSave.migrateLegacyToUid(activeUser.uid,{confirmed:true,cloudHasCharacter:cloudHas});
                         const migrated=global.FourSymbolsAccountSave.readForUid(activeUser.uid);
-                        const token=transitionToken;
                         saveResolved=true; void enterReady(migrated.save,false,token).catch(error=>fail(error,"migration 後角色載入失敗；原始 legacy 與備份均已保留。",token));
-                    }catch(error){ fail(error,"舊版存檔 migration 失敗；原檔與備份均未刪除。"); }
+                    }catch(error){ fail(error,"舊版存檔 migration 失敗；原檔與備份均未刪除。",token); }
                 }
                 if(action==="cancel-migration"&&state===STATES.MIGRATION_REQUIRED&&activeUser){ firebase.signOut().catch(error=>fail(error,"無法安全退出 migration 流程；資料未被修改。")); }
             });

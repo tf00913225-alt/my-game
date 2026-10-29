@@ -19,7 +19,7 @@ function fixture({state='OFFLINE_READY',cloud,session={uid:'uid-a',status:'activ
         setTimeout:(fn,ms)=>{timers.set(++timerId,{fn,ms});return timerId;},clearTimeout:id=>timers.delete(id),
         addEventListener:(name,fn)=>{if(!events.has(name))events.set(name,[]);events.get(name).push(fn);},
         FourSymbolsAccountSave:repo,__fixture:{firebase,user,state},location:{reload:()=>writes.push('reload')}};
-    context.window=context;vm.createContext(context);vm.runInContext(read('js/startup/startup-contract.js'),context);
+    context.window=context;vm.createContext(context);vm.runInContext(read('js/00-main.js').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0],context);vm.runInContext(read('js/startup/startup-contract.js'),context);
     const retryBranch=startup.slice(startup.indexOf('                if(action==="retry"'),startup.indexOf('                if(action==="confirm-migration"'));
     vm.runInContext(startup.replace('    void boot();',`    firebase=global.__fixture.firebase;activeUser=global.__fixture.user;resolvedUid=activeUser.uid;state=global.__fixture.state;saveResolved=true;global.__fixture.auth=onAuth;global.__fixture.retryAction=()=>{const action="retry";${retryBranch}};`),context);
     return {context,local,calls,writes,messages,timers,policy:context.FourSymbolsStartupPolicy,
