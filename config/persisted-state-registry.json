@@ -79,6 +79,18 @@
     },
     {
       "key": "four_symbols_save_meta:<UID>",
+      "extensions": {
+        "cloudState": {
+          "schemaVersion": 1,
+          "ownerModule": "js/startup/account-save-repository.js",
+          "meaning": "Local provenance only: same-cut serverRevision/canonicalRevision, sourceSnapshotSha256, main-plus-sidecar bundleFingerprint and persisted sidecarsFingerprint; optional normalizedMainFingerprint tracks original hydration-normalization separately from the cloud base; local writes never advance server revision"
+        },
+        "cloudAdoptionPending": {
+          "schemaVersion": 1,
+          "ownerModule": "js/startup/account-save-repository.js",
+          "meaning": "Incomplete multi-key local adoption blocks read/write until recovery; original UID migration backup retained; not a localStorage transaction or server publication authority"
+        }
+      },
       "ownerModule": "js/startup/account-save-repository.js",
       "storageType": "localStorage",
       "scope": "uid",

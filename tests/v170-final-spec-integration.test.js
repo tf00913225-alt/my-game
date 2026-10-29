@@ -280,7 +280,7 @@ function loadFinalRuntime(){
     vm.runInContext(fs.readFileSync("functions/src/equipment-combat-percent-migration.js","utf8"),context);
     vm.runInContext(fs.readFileSync("functions/src/equipment-reforge.js","utf8"),context);
     vm.runInContext(fs.readFileSync("js/equipment-factory.js","utf8"),context);
-    vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),context,{filename:"js/startup/account-save-repository.js"});
+    vm.runInContext((fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]),context,{filename:"js/startup/account-save-repository.js"});
     vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     EXPECTED_DIRECT_SCRIPT_PATHS.forEach(path=>{
         vm.runInContext(fs.readFileSync(path,"utf8"),context,{filename:path,timeout:2000});
@@ -1743,7 +1743,7 @@ test("V2 explicit hit fields survive Daily Owner construction and repeated rende
 test("Level Suppression V2 after ALL generated production feature bundles",()=>{
     const context=makeContext();
     context.document.createDocumentFragment=()=>makeUniversalNode();
-    vm.runInContext(fs.readFileSync('js/startup/account-save-repository.js','utf8'),context);
+    vm.runInContext((fs.readFileSync('js/startup/account-save-repository.js','utf8')+fs.readFileSync('js/00-main.js','utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]),context);
     vm.runInContext('FourSymbolsAccountSave.activate("v170-test-uid")',context);
     const manifest=JSON.parse(fs.readFileSync('asset-manifest.json','utf8'));
     const features=manifest.featureManifest.bundles;

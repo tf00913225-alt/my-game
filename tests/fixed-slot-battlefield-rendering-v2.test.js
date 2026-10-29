@@ -121,7 +121,7 @@ const classes=set=>({add(...names){names.forEach(name=>set.add(name));},remove(.
 const transitionPage={classList:classes(pageClasses)};
 const transitionOverlay={classList:classes(overlayClasses)};
 const transitionContext={
-    window:{v132ActiveDungeonRun:{}},lastWildRankToken:null,battleToken:10,battleActive:true,
+    window:{v132ActiveDungeonRun:{},FourSymbolsBattleFlow:{acquirePresentationLock(){let active=true;return ()=>{assert.ok(active,"entry lock is released once");active=false;};}}},lastWildRankToken:null,battleToken:10,battleActive:true,
     gold:0,sharedExp:0,currentBattleMonsters:[0],getItemCounts(){return [];},
     rebalanceDungeonElements(){},decorateBattleCards(){},renderBattle(){},
     turnStarts:0,startTurn(){transitionContext.turnStarts++;},

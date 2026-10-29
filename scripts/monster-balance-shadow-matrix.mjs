@@ -11,7 +11,7 @@ export function loadLegacyRuntime(){
   const fixture=source.slice(source.indexOf('function makeUniversalNode()'),source.indexOf('function loadFinalRuntime()'));
   const context=new Function('vm','fs',fixture+';return makeContext();')(vm,fs);
   context.document.createDocumentFragment=()=>context.document.createElement('fragment');
-  vm.runInContext(fs.readFileSync('js/startup/account-save-repository.js','utf8'),context);
+  vm.runInContext((fs.readFileSync('js/startup/account-save-repository.js','utf8')+fs.readFileSync('js/00-main.js','utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]),context);
   vm.runInContext('FourSymbolsAccountSave.activate("monster-shadow-isolated-fixture")',context);
   const build=fs.readFileSync('scripts/build-production.mjs','utf8');
   const paths=[];
