@@ -1,0 +1,5 @@
+# UI shop and experience synthetic evidence
+
+Source checkpoint: 589970aca85f5f6181373ffca32f09b90544e2d2. Local synthetic QA uses a fresh Chrome profile and existing synthetic authentication/cloud/session stubs. Screenshots cover 360x640, 393x873, 412x915 and 1280x800; mobile input is emulated, not a physical device. The included script records title/back geometry, long-title screenshots, wheel scroll observations, and executes back clicks. Programmatic entry and tab switching are setup, not user-input acceptance. The earlier ui1016-product-qa-ready images used the wrong cwd and are excluded. A failed initial hidden-button selector attempt is excluded.
+
+Independent reviewer inspected earlier same-head long-title screenshots: visually centered without clipping or overlap; bottom content requires scroll verification. Art reviewer previously identified that frame ornamentation may be insufficient. Touch scrolling, real tab switching, detail actions, physical devices and deployment remain unverified. Do not treat screenshots as complete interaction or visual approval. CI for this evidence commit is not inherited from the source checkpoint.
