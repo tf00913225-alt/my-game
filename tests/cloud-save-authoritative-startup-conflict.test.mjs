@@ -201,8 +201,9 @@ function adoptionFixture(uid){
     const main=readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8'),ownerStart=main.indexOf('let SAVE_KEY=null;');
     vm.runInContext(main.slice(ownerStart,main.indexOf('\n});',ownerStart)+4),context);
     vm.runInContext(main.slice(main.indexOf('function saveGame(options={}){'),main.indexOf('function showCreation(){',main.indexOf('function loadGame(){'))),context);
-    const repo=context.FourSymbolsAccountSave;let response,user={uid},session={uid,status:'active',sessionId:'session-one'};
-    const firebase={getUser:()=>user,getGameSessionState:()=>session,resolveCloudSave:async()=>typeof response==='function'?response():response,
+    const repo=context.FourSymbolsAccountSave,reads=[];let response,user={uid},session={uid,status:'active',sessionId:'session-one'};
+    const firebase={getUser:()=>user,getGameSessionState:()=>session,resolveCloudSave:async(user,options)=>{
+        reads.push({uid:user.uid,options});return typeof response==='function'?response():response;},
         setUiState:noop,closeAuth:noop};
     const payload=source.slice(source.indexOf('    function cloudPayload('),source.indexOf('    function domReady('));
     const empty=source.slice(source.indexOf('    function safeCloudEmpty('),source.indexOf('    function cloudPayload('));
@@ -219,7 +220,7 @@ function adoptionFixture(uid){
         const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
         ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
     const resolve=make(context,firebase,ready,errors);
-    return {repo,values,ready,errors,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
+    return {repo,values,ready,errors,reads,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
             const before=ready.length;
             response=waiting||{uid,exists:true,serverConfirmed:true,data:{ownerUid:uid,serverRevision:bundle.serverRevision,
@@ -227,6 +228,27 @@ function adoptionFixture(uid){
             if(mutate)mutate(response);return resolve(user).then(result=>result||(ready.length>before?{ready:true}:undefined));
         }};
 }
+test('initial actual Boot resolution requests server confirmation before bundle adoption',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    assert.equal(f.reads.length,1);assert.equal(f.reads[0].uid,h.uid);
+    assert.equal(f.reads[0].options?.serverOnly,true,'the original Firestore Owner only confirms an explicit server-only read');
+});
+
+test('unconfirmed initial server read preserves a verified local fallback and cannot create an empty account',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    await f.load(cuts[0]);
+    const local=f.repo.readForUid(h.uid),rawSidecars=f.repo.BACKUP_SIDECARS.map(name=>f.values.get(f.repo.accountKey(name,h.uid)));
+    const refuse=()=>Promise.reject(Object.assign(Error('Server confirmation unavailable'),{code:'cloud-server-unconfirmed'}));
+    assert.equal((await f.load(cuts[1],{waiting:refuse})).ready,true);
+    assert.equal(f.ready.at(-1).offline,true);
+    assert.equal(f.repo.readForUid(h.uid).metadata.cloudState.serverRevision,local.metadata.cloudState.serverRevision);
+    assert.deepEqual(f.repo.BACKUP_SIDECARS.map(name=>f.values.get(f.repo.accountKey(name,h.uid))),rawSidecars);
+    const empty=adoptionFixture(h.uid);
+    assert.equal((await empty.load(cuts[0],{waiting:refuse})).blocked,true);
+    assert.equal(empty.ready.length,0);assert.equal(empty.repo.readForUid(h.uid).status,'empty');
+});
+
 test('original lawful cuts traverse actual Boot/repository main and sidecars, preserve revisions and old bytes',async()=>{
     const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
     assert.notDeepEqual(cuts[0].sidecars,cuts[1].sidecars);
