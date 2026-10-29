@@ -296,7 +296,7 @@
         catch(error){ return fail(error,"本機帳號存檔無法安全讀取。",token); }
         let cloud;
         const sessionBefore=sessionView();
-        try{ cloud=await firebase.resolveCloudSave(user); }
+        try{ cloud=await firebase.resolveCloudSave(user,{serverOnly:true}); }
         catch(error){
             if(token!==transitionToken){ return; }
             if(local.status==="ready"){
