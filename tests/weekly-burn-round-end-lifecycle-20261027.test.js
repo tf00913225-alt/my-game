@@ -104,7 +104,12 @@ test("Burn ticks exactly twice on real round_end for player and monster, then ex
     assert.deepEqual(f.dotCalls.map(call=>call.amount),[100,100,100,100]);
     assert.equal(f.visualCalls.length,4);
 
-    f.context.battleActive=false;
-    f.context.consumeRoundEndDurations();
-    assert.equal(f.dotCalls.length,4,"battle teardown must not tick Burn");
+    const inactive=burnRoundFixture();
+    inactive.context.battleActive=false;
+    inactive.context.consumeRoundEndDurations();
+    assert.equal(inactive.dotCalls.length,0,"battle teardown must not tick an unexpired Burn");
+    assert.equal(inactive.monster.hp,500);
+    assert.equal(inactive.character.hp,500);
+    assert.equal(inactive.monster.statusEffects[0].turnsLeft,2);
+    assert.equal(inactive.character.statusEffects[0].turnsLeft,2);
 });
