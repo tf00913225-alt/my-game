@@ -11,6 +11,6 @@ const policy=main.slice(main.indexOf('const GENERAL_NEGATIVE_STATUS_TYPES='),mai
 const body=fixture.slice(start,end);
 const factory=new Function('vm','repositorySource','summarySource','source','shieldSource','combatSource','policySource',body+';return createRuntime;');
 module.exports=factory(vm,
-  fs.readFileSync('js/startup/account-save-repository.js','utf8'),
+  fs.readFileSync('js/startup/account-save-repository.js','utf8')+main.split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0],
   fs.readFileSync('js/relic-summary-catalog.js','utf8'),
   fs.readFileSync('js/60-team-relic-system.js','utf8'),shield,combat,policy);

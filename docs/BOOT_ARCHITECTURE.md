@@ -27,6 +27,8 @@
 | 正式版本檢查、跑馬燈與共用更新視窗協調 | `js/release-update-notification.js` + `release/release-update.json` |
 | 巡怪圖片 | `js/26-v131-patrol-appearance.js` 與 `assets/characters/patrol/*.webp` |
 
+P4 完整封包的實作分段沿用同一 Owner：Critical repository 保留 UID 讀取、pending 拒絕、既有 migration／backup 與凍結同步 API；唯一 writer／封包查核實作固定在既有 app-shell 的 `js/00-main.js` 最前端固定 Owner 區段（`ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN/END`），不提供註冊或替換 writer 的入口。未載入即拒絕，migration 必須在 activate／backup 等任何寫入前確認 writer。Startup 仍決定 destination／hydrate／READY；cloud payload 解碼與新增 bundle 決策 helper 不另建立狀態機。舊／新 cloud 寫入先等待 app-shell，confirmed migration 等待前後保留 token、UID、Session 與本機／legacy bytes 檢查；過時失敗只作用於原 token。此分段只解除 Boot 大小阻塞，不啟用 backend publisher，不代表正式換機或雲端恢復驗收完成。
+
 不得新增另一個 startup owner、全域 runtime gate、帳號 bypass loader 或 `*-fix-loading.js` 類後置 patch。
 
 Display tokens 位於 Critical Boot 的 `css/00-main.css`，app-shell 的 scaler／座標 Owner 直接消費同一來源。Boot／Auth 不依賴 app scaler；`#startupLoader` 與 Auth 同屬 browser boundary，直接掛在 body，不能放入會 transform 的 `#game-stage`。Startup 是載入遮罩唯一可見性 Owner；Mobile Lifecycle 只記錄 session，不得提前隱藏遮罩。退出沿用 CSS 的 360ms fade，重新顯示時取消尚未完成的舊退出。一般 UI 與戰鬥局部舞台的遷移邊界由 `UI_GUIDELINES.md` 第十三節控制。不得因 responsive 工程新增 Critical feature、重跑 Startup 或搬動 Auth／Save destination 決策。

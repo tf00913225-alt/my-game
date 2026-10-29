@@ -78,7 +78,7 @@ const saveContext=vm.createContext({console,window:{FourSymbolsHeroCore:core,loc
     SAVE_KEY:"four_symbols_save:hero-uid",normalizeInventoryStacks:()=>{},sharedExp:7,gold:legacy.gold,
     dailyQuestState:{},commissionQuestState:{},bestiaryData:{},achievementState:{},selectedCreationElement:"fire",
     characterEquipment:{},characterSkillLoadouts:legacy.characterSkillLoadouts,autoConfig:{},autoConfig2:{},autoConfig3:{},inventoryItems:legacy.inventoryItems});
-vm.runInContext(fs.readFileSync("js/startup/account-save-repository.js","utf8"),saveContext);
+vm.runInContext((fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]),saveContext);
 saveContext.window.FourSymbolsAccountSave.activate("hero-uid");
 vm.runInContext(main.slice(main.indexOf("function saveGame("),main.indexOf("function normalizeHydratedRetiredSkillReferences(")),saveContext);
 assert.equal(saveContext.saveGame(),true);

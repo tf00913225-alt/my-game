@@ -3,7 +3,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 const vm=require("node:vm");
 const source=fs.readFileSync("js/23-v125-character-creation-bootstrap.js","utf8");
-const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const accountSource=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const TEST_UID="creation-guard-test";
 
 function harness(options={}){
