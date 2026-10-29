@@ -3025,7 +3025,6 @@
     image-rendering:auto !important;
     transform:translateZ(0);
     backface-visibility:hidden;
-    will-change:transform;
 }
 
 #game-stage #mapPage #patrolCharacterWrap{
