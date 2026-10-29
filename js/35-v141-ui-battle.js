@@ -678,6 +678,7 @@
     if(typeof startTurn==="function"){
         const originalStartTurn=startTurn;
         startTurn=function(token){
+            if(token!==battleToken){ return; }
             if(!battleActive||startedEntryTokens.has(token)){
                 return originalStartTurn.apply(this,arguments);
             }
@@ -685,17 +686,27 @@
             const overlay=ensureBattleTransitionOverlay();
             const page=document.getElementById("battlePage");
             transitionRunning=true;
+            const releaseEntryLock=window.FourSymbolsBattleFlow.acquirePresentationLock("battle-entry");
             if(overlay){ overlay.classList.add("show"); }
             setTimeout(()=>{
+                if(!battleActive||token!==battleToken){
+                    if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                    return;
+                }
                 if(overlay){ overlay.classList.remove("show"); }
                 if(page){
                     page.classList.remove("v141-preparing-entry");
                     page.classList.add("v141-entry-moving");
                 }
                 setTimeout(()=>{
+                    if(!battleActive||token!==battleToken){
+                        if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                        return;
+                    }
                     if(page){ page.classList.remove("v141-entry-moving"); }
                     transitionRunning=false;
-                    if(battleActive&&token===battleToken){ originalStartTurn.call(this,token); }
+                    try{ originalStartTurn.call(this,token); }
+                    finally{ releaseEntryLock(); }
                 },720);
             },1000);
         };

@@ -3,7 +3,7 @@ const assert=require("node:assert/strict");
 const fs=require("node:fs");
 
 const startup=fs.readFileSync("js/52-v173.20-startup-loader.js","utf8");
-const repository=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const repository=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 
 const transition=startup.slice(
     startup.indexOf("function reloadForAccountTransition"),

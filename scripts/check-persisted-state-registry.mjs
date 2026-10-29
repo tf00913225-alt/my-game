@@ -13,14 +13,14 @@ for(const row of rows){
  if(!fs.existsSync(path.join(root,row.ownerModule)))errors.push(`owner missing: ${row.ownerModule}`);
 }
 const writerCounts={
- 'js/00-main.js':1,'js/25-v131-fix-batch.js':1,'js/26-v131-patrol-appearance.js':1,
+ 'js/00-main.js':14,'js/25-v131-fix-batch.js':1,'js/26-v131-patrol-appearance.js':1,
  'js/27-v132-content-expansion.js':1,'js/28-v133-economy-rebalance.js':1,
  'js/32-v139-rested-experience.js':1,'js/34-v141-core-systems.js':1,
  'js/35-v141-ui-battle.js':3,'js/36-v141-content-systems.js':1,
  'js/equipment-progression.js':1,'js/53-v173.50-inventory-qol.js':1,
  'js/55-v173.51-inventory-qa.js':1,'js/59-abyss-two-tier-runtime.js':1,
  'js/firebase/session-client.js':1,'js/firebase/firebase-session.js':2,'js/release-update-notification.js':1,
- 'js/startup/account-save-repository.js':12,'js/startup/first-play-resource-loader.js':1,
+ 'js/startup/account-save-repository.js':6,'js/startup/first-play-resource-loader.js':1,
  'privacy-consent.html':1
 };
 const writer=/\b(?:localStorage|sessionStorage|storage\(\)|storage|global\.localStorage|window\.sessionStorage|storage\?)\??\.setItem\s*\(/g;
@@ -35,8 +35,16 @@ function inspect(file,source){
    errors.push(`${file}: historical-only equipment-shop-purchases requires an owner and claim-policy review before runtime use`);
   }
  }
+ // Only the physically moved original AccountSave implementation retains
+ // its existing dynamic BACKUP_SIDECARS policy. Main's other code stays guarded.
+ let accountSource=source;
+ if(file==='js/00-main.js'){
+  const begin='/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */',end='/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */';
+  if(source.split(begin).length!==2||source.split(end).length!==2||source.indexOf(end)<source.indexOf(begin))errors.push('fixed AccountSave Owner segment missing or duplicated');
+  else accountSource=source.slice(0,source.indexOf(begin))+source.slice(source.indexOf(end)+end.length);
+ }
  if(file!=='js/startup/account-save-repository.js'){
-  for(const match of source.matchAll(/\baccountKey\s*\(\s*([^\s,)]+)/g)){
+  for(const match of accountSource.matchAll(/\baccountKey\s*\(\s*([^\s,)]+)/g)){
    if(!/^['"]/.test(match[1]))errors.push(`${file}: dynamic accountKey suffix requires an explicit registry policy`);
   }
  }
@@ -64,6 +72,15 @@ if(process.argv.includes('--self-test')){
  inspect('js/25-v131-fix-batch.js',`localStorage.setItem('newReward', '1');`);
  inspect('js/new-account-writer.js',`const key=accountKey(suffix);`);
  inspect('js/new-historical-writer.js',`const key=accountKey('equipment-shop-purchases');`);
+ const main=fs.readFileSync(path.join(root,'js/00-main.js'),'utf8');
+ const marker='/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */';
+ const dynamicBefore=errors.length;
+ inspect('js/00-main.js',main+'\nconst forbidden=accountKey(unregisteredSuffix);');
+ if(!errors.slice(dynamicBefore).some(error=>error.includes('dynamic accountKey')))throw Error('Main outside the AccountSave segment must reject dynamic suffixes.');
+ for(const broken of [main.replace(marker,''),main+'\n'+marker]){
+  const markerBefore=errors.length;inspect('js/00-main.js',broken);
+  if(!errors.slice(markerBefore).some(error=>error.includes('fixed AccountSave Owner segment')))throw Error('Missing/duplicate AccountSave markers must fail closed.');
+ }
  const probes=errors.slice(before).join('\n');
  if(!probes.includes('newReward')||!probes.includes('IndexedDB')||
     !probes.includes('dynamic accountKey')||!probes.includes('historical-only equipment-shop-purchases')){

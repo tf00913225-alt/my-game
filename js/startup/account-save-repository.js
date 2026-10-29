@@ -112,77 +112,29 @@
         if(!metadata || metadata.ownerUid!==uid){
             throw coded("account-owner-mismatch","Local save ownership cannot be verified.");
         }
-        return {status:"ready",uid,save,metadata};
+        if(metadata.cloudAdoptionPending===true){
+            throw coded("account-cloud-adoption-incomplete","Cloud adoption is incomplete; the original backup must be retained.");
+        }
+        const cloudSidecarsFingerprint=metadata.cloudState?fingerprint(Object.fromEntries(BACKUP_SIDECARS.map(name=>{
+            const value=storage().getItem(accountKey(name,uid));
+            return [name,value===null?{status:"missing",raw:null}:{status:"present",raw:value}];
+        }))):null;
+        return {status:"ready",uid,save,metadata,...(metadata.cloudState?{cloudSidecarsFingerprint}:{})};
     }
     function readActive(){
         const uid=getActiveUid();
         return uid ? readForUid(uid) : {status:"inactive",uid:null,save:null,metadata:null};
     }
-    function writeForUid(uid,save,options={}){
-        uid=validUid(uid);
-        if(!save || typeof save!=="object" || Array.isArray(save)){
-            throw coded("account-save-invalid","Save must be an object.");
-        }
-        const active=getActiveUid();
-        if(active!==uid){ throw coded("account-not-active","Refusing to write a non-active account save."); }
-        const key=saveKey(uid);
-        const metaKey=metadataKey(uid);
-        const previousRaw=storage().getItem(key);
-        const previousMeta=storage().getItem(metaKey);
-        // The existing local equipment shop commits its batch receipt with
-        // gold/inventory through this same rollback boundary. No Cloud authority.
-        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily"):null;
-        const previousShop=shopKey?storage().getItem(shopKey):null;
-        const shopRaw=shopKey?JSON.stringify(options.equipmentShopState):null;
-        let previousMetadata=null;
-        if(previousMeta){
-            try{ previousMetadata=JSON.parse(previousMeta); }
-            catch(cause){ throw coded("account-metadata-corrupt","Account save metadata is corrupt.",cause); }
-            if(!previousMetadata||previousMetadata.ownerUid!==uid){
-                throw coded("account-owner-mismatch","Existing local save ownership cannot be verified.");
-            }
-        }
-        const raw=JSON.stringify(save);
-        const source=String(options.source||"local");
-        const explicitBase=Object.prototype.hasOwnProperty.call(options,"cloudBaseFingerprint");
-        const cloudBaseFingerprint=explicitBase
-            ? (options.cloudBaseFingerprint===null?null:String(options.cloudBaseFingerprint||""))
-            : (previousMetadata&&previousMetadata.cloudBaseFingerprint||null);
-        if(cloudBaseFingerprint!==null&&!/^v1:[0-9a-f]+:[0-9a-f]{32}$/.test(cloudBaseFingerprint)){
-            throw coded("account-cloud-base-invalid","Cloud save provenance fingerprint is invalid.");
-        }
-        let localDirty;
-        if(typeof options.localDirty==="boolean"){
-            localDirty=options.localDirty;
-        }else if(source==="authoritative-cloud-read"){
-            localDirty=false;
-        }else if(source==="hydration-normalization"){
-            localDirty=previousMetadata?previousMetadata.localDirty===true:true;
-        }else{
-            localDirty=true;
-        }
-        const metadata=JSON.stringify({
-            schemaVersion:SCHEMA_VERSION,
-            ownerUid:uid,
-            source,
-            cloudBaseFingerprint,
-            localDirty,
-            updatedAt:Date.now()
-        });
-        try{
-            storage().setItem(key,raw);
-            storage().setItem(metaKey,metadata);
-            if(shopKey){ storage().setItem(shopKey,shopRaw); }
-        }catch(error){
-            try{
-                if(previousRaw===null){ storage().removeItem(key); }else{ storage().setItem(key,previousRaw); }
-                if(previousMeta===null){ storage().removeItem(metaKey); }else{ storage().setItem(metaKey,previousMeta); }
-                if(shopKey){ if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); } }
-            }catch(_){ }
-            throw coded("account-save-write-failed","Account save could not be committed atomically.",error);
-        }
-        return {uid,key,metadata:JSON.parse(metadata)};
-    }
+    // Transport/schema screening only, never publication or reward authority.
+    function writerOperations(){
+ const value=global.FourSymbolsAccountSaveOperations;
+ if(!value)throw coded("account-writer-unavailable","Account writer must load before any save operation.");
+ return value;
+ }
+ function writerContext(){return {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave};}
+ function inspectCloudBundle(uid,bundle){return writerOperations().inspectCloudBundle(writerContext(),uid,bundle);}
+ function writeForUid(uid,save,options={}){return writerOperations().writeForUid(writerContext(),uid,save,options);}
+
     function inspectLegacy(){
         let raw;
         try{ raw=storage().getItem(LEGACY_KEY); }
@@ -377,6 +329,7 @@
             authoritativeStateReady:false,backups});
     }
     function migrateLegacyToUid(uid,options={}){
+        writerOperations();
         uid=validUid(uid);
         if(options.confirmed!==true){ throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation."); }
         const legacy=inspectLegacy();
@@ -425,7 +378,7 @@
 
     global.FourSymbolsAccountSave=Object.freeze({
         SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
-        saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
+        saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,inspectCloudBundle,
         migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
         migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
         exportMigrationBackups,recoverArchivedMigrationSidecars,BACKUP_SIDECARS

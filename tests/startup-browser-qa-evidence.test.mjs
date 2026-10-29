@@ -1,8 +1,36 @@
 import assert from 'node:assert/strict';
+import fs from 'node:fs';
 import http from 'node:http';
 import vm from 'node:vm';
 import test from 'node:test';
 import {startServer,collectStartupFailure} from '../.github/scripts/runtime-browser-qa-support.mjs';
+
+test('Daily QA waits for the Startup Owner without losing the existing readiness conditions or deadline',async()=>{
+    const source=fs.readFileSync('.github/scripts/run-daily-balance-browser-qa.mjs','utf8');
+    const waitSource=source.match(/^ const wait=(.*);$/m)[1];
+    const condition=source.match(/^ await wait\(\(\)=>(.*)\);$/m)[1];
+    let elapsed=0;
+    const state={window:{},performance:{now:()=>elapsed},Error,
+        document:{getElementById:id=>id==='startupLoader'?{hidden:true}:id==='gameInterface'?{}:{classList:{contains:()=>false}}},
+        getComputedStyle:()=>({display:'block'}),check:(value,message)=>assert.ok(value,message)};
+    state.setTimeout=(resolve,ms)=>{elapsed+=ms;if(elapsed>=80)state.window.FourSymbolsStartupPolicy={getState:()=> 'READY'};resolve();};
+    const context=vm.createContext(state);
+    const ready=vm.runInContext('(()=>'+condition+')',context);
+    assert.equal(ready(),false,'the original Owner may not be installed yet');
+    await vm.runInContext('('+waitSource+')',context)(ready);
+    assert.equal(elapsed,80,'wait for actual Owner installation rather than throwing or bypassing readiness');
+    state.window.FourSymbolsStartupPolicy={getState:()=> 'AUTH_REQUIRED'};assert.equal(ready(),false);
+    state.window.FourSymbolsStartupPolicy={getState:()=> 'READY'};
+    state.document.getElementById=id=>id==='startupLoader'?{hidden:false}:{};assert.equal(ready(),false);
+    state.document.getElementById=id=>id==='startupLoader'?{hidden:true}:id==='gameInterface'?{}:{classList:{contains:()=>true}};assert.equal(ready(),false);
+    state.document.getElementById=id=>id==='startupLoader'?{hidden:true}:id==='gameInterface'?{}:{classList:{contains:()=>false}};
+    state.getComputedStyle=()=>({display:'none'});assert.equal(ready(),false);
+    state.getComputedStyle=()=>({display:'block'});assert.equal(ready(),true);
+    delete state.window.FourSymbolsStartupPolicy;elapsed=0;
+    state.setTimeout=(resolve,ms)=>{elapsed+=ms;resolve();};
+    await assert.rejects(vm.runInContext('('+waitSource+')',context)(ready),/Runtime wait:/);
+    assert.equal(elapsed,30000,'missing Owner still fails at the unchanged finite deadline');
+});
 
 test('deployed QA proxy preserves failed status and bounded path evidence without retrying',async()=>{
     let calls=0;

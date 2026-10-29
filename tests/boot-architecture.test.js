@@ -18,6 +18,15 @@ const boot=JSON.parse(fs.readFileSync("config/boot-manifest.json","utf8"));
 assert.doesNotMatch(productionBuild,/js\/22-v124-character-creation-native-runtime\.js|css\/28-v124-character-creation-native\.css/,
     "retired V124 creation owners must not re-enter the production app-shell");
 const manifest=JSON.parse(fs.readFileSync("asset-manifest.json","utf8"));
+const productionBuilder=fs.readFileSync("scripts/build-production.mjs","utf8");
+const bootList=productionBuilder.match(/const bootScripts=\[([\s\S]*?)\];/)[1];
+const appList=productionBuilder.match(/const appScripts=\[([\s\S]*?)\];/)[1];
+assert.doesNotMatch(bootList,/account-save-operations/);
+const mainSource=fs.readFileSync("js/00-main.js","utf8");
+assert.ok(mainSource.indexOf("/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */")<mainSource.indexOf("let SAVE_KEY=null;"));
+assert.equal(mainSource.split("/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */").length,2);
+assert.equal(mainSource.split("/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */").length,2);
+assert.ok(appList.indexOf('"js/00-main.js"')>=0);
 
 const directScripts=[...index.matchAll(/<script\b[^>]*\bsrc="([^"]+)"/g)].map(match=>match[1]);
 const scriptTags=[...index.matchAll(/<script\b[^>]*>/g)];
