@@ -70,6 +70,14 @@
                 if(JSON.stringify(local)!==before||local.status!=="ready"||cloud?.uid!==uid||cloud.serverConfirmed!==true||!cloud.exists||
                    cloud.data?.ownerUid!==uid||!Number.isSafeInteger(revision)||revision<1||revision>=Number.MAX_SAFE_INTEGER)throw Error("Unconfirmed");
                 const save=cloudPayload(cloud);if(!save)throw Error("Unconfirmed");
+                if(cloud.data.cloudBundle){
+                    const base=local.metadata?.cloudState;
+                    const matches=base?.serverRevision===revision&&local.metadata.localDirty===false&&
+                        local.cloudSidecarsFingerprint===base.sidecarsFingerprint&&
+                        base.bundleFingerprint===repo.fingerprint({gameSave:save,sidecars:cloud.data.cloudBundle.sidecars})&&
+                        repo.fingerprint(local.save)===(base.normalizedMainFingerprint||local.metadata.cloudBaseFingerprint);
+                    reportRead(matches?"confirmed":"conflict",revision);return;
+                }
                 reportRead(repo.fingerprint(save)===repo.fingerprint(local.save)?"confirmed":"conflict",revision);
             }catch(_){
                 if(isCurrent()){ reportRead("unconfirmed"); }
@@ -174,6 +182,13 @@
     function cloudPayload(result){
         const data=result&&result.data;
         if(!data||data.authoritativeStateReady!==true){ return null; }
+        if(Object.prototype.hasOwnProperty.call(data,"cloudBundle")){
+            const bundle=global.FourSymbolsAccountSave.inspectCloudBundle(result.uid,data.cloudBundle);
+            if(result.serverConfirmed!==true||data.ownerUid!==result.uid||data.serverRevision!==bundle.serverRevision){
+                throw Object.assign(new Error("Cloud bundle transport/cut is unconfirmed."),{code:"cloud-authoritative-payload-invalid"});
+            }
+            return bundle.gameSave;
+        }
         const payload=data.gameSave||data.save||data.authoritativeSave||null;
         if(!payload||typeof payload!=="object"||Array.isArray(payload)||!payload.player||!payload.player.id){
             const error=new Error("Authoritative cloud metadata has no valid game-save payload."); error.code="cloud-authoritative-payload-invalid"; throw error;
@@ -230,10 +245,11 @@
         }
         creation.setAttribute("aria-hidden","false");
     }
-    async function enterReady(save,offline=false,token=transitionToken){
+    async function enterReady(save,offline=false,token=transitionToken,isCurrentSession=null){
         showLoader(); status("載入角色資料",offline?"使用已驗證 UID 的本機存檔離線繼續":"準備第一個可操作畫面");
         await Promise.all([requireAppShell(),domReady()]);
         if(token!==transitionToken){ return; }
+        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud hydration.");}
         activateGameplaySaveOwner();
         const loaded=global.FourSymbolsGameSave&&typeof global.FourSymbolsGameSave.hydrate==="function"&&global.FourSymbolsGameSave.hydrate(save);
         if(!loaded){ throw new Error("Resolved account save could not hydrate gameplay state."); }
@@ -245,12 +261,14 @@
         status("準備主城畫面","正在完成首屏圖片、字型與版面繪製");
         await global.FourSymbolsHomeRelicSummary.prepareFirstScreenVisuals();
         if(token!==transitionToken){ return; }
+        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud READY.");}
         transition(offline?STATES.OFFLINE_READY:STATES.READY,{uid:resolvedUid});
         firebase.setUiState({mode:state,migration:null});
         firebase.closeAuth(); status("載入完成","主城已可操作");
         mark("four-symbols:critical-ready");
         await hideLoader();
         if(token!==transitionToken){ return; }
+        if(isCurrentSession&&!isCurrentSession()){throw new Error("Session changed before cloud ready event.");}
         mark("four-symbols:main-city-interactive");
         emit("four-symbols:startup-ready",{uid:resolvedUid,offline});
         document.dispatchEvent(new CustomEvent("v173.20:startup-entered"));
@@ -293,6 +311,7 @@
         try{ local=repo.readForUid(user.uid); }
         catch(error){ return fail(error,"本機帳號存檔無法安全讀取。",token); }
         let cloud;
+        const sessionBefore=sessionView();
         try{ cloud=await firebase.resolveCloudSave(user); }
         catch(error){
             if(token!==transitionToken){ return; }
@@ -304,6 +323,9 @@
             return fail(error,"雲端存檔尚未確認；為避免誤判新玩家，禁止創角。",token);
         }
         if(token!==transitionToken){ return; }
+        if(sessionView()!==sessionBefore||firebase.getUser?.()?.uid!==user.uid||repo.getActiveUid()!==user.uid){
+            return fail(new Error("Cloud read session changed."),"帳號或 Session 已變更；未採納雲端資料。",token);
+        }
         cloudResult=cloud;
         let authoritative=null;
         try{ authoritative=cloudPayload(cloud); }
@@ -314,6 +336,22 @@
         }
         if(authoritative&&legacy.status==="available"){
             return migration("雲端已有角色，同時偵測到未綁定舊版角色。系統禁止自動覆寫；請保留資料並由後續衝突處理流程處理。",true);
+        }
+        if(authoritative&&local.metadata?.cloudState&&!Object.prototype.hasOwnProperty.call(cloud.data,"cloudBundle")){
+            return fail(new Error("Cloud bundle downgrade."),"完整雲端資料不可退回未綁定的主存檔。",token);
+        }
+        if(authoritative&&cloud.data&&Object.prototype.hasOwnProperty.call(cloud.data,"cloudBundle")){
+            try{
+                const session=firebase.getGameSessionState?.();
+                if(session?.status!=="active"||session.uid!==user.uid||typeof session.sessionId!=="string"||!session.sessionId){
+                    throw new Error("Cloud bundle requires an active same-UID session.");
+                }
+                if(JSON.stringify(repo.readForUid(user.uid))!==JSON.stringify(local))throw new Error("Local save changed during cloud read.");
+                repo.writeForUid(user.uid,authoritative,{source:"authoritative-cloud-read",cloudBundle:cloud.data.cloudBundle});
+            }catch(error){return fail(error,"完整雲端資料未採納；原資料與備份保留。",token);}
+            saveResolved=true;mark("four-symbols:save-resolved");
+            return enterReady(authoritative,false,token,()=>sessionView()===sessionBefore&&
+                firebase.getUser?.()?.uid===user.uid&&repo.getActiveUid()===user.uid).catch(error=>fail(error,"角色載入失敗。",token));
         }
         let selectedSave=authoritative;
         if(authoritative&&local.status==="ready"){

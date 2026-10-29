@@ -9,7 +9,7 @@ function fixture({state='OFFLINE_READY',cloud,session={uid:'uid-a',status:'activ
     const events=new Map(),timers=new Map(),messages=[],calls=[],writes=[];
     let timerId=0,user={uid:'uid-a'},currentSession=session;
     const local={status:'ready',save:{player:{id:'character-a'},gold:10},metadata:{ownerUid:'uid-a',cloudBaseFingerprint:'base',localDirty:true}};
-    const repo={getActiveUid:()=>user?.uid,readForUid:()=>structuredClone(local),fingerprint:JSON.stringify,
+    const repo={getActiveUid:()=>user?.uid,readForUid:()=>structuredClone(local),fingerprint:JSON.stringify,inspectCloudBundle:(_,bundle)=>bundle,
         writeForUid:()=>writes.push('write'),activate:()=>writes.push('activate'),deactivate:()=>writes.push('deactivate')};
     const firebase={getUser:()=>user,getGameSessionState:()=>currentSession,
         resolveCloudSave:(...args)=>{calls.push(args);return cloud?cloud(...args):Promise.resolve({uid:'uid-a',exists:true,serverConfirmed:true,data:{ownerUid:'uid-a',authoritativeStateReady:true,serverRevision:4,gameSave:structuredClone(local.save)}});},
@@ -34,6 +34,23 @@ test('actual startup Owner observes online once and only confirms cloud read wit
     assert.deepEqual(f.local,before);assert.deepEqual(f.writes,[]);assert.equal(f.messages.includes('open'),false);
     await f.fire('online');assert.equal(f.calls.length,1);
     f.policy.openAccountManager();assert.match(f.messages.at(-2).message,/本機/);
+});
+
+test('complete-bundle reconnect compares actual local sidecars rather than only retained metadata',async()=>{
+    let bundle;
+    const f=fixture({cloud:async()=>({uid:'uid-a',exists:true,serverConfirmed:true,data:{ownerUid:'uid-a',
+        authoritativeStateReady:true,serverRevision:4,cloudBundle:bundle}})});
+    bundle={serverRevision:4,gameSave:structuredClone(f.local.save),sidecars:{progress:{status:'present',raw:'{"eliteKills":0}'}}};
+    f.local.save.lastSaveTimestamp=123;f.local.metadata.localDirty=false;
+    f.local.metadata.cloudState={serverRevision:4,sidecarsFingerprint:'original-sidecars',
+        normalizedMainFingerprint:JSON.stringify(f.local.save),
+        bundleFingerprint:JSON.stringify({gameSave:bundle.gameSave,sidecars:bundle.sidecars})};
+    f.local.cloudSidecarsFingerprint='original-sidecars';
+    await f.fire('online');assert.equal(f.policy.getReconnectState().status,'confirmed');
+    await f.fire('offline');f.local.cloudSidecarsFingerprint='changed-actual-sidecars';
+    await f.fire('online');assert.equal(f.policy.getReconnectState().status,'conflict');assert.deepEqual(f.writes,[]);
+    await f.fire('offline');f.local.cloudSidecarsFingerprint='original-sidecars';f.local.save.gold++;
+    await f.fire('online');assert.equal(f.policy.getReconnectState().status,'conflict');assert.deepEqual(f.writes,[]);
 });
 test('single flight, timeout and offline epochs discard late results while keeping bytes and startup state',async()=>{
     const pending=[];const f=fixture({cloud:()=>new Promise(resolve=>pending.push(resolve))});

@@ -20,7 +20,7 @@ const writerCounts={
  'js/equipment-progression.js':1,'js/53-v173.50-inventory-qol.js':1,
  'js/55-v173.51-inventory-qa.js':1,'js/59-abyss-two-tier-runtime.js':1,
  'js/firebase/session-client.js':1,'js/firebase/firebase-session.js':2,'js/release-update-notification.js':1,
- 'js/startup/account-save-repository.js':12,'js/startup/first-play-resource-loader.js':1,
+ 'js/startup/account-save-repository.js':19,'js/startup/first-play-resource-loader.js':1,
  'privacy-consent.html':1
 };
 const writer=/\b(?:localStorage|sessionStorage|storage\(\)|storage|global\.localStorage|window\.sessionStorage|storage\?)\??\.setItem\s*\(/g;

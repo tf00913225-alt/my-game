@@ -112,11 +112,38 @@
         if(!metadata || metadata.ownerUid!==uid){
             throw coded("account-owner-mismatch","Local save ownership cannot be verified.");
         }
-        return {status:"ready",uid,save,metadata};
+        if(metadata.cloudAdoptionPending===true){
+            throw coded("account-cloud-adoption-incomplete","Cloud adoption is incomplete; the original backup must be retained.");
+        }
+        const cloudSidecarsFingerprint=metadata.cloudState?fingerprint(Object.fromEntries(BACKUP_SIDECARS.map(name=>{
+            const value=storage().getItem(accountKey(name,uid));
+            return [name,value===null?{status:"missing",raw:null}:{status:"present",raw:value}];
+        }))):null;
+        return {status:"ready",uid,save,metadata,...(metadata.cloudState?{cloudSidecarsFingerprint}:{})};
     }
     function readActive(){
         const uid=getActiveUid();
         return uid ? readForUid(uid) : {status:"inactive",uid:null,save:null,metadata:null};
+    }
+    // Transport/schema screening only, never publication or reward authority.
+    function inspectCloudBundle(uid,bundle){
+        uid=validUid(uid);
+        if(!bundle||bundle.bundleVersion!==1||bundle.ownerUid!==uid||
+           Object.keys(bundle).sort().join("|")!=="bundleVersion|canonicalRevision|gameSave|ownerUid|serverRevision|sidecars|sourceSnapshotSha256"||
+           !Number.isSafeInteger(bundle.serverRevision)||bundle.serverRevision<1||bundle.serverRevision>=Number.MAX_SAFE_INTEGER||
+           bundle.canonicalRevision!==bundle.serverRevision||!/^[a-f0-9]{64}$/.test(bundle.sourceSnapshotSha256||"")||
+           !bundle.gameSave?.player?.id||!bundle.sidecars||
+           Object.keys(bundle.sidecars).sort().join("|")!==[...BACKUP_SIDECARS].sort().join("|")){
+            throw coded("account-cloud-bundle-invalid","Complete versioned same-cut cloud bundle is required.");
+        }
+        const optional=new Set(["announcement-read","bulk-sell-quality","patrol-character-index","task-tracker"]);
+        for(const [name,row] of Object.entries(bundle.sidecars)){
+            if(!row||Object.keys(row).sort().join("|")!=="raw|status")throw coded("account-cloud-bundle-invalid","Invalid sidecar record.");
+            if((optional.has(name)&&["missing","not-applicable"].includes(row.status)||name==="equipment-shop-purchases"&&row.status==="not-applicable")&&row.raw===null)continue;
+            if(row.status!=="present"||typeof row.raw!=="string")throw coded("account-cloud-bundle-invalid","Required sidecar is missing.");
+            if(!PLAIN_SIDECARS.has(name)&&!parseSave(row.raw,"account-cloud-bundle-invalid"))throw coded("account-cloud-bundle-invalid","Required sidecar is empty.");
+        }
+        return bundle;
     }
     function writeForUid(uid,save,options={}){
         uid=validUid(uid);
@@ -129,6 +156,58 @@
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        if(options.cloudBundle){
+            const bundle=inspectCloudBundle(uid,options.cloudBundle),local=readForUid(uid);
+            if(options.source!=="authoritative-cloud-read"||options.equipmentShopState||fingerprint(save)!==fingerprint(bundle.gameSave)){
+                throw coded("account-cloud-bundle-invalid","Cloud bundle and main-save boundary differ.");
+            }
+            const prior=local.metadata?.cloudState;
+            const currentSidecars=Object.fromEntries(BACKUP_SIDECARS.map(name=>{
+                const raw=storage().getItem(accountKey(name,uid));
+                return [name,raw===null?{status:"missing",raw:null}:{status:"present",raw}];
+            }));
+            const identity=fingerprint({gameSave:bundle.gameSave,sidecars:bundle.sidecars});
+            if(local.status==="ready"){
+                if(!prior||!Number.isSafeInteger(prior.serverRevision)||prior.serverRevision<1||prior.canonicalRevision!==prior.serverRevision||
+                   !/^[a-f0-9]{64}$/.test(prior.sourceSnapshotSha256||"")||
+                   local.metadata.localDirty!==false||fingerprint(local.save)!==(prior.normalizedMainFingerprint||local.metadata.cloudBaseFingerprint)||
+                   fingerprint(currentSidecars)!==prior.sidecarsFingerprint||bundle.serverRevision<prior.serverRevision||
+                   bundle.serverRevision===prior.serverRevision&&(identity!==prior.bundleFingerprint||bundle.sourceSnapshotSha256!==prior.sourceSnapshotSha256)){
+                    throw coded("account-cloud-bundle-conflict","Local changes or an older/different cloud cut must not be overwritten.");
+                }
+                if(bundle.serverRevision===prior.serverRevision)return {uid,key,metadata:local.metadata,unchanged:true};
+            }else if(Object.values(currentSidecars).some(row=>row.status==="present")){
+                throw coded("account-cloud-bundle-conflict","Existing orphan sidecars must be preserved.");
+            }
+            // Seal the original UID bytes before changing an existing cache.
+            if(local.status==="ready")createMigrationBackup(uid);
+            const entries=BACKUP_SIDECARS.map(name=>[accountKey(name,uid),bundle.sidecars[name].raw]);
+            const previous=entries.map(([target])=>[target,storage().getItem(target)]);
+            const persistedSidecars=Object.fromEntries(BACKUP_SIDECARS.map(name=>[name,bundle.sidecars[name].raw===null?
+                {status:"missing",raw:null}:{status:"present",raw:bundle.sidecars[name].raw}]));
+            const metadata={schemaVersion:SCHEMA_VERSION,ownerUid:uid,source:"authoritative-cloud-read",
+                cloudBaseFingerprint:fingerprint(save),localDirty:false,updatedAt:Date.now(),
+                cloudState:{serverRevision:bundle.serverRevision,canonicalRevision:bundle.canonicalRevision,
+                    sourceSnapshotSha256:bundle.sourceSnapshotSha256,bundleFingerprint:identity,
+                    sidecarsFingerprint:fingerprint(persistedSidecars)}};
+            let marked=false;
+            try{
+                storage().setItem(metaKey,JSON.stringify({...metadata,cloudAdoptionPending:true}));marked=true;
+                for(const [target,raw] of entries){if(raw===null)storage().removeItem(target);else storage().setItem(target,raw);}
+                storage().setItem(key,JSON.stringify(save));
+                storage().setItem(metaKey,JSON.stringify(metadata));
+            }catch(error){
+                if(marked){
+                    try{
+                        for(const [target,raw] of previous){if(raw===null)storage().removeItem(target);else storage().setItem(target,raw);}
+                        if(previousRaw===null)storage().removeItem(key);else storage().setItem(key,previousRaw);
+                        if(previousMeta===null)storage().removeItem(metaKey);else storage().setItem(metaKey,previousMeta);
+                    }catch(rollback){throw coded("account-cloud-rollback-failed","Cloud adoption rollback failed; retain pending marker and original backup.",rollback);}
+                }
+                throw coded("account-save-write-failed","Cloud bundle could not be stored; original data retained.",error);
+            }
+            return {uid,key,metadata};
+        }
         // The existing local equipment shop commits its batch receipt with
         // gold/inventory through this same rollback boundary. No Cloud authority.
         const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily"):null;
@@ -140,6 +219,9 @@
             catch(cause){ throw coded("account-metadata-corrupt","Account save metadata is corrupt.",cause); }
             if(!previousMetadata||previousMetadata.ownerUid!==uid){
                 throw coded("account-owner-mismatch","Existing local save ownership cannot be verified.");
+            }
+            if(previousMetadata.cloudAdoptionPending===true){
+                throw coded("account-cloud-adoption-incomplete","Incomplete cloud adoption must not be overwritten.");
             }
         }
         const raw=JSON.stringify(save);
@@ -167,6 +249,8 @@
             source,
             cloudBaseFingerprint,
             localDirty,
+            ...(previousMetadata?.cloudState?{cloudState:{...previousMetadata.cloudState,
+                ...(source==="hydration-normalization"?{normalizedMainFingerprint:fingerprint(save)}:{})}}:{}),
             updatedAt:Date.now()
         });
         try{
@@ -425,7 +509,7 @@
 
     global.FourSymbolsAccountSave=Object.freeze({
         SCHEMA_VERSION,LEGACY_KEY,ACTIVE_UID_KEY,activate,deactivate,getActiveUid,
-        saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,
+        saveKey,metadataKey,readForUid,readActive,writeForUid,inspectLegacy,inspectCloudBundle,
         migrateLegacyToUid,removeActive,accountKey,fingerprint,LEGACY_SIDECARS,
         migrationBackupKeyFor,createMigrationBackup,verifyMigrationBackup,
         exportMigrationBackups,recoverArchivedMigrationSidecars,BACKUP_SIDECARS
