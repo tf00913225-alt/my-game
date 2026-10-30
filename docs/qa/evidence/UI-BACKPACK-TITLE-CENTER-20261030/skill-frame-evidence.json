@@ -1,0 +1,256 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "longBagLayout": {
+        "nameOverflow": 0,
+        "nameVertical": 0,
+        "nameBox": {
+          "x": 81,
+          "y": 145.80209350585938,
+          "width": 161.1979217529297,
+          "height": 40.39582824707031,
+          "top": 145.80209350585938,
+          "right": 242.1979217529297,
+          "bottom": 186.1979217529297,
+          "left": 81
+        },
+        "levelBox": {
+          "x": 248.1979217529297,
+          "y": 158.1979217529297,
+          "width": 30.802078247070312,
+          "height": 15.598953247070312,
+          "top": 158.1979217529297,
+          "right": 279,
+          "bottom": 173.796875,
+          "left": 248.1979217529297
+        },
+        "arrows": [
+          {
+            "box": {
+              "x": 29,
+              "y": 144,
+              "width": 44,
+              "height": 44,
+              "top": 144,
+              "right": 73,
+              "bottom": 188,
+              "left": 29
+            },
+            "disabled": false
+          },
+          {
+            "box": {
+              "x": 287,
+              "y": 144,
+              "width": 44,
+              "height": 44,
+              "top": 144,
+              "right": 331,
+              "bottom": 188,
+              "left": 287
+            },
+            "disabled": false
+          }
+        ],
+        "gridInner": 575,
+        "slotHeight": 182,
+        "gap": 12
+      },
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    },
+    {
+      "emptyPageVisibility": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "visibility": {
+        "message": {
+          "x": 20,
+          "y": 474.3333435058594,
+          "width": 320,
+          "height": 33,
+          "top": 474.3333435058594,
+          "right": 340,
+          "bottom": 507.3333435058594,
+          "left": 20
+        },
+        "scroll": {
+          "x": 19,
+          "y": 464.3333435058594,
+          "width": 322,
+          "height": 191.66665649414062,
+          "top": 464.3333435058594,
+          "right": 341,
+          "bottom": 656,
+          "left": 19
+        },
+        "scrollTop": 0
+      }
+    },
+    {
+      "emptyPageNavigation": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "emptyPage": {
+        "label": "5 / 5",
+        "message": "此頁沒有物品",
+        "filled": 0
+      },
+      "backPage": {
+        "label": "1 / 5",
+        "message": null,
+        "filled": 24
+      }
+    },
+    {
+      "longBagLayout": {
+        "nameOverflow": 0,
+        "nameVertical": 0,
+        "nameBox": {
+          "x": 564.2000122070312,
+          "y": 78.9625015258789,
+          "width": 193.4375,
+          "height": 48.474998474121094,
+          "top": 78.9625015258789,
+          "right": 757.6375122070312,
+          "bottom": 127.4375,
+          "left": 564.2000122070312
+        },
+        "levelBox": {
+          "x": 764.8375244140625,
+          "y": 93.8375015258789,
+          "width": 36.9625244140625,
+          "height": 18.71875,
+          "top": 93.8375015258789,
+          "right": 801.800048828125,
+          "bottom": 112.5562515258789,
+          "left": 764.8375244140625
+        },
+        "arrows": [
+          {
+            "box": {
+              "x": 501.79998779296875,
+              "y": 76.80000305175781,
+              "width": 52.79998779296875,
+              "height": 52.80000305175781,
+              "top": 76.80000305175781,
+              "right": 554.5999755859375,
+              "bottom": 129.60000610351562,
+              "left": 501.79998779296875
+            },
+            "disabled": false
+          },
+          {
+            "box": {
+              "x": 811.4000244140625,
+              "y": 76.80000305175781,
+              "width": 52.79998779296875,
+              "height": 52.80000305175781,
+              "top": 76.80000305175781,
+              "right": 864.2000122070312,
+              "bottom": 129.60000610351562,
+              "left": 811.4000244140625
+            },
+            "disabled": false
+          }
+        ],
+        "gridInner": 575,
+        "slotHeight": 182,
+        "gap": 12
+      },
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    },
+    {
+      "emptyPageVisibility": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "visibility": {
+        "message": {
+          "x": 491,
+          "y": 473.20001220703125,
+          "width": 384,
+          "height": 39.5999755859375,
+          "top": 473.20001220703125,
+          "right": 875,
+          "bottom": 512.7999877929688,
+          "left": 491
+        },
+        "scroll": {
+          "x": 489.79998779296875,
+          "y": 461.20001220703125,
+          "width": 386.4000244140625,
+          "height": 230,
+          "top": 461.20001220703125,
+          "right": 876.2000122070312,
+          "bottom": 691.2000122070312,
+          "left": 489.79998779296875
+        },
+        "scrollTop": 0
+      }
+    },
+    {
+      "emptyPageNavigation": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "emptyPage": {
+        "label": "5 / 5",
+        "message": "此頁沒有物品",
+        "filled": 0
+      },
+      "backPage": {
+        "label": "1 / 5",
+        "message": null,
+        "filled": 24
+      }
+    }
+  ]
+}
