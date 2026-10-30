@@ -1530,6 +1530,26 @@ body > .v169-rpg-dialog-layer{
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button{border-radius:0;background:linear-gradient(#37332b,#171716);border-color:#67543b;color:#d8c7a6;}
 #game-ui #homeFeatureModal[data-character-tab="skill"] .character-tab-row button.active{background:linear-gradient(#76502a,#37251a);border-color:#d3ab68;color:#fff0cd;}
 
+/* Shop and experience use the same visual owner with scoped token values. */
+#game-ui #homeFeatureModal:is(.v131-shop-open,[data-character-tab="expPool"]){
+    --rpg-frame-edge:#8b704a;
+    --rpg-frame-radius:calc(5 * var(--ui-length-unit,1px));
+    --rpg-frame-fill:repeating-linear-gradient(176deg,#29231c 0,#29231c calc(5 * var(--ui-length-unit,1px)),#201a15 calc(7 * var(--ui-length-unit,1px)),#171410 calc(14 * var(--ui-length-unit,1px)));
+    --rpg-frame-shadow:0 0 0 calc(2 * var(--ui-length-unit,1px)) #15120f,0 0 0 calc(4 * var(--ui-length-unit,1px)) #4c3d2d,inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) #b59660;
+    --rpg-title-edge:#9d8055;
+    --rpg-title-fill:linear-gradient(180deg,#50392b,#2b211b 58%,#1a1511);
+    --rpg-title-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #c3a16b,inset 0 calc(-1 * var(--ui-length-unit,1px)) 0 #694e33;
+    --rpg-close-edge:#9b8058;
+    --rpg-close-fill:#49382b;
+    --rpg-close-shadow:inset 0 calc(1 * var(--ui-length-unit,1px)) 0 #b69767;
+}
+#game-ui #homeFeatureModal:is(.v131-shop-open,[data-character-tab="expPool"]) .home-feature-modal-title{
+    display:grid;grid-template-columns:minmax(max-content,1fr) minmax(0,2fr) minmax(max-content,1fr);align-items:center;
+}
+#game-ui #homeFeatureModal:is(.v131-shop-open,[data-character-tab="expPool"]) .home-feature-modal-title::before{content:"";}
+#game-ui #homeFeatureModal:is(.v131-shop-open,[data-character-tab="expPool"]) #homeFeatureModalTitle{min-width:0;text-align:center;overflow-wrap:anywhere;}
+#game-ui #homeFeatureModal:is(.v131-shop-open,[data-character-tab="expPool"]) .character-header-actions{justify-self:end;}
+
 /* =====================================================
    Shared Black-Gold Window Skin — visual-only owner
    Geometry, stacking, overflow and interaction remain owned by existing rules.
@@ -1553,22 +1573,20 @@ body > .v169-rpg-dialog-layer{
 .v169-rpg-dialog,
 .v132-reward-modal-inner,
 .v17351-ad-panel{
-    border-color:var(--rpg-window-gold-dark,#73582D);
-    border-radius:calc(10 * var(--ui-length-unit,1px));
+    border-color:var(--rpg-frame-edge,var(--rpg-window-gold-dark,#73582D));
+    border-radius:var(--rpg-frame-radius,calc(10 * var(--ui-length-unit,1px)));
     color:var(--rpg-window-text,#EEE7D8);
-    background:
-        radial-gradient(circle at 50% -12%,rgba(198,154,69,.14),transparent 34%),
+    background:var(--rpg-frame-fill,radial-gradient(circle at 50% -12%,rgba(198,154,69,.14),transparent 34%),
         linear-gradient(180deg,rgba(240,211,138,.045),transparent 14%),
-        linear-gradient(145deg,var(--rpg-window-panel,#201D17),var(--rpg-window-inset,#12110E) 58%,var(--rpg-window-iron,#0D0C09));
-    box-shadow:
-        0 calc(16 * var(--ui-length-unit,1px)) calc(38 * var(--ui-length-unit,1px)) rgba(0,0,0,.58),
+        linear-gradient(145deg,var(--rpg-window-panel,#201D17),var(--rpg-window-inset,#12110E) 58%,var(--rpg-window-iron,#0D0C09)));
+    box-shadow:var(--rpg-frame-shadow,0 calc(16 * var(--ui-length-unit,1px)) calc(38 * var(--ui-length-unit,1px)) rgba(0,0,0,.58),
         0 0 0 calc(2 * var(--ui-length-unit,1px)) var(--rpg-window-iron,#0D0C09),
         0 0 0 calc(3 * var(--ui-length-unit,1px)) var(--rpg-window-gold-dark,#73582D),
         0 0 0 calc(4 * var(--ui-length-unit,1px)) rgba(240,211,138,.5),
         inset 0 0 0 calc(1 * var(--ui-length-unit,1px)) rgba(240,211,138,.36),
         inset 0 0 0 calc(2 * var(--ui-length-unit,1px)) var(--rpg-window-iron,#0D0C09),
         inset 0 0 0 calc(3 * var(--ui-length-unit,1px)) rgba(115,88,45,.82),
-        inset 0 0 calc(30 * var(--ui-length-unit,1px)) rgba(0,0,0,.42);
+        inset 0 0 calc(30 * var(--ui-length-unit,1px)) rgba(0,0,0,.42));
 }
 
 :is(#game-stage,#game-ui) .home-feature-modal-title,
@@ -1578,15 +1596,13 @@ body > .v169-rpg-dialog-layer{
 #game-stage .v132-reward-modal-title,
 .v169-rpg-dialog h2,
 .v17351-ad-panel h2{
-    border-color:var(--rpg-window-gold-dark,#73582D);
+    border-color:var(--rpg-title-edge,var(--rpg-window-gold-dark,#73582D));
     color:var(--rpg-window-text,#EEE7D8);
-    background:
-        linear-gradient(90deg,transparent,rgba(198,154,69,.08) 16%,rgba(240,211,138,.12) 50%,rgba(198,154,69,.08) 84%,transparent),
-        linear-gradient(180deg,#2A251C,var(--rpg-window-iron-soft,#171510) 58%,var(--rpg-window-iron,#0D0C09));
-    box-shadow:
-        inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(240,211,138,.2),
+    background:var(--rpg-title-fill,linear-gradient(90deg,transparent,rgba(198,154,69,.08) 16%,rgba(240,211,138,.12) 50%,rgba(198,154,69,.08) 84%,transparent),
+        linear-gradient(180deg,#2A251C,var(--rpg-window-iron-soft,#171510) 58%,var(--rpg-window-iron,#0D0C09)));
+    box-shadow:var(--rpg-title-shadow,inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(240,211,138,.2),
         inset 0 calc(-2 * var(--ui-length-unit,1px)) 0 rgba(115,88,45,.8),
-        0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(0,0,0,.82);
+        0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(0,0,0,.82));
     text-shadow:0 calc(1 * var(--ui-length-unit,1px)) calc(2 * var(--ui-length-unit,1px)) #000,0 0 calc(6 * var(--ui-length-unit,1px)) rgba(198,154,69,.16);
 }
 
@@ -1728,13 +1744,12 @@ body > .v169-rpg-dialog-layer{
 :is(#game-stage,#game-ui) .item-modal-box .close-item-button,
 #game-stage .creation-skill-detail-box .creation-skill-detail-close,
 #game-stage .creation-skill-detail-box .creation-skill-detail-x{
-    border-color:#9B773B;
+    border-color:var(--rpg-close-edge,#9B773B);
     color:var(--rpg-window-text,#EEE7D8);
-    background:linear-gradient(180deg,#342C20,#171510 62%,#0D0C09);
-    box-shadow:
-        inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(240,211,138,.14),
+    background:var(--rpg-close-fill,linear-gradient(180deg,#342C20,#171510 62%,#0D0C09));
+    box-shadow:var(--rpg-close-shadow,inset 0 calc(1 * var(--ui-length-unit,1px)) 0 rgba(240,211,138,.14),
         inset 0 calc(-2 * var(--ui-length-unit,1px)) 0 rgba(0,0,0,.52),
-        0 calc(2 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px)) rgba(0,0,0,.36);
+        0 calc(2 * var(--ui-length-unit,1px)) calc(6 * var(--ui-length-unit,1px)) rgba(0,0,0,.36));
 }
 
 .v169-rpg-dialog[data-tone="danger"]{
