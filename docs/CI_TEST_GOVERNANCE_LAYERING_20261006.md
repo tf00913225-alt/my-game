@@ -7,6 +7,44 @@ Status: Layering and Boss tiers integrated. Current affected-area routing repair
 Work ID CI-IMPACT-ROUTING-20261018, branch fix/ci-impact-routing-20261018.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
 
+### 2026-10-30 CI usage efficiency checkpoint
+
+Work ID `CI-USAGE-EFFICIENCY-20261030`; branch `fix/ci-usage-efficiency-20261030`;
+base dev `871daa07360622e911594b2551cc7c5eed8f3e5f`. Prior routing work is integrated;
+no same-purpose open PR or remote routing branch remained. This is the single
+follow-up line, using the existing classifier and Session workflow Owners.
+
+Candidate: classify changes to the mixed expansion stylesheet by the existing
+selector parser (Element Box retains battle input/Boss Fast validation), map its
+existing UI contract test and the reviewed standalone UI sample, and remove only
+the independent Session **PR** trigger. The identical complete reusable Session
+emulator, Boot/SDK tests, aggregate failure propagation, independent dev push and
+manual deployment, backend non-cancellation lock and exact-SHA wait are retained.
+New/unknown runtime or tests, unknown prototypes, global CSS and mixed safety
+changes retain conservative gates. No workflow permissions are expanded.
+
+Baseline actual latest-attempt job durations (sum of started/completed jobs,
+not elapsed wall time or GitHub rounded billing minutes):
+
+| Snapshot / run | Actual runner minutes (rounded) | Observation |
+|---|---:|---|
+| [UI sample PR 41046073461](https://github.com/tf00913225-alt/my-game/actions/runs/41046073461), a1, PR Head `79f8723f061630675f08c6c655be6c8aea688c5a` | 140 | Unknown prototype owner fans out all ordinary browser groups and Session |
+| [Element Box PR 41047498751](https://github.com/tf00913225-alt/my-game/actions/runs/41047498751), a1, PR Head `4319138a0585a29ca0552d061d3de9e02d3de4c6` | 139 | Unknown css/38 and existing UI test fan out broad gates |
+| [dev CI 41047070764](https://github.com/tf00913225-alt/my-game/actions/runs/41047070764), a1, push `67a3da179612766897ab534930f83abd22389cb5` | 234 | Includes about 8.4 min reusable Session and Cloudflare deployed QA |
+| [independent Session 41047070937](https://github.com/tf00913225-alt/my-game/actions/runs/41047070937), a1, same dev SHA | 34 | About 7 min repeated emulator plus 22.6 min waiting in deploy job |
+
+Pending: latest Head CI, independent security/scope review, required-check settings
+confirmation, exact one-time Firebase deployment approval before merging this
+workflow change, actual post-change run comparison and cleanup. No measured
+savings or monthly reduction is claimed yet. PR body is the live status Owner.
+
+Remaining same-work issues: duplicate dev-push emulator and occupied deployment
+wait runner are not fixed by removing the PR trigger. A direct deployment child
+inside the cancelable dev CI was rejected before commit because it would weaken
+the existing backend cancellation protection. Any further orchestration must
+preserve that protection, exact source/attempt and full security evidence; no
+new dispatch permission or main/default-branch change is authorized by this note.
+
 ## Current routing owner (supersedes historical phase restrictions below)
 
 The classifier remains the single routing owner. PR comparisons require a real

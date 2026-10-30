@@ -80,7 +80,7 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
 const GENERATED=/^(?:build\/|asset-manifest\.json$|functions\/src\/generated\/restricted-forest-instance-policy\.json$)/;
 
 const SHARED_CSS = new Set(['css/00-main.css','css/30-v130-requested-updates.css',
-  'css/31-v131-fix-batch.css','css/42-v146-system-polish.css','css/44-v149-skill-ui-rules.css','css/49-v169-rpg-ui.css']);
+  'css/31-v131-fix-batch.css','css/38-v141-system-expansion.css','css/42-v146-system-polish.css','css/44-v149-skill-ui-rules.css','css/49-v169-rpg-ui.css']);
 
 // Compare actual rule/declaration changes in shared files. Global tokens,
 // imports, unknown selectors, cascade reordering and parser failures stay Full.
@@ -122,7 +122,7 @@ export function classifySharedCss(before, after) {
         const ids=selector.nodes.filter(n=>n.type==='id').map(n=>n.value);
         const classes=selector.nodes.filter(n=>n.type==='class').map(n=>n.value);
         let scope;
-        if(ids.includes('battlePage'))scope=['ui','battle'];
+        if(ids.includes('battlePage')||ids.includes('autoBattleSettingsPanel'))scope=['ui','battle'];
         else if(ids.includes('mapPage'))scope=['ui','tower','battle'];
         else if(ids.includes('skillPage')||ids.includes('homeFeatureModal')&&selector.nodes.some(n=>n.type==='attribute'&&n.attribute==='data-character-tab'&&n.operator==='='&&n.value==='skill'))scope=['ui','skill_ui'];
         else if(ids.includes('inventoryPage'))scope=['ui','inventory'];
@@ -265,7 +265,11 @@ const QA_OWNERS = {
   'tests/v169-rpg-ui.test.js':['ui','ui_shared'],
   'tests/ui-black-gold-window-skin.test.js':['ui','ui_shared'],
   'tests/ui-typography-standard.test.js':['ui','ui_shared'],
-  'tests/ui-typography-mobile-browser.test.js':['ui','ui_shared']
+  'tests/ui-typography-mobile-browser.test.js':['ui','ui_shared'],
+  'tests/ui-element-box-medium-modal.test.js':['ui','ui_shared'],
+  // Existing self-contained preview; no runtime/build consumer. New prototype
+  // paths still fail closed, as do mixed runtime or deployment changes.
+  'prototypes/ui-shared-samples-20261030/index.html':['ui','ui_shared']
 };
 const OWNERS = [
   [/^(?:functions\/|js\/firebase\/|firestore\.rules$|firebase.*\.json$)/, ['cloud', 'persistence']],
@@ -312,7 +316,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     if(SHARED_CSS.has(p)&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui','battle','tower'].includes(k))) {mark(...responsibility);continue;}
     if(p==='index.html'&&generatedVerified&&Array.isArray(responsibility)&&responsibility.length===0&&paths.some(x=>/^(?:js\/|css\/|assets\/|config\/)/.test(x)))continue;
     if(p==='index.html'&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui'].includes(k))) {mark(...responsibility);continue;}
-    if(QA_OWNERS[p]&&!addedPaths.includes(p)){mark(...QA_OWNERS[p]);continue;}
+    if(QA_OWNERS[p]&&(!addedPaths.includes(p)||p==='prototypes/ui-shared-samples-20261030/index.html')){mark(...QA_OWNERS[p]);continue;}
     if (/^(?:\.github\/scripts\/(?:ci-(?:change-classifier|aggregate)|full-regression-health)\.mjs|tests\/(?:ci-(?:boss-routing|change-classifier|aggregate|concurrency).*|full-regression-health.test)\.mjs|\.github\/workflows\/(?:ci|deploy-dev-cloudflare)\.yml|package\.json|package-lock\.json)$/.test(p)) {mark('workflow');continue;}
     if (/^(?:\.github\/|ci\/|package(?:-lock)?\.json$|scripts\/.*(?:build|deployment|release)|release\/|feature-manifest\.json$|config\/(?:boot|feature|first-play)-manifest\.json$)/.test(p)) {
       strict(`CI/build/release owner: ${p}`, 'workflow', 'release'); continue;

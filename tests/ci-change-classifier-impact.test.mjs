@@ -15,6 +15,60 @@ const onlyUi=p=>{
   assert.equal(p.gates.session_authority,false);assert.equal(p.bossMode,'none');
 };
 
+test('reviewed standalone UI sample routes to UI; unknown prototypes and mixed safety remain strict',()=>{
+  const sample='prototypes/ui-shared-samples-20261030/index.html';
+  onlyUi(plan([sample],{addedPaths:[sample]}));
+  for(const extra of ['prototypes/unknown/index.html','js/unknown.js','functions/src/session-authority.js']) {
+    const p=plan([sample,extra]);
+    assert.equal(p.gates.session_authority,true);
+    assert.equal(p.bossMode,'full');
+  }
+});
+
+test('mixed expansion CSS isolates Element Box presentation but retains battle input QA',()=>{
+  const file='css/38-v141-system-expansion.css';
+  const before=':root{--color:red;}#battlePage{color:white;}:is(#game-stage,#game-ui) #autoBattleSettingsPanel.v141-compact-element-box{max-height:none!important;overflow:hidden!important;}';
+  const after=':root{--color:red;}#battlePage{color:white;}';
+  const responsibilitiesByPath={[file]:classifySharedCss(before,after)};
+  assert.deepEqual(responsibilitiesByPath[file],['ui','battle']);
+  const p=plan([file,'tests/ui-element-box-medium-modal.test.js'],{responsibilitiesByPath});
+  assert.equal(p.strictMode,false);assert.equal(p.gates.ui_browser,true);
+  assert.equal(p.gates.battle_browser,true);assert.equal(p.bossMode,'fast');
+  for(const gate of ['daily_browser','tower_wild_browser','portrait_browser','adventure_ui_browser','abyss_balance','adventure_balance','session_authority'])assert.equal(p.gates[gate],false,gate);
+  for(const changed of [before.replace('--color:red','--color:gold'),before+'body{display:none;}',before+'@import "unknown.css";']) {
+    const unknown=plan([file],{responsibilitiesByPath:{[file]:classifySharedCss(before,changed)}});
+    assert.equal(unknown.strictMode,true);assert.equal(unknown.gates.session_authority,true);
+  }
+  assert.equal(plan(['tests/ui-element-box-medium-modal.test.js'],{addedPaths:['tests/ui-element-box-medium-modal.test.js']}).strictMode,true);
+});
+
+test('one PR Session validation preserves every former Session path and all original security steps',()=>{
+  const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
+  const session=parseDocument(fs.readFileSync('.github/workflows/session-authority.yml','utf8')).toJS();
+  assert.equal(session.on.pull_request,undefined);
+  assert.ok(ci.on.pull_request.branches.includes('dev'));
+  const paths=['functions/index.js','functions/src/session-authority.js','js/firebase/firebase-auth.js',
+    'firestore.rules','firebase.session-emulators.json','scripts/test-session-authority-emulator.mjs',
+    'tests/session-client.test.mjs','tests/cloud-save-envelope.test.mjs',
+    'tests/firebase-trusted-cloud-save-backend.test.mjs','scripts/firestore-backup-readiness.mjs',
+    'scripts/storage-recovery-readiness.mjs','tests/firestore-backup-readiness.test.mjs',
+    '.github/workflows/session-authority.yml','.github/scripts/wait-session-repository-checks.mjs',
+    'tests/session-repository-checks-wait.test.mjs'];
+  for(const source of paths)for(const addedPaths of [[],[source]])assert.equal(plan([source],{addedPaths}).gates.session_authority,true,source);
+  assert.equal(ci.jobs.session_authority.uses,'./.github/workflows/session-authority.yml');
+  assert.equal(ci.jobs.session_authority.with.emulator_only,true);
+  assert.equal(ci.jobs.session_authority.with.candidate_sha,'${{ inputs.candidate_sha || github.sha }}');
+  assert.ok(ci.jobs.verify.needs.includes('session_authority'));
+  assert.ok(session.on.push.branches.includes('dev'));
+  assert.ok(Object.hasOwn(session.on,'workflow_dispatch'));
+  assert.equal(session.concurrency['cancel-in-progress'],false);
+  const steps=session.jobs.emulator.steps;
+  for(const name of ['Verify account boot with session backend unavailable','Verify actual callable and Firestore authorization'])assert.ok(steps.some(s=>s.name===name));
+  assert.ok(steps.some(s=>s.run?.includes('tests/cloud-save-*.test.mjs')));
+  assert.ok(steps.some(s=>s.run?.includes('tests/session-client.test.mjs')));
+  assert.equal(session.jobs.deploy.needs,'emulator');
+});
+
 test('shared HTML isolates presentation labels and SVG paint, preserving event/data authority',()=>{
   const before='<!doctype html><html><head></head><body><div id="startupLoader">登入</div><div id="homeFeatureModal"><span id="homeFeatureModalTitle">技能</span><button onclick="closeHomeFeature()" class="old">返回</button><svg><path d="M0 0L1 1"/></svg><span id="gold">50</span><input value="1"><script>window.guard=1;</script></div></body></html>';
   const after=before.replace('>技能<','>角色<').replace('class="old"','class="bronze"').replace('M0 0L1 1','M0 0L2 2');
