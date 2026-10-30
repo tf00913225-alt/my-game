@@ -4117,6 +4117,9 @@ body.v174-battle-reading-open .v143-field-source-hidden{opacity:1!important;}
     font-size:64px;
     pointer-events:none;
 }
+#game-stage #battlePage .battle-status-detail-modal[data-side="player"][data-portrait-kind="player"] .battle-status-detail-portrait{
+    height:260px;
+}
 #game-stage #battlePage .battle-status-detail-core{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
@@ -7861,6 +7864,10 @@ body > .v169-rpg-dialog-layer{
 /* Party rows share one paint scale and frame; only enemies have depth. */
 #game-stage #battlePage.v-fixed-slot-render-v2 .v174-battle-art{scale:var(--battle-art-depth, 1);}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-player > .v174-battle-art{--battle-art-depth:1;}
+/* Canonical player indexes 0-2 only; Hero indexes 3-5 retain their paint scale. */
+#game-stage #battlePage.v-fixed-slot-render-v2 :is(#battlePlayerCard0,#battlePlayerCard1,#battlePlayerCard2) > .v174-battle-art{
+    --battle-paint-scale:1.587;
+}
 #game-stage #battlePage.v-fixed-slot-render-v2 .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.18;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .battle-monster:is([data-portrait-size-class="STANDARD"],[data-portrait-size-class="ELITE"]) > .v174-normalized-portrait{--battle-art-depth:1.10;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-enemy-row[data-slot-row="back"] .v174-battle-art{--battle-art-depth:.94;scale:var(--battle-art-depth, .94);}

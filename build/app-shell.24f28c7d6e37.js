@@ -6320,6 +6320,13 @@ function getCharacterArtworkPath(character){
    戰鬥卡片與戰鬥事件繼續由此函式提供獨立戰鬥姿勢；不混用一般立繪。
 */
 function getCharacterBattleArtworkPath(character){
+    const source=getCharacterBattleDetailArtworkPath(character);
+    return character&&character.combatantKind!=="heroNpc"
+        ?source.replace("/player_battle_","/player_battle_readable_")
+        :source;
+}
+
+function getCharacterBattleDetailArtworkPath(character){
     if(!character){ return ""; }
     if(character.combatantKind==="heroNpc"){
         return ({divineDogHongbao:"assets/heroes/divine-dog-hongbao.webp",vajraHeavenlyKing:"assets/heroes/vajra-heavenly-king.webp"})[character.heroId]||"";
@@ -24010,6 +24017,8 @@ function ensureBattleStatusDetailModal(){
 function closeBattleStatusDetailModal(){
     const modal=document.getElementById("battleStatusDetailModal");
     if(!modal){ return; }
+    delete modal.dataset.side;
+    delete modal.dataset.portraitKind;
     modal.hidden=true;
     modal.setAttribute("aria-hidden","true");
     syncBattleUiPriorityLayer();
@@ -24057,11 +24066,14 @@ function openBattleStatusDetailModal(side,index){
     if(!entity){ return false; }
 
     const modal=ensureBattleStatusDetailModal();
+    modal.dataset.side=isMonster?"monster":"player";
+    modal.dataset.portraitKind=isMonster?"monster":entity.combatantKind==="heroNpc"?"heroNpc":Number.isInteger(index)&&index>=0&&index<3?"player":"other";
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
     const portrait=modal.querySelector('.battle-status-detail-portrait');
     const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
     const artwork=card&&card.querySelector('.v174-battle-art');
-    const source=artwork&&artwork.style.backgroundImage;
+    const detailSource=modal.dataset.portraitKind==="player"?getCharacterBattleDetailArtworkPath(entity):"";
+    const source=detailSource?'url("'+detailSource+'")':artwork&&artwork.style.backgroundImage;
     portrait.style.backgroundImage=source&&source!=='none'?source:'none';
     portrait.textContent=source&&source!=='none'?'':'◇';
     portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
