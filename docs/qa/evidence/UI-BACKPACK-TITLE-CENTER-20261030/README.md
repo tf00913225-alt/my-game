@@ -11,3 +11,5 @@ backpack-*.png 是原 visual fixture 的合成畫面。該 fixture 缺正式 cha
 16 字合成名稱補修：四種視窗以正式 runtime 測量名稱無裁切、等級不重疊、三完整物品列；非作者實看四張前後畫面。第一次候選第三列部分遮擋，已調整並複驗；證據為 before-long-name 與 candidate-long-name。角色切換、長名稱下捲動與鍵盤、空資料及真機仍未驗。測試腳本固定顯示 fourteen viewports，但實際 DISPLAY_VIEWPORTS 為四。
 
 長名稱操作補驗：合成 runtime 的 360x800、1366x768 中，滑鼠下一角色及滑鼠返回可操作，物品格滾輪可捲至末端；合成 Enter 事件未能切回，根因未確定，不視為鍵盤通過。記錄精確 QA 變體和畫面。
+
+Enter 診斷：先前 CDP 只送 rawKeyDown/keyUp，補送 Enter char 後，360x800 與 1366x768 的合成事件均成功切回長名稱；不是已證實遊戲 Enter 無效。診斷輸出亦顯示切換重繪後 activeElement 為 BODY，焦點保留與連續鍵盤操作仍需評估，真機仍未驗。先前失敗測試的 QA 變體及 JSON 保留；兩張 keyboard-return 圖已更新為診斷後的成功畫面。
