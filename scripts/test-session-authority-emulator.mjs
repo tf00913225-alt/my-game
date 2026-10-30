@@ -395,6 +395,20 @@ const initialized=await initialWriter.commitInitialSources(yRequest,initialArgs)
 assert.equal(initialized.sourceRevision,2);
 const initialArchive=await checkRecoveryArchive(y,2);
 
+// Source preparation joins the same genuine actor; it grants no publication.
+const publicationEnvelopeBefore=await db.doc(`users/${y}/saves/current`).get();
+const preparedPublication=await initialWriter.preparePublicationSources(yRequest,{expectedRevision:2});
+assert.equal(preparedPublication.cloudBundle.ownerUid,y);
+assert.equal(preparedPublication.cloudBundle.serverRevision,2);
+assert.equal(preparedPublication.cloudBundle.gameSave.player.id,initialArchive.get("sourceRecords").characters[0].state.id);
+assert.equal(preparedPublication.authoritativeStateReady,false);
+assert.equal(preparedPublication.readyForPublication,false);
+await assert.rejects(initialWriter.preparePublicationSources(yRequest,{expectedRevision:3}),error=>error.code==="aborted");
+const publicationEnvelopeAfter=await db.doc(`users/${y}/saves/current`).get();
+assert.equal(publicationEnvelopeAfter.updateTime.isEqual(publicationEnvelopeBefore.updateTime),true);
+assert.equal(publicationEnvelopeAfter.get("cloudBundle"),undefined);
+console.log("PASS publication source preparation actual SDK: original nonempty writer, same protected cut, stale revision refusal, unchanged envelope and false readiness; not publication or device recovery.");
+
 // Later-day evidence only: exercise the existing owner against real protected
 // Firestore transactions. All fixtures stay inside the guarded demo project.
 let periodClock=freshQuestProgress.get("playableState.lastSaveTimestamp");
