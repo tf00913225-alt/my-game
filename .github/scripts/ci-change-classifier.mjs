@@ -80,7 +80,7 @@ export function classifySharedSource(before, after, sourcePath='js/00-main.js') 
 const GENERATED=/^(?:build\/|asset-manifest\.json$|functions\/src\/generated\/restricted-forest-instance-policy\.json$)/;
 
 const SHARED_CSS = new Set(['css/00-main.css','css/30-v130-requested-updates.css',
-  'css/31-v131-fix-batch.css','css/42-v146-system-polish.css','css/44-v149-skill-ui-rules.css','css/49-v169-rpg-ui.css']);
+  'css/31-v131-fix-batch.css','css/38-v141-system-expansion.css','css/42-v146-system-polish.css','css/44-v149-skill-ui-rules.css','css/49-v169-rpg-ui.css']);
 
 // Compare actual rule/declaration changes in shared files. Global tokens,
 // imports, unknown selectors, cascade reordering and parser failures stay Full.
@@ -122,7 +122,7 @@ export function classifySharedCss(before, after) {
         const ids=selector.nodes.filter(n=>n.type==='id').map(n=>n.value);
         const classes=selector.nodes.filter(n=>n.type==='class').map(n=>n.value);
         let scope;
-        if(ids.includes('battlePage'))scope=['ui','battle'];
+        if(ids.includes('battlePage')||ids.includes('autoBattleSettingsPanel'))scope=['ui','battle'];
         else if(ids.includes('mapPage'))scope=['ui','tower','battle'];
         else if(ids.includes('skillPage')||ids.includes('homeFeatureModal')&&selector.nodes.some(n=>n.type==='attribute'&&n.attribute==='data-character-tab'&&n.operator==='='&&n.value==='skill'))scope=['ui','skill_ui'];
         else if(ids.includes('inventoryPage'))scope=['ui','inventory'];
@@ -265,8 +265,21 @@ const QA_OWNERS = {
   'tests/v169-rpg-ui.test.js':['ui','ui_shared'],
   'tests/ui-black-gold-window-skin.test.js':['ui','ui_shared'],
   'tests/ui-typography-standard.test.js':['ui','ui_shared'],
-  'tests/ui-typography-mobile-browser.test.js':['ui','ui_shared']
+  'tests/ui-typography-mobile-browser.test.js':['ui','ui_shared'],
+  'tests/ui-element-box-medium-modal.test.js':['ui','ui_shared'],
+  // Existing self-contained preview; no runtime/build consumer. New prototype
+  // paths still fail closed, as do mixed runtime or deployment changes.
+  'prototypes/ui-shared-samples-20261030/index.html':['ui','ui_shared']
 };
+// Former Session Authority path filters, retained by the single CI Owner.
+export const SESSION_PATHS = [
+  /^functions\//, /^js\/firebase\//, /^firestore\.rules$/, /^firebase[^/]*\.json$/,
+  /^scripts\/test-session-authority-emulator\.mjs$/, /^tests\/session-[^/]*\.test\.mjs$/,
+  /^tests\/cloud-save-[^/]*\.test\.mjs$/, /^tests\/firebase-trusted-cloud-save-backend\.test\.mjs$/,
+  /^scripts\/firestore-backup-readiness\.mjs$/, /^scripts\/storage-recovery-readiness\.mjs$/,
+  /^tests\/firestore-backup-readiness\.test\.mjs$/, /^\.github\/workflows\/session-authority\.yml$/,
+  /^\.github\/scripts\/wait-session-repository-checks\.mjs$/, /^tests\/session-repository-checks-wait\.test\.mjs$/
+];
 const OWNERS = [
   [/^(?:functions\/|js\/firebase\/|firestore\.rules$|firebase.*\.json$)/, ['cloud', 'persistence']],
   [/^js\/startup\//, ['cloud', 'persistence']],
@@ -312,7 +325,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     if(SHARED_CSS.has(p)&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui','battle','tower'].includes(k))) {mark(...responsibility);continue;}
     if(p==='index.html'&&generatedVerified&&Array.isArray(responsibility)&&responsibility.length===0&&paths.some(x=>/^(?:js\/|css\/|assets\/|config\/)/.test(x)))continue;
     if(p==='index.html'&&!addedPaths.includes(p)&&Array.isArray(responsibility)&&responsibility.length&&responsibility.every(k=>['ui','ui_shared','inventory','skill_ui'].includes(k))) {mark(...responsibility);continue;}
-    if(QA_OWNERS[p]&&!addedPaths.includes(p)){mark(...QA_OWNERS[p]);continue;}
+    if(QA_OWNERS[p]&&(!addedPaths.includes(p)||p==='prototypes/ui-shared-samples-20261030/index.html')){mark(...QA_OWNERS[p]);continue;}
     if (/^(?:\.github\/scripts\/(?:ci-(?:change-classifier|aggregate)|full-regression-health)\.mjs|tests\/(?:ci-(?:boss-routing|change-classifier|aggregate|concurrency).*|full-regression-health.test)\.mjs|\.github\/workflows\/(?:ci|deploy-dev-cloudflare)\.yml|package\.json|package-lock\.json)$/.test(p)) {mark('workflow');continue;}
     if (/^(?:\.github\/|ci\/|package(?:-lock)?\.json$|scripts\/.*(?:build|deployment|release)|release\/|feature-manifest\.json$|config\/(?:boot|feature|first-play)-manifest\.json$)/.test(p)) {
       strict(`CI/build/release owner: ${p}`, 'workflow', 'release'); continue;
@@ -339,6 +352,10 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   const mainRequired = baseRef === 'main' || nightly || highRiskIntegration || (eventName==='push' && strictMode) || !['pull_request','push'].includes(eventName);
   const full = mainRequired || strictMode;
   const f = key => flags[`${key}_changed`];
+  // Generated-output verification does not retire the independent Session
+  // path contract. In particular, policy generation during a UI/art build
+  // previously required the standalone full Session gate on PR and dev push.
+  const sessionPathsChanged = Array.isArray(paths) && paths.some(p=>typeof p==='string'&&SESSION_PATHS.some(pattern=>pattern.test(p)));
   const predicted = {
     core_checks: true,
     battle_browser: full || f('battle') || f('skill') || f('monster_balance'),
@@ -352,7 +369,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     boss_balance: full || f('boss') || f('monster_balance') || f('battle') || f('skill'),
     main_browser: mainRequired,
     promotion_health: baseRef === 'main' && !nightly,
-    session_authority: full || f('cloud') || f('persistence')
+    session_authority: full || f('cloud') || f('persistence') || sessionPathsChanged
   };
   const shadow = eventName === 'pull_request' && !mainRequired && !enabled;
   const gates = shadow ? Object.fromEntries(Object.keys(predicted).map(k => [k, ['main_browser','promotion_health'].includes(k) ? false : true])) : predicted;
@@ -361,7 +378,9 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   // Gate policy edits must exercise the retained Full capability themselves.
   if(bossFull){predicted.boss_balance=true;gates.boss_balance=true;}
   const uiMode=full||shadow||f('workflow')||f('cloud')||f('persistence')||f('ui_shared')||f('inventory')&&(f('skill_ui')||f('skill')) ? 'all' : f('inventory') ? 'inventory' : f('skill_ui')||f('skill') ? 'skill' : 'smoke';
-  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode};
+  const sessionDeploy = error || !Array.isArray(paths) || !paths.length || paths.some(p=>typeof p!=='string'||p.startsWith('/')||p.includes('..')||p.includes('\\')) ? 'blocked' :
+    String(sessionPathsChanged);
+  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode, sessionDeploy};
 }
 
 export function changedPaths(base, head, added = false, eventName = 'pull_request') {
@@ -408,7 +427,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const plan = applyAuthorizedLethalBossException(classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'}),
     {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths, generatedVerified});
   const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
-    boss_mode:plan.bossMode, ui_mode:plan.uiMode, ...plan.flags, ...plan.gates};
+    boss_mode:plan.bossMode, ui_mode:plan.uiMode, session_deploy:plan.sessionDeploy, ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));
   const report = `## CI change classifier (${plan.shadow ? 'SHADOW — all original gates retained' : 'ENFORCED'})\n`+

@@ -95,6 +95,21 @@ test('legal docs classifier skips pass, failure/cancellation never does', () => 
   needs.boss_balance.result='cancelled';
   assert.throws(()=>requireChildGates(needs,{mainRequired:false,plan}),/boss_balance/);
 });
+
+test('legacy classifier cannot waive the workflow-required Session gate', () => {
+  const plan=classifyChanges(['docs/readme.md']);
+  delete plan.sessionDeploy;
+  plan.gates.session_authority=false;
+  const needs=passed();
+  assert.equal(requireChildGates(needs,{mainRequired:false,requireSession:true,plan}),true);
+  for(const result of ['skipped','failure','cancelled','neutral','queued',undefined]) {
+    needs.session_authority={result};
+    assert.throws(()=>requireChildGates(needs,{mainRequired:false,requireSession:true,plan}),/session_authority/);
+  }
+  needs.session_authority.result='skipped';
+  assert.equal(requireChildGates(needs,{mainRequired:false,requireSession:false,plan}),true);
+  assert.throws(()=>requireChildGates(needs,{requireSession:'false',plan}),/Invalid Session gate policy/);
+});
 test('missing classifier / forged strict or dev-push skips fail closed', () => {
   for(const eventName of ['push','pull_request']) {
     const plan=classifyChanges(['js/unknown.js'],{enabled:true,eventName});
@@ -117,7 +132,7 @@ test('reused Session cannot deploy or deadlock with the standalone Firebase wait
   const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
   const session=fs.readFileSync(new URL('../.github/workflows/session-authority.yml',import.meta.url),'utf8');
   assert.match(ci,/uses: \.\/\.github\/workflows\/session-authority\.yml[\s\S]*?emulator_only: true/);
-  assert.match(session,/if: \$\{\{ !inputs\.emulator_only &&/);
+  assert.match(session,/if: \$\{\{ !cancelled\(\) && !inputs\.emulator_only &&/);
   assert.match(session,/inputs\.emulator_only && format\('session-emulator-\{0\}', github\.run_id\)/);
 });
 test('missing or unknown dependency fails closed', () => {
