@@ -1,18 +1,17 @@
-name: Private DEV read-only diagnostic
+name: Private DEV startup read-only diagnostic
 on:
   push:
-    branches:
-      - fix/access-readonly-validation-20261030
+    branches: [fix/access-readonly-validation-20261030]
 permissions:
   contents: read
 concurrency:
-  group: access-readonly-diagnostic
+  group: access-startup-diagnostic
   cancel-in-progress: false
 jobs:
-  access_readonly:
+  startup:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/fix/access-readonly-validation-20261030' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 3
+    timeout-minutes: 4
     env:
       CF_ACCESS_REQUIRED: "1"
       CF_ACCESS_CLIENT_ID: ${{ secrets.DEV_ACCESS_CLIENT_ID }}
@@ -20,58 +19,47 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: ${{ github.sha }}
+          ref: 33739f94a169198517e4dee661c8d901475df333
           persist-credentials: false
-      - name: Verify private access without deployment
+      - uses: actions/setup-node@v7
+        with:
+          node-version: '24'
+          package-manager-cache: false
+      - name: Observe private DEV startup through isolated QA proxy
         shell: bash
         run: |
           node --input-type=module <<'NODE'
-          import { devAccessFetch } from './.github/scripts/dev-access-fetch.mjs';
-          const url = 'https://dev.four-symbols-dev.pages.dev/release-manifest.json';
-          try {
-            const anonymous = await fetch(url, {redirect:'manual', signal:AbortSignal.timeout(15000)});
-            const login = new URL(anonymous.headers.get('location') || '', url);
-            if (![301,302,303,307,308].includes(anonymous.status) || !login.hostname.endsWith('.cloudflareaccess.com')) throw new Error();
-            console.log('PASS: anonymous request requires Access login');
-            const response = await devAccessFetch(url, {signal:AbortSignal.timeout(15000)});
-            if (response.status !== 200 || !response.headers.get('content-type')?.includes('application/json')) throw new Error();
-            const data = await response.json();
-            if (typeof data.commitSha !== 'string' || typeof data.version !== 'string' || typeof data.cacheVersion !== 'string') throw new Error();
-            console.log('PASS: service credentials read the DEV release manifest');
-          } catch {
-            console.error('FAIL: private DEV access verification stopped');
-            process.exitCode = 1;
-          }
-          NODE
-
-      - name: Verify protected startup asset bytes
-        shell: bash
-        run: |
-          node --input-type=module <<'NODE'
-          import {createHash} from 'node:crypto';
+          import fs from 'node:fs';
+          import os from 'node:os';
+          import path from 'node:path';
+          import {spawn} from 'node:child_process';
           import {devAccessFetch} from './.github/scripts/dev-access-fetch.mjs';
+          import {startServer,findChrome,waitJson,Cdp,collectStartupFailure} from './.github/scripts/runtime-browser-qa-support.mjs';
           const base='https://dev.four-symbols-dev.pages.dev/';
+          let server,client,proc,profile;
           try {
-            const manifest=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
-            const release=await manifest.json();
-            if (manifest.status!==200 || release.commitSha!=='33739f94a169198517e4dee661c8d901475df333') throw new Error('DEV version changed');
-            const assets=await devAccessFetch(base+'build/asset-manifest.json',{signal:AbortSignal.timeout(15000)});
-            const data=await assets.json();
-            if (assets.status!==200) throw new Error('Asset manifest unavailable');
-            const entries=data.firstPlay.resources.filter(item=>item.path.startsWith('build/firebase/'));
-            if (!entries.length) throw new Error('No startup auth assets');
-            let failed=false;
-            for(const item of entries){
-              const response=await devAccessFetch(new URL(item.path,base),{signal:AbortSignal.timeout(15000)});
-              const bytes=Buffer.from(await response.arrayBuffer());
-              const digest=createHash('sha256').update(bytes).digest('hex');
-              const ok=response.status===200 && bytes.length===item.bytes && digest.startsWith(item.sha256);
-              console.log((ok?'PASS ':'FAIL ')+item.path+' HTTP '+response.status+' bytes '+(bytes.length===item.bytes?'match':'mismatch')+' hash '+(digest.startsWith(item.sha256)?'match':'mismatch'));
-              if(!ok) failed=true;
-            }
-            if(failed) process.exitCode=1;
-          } catch {
-            console.error('Diagnostic stopped: DEV version changed, network error, or manifest unavailable');
-            process.exitCode=1;
-          }
+            const manifestResponse=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
+            const manifest=await manifestResponse.json();
+            if(manifestResponse.status!==200||manifest.commitSha!=='33739f94a169198517e4dee661c8d901475df333') throw Error('fixed DEV version unavailable');
+            const html=await devAccessFetch(base+'index.html',{signal:AbortSignal.timeout(15000)});
+            if(html.status!==200) throw Error('DEV index unavailable');
+            console.log('QA injection marker present: '+(await html.text()).includes('<!-- build:critical-script -->'));
+            server=await startServer({baseUrl:base});
+            profile=fs.mkdtempSync(path.join(os.tmpdir(),'readonly-startup-'));
+            const port=9700+Math.floor(Math.random()*100);
+            proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+            const targets=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc});
+            client=new Cdp(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
+            await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Network.enable');
+            await client.send('Page.navigate',{url:server.url});
+            const until=Date.now()+45000;
+            let ready=false;
+            while(Date.now()<until){ready=await client.eval("window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')");if(ready)break;await new Promise(r=>setTimeout(r,500));}
+            const evidence=await collectStartupFailure(client,{});
+            const failed=(evidence.startup?.failedResources||[]).map(x=>({path:String(x.path||'').split('?')[0],reason:String(x.message||'').replace(/https?:[^ ]+/g,'[url]').slice(0,250)}));
+            const safe={ready,state:evidence.startup?.state||null,errorCode:evidence.startup?.error?.code||null,loaderHidden:evidence.startup?.loaderHidden??null,authVisible:evidence.startup?.authVisible??null,failedResources:failed,proxyFailures:server.failures.map(x=>({path:String(x.path||'').split('?')[0],status:x.status})),network:(evidence.network||[]).map(x=>({path:x.path,status:x.status,error:x.error}))};
+            console.log('STARTUP_DIAGNOSTIC '+JSON.stringify(safe));
+            if(!ready)process.exitCode=1;
+          } catch {console.error('Startup diagnostic stopped: version, network or observation unavailable');process.exitCode=1;}
+          finally {client?.close();proc?.kill();if(server?.server)await new Promise(r=>server.server.close(r));if(profile)fs.rmSync(profile,{recursive:true,force:true});}
           NODE
