@@ -37,3 +37,22 @@ test('required credentials fail closed before making a DEV request', async () =>
     await assert.rejects(devAccessFetch('https://dev.four-symbols-dev.pages.dev/'), /credentials are required/);
   } finally { delete process.env.CF_ACCESS_REQUIRED; }
 });
+
+test('invalid credential format fails without exposing values or sending requests', async () => {
+  const original = globalThis.fetch;
+  let calls = 0;
+  process.env.CF_ACCESS_CLIENT_ID = 'synthetic-id';
+  process.env.CF_ACCESS_CLIENT_SECRET = 'synthetic-secret-marker\ninside';
+  globalThis.fetch = async () => { calls++; throw new Error('Unexpected request'); };
+  const safeError = (error) => error.message === 'Invalid DEV Access credentials format' && !error.message.includes('synthetic-secret-marker');
+  try {
+    await assert.rejects(devAccessFetch('https://dev.four-symbols-dev.pages.dev/'), safeError);
+    assert.throws(() => accessContinueParams({requestId:'1',request:{url:'https://dev.four-symbols-dev.pages.dev/',headers:{}}}), safeError);
+    assert.equal(calls, 0);
+  } finally {
+    globalThis.fetch = original;
+    delete process.env.CF_ACCESS_CLIENT_ID;
+    delete process.env.CF_ACCESS_CLIENT_SECRET;
+  }
+});
+

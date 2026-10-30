@@ -7,6 +7,15 @@ export function accessHeaders(input) {
   const secret = process.env.CF_ACCESS_CLIENT_SECRET;
   if (Boolean(id) !== Boolean(secret)) throw new Error('Incomplete DEV Access credentials');
   if (!id && process.env.CF_ACCESS_REQUIRED === '1') throw new Error('DEV Access credentials are required');
+  if (id) {
+    try {
+      const headers = new Headers();
+      headers.set('CF-Access-Client-Id', id);
+      headers.set('CF-Access-Client-Secret', secret);
+    } catch {
+      throw new Error('Invalid DEV Access credentials format');
+    }
+  }
   return id ? { 'CF-Access-Client-Id': id, 'CF-Access-Client-Secret': secret } : null;
 }
 
@@ -32,3 +41,4 @@ export async function devAccessFetch(input, options = {}) {
   }
   return fetch(url, options);
 }
+
