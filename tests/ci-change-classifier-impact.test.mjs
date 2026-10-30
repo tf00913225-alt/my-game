@@ -264,6 +264,19 @@ test('CI policy retains Boss Full and required failure propagation; releases rem
   }
 });
 
+test('legacy or invalid Session output retains validation and aggregate enforcement',()=>{
+  const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
+  const condition=ci.jobs.session_authority.if;
+  const selected=new Function('needs',`return ${condition}`);
+  for(const value of [undefined,'','blocked','true','invalid']) {
+    assert.equal(selected({classify:{outputs:{cloud_gate:'false',session_deploy:value}}}),true);
+  }
+  assert.equal(selected({classify:{outputs:{cloud_gate:'false',session_deploy:'false'}}}),false);
+  assert.equal(selected({classify:{outputs:{cloud_gate:'true',session_deploy:'false'}}}),true);
+  const aggregate=ci.jobs.verify.steps.find(s=>s.name==='Require every necessary child gate');
+  assert.equal(aggregate.env.CI_REQUIRE_SESSION,'${{ '+condition+' }}');
+});
+
 test('UI mode flows unchanged to exact-SHA deployment with safe manual defaults',()=>{
   const ci=fs.readFileSync('.github/workflows/ci.yml','utf8');
   const deploy=fs.readFileSync('.github/workflows/deploy-dev-cloudflare.yml','utf8');

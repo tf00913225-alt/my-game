@@ -95,6 +95,21 @@ test('legal docs classifier skips pass, failure/cancellation never does', () => 
   needs.boss_balance.result='cancelled';
   assert.throws(()=>requireChildGates(needs,{mainRequired:false,plan}),/boss_balance/);
 });
+
+test('legacy classifier cannot waive the workflow-required Session gate', () => {
+  const plan=classifyChanges(['docs/readme.md']);
+  delete plan.sessionDeploy;
+  plan.gates.session_authority=false;
+  const needs=passed();
+  assert.equal(requireChildGates(needs,{mainRequired:false,requireSession:true,plan}),true);
+  for(const result of ['skipped','failure','cancelled','neutral','queued',undefined]) {
+    needs.session_authority={result};
+    assert.throws(()=>requireChildGates(needs,{mainRequired:false,requireSession:true,plan}),/session_authority/);
+  }
+  needs.session_authority.result='skipped';
+  assert.equal(requireChildGates(needs,{mainRequired:false,requireSession:false,plan}),true);
+  assert.throws(()=>requireChildGates(needs,{requireSession:'false',plan}),/Invalid Session gate policy/);
+});
 test('missing classifier / forged strict or dev-push skips fail closed', () => {
   for(const eventName of ['push','pull_request']) {
     const plan=classifyChanges(['js/unknown.js'],{enabled:true,eventName});

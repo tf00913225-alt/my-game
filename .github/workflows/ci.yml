@@ -1094,7 +1094,7 @@ jobs:
   session_authority:
     name: Full Session Authority validation
     needs: classify
-    if: needs.classify.outputs.cloud_gate == 'true'
+    if: needs.classify.outputs.cloud_gate == 'true' || needs.classify.outputs.session_deploy != 'false'
     permissions:
       contents: read
       actions: read
@@ -1212,6 +1212,7 @@ jobs:
           CI_NEEDS_JSON: ${{ toJSON(needs) }}
           CI_PLAN_JSON: ${{ needs.classify.outputs.plan_json }}
           CI_MAIN_REQUIRED: ${{ needs.classify.outputs.main_browser }}
+          CI_REQUIRE_SESSION: ${{ needs.classify.outputs.cloud_gate == 'true' || needs.classify.outputs.session_deploy != 'false' }}
         run: node .github/scripts/ci-aggregate.mjs
 
   deploy_dev:
