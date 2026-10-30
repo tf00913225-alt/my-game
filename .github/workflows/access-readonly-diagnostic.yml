@@ -1,65 +1,46 @@
-name: Private DEV startup read-only diagnostic
+name: Private DEV manifest phase diagnostic
 on:
   push:
     branches: [fix/access-readonly-validation-20261030]
 permissions:
   contents: read
 concurrency:
-  group: access-startup-diagnostic
+  group: access-manifest-diagnostic
   cancel-in-progress: false
 jobs:
-  startup:
+  manifest:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/fix/access-readonly-validation-20261030' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 2
     env:
-      CF_ACCESS_REQUIRED: "1"
       CF_ACCESS_CLIENT_ID: ${{ secrets.DEV_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.DEV_ACCESS_CLIENT_SECRET }}
     steps:
-      - uses: actions/checkout@v7
-        with:
-          ref: 33739f94a169198517e4dee661c8d901475df333
-          persist-credentials: false
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          package-manager-cache: false
-      - name: Observe private DEV startup through isolated QA proxy
+      - name: Observe private DEV manifest status
         shell: bash
         run: |
           node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import os from 'node:os';
-          import path from 'node:path';
-          import {spawn} from 'node:child_process';
-          import {devAccessFetch} from './.github/scripts/dev-access-fetch.mjs';
-          import {startServer,findChrome,waitJson,Cdp,collectStartupFailure} from './.github/scripts/runtime-browser-qa-support.mjs';
-          const base='https://dev.four-symbols-dev.pages.dev/';
-          let server,client,proc,profile;
+          const id=process.env.CF_ACCESS_CLIENT_ID,secret=process.env.CF_ACCESS_CLIENT_SECRET;
           try {
-            const manifestResponse=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
-            const manifest=await manifestResponse.json();
-            if(manifestResponse.status!==200||manifest.commitSha!=='33739f94a169198517e4dee661c8d901475df333') throw Error('fixed DEV version unavailable');
-            const html=await devAccessFetch(base+'index.html',{signal:AbortSignal.timeout(15000)});
-            if(html.status!==200) throw Error('DEV index unavailable');
-            console.log('QA injection marker present: '+(await html.text()).includes('<!-- build:critical-script -->'));
-            server=await startServer({baseUrl:base});
-            profile=fs.mkdtempSync(path.join(os.tmpdir(),'readonly-startup-'));
-            const port=9700+Math.floor(Math.random()*100);
-            proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-            const targets=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc});
-            client=new Cdp(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
-            await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Network.enable');
-            await client.send('Page.navigate',{url:server.url});
-            const until=Date.now()+45000;
-            let ready=false;
-            while(Date.now()<until){ready=await client.eval("window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')");if(ready)break;await new Promise(r=>setTimeout(r,500));}
-            const evidence=await collectStartupFailure(client,{});
-            const failed=(evidence.startup?.failedResources||[]).map(x=>({path:String(x.path||'').split('?')[0],reason:String(x.message||'').replace(/https?:[^ ]+/g,'[url]').slice(0,250)}));
-            const safe={ready,state:evidence.startup?.state||null,errorCode:evidence.startup?.error?.code||null,loaderHidden:evidence.startup?.loaderHidden??null,authVisible:evidence.startup?.authVisible??null,failedResources:failed,proxyFailures:server.failures.map(x=>({path:String(x.path||'').split('?')[0],status:x.status})),network:(evidence.network||[]).map(x=>({path:x.path,status:x.status,error:x.error}))};
-            console.log('STARTUP_DIAGNOSTIC '+JSON.stringify(safe));
-            if(!ready)process.exitCode=1;
-          } catch {console.error('Startup diagnostic stopped: version, network or observation unavailable');process.exitCode=1;}
-          finally {client?.close();proc?.kill();if(server?.server)await new Promise(r=>server.server.close(r));if(profile)fs.rmSync(profile,{recursive:true,force:true});}
+            if(!id||!secret) { console.log('RESULT missing_credentials'); process.exitCode=1; }
+            else {
+              const h=new Headers();
+              try {h.set('CF-Access-Client-Id',id);h.set('CF-Access-Client-Secret',secret);} catch {console.log('RESULT invalid_credentials_format');process.exit(1);}
+              const r=await fetch('https://dev.four-symbols-dev.pages.dev/release-manifest.json',{headers:h,redirect:'manual',signal:AbortSignal.timeout(15000)});
+              console.log('RESULT http_status='+r.status);
+              if(r.status!==200){process.exitCode=1;}
+              else {
+                let data;
+                try {data=await r.json();console.log('RESULT json_parse=success');}
+                catch {console.log('RESULT json_parse=failure');process.exit(1);}
+                if(typeof data.commitSha==='string'&&/^[0-9a-f]{40}$/.test(data.commitSha))console.log('RESULT deployed_sha='+data.commitSha);
+                else {console.log('RESULT deployed_sha=invalid');process.exitCode=1;}
+              }
+            }
+          } catch(error) {
+            const codes=['ETIMEDOUT','ECONNRESET','ECONNREFUSED','ENOTFOUND','EAI_AGAIN','UND_ERR_CONNECT_TIMEOUT'];
+            const code=error?.cause?.code;
+            console.log('RESULT network_error='+(codes.includes(code)?code:'unknown'));
+            process.exitCode=1;
+          }
           NODE
