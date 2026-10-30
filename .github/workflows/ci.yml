@@ -1244,6 +1244,7 @@ jobs:
         env:
           DEPLOYMENT_SCOPE: ${{ needs.classify.outputs.session_deploy }}
         with:
+          retries: 0
           script: |
             if (process.env.DEPLOYMENT_SCOPE !== 'true') throw Error('Unreliable Session deployment scope');
             const sha = context.sha;
@@ -1251,7 +1252,7 @@ jobs:
             if (dev.object.sha !== sha) throw Error('Superseded dev; no backend deployment requested');
             const {data:existing} = await github.rest.actions.listWorkflowRuns({...context.repo,
               workflow_id:'session-authority.yml',event:'workflow_dispatch',branch:'dev',head_sha:sha,per_page:100});
-            if (!Array.isArray(existing.workflow_runs) || !Number.isSafeInteger(existing.total_count) || existing.total_count < 0 || existing.total_count > 100) throw Error('Ambiguous deployment request history');
+            if (!Array.isArray(existing.workflow_runs) || !Number.isSafeInteger(existing.total_count) || existing.total_count < 0 || existing.total_count > 100 || existing.total_count !== existing.workflow_runs.length) throw Error('Ambiguous deployment request history');
             const matches = existing.workflow_runs.filter(run=>run.path === '.github/workflows/session-authority.yml' &&
               run.event === 'workflow_dispatch' && run.head_branch === 'dev' && run.head_sha === sha &&
               run.display_title === `Verified Session deployment ${sha}`);
@@ -1261,10 +1262,14 @@ jobs:
                 .addRaw(matches.map(run=>run.html_url).join('\n')).write();
               return;
             }
-            await github.rest.actions.createWorkflowDispatch({...context.repo,
-              workflow_id:'session-authority.yml',ref:'dev',inputs:{
-                verified_ci_run_id:String(context.runId),
-                verified_ci_attempt:process.env.GITHUB_RUN_ATTEMPT,
-                verified_sha:sha}});
+            try {
+              await github.rest.actions.createWorkflowDispatch({...context.repo,
+                workflow_id:'session-authority.yml',ref:'dev',inputs:{
+                  verified_ci_run_id:String(context.runId),
+                  verified_ci_attempt:process.env.GITHUB_RUN_ATTEMPT,
+                  verified_sha:sha}});
+            } catch (error) {
+              throw Error(`Deployment request rejected or outcome unknown; STOP and inspect child runs before any retry: ${error.message}`);
+            }
             await core.summary.addHeading('Protected deployment REQUESTED, not yet verified')
               .addRaw(`CI ${context.runId}/attempt ${process.env.GITHUB_RUN_ATTEMPT}, SHA ${sha}. Follow the independent Session Authority run; dispatch acceptance is not deployment acceptance.`).write();

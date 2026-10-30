@@ -24,6 +24,11 @@ dev push CI with those paths can request the existing independent Session workfl
 It binds source SHA/run/attempt, refuses stale dev or failed/duplicate requests,
 and explicitly reports REQUESTED rather than deployment acceptance. Only this
 post-validation job receives `actions: write` to dispatch that existing workflow.
+The token grants repository Actions write capability, not an endpoint-only
+permission. History lookup and dispatch are not atomic: this is not a claim of
+exactly-once dispatch. Partial/ambiguous history or a rejected/unknown dispatch
+outcome stops without automatic retry; inspect the original child before any
+human-authorized retry. GitHub-script retries are explicitly zero.
 
 The Session deployment independently verifies current dev, the newest trusted
 ci.yml push run/attempt, Repository checks, the full Session job and each required

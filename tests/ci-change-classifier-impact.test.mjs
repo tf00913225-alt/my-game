@@ -89,9 +89,9 @@ test('deployment request pins SHA/run/attempt and refuses blocked scope, stale d
   const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
   const script=ci.jobs.request_session_deploy.steps[0].with.script;
   const sha='a'.repeat(40),requests=[];
-  const execute=async({scope='true',current=sha,fail=false,existing=[]}={})=>{
+  const execute=async({scope='true',current=sha,fail=false,existing=[],history}={})=>{
     const summary={addHeading(){return this;},addRaw(){return this;},async write(){}};
-    const github={rest:{git:{getRef:async()=>({data:{object:{sha:current}}})},actions:{listWorkflowRuns:async()=>({data:{workflow_runs:existing,total_count:existing.length}}),createWorkflowDispatch:async args=>{if(fail)throw Error('dispatch rejected');requests.push(args);}}}};
+    const github={rest:{git:{getRef:async()=>({data:{object:{sha:current}}})},actions:{listWorkflowRuns:async()=>({data:history??{workflow_runs:existing,total_count:existing.length}}),createWorkflowDispatch:async args=>{if(fail)throw Error('dispatch rejected');requests.push(args);}}}};
     return vm.runInNewContext('(async()=>{'+script+'})()',{
       github,context:{repo:{owner:'owner',repo:'repo'},sha,runId:123},
       core:{summary},process:{env:{DEPLOYMENT_SCOPE:scope,GITHUB_RUN_ATTEMPT:'2'}}});
@@ -105,6 +105,11 @@ test('deployment request pins SHA/run/attempt and refuses blocked scope, stale d
   await execute({existing:[prior]});
   await execute({existing:[{...prior,status:'completed',conclusion:'success'}]});
   await assert.rejects(execute({existing:[{...prior,status:'completed',conclusion:'failure'}]}),/no automatic retry/);
+  for(const history of [{},{total_count:0},{workflow_runs:[]},{total_count:1,workflow_runs:[]},
+    {total_count:0,workflow_runs:[prior]},{total_count:101,workflow_runs:[]},
+    {total_count:-1,workflow_runs:[]},{total_count:0.5,workflow_runs:[]}])
+    await assert.rejects(execute({history}),/Ambiguous deployment request history/);
+  assert.equal(ci.jobs.request_session_deploy.steps[0].with.retries,0);
   assert.equal(requests.length,1,'no blind retries or stale deployment');
 });
 
