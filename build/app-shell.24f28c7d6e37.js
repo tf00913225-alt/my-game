@@ -6320,6 +6320,13 @@ function getCharacterArtworkPath(character){
    戰鬥卡片與戰鬥事件繼續由此函式提供獨立戰鬥姿勢；不混用一般立繪。
 */
 function getCharacterBattleArtworkPath(character){
+    const source=getCharacterBattleDetailArtworkPath(character);
+    return character&&character.combatantKind!=="heroNpc"
+        ?source.replace("/player_battle_","/player_battle_readable_")
+        :source;
+}
+
+function getCharacterBattleDetailArtworkPath(character){
     if(!character){ return ""; }
     if(character.combatantKind==="heroNpc"){
         return ({divineDogHongbao:"assets/heroes/divine-dog-hongbao.webp",vajraHeavenlyKing:"assets/heroes/vajra-heavenly-king.webp"})[character.heroId]||"";
@@ -24065,7 +24072,8 @@ function openBattleStatusDetailModal(side,index){
     const portrait=modal.querySelector('.battle-status-detail-portrait');
     const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);
     const artwork=card&&card.querySelector('.v174-battle-art');
-    const source=artwork&&artwork.style.backgroundImage;
+    const detailSource=modal.dataset.portraitKind==="player"?getCharacterBattleDetailArtworkPath(entity):"";
+    const source=detailSource?'url("'+detailSource+'")':artwork&&artwork.style.backgroundImage;
     portrait.style.backgroundImage=source&&source!=='none'?source:'none';
     portrait.textContent=source&&source!=='none'?'':'◇';
     portrait.setAttribute('aria-label',String(entity.name||entity.id||'角色')+'立繪');
