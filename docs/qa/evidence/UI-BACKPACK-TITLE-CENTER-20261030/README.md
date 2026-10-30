@@ -15,3 +15,5 @@ backpack-*.png 是原 visual fixture 的合成畫面。該 fixture 缺正式 cha
 Enter 診斷：先前 CDP 只送 rawKeyDown/keyUp，補送 Enter char 後，360x800 與 1366x768 的合成事件均成功切回長名稱；不是已證實遊戲 Enter 無效。診斷輸出亦顯示切換重繪後 activeElement 為 BODY，焦點保留與連續鍵盤操作仍需評估，真機仍未驗。先前失敗測試的 QA 變體及 JSON 保留；兩張 keyboard-return 圖已更新為診斷後的成功畫面。
 
 焦點遺失根因：實際 runtime 的 renderInventoryCharacterTabs 由 js/35-v141-ui-battle.js 覆寫，直接重建按鈕，焦點落至 BODY；原 js/00 定義不是生效 Owner。已在實際 Owner 保留原聚焦箭頭，合成 360x800 與 1366x768 實測 Enter 切換後焦點仍在箭頭，第二次 Enter 可繼續切換；焦點及畫面證據附檔。真機、其他鍵與完整輔助技術未驗。
+
+角色切換箭頭觸控補修：360x800 實際繪製尺寸由 44x38 調整為 44x44 CSS px，桌面約 52.8x52.8；360x800 合成觸控點選下一角色、1366x768 滑鼠點選，以及兩尺寸連續 Enter、長名及三完整物品列均通過，非作者實看兩尺寸畫面與直接 diff。這是模擬觸控，非實機；其他尺寸、空資料、字體放大及其他鍵未驗。
