@@ -8079,6 +8079,7 @@
         renderInventoryCharacterTabs=function(){
             const wrap=document.getElementById("inventoryCharacterTabs");
             if(!wrap){ return; }
+            const focusedArrow=wrap.contains(document.activeElement)&&document.activeElement.matches(".inventory-character-arrow") ? document.activeElement.getAttribute("aria-label") : null;
             const indexes=getCreatedBackpackIndexes();
             if(indexes.length&& !indexes.includes(inventoryCharacterIndex)){ inventoryCharacterIndex=indexes[0]; }
             const character=getBackpackCharacter(inventoryCharacterIndex);
@@ -8087,6 +8088,7 @@
                 '<div class="inventory-character-name"><span>'+escapeHtml(character&&character.id||"角色")+'</span>'+
                 '<small class="inventory-character-level">'+(character?"Lv."+(character.level||1):"尚未建立")+'</small></div>'+
                 '<button type="button" class="inventory-character-arrow" aria-label="下一個角色" onclick="changeInventoryCharacter(1)">›</button>';
+            if(focusedArrow){ wrap.querySelectorAll(".inventory-character-arrow").forEach(button=>{if(button.getAttribute("aria-label")===focusedArrow){button.focus({preventScroll:true});}}); }
         };
     }
 
