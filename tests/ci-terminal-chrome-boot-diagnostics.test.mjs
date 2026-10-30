@@ -178,6 +178,7 @@ test('terminal visual QA retains failed Chrome process evidence before CDP exist
             class Cdp{};
             const collectStartupFailure=async()=>{throw Error('CDP must not exist');};`;
         const source=original.replace(/^import \{ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup\} from .*;$/m,dependencies)
+            .replace("from './dev-access-fetch.mjs'",`from ${JSON.stringify(new URL('../.github/scripts/dev-access-fetch.mjs',import.meta.url).href)}`)
             .replace("const baseUrl=process.env.QA_BASE_URL||'';","const baseUrl='';");
         assert.notEqual(source,original,'fixture must isolate the imported transport');
         const script=`try{await import(${JSON.stringify('data:text/javascript;base64,'+Buffer.from(source).toString('base64'))});throw Error('expected failure');}

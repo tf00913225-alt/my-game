@@ -1,3 +1,4 @@
+import { devAccessFetch, accessContinueParams, DEV_ORIGIN } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -28,8 +29,8 @@ try{
  if(live){
   url=new URL('index.html',process.env.DEV_BASE_URL.replace(/\/$/,'')+'/').href;
   assert.ok(process.env.EXPECTED_COMMIT_SHA,'live QA requires deployment SHA');
-  const release=await (await fetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();assert.equal(release.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
-  const manifest=await (await fetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
+  const release=await (await devAccessFetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();assert.equal(release.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
+  const manifest=await (await devAccessFetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed bundles mismatch');
  }else{server=await startServer();url=server.url;}
  profile=fs.mkdtempSync(path.join(os.tmpdir(),'forge-qa-'));
  // Keep this pool above fetch's blocked 10080 port; Chrome itself can listen there.
@@ -41,8 +42,8 @@ try{
  // prefetch must not accidentally turn this cold-entry regression into a warm test.
  let holdGameplay=true;const heldGameplay=[];
  const stubs=new Map(live?[[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]:[]);
- c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p.requestId);return;}const body=stubs.get('/'+pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
- await c.send('Fetch.enable',{patterns:[{urlPattern:'*/build/gameplay-core-*.js*',resourceType:'Script'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
+ c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p);return;}const body=stubs.get('/'+pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:accessContinueParams(p)).catch(error=>console.error(error.message));}});
+ await c.send('Fetch.enable',{patterns:[...(live?[{urlPattern:DEV_ORIGIN+'/*'}]:[]),{urlPattern:'*/build/gameplay-core-*.js*',resourceType:'Script'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
   const point=await c.eval(`(async()=>{const n=document.querySelector(${JSON.stringify(selector)});if(!n)throw Error('missing control '+${JSON.stringify(selector)});n.scrollIntoView({block:'nearest',behavior:'instant'});await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));const r=n.getBoundingClientRect(),x=r.left+r.width/2,y=r.top+r.height/2,h=document.elementFromPoint(x,y);if(n.disabled||!r.width||!r.height||!(h&&(n===h||n.contains(h))))throw Error('untappable control '+${JSON.stringify(selector)}+' '+JSON.stringify({rect:r.toJSON(),hit:h&&{tag:h.tagName,id:h.id,class:h.className},body:document.querySelector('.v141-synthesis-body')?.getBoundingClientRect().toJSON(),nav:document.getElementById('bottomNav')?.getBoundingClientRect().toJSON(),detailsOpen:n.closest('details')?.open,scrollTop:document.querySelector('.v141-synthesis-body')?.scrollTop}));return {x,y,summary:n.tagName==='SUMMARY',wasOpen:n.tagName==='SUMMARY'?n.parentElement.open:null};})()`);
@@ -93,7 +94,7 @@ try{
    assert.equal(await c.eval(`document.getElementById('homeFeatureModal').classList.contains('show')`),false,'cold forge reopened stale announcement before owner ready');
    assert.equal(await c.eval(`document.querySelector('[aria-label="鍛造"]').getAttribute('aria-busy')`),'true','first touch did not wait for the forge owner');
    assert.ok(heldGameplay.length,'cold entry did not exercise a delayed real gameplay script');
-   holdGameplay=false;for(const requestId of heldGameplay.splice(0))await c.send('Fetch.continueRequest',{requestId});
+   holdGameplay=false;for(const request of heldGameplay.splice(0))await c.send('Fetch.continueRequest',accessContinueParams(request));
   }
   await c.eval(`(async()=>{const end=Date.now()+10000;while(Date.now()<end&&typeof v141SwitchForgeTab!=='function')await new Promise(r=>setTimeout(r,50));return true;})()`);
   assert.equal(await c.eval(`typeof v141SwitchForgeTab`),'function');

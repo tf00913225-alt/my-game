@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import http from "node:http";
@@ -60,7 +61,7 @@ async function startServer({baseUrl,cloudModule=QA_CLOUD_MODULE,handleRequest}={
             // Exact deployed assets remain authoritative; only the established
             // read-only account transport above is isolated from player data.
             try{
-                const upstream=await fetch(new URL(relative,baseUrl.replace(/\/$/,"")+"/"));
+                const upstream=await devAccessFetch(new URL(relative,baseUrl.replace(/\/$/,"")+"/"));
                 if(!upstream.ok){ recordFailure(pathname,upstream.status,"upstream HTTP failure"); }
                 res.writeHead(upstream.status,{"content-type":upstream.headers.get("content-type")||mime(relative),"cache-control":"no-store"});
                 if(relative==="index.html"){res.end((await upstream.text()).replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));}
