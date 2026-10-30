@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import crypto from 'node:crypto';
 import { execFileSync } from 'node:child_process';
+import { devAccessFetch } from './dev-access-fetch.mjs';
 
 const ROOT=process.cwd();
 const RELEASE_PATH=path.join(ROOT,'release','release.json');
@@ -257,7 +258,7 @@ async function verifyDeployed(config){
   const base=(process.env.DEPLOY_BASE_URL||'').replace(/\/$/,'');
   const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'';
   if(!base) fail('DEPLOY_BASE_URL is required.');
-  const response=await fetch(`${base}/release-manifest.json?sha=${encodeURIComponent(expected)}`,{cache:'no-store'});
+  const response=await devAccessFetch(`${base}/release-manifest.json?sha=${encodeURIComponent(expected)}`,{cache:'no-store'});
   if(!response.ok) fail(`Cannot fetch deployed manifest: HTTP ${response.status}`);
   const manifest=await response.json();
   if(manifest.commitSha!==expected) fail(`Deployed SHA ${manifest.commitSha} != branch commit ${expected}.`);

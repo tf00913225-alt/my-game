@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -7,7 +8,7 @@ import {ROOT,findChrome,startServer,waitJson,Cdp} from "./runtime-browser-qa-sup
 const baseUrl=process.env.QA_BASE_URL||"";
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||"local";
 if(baseUrl){
-    const manifest=await (await fetch(baseUrl+"/release-manifest.json",{cache:"no-store"})).json();
+    const manifest=await (await devAccessFetch(baseUrl+"/release-manifest.json",{cache:"no-store"})).json();
     assert.equal(manifest.commitSha,expected,"live V2 QA must use exact deployed SHA");
 }
 // Uses the existing read-only account transport fixture, production index and

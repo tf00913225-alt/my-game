@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import os from "node:os";
@@ -310,7 +311,7 @@ await import('../../tests/fixtures/run-chapter1-guided-pointer-qa.mjs');
 async function runProductionAdventureBalanceQa(){
     const baseUrl=process.env.ADVENTURE_BALANCE_BASE_URL;
     if(baseUrl){
-        const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());
+        const manifest=await devAccessFetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());
         assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed Adventure exact SHA');
     }
     const reference=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');

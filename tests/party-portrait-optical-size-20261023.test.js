@@ -9,7 +9,7 @@ const source=fs.readFileSync(path.join(root,'js/54-v173.51-battle-qa.js'),'utf8'
 const block=source.slice(source.indexOf('const PARTY_ART_DENSITY='),source.indexOf('function setTextIfChanged'));
 const context=vm.createContext({});
 vm.runInContext(block+';globalThis.catalog=PARTY_ART_DENSITY;globalThis.height=partyPortraitHeight;',context);
-const measurements=JSON.parse(fs.readFileSync(path.join(root,'docs/qa/PLAYER-BATTLE-PORTRAITS-20261030-optical.json'),'utf8'));
+const measurements=JSON.parse(fs.readFileSync(path.join(root,'docs/qa/BATTLE-PORTRAIT-READABILITY-20261030-optical.json'),'utf8'));
 test('party optical metadata matches all current binary assets and equalizes area to the approved original rear baseline',()=>{
  assert.equal(Object.keys(context.catalog).length,10);
  const areas=[];
