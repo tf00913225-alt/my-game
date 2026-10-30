@@ -3,8 +3,8 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Layering and Boss tiers integrated. Current affected-area routing repair is owned by
-Work ID CI-IMPACT-ROUTING-20261018, branch fix/ci-impact-routing-20261018.
+Status: Layering, Boss tiers and affected-area routing are integrated. Current usage-efficiency follow-up is owned by
+Work ID CI-USAGE-EFFICIENCY-20261030, branch fix/ci-usage-efficiency-20261030.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
 
 ### 2026-10-30 CI usage efficiency checkpoint

@@ -306,7 +306,7 @@ Phase 1–3 保留既有驗收結果。Phase 4 維持 **0/6 VERIFIED**；Phase 5
 
 ## Backend 部署與 protected-test 操作
 
-`.github/workflows/session-authority.yml`：PR→dev 執行專屬 emulator gate；merge 至 dev 後，先等該 SHA 的 Repository checks SUCCESS 並確認仍是最新 dev，才部署。沿用既有 Actions Secret `FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON`；缺少權限／Secret 則 job 失敗，Phase 1 必須保持 BLOCKED。
+CI-USAGE-EFFICIENCY-20261030 候選（生效與部署狀態以其 PR 為準）：PR／dev 的完整 Session emulator、Boot／SDK Gate 由 `.github/workflows/ci.yml` 重用原 `session-authority.yml` 一次，Repository checks 必須等待其成功。原 Session paths 的 dev push 全部必要驗證成功後，才要求原獨立 Session workflow 部署；該 workflow 再核 exact SHA、最新 CI run／attempt 與完整安全步驟，不占 runner 重等或重跑 emulator。人工無來源參數時仍跑原完整驗證及有界等待；原不可取消部署鎖保留。沿用既有 `FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON`，缺少權限／Secret 或來源證據失敗即 BLOCKED；要求派送不等於部署驗收。詳見 [CI Owner 的目前 checkpoint](CI_TEST_GOVERNANCE_LAYERING_20261006.md#2026-10-30-ci-usage-efficiency-checkpoint)。
 
 歷史 Rules API IAM 403 已解除；目前部署服務帳號為 `github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`，七支 Functions／Rules 已實際成功部署。若未來再次遇到權限錯誤，依實際錯誤核對最小權限；本次沒有授予 IAM 角色，也沒有存取或提交私鑰。
 
