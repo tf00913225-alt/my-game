@@ -1263,6 +1263,88 @@ jobs:
                 .addRaw(matches.map(run=>run.html_url).join('\n')).write();
               return;
             }
+            // Reuse only the latest positively completed backend deployment.
+            // Validation-only edits must not rebuild identical paid backend inputs.
+            const latestBackend = async () => {
+              const runs = await Promise.all(['push','workflow_dispatch'].map(async event=>{
+                const {data:history} = await github.rest.actions.listWorkflowRuns({...context.repo,
+                  workflow_id:'session-authority.yml',branch:'dev',event,per_page:1});
+                if (!Number.isSafeInteger(history.total_count) || history.total_count < 0 ||
+                    !Array.isArray(history.workflow_runs) || history.workflow_runs.length !== Math.min(history.total_count,1)) throw Error('Incomplete backend deployment history');
+                const run = history.workflow_runs[0];
+                if (run && (run.path !== '.github/workflows/session-authority.yml' || run.event !== event ||
+                    run.head_branch !== 'dev' || !Number.isSafeInteger(run.id) || run.id < 1)) throw Error('Invalid backend deployment history');
+                return run;
+              }));
+              return runs.filter(Boolean).sort((a,b)=>b.id-a.id)[0];
+            };
+            const baseline = await latestBackend();
+            if (!baseline || !Number.isSafeInteger(baseline.id) || !Number.isSafeInteger(baseline.run_attempt) ||
+                baseline.run_attempt < 1 || !/^[a-f0-9]{40}$/.test(baseline.head_sha) ||
+                baseline.status !== 'completed' || baseline.conclusion !== 'success') throw Error('Latest backend deployment baseline is not successful');
+            const {data:baselineJobs} = await github.rest.actions.listJobsForWorkflowRunAttempt({...context.repo,
+              run_id:baseline.id,attempt_number:baseline.run_attempt,per_page:100});
+            if (!Number.isSafeInteger(baselineJobs.total_count) || baselineJobs.total_count < 0 || baselineJobs.total_count > 100 ||
+                !Array.isArray(baselineJobs.jobs) || baselineJobs.total_count !== baselineJobs.jobs.length) throw Error('Incomplete backend deployment job evidence');
+            const deployed = baselineJobs.jobs?.filter(job=>job.name === 'Deploy session authority from dev');
+            if (deployed?.length !== 1 || deployed[0].run_id !== baseline.id || deployed[0].head_sha !== baseline.head_sha ||
+                deployed[0].status !== 'completed' || deployed[0].conclusion !== 'success' ||
+                !['Require current dev and its Repository checks','Deploy protected cloud endpoints and deny-write rules'].every(name=>{
+                  const steps = deployed[0].steps?.filter(step=>step.name === name);
+                  return steps?.length === 1 && steps[0].status === 'completed' && steps[0].conclusion === 'success';
+                })) throw Error('Missing successful backend deployment steps');
+            const payload = async ref => {
+              const {data:commit} = await github.rest.git.getCommit({...context.repo,commit_sha:ref});
+              if (commit.sha !== ref || !/^[a-f0-9]{40}$/.test(commit.tree?.sha)) throw Error('Backend source commit mismatch');
+              const {data:tree} = await github.rest.git.getTree({...context.repo,tree_sha:commit.tree.sha});
+              if (tree.sha !== commit.tree.sha || tree.truncated || !Array.isArray(tree.tree)) throw Error('Incomplete backend payload tree');
+              const entries = tree.tree.filter(entry=>['functions','scripts'].includes(entry.path) ||
+                /^(?:firebase[^/]*\.json|firestore[^/]*|storage\.rules|package(?:-lock)?\.json|\.firebaserc|\.firebaseignore|\.gcloudignore|\.npmrc)$/.test(entry.path));
+              for (const path of ['functions','firebase.json','firestore.rules']) {
+                const found = entries.filter(entry=>entry.path === path);
+                if (found.length !== 1 || found[0].type !== (path === 'functions' ? 'tree' : 'blob')) throw Error('Missing backend deployment input');
+              }
+              if (entries.some(entry=>!['blob','tree'].includes(entry.type) || !/^[a-f0-9]{40}$/.test(entry.sha))) throw Error('Invalid backend deployment input');
+              const {data:config} = await github.rest.repos.getContent({...context.repo,path:'firebase.json',ref});
+              if (config.encoding !== 'base64') throw Error('Unreadable backend deployment configuration');
+              const parsed = JSON.parse(Buffer.from(config.content,'base64').toString('utf8'));
+              if (JSON.stringify(parsed) !== JSON.stringify({functions:{source:'functions',runtime:'nodejs22'},firestore:{rules:'firestore.rules'}})) throw Error('Unknown backend packaging or hooks; no no-op exemption');
+              const {data:workflow} = await github.rest.repos.getContent({...context.repo,path:'.github/workflows/session-authority.yml',ref});
+              if (workflow.encoding !== 'base64') throw Error('Unreadable backend deployment workflow');
+              const source = Buffer.from(workflow.content,'base64').toString('utf8');
+              const root = source.split('\njobs:\n');
+              // Only the two reviewed trigger/permission/concurrency contexts
+              // qualify. Quoted keys, aliases or late root context cannot hide
+              // an environment/defaults change from the no-op comparison.
+              // SHA-256 over UTF-8 bytes before "\njobs:\n": baseline
+              // ad2a8dcdf947ad0b10a26a6b6e8657a234785887; candidate
+              // e28eebff37d4948f2bd180d0be81fc0465802a23.
+              if (root.length !== 2 || /^[^\s#]/m.test(root[1]) || ![
+                '410b98fa187ccdcdf2509686e1f1ad054eb2d2de79a196259864c0773aaa7a76',
+                'd34bb48a9307be0f049dd9256c22b51098e81770bc461e3aedeea0ffd674c24e'
+              ].includes(require('node:crypto').createHash('sha256').update(root[0]).digest('hex')) ||
+                  source.split('\n  deploy:\n').length !== 2) throw Error('Unknown backend deployment pipeline');
+              let deployment = source.split('\n  deploy:\n')[1];
+              const condition = deployment.match(/^    if: \$\{\{ (.+) \}\}$/m);
+              if (!condition || ![
+                "!inputs.emulator_only && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/dev'",
+                "!cancelled() && !inputs.emulator_only && (needs.emulator.result == 'success' || inputs.verified_ci_run_id) && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev'"
+              ].includes(condition[1])) throw Error('Unknown backend deployment eligibility');
+              deployment = deployment.replace(condition[0],'    if: verified-source');
+              const proof = /      - name: Require current dev and its Repository checks\n        env:\n          GH_TOKEN: \$\{\{ github.token \}\}\n(?:          VERIFIED_CI_RUN_ID: \$\{\{ inputs.verified_ci_run_id \}\}\n          VERIFIED_CI_ATTEMPT: \$\{\{ inputs.verified_ci_attempt \}\}\n          VERIFIED_CI_SHA: \$\{\{ inputs.verified_sha \}\}\n)?(?:        shell: bash\n)?        run: node \.github\/scripts\/wait-session-repository-checks\.mjs\n/g;
+              if ([...deployment.matchAll(proof)].length !== 1) throw Error('Unknown backend source verification step');
+              deployment = deployment.replace(proof,'      - name: Verified current dev and Repository checks\n');
+              return JSON.stringify([entries.map(({path,mode,type,sha})=>({path,mode,type,sha})).sort((a,b)=>a.path.localeCompare(b.path)),deployment]);
+            };
+            if (await payload(baseline.head_sha) === await payload(sha)) {
+              const latest = await latestBackend();
+              if (latest?.id !== baseline.id || latest.run_attempt !== baseline.run_attempt || latest.status !== 'completed' || latest.conclusion !== 'success') throw Error('Backend baseline changed during verification');
+              const {data:current} = await github.rest.git.getRef({...context.repo,ref:'heads/dev'});
+              if (current.object.sha !== sha) throw Error('Superseded dev during backend payload verification');
+              await core.summary.addHeading('Backend payload unchanged; no deployment requested')
+                .addRaw(`Current SHA ${sha}; successful deployment ${baseline.id}/attempt ${baseline.run_attempt}, source ${baseline.head_sha}. Functions tree, configuration/rules and protected deployment steps match. Full current Session/Repository validation remains required.`).write();
+              return;
+            }
             try {
               await github.rest.actions.createWorkflowDispatch({...context.repo,
                 workflow_id:'session-authority.yml',ref:'dev',inputs:{

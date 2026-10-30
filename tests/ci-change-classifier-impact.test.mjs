@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import vm from 'node:vm';
+import {createHash} from 'node:crypto';
 import {parseDocument} from 'yaml';
 import {classifyChanges, classifySharedCss, classifySharedHtml, BROWSER_GATES} from '../.github/scripts/ci-change-classifier.mjs';
 import {requireChildGates, CHILD_GATES} from '../.github/scripts/ci-aggregate.mjs';
@@ -96,17 +97,39 @@ test('one CI Session validation preserves every former Session path and all orig
   for(const [name,job] of Object.entries(ci.jobs))if(name!=='request_session_deploy')assert.notEqual(job.permissions?.actions,'write',name);
 });
 
-test('deployment request pins SHA/run/attempt and refuses blocked scope, stale dev or API failure',async()=>{
+async function executeDeploymentRequest({scope='true',current='a'.repeat(40),fail=false,existing=[],history,
+  baselinePatch={},jobPatch={},stepsPatch,missingInput=false,truncated=false,config,
+  samePayload=false,payloadPatch={},workflowPatch,changedBaseline=false,newerRun,baselineHistory,jobHistory}={},requests=[],headings=[]) {
   const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
   const script=ci.jobs.request_session_deploy.steps[0].with.script;
+  const sha='a'.repeat(40),base='b'.repeat(40);
+  const baseline={id:10,run_attempt:1,path:'.github/workflows/session-authority.yml',event:'push',head_branch:'dev',head_sha:base,status:'completed',conclusion:'success',...baselinePatch};
+  let baselineReads=0;
+  const summary={addHeading(value){headings.push(value);return this;},addRaw(){return this;},async write(){}};
+  const github={rest:{git:{
+    getRef:async()=>({data:{object:{sha:current}}}),
+    getCommit:async({commit_sha})=>({data:{sha:commit_sha,tree:{sha:commit_sha}}}),
+    getTree:async({tree_sha})=>({data:{sha:tree_sha,truncated,tree:['functions','firebase.json','firestore.rules'].filter(p=>!missingInput||p!=='functions').map(path=>({path,type:path==='functions'?'tree':'blob',mode:path==='functions'?'040000':'100644',sha:(tree_sha===sha&&!samePayload&&path==='functions'?'2':'1').repeat(40),...(tree_sha===sha?payloadPatch[path]:{})}))}})
+  },repos:{getContent:async({path,ref})=>({data:{encoding:'base64',content:Buffer.from(path==='firebase.json'?
+    JSON.stringify(config??{functions:{source:'functions',runtime:'nodejs22'},firestore:{rules:'firestore.rules'}}):
+    (ref===sha&&workflowPatch!==undefined?workflowPatch:fs.readFileSync('.github/workflows/session-authority.yml','utf8'))).toString('base64')}})},actions:{
+    listWorkflowRuns:async args=>({data:args.head_sha?(history??{workflow_runs:existing,total_count:existing.length}):
+      (baselineHistory??(args.event==='workflow_dispatch'?
+        {total_count:newerRun?1:0,workflow_runs:newerRun?[newerRun]:[]}:
+        {total_count:501,workflow_runs:[{...baseline,...(++baselineReads>1&&changedBaseline?{run_attempt:2}:{})}]}))}),
+    listJobsForWorkflowRunAttempt:async()=>({data:jobHistory??{total_count:1,jobs:[{name:'Deploy session authority from dev',run_id:10,head_sha:base,status:'completed',conclusion:'success',
+      steps:stepsPatch??['Require current dev and its Repository checks','Deploy protected cloud endpoints and deny-write rules'].map(name=>({name,status:'completed',conclusion:'success'})),...jobPatch}]}}),
+    createWorkflowDispatch:async args=>{if(fail)throw Error('dispatch rejected');requests.push(args);}
+  }}};
+  return vm.runInNewContext('(async()=>{'+script+'})()',{
+    Buffer,require:id=>{assert.equal(id,'node:crypto');return {createHash};},github,context:{repo:{owner:'owner',repo:'repo'},sha,runId:123},
+    core:{summary},process:{env:{DEPLOYMENT_SCOPE:scope,GITHUB_RUN_ATTEMPT:'2'}}});
+}
+
+test('deployment request pins SHA/run/attempt and refuses blocked scope, stale dev or API failure',async()=>{
+  const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
   const sha='a'.repeat(40),requests=[];
-  const execute=async({scope='true',current=sha,fail=false,existing=[],history}={})=>{
-    const summary={addHeading(){return this;},addRaw(){return this;},async write(){}};
-    const github={rest:{git:{getRef:async()=>({data:{object:{sha:current}}})},actions:{listWorkflowRuns:async()=>({data:history??{workflow_runs:existing,total_count:existing.length}}),createWorkflowDispatch:async args=>{if(fail)throw Error('dispatch rejected');requests.push(args);}}}};
-    return vm.runInNewContext('(async()=>{'+script+'})()',{
-      github,context:{repo:{owner:'owner',repo:'repo'},sha,runId:123},
-      core:{summary},process:{env:{DEPLOYMENT_SCOPE:scope,GITHUB_RUN_ATTEMPT:'2'}}});
-  };
+  const execute=options=>executeDeploymentRequest(options,requests);
   await execute();
   assert.equal(requests.length,1);assert.equal(requests[0].ref,'dev');
   assert.equal(requests[0].workflow_id,'session-authority.yml');
@@ -122,6 +145,50 @@ test('deployment request pins SHA/run/attempt and refuses blocked scope, stale d
     await assert.rejects(execute({history}),/Ambiguous deployment request history/);
   assert.equal(ci.jobs.request_session_deploy.steps[0].with.retries,0);
   assert.equal(requests.length,1,'no blind retries or stale deployment');
+});
+
+test('identical positively deployed backend inputs avoid dispatch, never current security validation',async()=>{
+  const requests=[],headings=[];
+  await executeDeploymentRequest({samePayload:true},requests,headings);
+  assert.equal(requests.length,0);
+  assert.ok(headings.includes('Backend payload unchanged; no deployment requested'));
+  for(const options of [
+    {baselinePatch:{conclusion:'failure'}},{baselinePatch:{status:'in_progress'}},
+    {baselinePatch:{event:'pull_request'}},{baselinePatch:{path:'.github/workflows/other.yml'}},
+    {jobPatch:{conclusion:'skipped'}},{jobPatch:{head_sha:'c'.repeat(40)}},{stepsPatch:[]},
+    {missingInput:true},{truncated:true},{changedBaseline:true},
+    {baselineHistory:{total_count:1,workflow_runs:[]}},{baselineHistory:{workflow_runs:[]}},
+    {jobHistory:{total_count:1,jobs:[]}},{jobHistory:{jobs:[]}},{jobHistory:{total_count:101,jobs:[]}},
+    {stepsPatch:[...['Require current dev and its Repository checks','Deploy protected cloud endpoints and deny-write rules'].map(name=>({name,status:'completed',conclusion:'success'})),{name:'Deploy protected cloud endpoints and deny-write rules',status:'completed',conclusion:'failure'}]},
+    {config:{functions:{source:'elsewhere'}}},{config:{functions:{source:'functions',runtime:'nodejs22',predeploy:['unsafe']},firestore:{rules:'firestore.rules'}}}
+  ])await assert.rejects(executeDeploymentRequest({samePayload:true,...options},requests));
+  assert.equal(requests.length,0,'untrusted baselines cannot deploy or claim a no-op');
+  for(const status of ['completed','in_progress']) {
+    await assert.rejects(executeDeploymentRequest({samePayload:true,newerRun:{id:11,run_attempt:1,path:'.github/workflows/session-authority.yml',event:'workflow_dispatch',head_branch:'dev',head_sha:'c'.repeat(40),status,conclusion:status==='completed'?'failure':null}},requests));
+  }
+  for(const path of ['functions','firebase.json','firestore.rules']) {
+    await executeDeploymentRequest({samePayload:true,payloadPatch:{[path]:{sha:'3'.repeat(40)}}},requests);
+  }
+  const workflow=fs.readFileSync('.github/workflows/session-authority.yml','utf8');
+  await executeDeploymentRequest({samePayload:true,workflowPatch:workflow.replace('firebase-tools@15.30.0','firebase-tools@15.30.1')},requests);
+  assert.equal(requests.length,3,'validation-only tool edits do not republish backend');
+  await executeDeploymentRequest({samePayload:true,workflowPatch:workflow.replaceAll('firebase-tools@15.30.0','firebase-tools@15.30.1')},requests);
+  assert.equal(requests.length,4,'actual payload or protected deployment tool changes retain deployment');
+  for(const changed of [
+    workflow.replace('\n  deploy:\n','\n  deploy:\n    env:\n      NODE_OPTIONS: unsafe\n'),
+    workflow.replace('      - name: Require current dev','      - run: echo changed > functions/index.js\n      - name: Require current dev'),
+    workflow.replaceAll('          ref: $'+'{{ inputs.candidate_sha || github.sha }}','          ref: other'),
+  ]) {
+    await executeDeploymentRequest({samePayload:true,workflowPatch:changed},requests);
+  }
+  assert.equal(requests.length,7,'job environment, checkout and unknown pre-deploy steps cannot receive no-op exemption');
+  for(const context of ['"env": {NODE_OPTIONS: unsafe}\n',"'defaults': {run: {shell: unsafe}}\n",'env: {NODE_OPTIONS: unsafe}\n']) {
+    await assert.rejects(executeDeploymentRequest({samePayload:true,workflowPatch:workflow.replace('\njobs:\n','\n'+context+'jobs:\n')},requests),/Unknown backend deployment pipeline/);
+    await assert.rejects(executeDeploymentRequest({samePayload:true,workflowPatch:workflow+'\n'+context},requests),/Unknown backend deployment pipeline/);
+  }
+  assert.equal(requests.length,7,'unknown root context never receives an exemption or automatic request');
+  const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
+  assert.deepEqual(ci.jobs.request_session_deploy.needs,['verify','classify','session_authority']);
 });
 
 test('shared HTML isolates presentation labels and SVG paint, preserving event/data authority',()=>{

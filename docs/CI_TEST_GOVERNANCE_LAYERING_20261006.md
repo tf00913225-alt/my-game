@@ -33,6 +33,19 @@ exactly-once dispatch. Partial/ambiguous history or a rejected/unknown dispatch
 outcome stops without automatic retry; inspect the original child before any
 human-authorized retry. GitHub-script retries are explicitly zero.
 
+Under the user's no-added-charge constraint, a request first compares against
+the latest positively successful dev Session deployment and its actual deploy
+steps. Identical Functions tree, Firebase configuration/rules, packaging inputs,
+repository scripts/dependency files and the complete protected deployment job do not request
+another backend deployment. Current full Session/Repository checks remain
+necessary. Missing/failed/in-progress baseline, incomplete input evidence,
+unknown packaging/hooks or a changing baseline blocks this exemption; only the
+reviewed old/new eligibility and exact source-proof metadata differences are
+normalized, never checkout, job environment/defaults or other steps. It never
+falls back to an older green deployment. Actual payload/tool changes retain the
+original protected deployment path. This is source-input reuse evidence, not a
+claim about out-of-band cloud administration or zero total provider charges.
+
 The Session deployment independently verifies current dev, the newest trusted
 ci.yml push run/attempt, Repository checks, the full Session job and each required
 security step via GitHub API before accessing deployment credentials. Verified
@@ -43,7 +56,9 @@ backend workflow/lock, permissions there, readiness checks, deployment list and
 pre-deploy dev recheck remain; PR/main/full/nightly and Cloudflare cancellation
 semantics are unchanged. No Firebase function/rule source is modified.
 New/unknown runtime or tests, unknown prototypes, global CSS and mixed safety
-changes retain conservative gates. No workflow permissions are expanded.
+changes retain conservative gates. Only the deployment-request job adds
+repository Actions write permission; the independent backend workflow's
+permissions remain unchanged.
 
 Baseline actual latest-attempt job durations (sum of started/completed jobs,
 not elapsed wall time or GitHub rounded billing minutes):
@@ -55,10 +70,11 @@ not elapsed wall time or GitHub rounded billing minutes):
 | [dev CI 41047070764](https://github.com/tf00913225-alt/my-game/actions/runs/41047070764), a1, push `67a3da179612766897ab534930f83abd22389cb5` | 234 | Includes about 8.4 min reusable Session and Cloudflare deployed QA |
 | [independent Session 41047070937](https://github.com/tf00913225-alt/my-game/actions/runs/41047070937), a1, same dev SHA | 34 | About 7 min repeated emulator plus 22.6 min waiting in deploy job |
 
-Pending: latest Head CI, independent security/scope review of the final dispatch
-checkpoint, fresh required-check settings confirmation, exact one-time Firebase
-deployment and scoped dispatcher permission approval before merging this workflow
-change, actual post-change run comparison and cleanup. No measured
+Pending: latest Head CI, independent security/scope review of the final no-op
+checkpoint, fresh required-check settings confirmation and safe integration
+under the user's no-added-charge constraint. Identical backend input reuse must
+be proved before integration; do not trigger a chargeable deployment merely to
+test the dispatcher. Actual post-change run comparison and cleanup remain. No measured
 savings or monthly reduction is claimed yet. PR body is the live status Owner.
 
 The first checkpoint `a2447495` removed only the duplicate PR trigger and passed
