@@ -1,0 +1,190 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "longBagLayout": {
+        "nameOverflow": 0,
+        "nameVertical": 0,
+        "nameBox": {
+          "x": 81,
+          "y": 147.80209350585938,
+          "width": 161.1979217529297,
+          "height": 40.39582824707031,
+          "top": 147.80209350585938,
+          "right": 242.1979217529297,
+          "bottom": 188.1979217529297,
+          "left": 81
+        },
+        "levelBox": {
+          "x": 248.1979217529297,
+          "y": 160.1979217529297,
+          "width": 30.802078247070312,
+          "height": 15.598953247070312,
+          "top": 160.1979217529297,
+          "right": 279,
+          "bottom": 175.796875,
+          "left": 248.1979217529297
+        },
+        "arrows": [
+          {
+            "box": {
+              "x": 29,
+              "y": 146,
+              "width": 44,
+              "height": 44,
+              "top": 146,
+              "right": 73,
+              "bottom": 190,
+              "left": 29
+            },
+            "disabled": false
+          },
+          {
+            "box": {
+              "x": 287,
+              "y": 146,
+              "width": 44,
+              "height": 44,
+              "top": 146,
+              "right": 331,
+              "bottom": 190,
+              "left": 287
+            },
+            "disabled": false
+          }
+        ],
+        "gridInner": 572,
+        "slotHeight": 182,
+        "gap": 12
+      },
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    },
+    {
+      "longNameInteractions": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "initialName": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+      "nextName": "誤它誤...",
+      "restoredName": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+      "gridScroll": {
+        "wheel": 300,
+        "end": 388
+      }
+    },
+    {
+      "longBagLayout": {
+        "nameOverflow": 0,
+        "nameVertical": 0,
+        "nameBox": {
+          "x": 564.2000122070312,
+          "y": 81.36250305175781,
+          "width": 193.4375,
+          "height": 48.475006103515625,
+          "top": 81.36250305175781,
+          "right": 757.6375122070312,
+          "bottom": 129.83750915527344,
+          "left": 564.2000122070312
+        },
+        "levelBox": {
+          "x": 764.8375244140625,
+          "y": 96.23750305175781,
+          "width": 36.9625244140625,
+          "height": 18.71875,
+          "top": 96.23750305175781,
+          "right": 801.800048828125,
+          "bottom": 114.95625305175781,
+          "left": 764.8375244140625
+        },
+        "arrows": [
+          {
+            "box": {
+              "x": 501.79998779296875,
+              "y": 79.20000457763672,
+              "width": 52.79998779296875,
+              "height": 52.79999542236328,
+              "top": 79.20000457763672,
+              "right": 554.5999755859375,
+              "bottom": 132,
+              "left": 501.79998779296875
+            },
+            "disabled": false
+          },
+          {
+            "box": {
+              "x": 811.4000244140625,
+              "y": 79.20000457763672,
+              "width": 52.79998779296875,
+              "height": 52.79999542236328,
+              "top": 79.20000457763672,
+              "right": 864.2000122070312,
+              "bottom": 132,
+              "left": 811.4000244140625
+            },
+            "disabled": false
+          }
+        ],
+        "gridInner": 572,
+        "slotHeight": 182,
+        "gap": 12
+      },
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    },
+    {
+      "longNameInteractions": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "initialName": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+      "nextName": "誤它誤...",
+      "restoredName": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+      "gridScroll": {
+        "wheel": 300,
+        "end": 388
+      }
+    }
+  ]
+}
