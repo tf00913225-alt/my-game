@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.62baef90de7f.js"
+          "build/app-shell.24f28c7d6e37.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -50,10 +50,10 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.3c3a0245f219.js",
-          "build/gameplay-core-secondary.1eedf7a806c3.js"
+          "build/gameplay-core-secondary.058219effb11.js"
         ],
         "styles": [
-          "build/gameplay-core.1dfa7cb3af52.css"
+          "build/gameplay-core.dee5878a9e8b.css"
         ],
         "dependencies": [
           "app-shell",
@@ -595,9 +595,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.62baef90de7f.js",
-        "sha256": "62baef90de7f",
-        "bytes": 1240207,
+        "path": "build/app-shell.24f28c7d6e37.js",
+        "sha256": "24f28c7d6e37",
+        "bytes": 1240903,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -619,65 +619,65 @@
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_female_01.webp",
-        "sha256": "e356e4833f64",
-        "bytes": 1503982,
+        "path": "assets/characters/battle/player_battle_readable_female_01.webp",
+        "sha256": "99aa18b1a1db",
+        "bytes": 1398808,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_female_02.webp",
-        "sha256": "40af67e2e3cd",
-        "bytes": 1310166,
+        "path": "assets/characters/battle/player_battle_readable_female_02.webp",
+        "sha256": "bcc50e27e10d",
+        "bytes": 1233004,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_female_03.webp",
-        "sha256": "429e0155c68e",
-        "bytes": 1544440,
+        "path": "assets/characters/battle/player_battle_readable_female_03.webp",
+        "sha256": "0dd5d11f8145",
+        "bytes": 1407862,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_female_04.webp",
-        "sha256": "7cbed1fd3ce5",
-        "bytes": 1334822,
+        "path": "assets/characters/battle/player_battle_readable_female_04.webp",
+        "sha256": "c2b0a0dd7dfc",
+        "bytes": 1368016,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_male_01.webp",
-        "sha256": "ff9b920f5bef",
-        "bytes": 1250584,
+        "path": "assets/characters/battle/player_battle_readable_male_01.webp",
+        "sha256": "7dec20e8b96b",
+        "bytes": 1254114,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_male_02.webp",
-        "sha256": "2a5a10f14bf2",
-        "bytes": 1336036,
+        "path": "assets/characters/battle/player_battle_readable_male_02.webp",
+        "sha256": "c4289e06e465",
+        "bytes": 1320446,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_male_03.webp",
-        "sha256": "dbbdf9c32722",
-        "bytes": 1470516,
+        "path": "assets/characters/battle/player_battle_readable_male_03.webp",
+        "sha256": "234921ae1c4d",
+        "bytes": 1390826,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle/player_battle_male_04.webp",
-        "sha256": "65be15a16e4d",
-        "bytes": 1310694,
+        "path": "assets/characters/battle/player_battle_readable_male_04.webp",
+        "sha256": "7c00e863e1df",
+        "bytes": 1225632,
         "priority": "P2",
         "type": "image",
         "decode": true
@@ -971,24 +971,24 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.1eedf7a806c3.js",
-        "sha256": "1eedf7a806c3",
-        "bytes": 748980,
+        "path": "build/gameplay-core-secondary.058219effb11.js",
+        "sha256": "058219effb11",
+        "bytes": 749050,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.1dfa7cb3af52.css",
-        "sha256": "1dfa7cb3af52",
-        "bytes": 453295,
+        "path": "build/gameplay-core.dee5878a9e8b.css",
+        "sha256": "dee5878a9e8b",
+        "bytes": 453695,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "0632a6ac9988",
-    "totalBytes": 58210542,
+    "manifestHash": "15f45a2c5366",
+    "totalBytes": 57749176,
     "totalResources": 95
   },
   "assets": {
@@ -996,17 +996,17 @@
       "sha256": "c90801d60a96",
       "bytes": 69996
     },
-    "build/app-shell.62baef90de7f.js": {
-      "sha256": "62baef90de7f",
-      "bytes": 1240207
+    "build/app-shell.24f28c7d6e37.js": {
+      "sha256": "24f28c7d6e37",
+      "bytes": 1240903
     },
     "build/gameplay-core-primary.3c3a0245f219.js": {
       "sha256": "3c3a0245f219",
       "bytes": 762265
     },
-    "build/gameplay-core-secondary.1eedf7a806c3.js": {
-      "sha256": "1eedf7a806c3",
-      "bytes": 748980
+    "build/gameplay-core-secondary.058219effb11.js": {
+      "sha256": "058219effb11",
+      "bytes": 749050
     },
     "build/feature-patrol.fa6fa230e09b.js": {
       "sha256": "fa6fa230e09b",
@@ -1052,9 +1052,9 @@
       "sha256": "801bc1a9895d",
       "bytes": 90552
     },
-    "build/gameplay-core.1dfa7cb3af52.css": {
-      "sha256": "1dfa7cb3af52",
-      "bytes": 453295
+    "build/gameplay-core.dee5878a9e8b.css": {
+      "sha256": "dee5878a9e8b",
+      "bytes": 453695
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",

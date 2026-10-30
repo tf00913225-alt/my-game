@@ -91,7 +91,7 @@ test('enemy details share projection while player details and player resource st
   const fields=new Map(['element','name','level','hp','sp','agility'].map(key=>[key,{textContent:''}]));
   const portrait={style:{},textContent:'',setAttribute(){}};
   const panel={scrollTop:120};
-  const modal={querySelector:s=>s==='.battle-status-detail-portrait'?portrait:s==='.battle-status-detail-panel'?panel:fields.get(s.match(/data-field="(.*?)"/)?.[1])||null,setAttribute(){}};
+  const modal={dataset:{},querySelector:s=>s==='.battle-status-detail-portrait'?portrait:s==='.battle-status-detail-panel'?panel:fields.get(s.match(/data-field="(.*?)"/)?.[1])||null,setAttribute(){}};
   c.ensureBattleStatusDetailModal=()=>modal;c.isBattleStatusInspectionBlocked=()=>false;
   c.renderBattleStatusDetailList=()=>{};c.syncBattleUiPriorityLayer=()=>{};
   set('{name:"QA",hp:66.666666,maxHP:100.25,sp:37.25,maxSP:100.75,alive:true,statusEffects:[],activeBuffs:[]}');
