@@ -8,6 +8,11 @@ import {spawn,spawnSync} from "node:child_process";
 import {Worker} from "node:worker_threads";
 
 export const ROOT=process.cwd();
+export function qaScriptStub(request, stubs, baseUrl){
+    if(request.resourceType!=='Script') return undefined;
+    const pathname=new URL(request.request.url).pathname;
+    return stubs.get('/'+pathname.slice(new URL('.',baseUrl).pathname.length));
+}
 const ASSET_MANIFEST=JSON.parse(fs.readFileSync(path.join(ROOT,"build","asset-manifest.json"),"utf8"));
 const QA_AUTH_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-auth\.[0-9a-f]{12}\.js$/.test(file));
 const QA_CLOUD_PATH="/"+Object.keys(ASSET_MANIFEST.assets).find(file=>/build\/firebase\/firebase-cloud-save\.[0-9a-f]{12}\.js$/.test(file));
