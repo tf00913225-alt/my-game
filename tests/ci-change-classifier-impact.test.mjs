@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import vm from 'node:vm';
 import {parseDocument} from 'yaml';
 import {classifyChanges, classifySharedCss, classifySharedHtml, BROWSER_GATES} from '../.github/scripts/ci-change-classifier.mjs';
 import {requireChildGates, CHILD_GATES} from '../.github/scripts/ci-aggregate.mjs';
@@ -42,7 +43,7 @@ test('mixed expansion CSS isolates Element Box presentation but retains battle i
   assert.equal(plan(['tests/ui-element-box-medium-modal.test.js'],{addedPaths:['tests/ui-element-box-medium-modal.test.js']}).strictMode,true);
 });
 
-test('one PR Session validation preserves every former Session path and all original security steps',()=>{
+test('one CI Session validation preserves every former Session path and all original security steps',()=>{
   const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
   const session=parseDocument(fs.readFileSync('.github/workflows/session-authority.yml','utf8')).toJS();
   assert.equal(session.on.pull_request,undefined);
@@ -54,12 +55,19 @@ test('one PR Session validation preserves every former Session path and all orig
     'scripts/storage-recovery-readiness.mjs','tests/firestore-backup-readiness.test.mjs',
     '.github/workflows/session-authority.yml','.github/scripts/wait-session-repository-checks.mjs',
     'tests/session-repository-checks-wait.test.mjs'];
-  for(const source of paths)for(const addedPaths of [[],[source]])assert.equal(plan([source],{addedPaths}).gates.session_authority,true,source);
+  for(const source of paths)for(const addedPaths of [[],[source]]) {
+    const candidate=plan([source],{addedPaths});
+    assert.equal(candidate.gates.session_authority,true,source);
+    assert.equal(candidate.sessionDeploy,'true',source);
+  }
+  for(const source of ['docs/readme.md','css/00-main.css','tests/unrelated.test.mjs','functions-other/file.js','js/firebase-other/file.js'])assert.equal(plan([source]).sessionDeploy,'false',source);
+  assert.equal(plan(['functions/index.js'],{error:'Missing ancestry'}).sessionDeploy,'blocked');
+  assert.equal(plan(['../functions/index.js']).sessionDeploy,'blocked');
   assert.equal(ci.jobs.session_authority.uses,'./.github/workflows/session-authority.yml');
   assert.equal(ci.jobs.session_authority.with.emulator_only,true);
   assert.equal(ci.jobs.session_authority.with.candidate_sha,'${{ inputs.candidate_sha || github.sha }}');
   assert.ok(ci.jobs.verify.needs.includes('session_authority'));
-  assert.ok(session.on.push.branches.includes('dev'));
+  assert.equal(session.on.push,undefined);
   assert.ok(Object.hasOwn(session.on,'workflow_dispatch'));
   assert.equal(session.concurrency['cancel-in-progress'],false);
   const steps=session.jobs.emulator.steps;
@@ -67,6 +75,37 @@ test('one PR Session validation preserves every former Session path and all orig
   assert.ok(steps.some(s=>s.run?.includes('tests/cloud-save-*.test.mjs')));
   assert.ok(steps.some(s=>s.run?.includes('tests/session-client.test.mjs')));
   assert.equal(session.jobs.deploy.needs,'emulator');
+  assert.match(session.jobs.deploy.if,/needs\.emulator\.result == 'success' \|\| inputs\.verified_ci_run_id/);
+  assert.match(session.jobs.deploy.if,/github\.event_name == 'workflow_dispatch'/);
+  assert.equal(session.jobs.deploy.steps.find(s=>s.name==='Require current dev and its Repository checks').env.VERIFIED_CI_SHA,'${{ inputs.verified_sha }}');
+  assert.equal(ci.jobs.request_session_deploy.permissions.actions,'write');
+  assert.deepEqual(ci.jobs.request_session_deploy.needs,['verify','classify','session_authority']);
+  assert.match(ci.jobs.request_session_deploy.if,/github\.event_name == 'push'.*github\.ref == 'refs\/heads\/dev'/);
+  assert.match(ci.jobs.request_session_deploy.if,/!inputs\.candidate_sha && !inputs\.full_regression/);
+  for(const [name,job] of Object.entries(ci.jobs))if(name!=='request_session_deploy')assert.notEqual(job.permissions?.actions,'write',name);
+});
+
+test('deployment request pins SHA/run/attempt and refuses blocked scope, stale dev or API failure',async()=>{
+  const ci=parseDocument(fs.readFileSync('.github/workflows/ci.yml','utf8')).toJS();
+  const script=ci.jobs.request_session_deploy.steps[0].with.script;
+  const sha='a'.repeat(40),requests=[];
+  const execute=async({scope='true',current=sha,fail=false,existing=[]}={})=>{
+    const summary={addHeading(){return this;},addRaw(){return this;},async write(){}};
+    const github={rest:{git:{getRef:async()=>({data:{object:{sha:current}}})},actions:{listWorkflowRuns:async()=>({data:{workflow_runs:existing,total_count:existing.length}}),createWorkflowDispatch:async args=>{if(fail)throw Error('dispatch rejected');requests.push(args);}}}};
+    return vm.runInNewContext('(async()=>{'+script+'})()',{
+      github,context:{repo:{owner:'owner',repo:'repo'},sha,runId:123},
+      core:{summary},process:{env:{DEPLOYMENT_SCOPE:scope,GITHUB_RUN_ATTEMPT:'2'}}});
+  };
+  await execute();
+  assert.equal(requests.length,1);assert.equal(requests[0].ref,'dev');
+  assert.equal(requests[0].workflow_id,'session-authority.yml');
+  assert.equal(JSON.stringify(requests[0].inputs),JSON.stringify({verified_ci_run_id:'123',verified_ci_attempt:'2',verified_sha:sha}));
+  for(const options of [{scope:'blocked'},{scope:''},{scope:'false'},{current:'b'.repeat(40)},{fail:true}])await assert.rejects(execute(options));
+  const prior={path:'.github/workflows/session-authority.yml',event:'workflow_dispatch',head_branch:'dev',head_sha:sha,display_title:`Verified Session deployment ${sha}`,status:'in_progress',conclusion:null,html_url:'https://github.com/owner/repo/actions/runs/456'};
+  await execute({existing:[prior]});
+  await execute({existing:[{...prior,status:'completed',conclusion:'success'}]});
+  await assert.rejects(execute({existing:[{...prior,status:'completed',conclusion:'failure'}]}),/no automatic retry/);
+  assert.equal(requests.length,1,'no blind retries or stale deployment');
 });
 
 test('shared HTML isolates presentation labels and SVG paint, preserving event/data authority',()=>{

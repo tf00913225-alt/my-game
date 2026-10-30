@@ -271,6 +271,15 @@ const QA_OWNERS = {
   // paths still fail closed, as do mixed runtime or deployment changes.
   'prototypes/ui-shared-samples-20261030/index.html':['ui','ui_shared']
 };
+// Former Session Authority path filters, retained by the single CI Owner.
+export const SESSION_PATHS = [
+  /^functions\//, /^js\/firebase\//, /^firestore\.rules$/, /^firebase[^/]*\.json$/,
+  /^scripts\/test-session-authority-emulator\.mjs$/, /^tests\/session-[^/]*\.test\.mjs$/,
+  /^tests\/cloud-save-[^/]*\.test\.mjs$/, /^tests\/firebase-trusted-cloud-save-backend\.test\.mjs$/,
+  /^scripts\/firestore-backup-readiness\.mjs$/, /^scripts\/storage-recovery-readiness\.mjs$/,
+  /^tests\/firestore-backup-readiness\.test\.mjs$/, /^\.github\/workflows\/session-authority\.yml$/,
+  /^\.github\/scripts\/wait-session-repository-checks\.mjs$/, /^tests\/session-repository-checks-wait\.test\.mjs$/
+];
 const OWNERS = [
   [/^(?:functions\/|js\/firebase\/|firestore\.rules$|firebase.*\.json$)/, ['cloud', 'persistence']],
   [/^js\/startup\//, ['cloud', 'persistence']],
@@ -365,7 +374,9 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   // Gate policy edits must exercise the retained Full capability themselves.
   if(bossFull){predicted.boss_balance=true;gates.boss_balance=true;}
   const uiMode=full||shadow||f('workflow')||f('cloud')||f('persistence')||f('ui_shared')||f('inventory')&&(f('skill_ui')||f('skill')) ? 'all' : f('inventory') ? 'inventory' : f('skill_ui')||f('skill') ? 'skill' : 'smoke';
-  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode};
+  const sessionDeploy = error || !Array.isArray(paths) || !paths.length || paths.some(p=>typeof p!=='string'||p.startsWith('/')||p.includes('..')||p.includes('\\')) ? 'blocked' :
+    String(paths.some(p=>SESSION_PATHS.some(pattern=>pattern.test(p))));
+  return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode, sessionDeploy};
 }
 
 export function changedPaths(base, head, added = false, eventName = 'pull_request') {
@@ -412,7 +423,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const plan = applyAuthorizedLethalBossException(classifyChanges(paths, {eventName: process.env.CI_EVENT_NAME, baseRef: process.env.CI_BASE_REF, addedPaths, error, responsibilities, responsibilitiesByPath, generatedVerified, fullRegression: process.env.CI_FULL_REGRESSION === 'true'}),
     {baseSha: process.env.CI_BASE_SHA, headSha: process.env.CI_HEAD_SHA, paths, generatedVerified});
   const outputs = {plan_json: JSON.stringify(plan), strict: plan.strictMode, cloud_gate: plan.gates.session_authority, full_node: plan.shadow || plan.strictMode || plan.fullRegression || !['pull_request','push'].includes(plan.eventName) || plan.baseRef === 'main' || plan.flags.monster_balance_changed || plan.flags.workflow_changed || plan.flags.cloud_changed || plan.flags.persistence_changed,
-    boss_mode:plan.bossMode, ui_mode:plan.uiMode, ...plan.flags, ...plan.gates};
+    boss_mode:plan.bossMode, ui_mode:plan.uiMode, session_deploy:plan.sessionDeploy, ...plan.flags, ...plan.gates};
   if (process.env.GITHUB_OUTPUT) fs.appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(outputs).map(([k,v]) => `${k}=${v}\n`).join(''));
   const report = `## CI change classifier (${plan.shadow ? 'SHADOW — all original gates retained' : 'ENFORCED'})\n`+

@@ -16,10 +16,24 @@ follow-up line, using the existing classifier and Session workflow Owners.
 
 Candidate: classify changes to the mixed expansion stylesheet by the existing
 selector parser (Element Box retains battle input/Boss Fast validation), map its
-existing UI contract test and the reviewed standalone UI sample, and remove only
-the independent Session **PR** trigger. The identical complete reusable Session
-emulator, Boot/SDK tests, aggregate failure propagation, independent dev push and
-manual deployment, backend non-cancellation lock and exact-SHA wait are retained.
+existing UI contract test and the reviewed standalone UI sample. PR and dev CI
+each execute the identical complete reusable Session emulator once, including
+Boot/SDK and authorization tests; Repository checks requires its success.
+The original Session path filters now drive an exact CI output. Only a successful
+dev push CI with those paths can request the existing independent Session workflow.
+It binds source SHA/run/attempt, refuses stale dev or failed/duplicate requests,
+and explicitly reports REQUESTED rather than deployment acceptance. Only this
+post-validation job receives `actions: write` to dispatch that existing workflow.
+
+The Session deployment independently verifies current dev, the newest trusted
+ci.yml push run/attempt, Repository checks, the full Session job and each required
+security step via GitHub API before accessing deployment credentials. Verified
+dispatches perform no emulator replay or sleep polling; missing/failed/stale or
+ambiguous evidence fails closed. Empty dispatch inputs preserve manual full
+validation and the original bounded wait. The original independent non-cancelable
+backend workflow/lock, permissions there, readiness checks, deployment list and
+pre-deploy dev recheck remain; PR/main/full/nightly and Cloudflare cancellation
+semantics are unchanged. No Firebase function/rule source is modified.
 New/unknown runtime or tests, unknown prototypes, global CSS and mixed safety
 changes retain conservative gates. No workflow permissions are expanded.
 
@@ -33,17 +47,19 @@ not elapsed wall time or GitHub rounded billing minutes):
 | [dev CI 41047070764](https://github.com/tf00913225-alt/my-game/actions/runs/41047070764), a1, push `67a3da179612766897ab534930f83abd22389cb5` | 234 | Includes about 8.4 min reusable Session and Cloudflare deployed QA |
 | [independent Session 41047070937](https://github.com/tf00913225-alt/my-game/actions/runs/41047070937), a1, same dev SHA | 34 | About 7 min repeated emulator plus 22.6 min waiting in deploy job |
 
-Pending: latest Head CI, independent security/scope review, required-check settings
-confirmation, exact one-time Firebase deployment approval before merging this
-workflow change, actual post-change run comparison and cleanup. No measured
+Pending: latest Head CI, independent security/scope review of the final dispatch
+checkpoint, fresh required-check settings confirmation, exact one-time Firebase
+deployment and scoped dispatcher permission approval before merging this workflow
+change, actual post-change run comparison and cleanup. No measured
 savings or monthly reduction is claimed yet. PR body is the live status Owner.
 
-Remaining same-work issues: duplicate dev-push emulator and occupied deployment
-wait runner are not fixed by removing the PR trigger. A direct deployment child
-inside the cancelable dev CI was rejected before commit because it would weaken
-the existing backend cancellation protection. Any further orchestration must
-preserve that protection, exact source/attempt and full security evidence; no
-new dispatch permission or main/default-branch change is authorized by this note.
+The first checkpoint `a2447495` removed only the duplicate PR trigger and passed
+176 targeted tests plus independent scope review; its CI cannot certify a later
+Head. Direct deployment in cancelable CI and a job-level cancellation rewrite
+were rejected before commit to preserve backend protection and latest-run
+cancellation semantics. The final candidate instead retains the original
+independent backend lifecycle. This document grants no deployment/permission
+approval; latest Head PR is authoritative. No main/default-branch changes.
 
 ## Current routing owner (supersedes historical phase restrictions below)
 

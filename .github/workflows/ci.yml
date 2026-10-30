@@ -57,6 +57,7 @@ jobs:
       promotion_health: ${{ steps.classify.outputs.promotion_health }}
       strict: ${{ steps.classify.outputs.strict }}
       cloud_gate: ${{ steps.classify.outputs.cloud_gate }}
+      session_deploy: ${{ steps.classify.outputs.session_deploy }}
       core_checks: ${{ steps.classify.outputs.core_checks }}
       battle_browser: ${{ steps.classify.outputs.battle_browser }}
       ui_browser: ${{ steps.classify.outputs.ui_browser }}
@@ -1227,3 +1228,43 @@ jobs:
       adventure_required: ${{ needs.classify.outputs.adventure_balance == 'true' || needs.classify.outputs.adventure_ui_browser == 'true' }}
       battle_daily_required: ${{ needs.classify.outputs.battle_browser == 'true' || needs.classify.outputs.daily_browser == 'true' }}
     secrets: inherit
+
+  request_session_deploy:
+    name: Request protected Session deployment
+    needs: [verify, classify, session_authority]
+    if: ${{ !cancelled() && needs.verify.result == 'success' && needs.session_authority.result == 'success' && needs.classify.outputs.session_deploy != 'false' && github.event_name == 'push' && github.ref == 'refs/heads/dev' && !inputs.candidate_sha && !inputs.full_regression }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      actions: write
+    steps:
+      - name: Dispatch existing protected deployment after exact CI dependencies
+        uses: actions/github-script@v7
+        env:
+          DEPLOYMENT_SCOPE: ${{ needs.classify.outputs.session_deploy }}
+        with:
+          script: |
+            if (process.env.DEPLOYMENT_SCOPE !== 'true') throw Error('Unreliable Session deployment scope');
+            const sha = context.sha;
+            const {data:dev} = await github.rest.git.getRef({...context.repo,ref:'heads/dev'});
+            if (dev.object.sha !== sha) throw Error('Superseded dev; no backend deployment requested');
+            const {data:existing} = await github.rest.actions.listWorkflowRuns({...context.repo,
+              workflow_id:'session-authority.yml',event:'workflow_dispatch',branch:'dev',head_sha:sha,per_page:100});
+            if (!Array.isArray(existing.workflow_runs) || !Number.isSafeInteger(existing.total_count) || existing.total_count < 0 || existing.total_count > 100) throw Error('Ambiguous deployment request history');
+            const matches = existing.workflow_runs.filter(run=>run.path === '.github/workflows/session-authority.yml' &&
+              run.event === 'workflow_dispatch' && run.head_branch === 'dev' && run.head_sha === sha &&
+              run.display_title === `Verified Session deployment ${sha}`);
+            if (matches.length) {
+              if (matches.some(run=>run.status === 'completed' && run.conclusion !== 'success')) throw Error('Prior deployment failed; no automatic retry');
+              await core.summary.addHeading('Protected deployment already requested; no duplicate dispatch')
+                .addRaw(matches.map(run=>run.html_url).join('\n')).write();
+              return;
+            }
+            await github.rest.actions.createWorkflowDispatch({...context.repo,
+              workflow_id:'session-authority.yml',ref:'dev',inputs:{
+                verified_ci_run_id:String(context.runId),
+                verified_ci_attempt:process.env.GITHUB_RUN_ATTEMPT,
+                verified_sha:sha}});
+            await core.summary.addHeading('Protected deployment REQUESTED, not yet verified')
+              .addRaw(`CI ${context.runId}/attempt ${process.env.GITHUB_RUN_ATTEMPT}, SHA ${sha}. Follow the independent Session Authority run; dispatch acceptance is not deployment acceptance.`).write();

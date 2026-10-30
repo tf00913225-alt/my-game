@@ -117,7 +117,7 @@ test('reused Session cannot deploy or deadlock with the standalone Firebase wait
   const ci=fs.readFileSync(new URL('../.github/workflows/ci.yml',import.meta.url),'utf8');
   const session=fs.readFileSync(new URL('../.github/workflows/session-authority.yml',import.meta.url),'utf8');
   assert.match(ci,/uses: \.\/\.github\/workflows\/session-authority\.yml[\s\S]*?emulator_only: true/);
-  assert.match(session,/if: \$\{\{ !inputs\.emulator_only &&/);
+  assert.match(session,/if: \$\{\{ !cancelled\(\) && !inputs\.emulator_only &&/);
   assert.match(session,/inputs\.emulator_only && format\('session-emulator-\{0\}', github\.run_id\)/);
 });
 test('missing or unknown dependency fails closed', () => {

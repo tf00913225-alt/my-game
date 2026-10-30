@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
-import {waitForRepositoryChecks, WAIT_BUDGET_MS} from '../.github/scripts/wait-session-repository-checks.mjs';
+import {waitForRepositoryChecks, WAIT_BUDGET_MS, SESSION_STEPS, verifiedSessionSource} from '../.github/scripts/wait-session-repository-checks.mjs';
 
 const sha = 'a'.repeat(40), otherSha = 'b'.repeat(40);
 const run = (extra = {}) => ({id: 20, run_attempt: 1, path: '.github/workflows/ci.yml',
@@ -10,11 +10,11 @@ const job = (extra = {}) => ({id: 30, run_id: 20, head_sha: sha, name: 'Reposito
   status: 'completed', conclusion: 'success', ...extra});
 
 function fixture({runs = () => [run()], jobs = () => [job()], current = () => sha,
-  budgetMs = 100, costMs = 0} = {}) {
+  budgetMs = 100, costMs = 0, source = {}} = {}) {
   let time = 0, lists = 0;
   const calls = [], logs = [];
   const promise = waitForRepositoryChecks({sha, repository: 'owner/repo', budgetMs, pollMs: 10,
-    now: () => time, sleep: async ms => {time += ms;}, log: line => logs.push(line),
+    ...source, now: () => time, sleep: async ms => {time += ms;}, log: line => logs.push(line),
     currentDev: () => current(time), api: endpoint => {
       calls.push(endpoint); time += costMs;
       if (endpoint.includes('/jobs?')) return {jobs: jobs(time, endpoint)};
@@ -28,6 +28,43 @@ test('accepts exact dev push Repository checks and logs SHA/run/attempt/job', as
   assert.deepEqual(await f.promise, {sha, runId: 20, attempt: 1, jobId: 30});
   assert.ok(f.calls.some(p => p.includes('/20/attempts/1/jobs')));
   assert.match(f.logs.at(-1), /accepted: sha=.*run=20 attempt=1.*job=30/);
+});
+
+const source={expectedRunId:20,expectedAttempt:1,requireSession:true};
+const sessionJob=(extra={})=>job({id:31,name:'Full Session Authority validation / Session authority emulator',
+  steps:SESSION_STEPS.map(name=>({name,status:'completed',conclusion:'success'})),...extra});
+
+test('verified deployment requires one exact source run, latest attempt and every full Session security step',async()=>{
+  const f=fixture({source,jobs:()=>[job(),sessionJob({run_attempt:1})]});
+  await f.promise;assert.equal(f.time(),0,'no runner polling after dependencies');
+  for(const jobs of [[],[job()],[job(),sessionJob(),sessionJob()],
+    [job(),sessionJob({run_id:19})],[job(),sessionJob({head_sha:otherSha})],
+    ...['failure','cancelled','skipped','neutral',null].map(conclusion=>[job(),sessionJob({conclusion})]),
+    [job(),sessionJob({status:'in_progress'})]]) {
+    await assert.rejects(fixture({source,jobs:()=>jobs}).promise);
+  }
+  for(const name of SESSION_STEPS)for(const conclusion of ['failure','cancelled','skipped','neutral',null,'missing']) {
+    const candidate=sessionJob();
+    candidate.steps=conclusion==='missing'?candidate.steps.filter(s=>s.name!==name):candidate.steps.map(s=>s.name===name?{...s,conclusion}:s);
+    await assert.rejects(fixture({source,jobs:()=>[job(),candidate]}).promise,/Required Session step/);
+  }
+  for(const extra of [{id:21},{run_attempt:2},{event:'pull_request'},{head_branch:'main'},{head_sha:otherSha},{path:'.github/workflows/other.yml'}])
+    await assert.rejects(fixture({source,runs:()=>[run(extra)],jobs:()=>[job(),sessionJob()]}).promise);
+  const changed=fixture({source,runs:(time,n)=>[run({run_attempt:n===1?1:2})],jobs:()=>[job(),sessionJob()]});
+  await assert.rejects(changed.promise,/source run\/attempt mismatch/);
+  // Successful jobs carried into the current failed-jobs rerun remain legal;
+  // the attempt endpoint and newest metadata, not original job attempt, govern.
+  await fixture({source:{...source,expectedAttempt:2},runs:()=>[run({run_attempt:2})],jobs:()=>[job({run_attempt:1}),sessionJob({run_attempt:1})]}).promise;
+});
+
+test('dispatch proof metadata cannot select PR/main/other SHA/partial or ambiguous source',()=>{
+  const env={VERIFIED_CI_RUN_ID:'20',VERIFIED_CI_ATTEMPT:'1',VERIFIED_CI_SHA:sha,GITHUB_SHA:sha,GITHUB_EVENT_NAME:'workflow_dispatch',GITHUB_REF:'refs/heads/dev'};
+  assert.deepEqual(verifiedSessionSource(env),source);
+  assert.equal(verifiedSessionSource({}),null);
+  for(const extra of [{VERIFIED_CI_RUN_ID:''},{VERIFIED_CI_ATTEMPT:''},{VERIFIED_CI_SHA:''},
+    {VERIFIED_CI_RUN_ID:'1e2'},{VERIFIED_CI_ATTEMPT:'01'},{VERIFIED_CI_RUN_ID:'99999999999999999'},
+    {VERIFIED_CI_SHA:otherSha},{GITHUB_EVENT_NAME:'pull_request'},{GITHUB_REF:'refs/heads/main'}])
+    assert.throws(()=>verifiedSessionSource({...env,...extra}),/Invalid verified/);
 });
 
 test('historical 25m32s CI completes after old 80x10s budget but inside formal cap', async () => {
