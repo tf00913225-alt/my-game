@@ -13,7 +13,7 @@ function decode(v){return v.replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/
 // Isolated presentation states: invoke only the real feedback renderer, never
 // createCharacter, Firebase, auth, saves or a fabricated server response.
 async function verifyCreationStates(){
- const {Cdp}=await import('../.github/scripts/runtime-browser-qa-support.mjs');
+ const {Cdp,waitJson}=await import('../.github/scripts/runtime-browser-qa-support.mjs');
  const source=fs.readFileSync('js/00-main.js','utf8');
  const feedback=source.match(/^function updateInitialCharacterCreationFeedback\([\s\S]*?^\}/m)?.[0];
  assert.ok(feedback,'formal creation feedback renderer missing');
@@ -25,10 +25,17 @@ async function verifyCreationStates(){
  const chrome=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--allow-file-access-from-files','--remote-debugging-port=0','--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});let c;
  try{
   const portFile=path.join(profile,'DevToolsActivePort'),end=Date.now()+15000;
-  while(!fs.existsSync(portFile)&&Date.now()<end)await new Promise(r=>setTimeout(r,50));
-  assert.ok(fs.existsSync(portFile),'Chrome remote debugging did not start');
-  const port=fs.readFileSync(portFile,'utf8').split('\n')[0];
-  const pages=await fetch('http://127.0.0.1:'+port+'/json/list').then(r=>r.json());c=new Cdp(pages.find(p=>p.type==='page').webSocketDebuggerUrl);
+  let port;
+  while(Date.now()<end){
+   assert.ok(chrome.exitCode===null&&chrome.signalCode===null,'Chrome exited before remote debugging was ready');
+   try{
+    const match=fs.readFileSync(portFile,'utf8').match(/^([1-9][0-9]{0,4})\r?\n/);
+    if(match&&Number(match[1])<=65535){port=match[1];break;}
+   }catch(error){if(error.code!=='ENOENT')throw error;}
+   await new Promise(r=>setTimeout(r,Math.min(50,Math.max(0,end-Date.now()))));
+  }
+  assert.ok(port&&Date.now()<end,'Chrome remote debugging did not start');
+  const pages=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:chrome,timeoutMs:end-Date.now(),accept:rows=>Array.isArray(rows)&&rows.some(p=>p.type==='page'&&p.webSocketDebuggerUrl)});c=new Cdp(pages.find(p=>p.type==='page'&&p.webSocketDebuggerUrl).webSocketDebuggerUrl);
   await c.send('Page.enable');
   for(const viewport of [[360,640],[1280,800]]){
    await c.send('Emulation.setDeviceMetricsOverride',{width:viewport[0],height:viewport[1],deviceScaleFactor:1,mobile:false});

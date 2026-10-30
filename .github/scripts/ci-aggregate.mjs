@@ -18,7 +18,8 @@ export function requireDeploymentGates(needs, {bossRequired = true, towerRequire
   return true;
 }
 
-export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
+export function requireChildGates(needs, {mainRequired = true, requireSession = false, plan} = {}) {
+  if (typeof requireSession !== 'boolean') throw Error('Invalid Session gate policy');
   if (!needs || typeof needs !== 'object' || Array.isArray(needs)) throw Error('Invalid aggregate input');
   const unexpected = Object.keys(needs).filter(key => !CHILD_GATES.includes(key));
   if (unexpected.length) throw Error(`Unknown aggregate dependencies: ${unexpected.join(', ')}`);
@@ -36,8 +37,9 @@ export function requireChildGates(needs, {mainRequired = true, plan} = {}) {
   }
   for (const key of CHILD_GATES) {
     const result = needs[key]?.result;
-    const permittedSkip = (['main_browser','promotion_health'].includes(key) && !mainRequired) ||
-      (plan && key !== 'classify' && key !== 'core_checks' && plan.gates[key] === false);
+    const permittedSkip = !(key === 'session_authority' && requireSession) &&
+      ((['main_browser','promotion_health'].includes(key) && !mainRequired) ||
+      (plan && key !== 'classify' && key !== 'core_checks' && plan.gates[key] === false));
     if (result !== 'success' && !(permittedSkip && result === 'skipped')) {
       throw Error(`Required CI child ${key} did not pass: ${result ?? 'missing'}`);
     }
@@ -57,10 +59,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       console.log('Exact-SHA deployed QA: every required group passed.');
     } else {
     if (!['true', 'false'].includes(process.env.CI_MAIN_REQUIRED)) throw Error('Missing main gate policy');
+    if (process.env.CI_REQUIRE_SESSION !== undefined && !['true', 'false'].includes(process.env.CI_REQUIRE_SESSION)) throw Error('Invalid Session gate policy');
     const plan = JSON.parse(process.env.CI_PLAN_JSON);
     if (!plan) throw Error('Missing classifier plan');
     requireChildGates(JSON.parse(process.env.CI_NEEDS_JSON), {
-      mainRequired: process.env.CI_MAIN_REQUIRED === 'true', plan
+      mainRequired: process.env.CI_MAIN_REQUIRED === 'true',
+      requireSession: process.env.CI_REQUIRE_SESSION !== 'false', plan
     });
     console.log('Repository checks: every required child passed; only explicit classifier/main-only skips accepted.');
     }

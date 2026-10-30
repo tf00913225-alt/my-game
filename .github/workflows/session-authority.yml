@@ -1,5 +1,6 @@
 # Phase 1 acceptance: docs/CLOUD_SAVE_IMPLEMENTATION_PROGRESS.md; final release evidence: https://github.com/tf00913225-alt/my-game/pull/341
 name: Session Authority
+run-name: ${{ inputs.verified_sha && format('Verified Session deployment {0}', inputs.verified_sha) || 'Session Authority full validation' }}
 
 on:
   workflow_call:
@@ -11,40 +12,17 @@ on:
         type: string
         default: ''
   workflow_dispatch:
-  pull_request:
-    branches: [dev]
-    paths:
-      - 'functions/**'
-      - 'js/firebase/**'
-      - 'firestore.rules'
-      - 'firebase*.json'
-      - 'scripts/test-session-authority-emulator.mjs'
-      - 'tests/session-*.test.mjs'
-      - 'tests/cloud-save-*.test.mjs'
-      - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
-      - 'scripts/firestore-backup-readiness.mjs'
-      - 'scripts/storage-recovery-readiness.mjs'
-      - 'tests/firestore-backup-readiness.test.mjs'
-      - '.github/workflows/session-authority.yml'
-      - '.github/scripts/wait-session-repository-checks.mjs'
-      - 'tests/session-repository-checks-wait.test.mjs'
-  push:
-    branches: [dev]
-    paths:
-      - 'functions/**'
-      - 'js/firebase/**'
-      - 'firestore.rules'
-      - 'firebase*.json'
-      - 'scripts/test-session-authority-emulator.mjs'
-      - 'tests/session-*.test.mjs'
-      - 'tests/cloud-save-*.test.mjs'
-      - 'tests/firebase-trusted-cloud-save-backend.test.mjs'
-      - 'scripts/firestore-backup-readiness.mjs'
-      - 'scripts/storage-recovery-readiness.mjs'
-      - 'tests/firestore-backup-readiness.test.mjs'
-      - '.github/workflows/session-authority.yml'
-      - '.github/scripts/wait-session-repository-checks.mjs'
-      - 'tests/session-repository-checks-wait.test.mjs'
+    inputs:
+      verified_ci_run_id:
+        description: 'Verified dev CI run; blank retains manual full validation'
+        type: string
+        default: ''
+      verified_ci_attempt:
+        type: string
+        default: ''
+      verified_sha:
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -57,6 +35,7 @@ concurrency:
 jobs:
   emulator:
     name: Session authority emulator
+    if: ${{ !inputs.verified_ci_run_id }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -91,7 +70,7 @@ jobs:
   deploy:
     name: Deploy session authority from dev
     needs: emulator
-    if: ${{ !inputs.emulator_only && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/dev' }}
+    if: ${{ !cancelled() && !inputs.emulator_only && (needs.emulator.result == 'success' || inputs.verified_ci_run_id) && github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/dev' }}
     runs-on: ubuntu-latest
     # 65m bounded aggregate wait + 15m checkout/auth/readiness/deployment reserve.
     timeout-minutes: 80
@@ -105,6 +84,9 @@ jobs:
       - name: Require current dev and its Repository checks
         env:
           GH_TOKEN: ${{ github.token }}
+          VERIFIED_CI_RUN_ID: ${{ inputs.verified_ci_run_id }}
+          VERIFIED_CI_ATTEMPT: ${{ inputs.verified_ci_attempt }}
+          VERIFIED_CI_SHA: ${{ inputs.verified_sha }}
         shell: bash
         run: node .github/scripts/wait-session-repository-checks.mjs
       - name: Require existing Firebase deployment secret

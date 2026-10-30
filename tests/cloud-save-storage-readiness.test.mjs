@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
+import {classifyChanges} from '../.github/scripts/ci-change-classifier.mjs';
 import {inspectStorageRecoveryReadiness,collectStorageRecoveryReadiness} from '../scripts/storage-recovery-readiness.mjs';
 const project='four-symbols-jianghu',bucket=project+'.firebasestorage.app';
 const runtime='runtime-reader@four-symbols-jianghu.iam.gserviceaccount.com';
@@ -100,7 +101,11 @@ test('existing workflow retains authenticated read-only inspection, fixed JSON u
     assert.ok(auth>0&&storage>auth);
     assert.match(workflow,/run: node scripts\/storage-recovery-readiness\.mjs/);
     assert.match(workflow,/path: artifacts\/recovery\/storage-readiness\.json/);
-    assert.equal(workflow.match(/- 'scripts\/storage-recovery-readiness\.mjs'/g).length,2);
+    for(const eventName of ['pull_request','push']) {
+        const plan=classifyChanges(['scripts/storage-recovery-readiness.mjs'],{eventName,baseRef:'dev'});
+        assert.equal(plan.gates.session_authority,true);
+        assert.equal(plan.sessionDeploy,'true');
+    }
     assert.match(workflow,/gcloud firestore databases describe/);assert.match(workflow,/gcloud firestore backups schedules list/);
     assert.match(workflow,/gcloud firestore backups list/);assert.match(workflow,/Require current dev and its Repository checks/);
     assert.match(workflow,/name: Deploy protected cloud endpoints and deny-write rules/);

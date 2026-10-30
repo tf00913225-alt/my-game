@@ -8,17 +8,36 @@ export const WAIT_BUDGET_MS = 65 * 60 * 1000;
 export const POLL_INTERVAL_MS = 10 * 1000;
 const TARGET = 'Repository checks';
 const OWNER = '.github/workflows/ci.yml';
+export const SESSION_STEPS = Object.freeze([
+  'Run node --test tests/session-client.test.mjs tests/session-repository-checks-wait.test.mjs',
+  'Run node --test tests/cloud-save-*.test.mjs tests/firebase-trusted-cloud-save-backend.test.mjs',
+  'Verify account boot with session backend unavailable',
+  'Run node --test tests/firestore-backup-readiness.test.mjs',
+  'Verify actual callable and Firestore authorization'
+]);
 
 function exactRun(run, sha) {
   return run.path === OWNER && run.event === 'push' &&
     run.head_branch === 'dev' && run.head_sha === sha;
 }
 
+export function verifiedSessionSource(env) {
+  const values = [env.VERIFIED_CI_RUN_ID, env.VERIFIED_CI_ATTEMPT, env.VERIFIED_CI_SHA];
+  if (!values.some(Boolean)) return null; // Existing manual full validation.
+  if (!/^[1-9][0-9]*$/.test(values[0] || '') || !/^[1-9][0-9]*$/.test(values[1] || '') ||
+      !/^[a-f0-9]{40}$/.test(values[2] || '') || values[2] !== env.GITHUB_SHA ||
+      env.GITHUB_EVENT_NAME !== 'workflow_dispatch' || env.GITHUB_REF !== 'refs/heads/dev' ||
+      !Number.isSafeInteger(Number(values[0])) || !Number.isSafeInteger(Number(values[1]))) throw Error('Invalid verified Session deployment scope');
+  return {expectedRunId:Number(values[0]), expectedAttempt:Number(values[1]), requireSession:true};
+}
+
 export async function waitForRepositoryChecks({sha, repository, api, currentDev,
   now = () => performance.now(), sleep = ms => new Promise(resolve => setTimeout(resolve, ms)),
-  log = console.log, budgetMs = WAIT_BUDGET_MS, pollMs = POLL_INTERVAL_MS}) {
+  log = console.log, budgetMs = WAIT_BUDGET_MS, pollMs = POLL_INTERVAL_MS,
+  expectedRunId, expectedAttempt, requireSession = false}) {
   if (!/^[a-f0-9]{40}$/.test(sha) || !/^[\w.-]+\/[\w.-]+$/.test(repository) ||
-      !Number.isFinite(budgetMs) || budgetMs <= 0 || !Number.isFinite(pollMs) || pollMs <= 0) {
+      !Number.isFinite(budgetMs) || budgetMs <= 0 || !Number.isFinite(pollMs) || pollMs <= 0 ||
+      requireSession && (!Number.isSafeInteger(expectedRunId) || expectedRunId < 1 || !Number.isSafeInteger(expectedAttempt) || expectedAttempt < 1)) {
     throw new Error('Invalid Session Authority wait configuration');
   }
   const deadline = now() + budgetMs;
@@ -55,6 +74,7 @@ export async function waitForRepositoryChecks({sha, repository, api, currentDev,
     if (run) {
       last = `run=${run.id} attempt=${run.run_attempt} runStatus=${run.status}/${run.conclusion ?? 'pending'} job=missing`;
       if (!Number.isSafeInteger(run.id) || !Number.isSafeInteger(run.run_attempt) || run.run_attempt < 1) fail('Invalid run identity');
+      if (requireSession && (run.id !== expectedRunId || run.run_attempt !== expectedAttempt)) fail('Deployment source run/attempt mismatch');
       if (run.status === 'completed' && run.conclusion !== 'success') fail('CI run did not succeed');
       const response = get(`repos/${repository}/actions/runs/${run.id}/attempts/${run.run_attempt}/jobs?per_page=100`);
       if (!Array.isArray(response.jobs)) fail('Invalid workflow job response');
@@ -68,6 +88,16 @@ export async function waitForRepositoryChecks({sha, repository, api, currentDev,
         if (job.run_id !== run.id || job.head_sha !== sha) fail('Job identity mismatch');
         if (job.status === 'completed' && job.conclusion !== 'success') fail('Repository checks did not succeed');
         if (job.status === 'completed' && job.conclusion === 'success') {
+          if (requireSession) {
+            const matches = response.jobs.filter(item => item.name === 'Full Session Authority validation / Session authority emulator');
+            if (matches.length !== 1 || matches[0].run_id !== run.id || matches[0].head_sha !== sha ||
+                matches[0].status !== 'completed' || matches[0].conclusion !== 'success') fail('Required exact-source Session validation did not succeed');
+            for (const name of SESSION_STEPS) {
+              const steps = (matches[0].steps || []).filter(step => step.name === name);
+              if (steps.length !== 1 || steps[0].status !== 'completed' || steps[0].conclusion !== 'success') fail(`Required Session step did not succeed: ${name}`);
+            }
+            last += ` sessionJob=${matches[0].id} fullSessionSteps=success`;
+          }
           // Re-read latest metadata: a rerun/new run may start during job lookup.
           const fresh = get(`repos/${repository}/actions/runs?head_sha=${sha}&event=push&branch=dev&per_page=100`);
           if (!Array.isArray(fresh.workflow_runs)) fail('Invalid workflow run response');
@@ -96,7 +126,10 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     maxBuffer: 8 * 1024 * 1024
   }).trim();
   try {
+    const verified = verifiedSessionSource(process.env);
     await waitForRepositoryChecks({sha: process.env.GITHUB_SHA, repository: process.env.GITHUB_REPOSITORY,
+      ...(verified ? {...verified,
+        budgetMs:30_000, sleep:async () => {throw Error('Verified dependencies are not complete; refusing deployment runner polling');}} : {}),
       api: (endpoint, ms) => JSON.parse(command('gh', ['api', endpoint], ms)),
       currentDev: ms => command('git', ['ls-remote', 'origin', 'refs/heads/dev'], ms).split(/\s+/)[0]
     });
