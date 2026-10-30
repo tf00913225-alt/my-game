@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
+import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,qaScriptStub,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
 
 // Production loader and UI, disposable UID-local fixtures only. No player
 // credentials or cloud writes; this does not certify a backend transaction.
@@ -42,7 +42,7 @@ try{
  // prefetch must not accidentally turn this cold-entry regression into a warm test.
  let holdGameplay=true;const heldGameplay=[];
  const stubs=new Map(live?[[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]:[]);
- c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p);return;}const body=stubs.get('/'+pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:accessContinueParams(p)).catch(error=>console.error(error.message));}});
+ c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,pathname=new URL(p.request.url).pathname;if(p.resourceType==='Script'&&holdGameplay&&/\/build\/gameplay-core-(primary|secondary)\.[0-9a-f]{12}\.js$/.test(pathname)){heldGameplay.push(p);return;}const body=qaScriptStub(p,stubs,url);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:accessContinueParams(p)).catch(error=>console.error(error.message));}});
  await c.send('Fetch.enable',{patterns:[...(live?[{urlPattern:DEV_ORIGIN+'/*'}]:[]),{urlPattern:'*/build/gameplay-core-*.js*',resourceType:'Script'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
  await c.send('Page.addScriptToEvaluateOnNewDocument',{source:qaPrelude().replace(/^<script>|<\/script>$/g,'')});
  async function tap(selector){
