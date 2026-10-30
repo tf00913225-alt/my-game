@@ -228,6 +228,25 @@ function adoptionFixture(uid){
             if(mutate)mutate(response);return resolve(user).then(result=>result||(ready.length>before?{ready:true}:undefined));
         }};
 }
+
+test('original Boot refuses an internal cloud wire candidate despite valid complete client shape',async()=>{
+    const h=storeHarness();
+    await h.initial.commitInitialSources(h.request(),{operationId:'wire-initial-00001',expectedRevision:1,selection});
+    const records=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+    const {assembleCanonicalCloudReadCandidate,verifyCanonicalCloudReadCandidateAgainstSources}=require('../functions/src/canonical-snapshot');
+    const candidate=assembleCanonicalCloudReadCandidate(h.uid,h.revision,h.revision,records);
+    const wire=verifyCanonicalCloudReadCandidateAgainstSources(candidate,h.uid,h.revision,h.revision,records);
+    const f=adoptionFixture(h.uid);
+    f.repo.activate(h.uid); // Auth's active-UID pointer precedes save resolution.
+    const before=JSON.stringify([...f.values]),serverBefore=JSON.stringify([...h.data]);
+    assert.equal(f.repo.inspectCloudBundle(h.uid,wire),wire,'actual unchanged client inspector accepts the exact wire');
+    const result=await f.load(wire,{published:candidate.authoritativeStateReady});
+    assert.equal(result?.ready,undefined);assert.equal(f.ready.length,0);
+    assert.equal(JSON.stringify([...f.values]),before,'no main, metadata, sidecars or backup writes');
+    assert.equal(f.runtime.player.id,undefined,'no character hydrated');
+    assert.equal(JSON.stringify([...h.data]),serverBefore,'candidate/read rehearsal makes no server writes');
+    assert.equal(candidate.readyForPublication,false);
+});
 test('initial actual Boot resolution requests server confirmation before bundle adoption',async()=>{
     const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
     assert.equal((await f.load(cuts[0])).ready,true);
