@@ -762,7 +762,7 @@ button:disabled{
     position:relative;z-index:2;display:grid;grid-template-columns:minmax(0,1fr);
     grid-template-rows:minmax(0,1fr) 126px;min-height:0;gap:12px;
 }
-.home-city-entrances{position:absolute;z-index:8;inset:72px 0 162px;pointer-events:none;}
+.home-city-entrances{position:absolute;z-index:8;inset:16px 0 162px;pointer-events:none;}
 .home-city-entrances>.home-card{position:absolute;}
 .home-city-entrances>[data-city-entry="0"]{left:0;top:0;}
 .home-city-entrances>[data-city-entry="1"]{left:0;top:calc((100% - 144px) / 3);}
