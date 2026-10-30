@@ -1,0 +1,78 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "fourSymbolAnimation": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "phase0": {
+        "animation": "v169FourSymbolRarityBreath",
+        "duration": 2800,
+        "filter": "brightness(0.96)",
+        "count": "×9",
+        "rect": {
+          "x": 47.802085876464844,
+          "y": 499.1302185058594,
+          "width": 27.994789123535156,
+          "height": 22.000030517578125,
+          "top": 499.1302185058594,
+          "right": 75.796875,
+          "bottom": 521.1302490234375,
+          "left": 47.802085876464844
+        },
+        "box": {
+          "x": 20,
+          "y": 464.3333435058594,
+          "width": 60.796875,
+          "height": 60.796905517578125,
+          "top": 464.3333435058594,
+          "right": 80.796875,
+          "bottom": 525.1302490234375,
+          "left": 20
+        }
+      },
+      "phase1": {
+        "filter": "brightness(1.14)"
+      }
+    },
+    {
+      "fourSymbolAnimation": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "phase0": {
+        "animation": "v169FourSymbolRarityBreath",
+        "duration": 2800,
+        "filter": "brightness(0.96)",
+        "count": "×9",
+        "rect": {
+          "x": 524.3624877929688,
+          "y": 502.9562683105469,
+          "width": 33.59375,
+          "height": 26.399993896484375,
+          "top": 502.9562683105469,
+          "right": 557.9562377929688,
+          "bottom": 529.3562622070312,
+          "left": 524.3624877929688
+        },
+        "box": {
+          "x": 491,
+          "y": 461.20001220703125,
+          "width": 72.95623779296875,
+          "height": 72.95623779296875,
+          "top": 461.20001220703125,
+          "right": 563.9562377929688,
+          "bottom": 534.15625,
+          "left": 491
+        }
+      },
+      "phase1": {
+        "filter": "brightness(1.14)"
+      }
+    }
+  ]
+}
