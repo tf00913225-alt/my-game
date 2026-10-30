@@ -76,6 +76,18 @@ test("validates candidate metadata without trusting candidate gameplay",()=>{
     }),"uid-a"),/migration metadata is invalid/);
 });
 
+test("unpublished envelopes reject cloudBundle payloads even when null, empty or malformed",()=>{
+    for(const value of [null,{},[],"partial",{bundleVersion:1,ownerUid:"uid-a",gameSave:{player:{id:"hero"}}}]){
+        for(const overrides of [{},{schemaVersion:1,serverRevision:0}]){
+            const candidate=empty({...overrides,cloudBundle:value}),before=Object.keys(candidate);
+            assert.throws(()=>envelope.inspectExistingEnvelope(candidate,"uid-a"),
+                error=>error.code==="data-loss"&&error.message==="Non-authoritative envelope must not contain gameplay state.");
+            assert.equal(candidate.cloudBundle,value);assert.deepEqual(Object.keys(candidate),before);
+        }
+    }
+    assert.equal(envelope.inspectExistingEnvelope(empty(),"uid-a").kind,"current");
+});
+
 test("only allowlisted preference fields may appear in a non-authoritative envelope",()=>{
     const auto={enabled:false,skill:"normal",hp:50,sp:25,returnToCityWhenEmpty:false};
     const value={characterIds:["hero",null,null],autoConfig:auto,autoConfig2:auto,autoConfig3:auto};
