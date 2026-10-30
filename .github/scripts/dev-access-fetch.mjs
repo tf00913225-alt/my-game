@@ -41,4 +41,3 @@ export async function devAccessFetch(input, options = {}) {
   }
   return fetch(url, options);
 }
-

@@ -55,4 +55,3 @@ test('invalid credential format fails without exposing values or sending request
     delete process.env.CF_ACCESS_CLIENT_SECRET;
   }
 });
-
