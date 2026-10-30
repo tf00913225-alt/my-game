@@ -43,3 +43,35 @@ jobs:
             process.exitCode = 1;
           }
           NODE
+
+      - name: Verify protected startup asset bytes
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import {createHash} from 'node:crypto';
+          import {devAccessFetch} from './.github/scripts/dev-access-fetch.mjs';
+          const base='https://dev.four-symbols-dev.pages.dev/';
+          try {
+            const manifest=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
+            const release=await manifest.json();
+            if (manifest.status!==200 || release.commitSha!=='33739f94a169198517e4dee661c8d901475df333') throw new Error('DEV version changed');
+            const assets=await devAccessFetch(base+'build/asset-manifest.json',{signal:AbortSignal.timeout(15000)});
+            const data=await assets.json();
+            if (assets.status!==200) throw new Error('Asset manifest unavailable');
+            const entries=data.firstPlay.resources.filter(item=>item.path.startsWith('build/firebase/'));
+            if (!entries.length) throw new Error('No startup auth assets');
+            let failed=false;
+            for(const item of entries){
+              const response=await devAccessFetch(new URL(item.path,base),{signal:AbortSignal.timeout(15000)});
+              const bytes=Buffer.from(await response.arrayBuffer());
+              const digest=createHash('sha256').update(bytes).digest('hex');
+              const ok=response.status===200 && bytes.length===item.bytes && digest.startsWith(item.sha256);
+              console.log((ok?'PASS ':'FAIL ')+item.path+' HTTP '+response.status+' bytes '+(bytes.length===item.bytes?'match':'mismatch')+' hash '+(digest.startsWith(item.sha256)?'match':'mismatch'));
+              if(!ok) failed=true;
+            }
+            if(failed) process.exitCode=1;
+          } catch {
+            console.error('Diagnostic stopped: DEV version changed, network error, or manifest unavailable');
+            process.exitCode=1;
+          }
+          NODE
