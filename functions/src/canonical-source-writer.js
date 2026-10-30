@@ -2,7 +2,7 @@
 
 const {assembleCanonicalSnapshot,inspectCanonicalSnapshot,
     assembleCanonicalPlayableProjection,verifyCanonicalSnapshotAgainstSources,
-    snapshotDigest,claimRecordsDigest}=require("./canonical-snapshot");
+    assembleCanonicalCloudReadCandidate,snapshotDigest,claimRecordsDigest}=require("./canonical-snapshot");
 const {makeInitialCharacterSources,makeInitialSidecars}=require("./initial-character-sources");
 const {createRecoveryArchive,inspectRecoveryArchive}=require("./canonical-recovery-archive");
 const {source,readCharacterSources,readOwnedSources,advanceOwnedRecords,advanceOwnedSources}=require("./canonical-owned-sources");
@@ -21,6 +21,55 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
     const additionalKind="additional-character-sources";
     const singleCollections={account:"account",economy:"economy",progress:"progress",
         relicLoadout:"relicLoadout",claimCheckpoint:"claimCheckpoints"};
+    // Source preparation for the original envelope producer, not publication
+    // admission. No client state, rights grant, callable or durable write.
+    async function preparePublicationSources(request,intent){
+        if(!intent||Object.keys(intent).join("|")!=="expectedRevision"||
+           !Number.isSafeInteger(intent.expectedRevision)||intent.expectedRevision<2||
+           intent.expectedRevision>=Number.MAX_SAFE_INTEGER){
+            fail("invalid-argument","Publication source preparation requires only an expected revision.");
+        }
+        const expectedRevision=intent.expectedRevision;
+        return runProtected(request,async(tx,session)=>{
+            const uid=session.uid,root=db.collection("serverUsers").doc(uid);
+            // Resolve lazily because Recovery's original proof Owner also uses
+            // this source writer. Reuse its fence schema, never duplicate it.
+            const {inspectRecoveryAuditFence,RECOVERY_AUDIT_FENCE_COLLECTION}=require("./canonical-current-recovery");
+            const [envelopeSnap,fenceSnap,...singles]=await Promise.all([
+                tx.get(db.collection("users").doc(uid).collection("saves").doc("current")),
+                tx.get(root.collection(RECOVERY_AUDIT_FENCE_COLLECTION).doc("current")),
+                ...Object.values(singleCollections).map(name=>tx.get(root.collection(name).doc("current")))]);
+            const fence=inspectRecoveryAuditFence(fenceSnap.exists?fenceSnap.data():undefined,uid,fail);
+            if(fence?.status==="active")fail("failed-precondition","RECOVERY_AUDIT_MAINTENANCE");
+            if(!envelopeSnap.exists||singles.some(row=>!row.exists)){
+                fail("failed-precondition","Complete current publication sources are required.");
+            }
+            const envelope=inspectExistingEnvelope(envelopeSnap.data(),uid),account=singles[0].data();
+            if(envelope.kind!=="current"||envelope.serverRevision!==expectedRevision){
+                fail("aborted","CLOUD_REVISION_CONFLICT");
+            }
+            if(account.ownerUid!==uid||account.serverRevision!==expectedRevision){
+                fail("failed-precondition","Publication sources require the current equal canonical and envelope cuts.");
+            }
+            const [snapshot,archive,characters]=await Promise.all([
+                tx.get(root.collection("playableSnapshots").doc(String(expectedRevision))),
+                tx.get(root.collection("recoveryArchives").doc(String(expectedRevision))),
+                readCharacterSources(tx,root,account,fail)]);
+            const owned=await readOwnedSources(tx,root,fail,{accountSnapshot:singles[0],currentSnapshot:snapshot});
+            const records={...owned.records,characters:characters.records,...Object.fromEntries(
+                Object.keys(singleCollections).map((key,index)=>[key,source(singles[index].data())]))};
+            try{
+                if(!snapshot.exists||!archive.exists||snapshot.get("sha256")!==account.snapshotSha256){
+                    throw Error("Missing current recovery evidence");
+                }
+                verifyCanonicalSnapshotAgainstSources(snapshot.data(),uid,expectedRevision,records);
+                if(!equal(inspectRecoveryArchive(archive.data(),uid,expectedRevision,snapshot.data()),records)){
+                    throw Error("Current archive differs");
+                }
+                return assembleCanonicalCloudReadCandidate(uid,expectedRevision,expectedRevision,records);
+            }catch(_){fail("data-loss","Current publication sources differ from their complete snapshot/archive.");}
+        });
+    }
     function additionalIntent(input){
         if(!input||Object.keys(input).sort().join("|")!=="expectedRevision|operationId|selection|slotIndex"||
            !OPERATION_ID.test(input.operationId||"")||![1,2].includes(input.slotIndex)||
@@ -970,7 +1019,7 @@ function createCanonicalSourceWriter({db,FieldValue,HttpsError,runProtected,
         if(["daily-period-application","daily-period-apply"].includes(kind))return 35;
         return 0; // Unsupported kinds are rejected without reads.
     }
-    return Object.freeze({commitInitialSources,commitAdditionalCharacter,observeDailyPeriod,applyDailyPeriod,
+    return Object.freeze({commitInitialSources,commitAdditionalCharacter,observeDailyPeriod,applyDailyPeriod,preparePublicationSources,
         verifyRetainedOperation,retainedOperationReadBudget});
 }
 
