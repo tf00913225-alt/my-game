@@ -1,65 +1,36 @@
-name: Private DEV startup read-only diagnostic
+name: Private DEV path phase diagnostic
 on:
   push:
     branches: [fix/access-readonly-validation-20261030]
 permissions:
   contents: read
 concurrency:
-  group: access-startup-diagnostic
+  group: access-path-diagnostic
   cancel-in-progress: false
 jobs:
-  startup:
+  observe:
     if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/fix/access-readonly-validation-20261030' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 2
     env:
-      CF_ACCESS_REQUIRED: "1"
       CF_ACCESS_CLIENT_ID: ${{ secrets.DEV_ACCESS_CLIENT_ID }}
       CF_ACCESS_CLIENT_SECRET: ${{ secrets.DEV_ACCESS_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: 876824a9f7c8ae59be6739e22b8bdf041f255b96
+          ref: ${{ github.sha }}
           persist-credentials: false
-      - uses: actions/setup-node@v7
-        with:
-          node-version: '24'
-          package-manager-cache: false
-      - name: Observe private DEV startup through isolated QA proxy
+      - name: Read exact DEV paths without following redirects
         shell: bash
         run: |
           node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import os from 'node:os';
-          import path from 'node:path';
-          import {spawn} from 'node:child_process';
-          import {devAccessFetch} from './.github/scripts/dev-access-fetch.mjs';
-          import {startServer,findChrome,waitJson,Cdp,collectStartupFailure} from './.github/scripts/runtime-browser-qa-support.mjs';
-          const base='https://dev.four-symbols-dev.pages.dev/';
-          let server,client,proc,profile;
-          try {
-            const manifestResponse=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
-            const manifest=await manifestResponse.json();
-            if(manifestResponse.status!==200||manifest.commitSha!=='876824a9f7c8ae59be6739e22b8bdf041f255b96') throw Error('fixed DEV version unavailable');
-            const html=await devAccessFetch(base+'index.html',{signal:AbortSignal.timeout(15000)});
-            if(html.status!==200) throw Error('DEV index unavailable');
-            console.log('QA injection marker present: '+(await html.text()).includes('<!-- build:critical-script -->'));
-            server=await startServer({baseUrl:base});
-            profile=fs.mkdtempSync(path.join(os.tmpdir(),'readonly-startup-'));
-            const port=9700+Math.floor(Math.random()*100);
-            proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-            const targets=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc});
-            client=new Cdp(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
-            await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Network.enable');
-            await client.send('Page.navigate',{url:server.url});
-            const until=Date.now()+45000;
-            let ready=false;
-            while(Date.now()<until){ready=await client.eval("window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')");if(ready)break;await new Promise(r=>setTimeout(r,500));}
-            const evidence=await collectStartupFailure(client,{});
-            const failed=(evidence.startup?.failedResources||[]).map(x=>({path:String(x.path||'').split('?')[0],reason:String(x.message||'').replace(/https?:[^ ]+/g,'[url]').slice(0,250)}));
-            const safe={ready,state:evidence.startup?.state||null,errorCode:evidence.startup?.error?.code||null,loaderHidden:evidence.startup?.loaderHidden??null,authVisible:evidence.startup?.authVisible??null,failedResources:failed,proxyFailures:server.failures.map(x=>({path:String(x.path||'').split('?')[0],status:x.status})),network:(evidence.network||[]).map(x=>({path:x.path,status:x.status,error:x.error}))};
-            console.log('STARTUP_DIAGNOSTIC '+JSON.stringify(safe));
-            if(!ready)process.exitCode=1;
-          } catch {console.error('Startup diagnostic stopped: version, network or observation unavailable');process.exitCode=1;}
-          finally {client?.close();proc?.kill();if(server?.server)await new Promise(r=>server.server.close(r));if(profile)fs.rmSync(profile,{recursive:true,force:true});}
+          import {probe} from './qa-phase-probe.mjs';
+          const id=process.env.CF_ACCESS_CLIENT_ID,secret=process.env.CF_ACCESS_CLIENT_SECRET;
+          if(!id||!secret){console.error('Missing credentials');process.exit(1);}
+          let h;
+          try{h=new Headers();h.set('CF-Access-Client-Id',id);h.set('CF-Access-Client-Secret',secret);}
+          catch{console.error('Invalid credential format');process.exit(1);}
+          const result=await probe(url=>fetch(url,{headers:h,redirect:'manual',signal:AbortSignal.timeout(15000)}));
+          console.log('PATH_DIAGNOSTIC '+JSON.stringify(result));
+          if(result.some(x=>x.phase==='network-error'))process.exitCode=1;
           NODE
