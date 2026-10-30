@@ -7,8 +7,8 @@
   <nav class="samples" aria-label="選擇樣張"><button data-sample="main" aria-pressed="true">通用主框</button><button data-sample="dialog" aria-pressed="false">次級彈窗</button><button data-sample="special" aria-pressed="false">高階框候選</button></nav>
   <section class="frame" data-frame="main" aria-labelledby="frame-title">
     <header class="frame-header"><button class="button secondary" type="button" data-action="back">返回</button><h2 id="frame-title">江湖見聞</h2><span class="header-spacer" aria-hidden="true"></span></header>
-    <div class="tabs" role="tablist" aria-label="內容分類"><button type="button" role="tab" aria-selected="true" data-tab="short">簡短內容</button><button type="button" role="tab" aria-selected="false" data-tab="long">較長內容</button></div>
-    <div class="content" tabindex="0"><h3>行旅札記</h3><p data-copy>青山如故，行路有伴。這是短內容的呈現範例。</p><div class="divider" aria-hidden="true">◆</div><p>文字、操作與捲動的示意內容不代表遊戲資料。</p></div>
+    <div class="tabs" role="tablist" aria-label="內容分類"><button type="button" role="tab" id="tab-short" aria-selected="true" aria-controls="sample-panel" tabindex="0" data-tab="short">簡短內容</button><button type="button" role="tab" id="tab-long" aria-selected="false" aria-controls="sample-panel" tabindex="-1" data-tab="long">較長內容</button></div>
+    <div class="content" id="sample-panel" role="tabpanel" aria-labelledby="tab-short" tabindex="0"><h3>行旅札記</h3><p data-copy>青山如故，行路有伴。這是短內容的呈現範例。</p><div class="divider" aria-hidden="true">◆</div><p>文字、操作與捲動的示意內容不代表遊戲資料。</p></div>
     <footer><button class="button secondary" type="button" data-action="back">返回</button><button class="button primary" type="button" data-action="confirm">確認</button></footer>
   </section><p class="feedback" role="status" aria-live="polite"></p>
 </main><script src="./sample.js"></script></body></html>
