@@ -8033,6 +8033,8 @@
             }
 
             if(pageItems.length===0){
+                const scroll=document.getElementById("inventoryGridScroll");
+                if(scroll){ scroll.scrollTop=0; }
                 const message=document.createElement("p");
                 message.className="inventory-empty-message";
                 message.setAttribute("role","status");
