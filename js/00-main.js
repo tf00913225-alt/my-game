@@ -23166,6 +23166,8 @@ function ensureBattleStatusDetailModal(){
 function closeBattleStatusDetailModal(){
     const modal=document.getElementById("battleStatusDetailModal");
     if(!modal){ return; }
+    delete modal.dataset.side;
+    delete modal.dataset.portraitKind;
     modal.hidden=true;
     modal.setAttribute("aria-hidden","true");
     syncBattleUiPriorityLayer();
@@ -23213,6 +23215,8 @@ function openBattleStatusDetailModal(side,index){
     if(!entity){ return false; }
 
     const modal=ensureBattleStatusDetailModal();
+    modal.dataset.side=isMonster?"monster":"player";
+    modal.dataset.portraitKind=isMonster?"monster":entity.combatantKind==="heroNpc"?"heroNpc":Number.isInteger(index)&&index>=0&&index<3?"player":"other";
     const stats=!isMonster&&typeof getPartyBattleStats==="function"?getPartyBattleStats(index):null;
     const portrait=modal.querySelector('.battle-status-detail-portrait');
     const card=document.getElementById((isMonster?'battleMonster':'battlePlayerCard')+index);

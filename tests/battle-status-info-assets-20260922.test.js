@@ -12,7 +12,7 @@ test("inspection portrait and agility follow the selected combatant without stal
   const fn=source.slice(source.indexOf('function openBattleStatusDetailModal(side,index){'),source.indexOf('\nif(typeof window!=="undefined"){',source.indexOf('function openBattleStatusDetailModal(side,index){')));
   const nodes=new Map();
   const node=selector=>{if(!nodes.has(selector))nodes.set(selector,{style:{},textContent:'',setAttribute(k,v){this[k]=v;}});return nodes.get(selector);};
-  const modal={querySelector:node,setAttribute(){}};
+  const modal={dataset:{},querySelector:node,setAttribute(){}};
   let blocked=false;
   const context={isBattleStatusInspectionBlocked:()=>blocked,monsters:[{name:'敵甲',level:9,hp:10,maxHP:20,sp:0,maxSP:0,agility:99},{name:'敵乙',level:3,hp:5,maxHP:5,sp:0,maxSP:0,agility:40}],
     getPartyCharacterByIndex:()=>({name:'隊友',level:4,hp:20,sp:5}),getPartyBattleStats:()=>({maxHP:30,maxSP:10,agility:72.5}),
@@ -25,6 +25,8 @@ test("inspection portrait and agility follow the selected combatant without stal
   assert.equal(node('[data-field="agility"]').textContent,'敏捷：49.5');
   assert.match(node('.battle-status-detail-portrait').style.backgroundImage,/battleMonster0/);
   context.openBattleStatusDetailModal('player',0);
+  assert.equal(modal.dataset.side,'player');
+  assert.equal(modal.dataset.portraitKind,'player');
   assert.equal(node('.battle-status-detail-panel').scrollTop,0);
   assert.equal(node('[data-field="agility"]').textContent,'敏捷：72.5');
   assert.match(node('.battle-status-detail-portrait').style.backgroundImage,/battlePlayerCard0/);
@@ -32,6 +34,11 @@ test("inspection portrait and agility follow the selected combatant without stal
   assert.equal(node('.battle-status-detail-portrait').style.backgroundImage,'none');
   assert.equal(node('.battle-status-detail-portrait').textContent,'◇');
   assert.equal(node('.battle-status-detail-portrait')['aria-label'],'敵乙立繪');
+  assert.equal(modal.dataset.portraitKind,'monster');
+  context.getPartyCharacterByIndex=()=>({combatantKind:'heroNpc',name:'英雄',level:4,hp:20,sp:5});
+  context.openBattleStatusDetailModal('player',3);
+  assert.equal(modal.dataset.portraitKind,'heroNpc');
+  context.openBattleStatusDetailModal('monster',1);
   blocked=true;assert.equal(context.openBattleStatusDetailModal('player',0),false);
   assert.equal(node('[data-field="agility"]').textContent,'敏捷：20');
   blocked=false;context.getPartyBattleStats=()=>null;

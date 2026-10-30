@@ -4121,6 +4121,9 @@ body.v174-battle-reading-open .v143-field-source-hidden{opacity:1!important;}
     font-size:64px;
     pointer-events:none;
 }
+#game-stage #battlePage .battle-status-detail-modal[data-side="player"][data-portrait-kind="player"] .battle-status-detail-portrait{
+    height:260px;
+}
 #game-stage #battlePage .battle-status-detail-core{
     display:grid;
     grid-template-columns:repeat(2,minmax(0,1fr));
