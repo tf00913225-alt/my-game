@@ -63,6 +63,17 @@ test('one CI Session validation preserves every former Session path and all orig
   for(const source of ['docs/readme.md','css/00-main.css','tests/unrelated.test.mjs','functions-other/file.js','js/firebase-other/file.js'])assert.equal(plan([source]).sessionDeploy,'false',source);
   assert.equal(plan(['functions/index.js'],{error:'Missing ancestry'}).sessionDeploy,'blocked');
   assert.equal(plan(['../functions/index.js']).sessionDeploy,'blocked');
+  // The original standalone functions/** gate also covered verified generated
+  // policy changes. Build verification cannot silently drop that safety gate.
+  for(const eventName of ['pull_request','push'])for(const paths of [
+    ['css/22-stage-v78-character-inventory-core.css','functions/src/generated/restricted-forest-instance-policy.json'],
+    ['functions/src/generated/restricted-forest-instance-policy.json']]) {
+    const generated=plan(paths,{eventName,generatedVerified:true});
+    assert.equal(generated.strictMode,paths.length===1);
+    assert.equal(generated.gates.session_authority,true);
+    assert.equal(generated.sessionDeploy,'true');
+    assert.equal(generated.gates.ui_browser,true);
+  }
   assert.equal(ci.jobs.session_authority.uses,'./.github/workflows/session-authority.yml');
   assert.equal(ci.jobs.session_authority.with.emulator_only,true);
   assert.equal(ci.jobs.session_authority.with.candidate_sha,'${{ inputs.candidate_sha || github.sha }}');

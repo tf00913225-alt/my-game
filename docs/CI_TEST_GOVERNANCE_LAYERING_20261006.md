@@ -19,6 +19,9 @@ selector parser (Element Box retains battle input/Boss Fast validation), map its
 existing UI contract test and the reviewed standalone UI sample. PR and dev CI
 each execute the identical complete reusable Session emulator once, including
 Boot/SDK and authorization tests; Repository checks requires its success.
+Original Session paths also require that gate when the generated-output verifier
+accepts a policy JSON during a UI/art build; verification never retires the
+former independent functions/** safety responsibility.
 The original Session path filters now drive an exact CI output. Only a successful
 dev push CI with those paths can request the existing independent Session workflow.
 It binds source SHA/run/attempt, refuses stale dev or failed/duplicate requests,

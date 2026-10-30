@@ -352,6 +352,10 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   const mainRequired = baseRef === 'main' || nightly || highRiskIntegration || (eventName==='push' && strictMode) || !['pull_request','push'].includes(eventName);
   const full = mainRequired || strictMode;
   const f = key => flags[`${key}_changed`];
+  // Generated-output verification does not retire the independent Session
+  // path contract. In particular, policy generation during a UI/art build
+  // previously required the standalone full Session gate on PR and dev push.
+  const sessionPathsChanged = Array.isArray(paths) && paths.some(p=>typeof p==='string'&&SESSION_PATHS.some(pattern=>pattern.test(p)));
   const predicted = {
     core_checks: true,
     battle_browser: full || f('battle') || f('skill') || f('monster_balance'),
@@ -365,7 +369,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
     boss_balance: full || f('boss') || f('monster_balance') || f('battle') || f('skill'),
     main_browser: mainRequired,
     promotion_health: baseRef === 'main' && !nightly,
-    session_authority: full || f('cloud') || f('persistence')
+    session_authority: full || f('cloud') || f('persistence') || sessionPathsChanged
   };
   const shadow = eventName === 'pull_request' && !mainRequired && !enabled;
   const gates = shadow ? Object.fromEntries(Object.keys(predicted).map(k => [k, ['main_browser','promotion_health'].includes(k) ? false : true])) : predicted;
@@ -375,7 +379,7 @@ export function classifyChanges(paths, {eventName = 'pull_request', baseRef = 'd
   if(bossFull){predicted.boss_balance=true;gates.boss_balance=true;}
   const uiMode=full||shadow||f('workflow')||f('cloud')||f('persistence')||f('ui_shared')||f('inventory')&&(f('skill_ui')||f('skill')) ? 'all' : f('inventory') ? 'inventory' : f('skill_ui')||f('skill') ? 'skill' : 'smoke';
   const sessionDeploy = error || !Array.isArray(paths) || !paths.length || paths.some(p=>typeof p!=='string'||p.startsWith('/')||p.includes('..')||p.includes('\\')) ? 'blocked' :
-    String(paths.some(p=>SESSION_PATHS.some(pattern=>pattern.test(p))));
+    String(sessionPathsChanged);
   return {policyVersion: 1, eventName, baseRef, strictMode, shadow, fullRegression: nightly, flags, reasons, predicted, gates, bossMode, uiMode, sessionDeploy};
 }
 
