@@ -701,6 +701,39 @@ function verifyCanonicalPlayableProjectionAgainstSources(bundle,uid,revision,rec
     return bundle.projection;
 }
 
+// Internal wire candidate only. Equal cuts are deliberate: a later envelope
+// requires complete intervening source/claim closure, not revision coercion.
+// Neither a valid wire nor its digest grants publication/readiness authority.
+function assembleCanonicalCloudReadCandidate(uid,serverRevision,canonicalRevision,records){
+    if(!Number.isSafeInteger(serverRevision)||serverRevision<1||
+       serverRevision>=Number.MAX_SAFE_INTEGER||canonicalRevision!==serverRevision){
+        fail("cloud read candidate requires equal valid revision cuts");
+    }
+    const {projection}=assembleCanonicalPlayableProjection(uid,canonicalRevision,records);
+    const cloudBundle={bundleVersion:1,ownerUid:uid,serverRevision,canonicalRevision,
+        sourceSnapshotSha256:projection.sourceSnapshotSha256,
+        gameSave:projection.gameSave,sidecars:projection.sidecars};
+    const byteLength=Buffer.byteLength(JSON.stringify(cloudBundle),"utf8");
+    if(byteLength>MAX_SNAPSHOT_BYTES){fail("cloud read candidate exceeds internal size budget");}
+    return Object.freeze({cloudBundle,sha256:snapshotDigest(cloudBundle),byteLength,
+        authoritativeStateReady:false,readyForPublication:false});
+}
+
+function verifyCanonicalCloudReadCandidateAgainstSources(candidate,uid,serverRevision,canonicalRevision,records){
+    if(!object(candidate)||!object(candidate.cloudBundle)||
+       candidate.authoritativeStateReady!==false||candidate.readyForPublication!==false||
+       snapshotDigest(candidate.cloudBundle)!==candidate.sha256||
+       Buffer.byteLength(JSON.stringify(candidate.cloudBundle),"utf8")!==candidate.byteLength){
+        fail("cloud read candidate digest, size or readiness");
+    }
+    const rebuilt=assembleCanonicalCloudReadCandidate(uid,serverRevision,canonicalRevision,records);
+    if(rebuilt.sha256!==candidate.sha256||rebuilt.byteLength!==candidate.byteLength){
+        fail("cloud read candidate differs from canonical sources");
+    }
+    return candidate.cloudBundle;
+}
+
 module.exports={assembleCanonicalSnapshot,assembleCanonicalPlayableProjection,inspectCanonicalSnapshot,
+    assembleCanonicalCloudReadCandidate,verifyCanonicalCloudReadCandidateAgainstSources,
     verifyCanonicalSnapshotAgainstSources,verifyCanonicalPlayableProjectionAgainstSources,
     claimRecordsDigest,snapshotDigest,MAX_SNAPSHOT_BYTES};
