@@ -27,7 +27,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: cloudflare-pages-dev
+  group: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/cloudflare-access-dev-ci-20261030' && format('access-readonly-{0}', github.run_id) || 'cloudflare-pages-dev' }}
   cancel-in-progress: true
 
 permissions:
@@ -470,7 +470,7 @@ jobs:
 
   deploy:
     name: Deploy dev preview
-    if: always()
+    if: ${{ always() && github.ref == 'refs/heads/dev' }}
     needs: [publish_dev, responsive_live, battle_daily_live, tower_live, abyss_live, adventure_live, boss_live]
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -514,3 +514,48 @@ jobs:
           echo "Branch: dev" >> "$GITHUB_STEP_SUMMARY"
           echo "Commit SHA: $EXPECTED_COMMIT_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "All deployed QA groups: PASSED on the same exact SHA" >> "$GITHUB_STEP_SUMMARY"
+
+  access_readonly_diagnostic:
+    name: Private DEV read-only access diagnostic
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/cloudflare-access-dev-ci-20261030' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 3
+    permissions:
+      contents: read
+    env:
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ secrets.DEV_ACCESS_CLIENT_ID }}
+      CF_ACCESS_CLIENT_SECRET: ${{ secrets.DEV_ACCESS_CLIENT_SECRET }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify private access without deployment
+        shell: bash
+        run: |
+          node --input-type=module <<'NODE'
+          import { devAccessFetch } from './.github/scripts/dev-access-fetch.mjs';
+          const url = 'https://dev.four-symbols-dev.pages.dev/release-manifest.json';
+          try {
+            const anonymous = await fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(15000) });
+            const location = anonymous.headers.get('location') || '';
+            const login = new URL(location, url);
+            if (![301,302,303,307,308].includes(anonymous.status) || !login.hostname.endsWith('.cloudflareaccess.com')) {
+              throw new Error('Anonymous access did not reach the expected login');
+            }
+            console.log('Anonymous request requires Cloudflare Access login');
+            const authenticated = await devAccessFetch(url, { signal: AbortSignal.timeout(15000) });
+            if (authenticated.status !== 200 || !authenticated.headers.get('content-type')?.includes('application/json')) {
+              throw new Error('Credential request did not return the release manifest');
+            }
+            const manifest = await authenticated.json();
+            if (typeof manifest.commitSha !== 'string' || typeof manifest.version !== 'string' || typeof manifest.cacheVersion !== 'string') {
+              throw new Error('Release manifest format was unexpected');
+            }
+            console.log('Service credentials can read the private DEV release manifest');
+          } catch {
+            console.error('Private DEV access verification failed');
+            process.exitCode = 1;
+          }
+          NODE
