@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -97,7 +98,7 @@ const expression=`(async()=>{
 `;
 const liveBase=process.env.DAILY_BALANCE_BASE_URL;
 if(liveBase){
- const manifest=await fetch(new URL('release-manifest.json',liveBase+'/')).then(r=>{assert.equal(r.ok,true,'deployed manifest');return r.json();});
+ const manifest=await devAccessFetch(new URL('release-manifest.json',liveBase+'/')).then(r=>{assert.equal(r.ok,true,'deployed manifest');return r.json();});
  assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Daily live exact SHA');
 }
 const server=await startServer({baseUrl:liveBase}),chrome=findChrome();

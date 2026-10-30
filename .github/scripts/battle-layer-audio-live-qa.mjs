@@ -1,3 +1,4 @@
+import { devAccessFetch, accessContinueParams, DEV_ORIGIN } from './dev-access-fetch.mjs';
 import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
@@ -48,7 +49,7 @@ async function runBossBalanceProductionQa(){
     const mode=process.env.BOSS_GATE_MODE||'full',startedAt=Date.now();
     assert.ok(['fast','full'].includes(mode),'Unknown Boss mode must fail closed');
     const baseUrl=process.env.BOSS_BALANCE_BASE_URL;
-    if(baseUrl){const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA);}
+    if(baseUrl){const manifest=await devAccessFetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA);}
     const reference=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','utf8');
     const expression=`(async()=>{
       const check=(v,m)=>{if(!v)throw Error(m);};
@@ -881,6 +882,15 @@ try{
     await client.send("Page.enable");
     await client.send("Runtime.enable");
     await client.send("Network.enable");
+    if(new URL(qaUrl).origin===DEV_ORIGIN){
+        client.socket.addEventListener('message',event=>{
+            const message=JSON.parse(String(event.data));
+            if(message.method==='Fetch.requestPaused'){
+                client.send('Fetch.continueRequest',accessContinueParams(message.params)).catch(error=>console.error(error.message));
+            }
+        });
+        await client.send('Fetch.enable',{patterns:[{urlPattern:DEV_ORIGIN+'/*'}]});
+    }
     await client.send("Emulation.setDeviceMetricsOverride",{width:412,height:915,deviceScaleFactor:3,mobile:true,screenWidth:412,screenHeight:915});
     await client.send("Page.navigate",{url:qaUrl});
     await waitFor(client,"document.readyState==='complete'","page load");

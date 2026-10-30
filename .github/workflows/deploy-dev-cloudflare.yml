@@ -36,6 +36,7 @@ permissions:
 jobs:
   publish_dev:
     name: Publish exact dev candidate
+    if: ${{ github.ref == 'refs/heads/dev' }}
     runs-on: ubuntu-latest
     # QA follows publication in isolated parallel jobs.
     timeout-minutes: 20
@@ -44,6 +45,9 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID_RAW: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       PROJECT_NAME: four-symbols-dev
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
 
@@ -144,6 +148,9 @@ jobs:
       UI_QA_MODE: ${{ github.event_name == 'workflow_dispatch' && 'all' || inputs.ui_mode }}
       RESPONSIVE_GENERAL_UI_ONLY: ${{ github.event_name != 'workflow_dispatch' && (inputs.ui_mode == 'skill' || inputs.ui_mode == 'smoke') && '1' || '' }}
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -208,6 +215,9 @@ jobs:
     timeout-minutes: 60
     env:
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -264,6 +274,9 @@ jobs:
     timeout-minutes: 60
     env:
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -311,6 +324,9 @@ jobs:
     timeout-minutes: 60
     env:
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -358,6 +374,9 @@ jobs:
     timeout-minutes: 60
     env:
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -406,6 +425,9 @@ jobs:
     env:
       BOSS_GATE_MODE: ${{ github.event_name == 'workflow_dispatch' && 'full' || inputs.boss_mode }}
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev
@@ -454,6 +476,9 @@ jobs:
     timeout-minutes: 5
     env:
       DEV_BASE_URL: https://dev.four-symbols-dev.pages.dev
+      CF_ACCESS_REQUIRED: "1"
+      CF_ACCESS_CLIENT_ID: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_ID || '' }}
+      CF_ACCESS_CLIENT_SECRET: ${{ github.ref == 'refs/heads/dev' && secrets.DEV_ACCESS_CLIENT_SECRET || '' }}
       EXPECTED_BRANCH: dev
       EXPECTED_COMMIT_SHA: ${{ github.sha }}
       DEPLOY_BASE_URL: https://dev.four-symbols-dev.pages.dev

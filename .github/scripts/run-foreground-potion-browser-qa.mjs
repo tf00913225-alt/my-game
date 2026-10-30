@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -7,7 +8,7 @@ import {findChrome,startServer,waitJson,Cdp,ASSET_MANIFEST,collectStartupFailure
 const out='artifacts/browser-qa';fs.mkdirSync(out,{recursive:true});
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
-if(baseUrl){const manifest=await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();assert.equal(manifest.commitSha,expected);assert.equal(manifest.cacheVersion,ASSET_MANIFEST.release);}
+if(baseUrl){const manifest=await (await devAccessFetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();assert.equal(manifest.commitSha,expected);assert.equal(manifest.cacheVersion,ASSET_MANIFEST.release);}
 const server=await startServer({baseUrl});
 const bases=[['home',"showPage('home')"],['training',"showPage('training')"],['patrol',"enterMap()"],['daily',"leaveMap();openDungeonHub()"],['gameplay',"showPage('gameplay')"],['boss',"vGameplayOpenBoss()"],['tower',"vGameplayOpenTower()"],['abyss',"vGameplayOpenAbyss()"],['abyss-map20',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(20)"],['abyss-map40',"vGameplayOpenAbyss();v174AbyssSelectDifficulty(40)"]];
 const measure=`(()=>{const shell=document.querySelector('.native-bottom-nav-layer'),nav=document.getElementById('bottomNav'),r=nav.getBoundingClientRect();return {visible:!shell.hidden&&getComputedStyle(shell).display!=='none',shellCount:document.querySelectorAll('.native-bottom-nav-layer').length,navCount:document.querySelectorAll('#bottomNav').length,legacy:document.querySelectorAll('#mapPageNav,#v141DungeonNav').length,context:nav.dataset.navContext,signature:nav.dataset.navSignature,buttons:[...nav.children].map(n=>n.getAttribute('onclick')),hitboxes:nav.getClientRects().length,reason:FourSymbolsBottomNav.foregroundSuppressionReason(),active:document.querySelector('#game-content .page.active')?.id};})()`;

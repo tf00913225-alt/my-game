@@ -181,7 +181,7 @@ jobs:
           node --check .github/scripts/run-water-wild-portrait-browser-qa.mjs
 
       - name: Verify CI aggregate failure propagation
-        run: node --test tests/ci-change-classifier.test.mjs tests/ci-change-classifier-impact.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs
+        run: node --test tests/ci-change-classifier.test.mjs tests/ci-change-classifier-impact.test.mjs tests/ci-boss-routing.test.mjs tests/ci-concurrency.test.mjs tests/ci-aggregate.test.mjs tests/session-repository-checks-wait.test.mjs tests/full-regression-health.test.mjs tests/ci-dev-access.test.mjs
 
       - name: Check all project JavaScript syntax
         run: node .github/scripts/ci.mjs syntax
