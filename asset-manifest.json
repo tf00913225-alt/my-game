@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.0d64661ef701.js"
+          "build/app-shell.62baef90de7f.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -50,7 +50,7 @@
       "gameplay-core": {
         "scripts": [
           "build/gameplay-core-primary.3c3a0245f219.js",
-          "build/gameplay-core-secondary.d4c9c9ba2893.js"
+          "build/gameplay-core-secondary.1eedf7a806c3.js"
         ],
         "styles": [
           "build/gameplay-core.830c08f5bea1.css"
@@ -595,9 +595,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.0d64661ef701.js",
-        "sha256": "0d64661ef701",
-        "bytes": 1240106,
+        "path": "build/app-shell.62baef90de7f.js",
+        "sha256": "62baef90de7f",
+        "bytes": 1240207,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -619,65 +619,65 @@
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_earth.png",
-        "sha256": "7add06d9c47c",
-        "bytes": 317289,
+        "path": "assets/characters/battle/player_battle_female_01.webp",
+        "sha256": "e356e4833f64",
+        "bytes": 1503982,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_fire.png",
-        "sha256": "cf43645eb6fd",
-        "bytes": 339677,
+        "path": "assets/characters/battle/player_battle_female_02.webp",
+        "sha256": "40af67e2e3cd",
+        "bytes": 1310166,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_water.png",
-        "sha256": "cd8f1b74be9f",
-        "bytes": 342821,
+        "path": "assets/characters/battle/player_battle_female_03.webp",
+        "sha256": "429e0155c68e",
+        "bytes": 1544440,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_wind.png",
-        "sha256": "ef5be3d2f6cb",
-        "bytes": 320753,
+        "path": "assets/characters/battle/player_battle_female_04.webp",
+        "sha256": "7cbed1fd3ce5",
+        "bytes": 1334822,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_earth.png",
-        "sha256": "2f120e082c78",
-        "bytes": 345639,
+        "path": "assets/characters/battle/player_battle_male_01.webp",
+        "sha256": "ff9b920f5bef",
+        "bytes": 1250584,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_fire.png",
-        "sha256": "058712570f01",
-        "bytes": 360873,
+        "path": "assets/characters/battle/player_battle_male_02.webp",
+        "sha256": "2a5a10f14bf2",
+        "bytes": 1336036,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_water.png",
-        "sha256": "3ef9a794f903",
-        "bytes": 369681,
+        "path": "assets/characters/battle/player_battle_male_03.webp",
+        "sha256": "dbbdf9c32722",
+        "bytes": 1470516,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_wind.png",
-        "sha256": "07454a11ee08",
-        "bytes": 359690,
+        "path": "assets/characters/battle/player_battle_male_04.webp",
+        "sha256": "65be15a16e4d",
+        "bytes": 1310694,
         "priority": "P2",
         "type": "image",
         "decode": true
@@ -971,9 +971,9 @@
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.d4c9c9ba2893.js",
-        "sha256": "d4c9c9ba2893",
-        "bytes": 748879,
+        "path": "build/gameplay-core-secondary.1eedf7a806c3.js",
+        "sha256": "1eedf7a806c3",
+        "bytes": 748980,
         "priority": "P2",
         "type": "script",
         "decode": false
@@ -987,8 +987,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "7e6cc28a661e",
-    "totalBytes": 49905657,
+    "manifestHash": "2b2dda9ca52c",
+    "totalBytes": 58210676,
     "totalResources": 95
   },
   "assets": {
@@ -996,17 +996,17 @@
       "sha256": "4915950d06e4",
       "bytes": 69987
     },
-    "build/app-shell.0d64661ef701.js": {
-      "sha256": "0d64661ef701",
-      "bytes": 1240106
+    "build/app-shell.62baef90de7f.js": {
+      "sha256": "62baef90de7f",
+      "bytes": 1240207
     },
     "build/gameplay-core-primary.3c3a0245f219.js": {
       "sha256": "3c3a0245f219",
       "bytes": 762265
     },
-    "build/gameplay-core-secondary.d4c9c9ba2893.js": {
-      "sha256": "d4c9c9ba2893",
-      "bytes": 748879
+    "build/gameplay-core-secondary.1eedf7a806c3.js": {
+      "sha256": "1eedf7a806c3",
+      "bytes": 748980
     },
     "build/feature-patrol.fa6fa230e09b.js": {
       "sha256": "fa6fa230e09b",

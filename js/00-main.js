@@ -5486,7 +5486,8 @@ function getCharacterBattleArtworkPath(character){
         ? character.element
         : "fire";
 
-    return "assets/characters/battle_"+gender+"_"+element+".png";
+    const portraitNumber={fire:"01",water:"02",wind:"03",earth:"04"}[element];
+    return "assets/characters/battle/player_battle_"+gender+"_"+portraitNumber+".webp";
 }
 
 
