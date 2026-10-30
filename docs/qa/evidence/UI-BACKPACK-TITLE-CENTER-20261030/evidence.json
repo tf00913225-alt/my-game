@@ -285,7 +285,7 @@
         800
       ],
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -769,8 +769,19 @@
       }
     },
     {
+      "backpackHeaderInteraction": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "headingGeometry": {
+        "headerCenter": 180,
+        "titleCenter": 180.00000762939453
+      }
+    },
+    {
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -1884,7 +1895,7 @@
         873
       ],
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -2368,8 +2379,19 @@
       }
     },
     {
+      "backpackHeaderInteraction": true,
+      "viewport": [
+        393,
+        873
+      ],
+      "headingGeometry": {
+        "headerCenter": 196.49999809265137,
+        "titleCenter": 196.5
+      }
+    },
+    {
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -3483,7 +3505,7 @@
         915
       ],
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -3967,8 +3989,19 @@
       }
     },
     {
+      "backpackHeaderInteraction": true,
+      "viewport": [
+        412,
+        915
+      ],
+      "headingGeometry": {
+        "headerCenter": 205.99999809265137,
+        "titleCenter": 205.99999237060547
+      }
+    },
+    {
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -5082,7 +5115,7 @@
         768
       ],
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -5566,8 +5599,19 @@
       }
     },
     {
+      "backpackHeaderInteraction": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "headingGeometry": {
+        "headerCenter": 683,
+        "titleCenter": 683
+      }
+    },
+    {
       "visual": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "scroll": 0,
         "scrollOwner": "hidden",
         "oldBackground": false,
@@ -6681,7 +6725,7 @@
         844
       ],
       "reloaded": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "roots": 1
       }
     },
@@ -6692,7 +6736,7 @@
         915
       ],
       "reloaded": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "roots": 1
       }
     },
@@ -6703,7 +6747,7 @@
         768
       ],
       "reloaded": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "roots": 1
       }
     },
@@ -6714,7 +6758,7 @@
         1080
       ],
       "reloaded": {
-        "background": "url(\"http://127.0.0.1:60052/assets/ui/home-background-v17344.png\")",
+        "background": "url(\"http://127.0.0.1:58522/assets/ui/home-background-v17344.png\")",
         "roots": 1
       }
     },

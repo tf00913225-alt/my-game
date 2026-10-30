@@ -366,6 +366,12 @@ async function run(chrome,url,live){
    assert.ok(density.height>=3*density.slot+2*density.gap-1,'character showcase crowds out three complete item rows '+JSON.stringify(density));
    evidence.push({proportions:true,viewport:v,composition,density});
    await screenshot('populated-backpack-'+v.join('x'));
+   const headingGeometry=await c.eval(`(()=>{const h=document.querySelector('.inventory-header').getBoundingClientRect(),t=document.querySelector('.inventory-title-plate h2').getBoundingClientRect();return {headerCenter:(h.left+h.right)/2,titleCenter:(t.left+t.right)/2};})()`);
+   assert.ok(Math.abs(headingGeometry.headerCenter-headingGeometry.titleCenter)<1,'backpack title off center '+JSON.stringify(headingGeometry));
+   await click('.map-inventory-overlay-close',v);await screenshot('backpack-closed-'+v.join('x'));
+   assert.equal(await c.eval("getComputedStyle(document.getElementById('inventoryPage')).display"),'none','backpack remained visible after close');
+   await c.eval("showPage('inventory')");await settle();await screenshot('backpack-reopened-'+v.join('x'));
+   evidence.push({backpackHeaderInteraction:true,viewport:v,headingGeometry});
    assert.equal(frame.columns.split(' ').length,1,'backpack must preserve one authored column at every viewport');
    await check('.inventory-bottom-actions',v);await check('.map-inventory-overlay-close',v,true);
    // Added short browser-chrome cases cover this work's home/backpack only.
