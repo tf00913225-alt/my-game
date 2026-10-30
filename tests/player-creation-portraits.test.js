@@ -44,7 +44,7 @@ for(const file of ["js/16-stage-v54-main-city-runtime.js","js/25-v131-fix-batch.
     assert.match(display,/getCharacterArtworkPath\(/,`${file} uses normal portraits`);
     assert.doesNotMatch(display,/getCharacterBattleArtworkPath\(/,`${file} does not borrow battle poses`);
 }
-assert.match(main,/return "assets\/characters\/battle_"\+gender\+"_"\+element\+"\.png";/,"actual battle resolver retains independent assets");
+assert.match(main,/return "assets\/characters\/battle\/player_battle_"\+gender\+"_"\+portraitNumber\+"\.webp";/,"actual battle resolver retains independent battle poses");
 console.log("✓ shared normal portraits replace old city/inventory/formation/story art; battle stays separate");
 
 const heroArtworkSource=main.slice(main.indexOf("function getCharacterBattleArtworkPath("),main.indexOf("function getCharacterDisplayNameByIndex("));

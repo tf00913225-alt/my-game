@@ -29,9 +29,9 @@ async function fixture(retained=false){
  }
  return {h,hero};
 }
-async function proof(f){
+async function proof(f,canonicalRevision=2){
  const {h,hero}=f,scope={root:h.dependencies.db.collection('serverUsers').doc(h.uid),uid:h.uid,
-  envelopeRevision:h.revision,canonicalRevision:2,captureSha256:'a'.repeat(64)};
+  envelopeRevision:h.revision,canonicalRevision,captureSha256:'a'.repeat(64)};
  const counts=[];
  const unit=async method=>h.dependencies.db.runTransaction(async tx=>{let reads=0;const result=await method({get:async ref=>{const snap=await tx.get(ref);reads+=ref.query?Math.max(1,snap.size):1;return snap;}});counts.push(reads);return result;});
  const inventory=Object.fromEntries(['heroAcquisition','heroAcquisitionHistory','heroChapter','heroChapterTickets','heroChapterSteps'].map(name=>[name,[...h.data.keys()].filter(p=>p.startsWith(h.root+'/'+name+'/')).map(p=>p.split('/').at(-1))]));
@@ -49,6 +49,67 @@ test('real seven-login and twenty-step route including unused renewal close with
  assert.equal(result.canonicalRevision,2);assert.equal(result.envelopeRevision,f.h.revision);assert.equal(f.h.data.has(f.h.root+'/recoveryArchives/3'),false);
  assert.deepEqual([...f.h.data],before);assert.equal(f.h.writes,writes);
 });
+test('lawfully earned Hero rights and a complete initial projection do not certify playable adoption',async()=>{
+ const f=await fixture(),before=copy([...f.h.data]),writes=f.h.writes;
+ const {result}=await proof(f),{h}=f;
+ const archive=h.data.get(h.root+'/recoveryArchives/2');
+ assert.ok(archive?.sourceRecords,'use the original writer archive, not hand-built player sources');
+ const {assembleCanonicalPlayableProjection}=require('../functions/src/canonical-snapshot');
+ const bundle=assembleCanonicalPlayableProjection(h.uid,2,archive.sourceRecords);
+ assert.equal(result.entitlements.length,2,'rights come from original login/chapter operations');
+ assert.equal(result.claimIds.length,2);
+ assert.equal(result.canonicalRevision,2);
+ assert.equal(result.envelopeRevision,h.revision);
+ assert.ok(result.envelopeRevision>result.canonicalRevision);
+ const {createHeroGrowth}=require('../functions/src/hero-growth');
+ const current=await createHeroGrowth({...h.dependencies,acquisition:f.hero}).read(h.request());
+ assert.equal(current.serverRevision,result.envelopeRevision);
+ // Structural completeness at the canonical cut cannot silently import later
+ // rights, replay claims or authorize a public save. The existing growth Owner
+ // resolves those rights; a future admission must bind that result to its cut.
+ for(const grant of result.entitlements){
+  assert.equal(bundle.projection.gameSave.heroAccount.heroes[grant.heroId].unlocked,false);
+  assert.equal(current.heroAccount.heroes[grant.heroId].unlocked,true);
+ }
+ assert.equal(archive.sourceRecords.claimRecords.length,0);
+ assert.equal(bundle.readyForPublication,false);
+ assert.equal(bundle.projection.authoritativeStateReady,false);
+ assert.equal(archive.readyForRestore,false);
+ assert.equal(h.data.get(h.save).authoritativeStateReady,false);
+ assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+});
+
+test('original earned login reward materializes Hero rights into one canonical cut without reopening claims',async()=>{
+ const f=await fixture(),{h}=f;
+ const {createHeroGrowth}=require('../functions/src/hero-growth');
+ const growth=createHeroGrowth({...h.dependencies,acquisition:f.hero});
+ const intent={...h.request(),data:{...h.request().data,operationId:'hero-login-reward-v1-day3',
+  expectedRevision:h.revision,milestoneDay:3}};
+ const earned=await growth.claimLoginReward(intent);
+ const archive=h.data.get(h.root+'/recoveryArchives/'+earned.serverRevision);
+ const {assembleCanonicalPlayableProjection}=require('../functions/src/canonical-snapshot');
+ const bundle=assembleCanonicalPlayableProjection(h.uid,earned.serverRevision,archive.sourceRecords);
+ const before=copy([...h.data]),writes=h.writes,{result}=await proof(f,earned.serverRevision);
+ assert.equal(result.canonicalRevision,earned.serverRevision);
+ assert.equal(result.envelopeRevision,earned.serverRevision);
+ for(const grant of result.entitlements){
+  assert.equal(bundle.projection.gameSave.heroAccount.heroes[grant.heroId].unlocked,true);
+ }
+ // Hero reward receipts belong to uniqueClaims, not canonical claimRecords.
+ // This proves original-Owner replay protection, not full recovery closure.
+ assert.equal(archive.sourceRecords.claimRecords.length,0);
+ for(const collection of ['operations','ledgerEntries','uniqueClaims']){
+  assert.deepEqual(h.data.get(h.root+'/'+collection+'/'+intent.data.operationId).intent,earned.receipt.intent);
+ }
+ const replay=await growth.claimLoginReward(intent);
+ assert.equal(replay.unchanged,true);
+ assert.deepEqual(replay.receipt,earned.receipt);
+ assert.deepEqual([...h.data],before);assert.equal(h.writes,writes);
+ assert.equal(bundle.readyForPublication,false);
+ assert.equal(bundle.projection.authoritativeStateReady,false);
+ assert.equal(archive.readyForRestore,false);
+});
+
 test('full closure rejects missing, orphan, duplicate, foreign-capture, renewal and reordered route summaries',async()=>{
  const f=await fixture(),{input}=await proof(f);
  for(const mutate of [x=>x.tickets.shift(),x=>x.steps.pop(),x=>x.steps.push(x.steps[0]),x=>x.inventory.heroChapterSteps.push('orphan-step'),

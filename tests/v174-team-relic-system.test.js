@@ -10,7 +10,7 @@ const mainSource=fs.readFileSync("js/00-main.js","utf8");
 const shieldSource=mainSource.slice(mainSource.indexOf("function getPlayerShieldRemaining("),mainSource.indexOf("function showShieldAbsorb("));
 const combatSource=mainSource.slice(mainSource.indexOf("const combatEventObservers="),mainSource.indexOf("const battleBeforeCombatantObservers="));
 const policySource=mainSource.slice(mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="),mainSource.indexOf("\n});",mainSource.indexOf("const GENERAL_NEGATIVE_STATUS_TYPES="))+4);
-const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const repositorySource=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const loader=fs.readFileSync("js/19-stage-v78-character-inventory-runtime.js","utf8");
 const css=authoredUiCss(fs.readFileSync("css/55-team-relic-system.css","utf8"));
 const utilityCss=authoredUiCss(fs.readFileSync("css/56-v174-critical-ui-regressions.css","utf8"));

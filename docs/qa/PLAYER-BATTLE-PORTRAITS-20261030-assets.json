@@ -1,0 +1,455 @@
+{
+  "workId": "PLAYER-BATTLE-PORTRAITS-20261030",
+  "status": "technical_pass",
+  "updatedAt": "2026-10-30T09:20:38.282791+00:00",
+  "assets": [
+    {
+      "identity": "player_battle_male_01",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_male_01_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_male_01_candidate_v1.png",
+      "webp": "player_battle_male_01.webp",
+      "sourceSha256": "9d5e5c724fc5d5fe1d0a4e7b66efec816b650216a847f10bcfcbff67dff30810",
+      "webpSha256": "ff9b920f5bef12ef99d3037a543b0678d16620bceca107015b87acb4516f7a92",
+      "sourceBytes": 2090156,
+      "webpBytes": 1250584,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 965157,
+      "fullyTransparentFraction": 0.6136302947998047,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        27,
+        18,
+        1010,
+        1512
+      ],
+      "bboxAlphaGt16": [
+        30,
+        20,
+        1007,
+        1508
+      ],
+      "bboxAlphaGt128": [
+        30,
+        21,
+        1007,
+        1507
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_male_01_light_dark.png"
+    },
+    {
+      "identity": "player_battle_male_02",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_male_02_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_male_02_candidate_v1.png",
+      "webp": "player_battle_male_02.webp",
+      "sourceSha256": "58b0e39895254a47a5b6acc7a7e251c05de000a3338cbbe2df91a046370b4e88",
+      "webpSha256": "2a5a10f14bf2c8fa0978f0ab2730a3e3c1ee8026fe720aa9a678f492ec36af5e",
+      "sourceBytes": 2164836,
+      "webpBytes": 1336036,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 883016,
+      "fullyTransparentFraction": 0.5614064534505209,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        0,
+        17,
+        1014,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        41,
+        18,
+        1008,
+        1507
+      ],
+      "bboxAlphaGt128": [
+        41,
+        20,
+        1007,
+        1506
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_male_02_light_dark.png"
+    },
+    {
+      "identity": "player_battle_male_03",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_male_03_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_male_03_candidate_v1.png",
+      "webp": "player_battle_male_03.webp",
+      "sourceSha256": "9fb79ccf990c2a47bc7e0ef19be2ee77dad2ea074f1b6d46fb1bb68992cb22cb",
+      "webpSha256": "dbbdf9c3272298bd51602595e50679aaed998b49638165ff426cd293b26b1b56",
+      "sourceBytes": 2445926,
+      "webpBytes": 1470516,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 641311,
+      "fullyTransparentFraction": 0.40773455301920575,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        0,
+        35,
+        1024,
+        1522
+      ],
+      "bboxAlphaGt16": [
+        4,
+        44,
+        1018,
+        1514
+      ],
+      "bboxAlphaGt128": [
+        5,
+        45,
+        1017,
+        1514
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_male_03_light_dark.png"
+    },
+    {
+      "identity": "player_battle_male_04",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_male_04_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_male_04_candidate_v1.png",
+      "webp": "player_battle_male_04.webp",
+      "sourceSha256": "c0c791d8f87f37d2b6ab16857b3af3ed36b1d9eb605bf194bb18978081c4fdb1",
+      "webpSha256": "65be15a16e4def5eea48d45cf5707bb8b02cbda8457482d0696b217c99988900",
+      "sourceBytes": 2202758,
+      "webpBytes": 1310694,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 910670,
+      "fullyTransparentFraction": 0.5789883931477865,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        15,
+        31,
+        1024,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        20,
+        49,
+        1016,
+        1488
+      ],
+      "bboxAlphaGt128": [
+        20,
+        50,
+        1015,
+        1487
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_male_04_light_dark.png"
+    },
+    {
+      "identity": "player_battle_female_01",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_female_01_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_female_01_candidate_v1.png",
+      "webp": "player_battle_female_01.webp",
+      "sourceSha256": "de6e466a8da25024c66b3176a8973542ea258d79bda65c31a49dc250726d2652",
+      "webpSha256": "e356e4833f64de1b9793332adcad01b1fdf3334fe0edaef6c540165f01fba586",
+      "sourceBytes": 2389598,
+      "webpBytes": 1503982,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 810115,
+      "fullyTransparentFraction": 0.5150572458902994,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        16,
+        0,
+        1024,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        18,
+        6,
+        1023,
+        1491
+      ],
+      "bboxAlphaGt128": [
+        19,
+        8,
+        1022,
+        1490
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_female_01_light_dark.png"
+    },
+    {
+      "identity": "player_battle_female_02",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_female_02_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_female_02_candidate_v1.png",
+      "webp": "player_battle_female_02.webp",
+      "sourceSha256": "a1fbadfe498401848e39550941dcbfc01e3ac62f60e5fcdf16fe074d871ebe74",
+      "webpSha256": "40af67e2e3cd7efa0e295ac4500166fdb833f6801462800d29a51ec952fefa09",
+      "sourceBytes": 2117998,
+      "webpBytes": 1310166,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 985746,
+      "fullyTransparentFraction": 0.6267204284667969,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 1,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        0,
+        5,
+        1017,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        34,
+        12,
+        1015,
+        1524
+      ],
+      "bboxAlphaGt128": [
+        35,
+        13,
+        1013,
+        1523
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_female_02_light_dark.png"
+    },
+    {
+      "identity": "player_battle_female_03",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_female_03_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_female_03_candidate_v1.png",
+      "webp": "player_battle_female_03.webp",
+      "sourceSha256": "21cb2ecfbd1378b773b62a4412dd6b2635c75ae6440b3131497ef00ce2da6bfe",
+      "webpSha256": "429e0155c68eed12adb12d2128e08c6172815a00b96cdf130bebf898ade5093e",
+      "sourceBytes": 2458365,
+      "webpBytes": 1544440,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 684171,
+      "fullyTransparentFraction": 0.4349842071533203,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        0,
+        0,
+        1024,
+        1520
+      ],
+      "bboxAlphaGt16": [
+        8,
+        10,
+        1014,
+        1514
+      ],
+      "bboxAlphaGt128": [
+        9,
+        10,
+        1013,
+        1513
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_female_03_light_dark.png"
+    },
+    {
+      "identity": "player_battle_female_04",
+      "original": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-portraits-20261030\\player_battle_female_04_candidate_v1.png",
+      "preservedSource": "sources\\player_battle_female_04_candidate_v1.png",
+      "webp": "player_battle_female_04.webp",
+      "sourceSha256": "81a12573a2f21eff1ac44ec143319708c45be53f1e00cbc998acd87da93ac661",
+      "webpSha256": "7cbed1fd3ce5f70340aa92b56bf57ff90d25153ba54e991e955163b33cddc2ec",
+      "sourceBytes": 2174114,
+      "webpBytes": 1334822,
+      "sourceMode": "RGBA",
+      "size": [
+        1024,
+        1536
+      ],
+      "decodedSize": [
+        1024,
+        1536
+      ],
+      "alphaExtrema": [
+        0,
+        254
+      ],
+      "fullyTransparentPixels": 864257,
+      "fullyTransparentFraction": 0.5494798024495443,
+      "corner24MaxAlpha": {
+        "topLeft": 0,
+        "topRight": 0,
+        "bottomLeft": 0,
+        "bottomRight": 0
+      },
+      "bboxAlphaGt0": [
+        0,
+        23,
+        1024,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        15,
+        25,
+        1013,
+        1508
+      ],
+      "bboxAlphaGt128": [
+        16,
+        27,
+        1012,
+        1508
+      ],
+      "bboxConvention": "[left, top, rightExclusive, bottomExclusive] in unchanged source canvas; threshold masks are read-only measurements, not crop instructions",
+      "roundtripRgbaExact": true,
+      "roundtripAlphaExact": true,
+      "originalSourceUnchanged": true,
+      "archivedSourceByteExact": true,
+      "qaLightDark": "qa\\player_battle_female_04_light_dark.png"
+    }
+  ],
+  "conversion": "Pillow WebP lossless=True quality=100 method=6 exact=True",
+  "scope": "Preview/processed only; no formal assets, manifest, resolver or deployment changes",
+  "sourcePolicy": "No background removal, alpha normalization, crop, resize, pose or color edits",
+  "alphaNote": "Original RGBA max254 is preserved. Black preview compositing does not imply an opaque background.",
+  "visualAlphaReview": "Pending read-only light/dark composite inspection; pixel-exact conversion alone does not certify background cleanliness",
+  "assetCount": 8,
+  "totalWebpBytes": 11061240,
+  "qaSheet": "qa/all-eight-light-dark-128x192.png"
+}

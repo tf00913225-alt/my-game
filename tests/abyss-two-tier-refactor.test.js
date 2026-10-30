@@ -5,7 +5,7 @@ const fs=require("node:fs");
 const vm=require("node:vm");
 
 const source=fs.readFileSync("js/59-abyss-two-tier-runtime.js","utf8");
-const accountRepositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const accountRepositorySource=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const TEST_UID="abyss-test-uid";
 
 function storage(seed){

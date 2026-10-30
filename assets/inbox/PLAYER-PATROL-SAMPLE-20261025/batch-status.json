@@ -1,0 +1,41 @@
+{
+  "workId": "PLAYER-PATROL-SAMPLE-20261025",
+  "branch": "feature/player-patrol-sample-20261025",
+  "approvedSampleHead": "0bc3eea0f9c8005ab27921ad8c43a92fb4b80fda",
+  "approval": {
+    "time": "2026-10-25T22:40:00+08:00",
+    "answer": "可以",
+    "scope": "male01 style/proportion/pose approved; produce remaining seven front/back"
+  },
+  "status": "ALL_EIGHT_HUMAN_APPROVED_V4_TECHNICAL_AND_INDEPENDENT_QA_PASS_RUNTIME_HANDOFF_PENDING",
+  "runtimeChanges": false,
+  "sharedFilesPendingHandoff": [
+    "exploration character mapping/resolver owner",
+    "asset-manifest.json",
+    "build/asset-manifest.json",
+    "generated runtime bundles if required"
+  ],
+  "boundaries": [
+    "inbox only during asset stage",
+    "no shared CSS changes",
+    "battle #994 owned elsewhere",
+    "UI #955 owned elsewhere",
+    "do not claim #998 or current exploration deployment acceptance"
+  ],
+  "pending": [
+    "shared-file coordination",
+    "runtime integration and latest Head CI",
+    "deployed acceptance"
+  ],
+  "generatedSources": 14,
+  "independentPending": [],
+  "technicalStatus": "16 lossless WebP exact RGBA/Alpha PASS, source-sized1024x1536",
+  "canonicalTotalSources": 16,
+  "independentStatus": "All8 pairs final84x126 independently accepted as candidates",
+  "next": "Present final contact sheet and precise runtime-handoff-plan.json; keep current inbox-only branch unmerged until coordinated integration stage",
+  "humanApproval": {
+    "male01": "previously approved",
+    "otherSix": "user: 其餘我覺得可以",
+    "female02BackV4": "user: 採用"
+  }
+}

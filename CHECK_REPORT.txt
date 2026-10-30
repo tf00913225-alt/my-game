@@ -1,7 +1,7 @@
 《my-game 專案檢查報告》
 
 正式版本基線：V173.73
-文件核對日期：2026-10-12（Asia/Taipei）
+文件核對日期：2026-10-26（Asia/Taipei）
 正式驗證執行日期：2026-10-03
 正式分支／production deployed SHA：f63d69dbfa66ba75637d1c3cd7fcc7d74782e356
 Game / Cache Version：173.73 / 173.73
@@ -49,11 +49,24 @@ Game / Cache Version：173.73 / 173.73
 - 本報告不指定新候選、不啟動 Freeze，不重跑共同部署／完整發布驗收。
 - main/dev ahead／behind 僅為歷史線索；是否需回流必須核對有效內容，不能僅由提交數判定。
 
-四、本次文件修正範圍
+四、2026-10-26 dev 與 Android 驗收（不是正式 main 基線）
 
-本次只更新 CHECK_REPORT.txt 與 HANDOFF.md，保留既有 release scope／版本來源／package metadata，不修改 Runtime、玩家公告、玩家資料或發布流程。PR 是本工作最新 CI、合併與清理狀態 Owner。本文件在 dev 更新，不表示 main 或正式網站文件已更新。
+- 文件工作基線 dev：3d74c4aae68c9dcf21df4319d7bea1f4d3dc16aa；較真機測試 SHA 新增 #1005 美術方向文件與兩張參考圖，未重新宣稱實機驗證此 SHA。
+- 已完成整合／部署／真機驗證快照：2e2de82eb0c80f4ba24796fd20b033bafcd81f6d。
+  GitHub Actions CI run 40291649609，attempt 1，event push，completed/success；含 Repository checks、exact-dev publish 及 live QA。https://github.com/tf00913225-alt/my-game/actions/runs/40291649609
+- 對應測試基線：421/421 Node suites、525/525 JS syntax。這是上述已完成 CI 快照的數量，不能與正式 main 的263/352混為一談。
+- dev asset-manifest：firstPlay 79 resources／29,720,665 bytes，manifestHash 63aac49af252；Game/Cache 173.73/173.73。這是 firstPlay 集合，不是整個 Repository 或所有 Runtime 素材大小。
+- 文件基線3d74c4aa的 CI run40305855001，attempt1，push，在本次取樣時 in_progress，不記PASS；後續狀態查該run及本工作PR。
+- Open PR 取樣：#955 UI暫停；#994戰鬥UI；#996 Cloud測試Draft；#997桃溪參考交接Draft；#999立繪素材Draft；#1004元素匣捲動已由使用者決定略過待UI改版，不合併部署。此表為取樣，不替代即時PR狀態。
+- #1002 null.textContent 根因為測試DOM fixture；修正只在tests/v170-final-spec-integration.test.js，沒有吞錯或改Runtime。#1003觸控修正已整合；360×800、390×844、412×915、393×873正式bundle驗證通過。
+- Android部分驗收與剩餘缺口：docs/qa/WEEKLY-ANDROID-20261026.txt。Cloud完整換機恢復與正式發獎不在本次驗收內，仍fail-closed；不得因PR或測試數量標成完成。
+- 沒有新發布候選、main-target驗證或本週正式部署。版本字串相同不代表dev內容已發布main。
 
-五、歷史基線：V173.72（2026-09-24）
+五、本次文件修正範圍
+
+本次更新 CHECK_REPORT.txt、HANDOFF.md 及精簡Android驗收記錄，保留既有 release scope／版本來源／package metadata，不修改 Runtime、玩家公告、玩家資料或發布流程。PR 是本工作最新 CI、合併與清理狀態 Owner。本文件在 dev 更新，不表示 main 或正式網站文件已更新。
+
+六、歷史基線：V173.72（2026-09-24）
 
 下列原文完整保留為歷史證據，已由上列 V173.73 正式基線取代。其中「目前」、「Final dev」、「可安全清理」及舊 PR 待辦只代表當時觀測，不是本次工作指令或目前剩餘項目。
 
