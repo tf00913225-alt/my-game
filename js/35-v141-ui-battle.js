@@ -147,6 +147,13 @@
                 grid.appendChild(box);
             }
 
+            if(pageItems.length===0){
+                const message=document.createElement("p");
+                message.className="inventory-empty-message";
+                message.setAttribute("role","status");
+                message.textContent=filtered.length===0?"此分類沒有物品":"此頁沒有物品";
+                grid.appendChild(message);
+            }
             const label=document.getElementById("v141InventoryPageLabel");
             if(label){ label.textContent=(inventoryPageIndex+1)+" / "+INVENTORY_PAGE_COUNT; }
             const quickSell=document.getElementById("inventoryQuickSellButton");
