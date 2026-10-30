@@ -51,3 +51,5 @@ Enter 診斷：先前 CDP 只送 rawKeyDown/keyUp，補送 Enter char 後，360x
 四象動畫兩時點：測試專用四象標記，將第一格動畫暫停於 0 與 1400ms；360x800／1366x768 測得 duration 2800ms、brightness 0.96 與 1.14。直接向 DOM 數量節點注入 ×9 做可視性測試，非正式裝備堆疊；非作者實看四圖，數量可辨且未被光效蓋住，但覆在部分物品圖像。現行共用動畫對整格施加同一 filter，與規格四元素不可完全同步的要求仍需處理；此測試不證明整週期、角位及真機。
 
 四象選中衝突：測試專用四象物件在 runtime 以 DOM 加入實際 is-selected 狀態，360x800／1366x768 最終 computed animation 均為 inventorySlotShine 2.1s，取代原 v169FourSymbolRarityBreath；只證明最終樣式衝突，非實際點擊流程。獨立程式分析確認 css/49 共用 item-slot 使用整格 filter、css/22 選中動畫覆寫，css/50 舊材料／圖示也引用舊 keyframes，需按替換契約收斂共用動畫及 reduced-motion；商店、穿戴、詳情、材料及背包選中/未選均須實畫回歸。
+
+最終產品快照空分類複審：與 cced61bc 相同產品檔案的 selected-rarity 合成 runtime 在 360x800、1366x768 產生四分類畫面；非作者審看八圖，龍首標題、黑鐵外框、選中 TAB、空提示與 footer 均可見無明顯遮擋。原測試程式與選中態證據見 four-symbol-selected-qa-variant；圖片屬合成資料、非真機。#1031 及本 PR 同時改 visual fixture 之同一段斷言，合併時須保留 #1031 的六標籤重疊斷言與本 PR 四象 6px 外框斷言。
