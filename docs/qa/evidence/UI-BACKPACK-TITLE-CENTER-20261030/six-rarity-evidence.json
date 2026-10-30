@@ -1,0 +1,94 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "mixedRarity": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "rarities": [
+        "four-symbol",
+        "four-symbol",
+        "four-symbol",
+        "four-symbol",
+        "pink",
+        "pink",
+        "pink",
+        "pink",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "white",
+        "white",
+        "white",
+        "white"
+      ]
+    },
+    {
+      "sixRarityScroll": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "sixScroll": {
+        "wheel": 300,
+        "end": 385
+      }
+    },
+    {
+      "mixedRarity": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "rarities": [
+        "four-symbol",
+        "four-symbol",
+        "four-symbol",
+        "four-symbol",
+        "pink",
+        "pink",
+        "pink",
+        "pink",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "white",
+        "white",
+        "white",
+        "white"
+      ]
+    },
+    {
+      "sixRarityScroll": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "sixScroll": {
+        "wheel": 300,
+        "end": 385
+      }
+    }
+  ]
+}
