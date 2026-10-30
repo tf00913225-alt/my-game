@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -112,7 +113,7 @@ const expression=`(async()=>{
  }finally{Math.random=oldRandom;window.FourSymbolsEnemySkillAI=enemySkillAiOwner;hardControlDecision=null;showMonsterSkillNameBadge=badgeOwner;rollStatusEffectHit=statusRollOwner;applyMonsterDebuff=debuffOwner;applyFreezeEffect=freezeOwner;window.v141HealMonsterPreservingShield=healOwner;autoBattle=false;autoConfig.enabled=false;}
 })()`;
 const baseUrl=process.env.ABYSS_BALANCE_BASE_URL;
-if(baseUrl){const manifest=await fetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Abyss deployed exact SHA');}
+if(baseUrl){const manifest=await devAccessFetch(new URL('release-manifest.json',baseUrl+'/')).then(r=>r.json());assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Abyss deployed exact SHA');}
 const server=await startServer({baseUrl});const artifact=path.join(ROOT,'artifacts/browser-qa/abyss-balance.json');fs.mkdirSync(path.dirname(artifact),{recursive:true});const results=[];let client,proc,profile;
 function close(){client?.close();client=null;proc?.kill('SIGTERM');proc=null;if(profile){try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch{}profile=null;}}
 try{

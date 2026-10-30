@@ -1,0 +1,416 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "emptyMessage": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "equipment",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 20,
+          "y": 474.3333435058594,
+          "width": 320,
+          "height": 33,
+          "top": 474.3333435058594,
+          "right": 340,
+          "bottom": 507.3333435058594,
+          "left": 20
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyActions": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "afterRefresh": {
+        "items": 0,
+        "message": "此分類沒有物品"
+      },
+      "sell": {
+        "shown": true,
+        "count": "0 件",
+        "gold": "0 金幣",
+        "disabled": true
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "equipment",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "equipment",
+        "footer": {
+          "x": 19,
+          "y": 658,
+          "width": 322,
+          "height": 49,
+          "top": 658,
+          "right": 341,
+          "bottom": 707,
+          "left": 19
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "item",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 20,
+          "y": 474.3333435058594,
+          "width": 320,
+          "height": 33,
+          "top": 474.3333435058594,
+          "right": 340,
+          "bottom": 507.3333435058594,
+          "left": 20
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "item",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "item",
+        "footer": {
+          "x": 19,
+          "y": 658,
+          "width": 322,
+          "height": 49,
+          "top": 658,
+          "right": 341,
+          "bottom": 707,
+          "left": 19
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "material",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 20,
+          "y": 474.3333435058594,
+          "width": 320,
+          "height": 33,
+          "top": 474.3333435058594,
+          "right": 340,
+          "bottom": 507.3333435058594,
+          "left": 20
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "material",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "material",
+        "footer": {
+          "x": 19,
+          "y": 658,
+          "width": 322,
+          "height": 49,
+          "top": 658,
+          "right": 341,
+          "bottom": 707,
+          "left": 19
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "function",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 20,
+          "y": 474.3333435058594,
+          "width": 320,
+          "height": 33,
+          "top": 474.3333435058594,
+          "right": 340,
+          "bottom": 507.3333435058594,
+          "left": 20
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "filter": "function",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "function",
+        "footer": {
+          "x": 19,
+          "y": 658,
+          "width": 322,
+          "height": 49,
+          "top": 658,
+          "right": 341,
+          "bottom": 707,
+          "left": 19
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "equipment",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 491,
+          "y": 473.20001220703125,
+          "width": 384,
+          "height": 39.5999755859375,
+          "top": 473.20001220703125,
+          "right": 875,
+          "bottom": 512.7999877929688,
+          "left": 491
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyActions": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "afterRefresh": {
+        "items": 0,
+        "message": "此分類沒有物品"
+      },
+      "sell": {
+        "shown": true,
+        "count": "0 件",
+        "gold": "0 金幣",
+        "disabled": true
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "equipment",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "equipment",
+        "footer": {
+          "x": 489.79998779296875,
+          "y": 693.6000366210938,
+          "width": 386.4000244140625,
+          "height": 58.79998779296875,
+          "top": 693.6000366210938,
+          "right": 876.2000122070312,
+          "bottom": 752.4000244140625,
+          "left": 489.79998779296875
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "item",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 491,
+          "y": 473.20001220703125,
+          "width": 384,
+          "height": 39.5999755859375,
+          "top": 473.20001220703125,
+          "right": 875,
+          "bottom": 512.7999877929688,
+          "left": 491
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "item",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "item",
+        "footer": {
+          "x": 489.79998779296875,
+          "y": 693.6000366210938,
+          "width": 386.4000244140625,
+          "height": 58.79998779296875,
+          "top": 693.6000366210938,
+          "right": 876.2000122070312,
+          "bottom": 752.4000244140625,
+          "left": 489.79998779296875
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "material",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 491,
+          "y": 473.20001220703125,
+          "width": 384,
+          "height": 39.5999755859375,
+          "top": 473.20001220703125,
+          "right": 875,
+          "bottom": 512.7999877929688,
+          "left": 491
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "material",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "material",
+        "footer": {
+          "x": 489.79998779296875,
+          "y": 693.6000366210938,
+          "width": 386.4000244140625,
+          "height": 58.79998779296875,
+          "top": 693.6000366210938,
+          "right": 876.2000122070312,
+          "bottom": 752.4000244140625,
+          "left": 489.79998779296875
+        }
+      }
+    },
+    {
+      "emptyMessage": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "function",
+      "message": {
+        "text": "此分類沒有物品",
+        "role": "status",
+        "rect": {
+          "x": 491,
+          "y": 473.20001220703125,
+          "width": 384,
+          "height": 39.5999755859375,
+          "top": 473.20001220703125,
+          "right": 875,
+          "bottom": 512.7999877929688,
+          "left": 491
+        },
+        "scroll": 960,
+        "client": 960
+      }
+    },
+    {
+      "emptyBackpack": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "filter": "function",
+      "emptyInfo": {
+        "slots": 24,
+        "filled": 0,
+        "active": "function",
+        "footer": {
+          "x": 489.79998779296875,
+          "y": 693.6000366210938,
+          "width": 386.4000244140625,
+          "height": 58.79998779296875,
+          "top": 693.6000366210938,
+          "right": 876.2000122070312,
+          "bottom": 752.4000244140625,
+          "left": 489.79998779296875
+        }
+      }
+    }
+  ]
+}
