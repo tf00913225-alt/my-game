@@ -1,0 +1,349 @@
+{
+  "workId": "BATTLE-PORTRAIT-READABILITY-20261030",
+  "pr": 1029,
+  "status": "measured_exact_rgba",
+  "formula": "row-major IEEE754: area=0; for alphaByte: area += alphaByte/255; density=area/(height*height)",
+  "compatibility": "Explicit sequential += reproduced all 10 existing js54 PARTY_ART_DENSITY records bit-for-bit on current originals; histogram rational or Python compensated sum differs at approx1e-12",
+  "unchangedReferenceDensity": 0.520696867047023,
+  "integrationRisk": "Readable optical heights follow the unchanged .520696867047023 reference and exact original alpha-area formula. No runtime/UI/test modification was performed here; integrate with original owner and verify actual visual fit.",
+  "densityRange": [
+    0.2336573698426036,
+    0.37483143858469925
+  ],
+  "heightPercentRange": [
+    117.86218212081631,
+    149.280382921414
+  ],
+  "partyArtDensityEntries": {
+    "assets/characters/battle/player_battle_readable_male_01.webp": {
+      "density": 0.26095922964634993,
+      "sha256": "7dec20e8b96b1d1c02fc6093986cb12cd1cb129f6aa5e8bd17367346c375e23a"
+    },
+    "assets/characters/battle/player_battle_readable_male_02.webp": {
+      "density": 0.28545633785655544,
+      "sha256": "c4289e06e4659cd8e3918c025816691df49d75de7a89e6aa54f3a31f41228832"
+    },
+    "assets/characters/battle/player_battle_readable_male_03.webp": {
+      "density": 0.37483143858469925,
+      "sha256": "234921ae1c4d4ceffab55bcb758f07ff6e3a3c411fcef51e777bdf7d5db04337"
+    },
+    "assets/characters/battle/player_battle_readable_male_04.webp": {
+      "density": 0.2792103187715577,
+      "sha256": "7c00e863e1dff245c992a82366ab5cd12d612f1ad4c02485c6d1481e080ecb65"
+    },
+    "assets/characters/battle/player_battle_readable_female_01.webp": {
+      "density": 0.3028116662523183,
+      "sha256": "99aa18b1a1db8755a545950a36c23b6d5bcd6bbc929b346869fd9d07ac41bbf2"
+    },
+    "assets/characters/battle/player_battle_readable_female_02.webp": {
+      "density": 0.2336573698426036,
+      "sha256": "bcc50e27e10dd90768b9d1ca6f244527948a658d2571fec818bfb9e966487301"
+    },
+    "assets/characters/battle/player_battle_readable_female_03.webp": {
+      "density": 0.3569899349177404,
+      "sha256": "0dd5d11f81456bd53d457cfe891730e48d40ed0e5045849ed501d34ca1b6294f"
+    },
+    "assets/characters/battle/player_battle_readable_female_04.webp": {
+      "density": 0.2945741823820552,
+      "sha256": "c2b0a0dd7dfcedb66f6b836f2711a4b609e328cf4acc5bc58226013deb3a2604"
+    }
+  },
+  "assets": [
+    {
+      "identity": "player_battle_readable_male_01",
+      "runtimePath": "assets/characters/battle/player_battle_readable_male_01.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_male_01.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_male_01.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_male_01.webp",
+      "sourceSha256": "5009a1c82aa9c0a84fda42bc9e177ea20d6d9e38c9a41728fb4b23164c567521",
+      "webpSha256": "7dec20e8b96b1d1c02fc6093986cb12cd1cb129f6aa5e8bd17367346c375e23a",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 615680.0666677149,
+      "density": 0.26095922964634993,
+      "integerAlphaSum": 156998417,
+      "alphaAreaRationalNumerator": 156998417,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        0,
+        1024,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        15,
+        10,
+        1018,
+        1513
+      ],
+      "bboxAlphaGt128": [
+        16,
+        10,
+        1017,
+        1512
+      ],
+      "heightPercentAtUnchangedReference": 141.25575523510236,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_male_02",
+      "runtimePath": "assets/characters/battle/player_battle_readable_male_02.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_male_02.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_male_02.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_male_02.webp",
+      "sourceSha256": "de91c197c27bb6ccdc2e9bd70995699abef12aa1f9ae71349cd480bc81eae5ba",
+      "webpSha256": "c4289e06e4659cd8e3918c025816691df49d75de7a89e6aa54f3a31f41228832",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 673475.9960796199,
+      "density": 0.28545633785655544,
+      "integerAlphaSum": 171736379,
+      "alphaAreaRationalNumerator": 171736379,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        1,
+        1024,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        35,
+        14,
+        1019,
+        1512
+      ],
+      "bboxAlphaGt128": [
+        36,
+        14,
+        1018,
+        1512
+      ],
+      "heightPercentAtUnchangedReference": 135.05872246161604,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_male_03",
+      "runtimePath": "assets/characters/battle/player_battle_readable_male_03.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_male_03.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_male_03.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_male_03.webp",
+      "sourceSha256": "e93a18a53e27bdcbd95852ed712b2320b93faa8ac0e6d90f7a25e977ff3f9919",
+      "webpSha256": "234921ae1c4d4ceffab55bcb758f07ff6e3a3c411fcef51e777bdf7d5db04337",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 884338.3137271266,
+      "density": 0.37483143858469925,
+      "integerAlphaSum": 225506270,
+      "alphaAreaRationalNumerator": 225506270,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        39,
+        1024,
+        1518
+      ],
+      "bboxAlphaGt16": [
+        6,
+        49,
+        1019,
+        1514
+      ],
+      "bboxAlphaGt128": [
+        6,
+        50,
+        1018,
+        1513
+      ],
+      "heightPercentAtUnchangedReference": 117.86218212081631,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_male_04",
+      "runtimePath": "assets/characters/battle/player_battle_readable_male_04.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_male_04.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_male_04.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_male_04.webp",
+      "sourceSha256": "e57165d9d2b435eabdd396bdf406d10d31e09908e2d80f5c14d1982bde8fb77b",
+      "webpSha256": "7c00e863e1dff245c992a82366ab5cd12d612f1ad4c02485c6d1481e080ecb65",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 658739.788236461,
+      "density": 0.2792103187715577,
+      "integerAlphaSum": 167978646,
+      "alphaAreaRationalNumerator": 167978646,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        24,
+        1024,
+        1506
+      ],
+      "bboxAlphaGt16": [
+        11,
+        27,
+        1023,
+        1502
+      ],
+      "bboxAlphaGt128": [
+        12,
+        27,
+        1022,
+        1501
+      ],
+      "heightPercentAtUnchangedReference": 136.5610194097582,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_female_01",
+      "runtimePath": "assets/characters/battle/player_battle_readable_female_01.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_female_01.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_female_01.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_female_01.webp",
+      "sourceSha256": "32bf22faf5d52380bdb56090dafb8430987e2ba8e837207103b3621cf37ab113",
+      "webpSha256": "99aa18b1a1db8755a545950a36c23b6d5bcd6bbc929b346869fd9d07ac41bbf2",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 714422.3529424296,
+      "density": 0.3028116662523183,
+      "integerAlphaSum": 182177700,
+      "alphaAreaRationalNumerator": 182177700,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        11,
+        0,
+        1024,
+        1495
+      ],
+      "bboxAlphaGt16": [
+        13,
+        4,
+        1020,
+        1493
+      ],
+      "bboxAlphaGt128": [
+        14,
+        5,
+        1019,
+        1493
+      ],
+      "heightPercentAtUnchangedReference": 131.13124387198704,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_female_02",
+      "runtimePath": "assets/characters/battle/player_battle_readable_female_02.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_female_02.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_female_02.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_female_02.webp",
+      "sourceSha256": "80bc18586fb543a023d3eea6450c8ea8d31295e6b397a6fc623cc550882a18d8",
+      "webpSha256": "bcc50e27e10dd90768b9d1ca6f244527948a658d2571fec818bfb9e966487301",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 551266.8980401753,
+      "density": 0.2336573698426036,
+      "integerAlphaSum": 140573059,
+      "alphaAreaRationalNumerator": 140573059,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        0,
+        1016,
+        1536
+      ],
+      "bboxAlphaGt16": [
+        28,
+        12,
+        1014,
+        1526
+      ],
+      "bboxAlphaGt128": [
+        29,
+        13,
+        1013,
+        1526
+      ],
+      "heightPercentAtUnchangedReference": 149.280382921414,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_female_03",
+      "runtimePath": "assets/characters/battle/player_battle_readable_female_03.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_female_03.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_female_03.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_female_03.webp",
+      "sourceSha256": "60777dc51c895ba84e2b52fefc345fe54a3e2b529cf21d9b31266e13f0315150",
+      "webpSha256": "0dd5d11f81456bd53d457cfe891730e48d40ed0e5045849ed501d34ca1b6294f",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 842244.9254916853,
+      "density": 0.3569899349177404,
+      "integerAlphaSum": 214772456,
+      "alphaAreaRationalNumerator": 214772456,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        0,
+        0,
+        1024,
+        1520
+      ],
+      "bboxAlphaGt16": [
+        10,
+        7,
+        1017,
+        1517
+      ],
+      "bboxAlphaGt128": [
+        11,
+        8,
+        1016,
+        1516
+      ],
+      "heightPercentAtUnchangedReference": 120.77151004915751,
+      "rgbaRoundtripExact": true
+    },
+    {
+      "identity": "player_battle_readable_female_04",
+      "runtimePath": "assets/characters/battle/player_battle_readable_female_04.webp",
+      "sourceInboxPath": "assets/inbox/player-battle-readable-20261030/player_battle_readable_female_04.png",
+      "sourcePath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\sources\\player_battle_readable_female_04.png",
+      "processedWebpPath": "C:\\Users\\User\\.codex\\visualizations\\2026\\10\\23\\01a1672c-506c-7a70-99ba-acf09e547ed6\\battle-readability-20261030\\readable-processed\\player_battle_readable_female_04.webp",
+      "sourceSha256": "b01180b48bcccca071b5f0f4b98c0926d3079964f6921f88a42c78140b96f304",
+      "webpSha256": "c2b0a0dd7dfcedb66f6b836f2711a4b609e328cf4acc5bc58226013deb3a2604",
+      "width": 1024,
+      "height": 1536,
+      "alphaAreaSequential": 694987.6901972533,
+      "density": 0.2945741823820552,
+      "integerAlphaSum": 177221861,
+      "alphaAreaRationalNumerator": 177221861,
+      "alphaAreaRationalDenominator": 255,
+      "densityRationalDenominator": 601620480,
+      "bboxAlphaGt0": [
+        11,
+        13,
+        1024,
+        1519
+      ],
+      "bboxAlphaGt16": [
+        14,
+        16,
+        1016,
+        1512
+      ],
+      "bboxAlphaGt128": [
+        15,
+        16,
+        1015,
+        1511
+      ],
+      "heightPercentAtUnchangedReference": 132.95208174263053,
+      "rgbaRoundtripExact": true
+    }
+  ]
+}

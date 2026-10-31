@@ -36,37 +36,37 @@ function numericValue(value){const n=Number(value);return Number.isFinite(n)?Mat
 /* Offline alpha-area metadata. User-approved rear-size optical footprint in every party Slot;
    no image mutation, runtime pixel scan, row multiplier or gameplay clock. */
 const PARTY_ART_DENSITY=Object.freeze({
-    "assets/characters/battle_female_earth.png": {
-        "density": 0.42186618327911163,
-        "sha256": "7add06d9c47cb7490e352a71600cfcf85f0c804d39c9377fd753e0db5a2bb0ec"
+    "assets/characters/battle/player_battle_readable_male_01.webp": {
+        "density": 0.26095922964634993,
+        "sha256": "7dec20e8b96b1d1c02fc6093986cb12cd1cb129f6aa5e8bd17367346c375e23a"
     },
-    "assets/characters/battle_female_fire.png": {
-        "density": 0.4527419832519206,
-        "sha256": "cf43645eb6fdf75ba13a021b723538bb7f18c20f4d5644653e2d8159280ffb0f"
+    "assets/characters/battle/player_battle_readable_male_02.webp": {
+        "density": 0.28545633785655544,
+        "sha256": "c4289e06e4659cd8e3918c025816691df49d75de7a89e6aa54f3a31f41228832"
     },
-    "assets/characters/battle_female_water.png": {
-        "density": 0.44937922113313844,
-        "sha256": "cd8f1b74be9f502ebd564ae7bff5eeee89b121e99a64ddca38323cc303448fea"
+    "assets/characters/battle/player_battle_readable_male_03.webp": {
+        "density": 0.37483143858469925,
+        "sha256": "234921ae1c4d4ceffab55bcb758f07ff6e3a3c411fcef51e777bdf7d5db04337"
     },
-    "assets/characters/battle_female_wind.png": {
-        "density": 0.43685583469524253,
-        "sha256": "ef5be3d2f6cb084c06561755b949933e614186e1542396c8d27fb9109973e58f"
+    "assets/characters/battle/player_battle_readable_male_04.webp": {
+        "density": 0.2792103187715577,
+        "sha256": "7c00e863e1dff245c992a82366ab5cd12d612f1ad4c02485c6d1481e080ecb65"
     },
-    "assets/characters/battle_male_earth.png": {
-        "density": 0.4382343409588743,
-        "sha256": "2f120e082c789157f1431bfac14100aea7dc1382bffdc59d51031e79c7d14918"
+    "assets/characters/battle/player_battle_readable_female_01.webp": {
+        "density": 0.3028116662523183,
+        "sha256": "99aa18b1a1db8755a545950a36c23b6d5bcd6bbc929b346869fd9d07ac41bbf2"
     },
-    "assets/characters/battle_male_fire.png": {
-        "density": 0.4403820635895895,
-        "sha256": "058712570f014d8acde999593bec3348c8524d64e67e56e213274a0072b13a3b"
+    "assets/characters/battle/player_battle_readable_female_02.webp": {
+        "density": 0.2336573698426036,
+        "sha256": "bcc50e27e10dd90768b9d1ca6f244527948a658d2571fec818bfb9e966487301"
     },
-    "assets/characters/battle_male_water.png": {
-        "density": 0.4396561308553197,
-        "sha256": "3ef9a794f90337a45745fff0d13bbd3cf3658be4732e043d7ab6d0aaa43b47ac"
+    "assets/characters/battle/player_battle_readable_female_03.webp": {
+        "density": 0.3569899349177404,
+        "sha256": "0dd5d11f81456bd53d457cfe891730e48d40ed0e5045849ed501d34ca1b6294f"
     },
-    "assets/characters/battle_male_wind.png": {
-        "density": 0.42985031998931345,
-        "sha256": "07454a11ee0806bf0d79e2f0e19dda4191ed21552799a6402d099e45db1d0d65"
+    "assets/characters/battle/player_battle_readable_female_04.webp": {
+        "density": 0.2945741823820552,
+        "sha256": "c2b0a0dd7dfcedb66f6b836f2711a4b609e328cf4acc5bc58226013deb3a2604"
     },
     "assets/heroes/divine-dog-hongbao.webp": {
         "density": 0.49974072097419614,

@@ -306,11 +306,11 @@ Phase 1–3 保留既有驗收結果。Phase 4 維持 **0/6 VERIFIED**；Phase 5
 
 ## Backend 部署與 protected-test 操作
 
-`.github/workflows/session-authority.yml`：PR→dev 執行專屬 emulator gate；merge 至 dev 後，先等該 SHA 的 Repository checks SUCCESS 並確認仍是最新 dev，才部署。沿用既有 Actions Secret `FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON`；缺少權限／Secret 則 job 失敗，Phase 1 必須保持 BLOCKED。
+CI-USAGE-EFFICIENCY-20261030 候選（生效與部署狀態以其 PR 為準）：PR／dev 的完整 Session emulator、Boot／SDK Gate 由 `.github/workflows/ci.yml` 重用原 `session-authority.yml` 一次，Repository checks 必須等待其成功。原 Session paths 的 dev push 全部必要驗證成功後，先核對最新成功部署的完整來源輸入與部署步驟；證實相同則不重部署，缺少可信基線不得套用此豁免。輸入改變才要求原獨立 Session workflow 部署；該 workflow 再核 exact SHA、最新 CI run／attempt 與完整安全步驟，不占 runner 重等或重跑 emulator。人工無來源參數時仍跑原完整驗證及有界等待；原不可取消部署鎖保留。沿用既有 `FIREBASE_DEPLOY_SERVICE_ACCOUNT_JSON`，缺少權限／Secret 或來源證據失敗即 BLOCKED；要求派送不等於部署驗收。詳見 [CI Owner 的目前 checkpoint](CI_TEST_GOVERNANCE_LAYERING_20261006.md#2026-10-30-ci-usage-efficiency-checkpoint)。
 
 歷史 Rules API IAM 403 已解除；目前部署服務帳號為 `github-firebase-deployer@four-symbols-jianghu.iam.gserviceaccount.com`，七支 Functions／Rules 已實際成功部署。若未來再次遇到權限錯誤，依實際錯誤核對最小權限；本次沒有授予 IAM 角色，也沒有存取或提交私鑰。
 
-此 workflow 依既有 path filters 在相關程式／規則／自身檔案變更時觸發，並已有 `workflow_dispatch` 入口；只有 dev 可部署。單改 Markdown 不會重跑 Firebase。本次只在既有 workflow 增加本結案文件的索引註解，使合併後既有 push 流程可驗證最新 dev；未修改 triggers、權限、部署範圍或 SHA gate。不得重跑舊 SHA 並冒稱是最新部署。
+候選生效前的既有流程：此 workflow 依 path filters 在相關程式／規則／自身檔案變更時觸發，並有 `workflow_dispatch` 入口；只有 dev 可部署。當時的結案修改僅增加文件索引註解，未修改 triggers、權限、部署範圍或 SHA gate。上方 CI-USAGE-EFFICIENCY 候選則調整觸發與來源驗證，生效狀態及新增 dispatcher 權限依其 PR 與 CI Owner checkpoint；不得把歷史流程當成候選現況，或重跑舊 SHA 冒稱是最新部署。
 
 Node.js 22、Java 21（emulator）、Firebase CLI 15.30.0；backend project `four-symbols-jianghu`，region `us-central1`。
 

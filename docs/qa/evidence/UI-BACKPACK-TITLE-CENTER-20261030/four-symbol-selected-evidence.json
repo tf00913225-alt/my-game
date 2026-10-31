@@ -1,0 +1,30 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "fourSymbolSelected": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "selectedAnimation": {
+        "name": "inventorySlotShine",
+        "duration": "2.1s",
+        "selected": true
+      }
+    },
+    {
+      "fourSymbolSelected": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "selectedAnimation": {
+        "name": "inventorySlotShine",
+        "duration": "2.1s",
+        "selected": true
+      }
+    }
+  ]
+}

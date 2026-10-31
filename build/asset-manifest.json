@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.bbbaf3175142.js"
+      "build/boot-core.4915950d06e4.js"
     ],
     "styles": [
       "build/boot-core.fa69d5eea44b.css"
@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.e59b170dae31.js"
+          "build/app-shell.24f28c7d6e37.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -49,11 +49,11 @@
       },
       "gameplay-core": {
         "scripts": [
-          "build/gameplay-core-primary.0fd49cba582e.js",
-          "build/gameplay-core-secondary.d4c9c9ba2893.js"
+          "build/gameplay-core-primary.7a38c2cd4707.js",
+          "build/gameplay-core-secondary.058219effb11.js"
         ],
         "styles": [
-          "build/gameplay-core.44d2995e60ca.css"
+          "build/gameplay-core.94d17096b2b8.css"
         ],
         "dependencies": [
           "app-shell",
@@ -62,7 +62,7 @@
       },
       "feature-patrol": {
         "scripts": [
-          "build/feature-patrol.ab5bd3ce5582.js"
+          "build/feature-patrol.fa6fa230e09b.js"
         ],
         "styles": [
           "build/feature-patrol.1cef20d37f82.css"
@@ -83,7 +83,23 @@
           "assets/characters/patrol/patrol-male-water-back.db1078669837.webp",
           "assets/characters/patrol/patrol-male-water-front.67d1d8aebfc8.webp",
           "assets/characters/patrol/patrol-male-wind-back.cb339ccc0db5.webp",
-          "assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp"
+          "assets/characters/patrol/patrol-male-wind-front.ee42171e1658.webp",
+          "assets/characters/patrol/player_female_01_patrol_back.71074afbf834.webp",
+          "assets/characters/patrol/player_female_01_patrol_front.21e88afe7019.webp",
+          "assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp",
+          "assets/characters/patrol/player_female_02_patrol_front.08e5b5b0b6af.webp",
+          "assets/characters/patrol/player_female_03_patrol_back.2acdd4187eef.webp",
+          "assets/characters/patrol/player_female_03_patrol_front.7b6ed6170a8b.webp",
+          "assets/characters/patrol/player_female_04_patrol_back.6c2247042c3d.webp",
+          "assets/characters/patrol/player_female_04_patrol_front.a658b6c0799a.webp",
+          "assets/characters/patrol/player_male_01_patrol_back.792c3e9357de.webp",
+          "assets/characters/patrol/player_male_01_patrol_front.2fbe777afada.webp",
+          "assets/characters/patrol/player_male_02_patrol_back.37000310182c.webp",
+          "assets/characters/patrol/player_male_02_patrol_front.32868ccf02dc.webp",
+          "assets/characters/patrol/player_male_03_patrol_back.baa78526987b.webp",
+          "assets/characters/patrol/player_male_03_patrol_front.68581fa853a8.webp",
+          "assets/characters/patrol/player_male_04_patrol_back.1e2a5ed85bb8.webp",
+          "assets/characters/patrol/player_male_04_patrol_front.cb5f2a79d880.webp"
         ],
         "dependencies": [
           "gameplay-core"
@@ -227,9 +243,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.bbbaf3175142.js",
-        "sha256": "bbbaf3175142",
-        "bytes": 69855,
+        "path": "build/boot-core.4915950d06e4.js",
+        "sha256": "4915950d06e4",
+        "bytes": 69987,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -579,19 +595,19 @@
         "decode": true
       },
       {
+        "path": "build/app-shell.24f28c7d6e37.js",
+        "sha256": "24f28c7d6e37",
+        "bytes": 1240903,
+        "priority": "P1",
+        "type": "script",
+        "decode": false
+      },
+      {
         "path": "build/app-shell.801bc1a9895d.css",
         "sha256": "801bc1a9895d",
         "bytes": 90552,
         "priority": "P1",
         "type": "style",
-        "decode": false
-      },
-      {
-        "path": "build/app-shell.e59b170dae31.js",
-        "sha256": "e59b170dae31",
-        "bytes": 1225903,
-        "priority": "P1",
-        "type": "script",
         "decode": false
       },
       {
@@ -603,65 +619,65 @@
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_earth.png",
-        "sha256": "7add06d9c47c",
-        "bytes": 317289,
+        "path": "assets/characters/battle/player_battle_readable_female_01.webp",
+        "sha256": "99aa18b1a1db",
+        "bytes": 1398808,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_fire.png",
-        "sha256": "cf43645eb6fd",
-        "bytes": 339677,
+        "path": "assets/characters/battle/player_battle_readable_female_02.webp",
+        "sha256": "bcc50e27e10d",
+        "bytes": 1233004,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_water.png",
-        "sha256": "cd8f1b74be9f",
-        "bytes": 342821,
+        "path": "assets/characters/battle/player_battle_readable_female_03.webp",
+        "sha256": "0dd5d11f8145",
+        "bytes": 1407862,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_female_wind.png",
-        "sha256": "ef5be3d2f6cb",
-        "bytes": 320753,
+        "path": "assets/characters/battle/player_battle_readable_female_04.webp",
+        "sha256": "c2b0a0dd7dfc",
+        "bytes": 1368016,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_earth.png",
-        "sha256": "2f120e082c78",
-        "bytes": 345639,
+        "path": "assets/characters/battle/player_battle_readable_male_01.webp",
+        "sha256": "7dec20e8b96b",
+        "bytes": 1254114,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_fire.png",
-        "sha256": "058712570f01",
-        "bytes": 360873,
+        "path": "assets/characters/battle/player_battle_readable_male_02.webp",
+        "sha256": "c4289e06e465",
+        "bytes": 1320446,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_water.png",
-        "sha256": "3ef9a794f903",
-        "bytes": 369681,
+        "path": "assets/characters/battle/player_battle_readable_male_03.webp",
+        "sha256": "234921ae1c4d",
+        "bytes": 1390826,
         "priority": "P2",
         "type": "image",
         "decode": true
       },
       {
-        "path": "assets/characters/battle_male_wind.png",
-        "sha256": "07454a11ee08",
-        "bytes": 359690,
+        "path": "assets/characters/battle/player_battle_readable_male_04.webp",
+        "sha256": "7c00e863e1df",
+        "bytes": 1225632,
         "priority": "P2",
         "type": "image",
         "decode": true
@@ -795,6 +811,134 @@
         "decode": true
       },
       {
+        "path": "assets/characters/patrol/player_female_01_patrol_back.71074afbf834.webp",
+        "sha256": "71074afbf834",
+        "bytes": 1318446,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_01_patrol_front.21e88afe7019.webp",
+        "sha256": "21e88afe7019",
+        "bytes": 1324458,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp",
+        "sha256": "b83a62120431",
+        "bytes": 1151830,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_02_patrol_front.08e5b5b0b6af.webp",
+        "sha256": "08e5b5b0b6af",
+        "bytes": 1181760,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_03_patrol_back.2acdd4187eef.webp",
+        "sha256": "2acdd4187eef",
+        "bytes": 1419618,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_03_patrol_front.7b6ed6170a8b.webp",
+        "sha256": "7b6ed6170a8b",
+        "bytes": 1401730,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_04_patrol_back.6c2247042c3d.webp",
+        "sha256": "6c2247042c3d",
+        "bytes": 1323768,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_female_04_patrol_front.a658b6c0799a.webp",
+        "sha256": "a658b6c0799a",
+        "bytes": 1309774,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_01_patrol_back.792c3e9357de.webp",
+        "sha256": "792c3e9357de",
+        "bytes": 1158968,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_01_patrol_front.2fbe777afada.webp",
+        "sha256": "2fbe777afada",
+        "bytes": 1196096,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_02_patrol_back.37000310182c.webp",
+        "sha256": "37000310182c",
+        "bytes": 1196796,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_02_patrol_front.32868ccf02dc.webp",
+        "sha256": "32868ccf02dc",
+        "bytes": 1196112,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_03_patrol_back.baa78526987b.webp",
+        "sha256": "baa78526987b",
+        "bytes": 1272676,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_03_patrol_front.68581fa853a8.webp",
+        "sha256": "68581fa853a8",
+        "bytes": 1277784,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_04_patrol_back.1e2a5ed85bb8.webp",
+        "sha256": "1e2a5ed85bb8",
+        "bytes": 1222144,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
+        "path": "assets/characters/patrol/player_male_04_patrol_front.cb5f2a79d880.webp",
+        "sha256": "cb5f2a79d880",
+        "bytes": 1216272,
+        "priority": "P2",
+        "type": "image",
+        "decode": true
+      },
+      {
         "path": "assets/ui/training-background.jpg",
         "sha256": "46a37ac81760",
         "bytes": 513696,
@@ -811,62 +955,62 @@
         "decode": false
       },
       {
-        "path": "build/feature-patrol.ab5bd3ce5582.js",
-        "sha256": "ab5bd3ce5582",
-        "bytes": 9720,
+        "path": "build/feature-patrol.fa6fa230e09b.js",
+        "sha256": "fa6fa230e09b",
+        "bytes": 9792,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-primary.0fd49cba582e.js",
-        "sha256": "0fd49cba582e",
-        "bytes": 761704,
+        "path": "build/gameplay-core-primary.7a38c2cd4707.js",
+        "sha256": "7a38c2cd4707",
+        "bytes": 763149,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core-secondary.d4c9c9ba2893.js",
-        "sha256": "d4c9c9ba2893",
-        "bytes": 748879,
+        "path": "build/gameplay-core-secondary.058219effb11.js",
+        "sha256": "058219effb11",
+        "bytes": 749050,
         "priority": "P2",
         "type": "script",
         "decode": false
       },
       {
-        "path": "build/gameplay-core.44d2995e60ca.css",
-        "sha256": "44d2995e60ca",
-        "bytes": 451671,
+        "path": "build/gameplay-core.94d17096b2b8.css",
+        "sha256": "94d17096b2b8",
+        "bytes": 454274,
         "priority": "P2",
         "type": "style",
         "decode": false
       }
     ],
-    "manifestHash": "186861575fb8",
-    "totalBytes": 29720690,
-    "totalResources": 79
+    "manifestHash": "1c33c768cc5c",
+    "totalBytes": 57750630,
+    "totalResources": 95
   },
   "assets": {
-    "build/boot-core.bbbaf3175142.js": {
-      "sha256": "bbbaf3175142",
-      "bytes": 69855
+    "build/boot-core.4915950d06e4.js": {
+      "sha256": "4915950d06e4",
+      "bytes": 69987
     },
-    "build/app-shell.e59b170dae31.js": {
-      "sha256": "e59b170dae31",
-      "bytes": 1225903
+    "build/app-shell.24f28c7d6e37.js": {
+      "sha256": "24f28c7d6e37",
+      "bytes": 1240903
     },
-    "build/gameplay-core-primary.0fd49cba582e.js": {
-      "sha256": "0fd49cba582e",
-      "bytes": 761704
+    "build/gameplay-core-primary.7a38c2cd4707.js": {
+      "sha256": "7a38c2cd4707",
+      "bytes": 763149
     },
-    "build/gameplay-core-secondary.d4c9c9ba2893.js": {
-      "sha256": "d4c9c9ba2893",
-      "bytes": 748879
+    "build/gameplay-core-secondary.058219effb11.js": {
+      "sha256": "058219effb11",
+      "bytes": 749050
     },
-    "build/feature-patrol.ab5bd3ce5582.js": {
-      "sha256": "ab5bd3ce5582",
-      "bytes": 9720
+    "build/feature-patrol.fa6fa230e09b.js": {
+      "sha256": "fa6fa230e09b",
+      "bytes": 9792
     },
     "build/feature-abyss.56786ed25f03.js": {
       "sha256": "56786ed25f03",
@@ -908,9 +1052,9 @@
       "sha256": "801bc1a9895d",
       "bytes": 90552
     },
-    "build/gameplay-core.44d2995e60ca.css": {
-      "sha256": "44d2995e60ca",
-      "bytes": 451671
+    "build/gameplay-core.94d17096b2b8.css": {
+      "sha256": "94d17096b2b8",
+      "bytes": 454274
     },
     "build/feature-patrol.1cef20d37f82.css": {
       "sha256": "1cef20d37f82",

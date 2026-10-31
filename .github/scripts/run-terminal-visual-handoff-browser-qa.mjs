@@ -4,13 +4,14 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {ROOT,findChrome,startServer,waitJson,Cdp,collectStartupFailure,observeChromeStartup} from './runtime-browser-qa-support.mjs';
+import {devAccessFetch} from './dev-access-fetch.mjs';
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
 const endFixture=fs.readFileSync('.github/scripts/battle-layer-audio-live-qa.mjs','utf8').match(/^function finishBattleLayerQaEndFixture\([\s\S]*?^\}/m)?.[0];
 assert.ok(endFixture,'use the actual formal QA end fixture');
 const handoffFixture=fs.readFileSync('.github/scripts/battle-layer-audio-live-qa.mjs','utf8').match(/^function battleLayerQaTerminalHandoffReady\([\s\S]*?^\}/m)?.[0];
 assert.ok(handoffFixture,'use the actual formal QA phase predicate');
-if(baseUrl){assert.equal((await (await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json()).commitSha,expected);}
+if(baseUrl){assert.equal((await (await devAccessFetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json()).commitSha,expected);}
 const expression=`(async()=>{
     ${endFixture}
     ${handoffFixture}

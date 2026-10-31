@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "emptyActions": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "afterRefresh": {
+        "items": 0,
+        "message": "此分類沒有物品"
+      },
+      "sell": {
+        "shown": true,
+        "count": "0 件",
+        "gold": "0 金幣",
+        "disabled": true
+      }
+    },
+    {
+      "emptyActions": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "afterRefresh": {
+        "items": 0,
+        "message": "此分類沒有物品"
+      },
+      "sell": {
+        "shown": true,
+        "count": "0 件",
+        "gold": "0 金幣",
+        "disabled": true
+      }
+    }
+  ]
+}

@@ -7,7 +7,7 @@ const vm=require("vm");
 const coreSource=fs.readFileSync("js/00-main.js","utf8");
 const relicSummarySource=fs.readFileSync("js/relic-summary-catalog.js","utf8");
 const relicSource=fs.readFileSync("js/60-team-relic-system.js","utf8");
-const repositorySource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const repositorySource=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const saveStart=coreSource.indexOf("function saveGame(options={}){");
 const saveEnd=coreSource.indexOf("function loadGame(){",saveStart);
 

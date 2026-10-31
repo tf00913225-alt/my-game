@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -63,8 +64,8 @@ try{
  const live=process.env.DEV_BASE_URL;
  if(live){
   assert.equal(new URL(live).hostname,'dev.four-symbols-dev.pages.dev');assert.ok(process.env.EXPECTED_COMMIT_SHA);
-  assert.equal((await (await fetch(new URL('release-manifest.json',live))).json()).commitSha,process.env.EXPECTED_COMMIT_SHA);
-  assert.deepEqual(await (await fetch(new URL('build/asset-manifest.json',live))).json(),ASSET_MANIFEST);
+  assert.equal((await (await devAccessFetch(new URL('release-manifest.json',live))).json()).commitSha,process.env.EXPECTED_COMMIT_SHA);
+  assert.deepEqual(await (await devAccessFetch(new URL('build/asset-manifest.json',live))).json(),ASSET_MANIFEST);
  }
  server=await startServer({baseUrl:live,cloudModule,handleRequest});
  profile=fs.mkdtempSync(path.join(OUT,'profile-'));const chrome=findChrome(),port=10300+Math.floor(Math.random()*300);

@@ -147,6 +147,15 @@
                 grid.appendChild(box);
             }
 
+            if(pageItems.length===0){
+                const scroll=document.getElementById("inventoryGridScroll");
+                if(scroll){ scroll.scrollTop=0; }
+                const message=document.createElement("p");
+                message.className="inventory-empty-message";
+                message.setAttribute("role","status");
+                message.textContent=filtered.length===0?"此分類沒有物品":"此頁沒有物品";
+                grid.appendChild(message);
+            }
             const label=document.getElementById("v141InventoryPageLabel");
             if(label){ label.textContent=(inventoryPageIndex+1)+" / "+INVENTORY_PAGE_COUNT; }
             const quickSell=document.getElementById("inventoryQuickSellButton");
@@ -194,6 +203,7 @@
         renderInventoryCharacterTabs=function(){
             const wrap=document.getElementById("inventoryCharacterTabs");
             if(!wrap){ return; }
+            const focusedArrow=wrap.contains(document.activeElement)&&document.activeElement.matches(".inventory-character-arrow") ? document.activeElement.getAttribute("aria-label") : null;
             const indexes=getCreatedBackpackIndexes();
             if(indexes.length&& !indexes.includes(inventoryCharacterIndex)){ inventoryCharacterIndex=indexes[0]; }
             const character=getBackpackCharacter(inventoryCharacterIndex);
@@ -202,6 +212,7 @@
                 '<div class="inventory-character-name"><span>'+escapeHtml(character&&character.id||"角色")+'</span>'+
                 '<small class="inventory-character-level">'+(character?"Lv."+(character.level||1):"尚未建立")+'</small></div>'+
                 '<button type="button" class="inventory-character-arrow" aria-label="下一個角色" onclick="changeInventoryCharacter(1)">›</button>';
+            if(focusedArrow){ wrap.querySelectorAll(".inventory-character-arrow").forEach(button=>{if(button.getAttribute("aria-label")===focusedArrow){button.focus({preventScroll:true});}}); }
         };
     }
 
@@ -678,6 +689,7 @@
     if(typeof startTurn==="function"){
         const originalStartTurn=startTurn;
         startTurn=function(token){
+            if(token!==battleToken){ return; }
             if(!battleActive||startedEntryTokens.has(token)){
                 return originalStartTurn.apply(this,arguments);
             }
@@ -685,17 +697,27 @@
             const overlay=ensureBattleTransitionOverlay();
             const page=document.getElementById("battlePage");
             transitionRunning=true;
+            const releaseEntryLock=window.FourSymbolsBattleFlow.acquirePresentationLock("battle-entry");
             if(overlay){ overlay.classList.add("show"); }
             setTimeout(()=>{
+                if(!battleActive||token!==battleToken){
+                    if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                    return;
+                }
                 if(overlay){ overlay.classList.remove("show"); }
                 if(page){
                     page.classList.remove("v141-preparing-entry");
                     page.classList.add("v141-entry-moving");
                 }
                 setTimeout(()=>{
+                    if(!battleActive||token!==battleToken){
+                        if(!battleActive){ transitionRunning=false; releaseEntryLock(); }
+                        return;
+                    }
                     if(page){ page.classList.remove("v141-entry-moving"); }
                     transitionRunning=false;
-                    if(battleActive&&token===battleToken){ originalStartTurn.call(this,token); }
+                    try{ originalStartTurn.call(this,token); }
+                    finally{ releaseEntryLock(); }
                 },720);
             },1000);
         };

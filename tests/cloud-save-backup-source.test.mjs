@@ -6,7 +6,7 @@ import test from 'node:test';
 import {createRequire} from 'node:module';
 const require=createRequire(import.meta.url);
 const {validateMigrationBackup}=require('../functions/src/cloud-save-policy.js');
-const repoSource=fs.readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8');
+const repoSource=(fs.readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8')+fs.readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8').split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const clientSource=fs.readFileSync(new URL('../js/firebase/firebase-cloud-save.js',import.meta.url),'utf8');
 const sha=s=>createHash('sha256').update(s).digest('hex');
 function fixture(){

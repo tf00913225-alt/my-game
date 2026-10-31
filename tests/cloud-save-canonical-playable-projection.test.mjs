@@ -60,6 +60,55 @@ function sources(count=1){
 }
 const assemble=records=>assembleCanonicalPlayableProjection("uid-a",7,records);
 
+const {assembleCanonicalCloudReadCandidate:wireCandidate,
+    verifyCanonicalCloudReadCandidateAgainstSources:verifyWireCandidate,
+    snapshotDigest}=require("../functions/src/canonical-snapshot.js");
+
+test("cloud wire candidate preserves complete original projection and source binding without readiness",()=>{
+    const records=sources(3),before=JSON.stringify(records),original=assemble(records);
+    const candidate=wireCandidate("uid-a",7,7,records),wire=candidate.cloudBundle;
+    assert.deepEqual(Object.keys(wire).sort(),["bundleVersion","canonicalRevision","gameSave","ownerUid","serverRevision","sidecars","sourceSnapshotSha256"]);
+    assert.deepEqual(wire.gameSave,original.projection.gameSave);
+    assert.deepEqual(wire.sidecars,original.projection.sidecars);
+    assert.equal(wire.sourceSnapshotSha256,original.projection.sourceSnapshotSha256);
+    assert.equal(candidate.authoritativeStateReady,false);assert.equal(candidate.readyForPublication,false);
+    assert.equal(candidate.byteLength,Buffer.byteLength(JSON.stringify(wire),"utf8"));
+    assert.equal(verifyWireCandidate(candidate,"uid-a",7,7,records),wire);
+    assert.equal(JSON.stringify(records),before);assert.deepEqual(assemble(records),original);
+});
+
+test("cloud wire candidate rejects unequal or invalid cuts, missing claims and mixed source revisions",()=>{
+    for(const [server,canonical] of [[8,7],[7,8],[0,0],[1.5,1.5],["7","7"],
+        [Number.MAX_SAFE_INTEGER,Number.MAX_SAFE_INTEGER]]){
+        const records=sources(),before=JSON.stringify(records);
+        assert.throws(()=>wireCandidate("uid-a",server,canonical,records),/requires equal valid revision cuts/);
+        assert.equal(JSON.stringify(records),before);
+    }
+    for(const change of [r=>delete r.claimCheckpoint,r=>delete r.claimRecords,
+        r=>r.economy.serverRevision=8,r=>r.account.ownerUid="uid-b"]){
+        const records=sources();change(records);const before=JSON.stringify(records);
+        assert.throws(()=>wireCandidate("uid-a",7,7,records));assert.equal(JSON.stringify(records),before);
+    }
+});
+
+test("cloud wire against-sources verifier rejects self-rehashed payload substitution and readiness grants",()=>{
+    const records=sources(),candidate=wireCandidate("uid-a",7,7,records);
+    for(const change of [c=>c.cloudBundle.gameSave.gold++,c=>c.cloudBundle.ownerUid="uid-b",
+        c=>c.cloudBundle.canonicalRevision=6,c=>c.cloudBundle.sourceSnapshotSha256="a".repeat(64),
+        c=>c.cloudBundle.sidecars.progress.raw='{"claimed":false}',c=>c.cloudBundle.extra=true]){
+        const changed=structuredClone(candidate);change(changed);
+        changed.sha256=snapshotDigest(changed.cloudBundle);
+        changed.byteLength=Buffer.byteLength(JSON.stringify(changed.cloudBundle),"utf8");
+        assert.throws(()=>verifyWireCandidate(changed,"uid-a",7,7,records),/differs from canonical sources/);
+    }
+    for(const key of ["authoritativeStateReady","readyForPublication","sha256","byteLength"]){
+        const changed=structuredClone(candidate);changed[key]=true;
+        assert.throws(()=>verifyWireCandidate(changed,"uid-a",7,7,records),/digest, size or readiness/);
+    }
+    assert.throws(()=>verifyWireCandidate(candidate,"uid-b",7,7,records));
+    assert.throws(()=>verifyWireCandidate(candidate,"uid-a",8,8,records));
+});
+
 test("canonical preference v1 retains original343 snapshot/projection bytes and strict errors",()=>{
     // Independently compiled original343 canonical reader produced these values
     // using this unchanged original fixture; v2 does not rewrite the v1 path.

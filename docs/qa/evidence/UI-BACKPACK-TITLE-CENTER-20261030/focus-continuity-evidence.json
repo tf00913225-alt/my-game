@@ -1,0 +1,40 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    },
+    {
+      "keyboardContinuity": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "keyboardFocus": {
+        "tag": "BUTTON",
+        "label": "上一個角色",
+        "visibility": "visible",
+        "hasFocus": true
+      },
+      "again": {
+        "name": "水球",
+        "focus": "上一個角色"
+      }
+    }
+  ]
+}

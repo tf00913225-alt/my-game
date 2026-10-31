@@ -1,9 +1,10 @@
+import { devAccessFetch, accessContinueParams, DEV_ORIGIN } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
-import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
+import {ROOT,ASSET_MANIFEST,findChrome,startServer,waitJson,Cdp,qaPrelude,qaScriptStub,QA_AUTH_PATH,QA_CLOUD_PATH,QA_SESSION_PATH,QA_AUTH_MODULE,QA_CLOUD_MODULE,QA_SESSION_MODULE} from './runtime-browser-qa-support.mjs';
 
 // Real index, loader, hashed CSS/JS and native modal lifecycle. Only the
 // external account transport is the existing isolated, read-only QA seam.
@@ -53,8 +54,8 @@ async function run(chrome,url,live){
   await c.send('Page.enable');await c.send('Runtime.enable');
   if(live){
    const stubs=new Map([[QA_AUTH_PATH,QA_AUTH_MODULE],[QA_CLOUD_PATH,QA_CLOUD_MODULE],[QA_SESSION_PATH,QA_SESSION_MODULE]]);
-   c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=stubs.get('/'+new URL(p.request.url).pathname.slice(new URL('.',url).pathname.length));c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:{requestId:p.requestId}).catch(error=>console.error(error));}});
-   await c.send('Fetch.enable',{patterns:[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))});
+   c.ws.addEventListener('message',event=>{const m=JSON.parse(String(event.data));if(m.method==='Fetch.requestPaused'){const p=m.params,body=qaScriptStub(p,stubs,url);c.send(body?'Fetch.fulfillRequest':'Fetch.continueRequest',body?{requestId:p.requestId,responseCode:200,responseHeaders:[{name:'Content-Type',value:'text/javascript'}],body:Buffer.from(body).toString('base64')}:accessContinueParams(p)).catch(error=>console.error(error.message));}});
+   await c.send('Fetch.enable',{patterns:[{urlPattern:DEV_ORIGIN+'/*'},...[...stubs.keys()].map(p=>({urlPattern:'*'+p+'*',resourceType:'Script'}))]});
   }
   // Same isolated-account reload reset used by foreground-potion QA. Never touches a player UID.
   await c.send('Page.addScriptToEvaluateOnNewDocument',{source:"for(const key of Object.keys(localStorage)){if(key.startsWith('four_symbols_save:skill-runtime-browser-qa')||key.startsWith('four_symbols_save_meta:skill-runtime-browser-qa'))localStorage.removeItem(key);}"});
@@ -462,9 +463,9 @@ try{
  const live=!!process.env.DEV_BASE_URL;let url;
  if(live){
   url=new URL('index.html',process.env.DEV_BASE_URL.replace(/\/$/,'')+'/').href;
-  const deployed=await (await fetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();
+  const deployed=await (await devAccessFetch(new URL('release-manifest.json',url),{cache:'no-store'})).json();
   assert.ok(process.env.EXPECTED_COMMIT_SHA,'live QA requires expected deployment SHA');assert.equal(deployed.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed SHA mismatch');
-  const manifest=await (await fetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed production bundles mismatch');
+  const manifest=await (await devAccessFetch(new URL('build/asset-manifest.json',url),{cache:'no-store'})).json();assert.deepEqual(manifest,ASSET_MANIFEST,'deployed production bundles mismatch');
  }else {local=await startServer();url=local.url;}
  const evidence=await run(findChrome(),url,live);
  fs.writeFileSync(path.join(OUT,'evidence.json'),JSON.stringify({passed:true,environment:live?'deployed-site':'production-local',sha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||null,evidence},null,2)+'\n');

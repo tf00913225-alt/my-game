@@ -12,7 +12,7 @@ const balanceSource=appSource.slice(balanceStart,balanceEnd);
 const rulesSource=fs.readFileSync("js/40-v144-rules-and-abyss.js","utf8");
 const uiSource=fs.readFileSync("js/35-v141-ui-battle.js","utf8");
 const slotSource=fs.readFileSync("js/battlefield-slot-owner.js","utf8");
-const accountSource=fs.readFileSync("js/startup/account-save-repository.js","utf8");
+const accountSource=(fs.readFileSync("js/startup/account-save-repository.js","utf8")+fs.readFileSync("js/00-main.js","utf8").split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */')[1].split('/* ACCOUNT_SAVE_OPERATIONS_OWNER_END */')[0]);
 const registry=JSON.parse(fs.readFileSync("config/monster-portrait-registry.json","utf8"));
 const contracts=fs.readFileSync("SYSTEM_CONTRACTS.md","utf8");
 

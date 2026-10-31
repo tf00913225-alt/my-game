@@ -1,0 +1,72 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "mixedRarity": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "rarities": [
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "white",
+        "white",
+        "white",
+        "white",
+        "white",
+        "white"
+      ]
+    },
+    {
+      "mixedRarity": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "rarities": [
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "orange",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "purple",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "blue",
+        "white",
+        "white",
+        "white",
+        "white",
+        "white",
+        "white"
+      ]
+    }
+  ]
+}

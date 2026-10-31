@@ -1,0 +1,197 @@
+
+/* bundled source: js/26-v131-patrol-appearance.js */
+/* Patrol appearance owner: ordinary cacheable WebP assets, loaded only with feature-patrol. */
+(function installPatrolAppearance(){
+    "use strict";
+
+    const ART={
+        female:{
+            fire:{front:"assets/characters/patrol/player_female_01_patrol_front.21e88afe7019.webp",back:"assets/characters/patrol/player_female_01_patrol_back.71074afbf834.webp"},
+            water:{front:"assets/characters/patrol/player_female_02_patrol_front.08e5b5b0b6af.webp",back:"assets/characters/patrol/player_female_02_patrol_back.b83a62120431.webp"},
+            wind:{front:"assets/characters/patrol/player_female_03_patrol_front.7b6ed6170a8b.webp",back:"assets/characters/patrol/player_female_03_patrol_back.2acdd4187eef.webp"},
+            earth:{front:"assets/characters/patrol/player_female_04_patrol_front.a658b6c0799a.webp",back:"assets/characters/patrol/player_female_04_patrol_back.6c2247042c3d.webp"}
+        },
+        male:{
+            fire:{front:"assets/characters/patrol/player_male_01_patrol_front.2fbe777afada.webp",back:"assets/characters/patrol/player_male_01_patrol_back.792c3e9357de.webp"},
+            water:{front:"assets/characters/patrol/player_male_02_patrol_front.32868ccf02dc.webp",back:"assets/characters/patrol/player_male_02_patrol_back.37000310182c.webp"},
+            wind:{front:"assets/characters/patrol/player_male_03_patrol_front.68581fa853a8.webp",back:"assets/characters/patrol/player_male_03_patrol_back.baa78526987b.webp"},
+            earth:{front:"assets/characters/patrol/player_male_04_patrol_front.cb5f2a79d880.webp",back:"assets/characters/patrol/player_male_04_patrol_back.1e2a5ed85bb8.webp"}
+        }
+    };
+    const SWITCH_ICON="assets/ui/patrol-appearance-switch-icon.png";
+    const localKey=()=>{
+        try{
+            const repo=window.FourSymbolsAccountSave;
+            return repo&&repo.getActiveUid()?repo.accountKey("patrol-character-index"):null;
+        }catch(_){ return null; }
+    };
+    function readSelection(){
+        const key=localKey();
+        if(!key){ return 0; }
+        const value=Number(localStorage.getItem(key));
+        return Number.isInteger(value)?value:0;
+    }
+    let selectedIndex=readSelection();
+    const decodedSources=new Set();
+    const decodePromises=new Map();
+    let artApplyGeneration=0;
+
+    function decodeSource(source){
+        if(!source){ return Promise.resolve(false); }
+        if(decodedSources.has(source)){ return Promise.resolve(true); }
+        if(decodePromises.has(source)){ return decodePromises.get(source); }
+        const promise=new Promise(resolve=>{
+            const probe=new Image();
+            probe.decoding="async";
+            const done=ok=>{
+                if(ok){ decodedSources.add(source); }
+                resolve(ok);
+            };
+            probe.addEventListener("load",()=>done(true),{once:true});
+            probe.addEventListener("error",()=>done(false),{once:true});
+            probe.src=source;
+            if(typeof probe.decode==="function"){
+                probe.decode().then(()=>done(true)).catch(()=>{});
+            }
+        }).finally(()=>decodePromises.delete(source));
+        decodePromises.set(source,promise);
+        return promise;
+    }
+
+    function preloadCharacterArt(character){
+        if(!character){ return Promise.resolve(false); }
+        return Promise.all([
+            decodeSource(artFor(character,"front")),
+            decodeSource(artFor(character,"back"))
+        ]).then(results=>results.every(Boolean));
+    }
+
+    function indexes(){
+        if(typeof getExistingPartyIndexes==="function"){
+            return getExistingPartyIndexes().filter(index=>getCharacter(index));
+        }
+        return [0,1,2].filter(index=>getCharacter(index));
+    }
+    function getCharacter(index){
+        if(typeof getPartyCharacterByIndex==="function"){ return getPartyCharacterByIndex(index); }
+        return index===0?window.player:index===1?window.player2:window.player3;
+    }
+    function normalize(){
+        const available=indexes();
+        if(!available.length){ selectedIndex=0; return 0; }
+        if(!available.includes(selectedIndex)){ selectedIndex=available[0]; }
+        return selectedIndex;
+    }
+    function artFor(character,facing){
+        const gender=character&&character.gender==="male"?"male":"female";
+        const element=String(character&&(character.element||character.elementType)||"fire").toLowerCase();
+        return (ART[gender][element]||ART[gender].fire)[facing];
+    }
+    function applyPatrolArt(facingBack){
+        const image=document.getElementById("patrolCharacterImg");
+        if(!image){ return; }
+        const index=normalize();
+        const character=getCharacter(index);
+        if(!character){ return; }
+        const facing=facingBack?"back":"front";
+        const source=artFor(character,facing);
+        const generation=++artApplyGeneration;
+        const reveal=()=>{
+            if(generation!==artApplyGeneration){ return; }
+            image.classList.add("v131-patrol-q-art");
+            image.style.removeProperty("width");
+            image.style.removeProperty("height");
+            image.src=source;
+            image.alt=(character.id||("角色"+(index+1)))+"巡怪形象";
+            image.dataset.v131PatrolCharacter=String(index);
+            image.dataset.v131Facing=facing;
+            image.dataset.v131PatrolReady="1";
+            image.style.visibility="visible";
+        };
+
+        if(decodedSources.has(source)){
+            reveal();
+            return;
+        }
+
+        image.style.visibility="hidden";
+        decodeSource(source).then(ok=>{
+            if(ok){ reveal(); }
+        });
+    }
+    window.v131ApplyPatrolArt=applyPatrolArt;
+
+    function refreshPanel(){
+        const panel=document.getElementById("v131PatrolAppearancePanel");
+        if(!panel){ return; }
+        normalize(); panel.replaceChildren();
+        indexes().forEach(index=>{
+            const character=getCharacter(index);
+            const button=document.createElement("button");
+            button.type="button";
+            button.className="v131-patrol-choice"+(index===selectedIndex?" active":"");
+            button.textContent=character.id||("角色"+(index+1));
+            button.setAttribute("aria-pressed",index===selectedIndex?"true":"false");
+            button.addEventListener("click",event=>{
+                event.preventDefault(); event.stopPropagation(); select(index); panel.classList.remove("show");
+            });
+            panel.appendChild(button);
+        });
+    }
+    function select(index){
+        index=Number(index);
+        if(!indexes().includes(index)){ return; }
+        selectedIndex=index;
+        const key=localKey();
+        if(key){ localStorage.setItem(key,String(index)); }
+        const image=document.getElementById("patrolCharacterImg");
+        applyPatrolArt(!!(image&&image.dataset.v131Facing==="back"));
+        refreshPanel();
+    }
+    window.v131SelectPatrolCharacter=select;
+
+    function installSwitcher(){
+        const page=document.getElementById("mapPage");
+        if(!page||document.getElementById("v131PatrolAppearanceSwitchWrap")){ return; }
+        const wrap=document.createElement("div"); wrap.id="v131PatrolAppearanceSwitchWrap";
+        const button=document.createElement("button"); button.id="v131PatrolAppearanceSwitch"; button.type="button";
+        button.setAttribute("aria-label","形象切換"); button.title="形象切換";
+        const viewport=document.createElement("span"); viewport.className="v131-switch-icon-viewport";
+        const icon=document.createElement("img");
+        icon.className="v131-switch-icon-image";
+        icon.src=SWITCH_ICON;
+        icon.alt="";
+        icon.draggable=false;
+        icon.decoding="async";
+        icon.addEventListener("error",()=>{ button.classList.add("v131-switch-icon-failed"); },{once:true});
+        icon.addEventListener("load",()=>{ button.classList.remove("v131-switch-icon-failed"); },{once:true});
+        viewport.appendChild(icon); button.appendChild(viewport);
+        const panel=document.createElement("div"); panel.id="v131PatrolAppearancePanel";
+        panel.setAttribute("aria-label","選擇巡怪角色形象");
+        button.addEventListener("click",event=>{ event.preventDefault(); event.stopPropagation(); refreshPanel(); panel.classList.toggle("show"); });
+        wrap.addEventListener("click",event=>event.stopPropagation());
+        page.addEventListener("click",()=>panel.classList.remove("show"));
+        wrap.append(button,panel); page.appendChild(wrap); refreshPanel();
+    }
+    if(typeof resetPatrolCharacterToIdle==="function"){
+        const original=resetPatrolCharacterToIdle;
+        resetPatrolCharacterToIdle=function(){ const result=original.apply(this,arguments); applyPatrolArt(false); refreshPanel(); return result; };
+    }
+    if(typeof movePatrolCharacterRandomly==="function"){
+        const original=movePatrolCharacterRandomly;
+        movePatrolCharacterRandomly=function(){
+            if(typeof patrolInFightAnimation!=="undefined"&&patrolInFightAnimation){ return original.apply(this,arguments); }
+            const before=typeof patrolCurrentTop==="number"?patrolCurrentTop:37;
+            const result=original.apply(this,arguments);
+            applyPatrolArt((typeof patrolCurrentTop==="number"?patrolCurrentTop:before)<before);
+            return result;
+        };
+    }
+    function boot(){
+        normalize();
+        installSwitcher();
+        const character=getCharacter(selectedIndex);
+        preloadCharacterArt(character).finally(()=>applyPatrolArt(false));
+    }
+    if(document.readyState==="loading"){ document.addEventListener("DOMContentLoaded",boot,{once:true}); }else{ boot(); }
+})();

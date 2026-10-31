@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -8,7 +9,7 @@ const fixture=fs.readFileSync('tests/fixtures/wild-balance-reference-party.js','
 const expression=`(async()=>{
  const check=(v,m)=>{if(!v)throw Error(m);};
  const wait=async(fn,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(fn(),'Runtime wait: '+fn);};
- await wait(()=>FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
+ await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&getComputedStyle(document.getElementById('gameInterface')).display!=='none'&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'));
  await FourSymbolsFeatures.ensure('gameplay-core','daily-balance-qa');
  await wait(()=>FourSymbolsReleaseUpdate?.getState?.().availableReleaseVersion);
  closeHomeFeature();autoConfig.enabled=false;autoBattle=false;autoPatrolEnabled=false;
@@ -97,7 +98,7 @@ const expression=`(async()=>{
 `;
 const liveBase=process.env.DAILY_BALANCE_BASE_URL;
 if(liveBase){
- const manifest=await fetch(new URL('release-manifest.json',liveBase+'/')).then(r=>{assert.equal(r.ok,true,'deployed manifest');return r.json();});
+ const manifest=await devAccessFetch(new URL('release-manifest.json',liveBase+'/')).then(r=>{assert.equal(r.ok,true,'deployed manifest');return r.json();});
  assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'Daily live exact SHA');
 }
 const server=await startServer({baseUrl:liveBase}),chrome=findChrome();

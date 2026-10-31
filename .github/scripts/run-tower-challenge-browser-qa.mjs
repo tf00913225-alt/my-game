@@ -1,3 +1,4 @@
+import { devAccessFetch } from './dev-access-fetch.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -88,7 +89,7 @@ const expression=`(async()=>{
 })()`;
 const deployedBase=process.env.TOWER_QA_BASE_URL;
 if(deployedBase){
- const manifest=await (await fetch(new URL('release-manifest.json',deployedBase.replace(/\/$/,'')+'/'),{cache:'no-store'})).json();
+ const manifest=await (await devAccessFetch(new URL('release-manifest.json',deployedBase.replace(/\/$/,'')+'/'),{cache:'no-store'})).json();
  assert.equal(manifest.commitSha,process.env.EXPECTED_COMMIT_SHA,'deployed Tower exact SHA');
 }
 const server=await startServer({baseUrl:deployedBase}),profile=fs.mkdtempSync(path.join(os.tmpdir(),'tower-challenge-')),port=9850+Math.floor(Math.random()*100);
