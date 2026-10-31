@@ -4,7 +4,7 @@
   "generatedAt": "deterministic",
   "critical": {
     "scripts": [
-      "build/boot-core.4915950d06e4.js"
+      "build/boot-core.c90801d60a96.js"
     ],
     "styles": [
       "build/boot-core.fa69d5eea44b.css"
@@ -243,9 +243,9 @@
         "decode": true
       },
       {
-        "path": "build/boot-core.4915950d06e4.js",
-        "sha256": "4915950d06e4",
-        "bytes": 69987,
+        "path": "build/boot-core.c90801d60a96.js",
+        "sha256": "c90801d60a96",
+        "bytes": 69996,
         "priority": "P0",
         "type": "script",
         "decode": false
@@ -987,14 +987,14 @@
         "decode": false
       }
     ],
-    "manifestHash": "9b6d829f68f6",
-    "totalBytes": 57750605,
+    "manifestHash": "b86904ca1644",
+    "totalBytes": 57750614,
     "totalResources": 95
   },
   "assets": {
-    "build/boot-core.4915950d06e4.js": {
-      "sha256": "4915950d06e4",
-      "bytes": 69987
+    "build/boot-core.c90801d60a96.js": {
+      "sha256": "c90801d60a96",
+      "bytes": 69996
     },
     "build/app-shell.24f28c7d6e37.js": {
       "sha256": "24f28c7d6e37",
