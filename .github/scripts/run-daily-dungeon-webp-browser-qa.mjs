@@ -52,7 +52,6 @@ try{
     const started=Date.now();
     console.log("Daily WebP stage: Chrome launch requested");
     const result=spawnSync(chrome,["--headless=new","--no-sandbox","--disable-gpu","--disable-dev-shm-usage","--window-size=412,915","--virtual-time-budget=15000","--dump-dom",base+"/.daily-dungeon-webp-browser-qa.html"],{encoding:"utf8",timeout:40000,maxBuffer:32*1024*1024});
-    const match=String(result.stdout||"").match(/<pre id="result">([\s\S]*?)<\/pre>/);
     let pageRequest="unavailable";
     try{
         const size=fs.statSync(serverLog).size;
@@ -61,7 +60,8 @@ try{
             try{const bytes=Buffer.alloc(size-logOffset);fs.readSync(fd,bytes,0,bytes.length,logOffset);pageRequest=/"GET \/\.daily-dungeon-webp-browser-qa\.html(?:[ ?]| HTTP\/)/.test(bytes.toString("utf8"))?"observed":"not observed";}finally{fs.closeSync(fd);}
         }
     }catch{}
-    console.log("Daily WebP stage:",JSON.stringify({elapsedMs:Date.now()-started,exitStatus:result.status,signal:result.signal,errorCode:result.error?.code||null,pageRequest,resultProduced:!!match}));
+    console.log("Daily WebP stage:",JSON.stringify({elapsedMs:Date.now()-started,exitStatus:result.status,signal:result.signal,errorCode:result.error?.code||null,pageRequest,resultProduced:/<pre id="result">([\s\S]*?)<\/pre>/.test(String(result.stdout||""))}));
+    const match=String(result.stdout||"").match(/<pre id="result">([\s\S]*?)<\/pre>/);
     if(result.status!==0||!match){
         // Failure-only, bounded evidence: preserve the original launch and assertion.
         const tail=(value,limit)=>String(value||"").slice(-limit);
