@@ -1,0 +1,100 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "emptyPageVisibility": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "visibility": {
+        "message": {
+          "x": 20,
+          "y": 480.3333435058594,
+          "width": 320,
+          "height": 33.000030517578125,
+          "top": 480.3333435058594,
+          "right": 340,
+          "bottom": 513.3333740234375,
+          "left": 20
+        },
+        "scroll": {
+          "x": 19,
+          "y": 470.3333435058594,
+          "width": 322,
+          "height": 190.66665649414062,
+          "top": 470.3333435058594,
+          "right": 341,
+          "bottom": 661,
+          "left": 19
+        },
+        "scrollTop": 0
+      }
+    },
+    {
+      "emptyPageNavigation": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "emptyPage": {
+        "label": "5 / 5",
+        "message": "此頁沒有物品",
+        "filled": 0
+      },
+      "backPage": {
+        "label": "1 / 5",
+        "message": null,
+        "filled": 24
+      }
+    },
+    {
+      "emptyPageVisibility": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "visibility": {
+        "message": {
+          "x": 491,
+          "y": 480.3999938964844,
+          "width": 384,
+          "height": 39.600006103515625,
+          "top": 480.3999938964844,
+          "right": 875,
+          "bottom": 520,
+          "left": 491
+        },
+        "scroll": {
+          "x": 489.79998779296875,
+          "y": 468.3999938964844,
+          "width": 386.4000244140625,
+          "height": 228.80001831054688,
+          "top": 468.3999938964844,
+          "right": 876.2000122070312,
+          "bottom": 697.2000122070312,
+          "left": 489.79998779296875
+        },
+        "scrollTop": 0
+      }
+    },
+    {
+      "emptyPageNavigation": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "emptyPage": {
+        "label": "5 / 5",
+        "message": "此頁沒有物品",
+        "filled": 0
+      },
+      "backPage": {
+        "label": "1 / 5",
+        "message": null,
+        "filled": 24
+      }
+    }
+  ]
+}

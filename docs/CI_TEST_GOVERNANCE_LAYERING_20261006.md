@@ -3,9 +3,87 @@
 Work ID: `CI-TEST-GOVERNANCE-LAYERING-20261006`
 Target: dev; main writes forbidden.
 Branch: `feature/ci-test-governance-layering-20261006`.
-Status: Layering and Boss tiers integrated. Current affected-area routing repair is owned by
-Work ID CI-IMPACT-ROUTING-20261018, branch fix/ci-impact-routing-20261018.
+Status: Layering, Boss tiers and affected-area routing are integrated. Current usage-efficiency follow-up is owned by
+Work ID CI-USAGE-EFFICIENCY-20261030, branch fix/ci-usage-efficiency-20261030.
 Latest Head, Required CI, integration and cleanup evidence belong to its PR.
+
+### 2026-10-30 CI usage efficiency checkpoint
+
+Work ID `CI-USAGE-EFFICIENCY-20261030`; branch `fix/ci-usage-efficiency-20261030`;
+base dev `871daa07360622e911594b2551cc7c5eed8f3e5f`. Prior routing work is integrated;
+no same-purpose open PR or remote routing branch remained. This is the single
+follow-up line, using the existing classifier and Session workflow Owners.
+
+Candidate: classify changes to the mixed expansion stylesheet by the existing
+selector parser (Element Box retains battle input/Boss Fast validation), map its
+existing UI contract test and the reviewed standalone UI sample. PR and dev CI
+each execute the identical complete reusable Session emulator once, including
+Boot/SDK and authorization tests; Repository checks requires its success.
+Original Session paths also require that gate when the generated-output verifier
+accepts a policy JSON during a UI/art build; verification never retires the
+former independent functions/** safety responsibility.
+The original Session path filters now drive an exact CI output. Only a successful
+dev push CI with those paths can request the existing independent Session workflow.
+It binds source SHA/run/attempt, refuses stale dev or failed/duplicate requests,
+and explicitly reports REQUESTED rather than deployment acceptance. Only this
+post-validation job receives `actions: write` to dispatch that existing workflow.
+The token grants repository Actions write capability, not an endpoint-only
+permission. History lookup and dispatch are not atomic: this is not a claim of
+exactly-once dispatch. Partial/ambiguous history or a rejected/unknown dispatch
+outcome stops without automatic retry; inspect the original child before any
+human-authorized retry. GitHub-script retries are explicitly zero.
+
+Under the user's no-added-charge constraint, a request first compares against
+the latest positively successful dev Session deployment and its actual deploy
+steps. Identical Functions tree, Firebase configuration/rules, packaging inputs,
+repository scripts/dependency files and the complete protected deployment job do not request
+another backend deployment. Current full Session/Repository checks remain
+necessary. Missing/failed/in-progress baseline, incomplete input evidence,
+unknown packaging/hooks or a changing baseline blocks this exemption; only the
+reviewed old/new eligibility and exact source-proof metadata differences are
+normalized, never checkout, job environment/defaults or other steps. It never
+falls back to an older green deployment. Actual payload/tool changes retain the
+original protected deployment path. This is source-input reuse evidence, not a
+claim about out-of-band cloud administration or zero total provider charges.
+
+The Session deployment independently verifies current dev, the newest trusted
+ci.yml push run/attempt, Repository checks, the full Session job and each required
+security step via GitHub API before accessing deployment credentials. Verified
+dispatches perform no emulator replay or sleep polling; missing/failed/stale or
+ambiguous evidence fails closed. Empty dispatch inputs preserve manual full
+validation and the original bounded wait. The original independent non-cancelable
+backend workflow/lock, permissions there, readiness checks, deployment list and
+pre-deploy dev recheck remain; PR/main/full/nightly and Cloudflare cancellation
+semantics are unchanged. No Firebase function/rule source is modified.
+New/unknown runtime or tests, unknown prototypes, global CSS and mixed safety
+changes retain conservative gates. Only the deployment-request job adds
+repository Actions write permission; the independent backend workflow's
+permissions remain unchanged.
+
+Baseline actual latest-attempt job durations (sum of started/completed jobs,
+not elapsed wall time or GitHub rounded billing minutes):
+
+| Snapshot / run | Actual runner minutes (rounded) | Observation |
+|---|---:|---|
+| [UI sample PR 41046073461](https://github.com/tf00913225-alt/my-game/actions/runs/41046073461), a1, PR Head `79f8723f061630675f08c6c655be6c8aea688c5a` | 140 | Unknown prototype owner fans out all ordinary browser groups and Session |
+| [Element Box PR 41047498751](https://github.com/tf00913225-alt/my-game/actions/runs/41047498751), a1, PR Head `4319138a0585a29ca0552d061d3de9e02d3de4c6` | 139 | Unknown css/38 and existing UI test fan out broad gates |
+| [dev CI 41047070764](https://github.com/tf00913225-alt/my-game/actions/runs/41047070764), a1, push `67a3da179612766897ab534930f83abd22389cb5` | 234 | Includes about 8.4 min reusable Session and Cloudflare deployed QA |
+| [independent Session 41047070937](https://github.com/tf00913225-alt/my-game/actions/runs/41047070937), a1, same dev SHA | 34 | About 7 min repeated emulator plus 22.6 min waiting in deploy job |
+
+Pending: latest Head CI, independent security/scope review of the final no-op
+checkpoint, fresh required-check settings confirmation and safe integration
+under the user's no-added-charge constraint. Identical backend input reuse must
+be proved before integration; do not trigger a chargeable deployment merely to
+test the dispatcher. Actual post-change run comparison and cleanup remain. No measured
+savings or monthly reduction is claimed yet. PR body is the live status Owner.
+
+The first checkpoint `a2447495` removed only the duplicate PR trigger and passed
+176 targeted tests plus independent scope review; its CI cannot certify a later
+Head. Direct deployment in cancelable CI and a job-level cancellation rewrite
+were rejected before commit to preserve backend protection and latest-run
+cancellation semantics. The final candidate instead retains the original
+independent backend lifecycle. This document grants no deployment/permission
+approval; latest Head PR is authoritative. No main/default-branch changes.
 
 ## Current routing owner (supersedes historical phase restrictions below)
 

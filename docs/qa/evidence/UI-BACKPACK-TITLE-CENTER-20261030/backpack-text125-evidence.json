@@ -1,0 +1,468 @@
+{
+  "passed": true,
+  "sha": null,
+  "evidence": [
+    {
+      "backpackText125": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "zoomState": 13,
+      "zoomGeometry": [
+        {
+          "selector": ".inventory-title-plate h2",
+          "text": "背包",
+          "rect": {
+            "x": 152,
+            "y": 102,
+            "width": 56,
+            "height": 25,
+            "top": 102,
+            "right": 208,
+            "bottom": 127,
+            "left": 152
+          },
+          "horizontal": 0,
+          "vertical": 16,
+          "font": "75px"
+        },
+        {
+          "selector": ".inventory-title-plate-kicker",
+          "text": "INVENTORY",
+          "rect": {
+            "x": 19,
+            "y": 106.875,
+            "width": 102.00521087646484,
+            "height": 16.25,
+            "top": 106.875,
+            "right": 121.00521087646484,
+            "bottom": 123.125,
+            "left": 19
+          },
+          "horizontal": 0,
+          "vertical": 10,
+          "font": "48.75px"
+        },
+        {
+          "selector": ".map-inventory-overlay-close",
+          "text": "關閉",
+          "rect": {
+            "x": 278,
+            "y": 93,
+            "width": 63,
+            "height": 44,
+            "top": 93,
+            "right": 341,
+            "bottom": 137,
+            "left": 278
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-character-name span",
+          "text": "色彩從此",
+          "rect": {
+            "x": 117.74479675292969,
+            "y": 155,
+            "width": 80,
+            "height": 26,
+            "top": 155,
+            "right": 197.7447967529297,
+            "bottom": 181,
+            "left": 117.74479675292969
+          },
+          "horizontal": 0,
+          "vertical": 1,
+          "font": "60px"
+        },
+        {
+          "selector": ".inventory-character-level",
+          "text": "Lv.70",
+          "rect": {
+            "x": 203.7447967529297,
+            "y": 158.25,
+            "width": 38.50520324707031,
+            "height": 19.5,
+            "top": 158.25,
+            "right": 242.25,
+            "bottom": 177.75,
+            "left": 203.7447967529297
+          },
+          "horizontal": 0,
+          "vertical": 5,
+          "font": "48.75px"
+        },
+        {
+          "selector": ".inventory-character-level",
+          "text": "等級 70",
+          "rect": {
+            "x": 173.6041717529297,
+            "y": 214.2291717529297,
+            "width": 159.39064025878906,
+            "height": 24.375,
+            "top": 214.2291717529297,
+            "right": 332.99481201171875,
+            "bottom": 238.6041717529297,
+            "left": 173.6041717529297
+          },
+          "horizontal": 0,
+          "vertical": 4,
+          "font": "56.25px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "裝備",
+          "rect": {
+            "x": 22,
+            "y": 426.3333435058594,
+            "width": 79,
+            "height": 38.5,
+            "top": 426.3333435058594,
+            "right": 101,
+            "bottom": 464.8333435058594,
+            "left": 22
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "物品",
+          "rect": {
+            "x": 101,
+            "y": 426.3333435058594,
+            "width": 79,
+            "height": 38.5,
+            "top": 426.3333435058594,
+            "right": 180,
+            "bottom": 464.8333435058594,
+            "left": 101
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "材料",
+          "rect": {
+            "x": 180,
+            "y": 426.3333435058594,
+            "width": 79,
+            "height": 38.5,
+            "top": 426.3333435058594,
+            "right": 259,
+            "bottom": 464.8333435058594,
+            "left": 180
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "功能",
+          "rect": {
+            "x": 259,
+            "y": 426.3333435058594,
+            "width": 79,
+            "height": 38.5,
+            "top": 426.3333435058594,
+            "right": 338,
+            "bottom": 464.8333435058594,
+            "left": 259
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-bottom-action",
+          "text": "重新整理",
+          "rect": {
+            "x": 19,
+            "y": 666,
+            "width": 102,
+            "height": 41,
+            "top": 666,
+            "right": 121,
+            "bottom": 707,
+            "left": 19
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-bottom-action",
+          "text": "一鍵售出",
+          "rect": {
+            "x": 239,
+            "y": 666,
+            "width": 102,
+            "height": 41,
+            "top": 666,
+            "right": 341,
+            "bottom": 707,
+            "left": 239
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".v141-inventory-pager span",
+          "text": "1 / 5",
+          "rect": {
+            "x": 156,
+            "y": 669.625,
+            "width": 48,
+            "height": 33.75,
+            "top": 669.625,
+            "right": 204,
+            "bottom": 703.375,
+            "left": 156
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        }
+      ]
+    },
+    {
+      "backpackText125": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "zoomState": 13,
+      "zoomGeometry": [
+        {
+          "selector": ".inventory-title-plate h2",
+          "text": "背包",
+          "rect": {
+            "x": 649.4000244140625,
+            "y": 26.399999618530273,
+            "width": 67.199951171875,
+            "height": 30.000001907348633,
+            "top": 26.399999618530273,
+            "right": 716.5999755859375,
+            "bottom": 56.400001525878906,
+            "left": 649.4000244140625
+          },
+          "horizontal": 0,
+          "vertical": 16,
+          "font": "75px"
+        },
+        {
+          "selector": ".inventory-title-plate-kicker",
+          "text": "INVENTORY",
+          "rect": {
+            "x": 489.79998779296875,
+            "y": 32.25,
+            "width": 122.40625,
+            "height": 19.5,
+            "top": 32.25,
+            "right": 612.2062377929688,
+            "bottom": 51.75,
+            "left": 489.79998779296875
+          },
+          "horizontal": 0,
+          "vertical": 10,
+          "font": "48.75px"
+        },
+        {
+          "selector": ".map-inventory-overlay-close",
+          "text": "關閉",
+          "rect": {
+            "x": 800.5999755859375,
+            "y": 15.600000381469727,
+            "width": 75.60003662109375,
+            "height": 52.80000305175781,
+            "top": 15.600000381469727,
+            "right": 876.2000122070312,
+            "bottom": 68.40000343322754,
+            "left": 800.5999755859375
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-character-name span",
+          "text": "色彩從此",
+          "rect": {
+            "x": 608.2937622070312,
+            "y": 90,
+            "width": 96,
+            "height": 31.20000457763672,
+            "top": 90,
+            "right": 704.2937622070312,
+            "bottom": 121.20000457763672,
+            "left": 608.2937622070312
+          },
+          "horizontal": 0,
+          "vertical": 1,
+          "font": "60px"
+        },
+        {
+          "selector": ".inventory-character-level",
+          "text": "Lv.70",
+          "rect": {
+            "x": 711.4937744140625,
+            "y": 93.9000015258789,
+            "width": 46.20623779296875,
+            "height": 23.400001525878906,
+            "top": 93.9000015258789,
+            "right": 757.7000122070312,
+            "bottom": 117.30000305175781,
+            "left": 711.4937744140625
+          },
+          "horizontal": 0,
+          "vertical": 5,
+          "font": "48.75px"
+        },
+        {
+          "selector": ".inventory-character-level",
+          "text": "等級 70",
+          "rect": {
+            "x": 675.3250122070312,
+            "y": 161.0749969482422,
+            "width": 191.26873779296875,
+            "height": 29.25,
+            "top": 161.0749969482422,
+            "right": 866.59375,
+            "bottom": 190.3249969482422,
+            "left": 675.3250122070312
+          },
+          "horizontal": 0,
+          "vertical": 4,
+          "font": "56.25px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "裝備",
+          "rect": {
+            "x": 493.3999938964844,
+            "y": 415.6000061035156,
+            "width": 94.80001831054688,
+            "height": 46.20001220703125,
+            "top": 415.6000061035156,
+            "right": 588.2000122070312,
+            "bottom": 461.8000183105469,
+            "left": 493.3999938964844
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "物品",
+          "rect": {
+            "x": 588.2000122070312,
+            "y": 415.6000061035156,
+            "width": 94.79998779296875,
+            "height": 46.20001220703125,
+            "top": 415.6000061035156,
+            "right": 683,
+            "bottom": 461.8000183105469,
+            "left": 588.2000122070312
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "材料",
+          "rect": {
+            "x": 683,
+            "y": 415.6000061035156,
+            "width": 94.800048828125,
+            "height": 46.20001220703125,
+            "top": 415.6000061035156,
+            "right": 777.800048828125,
+            "bottom": 461.8000183105469,
+            "left": 683
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-category-tab",
+          "text": "功能",
+          "rect": {
+            "x": 777.800048828125,
+            "y": 415.6000061035156,
+            "width": 94.7999267578125,
+            "height": 46.20001220703125,
+            "top": 415.6000061035156,
+            "right": 872.5999755859375,
+            "bottom": 461.8000183105469,
+            "left": 777.800048828125
+          },
+          "horizontal": 0,
+          "vertical": 3,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-bottom-action",
+          "text": "重新整理",
+          "rect": {
+            "x": 489.79998779296875,
+            "y": 703.2000122070312,
+            "width": 122.4000244140625,
+            "height": 49.20001220703125,
+            "top": 703.2000122070312,
+            "right": 612.2000122070312,
+            "bottom": 752.4000244140625,
+            "left": 489.79998779296875
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".inventory-bottom-action",
+          "text": "一鍵售出",
+          "rect": {
+            "x": 753.800048828125,
+            "y": 703.2000122070312,
+            "width": 122.39996337890625,
+            "height": 49.20001220703125,
+            "top": 703.2000122070312,
+            "right": 876.2000122070312,
+            "bottom": 752.4000244140625,
+            "left": 753.800048828125
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        },
+        {
+          "selector": ".v141-inventory-pager span",
+          "text": "1 / 5",
+          "rect": {
+            "x": 654.2000122070312,
+            "y": 707.5499877929688,
+            "width": 57.5999755859375,
+            "height": 40.5,
+            "top": 707.5499877929688,
+            "right": 711.7999877929688,
+            "bottom": 748.0499877929688,
+            "left": 654.2000122070312
+          },
+          "horizontal": 0,
+          "vertical": 0,
+          "font": "67.5px"
+        }
+      ]
+    }
+  ]
+}
