@@ -66,7 +66,8 @@ async function startServer({baseUrl,cloudModule=QA_CLOUD_MODULE,handleRequest}={
             // Exact deployed assets remain authoritative; only the established
             // read-only account transport above is isolated from player data.
             try{
-                const upstream=await devAccessFetch(new URL(relative==="index.html"?"./":relative,baseUrl.replace(/\/$/,"")+"/"));
+                const canonical=relative==="index.html"?"./":relative==="privacy-consent.html"?"privacy-consent":relative==="privacy.html"?"privacy":relative;
+                const upstream=await devAccessFetch(new URL(canonical,baseUrl.replace(/\/$/,"")+"/"));
                 if(!upstream.ok){ recordFailure(pathname,upstream.status,"upstream HTTP failure"); }
                 res.writeHead(upstream.status,{"content-type":upstream.headers.get("content-type")||mime(relative),"cache-control":"no-store"});
                 if(relative==="index.html"){res.end((await upstream.text()).replace("<!-- build:critical-script -->",qaPrelude()+"\n<!-- build:critical-script -->"));}

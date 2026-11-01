@@ -7,6 +7,15 @@
 Game / Cache Version：173.73 / 173.73
 版本唯一來源：release/release.json
 
+2026-11-01 dev 更新（歷史取樣，非正式 main 發布）
+
+- dev 取樣／部署 SHA：af9be7fd38b7b0efd80747b9d78049fa0fd4416d。CI run 41222181350、attempt 1、push：Repository checks、固定 SHA Publish、responsive／battle-daily／boss／abyss／tower／adventure live 及 Deploy dev preview 成功。https://github.com/tf00913225-alt/my-game/actions/runs/41222181350
+- 此 dev CI：Node 429/429 suites、JavaScript syntax 533/533 files、708 unique local targets、7 HTML／286 static IDs。Game／Cache 173.73／173.73；firstPlay 95 resources／57,750,630 bytes、manifestHash 1c33c768cc5c。這些數量僅屬此 SHA。
+- #1004 元素匣捲動及 #1007 獎勵視窗觸控已合入 dev；#1007 的四尺寸正式腳本合成按鈕觸控及隔離自然副本領獎（DOM click）通過，不能視為真機觸控領獎通過。手機體驗由使用者執行。
+- Open PR 取樣：#1034、#1030、#1027、#1017、#1012、#997、#994、#955；狀態以 GitHub 即時資料為準。
+- 完整跨裝置 Cloud Save 恢復、權威狀態驗證及一次性獎勵保護未完成；維持 fail-closed，不開放正式完整還原或宣稱完成。大型 UI／戰鬥 UI／Cloud 工作未收斂，無本次正式發布候選。
+- 以下 2026-10-26 的 #1004 暫停及 Open PR 敘述是當時快照，由本節取代。
+
 一、正式 V173.73 驗證基線
 
 以下引用既有正式 CI／部署證據，不是本次重新執行 Gameplay 或手機實機驗收。

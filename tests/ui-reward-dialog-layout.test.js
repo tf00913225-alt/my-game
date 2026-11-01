@@ -11,6 +11,7 @@ const css=fs.readFileSync("css/33-v132-content-expansion.css","utf8").replace(/c
 
 assert.match(css,/--ui-reward-dialog-max-width:340px;/);
 assert.match(css,/--ui-reward-dialog-height:300px;/);
+assert.match(css,/\.v132-reward-modal\.show\{\s*display:flex;\s*pointer-events:auto;/);
 assert.match(css,/\.v132-reward-modal-inner\{[\s\S]*?width:min\(100%,var\(--ui-reward-dialog-max-width\)\);[\s\S]*?height:min\(var\(--ui-reward-dialog-height\),calc\(calc\(100 \* var\(--layout-block-size,746.6667px\) \/ 100\) - 32px\)\);[\s\S]*?overflow-y:auto;/);
 assert.match(css,/\.v132-reward-modal-inner h3\{[\s\S]*?position:sticky;[\s\S]*?top:0;/);
 assert.match(css,/\.v132-reward-actions\{[\s\S]*?position:sticky;[\s\S]*?bottom:0;/);
@@ -20,6 +21,14 @@ assert.match(css,/\.v132-ticket-preview-modal\{[\s\S]*?height:min\(var\(--ui-rew
 assert.match(css,/\.v132-ticket-preview-modal \.v132-preview-grid\{[\s\S]*?grid-template-rows:repeat\(5,minmax\(0,1fr\)\);[\s\S]*?overflow:visible;/);
 
 function findChrome(){
+    const configured=process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
+    if(configured&&fs.existsSync(configured)){ return configured; }
+    if(process.platform==="win32"){
+        for(const candidate of [
+            path.join(process.env.PROGRAMFILES||"","Google","Chrome","Application","chrome.exe"),
+            path.join(process.env["PROGRAMFILES(X86)"]||"","Google","Chrome","Application","chrome.exe")
+        ]){ if(fs.existsSync(candidate)){ return candidate; } }
+    }
     for(const name of ["google-chrome","google-chrome-stable","chromium","chromium-browser"]){
         const result=cp.spawnSync("which",[name],{encoding:"utf8"});
         if(result.status===0&&result.stdout.trim()){ return result.stdout.trim(); }
@@ -37,8 +46,8 @@ const fixture=path.join(process.cwd(),".ui-reward-dialog-smoke.html");
 const fileUrl="file://"+fixture.replace(/\\/g,"/");
 const html=`<!doctype html><html><head><meta charset="utf-8">
 <link rel="stylesheet" href="css/33-v132-content-expansion.css">
-<style>html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000}.v132-reward-modal{display:flex!important}</style>
-</head><body><div class="v132-reward-modal"><div class="v132-reward-modal-inner"><h3>副本獎勵</h3><div id="content"></div><div class="v132-reward-actions"><button id="action">直接領取</button></div></div></div><pre id="result"></pre><script>
+<style>html,body{margin:0;width:420px;height:746.6667px;overflow:hidden;background:#000}#game-overlay-layer,#game-ui{pointer-events:none}.v132-reward-modal{display:flex!important}</style>
+</head><body><div id="game-overlay-layer"><div id="game-ui"><button id="background">背景按鈕</button><div class="v132-reward-modal show"><div class="v132-reward-modal-inner"><h3>副本獎勵</h3><div id="content"></div><div class="v132-reward-actions"><button id="action">直接領取</button></div></div></div></div></div><pre id="result"></pre><script>
 (function(){
  const box=document.querySelector('.v132-reward-modal-inner');
  const title=box.querySelector('h3');
@@ -47,7 +56,9 @@ const html=`<!doctype html><html><head><meta charset="utf-8">
  const rect=el=>{const r=el.getBoundingClientRect();return {top:r.top,left:r.left,width:r.width,height:r.height,bottom:r.bottom};};
  content.innerHTML=Array.from({length:30},(_,i)=>'<p>獎勵內容 '+i+'：測試說明文字</p>').join('');
  void box.offsetHeight;
- const before={box:rect(box),title:rect(title),action:rect(action),scrollHeight:box.scrollHeight,clientHeight:box.clientHeight,overflow:getComputedStyle(box).overflowY,titlePos:getComputedStyle(title).position,actionPos:getComputedStyle(action.parentElement).position,buttonHeight:rect(action).height};
+ const actionRect=action.getBoundingClientRect();
+ const hit=document.elementFromPoint(actionRect.left+actionRect.width/2,actionRect.top+actionRect.height/2);
+ const before={box:rect(box),title:rect(title),action:rect(action),scrollHeight:box.scrollHeight,clientHeight:box.clientHeight,overflow:getComputedStyle(box).overflowY,titlePos:getComputedStyle(title).position,actionPos:getComputedStyle(action.parentElement).position,buttonHeight:rect(action).height,hitAction:hit===action||action.contains(hit),modalPointerEvents:getComputedStyle(action.closest('.v132-reward-modal')).pointerEvents};
  box.scrollTop=box.scrollHeight;
  void box.offsetHeight;
  const after={box:rect(box),title:rect(title),action:rect(action),scrollTop:box.scrollTop};
@@ -69,6 +80,8 @@ try{
     assert.equal(data.before.titlePos,"sticky","reward title must stay sticky");
     assert.equal(data.before.actionPos,"sticky","reward action row must stay sticky");
     assert.ok(data.before.buttonHeight>=44,"reward action must remain touch friendly");
+    assert.equal(data.before.modalPointerEvents,"auto","visible reward dialog must receive pointer input inside the native overlay");
+    assert.equal(data.before.hitAction,true,"reward claim button must win real browser hit testing");
     assert.ok(data.after.scrollTop>0,"reward dialog must actually scroll");
     assert.ok(Math.abs(data.before.box.top-data.after.box.top)<0.25&&Math.abs(data.before.box.height-data.after.box.height)<0.25,"reward frame must not move while scrolling");
     assert.ok(data.after.title.top>=data.after.box.top-1,"sticky reward title must remain visible after scrolling");
