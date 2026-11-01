@@ -8391,7 +8391,7 @@ function syncHud(){
         hud.style.width=projection.width+"px";
         hud.style.height=projection.height+"px";
         hud.style.transform="scale("+projection.scaleX+","+projection.scaleY+")";
-        hud.style.opacity=card.classList.contains("dead")?.16:card.classList.contains("down")?.35:1;
+        hud.style.opacity=1;
     });
 }
 function syncResourceNumbers(){
@@ -9008,6 +9008,7 @@ ensureFunctionalStyles();runRepairs();
         area.classList.add("v-fixed-ally-formation","v-fixed-ally-zone","v-fixed-zone-v2");
         area.classList.remove("battle-player-row");
         area.dataset.geometryOwner="fixed-slot";
+        area.dataset.hasBackRow=String(slots.allyBackSlots.some(slot=>Number.isInteger(slots.getCharacterAtAllySlot(slot))));
     }
 
     function markBattlefieldZones(){

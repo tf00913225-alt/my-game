@@ -1418,7 +1418,6 @@ button:disabled{
 }
 
 .battle-monster.dead{
-    opacity:.16;
     pointer-events:none;
 }
 
@@ -2975,7 +2974,7 @@ button:active{
    移除變暗效果，不需要額外程式碼處理復活。
 */
 
-.battle-player.down{
+.battle-player.down > .v174-battle-art{
     filter:
         brightness(.4)
         grayscale(55%);
