@@ -8391,7 +8391,7 @@ function syncHud(){
         hud.style.width=projection.width+"px";
         hud.style.height=projection.height+"px";
         hud.style.transform="scale("+projection.scaleX+","+projection.scaleY+")";
-        hud.style.opacity=card.classList.contains("dead")?.16:card.classList.contains("down")?.35:1;
+        hud.style.opacity=1;
     });
 }
 function syncResourceNumbers(){

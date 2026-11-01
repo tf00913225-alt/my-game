@@ -8277,7 +8277,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
 }
 @keyframes v174BattleDeath{
     from{transform:translateY(0) scale(1);opacity:1}
-    to{transform:translateY(5px) scale(.97);opacity:.35}
+    to{transform:translateY(5px) scale(.97);opacity:.85}
 }
 @keyframes v174TargetReticlePulse{
     from{opacity:.58;filter:brightness(.92)}
@@ -8288,7 +8288,7 @@ body.team-relic-cinematic-active > .v174-battle-hud-layer > .v174-unit-hud[data-
     #game-stage #battlePage .v174-action-motion,
     #game-stage #battlePage .v174-portrait-paint,
     #game-stage #battlePage .v174-generic-portrait > .v174-action-motion::before{animation:none !important;}
-    #game-stage #battlePage .v174-battle-art[data-motion="dying"] > .v174-action-motion{opacity:.35;}
+    #game-stage #battlePage .v174-battle-art[data-motion="dying"] > .v174-action-motion{opacity:.85;}
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.target::before,
     #game-stage #battlePage.v-fixed-slot-render-v2 .v174-cardless-unit.ally-targetable::before{animation:none !important;}
 
