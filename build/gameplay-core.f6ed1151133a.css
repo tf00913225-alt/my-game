@@ -7790,6 +7790,7 @@ body > .v169-rpg-dialog-layer{
 /* The enemy is above this zone, so an ally front row belongs at the top.
    Keep the Slot names semantic; only this visual projection changes. */
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="front"]{top:-24px !important;}
+#game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow[data-has-back-row="false"] > .v-fixed-ally-slot-row[data-slot-row="front"]{top:16px !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 #battlePlayerRow > .v-fixed-ally-slot-row[data-slot-row="back"]{bottom:0 !important;}
 #game-stage #battlePage.v-fixed-slot-render-v2 .v-fixed-ally-slot{
     position:relative !important;
