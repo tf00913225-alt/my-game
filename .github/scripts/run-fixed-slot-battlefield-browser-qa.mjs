@@ -87,8 +87,10 @@ const elementBoxSource=read('js/20-anonymous-20.js');
 const elementBoxDragSource=elementBoxSource.slice(elementBoxSource.indexOf('(function initBattleUtilityControls(){')).replace(/<\/script/gi,'<\\/script');
 assert.ok(elementBoxDragSource.startsWith('(function initBattleUtilityControls(){'),'fixture must load the original utility interaction Owner');
 const portraitSamples=Object.keys(portraitRegistry.assets).filter(p=>p.startsWith("assets/monsters/wild/zone-01/")).slice(0,6);
-const allyPortraitSamples=[...read("js/26-v131-patrol-appearance.js").matchAll(/front:"(assets\/characters\/patrol\/[^" ]+)"/g)].map(match=>({path:match[1],data:"data:image/webp;base64,"+fs.readFileSync(path.join(ROOT,match[1])).toString("base64")}));
-assert.equal(allyPortraitSamples.length,8,"formal patrol front portrait coverage");
+const allyPortraitSamples=fs.readdirSync(path.join(ROOT,"assets/characters/battle"))
+    .filter(file=>/^player_battle_readable_.*\.webp$/.test(file)).sort()
+    .map(file=>({path:"assets/characters/battle/"+file,data:"data:image/webp;base64,"+fs.readFileSync(path.join(ROOT,"assets/characters/battle",file)).toString("base64")}));
+assert.equal(allyPortraitSamples.length,8,"formal battle portrait coverage");
 
 let allyPortraitProbeMetadata=null;
 function fixtureHtml(width,height){
@@ -145,7 +147,7 @@ ${portraitSource}
   return {...sample,width:canvas.width,height:canvas.height,alpha:[left,top,right,bottom]};
  }));
  function allyVisiblePortraits(){return Array.from(document.querySelectorAll('#battlePlayerRow .battle-player')).map(function(card,index){
-  const source=allyPortraits[index%allyPortraits.length];card.dataset.v174BattleArtwork='url("'+source.data+'")';syncUnitArtwork(card,'player');
+  const source=allyPortraits[index%allyPortraits.length];card.dataset.v174BattleArtwork='url("'+source.path+'")';syncUnitArtwork(card,'player');
   card.querySelector('.v174-battle-art').getAnimations({subtree:true}).forEach(a=>a.cancel());
   const r=card.querySelector('.v174-portrait-paint').getBoundingClientRect(),scale=Math.min(r.width/source.width,r.height/source.height),left=r.left+(r.width-source.width*scale)/2,top=r.bottom-source.height*scale,b=source.alpha;
   return {id:card.id,path:source.path,visible:{left:left+b[0]*scale,top:top+b[1]*scale,right:left+b[2]*scale,bottom:top+b[3]*scale}};
