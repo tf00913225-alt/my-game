@@ -79,7 +79,7 @@ assert.doesNotMatch(css,/--battle-info-region-track/);
 assert.match(css,/grid-template-rows:\s*minmax\(0,var\(--battle-enemy-region-track\)\)[\s\S]*var\(--battle-ally-region-track\)/);
 assert.doesNotMatch(css,/battle-info-region/,"retired battle log UI must stay absent");
 assert.doesNotMatch(main,/function toggleBattleInfoPanel/,"retired battle log UI must stay absent");
-assert.match(css,/--battle-ally-row-gap:8px/);
+assert.match(css,/--battle-ally-row-gap:32px/);
 assert.match(css,/data-slot-row="back"\]\{bottom:0 !important;\}/);
 assert.match(css,/\.v174-unit-hud\[data-side="monster"\] \.battle-monster-name\{top:0 !important;bottom:auto !important/);
 assert.match(css,/\.v174-unit-hud :is\(\.battle-monster-name,\.battle-player-id\)\{[^}]*bottom:16px !important/);
