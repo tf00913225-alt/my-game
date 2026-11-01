@@ -194,7 +194,7 @@ Loading progress 以已完成 task 為準：boot shell、account UI、Auth SDK�
 | Boot JavaScript source | ≤ 45 KB |
 | Boot CSS source | ≤ 250 KB |
 | Controlled cold auth UI | ≤ 5 s |
-| Controlled warm existing-user city | ≤ 3 s CI hard ceiling；產品目標 ≤ 2 s |
+| Controlled cold / warm existing-user city | 自各自新文件的 navigation time origin 起至真正的 main-city-interactive mark，≤ 15 s；超過 15 s 或未達 READY／互動標記均失敗。冷啟動停用 HTTP cache；暖啟動啟用 cache 並經既有同 UID 恢復流程。 |
 
 `tests/boot-architecture.test.js`、`auth-before-character-creation.test.js`、`account-save-ownership.test.js`、`feature-loader-runtime.test.js`、`critical-feature-budget.test.js` 與 `.github/scripts/run-boot-architecture-browser-qa.mjs` 是永久 gate。部署後另由 `boot-live-browser-qa.mjs` 記錄實際 CDN/Firebase cold auth 數據；超過 5 秒必須報告實值與瓶頸，不得竄改或宣稱達標。
 

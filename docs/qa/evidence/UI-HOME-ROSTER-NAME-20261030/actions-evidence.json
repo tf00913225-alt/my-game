@@ -1,0 +1,3625 @@
+{
+  "passed": true,
+  "environment": "production-local",
+  "sha": null,
+  "evidence": [
+    {
+      "display": "360x800",
+      "count": 15,
+      "maxError": 0,
+      "center": {
+        "x": 540,
+        "y": 960
+      },
+      "stage": {
+        "x": 0,
+        "y": 80,
+        "width": 360,
+        "height": 640,
+        "top": 80,
+        "right": 360,
+        "bottom": 720,
+        "left": 0
+      },
+      "content": {
+        "x": 0,
+        "y": 80,
+        "width": 360,
+        "height": 639.9910888671875,
+        "top": 80,
+        "right": 360,
+        "bottom": 719.9910888671875,
+        "left": 0
+      },
+      "inlineLegacyTransform": "",
+      "viewportScroll": {
+        "left": 0,
+        "top": 0
+      },
+      "viewport": {
+        "width": 360,
+        "height": 800
+      },
+      "safe": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "diagnostics": {
+        "left": 0,
+        "top": 80,
+        "scale": 0.3333333333333333
+      },
+      "document": {
+        "width": 360,
+        "height": 800,
+        "scrollWidth": 360,
+        "scrollHeight": 800
+      }
+    },
+    {
+      "display": "1366x768",
+      "count": 15,
+      "maxError": 5.684341886080802e-14,
+      "center": {
+        "x": 540,
+        "y": 960
+      },
+      "stage": {
+        "x": 467,
+        "y": 0,
+        "width": 432,
+        "height": 768,
+        "top": 0,
+        "right": 899,
+        "bottom": 768,
+        "left": 467
+      },
+      "content": {
+        "x": 467,
+        "y": 0,
+        "width": 432,
+        "height": 767.9892578125,
+        "top": 0,
+        "right": 899,
+        "bottom": 767.9892578125,
+        "left": 467
+      },
+      "inlineLegacyTransform": "",
+      "viewportScroll": {
+        "left": 0,
+        "top": 0
+      },
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "safe": {
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      },
+      "diagnostics": {
+        "left": 467,
+        "top": 0,
+        "scale": 0.4
+      },
+      "document": {
+        "width": 1366,
+        "height": 768,
+        "scrollWidth": 1366,
+        "scrollHeight": 768
+      }
+    },
+    {
+      "display": "asymmetric-safe-area",
+      "count": 15,
+      "maxError": 2.2737367544323206e-13,
+      "center": {
+        "x": 540,
+        "y": 960.0000000000001
+      },
+      "stage": {
+        "x": 469.34375,
+        "y": 20,
+        "width": 403.3125,
+        "height": 717,
+        "top": 20,
+        "right": 872.65625,
+        "bottom": 737,
+        "left": 469.34375
+      },
+      "content": {
+        "x": 469.34375,
+        "y": 20,
+        "width": 403.3125,
+        "height": 716.989990234375,
+        "top": 20,
+        "right": 872.65625,
+        "bottom": 736.989990234375,
+        "left": 469.34375
+      },
+      "inlineLegacyTransform": "",
+      "viewportScroll": {
+        "left": 0,
+        "top": 0
+      },
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "safe": {
+        "top": 20,
+        "right": 41,
+        "bottom": 31,
+        "left": 17
+      },
+      "diagnostics": {
+        "left": 469.34375,
+        "top": 20,
+        "scale": 0.3734375
+      },
+      "document": {
+        "width": 1366,
+        "height": 768,
+        "scrollWidth": 1366,
+        "scrollHeight": 768
+      }
+    },
+    {
+      "homeControls": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "visual": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "scroll": 0,
+        "scrollOwner": "hidden",
+        "oldBackground": false,
+        "badge": true
+      },
+      "controls": [
+        {
+          "selector": ".home-card[aria-label=\"角色\"]",
+          "rect": {
+            "left": 6,
+            "top": 344.953125,
+            "right": 54,
+            "bottom": 392.953125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"商店\"]",
+          "rect": {
+            "left": 6,
+            "top": 441.203125,
+            "right": 54,
+            "bottom": 489.203125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"英雄系統\"]",
+          "rect": {
+            "left": 6,
+            "top": 393.078125,
+            "right": 54,
+            "bottom": 441.078125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"合成\"]",
+          "rect": {
+            "left": 306,
+            "top": 489.3333435058594,
+            "right": 354,
+            "bottom": 537.3333740234375,
+            "width": 48,
+            "height": 48.000030517578125
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"任務\"]",
+          "rect": {
+            "left": 6,
+            "top": 489.3333435058594,
+            "right": 54,
+            "bottom": 537.3333740234375,
+            "width": 48,
+            "height": 48.000030517578125
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"鍛造\"]",
+          "rect": {
+            "left": 306,
+            "top": 441.203125,
+            "right": 354,
+            "bottom": 489.203125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"成就\"]",
+          "rect": {
+            "left": 9,
+            "top": 549.6666870117188,
+            "right": 94.5,
+            "bottom": 591.6666870117188,
+            "width": 85.5,
+            "height": 42
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"公告\"]",
+          "rect": {
+            "left": 94.5,
+            "top": 549.6666870117188,
+            "right": 180,
+            "bottom": 591.6666870117188,
+            "width": 85.5,
+            "height": 42
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"離線經驗\"]",
+          "rect": {
+            "left": 180,
+            "top": 549.6666870117188,
+            "right": 265.5,
+            "bottom": 591.6666870117188,
+            "width": 85.5,
+            "height": 42
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"系統\"]",
+          "rect": {
+            "left": 265.5,
+            "top": 549.6666870117188,
+            "right": 351,
+            "bottom": 591.6666870117188,
+            "width": 85.5,
+            "height": 42
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"秘寶\"]",
+          "rect": {
+            "left": 306,
+            "top": 344.953125,
+            "right": 354,
+            "bottom": 392.953125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"元素匣\"]",
+          "rect": {
+            "left": 306,
+            "top": 393.078125,
+            "right": 354,
+            "bottom": 441.078125,
+            "width": 48,
+            "height": 48
+          },
+          "hit": true
+        },
+        {
+          "selector": "#v146HomeRoster",
+          "rect": {
+            "left": 0,
+            "top": 181.953125,
+            "right": 360,
+            "bottom": 336.2864685058594,
+            "width": 360,
+            "height": 154.33334350585938
+          },
+          "hit": true
+        },
+        {
+          "selector": ".v-fixed-formation-entry",
+          "rect": {
+            "left": 296,
+            "top": 181.953125,
+            "right": 350,
+            "bottom": 225.953125,
+            "width": 54,
+            "height": 44
+          },
+          "hit": true
+        },
+        {
+          "selector": "#adventureHomeEntry",
+          "rect": {
+            "left": 80,
+            "top": 486.8020935058594,
+            "right": 196.6666717529297,
+            "bottom": 539.3333740234375,
+            "width": 116.66667175292969,
+            "height": 52.531280517578125
+          },
+          "hit": true
+        }
+      ]
+    },
+    {
+      "longRosterNames": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "names": [
+        {
+          "text": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 10,
+            "y": 231.953125,
+            "width": 108,
+            "height": 56,
+            "top": 231.953125,
+            "right": 118,
+            "bottom": 287.953125,
+            "left": 10
+          },
+          "level": {
+            "x": 87.19792175292969,
+            "y": 289.953125,
+            "width": 30.802078247070312,
+            "height": 18,
+            "top": 289.953125,
+            "right": 118,
+            "bottom": 307.953125,
+            "left": 87.19792175292969
+          },
+          "ellipsis": "clip"
+        },
+        {
+          "text": "春夏秋冬東南西北風雨雷電山海雲霧",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 126,
+            "y": 231.953125,
+            "width": 108,
+            "height": 56,
+            "top": 231.953125,
+            "right": 234,
+            "bottom": 287.953125,
+            "left": 126
+          },
+          "level": {
+            "x": 203.1979217529297,
+            "y": 289.953125,
+            "width": 30.802078247070312,
+            "height": 18,
+            "top": 289.953125,
+            "right": 234,
+            "bottom": 307.953125,
+            "left": 203.1979217529297
+          },
+          "ellipsis": "clip"
+        },
+        {
+          "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 242,
+            "y": 231.953125,
+            "width": 108,
+            "height": 56,
+            "top": 231.953125,
+            "right": 350,
+            "bottom": 287.953125,
+            "left": 242
+          },
+          "level": {
+            "x": 319.19793701171875,
+            "y": 289.953125,
+            "width": 30.80206298828125,
+            "height": 18,
+            "top": 289.953125,
+            "right": 350,
+            "bottom": 307.953125,
+            "left": 319.19793701171875
+          },
+          "ellipsis": "clip"
+        }
+      ]
+    },
+    {
+      "homeEntryActions": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "formationOpenedAndClosed": true,
+      "characterOpenedAndClosed": true
+    },
+    {
+      "homeResourceText": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "resourceText": [
+        {
+          "box": {
+            "x": 105.828125,
+            "y": 123.53646087646484,
+            "width": 96.921875,
+            "height": 22.333335876464844,
+            "top": 123.53646087646484,
+            "right": 202.75,
+            "bottom": 145.8697967529297,
+            "left": 105.828125
+          },
+          "text": {
+            "x": 105.828125,
+            "y": 123.53646087646484,
+            "width": 96.921875,
+            "height": 22.00000762939453,
+            "top": 123.53646087646484,
+            "right": 202.75,
+            "bottom": 145.53646850585938,
+            "left": 105.828125
+          },
+          "overflow": 0,
+          "font": 39
+        },
+        {
+          "box": {
+            "x": 210.75,
+            "y": 123.53646087646484,
+            "width": 139.25,
+            "height": 22.333335876464844,
+            "top": 123.53646087646484,
+            "right": 350,
+            "bottom": 145.8697967529297,
+            "left": 210.75
+          },
+          "text": {
+            "x": 210.75,
+            "y": 123.53646087646484,
+            "width": 139.25,
+            "height": 22.00000762939453,
+            "top": 123.53646087646484,
+            "right": 350,
+            "bottom": 145.53646850585938,
+            "left": 210.75
+          },
+          "overflow": 0,
+          "font": 39
+        }
+      ]
+    },
+    {
+      "proportions": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "composition": {
+        "rails": {
+          "left": 6,
+          "right": 354,
+          "top": 344.953125,
+          "bottom": 537.3333740234375,
+          "width": 348
+        },
+        "utility": {
+          "left": 6,
+          "right": 354,
+          "top": 549.3333740234375,
+          "bottom": 591.3333740234375,
+          "width": 348
+        },
+        "adventure": {
+          "left": 80,
+          "right": 196.6666717529297,
+          "top": 486.8020935058594,
+          "bottom": 539.3333740234375,
+          "width": 116.66667175292969
+        },
+        "roster": {
+          "left": 0,
+          "right": 360,
+          "top": 181.953125,
+          "bottom": 336.2864685058594,
+          "width": 360
+        },
+        "relic": {
+          "left": 6,
+          "right": 354,
+          "top": 594.6666870117188,
+          "bottom": 644,
+          "width": 348
+        },
+        "columns": "324px 324px 324px",
+        "people": 3,
+        "portraits": 3,
+        "side": 8,
+        "tools": 4,
+        "collections": [
+          {
+            "height": 48,
+            "width": 48
+          },
+          {
+            "height": 48,
+            "width": 48
+          }
+        ],
+        "entries": [
+          {
+            "label": "角色",
+            "rect": {
+              "x": 6,
+              "y": 344.953125,
+              "width": 48,
+              "height": 48,
+              "top": 344.953125,
+              "right": 54,
+              "bottom": 392.953125,
+              "left": 6
+            }
+          },
+          {
+            "label": "英雄系統",
+            "rect": {
+              "x": 6,
+              "y": 393.078125,
+              "width": 48,
+              "height": 48,
+              "top": 393.078125,
+              "right": 54,
+              "bottom": 441.078125,
+              "left": 6
+            }
+          },
+          {
+            "label": "商店",
+            "rect": {
+              "x": 6,
+              "y": 441.203125,
+              "width": 48,
+              "height": 48,
+              "top": 441.203125,
+              "right": 54,
+              "bottom": 489.203125,
+              "left": 6
+            }
+          },
+          {
+            "label": "任務",
+            "rect": {
+              "x": 6,
+              "y": 489.3333435058594,
+              "width": 48,
+              "height": 48.000030517578125,
+              "top": 489.3333435058594,
+              "right": 54,
+              "bottom": 537.3333740234375,
+              "left": 6
+            }
+          },
+          {
+            "label": "秘寶",
+            "rect": {
+              "x": 306,
+              "y": 344.953125,
+              "width": 48,
+              "height": 48,
+              "top": 344.953125,
+              "right": 354,
+              "bottom": 392.953125,
+              "left": 306
+            }
+          },
+          {
+            "label": "元素匣",
+            "rect": {
+              "x": 306,
+              "y": 393.078125,
+              "width": 48,
+              "height": 48,
+              "top": 393.078125,
+              "right": 354,
+              "bottom": 441.078125,
+              "left": 306
+            }
+          },
+          {
+            "label": "鍛造",
+            "rect": {
+              "x": 306,
+              "y": 441.203125,
+              "width": 48,
+              "height": 48,
+              "top": 441.203125,
+              "right": 354,
+              "bottom": 489.203125,
+              "left": 306
+            }
+          },
+          {
+            "label": "合成",
+            "rect": {
+              "x": 306,
+              "y": 489.3333435058594,
+              "width": 48,
+              "height": 48.000030517578125,
+              "top": 489.3333435058594,
+              "right": 354,
+              "bottom": 537.3333740234375,
+              "left": 306
+            }
+          },
+          {
+            "label": "成就",
+            "rect": {
+              "x": 9,
+              "y": 549.6666870117188,
+              "width": 85.5,
+              "height": 42,
+              "top": 549.6666870117188,
+              "right": 94.5,
+              "bottom": 591.6666870117188,
+              "left": 9
+            }
+          },
+          {
+            "label": "公告",
+            "rect": {
+              "x": 94.5,
+              "y": 549.6666870117188,
+              "width": 85.5,
+              "height": 42,
+              "top": 549.6666870117188,
+              "right": 180,
+              "bottom": 591.6666870117188,
+              "left": 94.5
+            }
+          },
+          {
+            "label": "離線經驗",
+            "rect": {
+              "x": 180,
+              "y": 549.6666870117188,
+              "width": 85.5,
+              "height": 42,
+              "top": 549.6666870117188,
+              "right": 265.5,
+              "bottom": 591.6666870117188,
+              "left": 180
+            }
+          },
+          {
+            "label": "系統",
+            "rect": {
+              "x": 265.5,
+              "y": 549.6666870117188,
+              "width": 85.5,
+              "height": 42,
+              "top": 549.6666870117188,
+              "right": 351,
+              "bottom": 591.6666870117188,
+              "left": 265.5
+            }
+          },
+          {
+            "label": "出城冒險，江湖主線章節推進",
+            "rect": {
+              "x": 80,
+              "y": 486.8020935058594,
+              "width": 116.66667175292969,
+              "height": 52.531280517578125,
+              "top": 486.8020935058594,
+              "right": 196.6666717529297,
+              "bottom": 539.3333740234375,
+              "left": 80
+            }
+          }
+        ]
+      },
+      "density": {
+        "height": 572,
+        "slot": 182,
+        "gap": 12,
+        "populated": 24,
+        "slots": 6
+      }
+    },
+    {
+      "visual": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "scroll": 0,
+        "scrollOwner": "hidden",
+        "oldBackground": false,
+        "badge": true
+      },
+      "characterTabs": [
+        {
+          "tab": "expPool",
+          "tabBottom": 323.25,
+          "contentTop": 329.25,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        },
+        {
+          "tab": "status",
+          "tabBottom": 323.25,
+          "contentTop": 329.25,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        },
+        {
+          "tab": "skill",
+          "tabBottom": 323.25,
+          "contentTop": 329.25,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        }
+      ],
+      "first": {
+        "top": 627.9479370117188,
+        "bottom": 811.9479370117188,
+        "visibleTop": 329.25,
+        "visibleBottom": 697
+      },
+      "reopen": true,
+      "viewport": [
+        360,
+        800
+      ]
+    },
+    {
+      "generalUi": true,
+      "viewport": [
+        360,
+        800
+      ],
+      "home": {
+        "selector": "#homePage",
+        "rect": {
+          "left": 0,
+          "top": 80,
+          "right": 360,
+          "bottom": 648,
+          "width": 360,
+          "height": 568
+        },
+        "clips": [
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 45,
+        "projectedFont": 15,
+        "display": "grid",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1704,
+        "clientHeight": 1704,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "1044px",
+        "boxSizing": "border-box",
+        "padding": "0px 18px 12px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "HEADER",
+            "class": "home-city-hud",
+            "rect": {
+              "x": 0,
+              "y": 80,
+              "width": 360,
+              "height": 98.61979675292969,
+              "top": 80,
+              "right": 360,
+              "bottom": 178.6197967529297,
+              "left": 0
+            }
+          },
+          {
+            "tag": "SECTION",
+            "class": "v146-home-roster",
+            "rect": {
+              "x": 0,
+              "y": 181.953125,
+              "width": 360,
+              "height": 154.33334350585938,
+              "top": 181.953125,
+              "right": 360,
+              "bottom": 336.2864685058594,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "home-card-grid",
+            "rect": {
+              "x": 6,
+              "y": 339.61981201171875,
+              "width": 348,
+              "height": 251.71356201171875,
+              "top": 339.61981201171875,
+              "right": 354,
+              "bottom": 591.3333740234375,
+              "left": 6
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "card",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "card",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "exp-pool-panel",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "adventure-home-axis",
+            "rect": {
+              "x": 6,
+              "y": 339.61981201171875,
+              "width": 348,
+              "height": 251.71356201171875,
+              "top": 339.61981201171875,
+              "right": 354,
+              "bottom": 591.3333740234375,
+              "left": 6
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-loadout-slot",
+            "rect": {
+              "x": 6,
+              "y": 594.6666870117188,
+              "width": 348,
+              "height": 49.33331298828125,
+              "top": 594.6666870117188,
+              "right": 354,
+              "bottom": 644,
+              "left": 6
+            }
+          }
+        ],
+        "mode": null
+      },
+      "nav": {
+        "selector": "#bottomNav",
+        "rect": {
+          "left": 0,
+          "top": 648,
+          "right": 360,
+          "bottom": 720,
+          "width": 360,
+          "height": 72
+        },
+        "clips": [
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 16,
+        "projectedFont": 5.333333333333333,
+        "display": "grid",
+        "overflowX": "visible",
+        "overflowY": "visible",
+        "overflow": 0,
+        "scrollHeight": 214,
+        "clientHeight": 214,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "216px 216px 216px 216px 216px",
+        "boxSizing": "border-box",
+        "padding": "0px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 0,
+              "y": 648.6666870117188,
+              "width": 72,
+              "height": 71.33331298828125,
+              "top": 648.6666870117188,
+              "right": 72,
+              "bottom": 720,
+              "left": 0
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 72,
+              "y": 648.6666870117188,
+              "width": 72,
+              "height": 71.33331298828125,
+              "top": 648.6666870117188,
+              "right": 144,
+              "bottom": 720,
+              "left": 72
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button active nav-art-button-wrap",
+            "rect": {
+              "x": 144,
+              "y": 648.6666870117188,
+              "width": 72,
+              "height": 71.33331298828125,
+              "top": 648.6666870117188,
+              "right": 216,
+              "bottom": 720,
+              "left": 144
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 216,
+              "y": 648.6666870117188,
+              "width": 72,
+              "height": 71.33331298828125,
+              "top": 648.6666870117188,
+              "right": 288,
+              "bottom": 720,
+              "left": 216
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 288,
+              "y": 648.6666870117188,
+              "width": 72,
+              "height": 71.33331298828125,
+              "top": 648.6666870117188,
+              "right": 360,
+              "bottom": 720,
+              "left": 288
+            }
+          }
+        ],
+        "mode": null
+      },
+      "bag": {
+        "selector": "#inventoryPage",
+        "rect": {
+          "left": 0,
+          "top": 80,
+          "right": 360,
+          "bottom": 720,
+          "width": 360,
+          "height": 640
+        },
+        "clips": [
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 45,
+        "projectedFont": 15,
+        "display": "block",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1920,
+        "clientHeight": 1920,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "none",
+        "boxSizing": "border-box",
+        "padding": "24px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "inventory-classic-shell",
+            "rect": {
+              "x": 8,
+              "y": 88,
+              "width": 344,
+              "height": 624,
+              "top": 88,
+              "right": 352,
+              "bottom": 712,
+              "left": 8
+            }
+          }
+        ],
+        "mode": null
+      },
+      "character": {
+        "selector": "#homeFeatureModal .home-feature-modal-box",
+        "rect": {
+          "left": 16,
+          "top": 96,
+          "right": 344,
+          "bottom": 704,
+          "width": 328,
+          "height": 608
+        },
+        "clips": [
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 45,
+        "projectedFont": 15,
+        "display": "flex",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1818,
+        "clientHeight": 1818,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "none",
+        "boxSizing": "border-box",
+        "padding": "18px",
+        "width": "984px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "home-feature-modal-title",
+            "rect": {
+              "x": 23,
+              "y": 103,
+              "width": 314,
+              "height": 38,
+              "top": 103,
+              "right": 337,
+              "bottom": 141,
+              "left": 23
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "",
+            "rect": {
+              "x": 23,
+              "y": 151,
+              "width": 314,
+              "height": 546,
+              "top": 151,
+              "right": 337,
+              "bottom": 697,
+              "left": 23
+            }
+          }
+        ],
+        "mode": null
+      },
+      "domain": {
+        "parent": "game-ui",
+        "ancestors": [
+          "none",
+          "none",
+          "none",
+          "matrix(0.333333, 0, 0, 0.333333, 0, 0)",
+          "none",
+          "none",
+          "none"
+        ],
+        "navParent": "game-overlay-layer",
+        "resources": [
+          42,
+          42,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39
+        ]
+      },
+      "entrance": {
+        "hit": true,
+        "covered": []
+      },
+      "shopGrid": {
+        "selector": ".shop-potion-list",
+        "rect": {
+          "left": 29,
+          "top": 319.796875,
+          "right": 331,
+          "bottom": 679,
+          "width": 302,
+          "height": 359.203125
+        },
+        "clips": [
+          {
+            "left": 29,
+            "top": 273.796875,
+            "right": 331,
+            "bottom": 679
+          },
+          {
+            "left": 29,
+            "top": 169,
+            "right": 331,
+            "bottom": 679
+          },
+          {
+            "left": 29,
+            "top": 169,
+            "right": 331,
+            "bottom": 679
+          },
+          {
+            "left": 12,
+            "top": 104,
+            "right": 348,
+            "bottom": 696
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 45,
+        "projectedFont": 15,
+        "display": "grid",
+        "overflowX": "hidden",
+        "overflowY": "auto",
+        "overflow": 0,
+        "scrollHeight": 2790,
+        "clientHeight": 1078,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "906px",
+        "boxSizing": "border-box",
+        "padding": "0px",
+        "width": "906px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 29,
+              "y": 319.796875,
+              "width": 302,
+              "height": 150,
+              "top": 319.796875,
+              "right": 331,
+              "bottom": 469.796875,
+              "left": 29
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 29,
+              "y": 475.796875,
+              "width": 302,
+              "height": 150,
+              "top": 475.796875,
+              "right": 331,
+              "bottom": 625.796875,
+              "left": 29
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 29,
+              "y": 631.796875,
+              "width": 302,
+              "height": 150,
+              "top": 631.796875,
+              "right": 331,
+              "bottom": 781.796875,
+              "left": 29
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 29,
+              "y": 787.796875,
+              "width": 302,
+              "height": 150,
+              "top": 787.796875,
+              "right": 331,
+              "bottom": 937.796875,
+              "left": 29
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 29,
+              "y": 943.796875,
+              "width": 302,
+              "height": 150,
+              "top": 943.796875,
+              "right": 331,
+              "bottom": 1093.796875,
+              "left": 29
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 29,
+              "y": 1099.796875,
+              "width": 302,
+              "height": 150,
+              "top": 1099.796875,
+              "right": 331,
+              "bottom": 1249.796875,
+              "left": 29
+            }
+          }
+        ],
+        "mode": null
+      },
+      "relicGrid": {
+        "selector": ".team-relic-grid",
+        "rect": {
+          "left": 25,
+          "top": 391.66668701171875,
+          "right": 335,
+          "bottom": 4313.666931152344,
+          "width": 310,
+          "height": 3922.000244140625
+        },
+        "clips": [
+          {
+            "left": 16,
+            "top": 152,
+            "right": 344,
+            "bottom": 702
+          },
+          {
+            "left": 8,
+            "top": 90,
+            "right": 352,
+            "bottom": 710
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 80,
+            "right": 360,
+            "bottom": 720
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 360,
+            "bottom": 800
+          }
+        ],
+        "font": 45,
+        "projectedFont": 15,
+        "display": "grid",
+        "overflowX": "visible",
+        "overflowY": "visible",
+        "overflow": 0,
+        "scrollHeight": 11766,
+        "clientHeight": 11766,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "930px",
+        "boxSizing": "border-box",
+        "padding": "0px 0px 42px",
+        "width": "930px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-four-symbol unlocked",
+            "rect": {
+              "x": 25,
+              "y": 391.66668701171875,
+              "width": 310,
+              "height": 184,
+              "top": 391.66668701171875,
+              "right": 335,
+              "bottom": 575.6666870117188,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-pink unlocked",
+            "rect": {
+              "x": 25,
+              "y": 587.6666870117188,
+              "width": 310,
+              "height": 184,
+              "top": 587.6666870117188,
+              "right": 335,
+              "bottom": 771.6666870117188,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 25,
+              "y": 783.6666870117188,
+              "width": 310,
+              "height": 184,
+              "top": 783.6666870117188,
+              "right": 335,
+              "bottom": 967.6666870117188,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 25,
+              "y": 979.6666870117188,
+              "width": 310,
+              "height": 184.00006103515625,
+              "top": 979.6666870117188,
+              "right": 335,
+              "bottom": 1163.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 25,
+              "y": 1175.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 1175.666748046875,
+              "right": 335,
+              "bottom": 1359.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 25,
+              "y": 1371.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 1371.666748046875,
+              "right": 335,
+              "bottom": 1555.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 1567.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 1567.666748046875,
+              "right": 335,
+              "bottom": 1751.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 1763.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 1763.666748046875,
+              "right": 335,
+              "bottom": 1947.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 1959.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 1959.666748046875,
+              "right": 335,
+              "bottom": 2143.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 2155.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 2155.666748046875,
+              "right": 335,
+              "bottom": 2339.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 2351.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 2351.666748046875,
+              "right": 335,
+              "bottom": 2535.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 2547.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 2547.666748046875,
+              "right": 335,
+              "bottom": 2731.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 2743.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 2743.666748046875,
+              "right": 335,
+              "bottom": 2927.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 2939.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 2939.666748046875,
+              "right": 335,
+              "bottom": 3123.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 25,
+              "y": 3135.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 3135.666748046875,
+              "right": 335,
+              "bottom": 3319.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 25,
+              "y": 3331.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 3331.666748046875,
+              "right": 335,
+              "bottom": 3515.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 25,
+              "y": 3527.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 3527.666748046875,
+              "right": 335,
+              "bottom": 3711.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 25,
+              "y": 3723.666748046875,
+              "width": 310,
+              "height": 184,
+              "top": 3723.666748046875,
+              "right": 335,
+              "bottom": 3907.666748046875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 25,
+              "y": 3919.666748046875,
+              "width": 310,
+              "height": 184.000244140625,
+              "top": 3919.666748046875,
+              "right": 335,
+              "bottom": 4103.6669921875,
+              "left": 25
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 25,
+              "y": 4115.6669921875,
+              "width": 310,
+              "height": 184,
+              "top": 4115.6669921875,
+              "right": 335,
+              "bottom": 4299.6669921875,
+              "left": 25
+            }
+          }
+        ],
+        "mode": null
+      }
+    },
+    {
+      "homeControls": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "visual": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "scroll": 0,
+        "scrollOwner": "hidden",
+        "oldBackground": false,
+        "badge": true
+      },
+      "controls": [
+        {
+          "selector": ".home-card[aria-label=\"角色\"]",
+          "rect": {
+            "left": 474.20001220703125,
+            "top": 317.9437561035156,
+            "right": 531.7999877929688,
+            "bottom": 375.54376220703125,
+            "width": 57.5999755859375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"商店\"]",
+          "rect": {
+            "left": 474.20001220703125,
+            "top": 433.4437561035156,
+            "right": 531.7999877929688,
+            "bottom": 491.04376220703125,
+            "width": 57.5999755859375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"英雄系統\"]",
+          "rect": {
+            "left": 474.20001220703125,
+            "top": 375.6937561035156,
+            "right": 531.7999877929688,
+            "bottom": 433.29376220703125,
+            "width": 57.5999755859375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"合成\"]",
+          "rect": {
+            "left": 834.2000122070312,
+            "top": 491.20001220703125,
+            "right": 891.800048828125,
+            "bottom": 548.7999877929688,
+            "width": 57.60003662109375,
+            "height": 57.5999755859375
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"任務\"]",
+          "rect": {
+            "left": 474.20001220703125,
+            "top": 491.20001220703125,
+            "right": 531.7999877929688,
+            "bottom": 548.7999877929688,
+            "width": 57.5999755859375,
+            "height": 57.5999755859375
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"鍛造\"]",
+          "rect": {
+            "left": 834.2000122070312,
+            "top": 433.4437561035156,
+            "right": 891.800048828125,
+            "bottom": 491.04376220703125,
+            "width": 57.60003662109375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"成就\"]",
+          "rect": {
+            "left": 477.79998779296875,
+            "top": 563.6000366210938,
+            "right": 580.4000244140625,
+            "bottom": 614,
+            "width": 102.60003662109375,
+            "height": 50.39996337890625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"公告\"]",
+          "rect": {
+            "left": 580.4000244140625,
+            "top": 563.6000366210938,
+            "right": 683,
+            "bottom": 614,
+            "width": 102.5999755859375,
+            "height": 50.39996337890625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"離線經驗\"]",
+          "rect": {
+            "left": 683,
+            "top": 563.6000366210938,
+            "right": 785.5999755859375,
+            "bottom": 614,
+            "width": 102.5999755859375,
+            "height": 50.39996337890625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"系統\"]",
+          "rect": {
+            "left": 785.5999755859375,
+            "top": 563.6000366210938,
+            "right": 888.2000122070312,
+            "bottom": 614,
+            "width": 102.60003662109375,
+            "height": 50.39996337890625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"秘寶\"]",
+          "rect": {
+            "left": 834.2000122070312,
+            "top": 317.9437561035156,
+            "right": 891.800048828125,
+            "bottom": 375.54376220703125,
+            "width": 57.60003662109375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": ".home-card[aria-label=\"元素匣\"]",
+          "rect": {
+            "left": 834.2000122070312,
+            "top": 375.6937561035156,
+            "right": 891.800048828125,
+            "bottom": 433.29376220703125,
+            "width": 57.60003662109375,
+            "height": 57.600006103515625
+          },
+          "hit": true
+        },
+        {
+          "selector": "#v146HomeRoster",
+          "rect": {
+            "left": 467,
+            "top": 122.34375,
+            "right": 899,
+            "bottom": 307.54376220703125,
+            "width": 432,
+            "height": 185.20001220703125
+          },
+          "hit": true
+        },
+        {
+          "selector": ".v-fixed-formation-entry",
+          "rect": {
+            "left": 822.2000122070312,
+            "top": 122.34375,
+            "right": 887,
+            "bottom": 175.1437530517578,
+            "width": 64.79998779296875,
+            "height": 52.80000305175781
+          },
+          "hit": true
+        },
+        {
+          "selector": "#adventureHomeEntry",
+          "rect": {
+            "left": 563,
+            "top": 488.1625061035156,
+            "right": 703,
+            "bottom": 551.2000122070312,
+            "width": 140,
+            "height": 63.037506103515625
+          },
+          "hit": true
+        }
+      ]
+    },
+    {
+      "longRosterNames": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "names": [
+        {
+          "text": "天地玄黃宇宙洪荒日月盈昃辰宿列張",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 479,
+            "y": 182.34375,
+            "width": 129.5999755859375,
+            "height": 67.19999694824219,
+            "top": 182.34375,
+            "right": 608.5999755859375,
+            "bottom": 249.5437469482422,
+            "left": 479
+          },
+          "level": {
+            "x": 571.6375122070312,
+            "y": 251.94375610351562,
+            "width": 36.96246337890625,
+            "height": 21.600006103515625,
+            "top": 251.94375610351562,
+            "right": 608.5999755859375,
+            "bottom": 273.54376220703125,
+            "left": 571.6375122070312
+          },
+          "ellipsis": "clip"
+        },
+        {
+          "text": "春夏秋冬東南西北風雨雷電山海雲霧",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 618.2000122070312,
+            "y": 182.34375,
+            "width": 129.60003662109375,
+            "height": 67.19999694824219,
+            "top": 182.34375,
+            "right": 747.800048828125,
+            "bottom": 249.5437469482422,
+            "left": 618.2000122070312
+          },
+          "level": {
+            "x": 710.8375244140625,
+            "y": 251.94375610351562,
+            "width": 36.9625244140625,
+            "height": 21.600006103515625,
+            "top": 251.94375610351562,
+            "right": 747.800048828125,
+            "bottom": 273.54376220703125,
+            "left": 710.8375244140625
+          },
+          "ellipsis": "clip"
+        },
+        {
+          "text": "甲乙丙丁戊己庚辛壬癸子丑寅卯辰巳",
+          "scrollWidth": 324,
+          "clientWidth": 324,
+          "scrollHeight": 168,
+          "clientHeight": 168,
+          "rect": {
+            "x": 757.4000244140625,
+            "y": 182.34375,
+            "width": 129.5999755859375,
+            "height": 67.19999694824219,
+            "top": 182.34375,
+            "right": 887,
+            "bottom": 249.5437469482422,
+            "left": 757.4000244140625
+          },
+          "level": {
+            "x": 850.0374755859375,
+            "y": 251.94375610351562,
+            "width": 36.9625244140625,
+            "height": 21.600006103515625,
+            "top": 251.94375610351562,
+            "right": 887,
+            "bottom": 273.54376220703125,
+            "left": 850.0374755859375
+          },
+          "ellipsis": "clip"
+        }
+      ]
+    },
+    {
+      "homeEntryActions": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "formationOpenedAndClosed": true,
+      "characterOpenedAndClosed": true
+    },
+    {
+      "homeResourceText": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "resourceText": [
+        {
+          "box": {
+            "x": 593.9937744140625,
+            "y": 52.243751525878906,
+            "width": 116.30621337890625,
+            "height": 26.800003051757812,
+            "top": 52.243751525878906,
+            "right": 710.2999877929688,
+            "bottom": 79.04375457763672,
+            "left": 593.9937744140625
+          },
+          "text": {
+            "x": 593.9937744140625,
+            "y": 52.243751525878906,
+            "width": 116.30621337890625,
+            "height": 26.400001525878906,
+            "top": 52.243751525878906,
+            "right": 710.2999877929688,
+            "bottom": 78.64375305175781,
+            "left": 593.9937744140625
+          },
+          "overflow": 0,
+          "font": 39
+        },
+        {
+          "box": {
+            "x": 719.9000244140625,
+            "y": 52.243751525878906,
+            "width": 167.0999755859375,
+            "height": 26.800003051757812,
+            "top": 52.243751525878906,
+            "right": 887,
+            "bottom": 79.04375457763672,
+            "left": 719.9000244140625
+          },
+          "text": {
+            "x": 719.9000244140625,
+            "y": 52.243751525878906,
+            "width": 167.0999755859375,
+            "height": 26.400001525878906,
+            "top": 52.243751525878906,
+            "right": 887,
+            "bottom": 78.64375305175781,
+            "left": 719.9000244140625
+          },
+          "overflow": 0,
+          "font": 39
+        }
+      ]
+    },
+    {
+      "proportions": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "composition": {
+        "rails": {
+          "left": 474.20001220703125,
+          "right": 891.800048828125,
+          "top": 317.9437561035156,
+          "bottom": 548.7999877929688,
+          "width": 417.60003662109375
+        },
+        "utility": {
+          "left": 474.20001220703125,
+          "right": 891.800048828125,
+          "top": 563.2000122070312,
+          "bottom": 613.6000366210938,
+          "width": 417.60003662109375
+        },
+        "adventure": {
+          "left": 563,
+          "right": 703,
+          "top": 488.1625061035156,
+          "bottom": 551.2000122070312,
+          "width": 140
+        },
+        "roster": {
+          "left": 467,
+          "right": 899,
+          "top": 122.34375,
+          "bottom": 307.54376220703125,
+          "width": 432
+        },
+        "relic": {
+          "left": 474.20001220703125,
+          "right": 891.800048828125,
+          "top": 617.6000366210938,
+          "bottom": 676.7999877929688,
+          "width": 417.60003662109375
+        },
+        "columns": "324px 324px 324px",
+        "people": 3,
+        "portraits": 3,
+        "side": 8,
+        "tools": 4,
+        "collections": [
+          {
+            "height": 57.600006103515625,
+            "width": 57.60003662109375
+          },
+          {
+            "height": 57.600006103515625,
+            "width": 57.60003662109375
+          }
+        ],
+        "entries": [
+          {
+            "label": "角色",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 317.9437561035156,
+              "width": 57.5999755859375,
+              "height": 57.600006103515625,
+              "top": 317.9437561035156,
+              "right": 531.7999877929688,
+              "bottom": 375.54376220703125,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "label": "英雄系統",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 375.6937561035156,
+              "width": 57.5999755859375,
+              "height": 57.600006103515625,
+              "top": 375.6937561035156,
+              "right": 531.7999877929688,
+              "bottom": 433.29376220703125,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "label": "商店",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 433.4437561035156,
+              "width": 57.5999755859375,
+              "height": 57.600006103515625,
+              "top": 433.4437561035156,
+              "right": 531.7999877929688,
+              "bottom": 491.04376220703125,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "label": "任務",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 491.20001220703125,
+              "width": 57.5999755859375,
+              "height": 57.5999755859375,
+              "top": 491.20001220703125,
+              "right": 531.7999877929688,
+              "bottom": 548.7999877929688,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "label": "秘寶",
+            "rect": {
+              "x": 834.2000122070312,
+              "y": 317.9437561035156,
+              "width": 57.60003662109375,
+              "height": 57.600006103515625,
+              "top": 317.9437561035156,
+              "right": 891.800048828125,
+              "bottom": 375.54376220703125,
+              "left": 834.2000122070312
+            }
+          },
+          {
+            "label": "元素匣",
+            "rect": {
+              "x": 834.2000122070312,
+              "y": 375.6937561035156,
+              "width": 57.60003662109375,
+              "height": 57.600006103515625,
+              "top": 375.6937561035156,
+              "right": 891.800048828125,
+              "bottom": 433.29376220703125,
+              "left": 834.2000122070312
+            }
+          },
+          {
+            "label": "鍛造",
+            "rect": {
+              "x": 834.2000122070312,
+              "y": 433.4437561035156,
+              "width": 57.60003662109375,
+              "height": 57.600006103515625,
+              "top": 433.4437561035156,
+              "right": 891.800048828125,
+              "bottom": 491.04376220703125,
+              "left": 834.2000122070312
+            }
+          },
+          {
+            "label": "合成",
+            "rect": {
+              "x": 834.2000122070312,
+              "y": 491.20001220703125,
+              "width": 57.60003662109375,
+              "height": 57.5999755859375,
+              "top": 491.20001220703125,
+              "right": 891.800048828125,
+              "bottom": 548.7999877929688,
+              "left": 834.2000122070312
+            }
+          },
+          {
+            "label": "成就",
+            "rect": {
+              "x": 477.79998779296875,
+              "y": 563.6000366210938,
+              "width": 102.60003662109375,
+              "height": 50.39996337890625,
+              "top": 563.6000366210938,
+              "right": 580.4000244140625,
+              "bottom": 614,
+              "left": 477.79998779296875
+            }
+          },
+          {
+            "label": "公告",
+            "rect": {
+              "x": 580.4000244140625,
+              "y": 563.6000366210938,
+              "width": 102.5999755859375,
+              "height": 50.39996337890625,
+              "top": 563.6000366210938,
+              "right": 683,
+              "bottom": 614,
+              "left": 580.4000244140625
+            }
+          },
+          {
+            "label": "離線經驗",
+            "rect": {
+              "x": 683,
+              "y": 563.6000366210938,
+              "width": 102.5999755859375,
+              "height": 50.39996337890625,
+              "top": 563.6000366210938,
+              "right": 785.5999755859375,
+              "bottom": 614,
+              "left": 683
+            }
+          },
+          {
+            "label": "系統",
+            "rect": {
+              "x": 785.5999755859375,
+              "y": 563.6000366210938,
+              "width": 102.60003662109375,
+              "height": 50.39996337890625,
+              "top": 563.6000366210938,
+              "right": 888.2000122070312,
+              "bottom": 614,
+              "left": 785.5999755859375
+            }
+          },
+          {
+            "label": "出城冒險，江湖主線章節推進",
+            "rect": {
+              "x": 563,
+              "y": 488.1625061035156,
+              "width": 140,
+              "height": 63.037506103515625,
+              "top": 488.1625061035156,
+              "right": 703,
+              "bottom": 551.2000122070312,
+              "left": 563
+            }
+          }
+        ]
+      },
+      "density": {
+        "height": 572,
+        "slot": 182,
+        "gap": 12,
+        "populated": 24,
+        "slots": 6
+      }
+    },
+    {
+      "visual": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "scroll": 0,
+        "scrollOwner": "hidden",
+        "oldBackground": false,
+        "badge": true
+      },
+      "characterTabs": [
+        {
+          "tab": "expPool",
+          "tabBottom": 291.8999938964844,
+          "contentTop": 299.1000061035156,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        },
+        {
+          "tab": "status",
+          "tabBottom": 291.8999938964844,
+          "contentTop": 299.1000061035156,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        },
+        {
+          "tab": "skill",
+          "tabBottom": 291.8999938964844,
+          "contentTop": 299.1000061035156,
+          "overflowY": "auto",
+          "overflowX": "hidden",
+          "touch": "pan-y",
+          "outerScroll": 0
+        }
+      ],
+      "first": {
+        "top": 657.5375366210938,
+        "bottom": 878.3375244140625,
+        "visibleTop": 299.1000061035156,
+        "visibleBottom": 740.4000244140625
+      },
+      "reopen": true,
+      "viewport": [
+        1366,
+        768
+      ]
+    },
+    {
+      "generalUi": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "home": {
+        "selector": "#homePage",
+        "rect": {
+          "left": 467,
+          "top": 0,
+          "right": 899,
+          "bottom": 681.6000366210938,
+          "width": 432,
+          "height": 681.6000366210938
+        },
+        "clips": [
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 45,
+        "projectedFont": 18,
+        "display": "grid",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1704,
+        "clientHeight": 1704,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "1044px",
+        "boxSizing": "border-box",
+        "padding": "0px 18px 12px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "HEADER",
+            "class": "home-city-hud",
+            "rect": {
+              "x": 467,
+              "y": 0,
+              "width": 432,
+              "height": 118.34375,
+              "top": 0,
+              "right": 899,
+              "bottom": 118.34375,
+              "left": 467
+            }
+          },
+          {
+            "tag": "SECTION",
+            "class": "v146-home-roster",
+            "rect": {
+              "x": 467,
+              "y": 122.34375,
+              "width": 432,
+              "height": 185.20001220703125,
+              "top": 122.34375,
+              "right": 899,
+              "bottom": 307.54376220703125,
+              "left": 467
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "home-card-grid",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 311.54376220703125,
+              "width": 417.60003662109375,
+              "height": 302.0562744140625,
+              "top": 311.54376220703125,
+              "right": 891.800048828125,
+              "bottom": 613.6000366210938,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "card",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "card",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "exp-pool-panel",
+            "rect": {
+              "x": 0,
+              "y": 0,
+              "width": 0,
+              "height": 0,
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "adventure-home-axis",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 311.54376220703125,
+              "width": 417.60003662109375,
+              "height": 302.0562744140625,
+              "top": 311.54376220703125,
+              "right": 891.800048828125,
+              "bottom": 613.6000366210938,
+              "left": 474.20001220703125
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-loadout-slot",
+            "rect": {
+              "x": 474.20001220703125,
+              "y": 617.6000366210938,
+              "width": 417.60003662109375,
+              "height": 59.199951171875,
+              "top": 617.6000366210938,
+              "right": 891.800048828125,
+              "bottom": 676.7999877929688,
+              "left": 474.20001220703125
+            }
+          }
+        ],
+        "mode": null
+      },
+      "nav": {
+        "selector": "#bottomNav",
+        "rect": {
+          "left": 467,
+          "top": 681.6000366210938,
+          "right": 899,
+          "bottom": 768,
+          "width": 432,
+          "height": 86.39996337890625
+        },
+        "clips": [
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 16,
+        "projectedFont": 6.4,
+        "display": "grid",
+        "overflowX": "visible",
+        "overflowY": "visible",
+        "overflow": 0,
+        "scrollHeight": 214,
+        "clientHeight": 214,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "216px 216px 216px 216px 216px",
+        "boxSizing": "border-box",
+        "padding": "0px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 467,
+              "y": 682.4000244140625,
+              "width": 86.4000244140625,
+              "height": 85.5999755859375,
+              "top": 682.4000244140625,
+              "right": 553.4000244140625,
+              "bottom": 768,
+              "left": 467
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 553.4000244140625,
+              "y": 682.4000244140625,
+              "width": 86.39996337890625,
+              "height": 85.5999755859375,
+              "top": 682.4000244140625,
+              "right": 639.7999877929688,
+              "bottom": 768,
+              "left": 553.4000244140625
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button active nav-art-button-wrap",
+            "rect": {
+              "x": 639.7999877929688,
+              "y": 682.4000244140625,
+              "width": 86.4000244140625,
+              "height": 85.5999755859375,
+              "top": 682.4000244140625,
+              "right": 726.2000122070312,
+              "bottom": 768,
+              "left": 639.7999877929688
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 726.2000122070312,
+              "y": 682.4000244140625,
+              "width": 86.39996337890625,
+              "height": 85.5999755859375,
+              "top": 682.4000244140625,
+              "right": 812.5999755859375,
+              "bottom": 768,
+              "left": 726.2000122070312
+            }
+          },
+          {
+            "tag": "BUTTON",
+            "class": "nav-button nav-art-button-wrap",
+            "rect": {
+              "x": 812.5999755859375,
+              "y": 682.4000244140625,
+              "width": 86.4000244140625,
+              "height": 85.5999755859375,
+              "top": 682.4000244140625,
+              "right": 899,
+              "bottom": 768,
+              "left": 812.5999755859375
+            }
+          }
+        ],
+        "mode": null
+      },
+      "bag": {
+        "selector": "#inventoryPage",
+        "rect": {
+          "left": 467,
+          "top": 0,
+          "right": 899,
+          "bottom": 768,
+          "width": 432,
+          "height": 768
+        },
+        "clips": [
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 45,
+        "projectedFont": 18,
+        "display": "block",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1920,
+        "clientHeight": 1920,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "none",
+        "boxSizing": "border-box",
+        "padding": "24px",
+        "width": "1080px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "inventory-classic-shell",
+            "rect": {
+              "x": 476.6000061035156,
+              "y": 9.600000381469727,
+              "width": 412.8000183105469,
+              "height": 748.800048828125,
+              "top": 9.600000381469727,
+              "right": 889.4000244140625,
+              "bottom": 758.4000492095947,
+              "left": 476.6000061035156
+            }
+          }
+        ],
+        "mode": null
+      },
+      "character": {
+        "selector": "#homeFeatureModal .home-feature-modal-box",
+        "rect": {
+          "left": 486.20001220703125,
+          "top": 19.200000762939453,
+          "right": 879.800048828125,
+          "bottom": 748.799976348877,
+          "width": 393.60003662109375,
+          "height": 729.5999755859375
+        },
+        "clips": [
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 45,
+        "projectedFont": 18.000001674745143,
+        "display": "flex",
+        "overflowX": "hidden",
+        "overflowY": "hidden",
+        "overflow": 0,
+        "scrollHeight": 1818,
+        "clientHeight": 1818,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "none",
+        "boxSizing": "border-box",
+        "padding": "18px",
+        "width": "984px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "home-feature-modal-title",
+            "rect": {
+              "x": 494.6000061035156,
+              "y": 27.600000381469727,
+              "width": 376.8000183105469,
+              "height": 45.600006103515625,
+              "top": 27.600000381469727,
+              "right": 871.4000244140625,
+              "bottom": 73.20000648498535,
+              "left": 494.6000061035156
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "",
+            "rect": {
+              "x": 494.6000061035156,
+              "y": 85.20000457763672,
+              "width": 376.8000183105469,
+              "height": 655.2000122070312,
+              "top": 85.20000457763672,
+              "right": 871.4000244140625,
+              "bottom": 740.400016784668,
+              "left": 494.6000061035156
+            }
+          }
+        ],
+        "mode": null
+      },
+      "domain": {
+        "parent": "game-ui",
+        "ancestors": [
+          "none",
+          "none",
+          "none",
+          "matrix(0.4, 0, 0, 0.4, 0, 0)",
+          "none",
+          "none",
+          "none"
+        ],
+        "navParent": "game-overlay-layer",
+        "resources": [
+          42,
+          42,
+          39,
+          39,
+          39,
+          39,
+          39,
+          39
+        ]
+      },
+      "entrance": {
+        "hit": true,
+        "covered": []
+      },
+      "shopGrid": {
+        "selector": ".shop-potion-list",
+        "rect": {
+          "left": 501.79998779296875,
+          "top": 287.7562561035156,
+          "right": 864.2000122070312,
+          "bottom": 718.7999877929688,
+          "width": 362.4000244140625,
+          "height": 431.0437316894531
+        },
+        "clips": [
+          {
+            "left": 501.79998779296875,
+            "top": 232.55625915527344,
+            "right": 864.2000122070312,
+            "bottom": 718.7999725341797
+          },
+          {
+            "left": 501.79998779296875,
+            "top": 106.80000305175781,
+            "right": 864.2000122070312,
+            "bottom": 718.8000030517578
+          },
+          {
+            "left": 501.79998779296875,
+            "top": 106.80000305175781,
+            "right": 864.2000122070312,
+            "bottom": 718.8000030517578
+          },
+          {
+            "left": 481.3999938964844,
+            "top": 28.80000114440918,
+            "right": 884.5999755859375,
+            "bottom": 739.2000255584717
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 45,
+        "projectedFont": 18.000001212618997,
+        "display": "grid",
+        "overflowX": "hidden",
+        "overflowY": "auto",
+        "overflow": 0,
+        "scrollHeight": 2790,
+        "clientHeight": 1078,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "906px",
+        "boxSizing": "border-box",
+        "padding": "0px",
+        "width": "906px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 287.7562561035156,
+              "width": 362.4000244140625,
+              "height": 180,
+              "top": 287.7562561035156,
+              "right": 864.2000122070312,
+              "bottom": 467.7562561035156,
+              "left": 501.79998779296875
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 474.9562683105469,
+              "width": 362.4000244140625,
+              "height": 179.99996948242188,
+              "top": 474.9562683105469,
+              "right": 864.2000122070312,
+              "bottom": 654.9562377929688,
+              "left": 501.79998779296875
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 662.15625,
+              "width": 362.4000244140625,
+              "height": 180,
+              "top": 662.15625,
+              "right": 864.2000122070312,
+              "bottom": 842.15625,
+              "left": 501.79998779296875
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 849.3562622070312,
+              "width": 362.4000244140625,
+              "height": 180.00006103515625,
+              "top": 849.3562622070312,
+              "right": 864.2000122070312,
+              "bottom": 1029.3563232421875,
+              "left": 501.79998779296875
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card hp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 1036.5562744140625,
+              "width": 362.4000244140625,
+              "height": 180,
+              "top": 1036.5562744140625,
+              "right": 864.2000122070312,
+              "bottom": 1216.5562744140625,
+              "left": 501.79998779296875
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "shop-potion-card sp",
+            "rect": {
+              "x": 501.79998779296875,
+              "y": 1223.7562255859375,
+              "width": 362.4000244140625,
+              "height": 180,
+              "top": 1223.7562255859375,
+              "right": 864.2000122070312,
+              "bottom": 1403.7562255859375,
+              "left": 501.79998779296875
+            }
+          }
+        ],
+        "mode": null
+      },
+      "relicGrid": {
+        "selector": ".team-relic-grid",
+        "rect": {
+          "left": 497,
+          "top": 374,
+          "right": 869,
+          "bottom": 5080.39990234375,
+          "width": 372,
+          "height": 4706.39990234375
+        },
+        "clips": [
+          {
+            "left": 486.20001220703125,
+            "top": 86.4000015258789,
+            "right": 879.800048828125,
+            "bottom": 746.4000015258789
+          },
+          {
+            "left": 476.6000061035156,
+            "top": 12,
+            "right": 889.4000244140625,
+            "bottom": 756
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 467,
+            "top": 0,
+            "right": 899,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          },
+          {
+            "left": 0,
+            "top": 0,
+            "right": 1366,
+            "bottom": 768
+          }
+        ],
+        "font": 45,
+        "projectedFont": 18,
+        "display": "grid",
+        "overflowX": "visible",
+        "overflowY": "visible",
+        "overflow": 0,
+        "scrollHeight": 11766,
+        "clientHeight": 11766,
+        "scrollTop": 0,
+        "objectFit": "fill",
+        "transform": "none",
+        "columns": "930px",
+        "boxSizing": "border-box",
+        "padding": "0px 0px 42px",
+        "width": "930px",
+        "children": [
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-four-symbol unlocked",
+            "rect": {
+              "x": 497,
+              "y": 374,
+              "width": 372,
+              "height": 220.79998779296875,
+              "top": 374,
+              "right": 869,
+              "bottom": 594.7999877929688,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-pink unlocked",
+            "rect": {
+              "x": 497,
+              "y": 609.2000122070312,
+              "width": 372,
+              "height": 220.79998779296875,
+              "top": 609.2000122070312,
+              "right": 869,
+              "bottom": 830,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 497,
+              "y": 844.4000244140625,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 844.4000244140625,
+              "right": 869,
+              "bottom": 1065.2000732421875,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 497,
+              "y": 1079.5999755859375,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 1079.5999755859375,
+              "right": 869,
+              "bottom": 1300.4000244140625,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 497,
+              "y": 1314.800048828125,
+              "width": 372,
+              "height": 220.7999267578125,
+              "top": 1314.800048828125,
+              "right": 869,
+              "bottom": 1535.5999755859375,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-orange unlocked",
+            "rect": {
+              "x": 497,
+              "y": 1550,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 1550,
+              "right": 869,
+              "bottom": 1770.800048828125,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 1785.2000732421875,
+              "width": 372,
+              "height": 220.7999267578125,
+              "top": 1785.2000732421875,
+              "right": 869,
+              "bottom": 2006,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 2020.4000244140625,
+              "width": 372,
+              "height": 220.7999267578125,
+              "top": 2020.4000244140625,
+              "right": 869,
+              "bottom": 2241.199951171875,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 2255.60009765625,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 2255.60009765625,
+              "right": 869,
+              "bottom": 2476.400146484375,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 2490.800048828125,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 2490.800048828125,
+              "right": 869,
+              "bottom": 2711.60009765625,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 2726,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 2726,
+              "right": 869,
+              "bottom": 2946.800048828125,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 2961.199951171875,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 2961.199951171875,
+              "right": 869,
+              "bottom": 3182,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 3196.400146484375,
+              "width": 372,
+              "height": 220.7998046875,
+              "top": 3196.400146484375,
+              "right": 869,
+              "bottom": 3417.199951171875,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 3431.60009765625,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 3431.60009765625,
+              "right": 869,
+              "bottom": 3652.400146484375,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-purple unlocked",
+            "rect": {
+              "x": 497,
+              "y": 3666.800048828125,
+              "width": 372,
+              "height": 220.800048828125,
+              "top": 3666.800048828125,
+              "right": 869,
+              "bottom": 3887.60009765625,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 497,
+              "y": 3902,
+              "width": 372,
+              "height": 220.80029296875,
+              "top": 3902,
+              "right": 869,
+              "bottom": 4122.80029296875,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 497,
+              "y": 4137.2001953125,
+              "width": 372,
+              "height": 220.7998046875,
+              "top": 4137.2001953125,
+              "right": 869,
+              "bottom": 4358,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 497,
+              "y": 4372.39990234375,
+              "width": 372,
+              "height": 220.80029296875,
+              "top": 4372.39990234375,
+              "right": 869,
+              "bottom": 4593.2001953125,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 497,
+              "y": 4607.60009765625,
+              "width": 372,
+              "height": 220.7998046875,
+              "top": 4607.60009765625,
+              "right": 869,
+              "bottom": 4828.39990234375,
+              "left": 497
+            }
+          },
+          {
+            "tag": "DIV",
+            "class": "team-relic-card rarity-blue unlocked",
+            "rect": {
+              "x": 497,
+              "y": 4842.80029296875,
+              "width": 372,
+              "height": 220.7998046875,
+              "top": 4842.80029296875,
+              "right": 869,
+              "bottom": 5063.60009765625,
+              "left": 497
+            }
+          }
+        ],
+        "mode": null
+      }
+    },
+    {
+      "familyAndReload": true,
+      "viewport": [
+        390,
+        844
+      ],
+      "reloaded": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "roots": 1
+      }
+    },
+    {
+      "familyAndReload": true,
+      "viewport": [
+        412,
+        915
+      ],
+      "reloaded": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "roots": 1
+      }
+    },
+    {
+      "familyAndReload": true,
+      "viewport": [
+        1366,
+        768
+      ],
+      "reloaded": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "roots": 1
+      }
+    },
+    {
+      "familyAndReload": true,
+      "viewport": [
+        1920,
+        1080
+      ],
+      "reloaded": {
+        "background": "url(\"http://127.0.0.1:51178/assets/ui/home-background-v17344.png\")",
+        "roots": 1
+      }
+    },
+    {
+      "generalVisibility": {
+        "hidden": true,
+        "restored": true,
+        "roots": 1
+      }
+    }
+  ]
+}

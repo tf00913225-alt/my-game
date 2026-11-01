@@ -51,7 +51,7 @@ An authenticated existing user adds `asset-manifest.json` plus one app-shell Jav
 
 `.github/scripts/boot-live-browser-qa.mjs` separately records the deployed Cloudflare/Firebase cold path and response cache headers. Output: `artifacts/browser-qa/boot-live-qa.json`.
 
-The controlled browser budgets are ≤5 seconds to an interactive signed-out account UI and a 3-second CI ceiling for warm city restore, with a product target of ≤2 seconds. Live timing is reported as measured; CDN/Firebase variance is never converted into a fabricated pass.
+The current controlled budget is ≤15 seconds from each document’s navigation time origin to the actual main-city-interactive mark for both cold and warm existing-user city startup; missing READY or the mark and times above 15 seconds fail. The separate signed-out account UI budget remains ≤5 seconds. Live timing is reported as measured; CDN/Firebase variance is never converted into a fabricated pass. The previously documented warm-city 3-second ceiling and 2-second product target are historical, superseded by the current Boot Architecture contract.
 
 ### Verified DEV measurements
 
