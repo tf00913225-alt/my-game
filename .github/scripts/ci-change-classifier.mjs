@@ -259,6 +259,7 @@ const QA_OWNERS = {
   '.github/scripts/run-foreground-potion-browser-qa.mjs':['ui','inventory'],
   '.github/scripts/run-fixed-slot-battlefield-browser-qa.mjs':['battle'],
   '.github/scripts/run-battle-target-lifecycle-browser-qa.mjs':['battle'],
+  '.github/scripts/run-battle-character-motion-browser-qa.mjs':['battle'],
   '.github/scripts/run-daily-balance-browser-qa.mjs':['daily','battle'],
   '.github/scripts/run-abyss-balance-browser-qa.mjs':['abyss','battle'],
   '.github/scripts/run-adventure-browser-qa.mjs':['adventure','ui'],

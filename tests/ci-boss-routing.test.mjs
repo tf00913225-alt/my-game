@@ -47,6 +47,24 @@ test('three Boss levels, PR/dev consistency and release strictness',()=>{
   for(const options of [{baseRef:'main'},{eventName:'workflow_dispatch'},{eventName:'schedule',fullRegression:true}])assert.equal(plan(['docs/readme.md'],options).bossMode,'full');
   assert.equal(plan(['.github/workflows/ci.yml']).bossMode,'full');
 });
+test('existing character motion QA uses Boss Fast unless another path requires Full',()=>{
+  const motion='.github/scripts/run-battle-character-motion-browser-qa.mjs';
+  const fullPaths=['.github/workflows/ci.yml','.github/scripts/ci-change-classifier.mjs',
+    'js/gameplay-boss-tower-system.js','js/combat/monster-balance-owner.mjs',
+    'functions/src/session-authority.js','config/persisted-state-registry.json','js/unknown.js'];
+  for(const eventName of ['pull_request','push']){
+    const targeted=plan([motion],{eventName});
+    assert.equal(targeted.gates.battle_browser,true);
+    assert.equal(targeted.gates.boss_balance,true);
+    assert.equal(targeted.bossMode,'fast');
+    assert.equal(plan([motion],{eventName,addedPaths:[motion]}).bossMode,'full');
+    for(const path of fullPaths){
+      const mixed=plan([motion,path],{eventName});
+      assert.equal(mixed.gates.boss_balance,true,path);
+      assert.equal(mixed.bossMode,'full',path);
+    }
+  }
+});
 test('shared reforge presentation is targeted; formulas, writes and callers fail closed',()=>{
   const sourcePath='js/36-v141-content-systems.js';
   const before='(()=>{function renderReforgeTab(){return "選擇裝備";}function reward(){return 1;}})();';
