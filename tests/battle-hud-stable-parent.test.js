@@ -9,6 +9,7 @@ test("formal syncHud keeps same real HUD nodes without reparenting and replaces 
   prepareUnitHud:card=>huds[cards.indexOf(card)],clearUnitHud(){throw Error("active cast must preserve HUD");}};
  cards.forEach(c=>c.classList={contains:()=>false});vm.createContext(context);vm.runInContext("let hudLayer=null;\n"+source.slice(source.indexOf("let hudBatchDepth="),source.indexOf("function syncResourceNumbers(){")),context);
  context.syncHud();const initial=moves,layer=vm.runInContext("hudLayer",context);assert.equal(layer.children.length,2);
+ cards[0].classList={contains:name=>name==="dead"};cards[1].classList={contains:name=>name==="down"};context.syncHud();assert.equal(huds[0].style.opacity,1,"defeated enemy HUD stays readable");assert.equal(huds[1].style.opacity,1,"downed ally HUD stays readable");cards.forEach(c=>c.classList={contains:()=>false});
  assert.ok(moveReadCounts.every(count=>count===2),"all geometry reads finish before any HUD layer move");
  for(let i=0;i<25;i++)context.syncHud();assert.equal(moves,initial,"same-parent updates perform no DOM moves");assert.deepEqual(layer.children,huds);assert.equal(huds[1].style.left,"80px");
  const beforeBatch=reads;const value=context.batchHud(()=>{context.syncHud();context.batchHud(()=>context.syncHud());assert.equal(reads,beforeBatch,"no intermediate geometry projection");return 7;});

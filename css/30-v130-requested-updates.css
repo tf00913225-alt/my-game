@@ -34,8 +34,8 @@
 }
 
 /* Fallen monsters stay readable because revival can return them to battle. */
-#game-stage > #app > #game-content #battlePage .battle-monster.dead{
-    opacity:.34 !important;
+#game-stage > #app > #game-content #battlePage .battle-monster.dead > .v174-battle-art{
+    opacity:.7 !important;
 }
 
 
