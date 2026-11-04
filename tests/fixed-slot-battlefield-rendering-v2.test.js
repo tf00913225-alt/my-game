@@ -15,6 +15,10 @@ const qaSource=read("js/54-v173.51-battle-qa.js");
 const feedbackSource=read("js/battle-floating-feedback-owner.js");
 const feedbackCss=read("css/battle-floating-feedback-owner.css");
 const css=read("css/fixed-slot-battlefield-rendering-v2.css");
+const baseCss=read("css/00-main.css");
+assert.match(baseCss,/\.battle-player\.down > \.v174-battle-art\{[^}]*--battle-defeat-filter:brightness\(\.4\) grayscale\(55%\)/,"downed-player art defines the dimming filter without fading its HUD");
+assert.match(css,/filter:var\(--battle-ground-filter\) var\(--battle-defeat-filter, brightness\(1\)\)/,"fixed-slot shadows preserve downed-player dimming");
+assert.match(css,/data-vfx-shadow-cache[\s\S]*?\.v174-portrait-paint\{[^}]*var\(--battle-defeat-filter, brightness\(1\)\)/,"cached VFX shadows preserve downed-player dimming");
 const build=read("scripts/build-production.mjs");
 
 assert.match(ownerSource,/window\.FourSymbolsBattlefieldSlots/);

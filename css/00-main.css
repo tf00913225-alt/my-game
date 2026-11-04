@@ -2975,9 +2975,8 @@ button:active{
 */
 
 .battle-player.down > .v174-battle-art{
-    filter:
-        brightness(.4)
-        grayscale(55%);
+    --battle-defeat-filter:brightness(.4) grayscale(55%);
+    filter:var(--battle-defeat-filter);
 }
 
 .battle-player-icon{
