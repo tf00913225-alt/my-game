@@ -4,13 +4,19 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-support.mjs';
 const baseUrl=process.env.QA_BASE_URL||'';
 const expected=process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local';
 if(baseUrl){
-    const manifest=await (await devAccessFetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();
+    const manifest=await (await devAccessFetch(baseUrl+'/release-manifest.json',{cache:'no-store',signal:AbortSignal.timeout(20000)})).json();
     assert.equal(manifest.commitSha,expected,'live QA must use exact deployed SHA');
 }
+const out=path.resolve(process.env.LIFECYCLE_QA_OUTPUT_DIR||path.join(ROOT,'artifacts/browser-qa'));fs.mkdirSync(out,{recursive:true});
+const planned=['battle-target-lifecycle.json',...[390,412].flatMap(width=>['hero-phase2b-'+width+'.png','battle-target-'+width+'.png',...['before','dead','revived'].map(stage=>'battle-target-lifecycle-'+width+'-'+stage+'.png')])];
+for(const name of planned)assert.equal(fs.existsSync(path.join(out,name)),false,'refusing to overwrite existing evidence: '+name);
+const terminalEvidenceDir=path.join(ROOT,'artifacts/browser-qa');
+if(fs.existsSync(terminalEvidenceDir)){const existing=fs.readdirSync(terminalEvidenceDir).filter(name=>name.startsWith('terminal-visual-'));assert.equal(existing.length,0,'refusing to overwrite existing terminal visual evidence: '+existing.join(', '));}
 await import('./run-terminal-visual-handoff-browser-qa.mjs');
 // Read-only disposable account transport; all production bundles and target,
 // attack, follow-up, damage, VFX and finish owners are real and unmodified.
@@ -147,12 +153,28 @@ const heroExpression=`(async()=>{
                 Math.random=()=>.99999;const target=createEnemyActionTargetSnapshot(0,battleToken);Math.random=()=>0;
                 battleStatisticsBeginAction({type:'monster',monsterIndex:0});processSingleMonsterAttack(0,battleToken,target);await new Promise(r=>setTimeout(r,2200));battleStatisticsFinishAction();check(h.hp<hp,'hero incoming damage');
                 const damaged=h.hp;Math.random=()=>.99999;processSingleMonsterAttack(0,battleToken,target);await new Promise(r=>setTimeout(r,2200));check(h.hp===damaged,'hero incoming MISS');
-                h.hp=0;check(!getLivingParty().includes(index),'death target exclusion');check(!buildInitiativeQueue().some(e=>e.characterIndex===index),'death initiative exclusion');
+                const captureState=async(stage)=>{
+                    updateSingleCharacterBars(index,h,getPartyBattleStats(index),true);
+                    const card=document.getElementById('battlePlayerCard'+index),hud=FourSymbolsBattlePresentation.getUnitHud(card),art=card?.querySelector('.v174-battle-art');
+                    const page=document.getElementById('battlePage'),rect=page?.getBoundingClientRect(),style=page&&getComputedStyle(page);
+                    check(card&&hud&&art&&rect?.width>0&&rect?.height>0&&style?.display!=='none'&&style?.visibility==='visible'&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')&&document.getElementById('startupLoader')?.hidden===true,'visible battle and HUD for '+stage);
+                    for(let node=page;node;node=node.parentElement){const x=getComputedStyle(node);check(x.display!=='none'&&x.visibility==='visible'&&Number(x.opacity)>0,'visible battle ancestor for '+stage);}
+                    const hit=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,rect.left+rect.width/2)),Math.min(innerHeight-1,Math.max(0,rect.top+rect.height/2)));check(hit&&(page.contains(hit)||hit.closest('.v174-battle-hud-layer')),'battle center unobscured for '+stage);
+                    const hudStyle=getComputedStyle(hud),hpBar=document.getElementById('battlePlayerHPBar'+index),paint=card.querySelector('.v174-portrait-paint');
+                    check(hpBar&&hudStyle.display!=='none'&&hudStyle.visibility==='visible'&&Number(hudStyle.opacity)>0,'readable HUD and HP bar for '+stage);
+                    const artFilter=getComputedStyle(art).filter,paintFilter=paint?getComputedStyle(paint).filter:'none',dim=(artFilter+' '+paintFilter).includes('brightness(0.4)');
+                    check(stage==='dead'?Number.parseFloat(hpBar.style.width)===0&&dim:Number.parseFloat(hpBar.style.width)>0&&!dim,'HP and defeated filter for '+stage);
+                    window.__lifecycleCapture={stage,index,hp:h.hp,down:card.classList.contains('down'),hudOpacity:hudStyle.opacity,hpBarWidth:hpBar.style.width,artFilter,paintFilter};
+                    const deadline=Date.now()+30000;while(window.__lifecycleCapture&&Date.now()<deadline)await new Promise(r=>setTimeout(r,30));check(!window.__lifecycleCapture,'capture acknowledged '+stage);
+                };
+                if(count===1){check(h.hp>0,'pre-death HP positive');await captureState('before');}
+                h.hp=0;if(count===1)await captureState('dead');check(!getLivingParty().includes(index),'death target exclusion');check(!buildInitiativeQueue().some(e=>e.characterIndex===index),'death initiative exclusion');
                 const oldSnapshot=createEnemyActionTargetSnapshot(0,battleToken),statId=FourSymbolsBattleStatistics.getCombatantIdByBattleIndex(index);
                 characterSkillLoadouts.fire.skillLevels.revive=1;characterSkillLoadouts.fire.equippedSkills=['revive'];player.sp=1000;activeBattleCharacterIndex=0;Math.random=()=>0;
                 resolveQueuedPlayerAction(0,battleToken); // Empty queue only exercises the normal no-action finish.
                 queuedPlayerActions[0]={action:'revive',targetAlly:index};battleStatisticsBeginAction({type:'player',characterIndex:0});resolveQueuedPlayerAction(0,battleToken);
                 await new Promise(r=>setTimeout(r,2300));battleStatisticsFinishAction();
+                if(count===1)await captureState('revived');
                 check(h.hp>0&&getPartyCharacterByIndex(index)===h,'legal revive same identity');check(FourSymbolsBattleStatistics.getCombatantIdByBattleIndex(index)===statId,'revive same statistic ID');
                 check(buildInitiativeQueue().some(e=>e.type==='heroNpc'&&e.characterIndex===index),'revive initiative');check(createEnemyActionTargetSnapshot(0,battleToken).targets.some(e=>e.character===h),'revive target');check(!resolveEnemyActionTargets(oldSnapshot,'all').targets.some(e=>e.character===h),'old snapshot stays closed');
                 const stats=FourSymbolsBattleStatistics.getSnapshot().combatants.find(c=>c.id===statId);check(stats.damageDealt>0&&stats.damageTaken>0&&stats.criticalHits>0,'hero statistics settlement');
@@ -196,24 +218,41 @@ const heroExpression=`(async()=>{
     return rows;
 })()`;
 
-const server=await startServer({baseUrl});
-const profile=fs.mkdtempSync(path.join(os.tmpdir(),'battle-target-qa-'));
 const port=9800+Math.floor(Math.random()*100);
-const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-let client;
-const out=path.join(ROOT,'artifacts/browser-qa');fs.mkdirSync(out,{recursive:true});
-const evidence=[];
+let client,server,profile,proc;
+const evidence=[],visualProof=[];
 try{
+    let setupExpired=false;const pendingServer=startServer({baseUrl});pendingServer.then(value=>{if(setupExpired)value.server.close();},()=>{});
+    let setupTimer;try{server=await Promise.race([pendingServer,new Promise((_,reject)=>{setupTimer=setTimeout(()=>reject(Error('server setup timed out')),30000);})]);}catch(error){setupExpired=true;throw error;}finally{clearTimeout(setupTimer);}
+    profile=fs.mkdtempSync(path.join(os.tmpdir(),'battle-target-qa-'));
+    proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
     const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(t=>t.type==='page');
-    client=new Cdp(page.webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
+    client=new Cdp(page.webSocketDebuggerUrl);const rawSend=client.send.bind(client);client.send=(method,params)=>{const ms=method==='Runtime.evaluate'&&(params?.expression===heroExpression||params?.expression===expression)?600000:30000;return new Promise((resolve,reject)=>{const t=setTimeout(()=>{client.close();reject(Error('CDP '+method+' timed out'));},ms);rawSend(method,params).then(x=>{clearTimeout(t);resolve(x);},e=>{clearTimeout(t);reject(e);});});};await client.send('Page.enable');await client.send('Runtime.enable');
     await client.send('Page.navigate',{url:server.url});
     for(const [width,height] of [[390,844],[412,915]]){
         await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:true});
-        const heroes=await client.eval(heroExpression);
+        let heroesDone=false,heroesError=null,heroes;
+        const heroTask=client.eval(heroExpression).then(value=>{heroes=value;heroesDone=true;},error=>{heroesError=error;heroesDone=true;});
+        const captureDeadline=Date.now()+600000;
+        while(!heroesDone){
+            if(Date.now()>captureDeadline)throw Error('hero capture deadline exceeded');
+            const state=await client.eval('window.__lifecycleCapture||null');
+            if(state){
+                assert.ok(['before','dead','revived'].includes(state.stage),'known lifecycle stage');
+                assert.equal(state.down,state.stage==='dead','down class follows HP');
+                if(state.stage==='dead')assert.equal(state.hp,0);else assert.ok(state.hp>0);
+                const shot=await client.send('Page.captureScreenshot',{format:'png'}),bytes=Buffer.from(shot.data,'base64');
+                visualProof.push({width,height,...state,expected,file:'battle-target-lifecycle-'+width+'-'+state.stage+'.png',sha256:createHash('sha256').update(bytes).digest('hex'),bytes});
+                await client.eval('window.__lifecycleCapture=null');
+            }else await new Promise(resolve=>setTimeout(resolve,50));
+        }
+        await heroTask;if(heroesError)throw heroesError;
+        assert.deepEqual(visualProof.filter(item=>item.width===width).map(item=>item.stage),['before','dead','revived'],'ordered lifecycle captures per viewport');
+        assert.equal(new Set(visualProof.filter(item=>item.width===width).map(item=>item.index)).size,1,'same ally across lifecycle');
         assert.deepEqual(heroes.map(r=>r.count),[0,1,2,3]);
         evidence.push({width,height,heroes});
         const heroPng=await client.send('Page.captureScreenshot',{format:'png'});
-        fs.writeFileSync(path.join(out,'hero-phase2b-'+width+'.png'),Buffer.from(heroPng.data,'base64'));
+        fs.writeFileSync(path.join(out,'hero-phase2b-'+width+'.png'),Buffer.from(heroPng.data,'base64'),{flag:'wx'});
         const rows=await client.eval(expression);
         evidence.push({width,height,rows});
         assert.equal(rows.length,24);
@@ -237,14 +276,17 @@ try{
             assert.equal(r.sp,r.beforeSp-r.cost,'original cost once; follow-up free');
         }
         const png=await client.send('Page.captureScreenshot',{format:'png'});
-        fs.writeFileSync(path.join(out,'battle-target-'+width+'.png'),Buffer.from(png.data,'base64'));
+        fs.writeFileSync(path.join(out,'battle-target-'+width+'.png'),Buffer.from(png.data,'base64'),{flag:'wx'});
     }
-    fs.writeFileSync(path.join(out,'battle-target-lifecycle.json'),JSON.stringify({passed:true,expected,baseUrl,evidence},null,2)+'\n');
+    assert.equal(visualProof.length,6,'three lifecycle images for both viewport sizes');
+    for(const item of visualProof){const output=path.join(out,item.file);assert.equal(fs.existsSync(output),false,'refusing to overwrite lifecycle evidence');fs.writeFileSync(output,item.bytes,{flag:'wx'});}
+    const visual=visualProof.map(({bytes,...item})=>item);
+    fs.writeFileSync(path.join(out,'battle-target-lifecycle.json'),JSON.stringify({passed:true,expected,baseUrl,evidence,visual},null,2)+'\n',{flag:'wx'});
     console.log('Battle target lifecycle: 48 full-production mobile browser scenarios PASS');
 }catch(error){
-    fs.writeFileSync(path.join(out,'battle-target-lifecycle.json'),JSON.stringify({passed:false,expected,baseUrl,evidence,error:String(error.stack||error),events:client?.events.slice(-15)},null,2)+'\n');throw error;
+    try{fs.writeFileSync(path.join(out,'battle-target-failure-'+Date.now()+'-'+process.pid+'.json'),JSON.stringify({passed:false,expected,baseUrl,evidence,error:String(error.stack||error),events:client?.events.slice(-15)},null,2)+'\n',{flag:'wx'});}catch(writeError){console.error('Failure evidence unavailable:',writeError.message);}throw error;
 }finally{
-    client?.close();proc.kill('SIGTERM');
-    fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});
-    await new Promise(resolve=>server.server.close(resolve));
+    client?.close();if(proc)proc.kill('SIGTERM');
+    if(profile)fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});
+    if(server)await Promise.race([new Promise(resolve=>server.server.close(resolve)),new Promise(resolve=>setTimeout(()=>{server.server.closeAllConnections?.();resolve();},5000))]);
 }
