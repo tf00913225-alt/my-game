@@ -1,17 +1,13 @@
-name: Private DEV startup read-only diagnostic
+name: Private DEV image read-only diagnostic
 on:
   push:
     branches: [fix/access-readonly-validation-20261030]
 permissions:
   contents: read
-concurrency:
-  group: access-startup-diagnostic
-  cancel-in-progress: false
 jobs:
-  startup:
-    if: ${{ github.event_name == 'push' && github.ref == 'refs/heads/fix/access-readonly-validation-20261030' }}
+  verify-images:
     runs-on: ubuntu-latest
-    timeout-minutes: 4
+    timeout-minutes: 5
     env:
       CF_ACCESS_REQUIRED: "1"
       CF_ACCESS_CLIENT_ID: ${{ secrets.DEV_ACCESS_CLIENT_ID }}
@@ -19,47 +15,54 @@ jobs:
     steps:
       - uses: actions/checkout@v7
         with:
-          ref: a77faba820fbcc0c5df3fe27ee6b8889564885fa
+          ref: 5e4dc940a7c1f8a942dc77d86eb266607748a7fc
+          sparse-checkout: .github/scripts/dev-access-fetch.mjs
+          sparse-checkout-cone-mode: false
           persist-credentials: false
       - uses: actions/setup-node@v7
         with:
           node-version: '24'
           package-manager-cache: false
-      - name: Observe private DEV startup through isolated QA proxy
+      - name: Verify authorized static image responses
         shell: bash
         run: |
           node --input-type=module <<'NODE'
-          import fs from 'node:fs';
-          import os from 'node:os';
-          import path from 'node:path';
-          import {spawn} from 'node:child_process';
+          import {createHash} from 'node:crypto';
           import {devAccessFetch} from './.github/scripts/dev-access-fetch.mjs';
-          import {startServer,findChrome,waitJson,Cdp,collectStartupFailure} from './.github/scripts/runtime-browser-qa-support.mjs';
-          const base='https://dev.four-symbols-dev.pages.dev/';
-          let server,client,proc,profile;
-          try {
-            const manifestResponse=await devAccessFetch(base+'release-manifest.json',{signal:AbortSignal.timeout(15000)});
-            const manifest=await manifestResponse.json();
-            if(manifestResponse.status!==200||manifest.commitSha!=='a77faba820fbcc0c5df3fe27ee6b8889564885fa') throw Error('fixed DEV version unavailable');
-            const html=await devAccessFetch(base,{signal:AbortSignal.timeout(15000)});
-            if(html.status!==200) throw Error('DEV index unavailable');
-            console.log('QA injection marker present: '+(await html.text()).includes('<!-- build:critical-script -->'));
-            server=await startServer({baseUrl:base});
-            profile=fs.mkdtempSync(path.join(os.tmpdir(),'readonly-startup-'));
-            const port=9700+Math.floor(Math.random()*100);
-            proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-gpu','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-            const targets=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc});
-            client=new Cdp(targets.find(t=>t.type==='page').webSocketDebuggerUrl);
-            await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Network.enable');
-            await client.send('Page.navigate',{url:server.url});
-            const until=Date.now()+45000;
-            let ready=false;
-            while(Date.now()<until){ready=await client.eval("window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')");if(ready)break;await new Promise(r=>setTimeout(r,500));}
-            const evidence=await collectStartupFailure(client,{});
-            const failed=(evidence.startup?.failedResources||[]).map(x=>({path:String(x.path||'').split('?')[0],reason:String(x.message||'').replace(/https?:[^ ]+/g,'[url]').slice(0,250)}));
-            const safe={ready,state:evidence.startup?.state||null,errorCode:evidence.startup?.error?.code||null,loaderHidden:evidence.startup?.loaderHidden??null,authVisible:evidence.startup?.authVisible??null,failedResources:failed,proxyFailures:server.failures.map(x=>({path:String(x.path||'').split('?')[0],status:x.status})),network:(evidence.network||[]).map(x=>({path:x.path,status:x.status,error:x.error}))};
-            console.log('STARTUP_DIAGNOSTIC '+JSON.stringify(safe));
-            if(!ready)process.exitCode=1;
-          } catch {console.error('Startup diagnostic stopped: version, network or observation unavailable');process.exitCode=1;}
-          finally {client?.close();proc?.kill();if(server?.server)await new Promise(r=>server.server.close(r));if(profile)fs.rmSync(profile,{recursive:true,force:true});}
+          const origin='https://dev.four-symbols-dev.pages.dev/';
+          const repo='https://raw.githubusercontent.com/tf00913225-alt/my-game/';
+          const merge='ad2a8dcdf947ad0b10a26a6b6e8657a234785887';
+          const manifestUrl=origin+'release-manifest.json';
+          async function manifest(){
+            const response=await devAccessFetch(manifestUrl,{cache:'no-store',signal:AbortSignal.timeout(15000)});
+            if(response.status!==200)throw Error('manifest HTTP '+response.status);
+            const result=await response.json();
+            if(!/^[0-9a-f]{40}$/.test(result.commitSha))throw Error('invalid manifest SHA');
+            return result.commitSha;
+          }
+          const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+          const sha=await manifest();
+          const ancestry=await fetch(`https://api.github.com/repos/tf00913225-alt/my-game/compare/${merge}...${sha}`,{signal:AbortSignal.timeout(15000)});
+          if(!ancestry.ok)throw Error('ancestry HTTP '+ancestry.status);
+          const comparison=await ancestry.json();
+          if(!['ahead','identical'].includes(comparison.status))throw Error('deployed SHA does not contain requested merge');
+          console.log('IMAGE_AUDIT_START '+JSON.stringify({sha,merge,at:new Date().toISOString()}));
+          let failed=false;
+          for(const variant of ['readable_',''])for(const sex of ['female','male'])for(const num of ['01','02','03','04']){
+            const path=`assets/characters/battle/player_battle_${variant}${sex}_${num}.webp`;
+            const [live,source]=await Promise.all([
+              devAccessFetch(origin+path,{cache:'no-store',signal:AbortSignal.timeout(30000)}),
+              fetch(repo+sha+'/'+path,{cache:'no-store',signal:AbortSignal.timeout(30000)})
+            ]);
+            const mime=(live.headers.get('content-type')||'').split(';')[0].trim().toLowerCase();
+            const bytes=Buffer.from(await live.arrayBuffer()),gitBytes=Buffer.from(await source.arrayBuffer());
+            const actual=digest(bytes),expected=digest(gitBytes);
+            const pass=live.status===200&&source.status===200&&mime==='image/webp'&&actual===expected;
+            failed ||= !pass;
+            console.log('IMAGE_AUDIT_ITEM '+JSON.stringify({path,http:live.status,mime,sha256:actual,gitHttp:source.status,gitSha256:expected,bytes:bytes.length,pass}));
+          }
+          const end=await manifest();
+          const stable=sha===end;
+          console.log('IMAGE_AUDIT_END '+JSON.stringify({shaBefore:sha,shaAfter:end,stable,pass:!failed&&stable,at:new Date().toISOString()}));
+          if(failed||!stable)process.exitCode=1;
           NODE
