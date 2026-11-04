@@ -12,7 +12,7 @@ async function scene(plan){
     const check=(value,label)=>{if(!value)throw Error(label);};
     const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
     const wait=async(fn,label,ms=30000)=>{const end=performance.now()+ms;while(!fn()&&performance.now()<end)await sleep(30);check(fn(),label);};
-    await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY','startup READY');
+    await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY'&&document.getElementById('startupLoader')?.hidden===true&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show'),'startup READY and login overlay hidden');
     await FourSymbolsFeatures.ensure('gameplay-core','character-motion-qa');
     await FourSymbolsFeatures.ensure('feature-boss-relic','character-motion-qa');
     await v154RequestMonsterPortraitRegistry();
@@ -191,6 +191,14 @@ async function scene(plan){
         paints.forEach(p=>p.style.animationPlayState='paused');evidence.pausedFrameTimes=await frames();paints.forEach(p=>p.style.removeProperty('animation-play-state'));
         evidence.finalBoxes=protectedBoxes();
         window.__motionEvidence=evidence;
+        if(plan.capture){
+            const page=document.getElementById('battlePage');
+            const visible=()=>{if(!page)return false;const rect=page.getBoundingClientRect();if(rect.width<=0||rect.height<=0||rect.bottom<=0||rect.right<=0||rect.top>=innerHeight||rect.left>=innerWidth)return false;for(let node=page;node;node=node.parentElement){const style=getComputedStyle(node);if(style.display==='none'||style.visibility!=='visible'||Number(style.opacity)===0)return false;}const hit=document.elementFromPoint(Math.min(innerWidth-1,Math.max(0,rect.left+rect.width/2)),Math.min(innerHeight-1,Math.max(0,rect.top+rect.height/2)));return !!hit&&(page.contains(hit)||!!hit.closest('.v174-battle-hud-layer'))&&!document.getElementById('firebaseAuthOverlay')?.classList.contains('show')&&document.getElementById('startupLoader')?.hidden===true;};
+            check(visible(),'battle visible and login overlay hidden before screenshot');
+            window.__motionCaptureReady=true;
+            await wait(()=>window.__motionCaptureRelease===true,'screenshot captured before scene cleanup');
+            check(visible(),'battle visible and login overlay hidden after screenshot');
+        }
         return evidence;
     }finally{
         Math.random=random;releaseFinish?.();releasePause?.();
@@ -202,26 +210,39 @@ async function scene(plan){
 }
 
 const baseUrl=process.env.QA_BASE_URL||'',expected=process.env.EXPECTED_COMMIT_SHA||'local';
-if(baseUrl){const m=await(await fetch(baseUrl+'/release-manifest.json',{cache:'no-store'})).json();assert.equal(m.commitSha,expected);}
-const server=await startServer({baseUrl});
-const profile=fs.mkdtempSync(path.join(os.tmpdir(),'character-motion-'));
 const port=Number(process.env.MOTION_QA_PORT||9881);
-const proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
-const out=path.resolve('artifacts/character-motion');fs.mkdirSync(out,{recursive:true});
-const evidence=[];let client;
+const out=path.resolve(process.env.MOTION_QA_OUTPUT_DIR||'artifacts/character-motion');
+const evidence=[],screenshots=[];let client,server,profile,proc;
+const deadline=(promise,label,ms=90000)=>new Promise((resolve,reject)=>{const timer=setTimeout(()=>{client?.close();reject(new Error(label+' timed out'));},ms);Promise.resolve(promise).then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});});
 try{
-    const page=(await waitJson('http://127.0.0.1:'+port+'/json/list')).find(p=>p.type==='page');
-    client=new Cdp(page.webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');
+    fs.mkdirSync(out,{recursive:true});
+    if(baseUrl){const m=await(await fetch(baseUrl+'/release-manifest.json',{cache:'no-store',signal:AbortSignal.timeout(20000)})).json();assert.equal(m.commitSha,expected);}
+    let setupExpired=false;const pendingServer=startServer({baseUrl});
+    pendingServer.then(value=>{if(setupExpired)value.server.close();},()=>{});
+    try{server=await deadline(pendingServer,'server setup');}catch(error){setupExpired=true;throw error;}
+    profile=fs.mkdtempSync(path.join(os.tmpdir(),'character-motion-'));
+    proc=spawn(findChrome(),['--headless=new','--no-sandbox','--disable-dev-shm-usage','--remote-debugging-port='+port,'--user-data-dir='+profile,'about:blank'],{stdio:'ignore'});
+    const page=(await deadline(waitJson('http://127.0.0.1:'+port+'/json/list'),'DevTools startup')).find(p=>p.type==='page');
+    client=new Cdp(page.webSocketDebuggerUrl);
+    const send=client.send.bind(client);client.send=(method,params)=>deadline(send(method,params),'CDP '+method);
+    await client.send('Page.enable');await client.send('Runtime.enable');
     await client.send('Page.navigate',{url:server.url});
     for(const [width,height] of [[412,915],[390,844],[1280,720]]){
         await client.send('Emulation.setDeviceMetricsOverride',{width,height,deviceScaleFactor:1,mobile:width<500});
         const extended=process.env.MOTION_QA_EXTENDED;
         const plans=extended?[{allies:3,enemies:1,boss:true},{allies:3,enemies:3,auto:true}].filter(p=>extended==='1'||(extended==='auto'?p.auto:p.boss)):[{allies:1,enemies:1},{allies:3,enemies:3},{allies:6,enemies:6,actions:true},{allies:6,enemies:10}];
         for(const plan of plans.filter(p=>!process.env.MOTION_QA_CAPACITY_ONLY||p.allies===6)){
-            const data=await client.eval('('+scene.toString()+')('+JSON.stringify(plan)+')');
+            await client.eval('window.__motionCaptureReady=false;window.__motionCaptureRelease=false');
+            let sceneError=null;
+            const pending=client.eval('('+scene.toString()+')('+JSON.stringify({...plan,capture:true})+')').catch(error=>{sceneError=error;});
+            try{
+                const deadline=Date.now()+60000;
+                while(!await client.eval('window.__motionCaptureReady===true')){if(sceneError)throw sceneError;if(Date.now()>deadline)throw Error('scene screenshot readiness timed out');await new Promise(resolve=>setTimeout(resolve,50));}
+                const png=await client.send('Page.captureScreenshot',{format:'png'});
+                screenshots.push({name:`${width}-${plan.allies}v${plan.enemies}.png`,data:Buffer.from(png.data,'base64')});
+            }finally{await client.eval('window.__motionCaptureRelease=true');}
+            const data=await pending;if(sceneError)throw sceneError;
             evidence.push({width,height,...data});
-            const png=await client.send('Page.captureScreenshot',{format:'png'});
-            fs.writeFileSync(path.join(out,`${width}-${plan.allies}v${plan.enemies}.png`),Buffer.from(png.data,'base64'));
             console.log('Character motion scene PASS',width,height,plan.allies,plan.enemies);
         }
     }
@@ -231,13 +252,16 @@ try{
     }
     const errors=client.events.filter(e=>e.method==='Runtime.exceptionThrown');
     assert.equal(errors.length,0,JSON.stringify(errors));
-    fs.writeFileSync(path.join(out,process.env.MOTION_QA_EXTENDED?'extended-'+process.env.MOTION_QA_EXTENDED+'.json':'evidence.json'),JSON.stringify({passed:true,expected,baseUrl,evidence},null,2));
+    const evidencePath=path.join(out,process.env.MOTION_QA_EXTENDED?'extended-'+process.env.MOTION_QA_EXTENDED+'.json':'evidence.json');
+    for(const file of [...screenshots.map(item=>path.join(out,item.name)),evidencePath])assert.equal(fs.existsSync(file),false,'refusing to overwrite existing evidence: '+file);
+    for(const item of screenshots)fs.writeFileSync(path.join(out,item.name),item.data,{flag:'wx'});
+    fs.writeFileSync(evidencePath,JSON.stringify({passed:true,expected,baseUrl,evidence},null,2),{flag:'wx'});
     console.log('Character Motion controlled production runtime matrix PASS');
-}catch(error){fs.writeFileSync(path.join(out,process.env.MOTION_QA_EXTENDED?'extended-'+process.env.MOTION_QA_EXTENDED+'.json':'evidence.json'),JSON.stringify({passed:false,expected,baseUrl,evidence,error:String(error.stack||error),events:client?.events.slice(-12)},null,2));throw error;}
+}catch(error){try{if(fs.existsSync(out)){const failurePath=path.join(out,`failure-${Date.now()}-${process.pid}.json`);fs.writeFileSync(failurePath,JSON.stringify({passed:false,expected,baseUrl,evidence,error:String(error.stack||error),events:client?.events.slice(-12)},null,2),{flag:'wx'});}}catch(writeError){console.error('Failure evidence unavailable:',writeError.message);}console.error('Character motion QA failed; partial screenshots may exist without success evidence:',error);throw error;}
 finally{
-    client?.close();proc.kill();
-    await new Promise(resolve=>{if(proc.exitCode!==null)resolve();else{proc.once('exit',resolve);setTimeout(resolve,5000);}});
-    await new Promise(resolve=>server.server.close(resolve));
-    try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});}
+    client?.close();
+    if(proc){proc.kill();await new Promise(resolve=>{if(proc.exitCode!==null)resolve();else{proc.once('exit',resolve);setTimeout(resolve,5000);}});}
+    if(server){try{await deadline(new Promise(resolve=>server.server.close(resolve)),'server cleanup',5000);}catch(error){server.server.closeAllConnections?.();console.error('Server cleanup pending:',error.message);}}
+    if(profile)try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});}
     catch(error){console.error('Temporary Chrome profile cleanup pending:',profile,error.code);}
 }
