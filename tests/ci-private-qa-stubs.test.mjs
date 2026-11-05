@@ -55,3 +55,35 @@ test('private QA proxy loads the canonical homepage without following redirects'
     delete process.env.CF_ACCESS_CLIENT_SECRET;
   }
 });
+
+test('private QA proxy retrieves genuine privacy pages through canonical paths', async () => {
+  const original=globalThis.fetch;
+  const seen=[];
+  globalThis.fetch=async (input,options)=>{
+    const url=new URL(input);
+    if(url.origin!=='https://dev.four-symbols-dev.pages.dev')return original(input,options);
+    seen.push({path:url.pathname,redirect:options.redirect});
+    if(url.pathname==='/privacy-consent.html'||url.pathname==='/privacy.html')return new Response(null,{status:308});
+    if(url.pathname==='/privacy-consent')return new Response('genuine-consent-page',{status:200});
+    if(url.pathname==='/privacy')return new Response('genuine-privacy-page',{status:200});
+    return new Response('other-asset',{status:200});
+  };
+  process.env.CF_ACCESS_CLIENT_ID='synthetic-id';
+  process.env.CF_ACCESS_CLIENT_SECRET='synthetic-secret';
+  let proxy;
+  try {
+    proxy=await startServer({baseUrl:'https://dev.four-symbols-dev.pages.dev'});
+    for(const [path,expected] of [['/privacy-consent.html','genuine-consent-page'],['/privacy.html','genuine-privacy-page'],['/other.html','other-asset'],['/asset.js','other-asset']]){
+      const response=await original(new URL(path,proxy.url));
+      assert.equal(response.status,200);
+      assert.equal(await response.text(),expected);
+    }
+    assert.deepEqual(seen.map(x=>x.path),['/privacy-consent','/privacy','/other.html','/asset.js']);
+    assert.ok(seen.every(x=>x.redirect==='manual'));
+  } finally {
+    if(proxy)await new Promise(resolve=>proxy.server.close(resolve));
+    globalThis.fetch=original;
+    delete process.env.CF_ACCESS_CLIENT_ID;
+    delete process.env.CF_ACCESS_CLIENT_SECRET;
+  }
+});

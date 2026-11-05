@@ -10,9 +10,15 @@
 - Game／Cache 唯一來源 `release/release.json`：173.73／173.73；dev 根 npm metadata 173.73.0 已正確投影。main 舊 package metadata 不另行直接修改，隨未來授權的正式發布整合。
 - dev 後續功能不因仍顯示 V173.73 而視為已正式發布。本次僅更新 dev 文件，沒有 main 發布授權，也沒有修改 main／玩家公告／Runtime。
 
+## 2026-11-01 週報 dev 驗證取樣
+
+- dev 取樣 SHA `af9be7fd38b7b0efd80747b9d78049fa0fd4416d`；[CI 41222181350](https://github.com/tf00913225-alt/my-game/actions/runs/41222181350) 的 Repository checks、固定 SHA 部署及適用 live QA 成功。這是 dev，不是 main 發布。
+- #1004 元素匣捲動及 #1007 獎勵視窗觸控已整合 dev；自動化四尺寸合成觸控與隔離領獎測試證據見 CHECK_REPORT。使用者手機實際操作尚待驗收。
+- Cloud Save 完整跨裝置恢復及發獎仍依原有權威與一次性保護 Gate，未宣告完成，維持 fail-closed。即時 PR／部署以 GitHub 為準。
+
 ## 施工狀態與續接入口
 
-### 2026-10-26 週報驗收界線
+### 2026-10-26 週報驗收界線（歷史取樣；UI 暫停狀態已由上節取代）
 
 - 已發布 main 仍為上列 V173.73／`f63d69dbfa66ba75637d1c3cd7fcc7d74782e356`；本週工作沒有正式發布。dev 文件整理基線為 `3d74c4aae68c9dcf21df4319d7bea1f4d3dc16aa`；Note9 實測及已完成部署驗收僅對應 `2e2de82eb0c80f4ba24796fd20b033bafcd81f6d`，不得用其結果替新 SHA 背書。
 - CI 初始化 fixture 修正 #1002、桃溪／Story 觸控修正 #1003 已合入 dev。後續使用者決定 UI／版面問題略過待整體改版；元素匣捲動 #1004 只保存成果，不合併或部署，#955 仍暫停。
