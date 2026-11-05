@@ -29,8 +29,12 @@ assert.equal((startup.match(/creation\.style\.display="block"/g)||[]).length,0,"
 assert.match(startup,/function showCharacterCreationSurface\(\)[\s\S]*?saveOwner\.showCreation\(\)/,
     "startup must enter creation through the canonical app-shell lifecycle");
 assert.match(startup,/safeCloudEmpty\(cloud,user\.uid\)[\s\S]*?enterCreation\(token\)/);
-assert.match(startup,/result&&result\.exists===false&&result\.uid===uid/,
+const emptyCheckSource=startup.slice(startup.indexOf('    function safeCloudEmpty('),startup.indexOf('    function cloudPayload('));
+const provesEmpty=vm.runInNewContext('('+emptyCheckSource+')');
+assert.equal(provesEmpty({exists:false,uid:'uid-a'},'uid-a'),true,
     "a successful same-UID missing-document read is a proven empty account");
+assert.equal(provesEmpty({exists:false,uid:'uid-b'},'uid-a'),false,"another UID cannot prove this account empty");
+assert.equal(provesEmpty(null,'uid-a'),false,"an unresolved read is not an empty account");
 assert.doesNotMatch(firebaseBootstrap,/await bootstrapTrustedCloudSave|bootstrapTrustedCloudSave\(\)/,
     "first-use read resolution must not invoke or depend on an optional trusted write deployment");
 assert.match(startup,/catch\(error\)\{[\s\S]*?禁止創角/);

@@ -36,7 +36,7 @@ function requireBaseState(data){
     if(!isTimestamp(data.createdAt)||!isTimestamp(data.updatedAt)||data.updatedAt.toMillis()<data.createdAt.toMillis()){
         fail("Cloud-save envelope timestamps are invalid.");
     }
-    if(data.gameSave!==undefined||data.save!==undefined||data.authoritativeSave!==undefined){
+    if(data.gameSave!==undefined||data.save!==undefined||data.authoritativeSave!==undefined||data.cloudBundle!==undefined){
         fail("Non-authoritative envelope must not contain gameplay state.");
     }
     if(data.preferences!==undefined||data.preferencesVersion!==undefined){

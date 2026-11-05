@@ -254,6 +254,32 @@ test('initial actual Boot resolution requests server confirmation before bundle 
     assert.equal(f.reads[0].options?.serverOnly,true,'the original Firestore Owner only confirms an explicit server-only read');
 });
 
+test('unpublished envelope carrying a bundle never proves the account empty or overwrites a local character',async()=>{
+    const h=storeHarness();
+    await h.initial.commitInitialSources(h.request(),{operationId:'unpublished-guard-0001',expectedRevision:1,selection});
+    const records=h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords;
+    const {assembleCanonicalCloudReadCandidate}=require('../functions/src/canonical-snapshot');
+    const wire=assembleCanonicalCloudReadCandidate(h.uid,h.revision,h.revision,records).cloudBundle;
+    const markEmpty=response=>Object.assign(response.data,{status:'awaiting_authoritative_migration',migrationCandidateStatus:'none'});
+    for(const payload of [wire,null,{},'partial']){
+        const f=adoptionFixture(h.uid);f.repo.activate(h.uid);const before=JSON.stringify([...f.values]);
+        const result=await f.load(wire,{published:false,mutate:response=>{markEmpty(response);response.data.cloudBundle=payload;}});
+        assert.equal(result.blocked,true,'a contradictory envelope is unresolved, never an empty account');
+        assert.equal(result.creation,undefined);assert.equal(f.ready.length,0);
+        assert.equal(f.runtime.player.id,undefined);assert.equal(JSON.stringify([...f.values]),before);
+    }
+    const empty=adoptionFixture(h.uid);
+    assert.equal((await empty.load(wire,{published:false,mutate:response=>{markEmpty(response);delete response.data.cloudBundle;}})).creation,true);
+    const local=adoptionFixture(h.uid);await local.load(wire);
+    const key=local.repo.saveKey(h.uid),{lastSaveTimestamp:beforeTimestamp,...main}=JSON.parse(local.values.get(key));
+    const sidecars=local.repo.BACKUP_SIDECARS.map(name=>local.values.get(local.repo.accountKey(name,h.uid)));
+    assert.equal((await local.load(wire,{published:false,mutate:markEmpty})).ready,true,'existing same-UID local state remains usable');
+    const {lastSaveTimestamp:afterTimestamp,...after}=JSON.parse(local.values.get(key));
+    assert.deepEqual(after,main,'ordinary local READY serialization cannot replace saved progression with cloud data');
+    assert.ok(afterTimestamp>=beforeTimestamp,'original local READY may refresh its save timestamp');
+    assert.deepEqual(local.repo.BACKUP_SIDECARS.map(name=>local.values.get(local.repo.accountKey(name,h.uid))),sidecars);
+});
+
 test('unconfirmed initial server read preserves a verified local fallback and cannot create an empty account',async()=>{
     const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
     await f.load(cuts[0]);

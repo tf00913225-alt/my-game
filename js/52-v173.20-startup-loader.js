@@ -170,9 +170,9 @@
         if(mode===STATES.SAVE_LOADING){ firebase.closeAuth(); }else{ firebase.openAuth(); }
     }
     function safeCloudEmpty(result,uid){
-        if(result&&result.exists===false&&result.uid===uid){ return true; }
-        const data=result&&result.data;
-        return !!(result&&result.exists&&data&&data.ownerUid===uid&&data.authoritativeStateReady===false&&
+        if(result?.exists===false&&result.uid===uid){ return true; }
+        const data=result?.data;
+        return !!(result?.exists&&data&&data.cloudBundle===undefined&&data.ownerUid===uid&&data.authoritativeStateReady===false&&
             data.status==="awaiting_authoritative_migration"&&(data.migrationCandidateStatus||"none")==="none");
     }
     function cloudPayload(result){
