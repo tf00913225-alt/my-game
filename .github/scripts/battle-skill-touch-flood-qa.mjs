@@ -5,7 +5,7 @@ import crypto from 'node:crypto';
 
 // Runs inside the existing account-first, production-bundle battle QA session.
 // All fixture changes are local to that disposable QA account/document.
-export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOnly=false}={}){
+export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOnly=false,fireOnly=false}={}){
     const bounded=(promise,label)=>new Promise((resolve,reject)=>{
         const timer=setTimeout(()=>reject(new Error('Battle touch/flood QA timed out: '+label)),15000);
         promise.then(value=>{clearTimeout(timer);resolve(value);},error=>{clearTimeout(timer);reject(error);});
@@ -27,9 +27,9 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
     if(deployedAssets.deployedSha){assert.equal(deployedAssets.deployedSha,process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA);}
     checks.assets={manifestMatches:true,files:deployedAssets.files,deployedSha:deployedAssets.deployedSha};
     await client.eval(`(()=>{
-        window.__touchQa={index:activeBattleCharacterIndex,phase:battlePhase,auto:autoBattle,ready:actionReady,pending:pendingAction,queued:queuedPlayerActions,loadouts:JSON.parse(JSON.stringify(characterSkillLoadouts)),sp:player.sp,finish:finishPlayerAction,submissions:0};
+        window.__touchQa={index:activeBattleCharacterIndex,phase:battlePhase,auto:autoBattle,ready:actionReady,pending:pendingAction,queued:queuedPlayerActions,loadouts:JSON.parse(JSON.stringify(characterSkillLoadouts)),sp:player.sp,finish:finishPlayerAction,submissions:0,fireSubmissions:0};
         clearInterval(timerId);timerId=null;
-        finishPlayerAction=function(){__touchQa.submissions++;return __touchQa.finish.apply(this,arguments);};
+        finishPlayerAction=function(){__touchQa.submissions++;if(${fireOnly}&&activeBattleCharacterIndex===0&&queuedPlayerActions[0]?.action==='fireRocket')__touchQa.fireSubmissions++;return __touchQa.finish.apply(this,arguments);};
         window.__touchQaReset=function(skill){
             clearTimeout(battleAdvanceTimeoutId);battleAdvanceTimeoutId=null;battleAdvanceScheduled=false;
             clearInterval(timerId);timerId=null;activeBattleCharacterIndex=0;battlePhase='declare';autoBattle=false;actionReady=false;pendingAction=null;queuedPlayerActions={};clearBattleTargetSelectionMode();
@@ -51,6 +51,27 @@ export async function battleSkillTouchFloodQa(rawClient,artifactDir,{animationOn
     };
     try{
         await client.send('Emulation.setTouchEmulationEnabled',{enabled:true,maxTouchPoints:5});
+        if(fireOnly){
+            await client.eval(`__touchQaReset('fireRocket');true`);
+            const before=await client.eval(`({sp:player.sp,fireSubmissions:__touchQa.fireSubmissions})`);
+            await tap('.skill-quick-button[data-skill-id="fireRocket"]');
+            const selected=await state();
+            assert.equal(selected.ready,true,'fireRocket must enter target selection');
+            assert.equal(selected.pending,'fireRocket');
+            const target=await client.eval(`currentBattleMonsters.find(i=>canSelectHostileBattlePrimary('monster',i,getBattleActionTargetType('fireRocket',0)))`);
+            assert.ok(Number.isInteger(target),'fireRocket requires a selectable enemy');
+            await tap('#battleMonster'+target);
+            const after=await client.eval(`(()=>({queue:queuedPlayerActions[0]||null,fireSubmissions:__touchQa.fireSubmissions,sp:player.sp,phase:battlePhase}))()`);
+            await new Promise(resolve=>setTimeout(resolve,500));
+            after.modalVisible=await client.eval(`document.getElementById('battleStatusDetailModal')?.hidden===false`);
+            checks.fireTarget={before,selected,target,after};
+            assert.equal(after.queue?.action,'fireRocket','one target touch must queue fireRocket');
+            assert.equal(after.queue?.target,target);
+            assert.equal(after.fireSubmissions,before.fireSubmissions+1,'one target touch submits fireRocket once');
+            assert.equal(after.sp,before.sp,'declaration must not charge SP before resolution');
+            assert.equal(after.modalVisible,false,'one target touch must not open monster inspection');
+            return checks;
+        }
         if(!animationOnly){
         await client.eval(`__touchQaReset('waterBall');true`);
         const button='.skill-quick-button[data-skill-id="waterBall"]';
