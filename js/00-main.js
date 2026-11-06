@@ -202,6 +202,14 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 /* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */
 /* Fixed implementation of the original AccountSave Owner; no registration API. */
 (function(global){"use strict";if(global.FourSymbolsAccountSaveOperations)return;
+// This writer is still a v1 gameplay client. Refuse unsupported data before
+// backups, sidecars or metadata are changed; this is not v2 admission authority.
+function assertGameplayVersion(context,save){
+ const progress=save&&save.gameplayProgress;
+ if(progress&&Object.prototype.hasOwnProperty.call(progress,"version")&&progress.version!==1){
+  throw context.coded("account-gameplay-version-unsupported","A compatible gameplay client is required.");
+ }
+}
 function inspectBundle(context,uid,bundle){
  const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave}=context;
         uid=validUid(uid);
@@ -213,6 +221,7 @@ function inspectBundle(context,uid,bundle){
            Object.keys(bundle.sidecars).sort().join("|")!==[...BACKUP_SIDECARS].sort().join("|")){
             throw coded("account-cloud-bundle-invalid","Complete versioned same-cut cloud bundle is required.");
         }
+        assertGameplayVersion(context,bundle.gameSave);
         const optional=new Set(["announcement-read","bulk-sell-quality","patrol-character-index","task-tracker"]);
         for(const [name,row] of Object.entries(bundle.sidecars)){
             if(!row||Object.keys(row).sort().join("|")!=="raw|status")throw coded("account-cloud-bundle-invalid","Invalid sidecar record.");
@@ -235,6 +244,12 @@ function writeForUid(context,uid,save,options={}){
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        assertGameplayVersion(context,save);
+        const previousSave=previousRaw?parseSave(previousRaw,"account-save-corrupt"):null;
+        assertGameplayVersion(context,previousSave);
+        if(previousSave?.gameplayProgress?.version===1&&save.gameplayProgress?.version!==1){
+            throw coded("account-gameplay-version-downgrade","Existing versioned gameplay progress must be preserved.");
+        }
         if(options.cloudBundle){
             const bundle=inspectCloudBundle(uid,options.cloudBundle),local=readForUid(uid);
             if(options.source!=="authoritative-cloud-read"||options.equipmentShopState||fingerprint(save)!==fingerprint(bundle.gameSave)){

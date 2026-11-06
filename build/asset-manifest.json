@@ -20,7 +20,7 @@
     "bundles": {
       "app-shell": {
         "scripts": [
-          "build/app-shell.24f28c7d6e37.js"
+          "build/app-shell.3f4340ec3882.js"
         ],
         "styles": [
           "build/app-shell.801bc1a9895d.css"
@@ -118,8 +118,8 @@
       },
       "feature-boss-relic": {
         "scripts": [
-          "build/feature-boss-relic.3173f479490d.js",
-          "build/feature-relic-progression.464cd8f702a6.js"
+          "build/feature-boss-relic.e20223c0b47c.js",
+          "build/feature-relic-progression.b623cb16bbd6.js"
         ],
         "styles": [
           "build/feature-boss-relic.6d53e861df6e.css",
@@ -595,9 +595,9 @@
         "decode": true
       },
       {
-        "path": "build/app-shell.24f28c7d6e37.js",
-        "sha256": "24f28c7d6e37",
-        "bytes": 1240903,
+        "path": "build/app-shell.3f4340ec3882.js",
+        "sha256": "3f4340ec3882",
+        "bytes": 1241829,
         "priority": "P1",
         "type": "script",
         "decode": false
@@ -987,8 +987,8 @@
         "decode": false
       }
     ],
-    "manifestHash": "1c33c768cc5c",
-    "totalBytes": 57750630,
+    "manifestHash": "f646bc23338c",
+    "totalBytes": 57751556,
     "totalResources": 95
   },
   "assets": {
@@ -996,9 +996,9 @@
       "sha256": "4915950d06e4",
       "bytes": 69987
     },
-    "build/app-shell.24f28c7d6e37.js": {
-      "sha256": "24f28c7d6e37",
-      "bytes": 1240903
+    "build/app-shell.3f4340ec3882.js": {
+      "sha256": "3f4340ec3882",
+      "bytes": 1241829
     },
     "build/gameplay-core-primary.7a38c2cd4707.js": {
       "sha256": "7a38c2cd4707",
@@ -1016,13 +1016,13 @@
       "sha256": "56786ed25f03",
       "bytes": 49914
     },
-    "build/feature-boss-relic.3173f479490d.js": {
-      "sha256": "3173f479490d",
-      "bytes": 99841
+    "build/feature-boss-relic.e20223c0b47c.js": {
+      "sha256": "e20223c0b47c",
+      "bytes": 100405
     },
-    "build/feature-relic-progression.464cd8f702a6.js": {
-      "sha256": "464cd8f702a6",
-      "bytes": 69904
+    "build/feature-relic-progression.b623cb16bbd6.js": {
+      "sha256": "b623cb16bbd6",
+      "bytes": 70292
     },
     "build/feature-adventure-entry.5e09bea7a0b6.js": {
       "sha256": "5e09bea7a0b6",

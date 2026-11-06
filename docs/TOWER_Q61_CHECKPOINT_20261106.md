@@ -77,3 +77,57 @@ did not execute tests and did not approve merge or deployment.
 These tests do not verify runtime Taipei rollover, atomic migration, cross-device
 once-only, failure recovery or player experience. Those remain pending, together
 with necessary final-head CI. No deployment QA is claimed.
+
+## Second checkpoint: v1 admission protection and retained cross-period pending
+
+Actual changes on this same branch:
+
+- The original AccountSaveOperations Writer in js/00-main.js rejects unsupported
+  incoming or stored gameplayProgress versions before any backup/storage write.
+  An existing v1 gameplayProgress cannot be omitted or replaced by unversioned
+  progress. Cloud bundle screening also rejects unsupported gameplay versions.
+- Tower bootstrap does not hydrate, normalize, persist or install battle callbacks
+  for unsupported versions. Its normalizer also refuses a future version.
+- Relic reconciliation returns blocked-period before inventory comparison or age
+  cleanup for Tower pending whose week is missing or differs from the active week.
+  It does not invent a victory, a new operation, delivery or an old-week reward.
+
+These are protections in the updated v1 client, not formal v2 admission or a way
+to force already-distributed old clients to reject downgrade. Same-week unknown
+pending still has the existing age cleanup; that is not fixed by this checkpoint.
+The shared pending guard also blocks Boss entry while an unresolved old Tower
+receipt exists. There is no new recovery/adjudication capability, so this preserves
+value at the cost of availability. Do not claim non-Tower behavior is unchanged
+in that exceptional state or enable v2 on the basis of these tests.
+
+Narrow source/consumer audit:
+
+- Tower startTowerFloor accepts the local launcher callback; completeTowerFloor
+  interprets its local result. getActiveBattleState exposes local context, not a
+  server-accepted entry entitlement or durable victory receipt.
+- Relic buildTowerPending stores a local week and reward plan; pendingVictory reads
+  the current claimedFloors marker. This cannot establish trusted eligibility.
+- functions/index.js wires reserveTrustedGrant and claimDailyCheckin, but no Tower
+  entry/outcome/settlement consumer. canonical-operation-classifier.js has no Tower
+  retained-operation kind. Unsupported kinds are rejected; do not add an alias
+  merely to make a client victory acceptable.
+- trusted-grant-ledger.js requires an existing server-issued grant;
+  canonical-resource-credit.js accepts specific server-event gold/EXP sources.
+  Neither creates a Tower source, period eligibility, victory proof or complete
+  Tower item/lifetime/pending transaction.
+- canonical-snapshot.js remains strict v1. The AccountSave/Reward Owner must prove
+  source-specific admission, atomic period receipts and recovery before v2 writes.
+  Frozen battle evidence cannot be promoted to this source.
+
+New version/admission tests cover raw save/metadata/sidecar preservation, valid v1,
+cloud screening and unsupported Tower bootstrap. The Relic regression covers
+reload, aged old pending, a current-week claim of the same floor and retries.
+Nine targeted test files pass (40 Node test-runner results, including legacy
+suites), production build/check and diff check pass. The original reviewer read
+the second diff, found no mandatory correction, and required the availability,
+same-week unknown and old-client limitations above to remain explicit.
+
+The official builder refreshed only js/00-main.js's source digest inside the
+retained restricted-forest-instance-policy.json; no battle policy/formula or
+frozen engine behavior was changed or activated. No CI rerun, merge or deployment
+was requested. Latest-head CI must be reported separately from the first commit.

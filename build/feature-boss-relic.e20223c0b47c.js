@@ -210,6 +210,9 @@
     }
     function normalizeState(raw,now){
         const source=raw&&typeof raw==="object"?raw:{};
+        if(Object.prototype.hasOwnProperty.call(source,"version")&&source.version!==STATE_VERSION){
+            throw Object.assign(new Error("Unsupported gameplay progress version"),{code:"gameplay-progress-version-unsupported"});
+        }
         const normalized=defaultState(now);
         PERSONAL_BOSSES.forEach(definition=>{
             const entry=source.personal&&source.personal[definition.id]||{};
@@ -244,6 +247,10 @@
 
     const initialMainSave=readMainSave();
     const initialStoredState=initialMainSave&&initialMainSave.gameplayProgress;
+    // A v1 runtime must never normalize a future schema into a writable v1 save.
+    // AccountSave independently refuses writes; do not install battle callbacks.
+    if(initialStoredState&&Object.prototype.hasOwnProperty.call(initialStoredState,"version")&&
+       initialStoredState.version!==STATE_VERSION){ return; }
     let state=normalizeState(initialStoredState);
     const initialStateNeedsPersist=JSON.stringify(initialStoredState||null)!==JSON.stringify(state);
     let bossTab="personal";

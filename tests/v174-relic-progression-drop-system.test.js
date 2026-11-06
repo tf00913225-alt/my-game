@@ -41,7 +41,7 @@ assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
         "a dependency-order miss must stay retryable instead of permanently claiming the owner");
 }
 
-function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null}={}){
+function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};
     const localStorage={
@@ -78,7 +78,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
     let activeBattle=null;
     const context={
         console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,
-        setTimeout,clearTimeout,setInterval,clearInterval,
+        setTimeout,clearTimeout,setInterval:noTimers?()=>1:setInterval,clearInterval,
         window:null,localStorage,gold:1000,
         FourSymbolsEquipmentGems:{definitions:{gemVitalityI:{id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:{vitality:1}}}},
         player:saveDoc.player,
@@ -322,6 +322,28 @@ function add(context,id,count){
 }
 
 /* UID isolation: separate account contexts do not share progression receipts or material inventory. */
+/* An unresolved old-week receipt cannot be cleared by age or a new-week claim. */
+{
+    const first=makeContext({withStarters:true,noTimers:true});
+    assert.equal(first.context.vGameplaySelectTowerBand(10),true);
+    const savedPlayer=JSON.parse(JSON.stringify(first.saveDoc.player));
+    savedPlayer.relicProgression.pending.startedAt=1;
+    const original=JSON.stringify(savedPlayer.relicProgression.pending);
+    const nextWeek=JSON.parse(JSON.stringify(first.gameplayState));
+    nextWeek.tower.weekKey="2026-09-14";
+    nextWeek.tower.claimedFloors={10:true};
+    const reload=makeContext({withStarters:true,noTimers:true,savedPlayer,gameplayOverride:nextWeek});
+    for(let retry=0;retry<3;retry++){
+        assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),"blocked-period");
+        assert.equal(JSON.stringify(reload.context.RelicProgressionSystem.getProgressionState().pending),original);
+        assert.equal(reload.context.vGameplaySelectTowerBand(10),false);
+        assert.equal(reload.context.vGameplayStartBoss("personal","personal-20"),false,
+            "shared unresolved pending also blocks Boss entry; no recovery is implied");
+    }
+    assert.equal(reload.context.RelicProgressionSystem.getItemCount("gemVitalityI"),0);
+    assert.equal(JSON.stringify(reload.saveDoc.player.relicProgression.pending),original);
+}
+
 {
     const a=makeContext({uid:"uid-a"});
     add(a.context,"relicUniversalFragment",10);a.context.saveGame();

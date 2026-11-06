@@ -716,6 +716,11 @@
         if(battleStillActive()){ return "waiting"; }
         const state=gameplayRuntime.getSerializableState&&gameplayRuntime.getSerializableState();
         if(!state){ return "waiting"; }
+        // A different active week is not evidence of defeat or delivery. Keep
+        // the original operation intact until a period-aware settlement exists.
+        // Do not compare current inventory counts against an old-week receipt.
+        if(pending.kind==="tower"&&(!pending.weekKey||!state.tower||
+           state.tower.weekKey!==pending.weekKey)){ return "blocked-period"; }
         if(pendingVictory(pending,state)){
             const already=receiptAlreadyDelivered(pending);
             if(!already&&!grantReceiptToTargets(pending)){
