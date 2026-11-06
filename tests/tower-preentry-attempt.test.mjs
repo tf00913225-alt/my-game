@@ -81,3 +81,20 @@ test('actual claimed-floor replay starts without creating a reward receipt',()=>
  assert.equal(c.RelicProgressionSystem.getProgressionState().pending,null);
  assert.equal(c.battleActive,true);
 });
+test('official entry guard and settled old promise preserve the next Tower preparation',async()=>{
+ const c=loadIntegrated(),first=deferred(),second=deferred();let preparations=0,launches=0;
+ c.v154PreparePortraitsForEncounter=()=>++preparations===1?first.promise:second.promise;
+ c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ assert.equal(c.vGameplaySelectTowerBand(1),false);
+ assert.equal(c.vGameplayStartBoss('personal','personal-30'),false);
+ first.reject(Error('first preparation'));await flush();
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=JSON.stringify(c.GameplaySystem.getActiveBattleState());
+ const pending=JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending);
+ first.resolve({state:'ready'});await flush();
+ assert.equal(JSON.stringify(c.GameplaySystem.getActiveBattleState()),before);
+ assert.equal(JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending),pending);
+ assert.equal(c.vGameplaySelectTowerBand(1),false);assert.equal(launches,0);
+ second.resolve({state:'ready'});await flush();assert.equal(launches,1);
+});
