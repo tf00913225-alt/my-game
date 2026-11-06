@@ -31,8 +31,10 @@ const expression=`(async()=>{
    const index=sceneIndex++;diagnostic('before-entry',element,floor,index);
    player.hp=getMainCharacterStats().maxHP;player.sp=getMainCharacterStats().maxSP;player.statusEffects=[];player.activeBuffs=[];
    const realNow=Date.now;let roster;
-   try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);let started;try{started=vGameplaySelectTowerBand(floor);}catch(error){diagnostic('entry-threw',element,floor,index,'throw');throw error;}diagnostic('entry-returned',element,floor,index,started===true?'true':started===false?'false':'other');check(started===true,'Tower entry refused');}finally{Date.now=realNow;}
-   diagnostic('wait-battle-active',element,floor,index);await wait(()=>battleActive);diagnostic('wait-entry-animation',element,floor,index);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+   // The portrait owner prepares asynchronously; keep this QA scene's clock
+   // through the original battleActive wait, then restore it on every outcome.
+   try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);let started;try{started=vGameplaySelectTowerBand(floor);}catch(error){diagnostic('entry-threw',element,floor,index,'throw');throw error;}diagnostic('entry-returned',element,floor,index,started===true?'true':started===false?'false':'other');check(started===true,'Tower entry refused');diagnostic('wait-battle-active',element,floor,index);await wait(()=>battleActive);}finally{Date.now=realNow;}
+   diagnostic('wait-entry-animation',element,floor,index);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
    check(currentBattleMonsters.length===6,'real roster count');
    check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
    const active=currentBattleMonsters.map(i=>monsters[i]);

@@ -59,6 +59,31 @@ for(const target of ['wait-battle-active','wait-entry-animation'])test('actual T
  await assert.rejects(c.__probeEnter('fire',1),/Runtime wait timeout/);
  assert.equal(c.__q61TowerFailureTrace.snapshot().at(-1).stage,target);
 });
+for(const outcome of ['success','timeout','refused','throw'])test('Tower fixture clock covers asynchronous preparation and restores on '+outcome,async()=>{
+ const script=readFileSync(new URL('../.github/scripts/run-tower-challenge-browser-qa.mjs',import.meta.url),'utf8');
+ const expression=script.match(/const expression=`([\s\S]*?)`;\s*const deployedBase/)[1];
+ const cut=expression.indexOf(' // Full production loadout');
+ const source=(expression.slice(0,cut)+' window.__probeEnter=enter;return true;}catch(error){throw error;}})()')
+  .replace('${createQ61DiagnosticTrace.toString()}',createQ61DiagnosticTrace.toString());
+ const actual=Date.UTC(2026,10,6,12),names=['fire','earth','water','wind'],week=604800000,anchor=Date.UTC(1970,0,5);
+ class ProbeDate extends Date{} ProbeDate.now=()=>actual;const originalNow=ProbeDate.now;
+ let tick=0,observed=null;const monster=()=>({balanceOwner:'MonsterBalance',mode:'tower',level:40,context:'tower/floor/1',rank:'regular',maxHP:100,maxSP:10,attack:10,magicAttack:10,defense:10,agility:10,vTowerCriticalBonusPercent:15,skillChance:.65,balanceProjection:{finalDamagePressure:1}});
+ const c={console,Date:ProbeDate,Promise,Math,Set,Object,Array,Number,performance:{now:()=>{tick+=1000;return tick;}},
+  setTimeout:fn=>fn(),player:{},autoBattle:false,autoConfig:{},autoPatrolEnabled:false,battleActive:false,innerWidth:500,
+  currentBattleMonsters:[0,1,2,3,4,5],monsters:Array.from({length:6},monster),showPage(){},closeHomeFeature(){},getMainCharacterStats:()=>({maxHP:10,maxSP:10}),
+  FourSymbolsStartupPolicy:{getState:()=> 'READY'},FourSymbolsFeatures:{ensure:async()=>{}},FourSymbolsReleaseUpdate:{checkForUpdate:async()=>{},notifySafeState(){}},
+  document:{getElementById:id=>id==='battlePage'?{matches:()=>false}:id.startsWith('battleMonster')?{getBoundingClientRect:()=>({width:10,height:10,left:0,right:10})}:null},
+  GameplaySystem:{getWeekInfo:time=>{const i=Math.floor((time-anchor)/week);return {key:new Date(anchor+i*week).toISOString().slice(0,10),element:names[((i%4)+4)%4]};},debugReloadState(){},buildTowerRoster:()=>Array.from({length:12},monster)},
+  MonsterBalance:{debug:m=>({final:{maxHP:m.maxHP,maxSP:m.maxSP,physicalAttack:m.attack,magicAttack:m.magicAttack,defense:m.defense,speed:m.agility}})},
+  FourSymbolsBattlefieldSlots:{getActiveEnemySnapshot:()=>({monsterIndexToSlot:{0:0,1:1,2:2,3:3,4:4,5:5}}),getEnemySlotForMonster:(_,i)=>i,createEnemyFormationSnapshot:()=>({})},
+  getMonsterCriticalChance:()=>25,getTowerDirectDamageMultiplier:()=>1.15,getMonsterEvasion:()=>0,getMonsterAgility:m=>m.agility,getMonsterEffectiveDefense:m=>m.defense,
+  vGameplaySelectTowerBand(){if(outcome==='refused')return false;if(outcome==='throw')throw Error('entry error');if(outcome==='success')Promise.resolve().then(()=>{observed=ProbeDate.now();c.battleActive=true;});return true;}};
+ c.window=c;vm.createContext(c);await vm.runInContext(source,c);
+ if(outcome==='success'){
+  await c.__probeEnter('fire',1);assert.notEqual(observed,actual);assert.equal(c.GameplaySystem.getWeekInfo(observed).element,'fire');
+ }else await assert.rejects(c.__probeEnter('fire',1),outcome==='timeout'?/Runtime wait timeout/:outcome==='refused'?/Tower entry refused/:/entry error/);
+ assert.equal(ProbeDate.now,originalNow,'Date.now must restore after '+outcome);
+});
 for(const mode of ['false','throw'])test('actual Battle QA tower entry preserves '+mode+' without extra observation calls',async()=>{
  const script=readFileSync(new URL('../.github/scripts/battle-layer-audio-live-qa.mjs',import.meta.url),'utf8');
  const start=script.indexOf('async function launchPresentationQaMode('),end=script.indexOf('\nasync function captureRelicPresentationQa(',start);
