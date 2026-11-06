@@ -910,22 +910,38 @@
         });
     }
 
+    let lastTowerEntryDiagnostic={result:"not-observed",reason:"not-observed",pendingKind:"none",pendingPhase:"none"};
+    function recordTowerEntryDiagnostic(result,reason){
+        try{
+            const pending=progressionState.pending;
+            const kind=pending?.kind;
+            const phase=pending?.phase;
+            lastTowerEntryDiagnostic={result:result,reason:reason,
+                pendingKind:!pending?"none":kind==="tower"||kind==="boss"?kind:"other",
+                pendingPhase:!pending?"none":phase===undefined?"legacy":["preparing","launch-requested","cancelled-before-launch"].includes(phase)?phase:"other"};
+        }catch(_){ lastTowerEntryDiagnostic={result:"not-observed",reason:"not-observed",pendingKind:"other",pendingPhase:"other"}; }
+    }
     function wrapTowerStarter(original,targetResolver,selectFloor){
         if(typeof original!=="function"){ return null; }
         return function(){
+            recordTowerEntryDiagnostic("not-observed","not-observed");
+            try{
             reconcilePending();
-            if(pendingBlocksEntry("爬塔挑戰")){ return false; }
+            if(pendingBlocksEntry("爬塔挑戰")){ recordTowerEntryDiagnostic("rejected",towerAttemptUnresolved?"attempt-unresolved":"pending-blocked");return false; }
             const target=targetResolver.apply(this,arguments);
             const pending=buildTowerPending(target);
             const attempt=pending?makeTowerAttempt(pending):null;
             if(pending&&(!attempt||!attempt.begin())){
+                recordTowerEntryDiagnostic("rejected",attempt?"attempt-begin-unconfirmed":"attempt-unavailable");
                 notify("無法建立安全的秘寶獎勵收據，為避免里程碑遺失，本次爬塔挑戰未開始。");
                 return false;
             }
             const started=selectFloor?original.call(this,target,attempt):original.call(this,attempt);
             if(!started&&attempt){ attempt.cancelBeforeLaunch(); }
             else if(started){ ensureReceiptMonitor(); }
+            recordTowerEntryDiagnostic(started?"accepted":"rejected",started?"entry-accepted":"owner-returned-falsy");
             return started;
+            }catch(error){ recordTowerEntryDiagnostic("threw","entry-threw");throw error; }
         };
     }
     if(typeof window.vGameplayContinueTower==="function"){
@@ -1319,7 +1335,8 @@
         estimateBossTarget:bossTargetEstimate,
         reconcileLevelMilestones:ensureFirstCharacterLevel20Relics,
         reconcilePending:reconcilePending,
-        getProgressionState:()=>clone(progressionState)
+        getProgressionState:()=>clone(progressionState),
+        getLastTowerEntryDiagnostic:()=>({...lastTowerEntryDiagnostic})
     });
 
     hydrateOwnedItemPresentation();

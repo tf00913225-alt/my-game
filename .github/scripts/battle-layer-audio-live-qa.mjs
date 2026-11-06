@@ -555,9 +555,10 @@ async function launchPresentationQaMode(client,mode,relicId){
     }else if(mode==="abyss"){
         started=await client.eval("(()=>{if(typeof v174AbyssReset!=='function'||typeof v174AbyssStartEncounter!=='function')return false;v174AbyssReset(40);return v174AbyssStartEncounter()===true;})()");
     }else if(mode==="tower"){
-        try{started=await client.eval("(()=>{if(typeof vGameplayContinueTower!=='function')return false;return vGameplayContinueTower()===true;})()");}
+        let observation;
+        try{observation=await client.eval("(()=>{if(typeof vGameplayContinueTower!=='function')return {started:false};const started=vGameplayContinueTower()===true;let diagnostic;try{diagnostic=window.RelicProgressionSystem?.getLastTowerEntryDiagnostic?.();}catch(_){}return {started,diagnostic};})()");started=observation?.started===true;}
         catch(error){q61PresentationTrace.record({stage:'entry-threw',mode,relicId,entryResult:'throw'});throw error;}
-        q61PresentationTrace.record({stage:'entry-returned',mode,relicId,entryResult:started===true?'true':started===false?'false':'other'});
+        q61PresentationTrace.record({stage:'entry-returned',mode,relicId,entryResult:started===true?'true':started===false?'false':'other',diagnostic:observation?.diagnostic});
     }else if(mode==="personal"){
         started=await client.eval("(()=>{if(typeof vGameplayStartBoss!=='function')return false;return vGameplayStartBoss('personal','personal-70')===true;})()");
     }else if(mode==="world"){

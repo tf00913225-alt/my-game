@@ -28,6 +28,39 @@ function attempt({failPhase=false}={}){
   get phase(){return phase;},get cancelled(){return cancelled;}};
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+test('Tower entry diagnostics report actual synchronous branch without exposing pending data',()=>{
+ const c=loadIntegrated();
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ let d=c.RelicProgressionSystem.getLastTowerEntryDiagnostic();
+ assert.equal(d.reason,'entry-accepted');assert.equal(d.result,'accepted');
+ assert.deepEqual(Object.keys(d).sort(),['pendingKind','pendingPhase','reason','result']);
+ assert.equal(c.vGameplaySelectTowerBand(1),false);
+ d=c.RelicProgressionSystem.getLastTowerEntryDiagnostic();
+ assert.equal(d.reason,'pending-blocked');assert.equal(d.pendingKind,'tower');
+ assert.equal(d.pendingPhase,'launch-requested');
+ const before=JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test'));
+ d.reason='changed';assert.equal(c.RelicProgressionSystem.getLastTowerEntryDiagnostic().reason,'pending-blocked');
+ assert.equal(JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test')),before);
+});
+test('Tower diagnostic preserves starter falsy and original exception',()=>{
+ const original=Error('private error');
+ for(const throws of [false,true]){
+  const {context:c}=makeRelic({withStarters:true,noTimers:true,towerStarter:()=>{if(throws)throw original;return false;}});
+  if(throws)assert.throws(()=>c.vGameplaySelectTowerBand(1),error=>error===original);
+  else assert.equal(c.vGameplaySelectTowerBand(1),false);
+  const d=c.RelicProgressionSystem.getLastTowerEntryDiagnostic();
+  assert.equal(d.reason,throws?'entry-threw':'owner-returned-falsy');
+  assert.doesNotMatch(JSON.stringify(d),/private|uid|reward|attemptId/);
+ }
+});
+test('unconfirmed begin remains fenced and reports no inferred save result',()=>{
+ const {context:c}=makeRelic({withStarters:true,noTimers:true});
+ c.saveGame=()=>false;
+ assert.equal(c.vGameplaySelectTowerBand(1),false);
+ assert.equal(c.RelicProgressionSystem.getLastTowerEntryDiagnostic().reason,'attempt-begin-unconfirmed');
+ assert.equal(c.vGameplaySelectTowerBand(1),false);
+ assert.equal(c.RelicProgressionSystem.getLastTowerEntryDiagnostic().reason,'attempt-unresolved');
+});
 function freshRepository(snapshot){
  const values=new Map(Object.entries(snapshot));
  const localStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value)),removeItem:key=>values.delete(key)};

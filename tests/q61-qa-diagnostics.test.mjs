@@ -4,6 +4,16 @@ import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
 import {createQ61DiagnosticTrace,captureQ61Event} from '../.github/scripts/q61-qa-diagnostics.mjs';
 
+test('bounded reason projection survives event capture and rejects unknown values',()=>{
+ const trace=createQ61DiagnosticTrace();
+ trace.record({stage:'entry-returned',diagnostic:{reason:'pending-blocked',pendingKind:'tower',pendingPhase:'launch-requested',uid:'secret',rewards:'secret'}});
+ const captured=captureQ61Event([{method:'Runtime.consoleAPICalled',params:{args:[{value:'Q61_TOWER_DIAGNOSTICS'},{value:JSON.stringify(trace.snapshot())}]}}]);
+ assert.equal(captured.rows[0].reason,'pending-blocked');assert.equal(captured.rows[0].pendingPhase,'launch-requested');
+ assert.doesNotMatch(JSON.stringify(captured),/secret|uid|rewards/);
+ trace.record({stage:'entry-returned',diagnostic:{reason:'secret',pendingKind:'secret',pendingPhase:'secret'}});
+ assert.equal(trace.snapshot().at(-1).reason,'not-observed');
+});
+
 test('two waits have distinct labels and only the latest eight stages remain',()=>{
  const trace=createQ61DiagnosticTrace();
  for(let i=0;i<10;i++)trace.record({stage:i===8?'wait-battle-active':i===9?'wait-entry-animation':'before-entry',sceneIndex:i});

@@ -5,11 +5,15 @@ export function createQ61DiagnosticTrace(){
     const elements=new Set(['fire','earth','water','wind']);
     const relics=new Set(['relic_cold_spring_jade','relic_qiankun_flask','relic_sun_orb','relic_nine_dragon_fire']);
     const results=new Set(['true','false','other','throw','not-observed']);
+    const reasons=new Set(['not-observed','pending-blocked','attempt-unresolved','attempt-unavailable','attempt-begin-unconfirmed','owner-returned-falsy','entry-accepted','entry-threw']);
+    const kinds=new Set(['none','tower','boss','other','not-observed']);
+    const phases=new Set(['none','legacy','preparing','launch-requested','cancelled-before-launch','other','not-observed']);
     const rows=[];
     return Object.freeze({
         record(value){
             try{
                 const input=value&&typeof value==='object'?value:{};
+                const diagnostic=input.diagnostic&&typeof input.diagnostic==='object'?input.diagnostic:{};
                 const row={
                     stage:stages.has(input.stage)?input.stage:'capture-failed',
                     mode:modes.has(input.mode)?input.mode:'tower',
@@ -20,7 +24,8 @@ export function createQ61DiagnosticTrace(){
                     weekKey:typeof input.weekKey==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(input.weekKey)?input.weekKey:null,
                     entryResult:results.has(input.entryResult)?input.entryResult:'not-observed',
                     battleActive:typeof input.battleActive==='boolean'?input.battleActive:null,
-                    pendingKind:'not-observed',pendingPhase:'not-observed',
+                    reason:reasons.has(diagnostic.reason)?diagnostic.reason:'not-observed',
+                    pendingKind:kinds.has(diagnostic.pendingKind)?diagnostic.pendingKind:'not-observed',pendingPhase:phases.has(diagnostic.pendingPhase)?diagnostic.pendingPhase:'not-observed',
                     preparation:'not-observed',save:'not-observed',launcher:'not-observed'
                 };
                 rows.push(row);if(rows.length>8)rows.shift();
@@ -33,7 +38,8 @@ export function createQ61DiagnosticTrace(){
                 const observed=read();
                 this.record({stage:context.stage,mode:context.mode,sceneIndex:context.sceneIndex,element:context.element,
                     relicId:context.relicId,floor:context.floor,entryResult:context.entryResult,
-                    weekKey:observed?.weekKey,battleActive:observed?.battleActive});
+                    weekKey:observed?.weekKey,battleActive:observed?.battleActive,
+                    diagnostic:observed?.diagnostic});
             }catch(_){this.record({stage:'capture-failed'});}
         },
         snapshot(){return rows.map(row=>({...row}));}
@@ -47,7 +53,7 @@ export function captureQ61Event(events){
         const rows=JSON.parse(event?.params?.args?.[1]?.value);
         if(!Array.isArray(rows)){ return {status:'capture-failed'}; }
         const trace=createQ61DiagnosticTrace();
-        for(const row of rows.slice(-8))trace.record(row);
+        for(const row of rows.slice(-8))trace.record({...row,diagnostic:{reason:row.reason,pendingKind:row.pendingKind,pendingPhase:row.pendingPhase}});
         return {status:'captured',rows:trace.snapshot()};
     }catch(_){ return {status:'capture-failed'}; }
 }

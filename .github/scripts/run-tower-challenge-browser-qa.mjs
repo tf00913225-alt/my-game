@@ -12,7 +12,8 @@ const expression=`(async()=>{
  const diagnostic=(stage,element,floor,sceneIndex,entryResult)=>{
    trace.capture({stage,mode:'tower',element,floor,sceneIndex,entryResult},()=>{
      const week=window.GameplaySystem?.getWeekInfo?.(Date.now());
-     return {weekKey:week?.key,battleActive:typeof battleActive==='boolean'?battleActive:null};
+     return {weekKey:week?.key,battleActive:typeof battleActive==='boolean'?battleActive:null,
+       diagnostic:stage==='entry-returned'?window.RelicProgressionSystem?.getLastTowerEntryDiagnostic?.():undefined};
    });
  };
  try{
