@@ -747,6 +747,10 @@
             decorateAllSurfaces();
             return already?"already-delivered":"delivered";
         }
+        // Elapsed time and absence of a current claim are not evidence of loss.
+        // The existing Tower lifecycle has no durable terminal-result receipt;
+        // retain unknown outcomes instead of silently dropping their entitlement.
+        if(pending.kind==="tower"){ return "blocked-outcome"; }
         const age=Date.now()-integer(pending.startedAt);
         if(age>250||age>RECEIPT_STALE_MS){
             progressionState.pending=null;writeProgressionState();
@@ -766,11 +770,19 @@
         if(receiptMonitor&&typeof receiptMonitor.unref==="function"){ receiptMonitor.unref(); }
     }
 
+    function pendingBlocksEntry(label){
+        if(!progressionState.pending){ return false; }
+        if(progressionState.pending.kind==="tower"){
+            notify("尚有四象塔獎勵紀錄未結清，原紀錄已保留。為避免覆寫，本次"+label+"未開始；目前尚無自動復原流程。");
+        }
+        return true;
+    }
+
     const originalStartBoss=typeof window.vGameplayStartBoss==="function"?window.vGameplayStartBoss:null;
     if(originalStartBoss){
         window.vGameplayStartBoss=function(type,id){
             reconcilePending();
-            if(progressionState.pending){ return false; }
+            if(pendingBlocksEntry(" BOSS 挑戰")){ return false; }
             const pending=buildBossPending(type,id);
             if(pending&&!setPending(pending)){
                 notify("無法建立安全的秘寶獎勵收據，為避免掉落遺失，本次 BOSS 挑戰未開始。");
@@ -787,7 +799,7 @@
         if(typeof original!=="function"){ return null; }
         return function(){
             reconcilePending();
-            if(progressionState.pending){ return false; }
+            if(pendingBlocksEntry("爬塔挑戰")){ return false; }
             const target=targetResolver.apply(this,arguments);
             const pending=buildTowerPending(target);
             if(pending&&!setPending(pending)){

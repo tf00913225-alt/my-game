@@ -41,7 +41,7 @@ assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
         "a dependency-order miss must stay retryable instead of permanently claiming the owner");
 }
 
-function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false}={}){
+function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};
     const localStorage={
@@ -80,6 +80,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
         console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,
         setTimeout,clearTimeout,setInterval:noTimers?()=>1:setInterval,clearInterval,
         window:null,localStorage,gold:1000,
+        alert(message){ (context.notices||(context.notices=[])).push(message); },
         FourSymbolsEquipmentGems:{definitions:{gemVitalityI:{id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:{vitality:1}}}},
         player:saveDoc.player,
         inventoryItems:saveDoc.inventoryItems,
@@ -128,7 +129,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
     if(withStarters){
         context.vGameplayStartBoss=(type,id)=>{activeBattle={mode:type,definitionId:id};return true;};
         context.vGameplayContinueTower=()=>{activeBattle={mode:"tower"};return true;};
-        context.vGameplaySelectTowerBand=floor=>{activeBattle={mode:"tower",floor};return true;};
+        context.vGameplaySelectTowerBand=floor=>{if(rejectTowerEntry){return false;}activeBattle={mode:"tower",floor};return true;};
     }
     context.__setActiveBattle=value=>{activeBattle=value;};
     context.window=context;
@@ -342,6 +343,37 @@ function add(context,id,count){
     }
     assert.equal(reload.context.RelicProgressionSystem.getItemCount("gemVitalityI"),0);
     assert.equal(JSON.stringify(reload.saveDoc.player.relicProgression.pending),original);
+    assert.ok(reload.context.notices.some(message=>message.includes("BOSS 挑戰")&&message.includes("原紀錄已保留")));
+    assert.ok(reload.context.notices.some(message=>message.includes("爬塔挑戰")&&message.includes("尚無自動復原流程")));
+}
+
+/* No same-week claim is unknown, not a time-based proof of defeat. */
+{
+    const first=makeContext({withStarters:true,noTimers:true});
+    assert.equal(first.context.vGameplaySelectTowerBand(10),true);
+    const savedPlayer=JSON.parse(JSON.stringify(first.saveDoc.player));
+    savedPlayer.relicProgression.pending.startedAt=1;
+    const original=JSON.stringify(savedPlayer.relicProgression.pending);
+    const reload=makeContext({withStarters:true,noTimers:true,savedPlayer,
+        gameplayOverride:JSON.parse(JSON.stringify(first.gameplayState))});
+    for(let retry=0;retry<3;retry++){
+        assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),"blocked-outcome");
+        assert.equal(JSON.stringify(reload.context.RelicProgressionSystem.getProgressionState().pending),original);
+        assert.equal(reload.context.vGameplaySelectTowerBand(10),false);
+        assert.equal(reload.context.vGameplayStartBoss("personal","personal-20"),false);
+    }
+    assert.equal(reload.context.RelicProgressionSystem.getItemCount("gemVitalityI"),0);
+    assert.equal(JSON.stringify(reload.saveDoc.player.relicProgression.pending),original);
+    assert.ok(reload.context.notices.some(message=>message.includes("原紀錄已保留")));
+}
+
+/* A rejected launch is still the original known-no-entry cancellation path. */
+{
+    const failed=makeContext({withStarters:true,noTimers:true,rejectTowerEntry:true});
+    assert.equal(failed.context.vGameplaySelectTowerBand(10),false);
+    assert.equal(failed.context.RelicProgressionSystem.getProgressionState().pending,null);
+    assert.equal(failed.saveDoc.player.relicProgression.pending,null);
+    assert.equal(failed.context.vGameplayStartBoss("personal","personal-20"),true);
 }
 
 {

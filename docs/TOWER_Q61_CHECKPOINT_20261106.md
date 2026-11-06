@@ -94,7 +94,8 @@ Actual changes on this same branch:
 
 These are protections in the updated v1 client, not formal v2 admission or a way
 to force already-distributed old clients to reject downgrade. Same-week unknown
-pending still has the existing age cleanup; that is not fixed by this checkpoint.
+pending was still age-cleared at the second checkpoint; the third checkpoint
+below removes that Tower cleanup.
 The shared pending guard also blocks Boss entry while an unresolved old Tower
 receipt exists. There is no new recovery/adjudication capability, so this preserves
 value at the cost of availability. Do not claim non-Tower behavior is unchanged
@@ -125,9 +126,42 @@ reload, aged old pending, a current-week claim of the same floor and retries.
 Nine targeted test files pass (40 Node test-runner results, including legacy
 suites), production build/check and diff check pass. The original reviewer read
 the second diff, found no mandatory correction, and required the availability,
-same-week unknown and old-client limitations above to remain explicit.
+then-outstanding same-week unknown and old-client limitations to remain explicit.
 
 The official builder refreshed only js/00-main.js's source digest inside the
 retained restricted-forest-instance-policy.json; no battle policy/formula or
 frozen engine behavior was changed or activated. No CI rerun, merge or deployment
 was requested. Latest-head CI must be reported separately from the first commit.
+
+## Third checkpoint: same-week unknown preservation and explicit entry refusal
+
+The same-week Tower no-claim case used to fall through to age > 250 ms cleanup.
+Neither elapsed time nor absence of claimedFloors proves defeat. Tower now returns
+blocked-outcome instead, retaining the original pending across reload and retries.
+The original Boss-only cleanup and known failed-launch cancellation remain as-is.
+This is not a trusted result writer, new receipt engine or recovery mechanism.
+
+Single-slot audit: normalizeProgressionState clones one pending; setPending
+replaces it. Both Boss and Tower starters require that slot for their planned
+rewards, and legacy Boss reward suppression also reads its kind. Allowing Boss
+while retaining a Tower record would either overwrite that record, lose Boss
+tracking or require another durable slot/schema and its recovery contract. No
+such contract is established here, so safe isolation was not implemented. Both
+entries remain blocked and now use the existing notify path to explain that the
+Tower record is retained and there is no automatic recovery. No new UI component,
+layout, wrapper, timer or save field was added; paused UI work remains untouched.
+
+Availability STOP: real defeat/escape with no durable terminal evidence can also
+remain unknown, blocking both Tower and Boss indefinitely. This Draft is not a
+publishable gameplay fix. Do not resolve that state by trusting a client win flag,
+deleting pending, promising that reload will recover, or resuming frozen battle
+engineering. A supported terminal/cancellation/recovery contract remains required.
+
+Targeted Relic tests cover same-week and cross-week aged pending, reload/retry,
+no grant, unchanged saved record, explicit Tower/Boss refusal notifications and
+known rejected-entry cancellation. Existing successful weekly/next-week and
+permanent-milestone cases continue to pass. Only the changed Relic suite and
+necessary builder/checks are rerun in this batch, not the completed prior suite.
+Original /root/compatibility reviewer read this diff and permits only a Draft
+value-preservation checkpoint, requiring the availability STOP to stay explicit.
+Player-visible notification layout/experience has not been browser-validated.
