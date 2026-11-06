@@ -18,6 +18,19 @@ function loadIntegrated(){
  assert.equal(c.saveGame(),true);vm.runInContext(relicSource,c,{filename:'relic-progression-drop-system.js'});
  return c;
 }
+test('manifest-selected production Relic bundle exposes the bounded Tower entry diagnostic',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../build/asset-manifest.json',import.meta.url),'utf8'));
+ const bundle=manifest.featureManifest.bundles['feature-boss-relic'].scripts.find(path=>/feature-relic-progression\.[^.]+\.js$/.test(path));
+ assert.ok(bundle,'production manifest must select Relic progression');
+ const source=readFileSync(new URL('../'+bundle,import.meta.url),'utf8');
+ const makeBuiltRelic=new Function('vm','source','require',relicFixture.slice(relicFixture.indexOf('function makeContext('),relicFixture.indexOf('\nfunction add('))+'\nreturn makeContext;')(vm,source,require);
+ const {context:c}=makeBuiltRelic({withStarters:true,noTimers:true});
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const d=c.RelicProgressionSystem.getLastTowerEntryDiagnostic();
+ assert.equal(d.reason,'entry-accepted');
+ assert.deepEqual(Object.keys(d).sort(),['pendingKind','pendingPhase','reason','result']);
+ assert.doesNotMatch(JSON.stringify(d),/uid|reward|attemptId/);
+});
 function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};}
 function attempt({failPhase=false}={}){
  let phase='preparing',cancelled=0;
