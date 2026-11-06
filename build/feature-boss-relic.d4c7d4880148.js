@@ -1633,6 +1633,7 @@
         towerConfig:TOWER_CONFIG,
         bossBalance:BOSS_BALANCE,
         getSerializableState:serializableState,
+        getCurrentStateSnapshot:function(){ return copy(state); },
         normalizeState:normalizeState,
         getWeekInfo:utcWeekInfo,
          getTowerFloorKind:towerFloorKind,

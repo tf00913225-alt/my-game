@@ -7,6 +7,36 @@ const require=createRequire(import.meta.url);
 const fixture=readFileSync(new URL('./gameplay-boss-tower-system.test.js',import.meta.url),'utf8');
 const load=new Function('require',fixture.slice(0,fixture.indexOf('let passed=0;'))+'\nreturn load;')(require);
 
+test('manifest-selected Tower bundle exposes the pure snapshot',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../build/asset-manifest.json',import.meta.url),'utf8'));
+ const bundle=manifest.featureManifest.bundles['feature-boss-relic'].scripts.find(path=>/feature-boss-relic\.[^.]+\.js$/.test(path));
+ assert.ok(bundle);
+ const declaration='const source=fs.readFileSync("js/gameplay-boss-tower-system.js","utf8");';
+ assert.ok(fixture.includes(declaration));
+ const built=fixture.slice(0,fixture.indexOf('let passed=0;')).replace(declaration,`const source=fs.readFileSync(${JSON.stringify(bundle)},"utf8");`);
+ const loadBuilt=new Function('require',built+'\nreturn load;')(require);
+ const {context:c}=loadBuilt();
+ assert.equal(typeof c.GameplaySystem.getCurrentStateSnapshot,'function');
+ assert.equal(c.GameplaySystem.getCurrentStateSnapshot().version,1);
+});
+
+test('current state snapshot does not read clock, mutate state, or write storage',()=>{
+ const originalNow=Date.now,oldTime=Date.UTC(2026,9,27);
+ try{
+  Date.now=()=>oldTime;
+  const {context:c,localStorage}=load(),week=c.GameplaySystem.getWeekInfo(oldTime);
+  c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:49,highestThisWeek:49,historicalHighest:49,claimedFloors:{'10':true},pendingRelicChoice:true}},oldTime);
+  const storageBefore=JSON.stringify(localStorage.snapshot());
+  Date.now=()=>{throw Error('snapshot must not read clock');};
+  const first=c.GameplaySystem.getCurrentStateSnapshot();
+  assert.equal(first.tower.weekKey,week.key);assert.equal(first.tower.claimedFloors['10'],true);
+  first.tower.claimedFloors['10']=false;first.tower.completedFloor=0;
+  const second=c.GameplaySystem.getCurrentStateSnapshot();
+  assert.equal(second.tower.completedFloor,49);assert.equal(second.tower.claimedFloors['10'],true);
+  assert.equal(JSON.stringify(localStorage.snapshot()),storageBefore);
+ }finally{Date.now=originalNow;}
+});
+
 // Characterization of the current unsafe behavior, not a preservation PASS.
 test('v1 serializer and normalizer discard prior-week Tower fields',()=>{
  const originalNow=Date.now,oldTime=Date.UTC(2026,9,27),newTime=Date.UTC(2026,10,3);
