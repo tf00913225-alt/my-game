@@ -181,3 +181,21 @@ test("characterization: uncooperative old client can still interleave and defeat
     assert.equal(f.repo.readForUid(f.uid).save.player.id,"other-tab",
         "known limitation, not a cross-context safety PASS");
 });
+
+test("characterization: legacy migration deletes UID data after an unknown final metadata read",()=>{
+    const legacy=JSON.stringify({player:{id:"legacy-original"}}),uid="migration-unknown";
+    const f=fixture([["battle_full_version_save_v5",legacy]]);
+    const meta=f.repo.metadataKey(uid),main=f.repo.saveKey(uid);let committed=false,readFailed=false;
+    f.hook((op,key,value)=>{
+        if(op==="after-set"&&key===meta&&!value.includes('localWritePending'))committed=true;
+        if(committed&&!readFailed&&op==="get"&&key===meta){readFailed=true;throw Error("final metadata read");}
+    });
+    assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),
+        code("account-local-commit-unknown"));
+    f.hook(()=>{});
+    assert.equal(f.values.has(main),false,"existing migration cleanup removes possibly committed main");
+    assert.equal(f.values.has(meta),false,"existing migration cleanup removes metadata");
+    assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+    assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
+    assert.equal(f.repo.readForUid(uid).status,"empty","known fail-open; this is not a recovery PASS");
+});

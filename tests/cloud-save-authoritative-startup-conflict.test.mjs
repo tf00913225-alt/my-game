@@ -176,8 +176,8 @@ async function lawfulCuts(){
     return {h,cuts};
 }
 function adoptionFixture(uid){
-    const values=new Map(),ready=[],errors=[],writes=[];let fault=()=>false;
-    const storage={getItem:key=>values.get(key)??null,
+    const values=new Map(),ready=[],errors=[],writes=[];let fault=()=>false,readFault=()=>false;
+    const storage={getItem:key=>{if(readFault(key))throw Error('read fixture');return values.get(key)??null;},
         setItem(key,value){writes.push({key,operation:'set'});if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
         removeItem(key){writes.push({key,operation:'remove'});if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
     const noop=()=>{},context={console,localStorage:storage,JSON,Date,Error,Object,Array,String,
@@ -221,7 +221,7 @@ function adoptionFixture(uid){
         const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
         ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
     const resolve=make(context,firebase,ready,errors);
-    return {repo,values,ready,errors,reads,writes,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
+    return {repo,values,ready,errors,reads,writes,runtime:context,fault:fn=>{fault=fn;},readFault:fn=>{readFault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
             const before=ready.length;
             response=waiting||{uid,exists:true,serverConfirmed:true,data:{ownerUid:uid,serverRevision:bundle.serverRevision,
@@ -399,6 +399,23 @@ test('actual cloud bundle adoption blocks Tower v2 and preserves existing UID st
     assert.equal(JSON.stringify(incompatible),raw);
     assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),hash);
     assert.equal(f.errors.at(-1).code,'account-gameplay-version-unsupported');
+});
+
+test('characterization: actual saveGame returns false for committed data and permits a later overwrite',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const metaKey=f.repo.metadataKey(h.uid),mainKey=f.repo.saveKey(h.uid);
+    let finalWrite=false,failed=false;
+    f.fault((key,value)=>{if(key===metaKey&&value&&!value.includes('localWritePending'))finalWrite=true;return false;});
+    f.readFault(key=>{if(key===metaKey&&finalWrite&&!failed){failed=true;return true;}return false;});
+    f.runtime.gold=4321;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(JSON.parse(f.values.get(mainKey)).gold,4321,'after state was already committed');
+    f.readFault(()=>false);f.fault(()=>false);
+    f.runtime.gold=1234; // A caller restoring its earlier in-memory value.
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),true);
+    assert.equal(JSON.parse(f.values.get(mainKey)).gold,1234,
+        'known overwrite hazard; this is not recovery or retry safety');
 });
 
 test('actual enterReady refuses Session takeover across app-shell and visual awaits',async()=>{
