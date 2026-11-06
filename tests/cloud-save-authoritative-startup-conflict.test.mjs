@@ -10,10 +10,10 @@ const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-
 
 function deferredMigration(){
     const values=new Map([['battle_full_version_save_v5',JSON.stringify({player:{id:'legacy-original'}})]]),writes=[];
-    let readFault=()=>false,afterWrite=()=>{};
+    let readFault=()=>false,afterWrite=()=>{},afterRemove=()=>{};
     const store={getItem:key=>{if(readFault(key))throw Error('migration read fixture');return values.get(key)??null;},setItem:(key,value)=>{writes.push(key);values.set(key,String(value));afterWrite(key,String(value));},
-        removeItem:key=>{writes.push(key);values.delete(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
-    const global={localStorage:store};global.window=global;vm.createContext(global);
+        removeItem:key=>{writes.push(key);values.delete(key);afterRemove(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
+    const global={localStorage:store,crypto:require('node:crypto').webcrypto};global.window=global;vm.createContext(global);
     vm.runInContext(readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8'),global);
     const repo=global.FourSymbolsAccountSave;repo.activate('migration-a');writes.length=0;
     let resume,reject;const shell=new Promise((yes,no)=>{resume=yes;reject=no;});
@@ -37,7 +37,7 @@ function deferredMigration(){
             state:()=>state,errors,ready};
     `);
     const f=make(global,shell,()=>vm.runInContext(operations,global));
-    return {...f,repo,global,values,writes,resume,reject,readFault:fn=>{readFault=fn;},afterWrite:fn=>{afterWrite=fn;}};
+    return {...f,repo,global,values,writes,resume,reject,readFault:fn=>{readFault=fn;},afterWrite:fn=>{afterWrite=fn;},afterRemove:fn=>{afterRemove=fn;}};
 }
 
 test('actual migration startup reports unknown and never enters READY or deletes the committed main',async()=>{
@@ -51,7 +51,20 @@ test('actual migration startup reports unknown and never enters READY or deletes
     assert.equal(f.errors.at(-1)?.code,'account-local-commit-unknown');
     assert.equal(JSON.parse(f.values.get(main)).player.id,'legacy-original');
     assert.ok(f.values.has(meta));
+    assert.throws(()=>f.repo.readForUid('migration-a'),e=>e.code==='account-migration-incomplete');
     assert.equal(f.writes.filter(key=>key===main).length,1,'no cleanup or compensating save');
+});
+
+test('actual migration Startup does not enter READY after marker removal read is unknown',async()=>{
+    const f=deferredMigration(),key='four_symbols_migration_pending:migration-a';let removed=false,failed=false;
+    f.afterRemove(value=>{if(value===key)removed=true;});
+    f.readFault(value=>{if(value===key&&removed&&!failed){failed=true;return true;}return false;});
+    const pending=f.run();f.resume();await pending;f.readFault(()=>false);
+    assert.equal(f.ready.length,0);assert.equal(f.state(),'ERROR');
+    assert.equal(f.errors.at(-1)?.code,'account-migration-commit-unknown');
+    assert.equal(f.values.has(key),false);
+    assert.throws(()=>f.repo.readForUid('migration-a'),e=>e.code==='account-migration-commit-unknown');
+    assert.equal(JSON.parse(f.values.get(f.repo.saveKey('migration-a'))).player.id,'legacy-original');
 });
 
 test('deferred original writer refuses unloaded migration and save before any writes',()=>{

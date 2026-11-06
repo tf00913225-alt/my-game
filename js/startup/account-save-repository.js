@@ -102,6 +102,9 @@
     // automatic recovery; an absent key is the only non-pending state.
     function assertNoMigrationPending(uid){
         uid=validUid(uid);
+        if(global.FourSymbolsAccountSaveOperations?.migrationIsUnresolved?.(uid)){
+            throw coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+        }
         const raw=storage().getItem(MIGRATION_PENDING_PREFIX+uid);
         if(raw===null){ return; }
         if(raw.length>512||!/^[\x00-\x7f]*$/.test(raw)){
@@ -167,7 +170,7 @@
  if(!value)throw coded("account-writer-unavailable","Account writer must load before any save operation.");
  return value;
  }
- function writerContext(){return {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave};}
+ function writerContext(){return {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave,inspectLegacy,activate,migrationBackupKey,LEGACY_KEY,LEGACY_SIDECARS,MIGRATION_PENDING_PREFIX};}
  function inspectCloudBundle(uid,bundle){return writerOperations().inspectCloudBundle(writerContext(),uid,bundle);}
  function writeForUid(uid,save,options={}){return writerOperations().writeForUid(writerContext(),uid,save,options);}
 
@@ -179,7 +182,11 @@
         try{ return {status:"available",save:parseSave(raw,"legacy-corrupt"),raw,error:null}; }
         catch(error){ return {status:"corrupt",save:null,raw,error}; }
     }
-    function migrationBackupKey(uid){ return BACKUP_PREFIX+validUid(uid)+":"+Date.now(); }
+    function migrationBackupKey(uid,transactionId){
+        uid=validUid(uid);
+        if(typeof transactionId!=="string"||!/^[a-f0-9]{32}$/.test(transactionId))throw coded("migration-identity-invalid","Migration backup identity is invalid.");
+        return BACKUP_PREFIX+uid+":"+transactionId;
+    }
     /* Original-device safety copy only.  This is never a cloud authority. */
     function migrationBackupKeyFor(uid,mainFingerprint,manifestFingerprint){
         uid=validUid(uid);
@@ -266,6 +273,7 @@
     // archived record remains missing. This does not establish claim entitlement.
     function recoverArchivedMigrationSidecars(uid){
         uid=validUid(uid);
+        if(global.FourSymbolsAccountSaveOperations?.migrationIsRunning?.())throw coded("account-save-reentrant","A migration is already in progress.");
         assertNoMigrationPending(uid);
         if(getActiveUid()!==uid){ throw coded("account-not-active","Recovery owner is not active."); }
         const missingKeys=["daily-dungeon-state","task-tracker","legacy-abyss-state"];
@@ -278,7 +286,7 @@
         for(let index=0;index<storage().length;index++){
             const key=storage().key(index);
             if(typeof key==="string"&&key.startsWith(legacyPrefix)&&
-               /^\d+$/.test(key.slice(legacyPrefix.length))){ legacyArchives++; }
+               /^(?:\d+|[a-f0-9]{32})$/.test(key.slice(legacyPrefix.length))){ legacyArchives++; }
         }
         for(let index=0;index<storage().length;index++){
             const key=storage().key(index);
@@ -290,7 +298,7 @@
             for(let other=0;other<storage().length;other++){
                 const root=storage().key(other);
                 if(typeof root!=="string"||!root.startsWith(legacyPrefix)||
-                    !/^\d+$/.test(root.slice(legacyPrefix.length))||
+                    !/^(?:\d+|[a-f0-9]{32})$/.test(root.slice(legacyPrefix.length))||
                     storage().getItem(root)!==backup.mainRaw){ continue; }
                 exactMainArchives++;
                 const recovered={};
@@ -366,46 +374,12 @@
             authoritativeStateReady:false,backups});
     }
     function migrateLegacyToUid(uid,options={}){
-        writerOperations();
-        uid=validUid(uid);
-        if(options.confirmed!==true){ throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation."); }
-        const legacy=inspectLegacy();
-        if(legacy.status!=="available"){ throw legacy.error||coded("legacy-missing","No safe legacy save exists."); }
-        const existing=readForUid(uid);
-        if(existing.status!=="empty" || options.cloudHasCharacter===true){
-            throw coded("migration-conflict","Migration is blocked because this account already has a save.");
-        }
-        activate(uid);
-        const backupKey=migrationBackupKey(uid);
-        const backups=[backupKey];
-        const writtenSidecars=[];
-        storage().setItem(backupKey,legacy.raw);
-        try{
-            writeForUid(uid,legacy.save,{source:"legacy-confirmed"});
-            for(const [oldKey,suffix] of Object.entries(LEGACY_SIDECARS)){
-                const raw=storage().getItem(oldKey);
-                if(raw===null){ continue; }
-                const target=accountKey(suffix,uid);
-                if(storage().getItem(target)!==null){ throw coded("migration-sidecar-conflict","An account sidecar already exists: "+suffix); }
-                const sidecarBackup=backupKey+":"+oldKey;
-                storage().setItem(sidecarBackup,raw); backups.push(sidecarBackup);
-                storage().setItem(target,raw); writtenSidecars.push(target);
-            }
-            return {status:"migrated",uid,backupKey,backupKeys:backups,legacyKey:LEGACY_KEY};
-        }catch(error){
-            // The writer may have committed data or left a protective marker.
-            // Never destroy either when its outcome cannot be verified.
-            if(["account-local-commit-unknown","account-local-rollback-failed",
-                "account-local-write-incomplete"].includes(error?.code)){ throw error; }
-            writtenSidecars.forEach(key=>{ try{ storage().removeItem(key); }catch(_){ } });
-            try{ storage().removeItem(saveKey(uid)); storage().removeItem(metadataKey(uid)); }catch(_){ }
-            // The canonical legacy key and its backup are deliberately preserved.
-            throw error;
-        }
+        return writerOperations().migrateLegacyToUid(writerContext(),uid,options);
     }
     function removeActive(){
         const uid=getActiveUid();
         if(!uid){ return false; }
+        if(global.FourSymbolsAccountSaveOperations?.migrationIsRunning?.())throw coded("account-save-reentrant","A migration is already in progress.");
         assertNoMigrationPending(uid);
         storage().removeItem(saveKey(uid));
         storage().removeItem(metadataKey(uid));

@@ -17,7 +17,7 @@ function storage(seed=[]){
     };
 }
 function repository(store=storage()){
-    const context=vm.createContext({console,JSON,Date,Error,Object,Array,String,localStorage:store,window:null});
+    const context=vm.createContext({console,JSON,Date,Error,Object,Array,String,localStorage:store,window:null,crypto:require("node:crypto").webcrypto});
     context.window=context;
     vm.runInContext(source,context);
     return {repo:context.FourSymbolsAccountSave,store};
@@ -119,7 +119,7 @@ function code(expected){ return error=>error&&error.code===expected; }
     assert.equal(store.getItem("battle_full_version_save_v5"),legacy);
     assert.equal(repo.readForUid("uid-rollback").status,"empty","failed migration must roll account save back");
     assert.equal(JSON.parse(store.getItem("four_symbols_account:uid-rollback:element-box-state")).owner,"existing");
-    assert.ok([...store.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:uid-rollback:")),"failure keeps a recovery backup");
+    assert.ok(![...store.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:uid-rollback:")),"preflight conflict must not write a backup");
 }
 
 {

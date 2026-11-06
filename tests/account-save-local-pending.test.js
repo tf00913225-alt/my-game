@@ -10,9 +10,9 @@ function fixture(seed){
     const storage={getItem(key){hook("get",key,null);return values.has(key)?values.get(key):null;},
         setItem(key,value){hook("before-set",key,String(value));values.set(key,String(value));events.push(["set",key]);hook("after-set",key,String(value));},
         removeItem(key){hook("before-remove",key,null);values.delete(key);events.push(["remove",key]);hook("after-remove",key,null);}};
-    const context=vm.createContext({console,localStorage:storage});context.window=context;
+    const context=vm.createContext({console,localStorage:storage,crypto:require("node:crypto").webcrypto});context.window=context;
     vm.runInContext(source,context);
-    return {repo:context.FourSymbolsAccountSave,values,events,hook:fn=>{hook=fn;}};
+    return {repo:context.FourSymbolsAccountSave,values,events,context,hook:fn=>{hook=fn;}};
 }
 function existing(){
     const f=fixture();f.repo.activate("pending-uid");
@@ -228,8 +228,7 @@ test("legacy migration preserves committed bytes after unknown final metadata re
     assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
     assert.equal(f.events.some(([op])=>op==="remove"),false,"unknown result must not trigger cleanup");
     assert.equal(f.values.has(f.repo.accountKey("element-box-state",uid)),false,"sidecar loop did not run");
-    assert.equal(fixture([...f.values]).repo.readForUid(uid).status,"ready",
-        "known remaining gap: partial migration may look ready after reload");
+    assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-migration-incomplete"));
 });
 
 test("legacy migration preserves marker on unreadable staging or failed rollback",()=>{
@@ -250,7 +249,7 @@ test("legacy migration preserves marker on unreadable staging or failed rollback
         assert.ok(JSON.parse(f.values.get(meta)).localWritePending);
         assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
         assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
-        assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-local-write-incomplete"));
+        assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-migration-incomplete"));
     }
 });
 
@@ -259,7 +258,7 @@ test("known marker-write failure does not become an unknown result",()=>{
     const meta=f.repo.metadataKey(uid);let failed=false;
     f.hook((op,key)=>{if(!failed&&op==="before-set"&&key===meta){failed=true;throw Error("marker write");}});
     assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code("account-save-write-failed"));
-    f.hook(()=>{});assert.equal(f.repo.readForUid(uid).status,"empty");
+    f.hook(()=>{});assert.throws(()=>f.repo.readForUid(uid),code("account-migration-incomplete"));
     assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
 });
 
@@ -268,6 +267,7 @@ test("unknown result after UID switch leaves both accounts untouched by cleanup"
     const f=fixture([["battle_full_version_save_v5",legacy]]),meta=f.repo.metadataKey(uid),main=f.repo.saveKey(uid);
     f.repo.activate(other);f.repo.writeForUid(other,{player:{id:"other"}});
     const otherMain=f.values.get(f.repo.saveKey(other)),otherMeta=f.values.get(f.repo.metadataKey(other));
+    f.repo.activate(uid);
     let committed=false,failed=false;
     f.hook((op,key,value)=>{
         if(op==="after-set"&&key===meta&&!value.includes('localWritePending'))committed=true;
@@ -278,4 +278,121 @@ test("unknown result after UID switch leaves both accounts untouched by cleanup"
     assert.equal(f.values.get(main),legacy);assert.ok(f.values.has(meta));
     assert.equal(f.values.get(f.repo.saveKey(other)),otherMain);
     assert.equal(f.values.get(f.repo.metadataKey(other)),otherMeta);
+});
+
+test("legacy migration keeps UID marker at every pre-completion write snapshot",()=>{
+    const uid="migration-matrix",legacy=JSON.stringify({player:{id:"legacy-matrix"}}),f=fixture([["battle_full_version_save_v5",legacy]]);
+    const rows=Object.entries(f.repo.LEGACY_SIDECARS);
+    rows.forEach(([oldKey],index)=>{if(index%2===0)f.values.set(oldKey,JSON.stringify({index}));});
+    const marker="four_symbols_migration_pending:"+uid,snapshots=[];
+    f.hook((op,key)=>{if(op==="after-set"&&f.values.has(marker)&&key!=="four_symbols_active_uid")snapshots.push([...f.values]);});
+    const result=f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false});
+    assert.equal(result.status,"migrated");assert.equal(f.values.has(marker),false);
+    assert.ok(snapshots.length>=3+Math.ceil(rows.length/2));
+    for(const snapshot of snapshots)assert.throws(()=>fixture(snapshot).repo.readForUid(uid),code("account-migration-incomplete"));
+    const reboot=fixture([...f.values]);assert.equal(reboot.repo.readForUid(uid).save.player.id,"legacy-matrix");
+    rows.forEach(([oldKey,suffix],index)=>assert.equal(reboot.values.get(reboot.repo.accountKey(suffix,uid))??null,index%2===0?JSON.stringify({index}):null));
+    reboot.repo.activate(uid);reboot.repo.writeForUid(uid,{player:{id:"later"}});
+    assert.equal(fixture([...reboot.values]).repo.readForUid(uid).save.player.id,"later");
+});
+
+test("failure after any prepared write keeps evidence and blocks a fresh reader",()=>{
+    const uid="migration-fault",legacy=JSON.stringify({player:{id:"legacy"}});
+    const seed=[["battle_full_version_save_v5",legacy]],prototype=fixture(seed),rows=Object.entries(prototype.repo.LEGACY_SIDECARS);
+    rows.forEach(([oldKey],index)=>seed.push([oldKey,JSON.stringify({index})]));
+    const marker="four_symbols_migration_pending:"+uid,meta=prototype.repo.metadataKey(uid),main=prototype.repo.saveKey(uid);
+    const targets=[marker,meta,main,meta,...rows.map(([,suffix])=>prototype.repo.accountKey(suffix,uid))];
+    for(let failIndex=0;failIndex<targets.length;failIndex++){
+        const f=fixture(seed);let index=0,failed=false;
+        f.hook((op,key)=>{if(op==="after-set"&&index<targets.length&&key===targets[index]){
+            if(index++===failIndex){failed=true;throw Error("injected crash");}
+        }});
+        assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}));
+        assert.equal(failed,true,"fault index "+failIndex);f.hook(()=>{});
+        assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+        assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
+        assert.ok(f.values.has(marker));
+        assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-migration-incomplete"));
+    }
+});
+
+test("marker removal failure blocks; post-removal read failure reports unknown with complete data",()=>{
+    for(const phase of ["before-remove","after-remove-read"]){
+        const uid="migration-end",legacy=JSON.stringify({player:{id:"legacy"}}),f=fixture([["battle_full_version_save_v5",legacy],["v131_element_box_state",'{"ok":true}']]);
+        const marker="four_symbols_migration_pending:"+uid;let removed=false,failed=false;
+        f.hook((op,key)=>{
+            if(phase==="before-remove"&&op==="before-remove"&&key===marker)throw Error("removal fault");
+            if(op==="after-remove"&&key===marker)removed=true;
+            if(phase==="after-remove-read"&&removed&&!failed&&op==="get"&&key===marker){failed=true;throw Error("completion read");}
+        });
+        if(phase==="before-remove")assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}));
+        else assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code("account-migration-commit-unknown"));
+        f.hook(()=>{});const reboot=fixture([...f.values]);
+        if(phase==="before-remove")assert.throws(()=>reboot.repo.readForUid(uid),code("account-migration-incomplete"));
+        else {
+            const before=[...f.values];
+            assert.throws(()=>f.repo.readForUid(uid),code("account-migration-commit-unknown"));
+            assert.throws(()=>f.repo.writeForUid(uid,next),code("account-migration-commit-unknown"));
+            assert.throws(()=>f.repo.removeActive(),code("account-migration-commit-unknown"));
+            assert.deepEqual([...f.values],before);
+            f.repo.activate("different-uid");f.repo.activate(uid);
+            assert.throws(()=>f.repo.readForUid(uid),code("account-migration-commit-unknown"));
+            assert.equal(reboot.repo.readForUid(uid).save.player.id,"legacy");
+            assert.equal(reboot.values.get(reboot.repo.accountKey("element-box-state",uid)),'{"ok":true}');
+        }
+    }
+});
+
+test("migration rejects missing entropy and existing backup before destination writes",()=>{
+    for(const failure of ["entropy","entropy-error","backup-collision"]){
+        const uid="migration-preflight",f=fixture([["battle_full_version_save_v5",'{"player":{"id":"legacy"}}']]);
+        if(failure==="entropy")f.context.crypto=undefined;
+        else if(failure==="entropy-error")f.context.crypto={getRandomValues:()=>{throw Error("entropy unavailable");}};
+        else {f.context.crypto={getRandomValues:bytes=>bytes.fill(1)};f.values.set('four_symbols_legacy_backup:'+uid+':'+"01".repeat(16),'protected');}
+        const before=[...f.values];
+        if(failure==="entropy-error")assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),/entropy unavailable/);
+        else assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),
+            code(failure==="entropy"?"migration-entropy-unavailable":"migration-backup-conflict"));
+        assert.deepEqual([...f.values],before);
+    }
+});
+
+test("source change after preparation retains migration marker and refuses READY",()=>{
+    const uid="migration-source-change",legacy=JSON.stringify({player:{id:"legacy"}});
+    const f=fixture([["battle_full_version_save_v5",legacy],["v131_element_box_state",'{"before":true}']]);
+    const target=f.repo.accountKey("element-box-state",uid);let changed=false;
+    f.hook((op,key)=>{if(op==="after-set"&&key===target&&!changed){changed=true;f.values.set("v131_element_box_state",'{"changed":true}');}});
+    assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code("migration-source-changed"));
+    f.hook(()=>{});assert.equal(changed,true);
+    assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-migration-incomplete"));
+    assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+});
+
+test("each migration storage boundary fails closed or leaves a fully verified completed cut",()=>{
+    const uid="migration-boundaries",legacy=JSON.stringify({player:{id:"legacy"}}),seed=[["battle_full_version_save_v5",legacy]];
+    const prototype=fixture(seed),rows=Object.entries(prototype.repo.LEGACY_SIDECARS);
+    rows.forEach(([oldKey],index)=>seed.push([oldKey,JSON.stringify({index})]));
+    const operations=[],baseline=fixture(seed);
+    baseline.hook((op,key)=>{if(["get","before-set","before-remove"].includes(op))operations.push([op,key]);});
+    baseline.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false});
+    const marker="four_symbols_migration_pending:"+uid;
+    for(let boundary=0;boundary<operations.length;boundary++){
+        const f=fixture(seed);let step=0,failed=false,removed=false;
+        f.hook((op,key)=>{
+            if(op==="after-remove"&&key===marker)removed=true;
+            if(!failed&&["get","before-set","before-remove"].includes(op)&&step++===boundary){failed=true;throw Error("boundary "+boundary);}
+        });
+        assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),undefined,"boundary "+boundary);
+        assert.equal(failed,true,"unreached boundary "+boundary);f.hook(()=>{});
+        assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+        const reboot=fixture([...f.values]);
+        if(f.values.has(marker))assert.throws(()=>reboot.repo.readForUid(uid),code("account-migration-incomplete"));
+        else if(removed){
+            assert.equal(reboot.repo.readForUid(uid).save.player.id,"legacy");
+            rows.forEach(([oldKey,suffix])=>assert.equal(reboot.values.get(reboot.repo.accountKey(suffix,uid)),f.values.get(oldKey)));
+        }else{
+            assert.equal(f.values.has(f.repo.saveKey(uid)),false,"preparation must not write main at boundary "+boundary);
+            rows.forEach(([,suffix])=>assert.equal(f.values.has(f.repo.accountKey(suffix,uid)),false));
+        }
+    }
 });

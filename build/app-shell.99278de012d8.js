@@ -1076,11 +1076,80 @@ function inspectBundle(context,uid,bundle){
         return bundle;
     }
 let accountWriteActive=false;
+let migrationOwnerActive=false;
+const unresolvedMigrations=new Set();
+function migrationIsUnresolved(uid){ return unresolvedMigrations.has(uid); }
+function migrationIsRunning(){ return migrationOwnerActive; }
 function writeForUid(context,uid,save,options={}){
+ if(migrationIsUnresolved(context.validUid(uid)))throw context.coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
  if(accountWriteActive){ throw context.coded("account-save-reentrant","A save is already in progress."); }
  accountWriteActive=true;
  try{ return writeForUidOnce(context,uid,save,options); }
  finally{ accountWriteActive=false; }
+}
+// Complete legacy migration is the only public command. The pending bypass and
+// restricted storage view remain private to this Owner's synchronous closure.
+function migrateLegacyToUid(context,uid,options={}){
+ const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,
+     accountKey,inspectLegacy,activate,migrationBackupKey,LEGACY_KEY,LEGACY_SIDECARS,MIGRATION_PENDING_PREFIX}=context;
+ if(accountWriteActive){ throw coded("account-save-reentrant","A save is already in progress."); }
+ accountWriteActive=true;migrationOwnerActive=true;
+ try{
+  uid=validUid(uid);
+  if(migrationIsUnresolved(uid))throw coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+  if(options.confirmed!==true)throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation.");
+  const initialActiveUid=getActiveUid();
+  if(initialActiveUid&&initialActiveUid!==uid)throw coded("account-not-active","Migration UID does not match the active account.");
+  const legacy=inspectLegacy();
+  if(legacy.status!=="available")throw legacy.error||coded("legacy-missing","No safe legacy save exists.");
+  if(readForUid(uid).status!=="empty"||options.cloudHasCharacter===true)throw coded("migration-conflict","Migration requires an empty UID save.");
+  assertGameplayVersion(context,legacy.save);
+  const records=Object.entries(LEGACY_SIDECARS).map(([oldKey,suffix])=>({oldKey,suffix,target:accountKey(suffix,uid),raw:storage().getItem(oldKey)}));
+  for(const row of records){if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","An account sidecar already exists: "+row.suffix);}
+  if(!global.crypto||typeof global.crypto.getRandomValues!=="function")throw coded("migration-entropy-unavailable","Secure migration identity is unavailable.");
+  const random=new Uint8Array(16);global.crypto.getRandomValues(random);
+  const transactionId=Array.from(random,byte=>byte.toString(16).padStart(2,"0")).join("");
+  const markerKey=MIGRATION_PENDING_PREFIX+uid;
+  const marker=JSON.stringify({version:1,kind:"legacy",ownerUid:uid,transactionId});
+  if(marker.length>512||!/^[\x00-\x7f]*$/.test(marker))throw coded("migration-marker-invalid","Migration marker exceeds its fixed bound.");
+  const backupKey=migrationBackupKey(uid,transactionId),backups=[backupKey];
+  const backupRows=[{key:backupKey,raw:legacy.raw},...records.filter(row=>row.raw!==null).map(row=>({key:backupKey+":"+row.oldKey,raw:row.raw}))];
+  for(const row of backupRows){if(storage().getItem(row.key)!==null)throw coded("migration-backup-conflict","An existing backup must not be overwritten.");}
+  if(!initialActiveUid)activate(uid);
+  const checkUid=()=>{if(getActiveUid()!==uid)throw coded("account-not-active","Migration UID changed.");};
+  const checkSources=()=>{
+   if(storage().getItem(LEGACY_KEY)!==legacy.raw)throw coded("migration-source-changed","Legacy source changed.");
+   for(const row of records)if(storage().getItem(row.oldKey)!==row.raw)throw coded("migration-source-changed","Legacy sidecar changed.");
+  };
+  for(const row of backupRows){checkUid();storage().setItem(row.key,row.raw);if(storage().getItem(row.key)!==row.raw)throw coded("migration-backup-write-failed","Migration backup could not be verified.");if(row.key!==backupKey)backups.push(row.key);}
+  checkUid();checkSources();
+  if(readForUid(uid).status!=="empty")throw coded("migration-conflict","UID save changed during preparation.");
+  for(const row of records)if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","UID sidecar changed during preparation.");
+  storage().setItem(markerKey,marker);
+  if(storage().getItem(markerKey)!==marker)throw coded("account-migration-incomplete","Migration marker could not be verified.");
+  let poisoned=false;
+  const check=()=>{checkUid();if(storage().getItem(markerKey)!==marker)throw coded("account-migration-incomplete","Migration marker changed.");};
+  const allowed=new Set([saveKey(uid),metadataKey(uid)]);
+  const guardedStorage=()=>({
+   getItem(key){try{check();if(!allowed.has(key))throw Error("Migration storage key not allowed");const result=storage().getItem(key);check();return result;}catch(error){poisoned=true;throw error;}},
+   setItem(key,value){try{if(poisoned)throw Error("Migration storage is fenced");check();if(!allowed.has(key))throw Error("Migration storage key not allowed");storage().setItem(key,value);check();}catch(error){poisoned=true;throw error;}},
+   removeItem(key){try{if(poisoned)throw Error("Migration storage is fenced");check();if(!allowed.has(key))throw Error("Migration storage key not allowed");storage().removeItem(key);check();}catch(error){poisoned=true;throw error;}}
+  });
+  const internal={...context,storage:guardedStorage,readForUid:()=>{check();return {status:"empty",uid,save:null,metadata:null};}};
+  const result=writeForUidOnce(internal,uid,legacy.save,{source:"legacy-confirmed"});
+  const expectedMain=JSON.stringify(legacy.save),expectedMeta=JSON.stringify(result.metadata);
+  for(const row of records){
+   check();if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","UID sidecar changed during migration.");
+   if(row.raw!==null){storage().setItem(row.target,row.raw);check();if(storage().getItem(row.target)!==row.raw)throw coded("account-migration-incomplete","Migrated sidecar could not be verified.");}
+  }
+  checkSources();check();
+  if(storage().getItem(saveKey(uid))!==expectedMain||storage().getItem(metadataKey(uid))!==expectedMeta)throw coded("account-migration-incomplete","Migrated main save could not be verified.");
+  for(const row of records)if(storage().getItem(row.target)!==row.raw)throw coded("account-migration-incomplete","Migrated sidecar cut changed.");
+  check();storage().removeItem(markerKey);
+  try{if(storage().getItem(markerKey)!==null)throw Error("Migration marker remains");}
+  catch(error){unresolvedMigrations.add(uid);throw coded("account-migration-commit-unknown","Migration completion could not be verified.",error);}
+  return {status:"migrated",uid,backupKey,backupKeys:backups,legacyKey:LEGACY_KEY};
+ }finally{migrationOwnerActive=false;accountWriteActive=false;}
 }
 function writeForUidOnce(context,uid,save,options={}){
  const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave}=context;
@@ -1244,7 +1313,7 @@ function writeForUidOnce(context,uid,save,options={}){
         }
         return {uid,key,metadata:JSON.parse(metadata)};
     }
-Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid})});
+Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid,migrateLegacyToUid,migrationIsUnresolved,migrationIsRunning})});
 })(window);
 /* Bundle decisions only; destination and READY remain StartupStateMachine. */
 (function(global){"use strict";if(global.FourSymbolsCloudBundle)return;

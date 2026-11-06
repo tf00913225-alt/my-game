@@ -226,13 +226,9 @@ delete and write-producing archived-sidecar recovery check directly. Existing
 sealed backup verify/export remain unchanged and are not a complete pending-state
 export. Direct gameplay sidecar writers are not frozen.
 
-NO CREATOR / NO CLEAR: the current legacy migration does not create the key or
-verify its full destination set before clearing it. Therefore a real partial
-migration can still reload READY. This checkpoint does not complete the approved
-repository/Startup objective and must not be merged or deployed. The remaining
-work is the closed single-Owner migration command, prepared/final boundaries and
-full real startup/fault matrix. Do not expose a public bypass, claim atomicity,
-enable Q61 or modify sidecar Owners to imply a global freeze.
+At the ninth checkpoint the legacy migration did not create this key, so a
+partial migration could still reload READY. The following tenth checkpoint
+adds a creator and completion boundary, subject to review and remaining gates.
 
 Four focused files yielded 41 passing Node runner results. After reviewer input,
 the marker check was moved before JSON parsing, a parseable oversized case and
@@ -240,3 +236,27 @@ Startup creation-count assertion were added, and the guard suite passed again.
 Production build/check and diff check passed. The original reviewer read the
 final diff and approved a Draft checkpoint only; AccountSave Owner's independent
 review of this exact diff is pending. Latest-head CI is not yet verified.
+
+## Tenth checkpoint: closed single-writer migration marker lifecycle
+
+The original AccountSave Operations closure owns the full migration command and
+same-page guard. After a fixed-source/destination preflight and checked legacy
+backups it writes the UID pending key. A private restricted context invokes the
+original local writer; a first fault fences its rollback mutations. The command
+then writes the fixed legacy sidecars, rechecks source/main/metadata and every
+present/missing sidecar, and only then removes the pending key. A removal
+readback failure returns typed unknown and fences that UID for the current page.
+No automatic pending recovery, cross-tab lock, old-client protection, sidecar
+freeze, filesystem durability or Cloud authority is claimed.
+
+Fault tests exercise every captured storage get/set/remove boundary, prepared
+write snapshots, all fixed sidecar writes, marker removal and readback, source
+change, backup collision, missing secure randomness, UID switch and the original
+Startup success/error path. Existing backup recovery accepts old numeric archive
+IDs and secure 32-hex transaction IDs; its focused suite passed all 10 cases.
+Five other focused files yielded 53 passing Node runner results; production
+build/check and diff check passed. Original reviewer read
+the implementation and approved a limited Draft checkpoint; AccountSave Owner
+review, latest-head CI and browser QA remain pending. Q61 weekly activation,
+Tower terminal evidence and the existing saveGame ordinary commit-unknown
+consumer hazard remain STOP.

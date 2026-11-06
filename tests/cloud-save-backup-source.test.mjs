@@ -115,6 +115,21 @@ test('archived UID migration sidecars create a distinct sealed backup only for t
  assert.equal(repo.recoverArchivedMigrationSidecars('uid-a').unchanged,true);
  assert.equal(validateMigrationBackup(bundle(recovered),'uid-a').snapshot.gold,200);
 });
+test('archived sidecars accept the new secure-transaction backup identity',()=>{
+ const {repo,values}=fixture();
+ const keys=['daily-dungeon-state','task-tracker','legacy-abyss-state'];
+ for(const suffix of keys)values.delete(repo.accountKey(suffix,'uid-a'));
+ const original=repo.createMigrationBackup('uid-a');
+ const root='four_symbols_legacy_backup:uid-a:'+'ab'.repeat(16);
+ values.set(root,original.mainRaw);
+ for(const suffix of keys){
+  const old=Object.entries(repo.LEGACY_SIDECARS).find(([,mapped])=>mapped===suffix)[0];
+  values.set(root+':'+old,JSON.stringify({source:suffix}));
+ }
+ const result=repo.recoverArchivedMigrationSidecars('uid-a');
+ const recovered=repo.verifyMigrationBackup('uid-a',result.backupKey);
+ for(const suffix of keys)assert.deepEqual(JSON.parse(recovered.sidecars[suffix].raw),{source:suffix});
+});
 test('archive recovery fails closed on absent, stale, ambiguous or malformed historical sources',()=>{
  const {repo,values}=fixture();
  const keys=['daily-dungeon-state','task-tracker','legacy-abyss-state'];
