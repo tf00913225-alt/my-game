@@ -41,7 +41,7 @@ assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
         "a dependency-order miss must stay retryable instead of permanently claiming the owner");
 }
 
-function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false}={}){
+function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false,towerStarter=null}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};
     const localStorage={
@@ -77,7 +77,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
     const world=[40,60,80,100].map(level=>({id:"world-"+level,name:"W"+level,level,relic:level===40?"relic_returning_wheel":null}));
     let activeBattle=null;
     const context={
-        console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,
+        console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,crypto:require("node:crypto").webcrypto,
         setTimeout,clearTimeout,setInterval:noTimers?()=>1:setInterval,clearInterval,
         window:null,localStorage,gold:1000,
         alert(message){ (context.notices||(context.notices=[])).push(message); },
@@ -128,8 +128,8 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
     };
     if(withStarters){
         context.vGameplayStartBoss=(type,id)=>{activeBattle={mode:type,definitionId:id};return true;};
-        context.vGameplayContinueTower=()=>{activeBattle={mode:"tower"};return true;};
-        context.vGameplaySelectTowerBand=floor=>{if(rejectTowerEntry){return false;}activeBattle={mode:"tower",floor};return true;};
+        context.vGameplayContinueTower=attempt=>{if(towerStarter){return towerStarter(null,attempt,context);}activeBattle={mode:"tower"};return true;};
+        context.vGameplaySelectTowerBand=(floor,attempt)=>{if(towerStarter){return towerStarter(floor,attempt,context);}if(rejectTowerEntry){return false;}activeBattle={mode:"tower",floor};return true;};
     }
     context.__setActiveBattle=value=>{activeBattle=value;};
     context.window=context;
@@ -410,4 +410,51 @@ console.log("✓ Relic progression/drop system targeted tests passed.");
  context.vGameplaySelectTowerBand(10);gameplayState.tower.claimedFloors['10']=true;context.__setActiveBattle(null);
  assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),2);
  assert.ok(!context.RelicProgressionSystem.getTowerRewardPlan(25,{firstEver:false}).rewards.some(r=>r.itemId==='gemVitalityI'));
+}
+
+/* Pre-entry handles may cancel only their own confirmed preparing receipt. */
+for(const failure of ["false","throw","readback"]){
+ let launches=0;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:()=>{launches++;return true;}});
+ if(failure==="false")f.context.saveGame=()=>false;
+ if(failure==="throw")f.context.saveGame=()=>{throw Error("save failure");};
+ if(failure==="readback")f.context.FourSymbolsAccountSave.readForUid=()=>({status:"ready",save:{player:{relicProgression:{pending:null}}}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,failure);
+ assert.equal(launches,0,failure);
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,"unresolved begin blocks retry: "+failure);
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5,"extra"),true);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"preparing");
+ const first=handle;
+ assert.equal(first.cancelBeforeLaunch(),true);
+ assert.equal(f.saveDoc.player.relicProgression.pending,null);
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ const second=handle;
+ assert.equal(first.cancelBeforeLaunch(),false,"old attempt must not clear the new one");
+ assert.equal(f.saveDoc.player.relicProgression.pending.attemptId!==undefined,true);
+ assert.equal(second.markLaunchRequested(),true);
+ assert.equal(second.cancelBeforeLaunch(),false,"launcher phase cannot be cancelled");
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"launch-requested");
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplayContinueTower("unexpected"),true);
+ f.context.FourSymbolsAccountSave.getActiveUid=()=>"other-uid";
+ assert.equal(handle.cancelBeforeLaunch(),false);
+ assert.equal(f.saveDoc.player.relicProgression.pending.ownerUid,"uid-a");
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ f.context.saveGame=()=>false;
+ assert.equal(handle.cancelBeforeLaunch(),false);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"preparing");
+ f.gameplayState.tower.claimedFloors['5']=true;
+ assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome',"unknown cancellation cannot trigger reward reconciliation");
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,"unknown cancellation blocks new entry");
 }

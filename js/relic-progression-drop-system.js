@@ -311,6 +311,7 @@
         return normalizeProgressionState(host&&host.relicProgression);
     }
     let progressionState=readProgressionState();
+    let towerAttemptUnresolved=false;
     function writeProgressionState(){
         const host=progressionHost();
         if(!host){ return false; }
@@ -711,6 +712,7 @@
         return typeof battleActive!=="undefined"&&!!battleActive;
     }
     function reconcilePending(){
+        if(towerAttemptUnresolved){ return "blocked-outcome"; }
         const pending=progressionState.pending;
         if(!pending){ return "none"; }
         if(battleStillActive()){ return "waiting"; }
@@ -771,6 +773,7 @@
     }
 
     function pendingBlocksEntry(label){
+        if(towerAttemptUnresolved){ return true; }
         if(!progressionState.pending){ return false; }
         if(progressionState.pending.kind==="tower"){
             notify("尚有四象塔獎勵紀錄未結清，原紀錄已保留。為避免覆寫，本次"+label+"未開始；目前尚無自動復原流程。");
@@ -795,19 +798,67 @@
         };
     }
 
-    function wrapTowerStarter(original,targetResolver){
+    function makeTowerAttempt(pending){
+        if(!ACTIVE_UID||accountRepository.getActiveUid()!==ACTIVE_UID||!window.crypto?.getRandomValues){ return null; }
+        const bytes=new Uint8Array(16);
+        try{ window.crypto.getRandomValues(bytes); }catch(_){ return null; }
+        const attemptId=Array.from(bytes,value=>value.toString(16).padStart(2,"0")).join("");
+        pending.ownerUid=ACTIVE_UID;pending.attemptId=attemptId;pending.phase="preparing";
+        function matches(phase){
+            const current=progressionState.pending;
+            try{ return !towerAttemptUnresolved&&accountRepository.getActiveUid()===ACTIVE_UID&&current&&
+                current.kind==="tower"&&current.ownerUid===ACTIVE_UID&&current.attemptId===attemptId&&
+                current.floor===pending.floor&&current.weekKey===pending.weekKey&&current.phase===phase; }
+            catch(_){ return false; }
+        }
+        function commit(next,expected){
+            const host=progressionHost();
+            if(!host){ towerAttemptUnresolved=true;return false; }
+            const hadPrevious=Object.prototype.hasOwnProperty.call(host,"relicProgression");
+            let previous,previousHost;
+            try{
+                previous=clone(progressionState.pending);previousHost=clone(host.relicProgression);
+                progressionState.pending=next?clone(next):null;
+                host.relicProgression=clone(progressionState);
+                if(accountRepository.getActiveUid()!==ACTIVE_UID||typeof saveGame!=="function"||saveGame({source:"relic-progression"})!==true){ throw Error("Save not confirmed"); }
+                const saved=accountRepository.readForUid(ACTIVE_UID);
+                const actual=saved?.status==="ready"?saved.save?.player?.relicProgression?.pending:undefined;
+                if(accountRepository.getActiveUid()!==ACTIVE_UID||JSON.stringify(actual)!==JSON.stringify(expected)){ throw Error("Save readback mismatch"); }
+                return true;
+            }catch(_){
+                if(previous!==undefined){ progressionState.pending=previous; }
+                if(previousHost!==undefined){ host.relicProgression=previousHost; }
+                else if(!hadPrevious){ delete host.relicProgression; }
+                towerAttemptUnresolved=true;return false;
+            }
+        }
+        return Object.freeze({
+            matches:()=>matches("preparing"),
+            launchMatches:()=>matches("launch-requested"),
+            begin:()=>commit(pending,pending),
+            markLaunchRequested:()=>{
+                if(!matches("preparing")){ return false; }
+                const next={...progressionState.pending,phase:"launch-requested"};
+                return commit(next,next);
+            },
+            cancelBeforeLaunch:()=>matches("preparing")&&commit(null,null)
+        });
+    }
+
+    function wrapTowerStarter(original,targetResolver,selectFloor){
         if(typeof original!=="function"){ return null; }
         return function(){
             reconcilePending();
             if(pendingBlocksEntry("爬塔挑戰")){ return false; }
             const target=targetResolver.apply(this,arguments);
             const pending=buildTowerPending(target);
-            if(pending&&!setPending(pending)){
+            const attempt=pending?makeTowerAttempt(pending):null;
+            if(pending&&(!attempt||!attempt.begin())){
                 notify("無法建立安全的秘寶獎勵收據，為避免里程碑遺失，本次爬塔挑戰未開始。");
                 return false;
             }
-            const started=original.apply(this,arguments);
-            if(!started&&pending){ progressionState.pending=null;writeProgressionState(); }
+            const started=selectFloor?original.call(this,target,attempt):original.call(this,attempt);
+            if(!started&&attempt){ attempt.cancelBeforeLaunch(); }
             else if(started){ ensureReceiptMonitor(); }
             return started;
         };
@@ -821,7 +872,7 @@
     }
     if(typeof window.vGameplaySelectTowerBand==="function"){
         const original=window.vGameplaySelectTowerBand;
-        window.vGameplaySelectTowerBand=wrapTowerStarter(original,function(floor){ return floor; });
+        window.vGameplaySelectTowerBand=wrapTowerStarter(original,function(floor){ return floor; },true);
     }
 
     function craftStatus(relicId){

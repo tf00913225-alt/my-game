@@ -1442,22 +1442,43 @@
             renderTowerPage();
         }
     }
-    function startTowerFloor(floor){
+    function startTowerFloor(floor,attempt){
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
         if(battleStarting||highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||target>state.tower.completedFloor+1){ return false; }
         const waves=buildTowerWaves(target);
         const roster=waves[0];
         const towerBoss=waves[1].find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
-        activeBattleContext={
+        const context={
             mode:"tower",
             floor:target,
             towerBoss:towerBoss,
             expectedPartySize:expectedPartySizeForLevel(target)
         };
+        activeBattleContext=context;
         battleStarting=true;
+        let launcherCalled=false;
+        const current=()=>{
+            try{ return activeBattleContext===context&&ACCOUNT_REPOSITORY.getActiveUid()===ACTIVE_UID&&(!attempt||attempt.matches()); }
+            catch(_){ return false; }
+        };
+        const cancelPreparation=()=>{
+            if(!current()||launcherCalled){ return false; }
+            if(attempt){ attempt.cancelBeforeLaunch(); }
+            if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+            return false;
+        };
         const launch=()=>{
+            if(!current()){ return false; }
             waves.flat().forEach(bindTowerMonsterIdentity);
+            if(attempt&&!attempt.markLaunchRequested()){
+                if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+                return false;
+            }
+            try{
+                if(activeBattleContext!==context||ACCOUNT_REPOSITORY.getActiveUid()!==ACTIVE_UID||attempt&&!attempt.launchMatches()){ return false; }
+            }catch(_){ return false; }
+            launcherCalled=true;
             const started=window.v132LaunchDungeonBattle(
                 roster,
                 outcome=>completeTowerFloor(target,outcome),
@@ -1468,33 +1489,27 @@
             return true;
         };
         if(typeof window.v154PreparePortraitsForEncounter!=="function"){
-            battleStarting=false;
-            activeBattleContext=null;
             console.warn("[tower-portrait] shared encounter preparation owner unavailable");
-            return false;
+            return cancelPreparation();
         }
-        const preparation=window.v154PreparePortraitsForEncounter(waves.flat());
+        let preparation;
+        try{ preparation=window.v154PreparePortraitsForEncounter(waves.flat()); }
+        catch(error){ console.warn("[tower-portrait] encounter preparation failed",error);return cancelPreparation(); }
         if(preparation&&typeof preparation.then!=="function"){
             if(preparation.state!=="ready"){
-                battleStarting=false;
-                activeBattleContext=null;
-                return false;
+                return cancelPreparation();
             }
             return launch();
         }
         Promise.resolve(preparation).then(prepared=>{
             if(!prepared||prepared.state!=="ready"){
-                battleStarting=false;
-                activeBattleContext=null;
                 console.warn("[tower-portrait] shared encounter preparation failed");
-                return false;
+                return cancelPreparation();
             }
             return launch();
         }).catch(error=>{
-            battleStarting=false;
-            activeBattleContext=null;
             console.warn("[tower-portrait] encounter preparation failed",error);
-            return false;
+            return cancelPreparation();
         });
         return true;
     }
@@ -1546,7 +1561,7 @@
     window.vGameplayOpenBossDetail=openBossDetail;
     window.vGameplayCloseBossDetail=function(){ bossDetail=null;renderBossPage(); };
     window.vGameplayStartBoss=startBoss;
-    window.vGameplayContinueTower=function(){ return startTowerFloor(state.tower.completedFloor>=TOWER_FLOORS?TOWER_FLOORS:state.tower.completedFloor+1); };
+    window.vGameplayContinueTower=function(attempt){ return startTowerFloor(state.tower.completedFloor>=TOWER_FLOORS?TOWER_FLOORS:state.tower.completedFloor+1,attempt); };
     window.vGameplayToggleTowerAutoAdvance=toggleTowerAutoAdvance;
     window.vGameplayToggleTowerOverview=function(){ towerOverviewOpen=!towerOverviewOpen;renderTowerPage(); };
     window.vGameplaySelectTowerBand=startTowerFloor;

@@ -1,0 +1,83 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {createRequire} from 'node:module';
+import vm from 'node:vm';
+
+const require=createRequire(import.meta.url);
+const fixture=readFileSync(new URL('./gameplay-boss-tower-system.test.js',import.meta.url),'utf8');
+const load=new Function('require',fixture.slice(0,fixture.indexOf('let passed=0;'))+'\nreturn load;')(require);
+const relicFixture=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+const relicSource=readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8');
+const makeRelic=new Function('vm','source','require',relicFixture.slice(relicFixture.indexOf('function makeContext('),relicFixture.indexOf('\nfunction add('))+'\nreturn makeContext;')(vm,relicSource,require);
+function loadIntegrated(){
+ const {context:c}=load(),r=makeRelic({uid:'boss-tower-test',withStarters:true,noTimers:true});
+ for(const name of ['v174RelicSystem','FourSymbolsEquipmentGems','v132CanAddItemToInventory','v132AddItemToInventory','v132ConsumeStackItem','v132RunInventoryTransaction'])c[name]=r.context[name];
+ c.crypto=require('node:crypto').webcrypto;c.inventoryItems=[];
+ c.saveGame=()=>{try{c.FourSymbolsAccountSave.writeForUid('boss-tower-test',{player:c.player,inventoryItems:c.inventoryItems,gameplayProgress:c.GameplaySystem.getSerializableState()},{source:'test'});return true;}catch(_){return false;}};
+ assert.equal(c.saveGame(),true);vm.runInContext(relicSource,c,{filename:'relic-progression-drop-system.js'});
+ return c;
+}
+function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};}
+function attempt({failPhase=false}={}){
+ let phase='preparing',cancelled=0;
+ return {matches:()=>phase==='preparing',launchMatches:()=>phase==='launch-requested',
+  markLaunchRequested(){if(failPhase)return false;phase='launch-requested';return true;},
+  cancelBeforeLaunch(){if(phase!=='preparing')return false;phase='cancelled';cancelled++;return true;},
+  get phase(){return phase;},get cancelled(){return cancelled;}};
+}
+const flush=()=>new Promise(resolve=>setImmediate(resolve));
+
+test('portrait rejection cancels only before launcher invocation',async()=>{
+ const {context:c}=load(),d=deferred(),a=attempt();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1,a),true);d.reject(Error('prepare'));await flush();
+ assert.equal(a.cancelled,1);assert.equal(launches,0);
+});
+test('sync portrait throw follows the same pre-entry cancellation',()=>{
+ const {context:c}=load(),a=attempt();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>{throw Error('prepare');};c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1,a),false);assert.equal(a.cancelled,1);assert.equal(launches,0);
+});
+test('UID change during portrait preparation prevents cancellation and launch',async()=>{
+ const {context:c}=load(),d=deferred(),a=attempt();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1,a),true);c.FourSymbolsAccountSave.activate('other-uid');d.resolve({state:'ready'});await flush();
+ assert.equal(a.cancelled,0);assert.equal(launches,0);
+});
+test('stale preparation rejection cannot clear the active Tower context',async()=>{
+ const {context:c}=load(),d=deferred(),a=attempt();let launches=0,valid=true;
+ const stale={...a,matches:()=>valid,cancelBeforeLaunch:()=>{throw Error('stale cancellation');}};
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1,stale),true);valid=false;d.reject(Error('stale'));await flush();
+ assert.equal(c.vGameplaySelectTowerBand(1,attempt()),false,'stale callback must not clear battleStarting');
+ assert.equal(launches,0);
+});
+test('failed phase save never invokes launcher or cancels unknown',async()=>{
+ const {context:c}=load(),d=deferred(),a=attempt({failPhase:true});let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1,a),true);d.resolve({state:'ready'});await flush();
+ assert.equal(a.cancelled,0);assert.equal(launches,0);
+});
+test('launcher throw after phase advance is never treated as preparation failure',async()=>{
+ const {context:c}=load(),d=deferred(),a=attempt();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;throw Error('partial launch');};
+ assert.equal(c.vGameplaySelectTowerBand(1,a),true);d.resolve({state:'ready'});await flush();
+ assert.equal(a.phase,'launch-requested');assert.equal(a.cancelled,0);assert.equal(launches,1);
+});
+test('actual Relic and Tower owners cancel a verified portrait failure before launch',async()=>{
+ const c=loadIntegrated(),d=deferred();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending.phase,'preparing');
+ d.reject(Error('prepare'));await flush();
+ assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending,null);
+ assert.equal(launches,0);
+});
+test('actual claimed-floor replay starts without creating a reward receipt',()=>{
+ const c=loadIntegrated(),week=c.GameplaySystem.getWeekInfo(Date.now());
+ c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:1,claimedFloors:{'1':true}}},Date.now());
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ assert.equal(c.RelicProgressionSystem.getProgressionState().pending,null);
+ assert.equal(c.battleActive,true);
+});

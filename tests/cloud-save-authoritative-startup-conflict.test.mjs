@@ -468,8 +468,8 @@ test('actual Relic grant rollback cannot overwrite an uncertain actual saveGame 
     assert.equal((await f.load(cuts[0])).ready,true);
     const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
     const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
-    const makeRelic=new Function('vm','source',fixtureCode+'\nreturn makeContext;')(
-        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
     const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true});
     relic.context.player.level=20;
     relic.context.saveGame=options=>{
@@ -491,6 +491,53 @@ test('actual Relic grant rollback cannot overwrite an uncertain actual saveGame 
     assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
     assert.equal(f.writes.length,writesBefore);
     assert.equal(f.values.get(main),committed,'later actual saveGame cannot overwrite the committed bytes');
+});
+
+test('uncertain actual saveGame cancellation blocks a new Tower attempt',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),createRequire(import.meta.url));
+    let handle;
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+    relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
+    relic.context.saveGame=options=>{
+        f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;
+        return f.runtime.saveGame(options);
+    };
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),true);
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(handle.cancelBeforeLaunch(),false);
+    f.readFault(()=>false);f.fault(()=>false);
+    const committed=f.values.get(main),writes=f.writes.length;
+    assert.equal(JSON.parse(committed).player.relicProgression.pending,null);
+    assert.equal(relic.context.RelicProgressionSystem.getProgressionState().pending.phase,'preparing');
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(f.writes.length,writes);assert.equal(f.values.get(main),committed);
+});
+
+test('uncertain actual saveGame initial Tower receipt never calls starter',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
+    let calls=0;
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,towerStarter:()=>{calls++;return true;}});
+    relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
+    relic.context.saveGame=options=>{f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;return f.runtime.saveGame(options);};
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    f.readFault(()=>false);f.fault(()=>false);
+    assert.equal(calls,0);assert.equal(JSON.parse(f.values.get(main)).player.relicProgression.pending.phase,'preparing');
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);assert.equal(calls,0);
 });
 
 test('actual enterReady refuses Session takeover across app-shell and visual awaits',async()=>{

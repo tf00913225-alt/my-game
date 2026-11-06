@@ -55,6 +55,16 @@
           "corruptionBehavior": "block validation; preserve original save",
           "authorityTier": "B",
           "authoritativeSource": "cache only; protected server account/current.formation is authoritative"
+        },
+        "player.relicProgression.pending": {
+          "schemaVersion": "1; new Tower attempts add ownerUid, attemptId and phase",
+          "ownerModule": "js/relic-progression-drop-system.js",
+          "restoreOwner": "js/relic-progression-drop-system.js",
+          "contract": "docs/PERSISTED_STATE_REGISTRY.md",
+          "missingDataBehavior": "old receipts remain unresolved without automatic cancellation",
+          "corruptionBehavior": "do not infer a terminal outcome or cancel a mismatched attempt",
+          "authorityTier": "B",
+          "authoritativeSource": "UID local pending receipt; no trusted battle outcome or server authority"
         }
       },
       "ownerModule": "js/startup/account-save-repository.js",
