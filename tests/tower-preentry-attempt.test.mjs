@@ -22,6 +22,7 @@ function deferred(){let resolve,reject;const promise=new Promise((a,b)=>{resolve
 function attempt({failPhase=false}={}){
  let phase='preparing',cancelled=0;
  return {matches:()=>phase==='preparing',launchMatches:()=>phase==='launch-requested',
+  periodMatches:()=>true,blockForPeriodChange(){phase='blocked-period';},
   markLaunchRequested(){if(failPhase)return false;phase='launch-requested';return true;},
   cancelBeforeLaunch(){if(phase!=='preparing')return false;phase='cancelled';cancelled++;return true;},
   get phase(){return phase;},get cancelled(){return cancelled;}};
@@ -97,4 +98,56 @@ test('official entry guard and settled old promise preserve the next Tower prepa
  assert.equal(JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending),pending);
  assert.equal(c.vGameplaySelectTowerBand(1),false);assert.equal(launches,0);
  second.resolve({state:'ready'});await flush();assert.equal(launches,1);
+});
+test('cross-week portrait preparation never launches the old roster or clears its receipt',async()=>{
+ const c=loadIntegrated(),d=deferred();let now=Date.parse('2026-11-01T23:59:59.000Z'),launches=0;
+ c.Date=class extends Date{static now(){return now;}};
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ now+=2000;d.resolve({state:'ready'});await flush();
+ const after=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ assert.deepEqual(JSON.parse(JSON.stringify(after)),JSON.parse(JSON.stringify(before)));
+ assert.equal(after.phase,'preparing');assert.equal(launches,0);
+ assert.equal(c.vGameplaySelectTowerBand(1),false);
+});
+test('cross-week portrait rejection retains the original pending receipt',async()=>{
+ const c=loadIntegrated(),d=deferred();let now=Date.parse('2026-11-01T23:59:59.000Z'),launches=0;
+ c.Date=class extends Date{static now(){return now;}};
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending);
+ now+=2000;d.reject(Error('prepare'));await flush();
+ assert.equal(JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending),before);
+ assert.equal(launches,0);assert.equal(c.vGameplaySelectTowerBand(1),false);
+});
+test('week change during initial save cannot clear pending on synchronous floor rejection',()=>{
+ const c=loadIntegrated();let now=Date.parse('2026-11-01T23:59:59.000Z'),calls=0,launches=0;
+ c.Date=class extends Date{static now(){return now;}};
+ const week=c.GameplaySystem.getWeekInfo(now);
+ c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:4,claimedFloors:{}}},now);
+ const save=c.saveGame;c.saveGame=()=>{const result=save();if(++calls===1)now+=2000;return result;};
+ c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(5),false);
+ const pending=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ assert.equal(pending.floor,5);assert.equal(pending.weekKey,week.key);assert.equal(pending.phase,'preparing');
+ assert.equal(launches,0);assert.equal(c.vGameplaySelectTowerBand(1),false);
+});
+test('week change during phase save retains launch-requested and never calls launcher',async()=>{
+ const c=loadIntegrated(),d=deferred();let now=Date.parse('2026-11-01T23:59:59.000Z'),calls=0,launches=0;
+ c.Date=class extends Date{static now(){return now;}};
+ const save=c.saveGame;c.saveGame=()=>{const result=save();if(++calls===2)now+=2000;return result;};
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);d.resolve({state:'ready'});await flush();
+ assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending.phase,'launch-requested');
+ assert.equal(launches,0);assert.equal(c.vGameplaySelectTowerBand(1),false);
+});
+test('claimed floor replay also refuses a roster prepared in a previous week',async()=>{
+ const c=loadIntegrated(),d=deferred();let now=Date.parse('2026-11-01T23:59:59.000Z'),launches=0;
+ c.Date=class extends Date{static now(){return now;}};
+ const week=c.GameplaySystem.getWeekInfo(now);
+ c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:1,claimedFloors:{'1':true}}},now);
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);now+=2000;d.resolve({state:'ready'});await flush();
+ assert.equal(launches,0);assert.equal(c.RelicProgressionSystem.getProgressionState().pending,null);
 });

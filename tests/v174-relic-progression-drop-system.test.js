@@ -123,6 +123,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
             towerConfig:{floorCount:100,relicChoices:[{id:"relic_nine_dragon_fire"},{id:"relic_cold_spring_jade"},{id:"relic_qinglan_feather"},{id:"relic_rock_mountain_seal"}]},
             personalBosses:personal,worldBosses:world,
             getSerializableState:()=>JSON.parse(JSON.stringify(gameplayState)),
+            getWeekInfo:()=>({key:gameplayState.tower.weekKey}),
             getActiveBattleState:()=>activeBattle
         }
     };

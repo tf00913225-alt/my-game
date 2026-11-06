@@ -1452,6 +1452,8 @@
         const context={
             mode:"tower",
             floor:target,
+            weekKey:state.tower.weekKey,
+            element:state.tower.element,
             towerBoss:towerBoss,
             expectedPartySize:expectedPartySizeForLevel(target)
         };
@@ -1464,12 +1466,26 @@
         };
         const cancelPreparation=()=>{
             if(!current()||launcherCalled){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
             if(attempt){ attempt.cancelBeforeLaunch(); }
+            if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+            return false;
+        };
+        const samePeriod=()=>{
+            try{
+                const week=utcWeekInfo();
+                return week.key===context.weekKey&&week.element===context.element&&
+                    (!attempt||attempt.periodMatches(context.weekKey));
+            }catch(_){ return false; }
+        };
+        const stopForPeriodChange=()=>{
+            if(attempt){ attempt.blockForPeriodChange(); }
             if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
             return false;
         };
         const launch=()=>{
             if(!current()){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
             waves.flat().forEach(bindTowerMonsterIdentity);
             if(attempt&&!attempt.markLaunchRequested()){
                 if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
@@ -1478,6 +1494,7 @@
             try{
                 if(activeBattleContext!==context||ACCOUNT_REPOSITORY.getActiveUid()!==ACTIVE_UID||attempt&&!attempt.launchMatches()){ return false; }
             }catch(_){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
             launcherCalled=true;
             const started=window.v132LaunchDungeonBattle(
                 roster,

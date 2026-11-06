@@ -835,13 +835,23 @@
         return Object.freeze({
             matches:()=>matches("preparing"),
             launchMatches:()=>matches("launch-requested"),
+            periodMatches:weekKey=>pending.weekKey===weekKey,
+            blockForPeriodChange:()=>{
+                if(matches("preparing")||matches("launch-requested")){ towerAttemptUnresolved=true; }
+            },
             begin:()=>commit(pending,pending),
             markLaunchRequested:()=>{
                 if(!matches("preparing")){ return false; }
                 const next={...progressionState.pending,phase:"launch-requested"};
                 return commit(next,next);
             },
-            cancelBeforeLaunch:()=>matches("preparing")&&commit(null,null)
+            cancelBeforeLaunch:()=>{
+                if(!matches("preparing")){ return false; }
+                try{
+                    if(gameplayRuntime.getWeekInfo(Date.now())?.key!==pending.weekKey){ towerAttemptUnresolved=true;return false; }
+                }catch(_){ towerAttemptUnresolved=true;return false; }
+                return commit(null,null);
+            }
         });
     }
 
