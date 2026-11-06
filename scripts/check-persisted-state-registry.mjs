@@ -13,14 +13,14 @@ for(const row of rows){
  if(!fs.existsSync(path.join(root,row.ownerModule)))errors.push(`owner missing: ${row.ownerModule}`);
 }
 const writerCounts={
- 'js/00-main.js':14,'js/25-v131-fix-batch.js':1,'js/26-v131-patrol-appearance.js':1,
+ 'js/00-main.js':19,'js/25-v131-fix-batch.js':1,'js/26-v131-patrol-appearance.js':1,
  'js/27-v132-content-expansion.js':1,'js/28-v133-economy-rebalance.js':1,
  'js/32-v139-rested-experience.js':1,'js/34-v141-core-systems.js':1,
  'js/35-v141-ui-battle.js':3,'js/36-v141-content-systems.js':1,
  'js/equipment-progression.js':1,'js/53-v173.50-inventory-qol.js':1,
  'js/55-v173.51-inventory-qa.js':1,'js/59-abyss-two-tier-runtime.js':1,
  'js/firebase/session-client.js':1,'js/firebase/firebase-session.js':2,'js/release-update-notification.js':1,
- 'js/startup/account-save-repository.js':6,'js/startup/first-play-resource-loader.js':1,
+ 'js/startup/account-save-repository.js':3,'js/startup/first-play-resource-loader.js':1,
  'privacy-consent.html':1
 };
 const writer=/\b(?:localStorage|sessionStorage|storage\(\)|storage|global\.localStorage|window\.sessionStorage|storage\?)\??\.setItem\s*\(/g;
@@ -61,6 +61,12 @@ function walk(dir){for(const item of fs.readdirSync(dir,{withFileTypes:true})){
 walk(path.join(root,'js'));
 inspect('privacy-consent.html',fs.readFileSync(path.join(root,'privacy-consent.html'),'utf8'));
 const repository=fs.readFileSync(path.join(root,'js/startup/account-save-repository.js'),'utf8');
+function inspectMigrationRegistration(stateKeys,stateRows,source){
+ if(!stateKeys.has('four_symbols_migration_pending:<UID>'))errors.push('Migration pending key is not registered.');
+ if(!stateRows.find(row=>row.key==='four_symbols_save_meta:<UID>')?.extensions?.localWritePending)errors.push('Local write pending metadata is not registered.');
+ if(!source.includes('const MIGRATION_PENDING_PREFIX="four_symbols_migration_pending:"'))errors.push('Migration pending key prefix changed; review its registry entry.');
+}
+inspectMigrationRegistration(keys,rows,repository);
 const block=repository.match(/const LEGACY_SIDECARS=Object\.freeze\(\{([\s\S]*?)\}\);/)?.[1]||'';
 for(const [,suffix] of block.matchAll(/:\s*"([^"]+)"/g)){
  if(!keys.has(`four_symbols_account:<UID>:${suffix}`))errors.push(`legacy sidecar not registered: ${suffix}`);
@@ -87,6 +93,13 @@ if(process.argv.includes('--self-test')){
   throw Error('Registry guard did not reject unknown or historical-only storage.');
  }
  errors.splice(before);
+ const missingBefore=errors.length;
+ inspectMigrationRegistration(new Set([...keys].filter(key=>key!=='four_symbols_migration_pending:<UID>')),rows,repository);
+ inspectMigrationRegistration(keys,rows.filter(row=>row.key!=='four_symbols_save_meta:<UID>'),repository);
+ inspectMigrationRegistration(keys,rows,repository.replace('four_symbols_migration_pending:', 'unregistered_pending:'));
+ const missing=errors.slice(missingBefore).join('\n');
+ if(!missing.includes('Migration pending key is not registered')||!missing.includes('Local write pending metadata is not registered')||!missing.includes('Migration pending key prefix changed'))throw Error('Pending state registry checks must fail closed.');
+ errors.splice(missingBefore);
 }
 if(errors.length){console.error(errors.join('\n'));process.exitCode=1;}
 else console.log(`Persisted state registry: ${rows.length} entries; runtime storage writes and account keys covered.`);

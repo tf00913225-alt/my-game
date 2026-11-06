@@ -179,9 +179,32 @@ test("final metadata read failure returns unknown without rolling back validated
     });
     assert.throws(()=>f.repo.writeForUid(f.uid,next,opts),code("account-local-commit-unknown"));
     f.hook(()=>{});
-    assert.equal(f.repo.readForUid(f.uid).save.player.id,"after");
+    assert.throws(()=>f.repo.readForUid(f.uid),code("account-local-write-fenced"));
+    assert.equal(fixture([...f.values]).repo.readForUid(f.uid).save.player.id,"after");
     assert.equal(JSON.parse(f.values.get(f.shop)).refreshCount,1);
     assert.deepEqual(f.events,[["set",f.meta],["set",f.main],["set",f.shop],["set",f.meta]]);
+    const before=[...f.values],eventCount=f.events.length;
+    for(const action of [()=>f.repo.writeForUid(f.uid,next),()=>f.repo.writeForUid(f.uid,next,{source:"hydration-normalization"}),
+        ()=>f.repo.writeForUid(f.uid,next,{cloudBundle:{}}),()=>f.repo.migrateLegacyToUid(f.uid,{confirmed:true}),
+        ()=>f.repo.removeActive(),()=>f.repo.recoverArchivedMigrationSidecars(f.uid)]){
+        assert.throws(action,code("account-local-write-fenced"));
+    }
+    assert.equal(f.events.length,eventCount);assert.deepEqual([...f.values],before);
+    f.repo.activate("other-uid");f.repo.writeForUid("other-uid",{player:{id:"other"}});
+    assert.equal(f.repo.readForUid("other-uid").save.player.id,"other");
+    f.repo.activate(f.uid);
+    assert.throws(()=>f.repo.writeForUid(f.uid,next),code("account-local-write-fenced"));
+});
+
+test("known successful rollback does not fence later legitimate writes",()=>{
+    const f=existing();let marked=false,failed=false;
+    f.hook((op,key,value)=>{
+        if(op==="after-set"&&key===f.meta&&value.includes('localWritePending'))marked=true;
+        if(marked&&!failed&&op==="before-set"&&key===f.main){failed=true;throw Error("known failure");}
+    });
+    assert.throws(()=>f.repo.writeForUid(f.uid,next),code("account-save-write-failed"));
+    f.hook(()=>{});f.repo.writeForUid(f.uid,next);
+    assert.equal(f.repo.readForUid(f.uid).save.player.id,"after");
 });
 
 test("rollback metadata read failure does not report successful restoration",()=>{
@@ -193,7 +216,8 @@ test("rollback metadata read failure does not report successful restoration",()=
         if(restoredMeta&&op==="get"&&key===f.meta)throw Error("metadata rollback read");
     });
     assert.throws(()=>f.repo.writeForUid(f.uid,next),code("account-local-rollback-failed"));
-    f.hook(()=>{});assert.equal(f.repo.readForUid(f.uid).save.player.id,"before");
+    f.hook(()=>{});assert.throws(()=>f.repo.readForUid(f.uid),code("account-local-write-fenced"));
+    assert.equal(fixture([...f.values]).repo.readForUid(f.uid).save.player.id,"before");
 });
 
 test("characterization: uncooperative old client can still interleave and defeat the marker",()=>{

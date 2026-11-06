@@ -444,7 +444,7 @@ test('actual Startup rejects an orphan migration marker before READY or characte
     assert.equal(f.values.has(f.repo.metadataKey(h.uid)),false);
 });
 
-test('characterization: actual saveGame returns false for committed data and permits a later overwrite',async()=>{
+test('actual saveGame returns false for uncertain commit but later same-page writes cannot overwrite',async()=>{
     const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
     assert.equal((await f.load(cuts[0])).ready,true);
     const metaKey=f.repo.metadataKey(h.uid),mainKey=f.repo.saveKey(h.uid);
@@ -456,9 +456,41 @@ test('characterization: actual saveGame returns false for committed data and per
     assert.equal(JSON.parse(f.values.get(mainKey)).gold,4321,'after state was already committed');
     f.readFault(()=>false);f.fault(()=>false);
     f.runtime.gold=1234; // A caller restoring its earlier in-memory value.
-    assert.equal(f.runtime.saveGame({source:'relic-progression'}),true);
-    assert.equal(JSON.parse(f.values.get(mainKey)).gold,1234,
-        'known overwrite hazard; this is not recovery or retry safety');
+    const before=[...f.values],writesBefore=f.writes.length;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(JSON.parse(f.values.get(mainKey)).gold,4321,'the committed value is not overwritten');
+    assert.deepEqual([...f.values],before);
+    assert.equal(f.writes.length,writesBefore,'retry must not write or remove storage keys');
+});
+
+test('actual Relic grant rollback cannot overwrite an uncertain actual saveGame commit',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'));
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true});
+    relic.context.player.level=20;
+    relic.context.saveGame=options=>{
+        f.runtime.player=relic.context.player;
+        f.runtime.inventoryItems=relic.context.inventoryItems;
+        return f.runtime.saveGame(options);
+    };
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(relic.context.RelicProgressionSystem.reconcileLevelMilestones(),false);
+    f.readFault(()=>false);f.fault(()=>false);
+    const committed=f.values.get(main),committedSave=JSON.parse(committed);
+    assert.equal(committedSave.player.relicProgression.firstCharacterLevel20Grant,true,
+        'actual Relic grant was in the committed bytes');
+    assert.equal(relic.context.player.relicProgression.firstCharacterLevel20Grant,false,
+        'actual Relic caller restored its in-memory state on false');
+    const writesBefore=f.writes.length;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(f.writes.length,writesBefore);
+    assert.equal(f.values.get(main),committed,'later actual saveGame cannot overwrite the committed bytes');
 });
 
 test('actual enterReady refuses Session takeover across app-shell and visual awaits',async()=>{

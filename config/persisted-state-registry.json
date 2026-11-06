@@ -89,6 +89,11 @@
           "schemaVersion": 1,
           "ownerModule": "js/startup/account-save-repository.js",
           "meaning": "Incomplete multi-key local adoption blocks read/write until recovery; original UID migration backup retained; not a localStorage transaction or server publication authority"
+        },
+        "localWritePending": {
+          "schemaVersion": 1,
+          "ownerModule": "js/00-main.js",
+          "meaning": "Incomplete local main and optional shop write blocks repository reads and writes; final metadata is installed only after destination readback; an unknown result is fenced in the current page"
         }
       },
       "ownerModule": "js/startup/account-save-repository.js",
@@ -110,6 +115,28 @@
       "corruptionBehavior": "block if gameplay critical",
       "defaultBehavior": "block",
       "missingDataBehavior": "block rewards and recovery"
+    },
+    {
+      "key": "four_symbols_migration_pending:<UID>",
+      "ownerModule": "js/00-main.js",
+      "storageType": "localStorage",
+      "scope": "uid",
+      "deviceOnly": true,
+      "gameplayCritical": true,
+      "rewardCoupled": true,
+      "economyCoupled": true,
+      "claimCoupled": true,
+      "cloudRequired": false,
+      "backupRequired": false,
+      "migrationRequired": true,
+      "authorityTier": "C",
+      "authoritativeSource": "local incomplete legacy migration marker, not entitlement or server authority",
+      "schemaVersion": "1",
+      "restoreOwner": "js/startup/account-save-repository.js",
+      "deletionPolicy": "remove only after verified migration cut; retain on incomplete or unknown outcome",
+      "corruptionBehavior": "block reads and writes, including malformed or unreadable marker",
+      "defaultBehavior": "no marker before migration starts",
+      "missingDataBehavior": "absence alone does not prove completion or entitlement"
     },
     {
       "key": "battle_full_version_save_v5",
@@ -156,8 +183,8 @@
       "missingDataBehavior": "safe default"
     },
     {
-      "key": "four_symbols_legacy_backup:<UID>:<time>[:legacy key]",
-      "ownerModule": "js/startup/account-save-repository.js",
+      "key": "four_symbols_legacy_backup:<UID>:<time or secure transaction id>[:legacy key]",
+      "ownerModule": "js/00-main.js",
       "storageType": "localStorage",
       "scope": "uid",
       "deviceOnly": true,

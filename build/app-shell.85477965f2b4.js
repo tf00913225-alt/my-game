@@ -1078,13 +1078,21 @@ function inspectBundle(context,uid,bundle){
 let accountWriteActive=false;
 let migrationOwnerActive=false;
 const unresolvedMigrations=new Set();
+const unresolvedLocalWrites=new Set();
 function migrationIsUnresolved(uid){ return unresolvedMigrations.has(uid); }
+function localWriteIsUnresolved(uid){ return unresolvedLocalWrites.has(uid); }
 function migrationIsRunning(){ return migrationOwnerActive; }
 function writeForUid(context,uid,save,options={}){
- if(migrationIsUnresolved(context.validUid(uid)))throw context.coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+ uid=context.validUid(uid);
+ if(migrationIsUnresolved(uid))throw context.coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+ if(localWriteIsUnresolved(uid))throw context.coded("account-local-write-fenced","A local save result is unresolved in this page.");
  if(accountWriteActive){ throw context.coded("account-save-reentrant","A save is already in progress."); }
  accountWriteActive=true;
  try{ return writeForUidOnce(context,uid,save,options); }
+ catch(error){
+  if(error?.code==="account-local-commit-unknown"||error?.code==="account-local-rollback-failed")unresolvedLocalWrites.add(uid);
+  throw error;
+ }
  finally{ accountWriteActive=false; }
 }
 // Complete legacy migration is the only public command. The pending bypass and
@@ -1097,6 +1105,7 @@ function migrateLegacyToUid(context,uid,options={}){
  try{
   uid=validUid(uid);
   if(migrationIsUnresolved(uid))throw coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+  if(localWriteIsUnresolved(uid))throw coded("account-local-write-fenced","A local save result is unresolved in this page.");
   if(options.confirmed!==true)throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation.");
   const initialActiveUid=getActiveUid();
   if(initialActiveUid&&initialActiveUid!==uid)throw coded("account-not-active","Migration UID does not match the active account.");
@@ -1313,7 +1322,7 @@ function writeForUidOnce(context,uid,save,options={}){
         }
         return {uid,key,metadata:JSON.parse(metadata)};
     }
-Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid,migrateLegacyToUid,migrationIsUnresolved,migrationIsRunning})});
+Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid,migrateLegacyToUid,migrationIsUnresolved,migrationIsRunning,localWriteIsUnresolved})});
 })(window);
 /* Bundle decisions only; destination and READY remain StartupStateMachine. */
 (function(global){"use strict";if(global.FourSymbolsCloudBundle)return;

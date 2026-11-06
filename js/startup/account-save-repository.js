@@ -102,6 +102,9 @@
     // automatic recovery; an absent key is the only non-pending state.
     function assertNoMigrationPending(uid){
         uid=validUid(uid);
+        if(global.FourSymbolsAccountSaveOperations?.localWriteIsUnresolved?.(uid)){
+            throw coded("account-local-write-fenced","A local save result is unresolved in this page.");
+        }
         if(global.FourSymbolsAccountSaveOperations?.migrationIsUnresolved?.(uid)){
             throw coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
         }
