@@ -24,6 +24,30 @@ function repository(store=storage()){
 }
 function code(expected){ return error=>error&&error.code===expected; }
 
+// Characterization only: an ordinary local-write rollback failure can leave
+// mixed bytes that the existing reader accepts. This is not a recovery PASS.
+{
+    const {repo,store}=repository();
+    const uid="uid-q61-double-failure";
+    repo.activate(uid);
+    repo.writeForUid(uid,{player:{id:"before"}},{source:"test"});
+    const mainKey=repo.saveKey(uid),metaKey=repo.metadataKey(uid);
+    const beforeMain=store.getItem(mainKey),beforeMeta=store.getItem(metaKey);
+    const set=store.setItem.bind(store);let metadataFailed=false;
+    store.setItem=(key,value)=>{
+        if(key===metaKey&&!metadataFailed){metadataFailed=true;throw Error("metadata failure");}
+        if(key===mainKey&&metadataFailed&&value===beforeMain){throw Error("rollback failure");}
+        return set(key,value);
+    };
+    assert.throws(()=>repo.writeForUid(uid,{player:{id:"after"}},{source:"test"}),code("account-save-write-failed"));
+    assert.equal(JSON.parse(store.getItem(mainKey)).player.id,"after","failed rollback leaves new main bytes");
+    assert.equal(store.getItem(metaKey),beforeMeta,"old metadata remains");
+    const restarted=repository(store).repo;
+    const mixed=restarted.readForUid(uid);
+    assert.equal(mixed.status,"ready","known limitation: existing reader does not detect this mixed pair");
+    assert.equal(mixed.save.player.id,"after","restart must not silently create an empty account");
+}
+
 {
     const {repo}=repository();
     repo.activate("uid-A");
