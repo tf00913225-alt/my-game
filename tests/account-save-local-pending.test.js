@@ -182,9 +182,9 @@ test("characterization: uncooperative old client can still interleave and defeat
         "known limitation, not a cross-context safety PASS");
 });
 
-test("characterization: legacy migration deletes UID data after an unknown final metadata read",()=>{
+test("legacy migration preserves committed bytes after unknown final metadata read",()=>{
     const legacy=JSON.stringify({player:{id:"legacy-original"}}),uid="migration-unknown";
-    const f=fixture([["battle_full_version_save_v5",legacy]]);
+    const f=fixture([["battle_full_version_save_v5",legacy],["v131_element_box_state",'{"old":true}']]);
     const meta=f.repo.metadataKey(uid),main=f.repo.saveKey(uid);let committed=false,readFailed=false;
     f.hook((op,key,value)=>{
         if(op==="after-set"&&key===meta&&!value.includes('localWritePending'))committed=true;
@@ -193,9 +193,60 @@ test("characterization: legacy migration deletes UID data after an unknown final
     assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),
         code("account-local-commit-unknown"));
     f.hook(()=>{});
-    assert.equal(f.values.has(main),false,"existing migration cleanup removes possibly committed main");
-    assert.equal(f.values.has(meta),false,"existing migration cleanup removes metadata");
+    assert.equal(f.values.get(main),legacy,"possibly committed main is preserved");
+    assert.equal(f.values.has(meta),true,"possibly committed metadata is preserved");
     assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
     assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
-    assert.equal(f.repo.readForUid(uid).status,"empty","known fail-open; this is not a recovery PASS");
+    assert.equal(f.events.some(([op])=>op==="remove"),false,"unknown result must not trigger cleanup");
+    assert.equal(f.values.has(f.repo.accountKey("element-box-state",uid)),false,"sidecar loop did not run");
+    assert.equal(fixture([...f.values]).repo.readForUid(uid).status,"ready",
+        "known remaining gap: partial migration may look ready after reload");
+});
+
+test("legacy migration preserves marker on unreadable staging or failed rollback",()=>{
+    for(const failure of ["marker-read","rollback"]){
+        const uid="migration-"+failure,legacy=JSON.stringify({player:{id:"legacy"}});
+        const f=fixture([["battle_full_version_save_v5",legacy]]),meta=f.repo.metadataKey(uid),main=f.repo.saveKey(uid);
+        let marker=false,mainWritten=false,failed=false,metaCommitFailed=false;
+        f.hook((op,key,value)=>{
+            if(op==="after-set"&&key===meta&&value.includes('localWritePending'))marker=true;
+            if(failure==="marker-read"&&marker&&!failed&&op==="get"&&key===meta){failed=true;throw Error("marker read");}
+            if(op==="after-set"&&key===main)mainWritten=true;
+            if(failure==="rollback"&&mainWritten&&!metaCommitFailed&&op==="before-set"&&key===meta){metaCommitFailed=true;throw Error("final metadata");}
+            if(failure==="rollback"&&metaCommitFailed&&op==="before-remove"&&key===main)throw Error("main rollback");
+        });
+        assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),
+            code(failure==="marker-read"?"account-local-write-incomplete":"account-local-rollback-failed"));
+        f.hook(()=>{});
+        assert.ok(JSON.parse(f.values.get(meta)).localWritePending);
+        assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+        assert.ok([...f.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:"+uid+":")));
+        assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code("account-local-write-incomplete"));
+    }
+});
+
+test("known marker-write failure does not become an unknown result",()=>{
+    const uid="migration-known",legacy=JSON.stringify({player:{id:"legacy"}}),f=fixture([["battle_full_version_save_v5",legacy]]);
+    const meta=f.repo.metadataKey(uid);let failed=false;
+    f.hook((op,key)=>{if(!failed&&op==="before-set"&&key===meta){failed=true;throw Error("marker write");}});
+    assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code("account-save-write-failed"));
+    f.hook(()=>{});assert.equal(f.repo.readForUid(uid).status,"empty");
+    assert.equal(f.values.get("battle_full_version_save_v5"),legacy);
+});
+
+test("unknown result after UID switch leaves both accounts untouched by cleanup",()=>{
+    const uid="migration-switch",other="other-uid",legacy=JSON.stringify({player:{id:"legacy"}});
+    const f=fixture([["battle_full_version_save_v5",legacy]]),meta=f.repo.metadataKey(uid),main=f.repo.saveKey(uid);
+    f.repo.activate(other);f.repo.writeForUid(other,{player:{id:"other"}});
+    const otherMain=f.values.get(f.repo.saveKey(other)),otherMeta=f.values.get(f.repo.metadataKey(other));
+    let committed=false,failed=false;
+    f.hook((op,key,value)=>{
+        if(op==="after-set"&&key===meta&&!value.includes('localWritePending'))committed=true;
+        if(committed&&!failed&&op==="get"&&key===meta){failed=true;f.repo.activate(other);throw Error("final read");}
+    });
+    assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code("account-local-commit-unknown"));
+    f.hook(()=>{});
+    assert.equal(f.values.get(main),legacy);assert.ok(f.values.has(meta));
+    assert.equal(f.values.get(f.repo.saveKey(other)),otherMain);
+    assert.equal(f.values.get(f.repo.metadataKey(other)),otherMeta);
 });

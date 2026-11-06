@@ -371,6 +371,10 @@
             }
             return {status:"migrated",uid,backupKey,backupKeys:backups,legacyKey:LEGACY_KEY};
         }catch(error){
+            // The writer may have committed data or left a protective marker.
+            // Never destroy either when its outcome cannot be verified.
+            if(["account-local-commit-unknown","account-local-rollback-failed",
+                "account-local-write-incomplete"].includes(error?.code)){ throw error; }
             writtenSidecars.forEach(key=>{ try{ storage().removeItem(key); }catch(_){ } });
             try{ storage().removeItem(saveKey(uid)); storage().removeItem(metadataKey(uid)); }catch(_){ }
             // The canonical legacy key and its backup are deliberately preserved.

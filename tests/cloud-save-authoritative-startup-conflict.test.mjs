@@ -10,7 +10,8 @@ const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-
 
 function deferredMigration(){
     const values=new Map([['battle_full_version_save_v5',JSON.stringify({player:{id:'legacy-original'}})]]),writes=[];
-    const store={getItem:key=>values.get(key)??null,setItem:(key,value)=>{writes.push(key);values.set(key,String(value));},
+    let readFault=()=>false,afterWrite=()=>{};
+    const store={getItem:key=>{if(readFault(key))throw Error('migration read fixture');return values.get(key)??null;},setItem:(key,value)=>{writes.push(key);values.set(key,String(value));afterWrite(key,String(value));},
         removeItem:key=>{writes.push(key);values.delete(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
     const global={localStorage:store};global.window=global;vm.createContext(global);
     vm.runInContext(readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8'),global);
@@ -36,8 +37,22 @@ function deferredMigration(){
             state:()=>state,errors,ready};
     `);
     const f=make(global,shell,()=>vm.runInContext(operations,global));
-    return {...f,repo,global,values,writes,resume,reject};
+    return {...f,repo,global,values,writes,resume,reject,readFault:fn=>{readFault=fn;},afterWrite:fn=>{afterWrite=fn;}};
 }
+
+test('actual migration startup reports unknown and never enters READY or deletes the committed main',async()=>{
+    const f=deferredMigration(),meta=f.repo.metadataKey('migration-a'),main=f.repo.saveKey('migration-a');
+    let final=false,failed=false;
+    f.afterWrite((key,value)=>{if(key===meta&&!value.includes('localWritePending'))final=true;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    const pending=f.run();f.resume();await pending;f.readFault(()=>false);
+    assert.equal(f.ready.length,0);
+    assert.equal(f.state(),'ERROR');
+    assert.equal(f.errors.at(-1)?.code,'account-local-commit-unknown');
+    assert.equal(JSON.parse(f.values.get(main)).player.id,'legacy-original');
+    assert.ok(f.values.has(meta));
+    assert.equal(f.writes.filter(key=>key===main).length,1,'no cleanup or compensating save');
+});
 
 test('deferred original writer refuses unloaded migration and save before any writes',()=>{
     const f=deferredMigration(),before=JSON.stringify([...f.values]);

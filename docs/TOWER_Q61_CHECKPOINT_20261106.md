@@ -198,3 +198,20 @@ pass. No v2 admission, reliable victory/negative terminal, receipt recovery or
 Cloud readiness is activated. Original AccountSave Owner's independent review
 of this exact diff remains pending. Future work must settle uncertain-result
 propagation and gameplay blocking without changing other Owners opportunistically.
+
+## Eighth checkpoint: do not delete an uncertain legacy migration
+
+The original migration catch now rethrows `account-local-commit-unknown`,
+`account-local-rollback-failed`, and `account-local-write-incomplete` unchanged
+before cleanup. It does not remove main, metadata, sidecars, legacy or backups
+for those three outcomes. Other errors retain the old cleanup behavior; this
+does not prove that broader cleanup or partial sidecar migration is safe.
+
+Targeted tests use the real AccountSave writer and the original Startup
+confirm-migration branch. They cover each of the three errors, verified ordinary
+failure, UID switch, no compensating deletion, and no READY in that same startup.
+After a final-metadata read failure, reload may still see READY with sidecars not
+yet migrated. This characterization is an explicit STOP, not recovery PASS.
+There is no durable migration marker, global unknown barrier or auto recovery.
+The original reviewer read the diff and allowed an unreleased Draft checkpoint;
+the Startup test is an isolated original branch, not browser Boot QA.
