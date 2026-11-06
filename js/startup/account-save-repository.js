@@ -101,6 +101,21 @@
         uid=validUid(uid);
         const raw=storage().getItem(saveKey(uid));
         const metadataRaw=storage().getItem(metadataKey(uid));
+        // Presence, including a malformed/false marker, is never a committed save.
+        // Check before the empty/incomplete branches so orphan markers stay blocked.
+        if(metadataRaw!==null){
+            let staged;
+            try{ staged=JSON.parse(metadataRaw); }
+            catch(cause){ throw coded("account-metadata-corrupt","Account save metadata is corrupt.",cause); }
+            if(staged&&Object.prototype.hasOwnProperty.call(staged,"localWritePending")){
+                const marker=staged.localWritePending;
+                if(!marker||typeof marker!=="object"||Array.isArray(marker)||
+                   Object.keys(marker).join("|")!=="version"||marker.version!==1){
+                    throw coded("account-metadata-corrupt","Local save marker is malformed.");
+                }
+                throw coded("account-local-write-incomplete","An interrupted local save must be preserved for recovery.");
+            }
+        }
         if(!raw&&!metadataRaw){ return {status:"empty",uid,save:null,metadata:null}; }
         if(!raw||!metadataRaw){
             throw coded("account-save-incomplete","Local account save and ownership metadata are incomplete.");

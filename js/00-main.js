@@ -231,7 +231,14 @@ function inspectBundle(context,uid,bundle){
         }
         return bundle;
     }
+let accountWriteActive=false;
 function writeForUid(context,uid,save,options={}){
+ if(accountWriteActive){ throw context.coded("account-save-reentrant","A save is already in progress."); }
+ accountWriteActive=true;
+ try{ return writeForUidOnce(context,uid,save,options); }
+ finally{ accountWriteActive=false; }
+}
+function writeForUidOnce(context,uid,save,options={}){
  const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave}=context;
  const inspectCloudBundle=(uid,bundle)=>inspectBundle(context,uid,bundle);
         uid=validUid(uid);
@@ -244,6 +251,9 @@ function writeForUid(context,uid,save,options={}){
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        // The reader blocks orphan or malformed pending metadata before either
+        // local writes or the cloud-adoption same-cut early return / backup.
+        readForUid(uid);
         assertGameplayVersion(context,save);
         const previousSave=previousRaw?parseSave(previousRaw,"account-save-corrupt"):null;
         assertGameplayVersion(context,previousSave);
@@ -304,7 +314,7 @@ function writeForUid(context,uid,save,options={}){
         }
         // The existing local equipment shop commits its batch receipt with
         // gold/inventory through this same rollback boundary. No Cloud authority.
-        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily"):null;
+        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily",uid):null;
         const previousShop=shopKey?storage().getItem(shopKey):null;
         const shopRaw=shopKey?JSON.stringify(options.equipmentShopState):null;
         let previousMetadata=null;
@@ -347,17 +357,46 @@ function writeForUid(context,uid,save,options={}){
                 ...(source==="hydration-normalization"?{normalizedMainFingerprint:fingerprint(save)}:{})}}:{}),
             updatedAt:Date.now()
         });
+        const marker=JSON.stringify({...(previousMetadata||{schemaVersion:SCHEMA_VERSION,ownerUid:uid}),
+            localWritePending:{version:1}});
+        // A marker readback failure is left blocked: do not guess whether it landed.
+        try{ storage().setItem(metaKey,marker); }
+        catch(error){ throw coded("account-save-write-failed","Local save marker could not be stored.",error); }
+        let metadataCommitted=false;
         try{
+            if(storage().getItem(metaKey)!==marker){ throw Error("Local save marker readback mismatch"); }
+        }catch(error){ throw coded("account-local-write-incomplete","Local save marker cannot be verified.",error); }
+        try{
+            if(getActiveUid()!==uid){ throw Error("Active UID changed before save"); }
             storage().setItem(key,raw);
+            if(storage().getItem(key)!==raw){ throw Error("Main save readback mismatch"); }
+            if(shopKey){
+                storage().setItem(shopKey,shopRaw);
+                if(storage().getItem(shopKey)!==shopRaw){ throw Error("Shop state readback mismatch"); }
+            }
+            if(getActiveUid()!==uid){ throw Error("Active UID changed during save"); }
             storage().setItem(metaKey,metadata);
-            if(shopKey){ storage().setItem(shopKey,shopRaw); }
+            metadataCommitted=true;
+            if(storage().getItem(metaKey)!==metadata){ throw Error("Final metadata readback mismatch"); }
         }catch(error){
+            // Once final metadata was written, destinations were already read
+            // back. Never roll them back after an uncertain final read: the
+            // marker may already be gone. Report uncertainty without mutation.
+            if(metadataCommitted){ throw coded("account-local-commit-unknown","Final metadata could not be verified; do not retry blindly.",error); }
             try{
                 if(previousRaw===null){ storage().removeItem(key); }else{ storage().setItem(key,previousRaw); }
+                if(storage().getItem(key)!==previousRaw){ throw Error("Main rollback readback mismatch"); }
+                if(shopKey){
+                    if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); }
+                    if(storage().getItem(shopKey)!==previousShop){ throw Error("Shop rollback readback mismatch"); }
+                }
+                // Restore metadata last, only after all destination bytes match.
                 if(previousMeta===null){ storage().removeItem(metaKey); }else{ storage().setItem(metaKey,previousMeta); }
-                if(shopKey){ if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); } }
-            }catch(_){ }
-            throw coded("account-save-write-failed","Account save could not be committed atomically.",error);
+                if(storage().getItem(metaKey)!==previousMeta){ throw Error("Metadata rollback readback mismatch"); }
+            }catch(rollback){
+                throw coded("account-local-rollback-failed","Local save rollback could not be verified; preserve stored data and do not retry blindly.",rollback);
+            }
+            throw coded("account-save-write-failed","Local save failed; previous destination bytes were restored.",error);
         }
         return {uid,key,metadata:JSON.parse(metadata)};
     }

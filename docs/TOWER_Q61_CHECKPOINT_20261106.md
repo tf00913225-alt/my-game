@@ -165,3 +165,36 @@ necessary builder/checks are rerun in this batch, not the completed prior suite.
 Original /root/compatibility reviewer read this diff and permits only a Draft
 value-preservation checkpoint, requiring the availability STOP to stay explicit.
 Player-visible notification layout/experience has not been browser-validated.
+
+## Sixth checkpoint: local pending marker, single updated writer only
+
+Ordinary AccountSave now stages `localWritePending:{version:1}` in the existing
+metadata and verifies it before main/shop writes. It reads back main and optional
+shop, writes final metadata last, and rolls back destination bytes and verifies
+them before restoring metadata. Reader and writer reject any present marker;
+malformed values block, and a marker without main is not treated as an empty
+account. Legacy metadata without the field follows the existing path. Cloud
+adoption reaches the same read guard before same-cut return or backup. A local
+synchronous reentry guard also covers getters/toJSON. Shop key binds captured UID.
+
+Original reviewer confirms only a Draft checkpoint. If the final metadata write
+succeeds but readback fails, the Writer reports `account-local-commit-unknown`
+without rollback: all destination bytes were previously checked but the metadata
+outcome is uncertain. **Consumer STOP:** existing `saveGame()` can turn this
+error into `false`; Relic and other consumers may revert in-memory state and
+later overwrite an already committed result. It does not yet prevent gameplay
+or blind retry after an uncertain read. The requested end-to-end blocking after
+storage-read failure is therefore not complete. No merge or deployment.
+
+Rollback metadata readback failure reports rollback failure without claiming a
+marker necessarily remains; metadata restoration may already have succeeded.
+The tests also characterize an uncooperative old client interleaving through
+the marker and yielding an undetected mixed write. This is not cross-tab CAS,
+old-client protection, a crash recovery journal or filesystem durability.
+
+Focused account marker, ownership, legacy hydration, admission and actual cloud
+bundle tests pass (37 Node runner results); production build/check and diff check
+pass. No v2 admission, reliable victory/negative terminal, receipt recovery or
+Cloud readiness is activated. Original AccountSave Owner's independent review
+of this exact diff remains pending. Future work must settle uncertain-result
+propagation and gameplay blocking without changing other Owners opportunistically.
