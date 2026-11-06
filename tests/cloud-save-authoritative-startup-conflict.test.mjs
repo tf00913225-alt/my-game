@@ -3,6 +3,7 @@ import {readFileSync} from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 import {createRequire} from "node:module";
+import {createHash} from "node:crypto";
 import {storeHarness,selection,copy} from "../scripts/test-helpers/canonical-store-harness.mjs";
 const require=createRequire(import.meta.url);
 const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot");
@@ -175,10 +176,10 @@ async function lawfulCuts(){
     return {h,cuts};
 }
 function adoptionFixture(uid){
-    const values=new Map(),ready=[],errors=[];let fault=()=>false;
+    const values=new Map(),ready=[],errors=[],writes=[];let fault=()=>false;
     const storage={getItem:key=>values.get(key)??null,
-        setItem(key,value){if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
-        removeItem(key){if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
+        setItem(key,value){writes.push({key,operation:'set'});if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
+        removeItem(key){writes.push({key,operation:'remove'});if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
     const noop=()=>{},context={console,localStorage:storage,JSON,Date,Error,Object,Array,String,
         player:{},player2:null,player3:null,characters:[],characterEquipment:{fire:{}},characterSkillLoadouts:{fire:{skillLevels:{},equippedSkills:[]}},
         autoConfig:{},autoConfig2:{},autoConfig3:{},inventoryItems:[],sharedExp:0,gold:0,
@@ -220,7 +221,7 @@ function adoptionFixture(uid){
         const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
         ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
     const resolve=make(context,firebase,ready,errors);
-    return {repo,values,ready,errors,reads,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
+    return {repo,values,ready,errors,reads,writes,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
             const before=ready.length;
             response=waiting||{uid,exists:true,serverConfirmed:true,data:{ownerUid:uid,serverRevision:bundle.serverRevision,
@@ -352,6 +353,52 @@ test('bundle failures never fall back to main-only and storage interruption pres
     assert.throws(()=>f.repo.readForUid(h.uid),e=>e.code==='account-cloud-adoption-incomplete');
     assert.throws(()=>f.repo.writeForUid(h.uid,cuts[0].gameSave),e=>e.code==='account-cloud-adoption-incomplete');
     assert.ok([...f.values.keys()].some(key=>key.startsWith('four_symbols_migration_backup:')));
+});
+
+test('Tower v2 is rejected by canonical consumers without changing v1 source bytes or hashes',async()=>{
+    const {h}=await lawfulCuts();
+    const storeRaw=JSON.stringify([...h.data]);
+    const records=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+    const api=require('../functions/src/canonical-snapshot');
+    const valid=api.assembleCanonicalPlayableProjection(h.uid,h.revision,records);
+    assert.equal(records.progress.gameplayProgress.version,1);
+    const raw=JSON.stringify(records),hash=createHash('sha256').update(raw).digest('hex');
+    const incompatible=copy(records);incompatible.progress.gameplayProgress.version=2;
+    const invalidRaw=JSON.stringify(incompatible),invalidHash=createHash('sha256').update(invalidRaw).digest('hex');
+    for(const consumer of [
+        ()=>api.assembleCanonicalSnapshot(h.uid,h.revision,incompatible),
+        ()=>api.assembleCanonicalPlayableProjection(h.uid,h.revision,incompatible),
+        ()=>api.assembleCanonicalCloudReadCandidate(h.uid,h.revision,h.revision,incompatible)
+    ]){
+        assert.throws(consumer,/gameplay progress/);
+        assert.equal(JSON.stringify(incompatible),invalidRaw);
+        assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),invalidHash);
+        assert.equal(JSON.stringify(records),raw);
+        assert.equal(createHash('sha256').update(JSON.stringify(records)).digest('hex'),hash);
+        assert.equal(JSON.stringify([...h.data]),storeRaw,'validation must not write the source store');
+    }
+    assert.equal(api.assembleCanonicalPlayableProjection(h.uid,h.revision,records).projection.sourceSnapshotSha256,
+        valid.projection.sourceSnapshotSha256);
+    assert.equal(valid.projection.authoritativeStateReady,false);
+});
+
+test('actual cloud bundle adoption blocks Tower v2 and preserves existing UID storage',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const before=[...f.values],writesBefore=f.writes.length,incompatible=copy(cuts[1]);
+    incompatible.gameSave.gameplayProgress.version=2;
+    const raw=JSON.stringify(incompatible),hash=createHash('sha256').update(raw).digest('hex');
+    const readyBefore=f.ready.length;
+    assert.equal((await f.load(incompatible)).blocked,true);
+    assert.equal(f.ready.length,readyBefore);
+    assert.deepEqual([...f.values],before);
+    assert.deepEqual(f.writes.slice(writesBefore),[
+        {key:'four_symbols_active_uid',operation:'set'},
+        {key:'four_symbols_active_uid',operation:'set'}
+    ],'Boot reasserts active UID; it must not write the main save, metadata or sidecars');
+    assert.equal(JSON.stringify(incompatible),raw);
+    assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),hash);
+    assert.equal(f.errors.at(-1).code,'account-gameplay-version-unsupported');
 });
 
 test('actual enterReady refuses Session takeover across app-shell and visual awaits',async()=>{
