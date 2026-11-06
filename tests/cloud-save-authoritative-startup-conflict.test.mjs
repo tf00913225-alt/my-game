@@ -191,7 +191,7 @@ async function lawfulCuts(){
     return {h,cuts};
 }
 function adoptionFixture(uid){
-    const values=new Map(),ready=[],errors=[],writes=[];let fault=()=>false,readFault=()=>false;
+    const values=new Map(),ready=[],errors=[],writes=[],creations=[];let fault=()=>false,readFault=()=>false;
     const storage={getItem:key=>{if(readFault(key))throw Error('read fixture');return values.get(key)??null;},
         setItem(key,value){writes.push({key,operation:'set'});if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
         removeItem(key){writes.push({key,operation:'remove'});if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
@@ -225,7 +225,7 @@ function adoptionFixture(uid){
     const empty=source.slice(source.indexOf('    function safeCloudEmpty('),source.indexOf('    function cloudPayload('));
     const resolver=source.slice(source.indexOf('    async function resolveSaveFor('),source.indexOf('    function requireAuth('));
     const enter=source.slice(source.indexOf('    async function enterReady('),source.indexOf('    async function enterCreation('));
-    const make=new Function('global','firebase','ready','errors',`
+    const make=new Function('global','firebase','ready','errors','creations',`
         let transitionToken=0,activeUser,resolvedUid,saveResolved,cloudResult,lastError,state;
         const STATES={SAVE_LOADING:'SAVE_LOADING',READY:'READY',OFFLINE_READY:'OFFLINE_READY'},showCity=()=>{},startAppShell=()=>{},transition=value=>{state=value;},showLoader=()=>{},status=()=>{},accountUi=()=>{},mark=()=>{};
         const requireAppShell=()=>global.__appShellWait||Promise.resolve(),domReady=()=>Promise.resolve(),hideLoader=()=>Promise.resolve();
@@ -233,10 +233,10 @@ function adoptionFixture(uid){
         const document=global.document,CustomEvent=global.CustomEvent,emit=(name,detail)=>{if(name==='four-symbols:startup-ready')ready.push(detail);};
         const sessionView=()=>JSON.stringify(firebase.getGameSessionState());
         const fail=error=>{errors.push(error);return {blocked:true,error};};
-        const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
+        const migration=()=>({blocked:true}),enterCreation=async()=>{creations.push(true);return {creation:true};};
         ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
-    const resolve=make(context,firebase,ready,errors);
-    return {repo,values,ready,errors,reads,writes,runtime:context,fault:fn=>{fault=fn;},readFault:fn=>{readFault=fn;},session:value=>{session=value;},
+    const resolve=make(context,firebase,ready,errors,creations);
+    return {repo,values,ready,errors,reads,writes,creations,runtime:context,fault:fn=>{fault=fn;},readFault:fn=>{readFault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
             const before=ready.length;
             response=waiting||{uid,exists:true,serverConfirmed:true,data:{ownerUid:uid,serverRevision:bundle.serverRevision,
@@ -414,6 +414,21 @@ test('actual cloud bundle adoption blocks Tower v2 and preserves existing UID st
     assert.equal(JSON.stringify(incompatible),raw);
     assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),hash);
     assert.equal(f.errors.at(-1).code,'account-gameplay-version-unsupported');
+});
+
+test('actual Startup rejects an orphan migration marker before READY or character creation',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    const pendingKey='four_symbols_migration_pending:'+h.uid;
+    const raw=JSON.stringify({version:1,kind:'legacy',ownerUid:h.uid,transactionId:'a'.repeat(32)});
+    f.values.set(pendingKey,raw);
+    const result=await f.load(cuts[0]);
+    assert.equal(result.blocked,true);
+    assert.equal(f.ready.length,0);
+    assert.equal(f.creations.length,0);
+    assert.equal(f.errors.at(-1)?.code,'account-migration-incomplete');
+    assert.equal(f.values.get(pendingKey),raw);
+    assert.equal(f.values.has(f.repo.saveKey(h.uid)),false);
+    assert.equal(f.values.has(f.repo.metadataKey(h.uid)),false);
 });
 
 test('characterization: actual saveGame returns false for committed data and permits a later overwrite',async()=>{

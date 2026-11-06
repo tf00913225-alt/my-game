@@ -215,3 +215,28 @@ yet migrated. This characterization is an explicit STOP, not recovery PASS.
 There is no durable migration marker, global unknown barrier or auto recovery.
 The original reviewer read the diff and allowed an unreleased Draft checkpoint;
 the Startup test is an isolated original branch, not browser Boot QA.
+
+## Ninth checkpoint: reader-side migration-pending guard only
+
+The existing AccountSave repository recognizes the reserved UID-local
+`four_symbols_migration_pending:<UID>` key. A present valid marker blocks before
+the empty/ready decision; malformed, foreign, oversized and unreadable markers
+also fail closed. Ordinary writer/adoption/migration reach that reader guard;
+delete and write-producing archived-sidecar recovery check directly. Existing
+sealed backup verify/export remain unchanged and are not a complete pending-state
+export. Direct gameplay sidecar writers are not frozen.
+
+NO CREATOR / NO CLEAR: the current legacy migration does not create the key or
+verify its full destination set before clearing it. Therefore a real partial
+migration can still reload READY. This checkpoint does not complete the approved
+repository/Startup objective and must not be merged or deployed. The remaining
+work is the closed single-Owner migration command, prepared/final boundaries and
+full real startup/fault matrix. Do not expose a public bypass, claim atomicity,
+enable Q61 or modify sidecar Owners to imply a global freeze.
+
+Four focused files yielded 41 passing Node runner results. After reviewer input,
+the marker check was moved before JSON parsing, a parseable oversized case and
+Startup creation-count assertion were added, and the guard suite passed again.
+Production build/check and diff check passed. The original reviewer read the
+final diff and approved a Draft checkpoint only; AccountSave Owner's independent
+review of this exact diff is pending. Latest-head CI is not yet verified.

@@ -106,6 +106,35 @@ test("orphan, malformed and valid marker metadata block all writer entrances",()
     }
 });
 
+test("independent migration marker blocks empty, reads, writers, delete and recovery",()=>{
+    const uid="pending-migration",key="four_symbols_migration_pending:"+uid;
+    for(const [raw,expected] of [
+        [JSON.stringify({version:1,kind:"legacy",ownerUid:uid,transactionId:"a".repeat(32)}),"account-migration-incomplete"],
+        ["null","account-migration-marker-corrupt"],["false","account-migration-marker-corrupt"],
+        [JSON.stringify({version:1,kind:"legacy",ownerUid:"other",transactionId:"a".repeat(32)}),"account-migration-marker-corrupt"],
+        [JSON.stringify({version:1,kind:"legacy",ownerUid:uid,transactionId:"a".repeat(32),extra:"x".repeat(512)}),"account-migration-marker-corrupt"]]){
+        const f=fixture([[key,raw],["battle_full_version_save_v5",JSON.stringify({player:{id:"legacy"}})]]);
+        f.repo.activate(uid);const before=[...f.values],eventCount=f.events.length;
+        assert.throws(()=>f.repo.readForUid(uid),code(expected));
+        assert.throws(()=>f.repo.writeForUid(uid,next),code(expected));
+        assert.throws(()=>f.repo.writeForUid(uid,next,{cloudBundle:{}}),code(expected));
+        assert.throws(()=>f.repo.migrateLegacyToUid(uid,{confirmed:true,cloudHasCharacter:false}),code(expected));
+        assert.throws(()=>f.repo.removeActive(),code(expected));
+        assert.throws(()=>f.repo.recoverArchivedMigrationSidecars(uid),code(expected));
+        assert.deepEqual([...f.values],before);
+        assert.equal(f.events.length,eventCount,"guarded calls must not write or remove keys");
+        assert.throws(()=>fixture([...f.values]).repo.readForUid(uid),code(expected));
+    }
+});
+
+test("pending key read failure is not interpreted as an empty account",()=>{
+    const f=fixture();f.repo.activate("pending-read");
+    f.hook((op,key)=>{if(op==="get"&&key==="four_symbols_migration_pending:pending-read")throw Error("storage unavailable");});
+    assert.throws(()=>f.repo.readForUid("pending-read"),/storage unavailable/);
+    assert.throws(()=>f.repo.writeForUid("pending-read",next),/storage unavailable/);
+    assert.equal(f.values.has(f.repo.saveKey("pending-read")),false);
+});
+
 test("legacy without marker and empty accounts retain original behavior",()=>{
     const f=fixture();f.repo.activate("legacy-uid");
     assert.equal(f.repo.readForUid("legacy-uid").status,"empty");

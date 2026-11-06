@@ -9,6 +9,7 @@
     const BACKUP_PREFIX="four_symbols_legacy_backup:";
     const MIGRATION_BACKUP_PREFIX="four_symbols_migration_backup:";
     const ACTIVE_UID_KEY="four_symbols_active_uid";
+    const MIGRATION_PENDING_PREFIX="four_symbols_migration_pending:";
     const SCHEMA_VERSION=2;
     const LEGACY_SIDECARS=Object.freeze({
         v131_element_box_state:"element-box-state",
@@ -97,8 +98,28 @@
         uid=validUid(uid); storage().setItem(ACTIVE_UID_KEY,uid); return uid;
     }
     function deactivate(){ storage().removeItem(ACTIVE_UID_KEY); }
+    // Fail closed even when no main/meta exists. There is no public bypass or
+    // automatic recovery; an absent key is the only non-pending state.
+    function assertNoMigrationPending(uid){
+        uid=validUid(uid);
+        const raw=storage().getItem(MIGRATION_PENDING_PREFIX+uid);
+        if(raw===null){ return; }
+        if(raw.length>512||!/^[\x00-\x7f]*$/.test(raw)){
+            throw coded("account-migration-marker-corrupt","Migration marker is invalid.");
+        }
+        let marker;
+        try{ marker=JSON.parse(raw); }catch(cause){ throw coded("account-migration-marker-corrupt","Migration marker is malformed.",cause); }
+        if(!marker||typeof marker!=="object"||Array.isArray(marker)||
+           Object.keys(marker).sort().join("|")!=="kind|ownerUid|transactionId|version"||
+           marker.version!==1||marker.kind!=="legacy"||marker.ownerUid!==uid||
+           typeof marker.transactionId!=="string"||!/^[a-f0-9]{32}$/.test(marker.transactionId)){
+            throw coded("account-migration-marker-corrupt","Migration marker is invalid.");
+        }
+        throw coded("account-migration-incomplete","An incomplete migration must be preserved for recovery.");
+    }
     function readForUid(uid){
         uid=validUid(uid);
+        assertNoMigrationPending(uid);
         const raw=storage().getItem(saveKey(uid));
         const metadataRaw=storage().getItem(metadataKey(uid));
         // Presence, including a malformed/false marker, is never a committed save.
@@ -245,6 +266,7 @@
     // archived record remains missing. This does not establish claim entitlement.
     function recoverArchivedMigrationSidecars(uid){
         uid=validUid(uid);
+        assertNoMigrationPending(uid);
         if(getActiveUid()!==uid){ throw coded("account-not-active","Recovery owner is not active."); }
         const missingKeys=["daily-dungeon-state","task-tracker","legacy-abyss-state"];
         const oldKeys=Object.fromEntries(Object.entries(LEGACY_SIDECARS)
@@ -384,6 +406,7 @@
     function removeActive(){
         const uid=getActiveUid();
         if(!uid){ return false; }
+        assertNoMigrationPending(uid);
         storage().removeItem(saveKey(uid));
         storage().removeItem(metadataKey(uid));
         return true;
