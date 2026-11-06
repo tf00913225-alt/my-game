@@ -41,7 +41,7 @@ assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
         "a dependency-order miss must stay retryable instead of permanently claiming the owner");
 }
 
-function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false,towerStarter=null}={}){
+function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false,towerStarter=null,weekForStartedAt=null}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};
     const localStorage={
@@ -123,14 +123,14 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
             towerConfig:{floorCount:100,relicChoices:[{id:"relic_nine_dragon_fire"},{id:"relic_cold_spring_jade"},{id:"relic_qinglan_feather"},{id:"relic_rock_mountain_seal"}]},
             personalBosses:personal,worldBosses:world,
             getSerializableState:()=>JSON.parse(JSON.stringify(gameplayState)),
-            getWeekInfo:()=>({key:gameplayState.tower.weekKey}),
+            getWeekInfo:instant=>({key:weekForStartedAt?weekForStartedAt(instant):gameplayState.tower.weekKey}),
             getActiveBattleState:()=>activeBattle
         }
     };
     if(withStarters){
         context.vGameplayStartBoss=(type,id)=>{activeBattle={mode:type,definitionId:id};return true;};
-        context.vGameplayContinueTower=attempt=>{if(towerStarter){return towerStarter(null,attempt,context);}activeBattle={mode:"tower"};return true;};
-        context.vGameplaySelectTowerBand=(floor,attempt)=>{if(towerStarter){return towerStarter(floor,attempt,context);}if(rejectTowerEntry){return false;}activeBattle={mode:"tower",floor};return true;};
+        context.vGameplayContinueTower=attempt=>{if(towerStarter){return towerStarter(null,attempt,context);}if(attempt&&!attempt.markLaunchRequested()){return false;}activeBattle={mode:"tower"};return true;};
+        context.vGameplaySelectTowerBand=(floor,attempt)=>{if(towerStarter){return towerStarter(floor,attempt,context);}if(rejectTowerEntry){return false;}if(attempt&&!attempt.markLaunchRequested()){return false;}activeBattle={mode:"tower",floor};return true;};
     }
     context.__setActiveBattle=value=>{activeBattle=value;};
     context.window=context;
@@ -372,8 +372,9 @@ function add(context,id,count){
 {
     const failed=makeContext({withStarters:true,noTimers:true,rejectTowerEntry:true});
     assert.equal(failed.context.vGameplaySelectTowerBand(10),false);
-    assert.equal(failed.context.RelicProgressionSystem.getProgressionState().pending,null);
-    assert.equal(failed.saveDoc.player.relicProgression.pending,null);
+    assert.equal(failed.context.RelicProgressionSystem.getProgressionState().pending.phase,"cancelled-before-launch");
+    assert.equal(failed.saveDoc.player.relicProgression.pending.phase,"cancelled-before-launch");
+    assert.equal(failed.context.RelicProgressionSystem.reconcilePending(),"pre-entry-cancelled");
     assert.equal(failed.context.vGameplayStartBoss("personal","personal-20"),true);
 }
 
@@ -426,12 +427,61 @@ for(const failure of ["false","throw","readback"]){
 }
 {
  let handle;
+ const initial=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(initial.context.vGameplaySelectTowerBand(5),true);assert.equal(handle.cancelBeforeLaunch(),true);
+ const saved=JSON.parse(JSON.stringify(initial.saveDoc.player));
+ const mutations=[
+  pending=>{pending.weekKey='2026-99-99';},pending=>{pending.weekKey='2026-09-08';},
+  pending=>{pending.ownerUid='foreign';},pending=>{pending.attemptId='bad';},
+  pending=>{pending.extra='unknown';},pending=>{pending.rewards[0].count++;},
+  pending=>{delete pending.attemptVersion;},pending=>{delete pending.phase;},
+  pending=>{pending.phase='launch-requested';pending.ownerUid='foreign';}
+ ];
+ for(const mutate of mutations){
+  const player=JSON.parse(JSON.stringify(saved));mutate(player.relicProgression.pending);
+  const f=makeContext({withStarters:true,noTimers:true,savedPlayer:player});
+  f.gameplayState.tower.claimedFloors['5']=true;
+  const before=JSON.stringify(f.saveDoc.player.relicProgression.pending);
+  assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+  assert.equal(f.context.vGameplaySelectTowerBand(5),false);
+  assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),before);
+  assert.equal(f.context.inventoryItems.length,0);
+ }
+}
+for(const failure of ['false','readback']){
+ let handle,launches=0;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;launches++;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);assert.equal(handle.cancelBeforeLaunch(),true);
+ const terminal=JSON.stringify(f.saveDoc.player.relicProgression.pending);
+ if(failure==='false')f.context.saveGame=()=>false;
+ if(failure==='readback'){
+  const read=f.context.FourSymbolsAccountSave.readForUid;let reads=0;
+  f.context.FourSymbolsAccountSave.readForUid=uid=>{if(++reads===2)throw Error('retire readback');return read(uid);};
+ }
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,failure);
+ assert.equal(launches,1,failure);
+ if(failure==='false')assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),terminal);
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,'unresolved retirement blocks retry: '+failure);
+}
+{
+ const f=makeContext({withStarters:true,noTimers:true});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ const before=JSON.stringify(f.saveDoc.player.relicProgression.pending),inventory=JSON.stringify(f.context.inventoryItems);
+ let writes=0;f.context.saveGame=()=>{writes++;return true;};
+ f.context.FourSymbolsAccountSave.getActiveUid=()=>"other-uid";
+ f.gameplayState.tower.claimedFloors['5']=true;f.context.__setActiveBattle(null);
+ assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+ assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),before);
+ assert.equal(JSON.stringify(f.context.inventoryItems),inventory);assert.equal(writes,0);
+}
+{
+ let handle;
  const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
  assert.equal(f.context.vGameplaySelectTowerBand(5,"extra"),true);
  assert.equal(f.saveDoc.player.relicProgression.pending.phase,"preparing");
  const first=handle;
  assert.equal(first.cancelBeforeLaunch(),true);
- assert.equal(f.saveDoc.player.relicProgression.pending,null);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"cancelled-before-launch");
  assert.equal(f.context.vGameplaySelectTowerBand(5),true);
  const second=handle;
  assert.equal(first.cancelBeforeLaunch(),false,"old attempt must not clear the new one");

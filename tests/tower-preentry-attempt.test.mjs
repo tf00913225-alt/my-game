@@ -28,6 +28,13 @@ function attempt({failPhase=false}={}){
   get phase(){return phase;},get cancelled(){return cancelled;}};
 }
 const flush=()=>new Promise(resolve=>setImmediate(resolve));
+function freshRepository(snapshot){
+ const values=new Map(Object.entries(snapshot));
+ const localStorage={getItem:key=>values.get(key)??null,setItem:(key,value)=>values.set(key,String(value)),removeItem:key=>values.delete(key)};
+ const c=vm.createContext({localStorage,console});c.window=c;
+ const repo=readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8');
+ vm.runInContext(repo,c);return c.FourSymbolsAccountSave;
+}
 
 test('portrait rejection cancels only before launcher invocation',async()=>{
  const {context:c}=load(),d=deferred(),a=attempt();let launches=0;
@@ -72,7 +79,7 @@ test('actual Relic and Tower owners cancel a verified portrait failure before la
  assert.equal(c.vGameplaySelectTowerBand(1),true);
  assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending.phase,'preparing');
  d.reject(Error('prepare'));await flush();
- assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending,null);
+ assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending.phase,'cancelled-before-launch');
  assert.equal(launches,0);
 });
 test('actual claimed-floor replay starts without creating a reward receipt',()=>{
@@ -150,4 +157,80 @@ test('claimed floor replay also refuses a roster prepared in a previous week',as
  c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
  assert.equal(c.vGameplaySelectTowerBand(1),true);now+=2000;d.resolve({state:'ready'});await flush();
  assert.equal(launches,0);assert.equal(c.RelicProgressionSystem.getProgressionState().pending,null);
+});
+for(const boundary of ['main-write','final-readback'])test('cancellation retains terminal receipt across week boundary during '+boundary,async()=>{
+ const c=loadIntegrated(),d=deferred();let now=Date.parse('2026-11-01T23:59:59.000Z'),launches=0,shifted=false,armed=false;
+ c.Date=class extends Date{static now(){return now;}};
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ const set=c.localStorage.setItem,get=c.localStorage.getItem;
+ c.localStorage.setItem=(key,value)=>{
+  if(boundary==='main-write'&&!shifted&&key==='four_symbols_save:boss-tower-test'&&JSON.parse(value).player.relicProgression.pending?.phase==='cancelled-before-launch'){shifted=true;now+=2000;}
+  const result=set(key,value);
+  if(boundary==='final-readback'&&key==='four_symbols_save_meta:boss-tower-test'&&!String(value).includes('localWritePending'))armed=true;
+  return result;
+ };
+ c.localStorage.getItem=key=>{if(boundary==='final-readback'&&armed&&!shifted&&key==='four_symbols_save_meta:boss-tower-test'){shifted=true;now+=2000;}return get(key);};
+ d.reject(Error('prepare'));await flush();
+ const terminal=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ assert.equal(shifted,true);assert.equal(terminal.phase,'cancelled-before-launch');
+ assert.equal(terminal.ownerUid,before.ownerUid);assert.equal(terminal.attemptId,before.attemptId);assert.equal(terminal.weekKey,before.weekKey);
+ assert.deepEqual(JSON.parse(JSON.stringify(terminal.rewards)),JSON.parse(JSON.stringify(before.rewards)));
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'pre-entry-cancelled');assert.equal(launches,0);
+ const fresh=freshRepository(c.localStorage.snapshot()).readForUid('boss-tower-test').save;
+ assert.equal(fresh.player.relicProgression.pending.phase,'cancelled-before-launch');
+ const weekForStartedAt=instant=>{const d=new Date(instant),midnight=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());return new Date(midnight-((d.getUTCDay()+6)%7)*86400000).toISOString().slice(0,10);};
+ const reload=makeRelic({uid:'boss-tower-test',withStarters:true,noTimers:true,savedPlayer:fresh.player,weekForStartedAt});
+ assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),'pre-entry-cancelled');
+ const save=reload.context.saveGame,phases=[];reload.context.saveGame=(...args)=>{phases.push(reload.context.player.relicProgression.pending?.phase??null);return save(...args);};
+ assert.equal(reload.context.vGameplayStartBoss('personal','personal-20'),true);
+ assert.equal(phases[0],null,'retirement is separately saved before a new receipt');
+ assert.equal(reload.context.inventoryItems.length,0,'cancelled receipt grants no reward');
+});
+for(const fault of ['marker','main','final-meta','final-readback','rollback'])test('terminal save '+fault+' fault blocks entry and preserves the actual cut',async()=>{
+ const c=loadIntegrated(),d=deferred();let launches=0,failed=false,armed=false;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ const set=c.localStorage.setItem,get=c.localStorage.getItem,main='four_symbols_save:boss-tower-test',meta='four_symbols_save_meta:boss-tower-test';
+ c.localStorage.setItem=(key,value)=>{
+  const marker=key===meta&&String(value).includes('localWritePending');
+  const terminal=key===main&&JSON.parse(value).player.relicProgression.pending?.phase==='cancelled-before-launch';
+  const final=key===meta&&!String(value).includes('localWritePending');
+  if(!failed&&(fault==='marker'&&marker||fault==='main'&&terminal||fault==='final-meta'&&final)){failed=true;throw Error(fault);}
+  if(fault==='rollback'&&key===main){failed=true;throw Error(fault);}
+  const result=set(key,value);if(fault==='final-readback'&&final)armed=true;return result;
+ };
+ c.localStorage.getItem=key=>{if(fault==='final-readback'&&armed&&!failed&&key===meta){failed=true;throw Error(fault);}return get(key);};
+ d.reject(Error('prepare'));await flush();assert.equal(failed,true);assert.equal(launches,0);
+ c.localStorage.setItem=set;c.localStorage.getItem=get;
+ const snapshot=c.localStorage.snapshot(),fresh=freshRepository(snapshot);
+ if(fault==='rollback')assert.throws(()=>fresh.readForUid('boss-tower-test'),error=>error.code==='account-local-write-incomplete');
+ else{
+  const pending=fresh.readForUid('boss-tower-test').save.player.relicProgression.pending;
+  assert.equal(pending.attemptId,before.attemptId);
+  assert.equal(pending.phase,fault==='final-readback'?'cancelled-before-launch':'preparing');
+  if(fault==='final-readback'){
+   const saved=fresh.readForUid('boss-tower-test').save;
+   const weekForStartedAt=instant=>{const d=new Date(instant),midnight=Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate());return new Date(midnight-((d.getUTCDay()+6)%7)*86400000).toISOString().slice(0,10);};
+   const reload=makeRelic({uid:'boss-tower-test',withStarters:true,noTimers:true,savedPlayer:saved.player,weekForStartedAt});
+   assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),'pre-entry-cancelled');
+   assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),'pre-entry-cancelled');
+   assert.equal(reload.context.inventoryItems.length,0);
+  }
+ }
+ assert.equal(c.vGameplaySelectTowerBand(1),false);assert.deepEqual(c.localStorage.snapshot(),snapshot);
+ assert.equal(c.inventoryItems.length,0);
+});
+test('UID change during terminal save preserves the original receipt and fences same-page retry',async()=>{
+ const c=loadIntegrated(),d=deferred();let launches=0;
+ c.v154PreparePortraitsForEncounter=()=>d.promise;c.v132LaunchDungeonBattle=()=>{launches++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending);
+ const save=c.saveGame;c.saveGame=()=>{c.FourSymbolsAccountSave.activate('other-uid');return save();};
+ d.reject(Error('prepare'));await flush();
+ assert.equal(JSON.stringify(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending),before);
+ c.FourSymbolsAccountSave.activate('boss-tower-test');assert.equal(c.vGameplaySelectTowerBand(1),false);
+ assert.equal(launches,0);
 });
