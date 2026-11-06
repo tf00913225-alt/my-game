@@ -6,6 +6,9 @@ import {spawn,spawnSync} from "node:child_process";
 import {battleSkillTouchFloodQa} from './battle-skill-touch-flood-qa.mjs';
 import os from 'node:os';
 import {startServer,waitJson,Cdp,findChrome} from './runtime-browser-qa-support.mjs';
+import {createQ61DiagnosticTrace} from './q61-qa-diagnostics.mjs';
+
+const q61PresentationTrace=createQ61DiagnosticTrace();
 
 // Match the formal portrait QA's authored alpha projection, not the larger
 // depth-scaled carrier. getBoundingClientRect includes the current motion.
@@ -534,6 +537,7 @@ async function cleanupPresentationQaBattle(client){
 }
 
 async function launchPresentationQaMode(client,mode,relicId){
+    if(mode==='tower')q61PresentationTrace.record({stage:'before-entry',mode,relicId});
     await cleanupPresentationQaBattle(client);
     if(relicId){
         assert.equal(await client.eval(`(()=>{const owner=window.v174RelicSystem;const owned=owner?.getOwnedState?.()[${JSON.stringify(relicId)}];if(!owned)return false;owned.unlocked=true;owned.level=10;return window.v174EquipRelic(${JSON.stringify(relicId)})===true;})()`),true,"Local QA relic equip failed: "+relicId);
@@ -551,7 +555,9 @@ async function launchPresentationQaMode(client,mode,relicId){
     }else if(mode==="abyss"){
         started=await client.eval("(()=>{if(typeof v174AbyssReset!=='function'||typeof v174AbyssStartEncounter!=='function')return false;v174AbyssReset(40);return v174AbyssStartEncounter()===true;})()");
     }else if(mode==="tower"){
-        started=await client.eval("(()=>{if(typeof vGameplayContinueTower!=='function')return false;return vGameplayContinueTower()===true;})()");
+        try{started=await client.eval("(()=>{if(typeof vGameplayContinueTower!=='function')return false;return vGameplayContinueTower()===true;})()");}
+        catch(error){q61PresentationTrace.record({stage:'entry-threw',mode,relicId,entryResult:'throw'});throw error;}
+        q61PresentationTrace.record({stage:'entry-returned',mode,relicId,entryResult:started===true?'true':started===false?'false':'other'});
     }else if(mode==="personal"){
         started=await client.eval("(()=>{if(typeof vGameplayStartBoss!=='function')return false;return vGameplayStartBoss('personal','personal-70')===true;})()");
     }else if(mode==="world"){
@@ -559,12 +565,14 @@ async function launchPresentationQaMode(client,mode,relicId){
     }
     assert.equal(started,true,"Could not start formal battle presentation QA mode: "+mode);
     await client.eval("(()=>{try{autoBattle=false;if(typeof updateAutoButton==='function')updateAutoButton();}catch(_){}return true;})()");
+    if(mode==='tower')q61PresentationTrace.record({stage:'wait-battle-active',mode,relicId});
     await waitFor(
         client,
         "(()=>{const p=document.getElementById('battlePage');return typeof battleActive!=='undefined'&&battleActive&&p?.classList.contains('active')&&document.querySelector('#battlePlayerRow .battle-player')&&document.querySelector('#battleMonsterArea .battle-monster');})()",
         mode+" formal battle DOM",
         15000
     );
+    if(mode==='tower')q61PresentationTrace.record({stage:'wait-entry-animation',mode,relicId});
     await waitFor(
         client,
         "(()=>{const p=document.getElementById('battlePage');return !p?.classList.contains('v141-preparing-entry')&&!p?.classList.contains('v141-entry-moving');})()",
@@ -1890,6 +1898,7 @@ try{
     console.log("Battle layer/audio live mobile QA: PASS");
 } catch(error){
     // Failure evidence only: never alter the scene or release a production lock.
+    try{evidence.checks.q61Diagnostics=q61PresentationTrace.snapshot();}catch(_){evidence.checks.q61Diagnostics={status:'capture-failed'};}
     evidence.failureState=await client?.eval("(()=>({url:location.href,hidden:document.hidden,phaseTrace:window.__relicQaPhaseTrace,qaProbe:window.__relicQaProbe,qaIdentity:window.__relicQaIdentitySnapshot,qaFocus:window.__relicQaFocusSnapshot,party:typeof getExistingPartyIndexes==='function'?getExistingPartyIndexes().map(i=>({i,hp:getPartyCharacterByIndex(i)?.hp,id:getPartyCharacterByIndex(i)?.id})):[],sprites:[...document.querySelectorAll('#v143-skill-stage .v143-vfx-sprite')].map(n=>({className:n.className,dataset:{...n.dataset},visibility:getComputedStyle(n).visibility})),battleActive:typeof battleActive==='undefined'?null:battleActive,token:typeof battleToken==='undefined'?null:battleToken,phase:typeof battlePhase==='undefined'?null:battlePhase,turn:typeof turn==='undefined'?null:turn,advance:typeof battleAdvanceScheduled==='undefined'?null:battleAdvanceScheduled,action:typeof battleDurationAction==='undefined'||!battleDurationAction?null:{token:battleDurationAction.token,index:battleDurationAction.index,completed:battleDurationAction.completed},waves:window.FourSymbolsBattleWaves?.getState?.(),run:window.v132ActiveDungeonRun?{mode:v132ActiveDungeonRun.mode,gameplayMode:v132ActiveDungeonRun.gameplayMode}:null,enemyIndexes:typeof currentBattleMonsters==='undefined'?[]:currentBattleMonsters.slice(),relic:window.v174RelicDebugState?.(),presentation:window.v174RelicPresentationState?.(),animation:window.v143SkillAnimationState?.current?{id:v143SkillAnimationState.current.config.id,sequence:v143SkillAnimationState.current.sequence,targets:v143SkillAnimationState.current.targetIndexes,done:v143SkillAnimationState.current.done}:null,locks:window.FourSymbolsBattleFlow?.isPresentationActive?.(),nodes:['battlePage','v141BattleTransition','teamRelicBattlePresentation','v143-skill-stage'].map(id=>{const n=document.getElementById(id);return {id,exists:!!n,className:n?.className,dataset:n?{...n.dataset}:null,display:n?getComputedStyle(n).display:null};}),feedback:document.querySelectorAll('.battle-floating-feedback').length}) )()").catch(diagnosticError=>({unavailable:String(diagnosticError)}));
     evidence.runtimeErrors=client?.events.filter(e=>e.method==='Runtime.exceptionThrown'||e.method==='Runtime.consoleAPICalled').slice(-20);
     evidence.status="FAIL";

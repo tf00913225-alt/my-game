@@ -5,7 +5,17 @@ import os from 'node:os';
 import path from 'node:path';
 import {spawn} from 'node:child_process';
 import {ROOT,findChrome,startServer,waitJson,Cdp} from './runtime-browser-qa-support.mjs';
+import {createQ61DiagnosticTrace,captureQ61Event} from './q61-qa-diagnostics.mjs';
 const expression=`(async()=>{
+ const trace=(${createQ61DiagnosticTrace.toString()})();
+ try{window.__q61TowerFailureTrace=trace;}catch(_){}
+ const diagnostic=(stage,element,floor,sceneIndex,entryResult)=>{
+   trace.capture({stage,mode:'tower',element,floor,sceneIndex,entryResult},()=>{
+     const week=window.GameplaySystem?.getWeekInfo?.(Date.now());
+     return {weekKey:week?.key,battleActive:typeof battleActive==='boolean'?battleActive:null};
+   });
+ };
+ try{
  const check=(value,message)=>{if(!value)throw new Error(message);};
  const wait=async(test,ms=12000)=>{const end=performance.now()+ms;while(!test()&&performance.now()<end)await new Promise(r=>setTimeout(r,40));check(test(),'Runtime wait timeout');};
  await wait(()=>window.FourSymbolsStartupPolicy?.getState?.()==='READY',30000);
@@ -16,11 +26,13 @@ const expression=`(async()=>{
  autoBattle=false;autoConfig.enabled=false;autoPatrolEnabled=false;player.level=100;player.vitality=100000;player.energy=100000;
  const evidence={matrix:[],actions:[],healing:[],status:[],aoe:[]};
  const dates={};for(const element of ['fire','water','wind','earth']){let date=Date.now();while(GameplaySystem.getWeekInfo(date).element!==element)date-=604800000;dates[element]=date;}
+ let sceneIndex=0;
  const enter=async(element,floor)=>{
+   const index=sceneIndex++;diagnostic('before-entry',element,floor,index);
    player.hp=getMainCharacterStats().maxHP;player.sp=getMainCharacterStats().maxSP;player.statusEffects=[];player.activeBuffs=[];
    const realNow=Date.now;let roster;
-   try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);check(vGameplaySelectTowerBand(floor)===true,'Tower entry refused');}finally{Date.now=realNow;}
-   await wait(()=>battleActive);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
+   try{Date.now=()=>dates[element];const week=GameplaySystem.getWeekInfo(Date.now());GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:floor-1}},Date.now());roster=GameplaySystem.buildTowerRoster(floor);let started;try{started=vGameplaySelectTowerBand(floor);}catch(error){diagnostic('entry-threw',element,floor,index,'throw');throw error;}diagnostic('entry-returned',element,floor,index,started===true?'true':started===false?'false':'other');check(started===true,'Tower entry refused');}finally{Date.now=realNow;}
+   diagnostic('wait-battle-active',element,floor,index);await wait(()=>battleActive);diagnostic('wait-entry-animation',element,floor,index);await wait(()=>!document.getElementById('battlePage')?.matches('.v141-preparing-entry,.v141-entry-moving'));
    check(currentBattleMonsters.length===6,'real roster count');
    check(!document.getElementById('homeFeatureModal')?.classList.contains('show'),'battle has no covering shared modal');
    const active=currentBattleMonsters.map(i=>monsters[i]);
@@ -46,7 +58,7 @@ const expression=`(async()=>{
    const secondSlots=FourSymbolsBattlefieldSlots.createEnemyFormationSnapshot(second.map((_,i)=>i),{encounterMode:'tower',originalFormationType:6,rankWeight:i=>second[i].rank==='smallBoss'?3:second[i].rank==='elite'?2:1});
    check(second.filter(m=>m.rank==='smallBoss').every(m=>FourSymbolsBattlefieldSlots.getEnemySlotForMonster(secondSlots,second.indexOf(m))==='ENEMY_B2'),'second-wave central Boss slot');
    check(units.every(u=>{const r=document.getElementById('battleMonster'+u.index)?.getBoundingClientRect();return r&&r.width>0&&r.height>0&&r.left>=0&&r.right<=innerWidth+1;}),'six visible targets');
-   evidence.matrix.push({element,floor,units});return roster;
+   evidence.matrix.push({element,floor,units});diagnostic('completed',element,floor,index);return roster;
  };
  const exit=async()=>{loseBattle();await wait(()=>!battleActive);await new Promise(r=>setTimeout(r,1300));};
  // Full production loadout, slots and decision frequency at every band and rank.
@@ -86,6 +98,7 @@ const expression=`(async()=>{
  check(ids.every(i=>monsters[i].hp<100000),'AOE damages all 6');check(feedback.length===6&&new Set(feedback.map(x=>x.index)).size===6,'AOE feedback exactly once per target');evidence.aoe=feedback;
  evidence.battleScreenshotPending=true;vGameplayRenderTower();evidence.rules=document.getElementById('towerPageContent').textContent;check(evidence.rules.includes('每層兩波、每波 6 名敵人')&&evidence.rules.includes('65%')&&evidence.rules.includes('80%'),'visible tower rules');
  return evidence;
+ }catch(error){try{console.info('Q61_TOWER_DIAGNOSTICS',JSON.stringify(trace.snapshot()));}catch(_){}throw error;}
 })()`;
 const deployedBase=process.env.TOWER_QA_BASE_URL;
 if(deployedBase){
@@ -98,5 +111,5 @@ const artifact=path.join(ROOT,'artifacts/browser-qa/tower-challenge.json');fs.mk
 try{
  const targets=await waitJson('http://127.0.0.1:'+port+'/json/list',{chromeProcess:proc});client=new Cdp(targets.find(x=>x.type==='page').webSocketDebuggerUrl);await client.send('Page.enable');await client.send('Runtime.enable');await client.send('Emulation.setDeviceMetricsOverride',{width:412,height:915,deviceScaleFactor:1,mobile:true});await client.send('Page.navigate',{url:server.url});evidence=await client.eval(expression);assert.equal(evidence.matrix.length,27);assert.deepEqual(evidence.matrix.map(({element,floor})=>[element,floor]),[...['fire','water','wind','earth'].flatMap(element=>[1,5,10,45,75,100].map(floor=>[element,floor])),['water',100],['water',100],['fire',1]]);
  const shot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-battle.png'),Buffer.from(shot.data,'base64'));await client.eval('loseBattle()');await new Promise(r=>setTimeout(r,3000));await client.eval('vGameplayOpenTower()');const ruleShot=await client.send('Page.captureScreenshot',{format:'png'});fs.writeFileSync(artifact.replace('.json','-rules.png'),Buffer.from(ruleShot.data,'base64'));fs.writeFileSync(artifact,JSON.stringify({passed:true,commitSha:process.env.EXPECTED_COMMIT_SHA||process.env.GITHUB_SHA||'local',evidence},null,2)+'\n');console.log('Tower challenge production Runtime 27 scenes / Phase2C owner / six-unit queue / AOE QA passed');
-}catch(error){fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
+}catch(error){const q61Diagnostics=captureQ61Event(client?.events);fs.writeFileSync(artifact,JSON.stringify({passed:false,error:String(error.stack||error),evidence,q61Diagnostics,console:client?.events.filter(e=>e.method==='Runtime.consoleAPICalled').slice(-12)},null,2)+'\n');throw error;}
 finally{client?.close();proc.kill('SIGTERM');try{fs.rmSync(profile,{recursive:true,force:true,maxRetries:3,retryDelay:100});}catch(_){}await new Promise(r=>server.server.close(r));}
