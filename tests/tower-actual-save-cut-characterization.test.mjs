@@ -8,6 +8,7 @@ const require=createRequire(import.meta.url);
 const tests=readFileSync(new URL('./tower-preentry-attempt.test.mjs',import.meta.url),'utf8');
 const factory=tests.slice(tests.indexOf('const fixture='),tests.indexOf("test('manifest-selected"));
 const loadIntegrated=new Function('readFileSync','require','vm','URL','importMetaUrl','assert',factory.replaceAll('import.meta.url','importMetaUrl')+'\nreturn loadIntegrated;')(readFileSync,require,vm,URL,import.meta.url,assert);
+const makeRelic=new Function('readFileSync','require','vm','URL','importMetaUrl','assert',factory.replaceAll('import.meta.url','importMetaUrl')+'\nreturn makeRelic;')(readFileSync,require,vm,URL,import.meta.url,assert);
 const main=readFileSync(new URL('../js/00-main.js',import.meta.url),'utf8');
 function installOriginalSave(c){
  Object.assign(c,{SAVE_KEY:'four_symbols_save:boss-tower-test',deleteAllCharactersInProgress:false,
@@ -54,6 +55,51 @@ test('same-week Tower completion and Relic receipt reconciliation keep original 
  assert.equal(c.RelicProgressionSystem.reconcilePending(),'none');
  assert.deepEqual(JSON.parse(JSON.stringify(c.inventoryItems)),JSON.parse(JSON.stringify(saved.inventoryItems)));
 });
+test('Tower reconciliation cannot grant from a live claim after its save is rejected',()=>{
+ const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+ c.v132AddItemToInventory=(definition,count)=>{let stack=c.inventoryItems.find(item=>item.id===definition.id);if(!stack){stack={id:definition.id,count:0};c.inventoryItems.push(stack);}stack.count+=count;return true;};
+ c.v132RunInventoryTransaction=operation=>operation();
+ c.setInterval=fn=>{c.__receiptTick=fn;return 1;};c.clearInterval=()=>{};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=c.localStorage.snapshot(),set=c.localStorage.setItem,meta='four_symbols_save_meta:boss-tower-test';let rejected=false,writes=0;
+ c.localStorage.setItem=(key,value)=>{writes++;if(!rejected&&key===meta&&String(value).includes('localWritePending')){rejected=true;throw Error('fixture marker rejection');}return set(key,value);};
+ c.battleActive=false;c.lastBattleCallback({result:'win'});assert.equal(rejected,true);
+ const after=c.localStorage.snapshot();assert.deepEqual(after,before);assert.deepEqual(c.inventoryItems,[]);
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+ assert.equal(typeof c.__receiptTick,'function');c.__receiptTick();c.__receiptTick();assert.equal(writes,1);
+ assert.deepEqual(c.inventoryItems,[]);assert.deepEqual(c.localStorage.snapshot(),after);
+});
+for(const mismatch of ['pending','missing','week','claim','read-error'])test('Tower reconciliation blocks durable '+mismatch+' mismatch',()=>{
+ const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+ let grants=0;c.v132AddItemToInventory=()=>{grants++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);c.battleActive=false;c.lastBattleCallback({result:'win'});
+ const main='four_symbols_save:boss-tower-test',saved=JSON.parse(c.localStorage.snapshot()[main]);
+ if(mismatch==='pending')saved.player.relicProgression.pending.attemptId='ffffffffffffffffffffffffffffffff';
+ if(mismatch==='missing')saved.player.relicProgression.pending=null;
+ if(mismatch==='week')saved.gameplayProgress.tower.weekKey=saved.gameplayProgress.tower.weekKey==='2026-10-26'?'2026-11-02':'2026-10-26';
+ if(mismatch==='claim')saved.gameplayProgress.tower.claimedFloors['1']=false;
+ if(mismatch!=='read-error')c.localStorage.setItem(main,JSON.stringify(saved));
+ const before=c.localStorage.snapshot(),get=c.localStorage.getItem;let writes=0;
+ const set=c.localStorage.setItem;c.localStorage.setItem=(...args)=>{writes++;return set(...args);};
+ if(mismatch==='read-error')c.localStorage.getItem=key=>{if(key===main)throw Error('fixture read');return get(key);};
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+ assert.equal(grants,0);assert.equal(writes,0);assert.deepEqual(c.localStorage.snapshot(),before);
+});
+test('Tower reconciliation blocks an active UID change during durable read',()=>{
+ const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+ let grants=0;c.v132AddItemToInventory=()=>{grants++;return true;};
+ assert.equal(c.vGameplaySelectTowerBand(1),true);c.battleActive=false;c.lastBattleCallback({result:'win'});
+ const main='four_symbols_save:boss-tower-test',active='four_symbols_active_uid',get=c.localStorage.getItem,set=c.localStorage.setItem;let switched=false;
+ c.localStorage.getItem=key=>{if(key===main&&!switched){switched=true;set(active,'other-uid');}return get(key);};
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'blocked-outcome');assert.equal(switched,true);assert.equal(grants,0);
+});
+test('Boss receipt reconciliation does not add a Tower durable read',()=>{
+ const f=makeRelic({withStarters:true,noTimers:true}),c=f.context;
+ assert.equal(c.vGameplayStartBoss('personal','personal-20'),true);let reads=0;
+ const read=c.FourSymbolsAccountSave.readForUid;c.FourSymbolsAccountSave.readForUid=(...args)=>{reads++;return read(...args);};
+ f.gameplayState.personal['personal-20'].clears=1;c.__setActiveBattle(null);
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'delivered');assert.equal(reads,0);
+});
 for(const outcome of ['guard-reject','commit-unknown','rollback-failed','success'])test('Tower win '+outcome+' preserves cleanup and gates automatic continuation',()=>{
  const c=loadIntegrated();installOriginalSave(c);let now=Date.UTC(2026,9,27);
  c.Date=class extends Date{static now(){return now;}};
@@ -61,8 +107,9 @@ for(const outcome of ['guard-reject','commit-unknown','rollback-failed','success
  c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:0,claimedFloors:{}}},now);
  assert.equal(c.saveGame(),true);assert.equal(c.vGameplayToggleTowerAutoAdvance(true),true);
  assert.equal(c.vGameplaySelectTowerBand(1),true);
- const before=c.localStorage.snapshot(),popups=[],timeouts=[];
+ const before=c.localStorage.snapshot(),popups=[],timeouts=[];let grants=0;
  c.v141ShowBlackGoldReward=value=>popups.push(value);
+ c.v132AddItemToInventory=()=>{grants++;return true;};
  c.setTimeout=(fn,ms)=>{timeouts.push(ms);return timeouts.length;};
  const set=c.localStorage.setItem,get=c.localStorage.getItem,meta='four_symbols_save_meta:boss-tower-test';
  let markerWrites=0,armed=false,failed=false;
@@ -79,7 +126,13 @@ for(const outcome of ['guard-reject','commit-unknown','rollback-failed','success
  }else{
   assert.equal(popups.length,0);assert.equal(timeouts.includes(1000),false);
   if(outcome==='guard-reject'){assert.equal(markerWrites,0);assert.deepEqual(c.localStorage.snapshot(),before);}
-  else{assert.equal(failed,true);assert.equal(markerWrites,1);assert.throws(()=>c.FourSymbolsAccountSave.readForUid('boss-tower-test'),e=>e.code==='account-local-write-fenced');}
+  else{
+   assert.equal(failed,true);assert.equal(markerWrites,1);assert.throws(()=>c.FourSymbolsAccountSave.readForUid('boss-tower-test'),e=>e.code==='account-local-write-fenced');
+   const after=c.localStorage.snapshot();
+   assert.equal(c.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+   assert.equal(c.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+   assert.equal(grants,0);assert.equal(markerWrites,1);assert.deepEqual(c.localStorage.snapshot(),after);
+  }
  }
 });
 for(const outcome of ['false','undefined','throw'])test('Tower win treats save '+outcome+' as unconfirmed',()=>{

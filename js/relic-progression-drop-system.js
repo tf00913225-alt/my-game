@@ -798,6 +798,20 @@
             return "blocked-outcome";
         }
         if(pendingVictory(pending,state)){
+            // A live Tower claim can precede a failed or unknown save. Do not
+            // grant from it unless this exact pending and claim are also in a
+            // readable local account cut. This is not server victory evidence.
+            if(pending.kind==="tower"){
+                try{
+                    if(accountRepository.getActiveUid()!==ACTIVE_UID){ return "blocked-outcome"; }
+                    const stored=accountRepository.readForUid(ACTIVE_UID);
+                    const saved=stored?.status==="ready"?stored.save:null;
+                    if(accountRepository.getActiveUid()!==ACTIVE_UID||
+                       JSON.stringify(saved?.player?.relicProgression?.pending)!==JSON.stringify(pending)||
+                       saved?.gameplayProgress?.tower?.weekKey!==pending.weekKey||
+                       saved?.gameplayProgress?.tower?.claimedFloors?.[String(pending.floor)]!==true){ return "blocked-outcome"; }
+                }catch(_){ return "blocked-outcome"; }
+            }
             const already=receiptAlreadyDelivered(pending);
             if(!already&&!grantReceiptToTargets(pending)){
                 notify("秘寶獎勵尚未寫入：背包空間不足或資料暫時不可用。獎勵已保留，整理背包後重新開啟秘寶／玩法頁即可重試。");

@@ -87,6 +87,7 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
         saveGame(){
             saveDoc.player=JSON.parse(JSON.stringify(context.player));
             saveDoc.inventoryItems=context.inventoryItems.map(item=>({...item,stats:{...(item.stats||{})}}));
+            saveDoc.gameplayProgress=JSON.parse(JSON.stringify(gameplayState));
             saveDoc.playerRelics=JSON.parse(JSON.stringify(owned));
             saveDoc.teamLoadout=JSON.parse(JSON.stringify(loadout));
             return true;
@@ -290,6 +291,7 @@ function add(context,id,count){
     const pending=context.RelicProgressionSystem.getProgressionState().pending;
     assert.ok(pending&&pending.floor===5);
     gameplayState.tower.claimedFloors["5"]=true;gameplayState.tower.completedFloor=5;gameplayState.tower.historicalHighest=5;
+    assert.equal(context.saveGame(),true);
     context.__setActiveBattle(null);
     assert.equal(context.RelicProgressionSystem.reconcilePending(),"delivered");
     const universal=context.RelicProgressionSystem.getItemCount("relicUniversalFragment");
@@ -307,6 +309,7 @@ function add(context,id,count){
     const pending=first.context.RelicProgressionSystem.getProgressionState().pending;
     assert.ok(pending.rewards.some(reward=>reward.itemId==="relicChoiceBoxBlue"));
     first.gameplayState.tower.claimedFloors["25"]=true;first.gameplayState.tower.completedFloor=25;first.gameplayState.tower.highestThisWeek=25;first.gameplayState.tower.historicalHighest=25;
+    assert.equal(first.context.saveGame(),true);
     first.context.__setActiveBattle(null);
     assert.equal(first.context.RelicProgressionSystem.reconcilePending(),"delivered");
     assert.equal(first.saveDoc.player.relicProgression.majorMilestoneClaims["25"],true);
@@ -405,11 +408,13 @@ console.log("✓ Relic progression/drop system targeted tests passed.");
  assert.equal(context.vGameplaySelectTowerBand(10),true);
  assert.ok(context.RelicProgressionSystem.getProgressionState().pending.rewards.some(r=>r.itemId==='gemVitalityI'&&r.count===1));
  gameplayState.tower.claimedFloors['10']=true;gameplayState.tower.completedFloor=10;gameplayState.tower.historicalHighest=10;
+ assert.equal(context.saveGame(),true);
  context.__setActiveBattle(null);assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');
  assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),1);
  context.vGameplaySelectTowerBand(10);assert.equal(context.RelicProgressionSystem.getProgressionState().pending,null);
  gameplayState.tower.weekKey='2026-09-14';gameplayState.tower.claimedFloors={};
  context.vGameplaySelectTowerBand(10);gameplayState.tower.claimedFloors['10']=true;context.__setActiveBattle(null);
+ assert.equal(context.saveGame(),true);
  assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),2);
  assert.ok(!context.RelicProgressionSystem.getTowerRewardPlan(25,{firstEver:false}).rewards.some(r=>r.itemId==='gemVitalityI'));
 }
