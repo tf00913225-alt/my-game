@@ -13,7 +13,13 @@
 .lock-one{left:125px;top:430px}.lock-two{right:90px;top:600px}.lock-three{right:70px;top:930px}
 #explorationPage .taoxi-region{position:absolute;top:1130px;left:140px;width:520px;background:#2d281eeb;box-shadow:0 0 55px #edc36a88;border-color:#ffe6a0}
 .taoxi-region span{display:block;font-size:110px;color:#ffe6a0;line-height:1}.taoxi-region strong{display:block;font-size:66px;letter-spacing:10px}.taoxi-region small{display:block;font-size:40px}
+#explorationPage .taoxi-region.is-locked{filter:grayscale(1);box-shadow:none;opacity:.7}
 .taoxi-map-caption{position:absolute;bottom:70px;left:40px;right:40px;text-align:center;font-size:44px;text-shadow:0 4px 8px #000;background:#17251cbb;padding:24px}
+.taoxi-region-info{position:absolute;left:40px;right:40px;bottom:50px;padding:32px;background:#25251ff5;border:3px solid #b69865;border-radius:18px;box-shadow:0 12px 35px #0008}
+.taoxi-region-info[hidden]{display:none}
+.taoxi-region-info h2{font-size:57px;line-height:1.25;margin:0 0 20px;color:#e8c98a}
+.taoxi-region-info p{font-size:45px;line-height:1.5;margin:16px 0}
+#explorationPage .taoxi-region-info button{width:100%;min-height:140px;background:#682e29;margin-top:12px}
 .taoxi-error{margin:250px 70px;font-size:48px;line-height:1.6}
 .taoxi-viewport{position:absolute;left:0;top:180px;width:1080px;height:1420px;overflow:hidden;touch-action:none;background:#9da76e}
 .taoxi-world{position:absolute;will-change:transform}
