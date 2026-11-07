@@ -42,7 +42,7 @@ for(const fault of ['none','marker','final-readback'])test('legacy choice report
  assert.equal(markers,3);assert.equal(failed,fault!=='none');
  assert.equal(result,fault==='none');assert.equal((c.popups||[]).length,fault==='none'?1:0);
  assert.equal(c.inventoryItems.length,1);assert.equal(c.inventoryItems[0].count,50);
- if(fault!=='none')assert.match(c.notices.at(-1),/保存結果未確認/);
+ if(fault!=='none')assert.equal(c.notices.at(-1),'舊版第 50 層秘寶獎勵保存結果未確認，請先不要重複領取。');
  const saved=JSON.parse(c.localStorage.snapshot()['four_symbols_save:boss-tower-test']);
  assert.equal(saved.gameplayProgress.tower.pendingRelicChoice,false);
  assert.equal(saved.inventoryItems[0].count,50);

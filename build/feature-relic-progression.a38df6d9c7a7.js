@@ -744,7 +744,7 @@
             }
             progressionState.legacyTowerChoiceHandled=true;
             if(!writeProgressionState()){
-                notify("舊版第 50 層秘寶獎勵保存結果未確認；請重新開啟遊戲確認存檔狀態。");
+                notify("舊版第 50 層秘寶獎勵保存結果未確認，請先不要重複領取。");
                 return false;
             }
             refreshInventoryUi();
