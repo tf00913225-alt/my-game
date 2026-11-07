@@ -1450,6 +1450,22 @@
             renderTowerPage();
         }
     }
+    // Draft-only qualification; not connected to battle outcome or storage.
+    // A true result is not a terminal receipt or proof of a particular run.
+    function isValidTowerDefeatedParty(indexes,getCharacter){
+        try{
+            if(!Array.isArray(indexes)||indexes.length===0||typeof getCharacter!=="function"){ return false; }
+            const seen=new Set();
+            for(const index of indexes){
+                if(!Number.isSafeInteger(index)||index<0||index>5||seen.has(index)){ return false; }
+                seen.add(index);
+                const character=getCharacter(index);
+                if(!character||typeof character!=="object"||typeof character.hp!=="number"||
+                   !Number.isFinite(character.hp)||character.hp>0){ return false; }
+            }
+            return true;
+        }catch(_){ return false; }
+    }
     function startTowerFloor(floor,attempt){
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
