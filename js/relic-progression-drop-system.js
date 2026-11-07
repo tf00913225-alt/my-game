@@ -743,7 +743,10 @@
                 return false;
             }
             progressionState.legacyTowerChoiceHandled=true;
-            writeProgressionState();
+            if(!writeProgressionState()){
+                notify("舊版第 50 層秘寶獎勵保存結果未確認；請重新開啟遊戲確認存檔狀態。");
+                return false;
+            }
             refreshInventoryUi();
             showRewardItems([{itemId:fragmentId,count:50}]);
             decorateTowerSurface();
