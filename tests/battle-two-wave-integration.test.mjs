@@ -6,8 +6,47 @@ import {loadLegacyRuntime} from '../scripts/monster-balance-shadow-matrix.mjs';
 import {buildAbyssTtkMatrix} from '../scripts/abyss-balance-ttk-matrix.mjs';
 
 // Source Runtime integration, not browser/portrait/VFX rendering evidence.
-function load(){
-  const {context:c}=loadLegacyRuntime(), timers=new Map();let id=100,clock=0;
+function load(probe=false){
+  let context;
+  if(probe){
+    const sourceTransform=function(path,value){
+      if(path==='js/00-main.js'){
+        const marker='function checkBattleEnd(afterAction=false){';
+        if(!value.includes(marker))throw Error('missing core probe marker');
+        value=value.replace(marker,`const __q61DryRun=(()=>{
+          const runs=new WeakMap(),proofs=new WeakMap();
+          return {events:[],capture(run,token){if(!run||run.mode!=='tower'||runs.has(run))return;
+            const indexes=getExistingPartyIndexes().slice();runs.set(run,{token,indexes,members:indexes.map(getPartyCharacterByIndex)});},
+          issue(){const run=window.v132ActiveDungeonRun,entry=run&&runs.get(run);if(!entry||entry.issued||!battleActive||entry.token!==battleToken)return null;
+            const indexes=getExistingPartyIndexes();if(!indexes.length||indexes.length!==entry.indexes.length||new Set(indexes).size!==indexes.length)return null;
+            if(indexes.some((index,i)=>index!==entry.indexes[i]||!Number.isSafeInteger(index)||index<0||index>5||getPartyCharacterByIndex(index)!==entry.members[i]||!entry.members[i]||typeof entry.members[i].hp!=='number'||!Number.isFinite(entry.members[i].hp)||entry.members[i].hp>0))return null;
+            const proof={};entry.issued=true;proofs.set(proof,{run,token:battleToken});this.events.push('issued');return proof;},
+          consume(proof,run,token){const entry=proof&&proofs.get(proof);if(proof)proofs.delete(proof);
+            const valid=!!entry&&entry.run===run&&entry.token===token&&battleToken===token&&battleActive&&window.v132ActiveDungeonRun===run;
+            this.events.push(valid?'consumed':'rejected');return valid;}};
+        })();\n`+marker);
+        const branch='    if(partyDefeated){\n\n        loseBattle();';
+        if(!value.includes(branch))throw Error('missing defeat probe marker');
+        value=value.replace(branch,'    if(partyDefeated){\n\n        loseBattle(__q61DryRun.issue());');
+      }
+      if(path==='js/27-v132-content-expansion.js'){
+        const entry='        battleActive=true;\n        battleToken++;\n        battleRoundBoundaryKeys';
+        if(!value.includes(entry))throw Error('missing launcher probe marker');
+        value=value.replace(entry,'        battleActive=true;\n        battleToken++;\n        __q61DryRun.capture(window.v132ActiveDungeonRun,battleToken);\n        battleRoundBoundaryKeys');
+        const start=value.indexOf('    if(typeof loseBattle==="function"){'),tail=value.slice(start);
+        if(start<0||!tail.includes('            battleActive=false;')||!tail.includes('run.onComplete({result:"lose"});'))throw Error('missing loss probe marker');
+        value=value.slice(0,start)+tail.replace('            battleActive=false;','            const __q61Consumed=__q61DryRun.consume(arguments[0],run,battleToken);\n            battleActive=false;').replace('run.onComplete({result:"lose"});','run.onComplete({result:"lose",__q61Consumed});');
+      }
+      if(path==='js/gameplay-boss-tower-system.js'){
+        const marker='    function completeTowerFloor(floor,outcome){';
+        if(!value.includes(marker))throw Error('missing Tower consumer probe marker');
+        value=value.replace(marker,marker+'\n        __q61DryRun.events.push(outcome&&outcome.__q61Consumed===true?"tower-observed-candidate":"tower-observed-none");');
+      }
+      return value;
+    };
+    context=loadLegacyRuntime({sourceTransform}).context;
+  }else context=loadLegacyRuntime().context;
+  const c=context, timers=new Map();let id=100,clock=0;
   c.setTimeout=(fn,ms)=>{timers.set(++id,{fn,ms,at:clock+Math.max(0,Number(ms)||0)});return id;};
   c.clearTimeout=key=>timers.delete(key);
   c.performance.now=()=>clock;
@@ -92,6 +131,46 @@ for(const [name,mode,build,size] of [
     assert.deepEqual(r.json('__outcomes'),['win']);
   });
 }
+
+test('isolated dry-run: core defeat reaches original Tower consumer; direct loss does not',()=>{
+  for(const origin of ['core','direct']){
+    const r=load(true);
+    assert.equal(r.run('vGameplaySelectTowerBand(1)'),true);
+    r.enter();
+    if(origin==='core'){
+      r.run('getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd()');
+      assert.equal(r.run('__q61DryRun.issue()'),null,'one candidate per captured run');
+      r.run('__q61DryRun.capture(v132ActiveDungeonRun,battleToken)');
+      assert.equal(r.run('__q61DryRun.issue()'),null,'recapturing cannot reset issuance');
+    }
+    else r.run('loseBattle()');
+    r.presentation(2700);
+    assert.deepEqual(r.json('__q61DryRun.events'),origin==='core'?
+      ['issued','consumed','tower-observed-candidate']:['rejected','tower-observed-none']);
+  }
+});
+
+test('isolated dry-run: empty, missing or replaced party cannot qualify a Tower loss',()=>{
+  for(const scenario of ['empty','missing','replaced']){
+    const r=load(true);assert.equal(r.run('vGameplaySelectTowerBand(1)'),true);r.enter();
+    r.run(scenario==='empty'?"getExistingPartyIndexes=()=>[]":scenario==='missing'?
+      "getExistingPartyIndexes=()=>[0];getPartyCharacterByIndex=()=>null":
+      "window.__originalMember=getPartyCharacterByIndex;getPartyCharacterByIndex=i=>{const p=__originalMember(i);return p?{...p,hp:0}:null}");
+    r.run('checkBattleEnd()');r.presentation(2700);
+    assert.deepEqual(r.json('__q61DryRun.events'),['rejected','tower-observed-none']);
+  }
+});
+
+test('isolated dry-run: abort and stale loss callback cannot qualify a replacement run',()=>{
+  const r=load(true);assert.equal(r.run('vGameplaySelectTowerBand(1)'),true);r.enter();
+  r.run('getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd()');
+  const stale=Array.from(r.timers.values()).find(timer=>timer.ms===2700)?.fn;assert.ok(stale);
+  assert.equal(r.run("v132AbortDungeonBattle('escape')"),true);
+  assert.equal(r.run('vGameplaySelectTowerBand(1)'),true);
+  const token=r.run('battleToken');stale();
+  assert.equal(r.run('battleToken'),token);assert.equal(r.run('battleActive'),true);
+  assert.deepEqual(r.json('__q61DryRun.events'),['issued','tower-observed-none']);
+});
 
 test('Tower real launcher distinguishes core defeat from direct loss and protects replacement from stale exit',()=>{
   for(const origin of ['core','direct']){
