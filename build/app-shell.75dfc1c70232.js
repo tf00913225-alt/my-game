@@ -1251,6 +1251,26 @@ function writeForUidOnce(context,uid,save,options={}){
             }
         }
         const raw=JSON.stringify(save);
+        // Preserve an unresolved Tower attempt's durable period in ordinary
+        // saves. Compare the exact bytes used below, never a second projection.
+        const towerPending=previousSave?.player?.relicProgression?.pending;
+        if(towerPending&&towerPending.kind==="tower"){
+            const week=towerPending.weekKey,oldWeek=previousSave?.gameplayProgress?.tower?.weekKey;
+            const validWeek=value=>{
+                if(typeof value!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(value)){return false;}
+                const date=new Date(value+"T00:00:00.000Z");
+                return Number.isFinite(date.getTime())&&date.getUTCFullYear()>=100&&date.toISOString().slice(0,10)===value&&date.getUTCDay()===1;
+            };
+            let candidate;
+            try{candidate=JSON.parse(raw);}catch(error){throw coded("account-tower-period-unresolved","Tower period cannot be verified.",error);}
+            const hasAttemptFields=["attemptVersion","ownerUid","attemptId","phase"].some(key=>Object.prototype.hasOwnProperty.call(towerPending,key));
+            const validAttemptIdentity=!hasAttemptFields||(towerPending.attemptVersion===1&&towerPending.ownerUid===uid&&
+                typeof towerPending.attemptId==="string"&&/^[a-f0-9]{32}$/.test(towerPending.attemptId)&&
+                ["preparing","launch-requested","cancelled-before-launch"].includes(towerPending.phase));
+            if(!validAttemptIdentity||!validWeek(week)||oldWeek!==week||candidate?.gameplayProgress?.tower?.weekKey!==week){
+                throw coded("account-tower-period-unresolved","Unresolved Tower period must be preserved.");
+            }
+        }
         const source=String(options.source||"local");
         const explicitBase=Object.prototype.hasOwnProperty.call(options,"cloudBaseFingerprint");
         const cloudBaseFingerprint=explicitBase
