@@ -24,6 +24,9 @@
     let battleSnapshot=null;
     let lastWildRankToken=null;
     let transitionRunning=false;
+    let towerLossExit=null;
+    let transitionOwner=0;
+    window.v141HasTowerLossExit=()=>!!(towerLossExit&&towerLossExit.current());
     let suppressLegacyExpToastUntil=0;
 
     function escapeHtml(value){
@@ -690,10 +693,12 @@
         const originalStartTurn=startTurn;
         startTurn=function(token){
             if(token!==battleToken){ return; }
+            if(battleActive&&towerLossExit&&!towerLossExit.current()){ towerLossExit.cancel(); }
             if(!battleActive||startedEntryTokens.has(token)){
                 return originalStartTurn.apply(this,arguments);
             }
             startedEntryTokens.add(token);
+            transitionOwner++;
             const overlay=ensureBattleTransitionOverlay();
             const page=document.getElementById("battlePage");
             transitionRunning=true;
@@ -784,50 +789,92 @@
         };
     }
 
-    function finishBattleExit(kind,original,args,context){
-        if(transitionRunning){ return; }
+    function finishBattleExit(kind,original,args,context,onCancel){
+        if(transitionRunning){ return false; }
         transitionRunning=true;
-        const wasDungeon=!!window.v132ActiveDungeonRun;
+        const owner=++transitionOwner;
+        const run=window.v132ActiveDungeonRun;
+        const wasDungeon=!!run;
         const page=document.getElementById("battlePage");
         const overlay=ensureBattleTransitionOverlay();
+        const guarded=kind==="lose"&&run&&run.mode==="tower";
+        const token=guarded?battleToken:null;
+        let exit=null;
+        function clearTowerExitVisual(){
+            if(!exit||owner!==transitionOwner){ return; }
+            if(exit.classApplied&&page){ page.classList.remove("v141-exit-monster"); }
+            if(exit.overlayShown&&overlay){ overlay.classList.remove("show"); }
+            if(exit.overlayTouched&&overlay&&overlay.dataset.v144Kind==="lose"){
+                if(exit.kindBefore===undefined){ delete overlay.dataset.v144Kind; }else{ overlay.dataset.v144Kind=exit.kindBefore; }
+                if(exit.label&&exit.label.textContent==="戰鬥失敗"){ exit.label.textContent=exit.labelBefore; }
+            }
+            transitionRunning=false;
+        }
+        if(guarded){
+            exit={timers:[],closed:false,classApplied:false,overlayShown:false,overlayTouched:false,label:null,labelBefore:null,kindBefore:undefined,
+                current:()=>!exit.closed&&towerLossExit===exit&&owner===transitionOwner&&battleActive&&battleToken===token&&window.v132ActiveDungeonRun===run,
+                cancel:()=>{
+                    if(exit.closed||towerLossExit!==exit){ return; }
+                    exit.closed=true;towerLossExit=null;
+                    exit.timers.forEach(clearTimeout);
+                    clearTowerExitVisual();
+                    if(typeof onCancel==="function"){ onCancel(); }
+                }};
+            towerLossExit=exit;
+        }
         /* Keep the final hit / death pose readable before cards leave and the
            opaque result seal arrives.  This is deliberately longer than the
            card-hit animation and is still owned by the battle exit lifecycle. */
-        setTimeout(()=>{
+        const first=setTimeout(()=>{
+            if(exit&&!exit.current()){ exit.cancel();return; }
+            if(exit&&page){ exit.classApplied=!page.classList.contains("v141-exit-monster"); }
             if(page){ page.classList.add(kind==="win"?"v141-exit-player":"v141-exit-monster"); }
         },720);
-        setTimeout(()=>{
+        const second=setTimeout(()=>{
+            if(exit&&!exit.current()){ exit.cancel();return; }
             if(overlay){
                 const label=overlay.querySelector("b");
+                if(exit){ exit.label=label;exit.labelBefore=label?.textContent;exit.kindBefore=overlay.dataset.v144Kind;exit.overlayShown=!overlay.classList.contains("show");exit.overlayTouched=true; }
                 if(label){ label.textContent=kind==="win"?"勝利":"戰鬥失敗"; }
                 overlay.dataset.v144Kind=kind==="win"?"win":"lose";
                 overlay.classList.add("show");
             }
         },1450);
-        setTimeout(()=>{
+        const last=setTimeout(()=>{
+            if(exit&&!exit.current()){ exit.cancel();return; }
+            if(exit){ exit.closed=true;if(towerLossExit===exit){ towerLossExit=null; } }
             /* 舊 winBattle 會再延遲呼叫一次 showExpToast；必須在進入舊
                結算前先抑制，否則會先跳單獨 EXP，再跳本層整合獎勵。 */
             if(kind==="win"){ suppressLegacyExpToastUntil=Date.now()+5000; }
-            const result=original.apply(context,args);
-            const summary=collectRewardSummary();
-            if(page){ page.classList.remove("v141-exit-player","v141-exit-monster","v141-preparing-entry","v141-entry-moving"); }
-            if(overlay){ overlay.classList.remove("show"); }
-            transitionRunning=false;
+            try{
+                const result=original.apply(context,args);
+                if(exit&&owner!==transitionOwner){ return result; }
+                const summary=collectRewardSummary();
+                if(page){ page.classList.remove("v141-exit-player","v141-exit-monster","v141-preparing-entry","v141-entry-moving"); }
+                if(overlay){ overlay.classList.remove("show"); }
+                transitionRunning=false;
 
-            if(!wasDungeon){
-                showPage("map");
-                if(typeof startMonsterMovement==="function"){ startMonsterMovement(); }
-                if(typeof scheduleAutoPatrolCheck==="function"){ scheduleAutoPatrolCheck(5000); }
-                if(typeof updateUI==="function"){ updateUI(); }
-                if(kind==="win"){ setTimeout(()=>showBlackGoldReward(summary),120); }
+                if(!wasDungeon){
+                    showPage("map");
+                    if(typeof startMonsterMovement==="function"){ startMonsterMovement(); }
+                    if(typeof scheduleAutoPatrolCheck==="function"){ scheduleAutoPatrolCheck(5000); }
+                    if(typeof updateUI==="function"){ updateUI(); }
+                    if(kind==="win"){ setTimeout(()=>showBlackGoldReward(summary),120); }
+                }
+                return result;
+            }catch(error){
+                clearTowerExitVisual();
+                throw error;
             }
-            return result;
         },2700);
+        if(exit){ exit.timers.push(first,second,last); }
+        return true;
     }
 
     window.v141PlayEscapeBattleExit=function(onCovered){
         if(transitionRunning){ return Promise.resolve(false); }
         transitionRunning=true;
+        transitionOwner++;
         const overlay=ensureBattleTransitionOverlay();
         const label=overlay&&overlay.querySelector("b");
         if(label){ label.textContent="撤離"; }
@@ -874,14 +921,17 @@
         const originalLoseBattle=loseBattle;
         let exitingLoss=false;
         loseBattle=function(){
-            if(!battleActive||exitingLoss){ return; }
+            const tower=window.v132ActiveDungeonRun?.mode==="tower";
+            if(!battleActive||exitingLoss){ return tower?false:undefined; }
             exitingLoss=true;
             const args=arguments;
             const context=this;
-            finishBattleExit("lose",function(){
+            const started=finishBattleExit("lose",function(){
                 try{ return originalLoseBattle.apply(context,args); }
                 finally{ exitingLoss=false; }
-            },[],this);
+            },[],this,()=>{exitingLoss=false;});
+            if(!started&&tower){ exitingLoss=false; }
+            if(tower){ return started===true; }
         };
     }
 

@@ -824,7 +824,7 @@
                 progressionState.majorMilestoneClaims[String(pending.floor)]=true;
             }
             if(!already&&!writeProgressionState()){
-                notify("秘寶獎勵存檔失敗，獎勵收據已保留，重新載入後會安全補發且不重複累加。");
+                notify(pending.kind==="tower"?"四象塔秘寶獎勵保存結果未確認，請先不要重複領取。":"秘寶獎勵存檔失敗，獎勵收據已保留，重新載入後會安全補發且不重複累加。");
                 return "save-failed";
             }
             if(!already){

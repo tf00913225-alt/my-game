@@ -192,6 +192,70 @@ for(const fault of ['marker','final-readback'])test('Relic reports retirement '+
   assert.throws(()=>c.FourSymbolsAccountSave.writeForUid('boss-tower-test',stored),e=>e.code==='account-local-write-fenced');
  }
 });
+for(const fault of ['marker','final-readback'])test('Tower reward save '+fault+' reports uncertainty without another write',()=>{
+ const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+ c.v132AddItemToInventory=(definition,count)=>{let stack=c.inventoryItems.find(item=>item.id===definition.id);if(!stack){stack={id:definition.id,count:0};c.inventoryItems.push(stack);}stack.count+=count;return true;};
+ c.v132RunInventoryTransaction=operation=>operation();
+ const notices=[],popups=[];c.alert=message=>notices.push(message);c.v141ShowBlackGoldReward=value=>popups.push(value);
+ assert.equal(c.vGameplaySelectTowerBand(1),true);c.battleActive=false;c.lastBattleCallback({result:'win'});popups.length=0;
+ const set=c.localStorage.setItem,get=c.localStorage.getItem,meta='four_symbols_save_meta:boss-tower-test';let failed=false,armed=false,markers=0;
+ c.localStorage.setItem=(key,value)=>{if(key===meta&&String(value).includes('localWritePending')){markers++;if(fault==='marker'){failed=true;throw Error('reward marker');}}const result=set(key,value);if(fault==='final-readback'&&key===meta&&!String(value).includes('localWritePending'))armed=true;return result;};
+ c.localStorage.getItem=key=>{if(key===meta&&armed&&!failed){failed=true;throw Error('reward final readback');}return get(key);};
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'save-failed');
+ assert.equal(failed,true);assert.equal(markers,1);assert.equal(popups.length,0);
+ assert.equal(notices.at(-1),'四象塔秘寶獎勵保存結果未確認，請先不要重複領取。');
+ assert.notEqual(c.player.relicProgression.pending,null);
+ const stored=JSON.parse(c.localStorage.snapshot()['four_symbols_save:boss-tower-test']);
+ assert.ok(c.inventoryItems.length>0);
+ assert.equal(stored.inventoryItems.length>0,fault==='final-readback');
+ assert.notEqual(stored.player.relicProgression.pending,null);
+ if(fault==='final-readback'){
+  assert.throws(()=>c.FourSymbolsAccountSave.readForUid('boss-tower-test'),e=>e.code==='account-local-write-fenced');
+  assert.throws(()=>c.FourSymbolsAccountSave.writeForUid('boss-tower-test',stored),e=>e.code==='account-local-write-fenced');
+ }
+});
+test('Boss reward failure retains its existing notification and return',()=>{
+ const f=makeRelic({withStarters:true,noTimers:true}),c=f.context;
+ assert.equal(c.vGameplayStartBoss('personal','personal-20'),true);
+ f.gameplayState.personal['personal-20'].clears=1;c.__setActiveBattle(null);let writes=0;
+ c.saveGame=()=>{writes++;return false;};
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'save-failed');assert.equal(writes,1);
+ assert.equal(c.notices.at(-1),'秘寶獎勵存檔失敗，獎勵收據已保留，重新載入後會安全補發且不重複累加。');
+});
+for(const crossWeek of [false,true])for(const origin of ['core','direct'])test('v132 '+origin+' loss '+(crossWeek?'cross-week':'same-week')+' retains unresolved Tower receipt',()=>{
+ const realNow=Date.now,oldTime=Date.UTC(2026,9,27);Date.now=()=>oldTime;
+ try{
+  const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+  assert.equal(c.vGameplaySelectTowerBand(1),true);
+  const before=c.localStorage.snapshot(),initial=JSON.parse(before['four_symbols_save:boss-tower-test']);
+  assert.equal(initial.player.relicProgression.pending.phase,'launch-requested');
+  Object.assign(c,{loseBattle(){},clearBattleRoundPrompt(){},finishBattleStatisticsSession(){},clearInterval(){},timerId:null,battleAdvanceTimeoutId:null,closeMenus(){},v132ActiveDungeonRun:{onComplete:c.lastBattleCallback}});
+  const src=readFileSync(new URL('../js/27-v132-content-expansion.js',import.meta.url),'utf8');
+  const start=src.indexOf('    if(typeof loseBattle==="function"){'),end=src.indexOf('\n    }',start)+6;
+  assert.ok(start>=0&&end>start);
+  vm.runInContext('(function(){function restoreDungeonMonsters(){}\n'+src.slice(start,end)+'\n})()',c);
+  const battleStart=main.indexOf('function checkBattleEnd('),battleEnd=main.indexOf('\nfunction applyPostBattleAutoRecovery()',battleStart);
+  assert.ok(battleStart>=0&&battleEnd>battleStart);
+  vm.runInContext(main.slice(battleStart,battleEnd),c);
+  const set=c.localStorage.setItem,remove=c.localStorage.removeItem;let writes=0;
+  c.localStorage.setItem=(...args)=>{writes++;return set(...args);};c.localStorage.removeItem=(...args)=>{writes++;return remove(...args);};
+  const save=c.saveGame,results=[];c.saveGame=function(){const result=save.apply(this,arguments);results.push(result);return result;};
+  if(crossWeek)Date.now=()=>oldTime+7*86400000;
+  assert.equal(c.battleActive,true);assert.ok(c.player.hp>0);
+  if(origin==='core'){
+   c.player.hp=0;c.isBattleEscapePending=()=>false;c.currentBattleMonsters=[];
+   assert.equal(c.checkBattleEnd(),true);
+  }else{ c.loseBattle(); }
+  assert.deepEqual(results,[!crossWeek]);
+  const after=c.localStorage.snapshot();
+  if(crossWeek){assert.equal(writes,0);assert.deepEqual(after,before);}
+  const stored=JSON.parse(after['four_symbols_save:boss-tower-test']);
+  assert.deepEqual(stored.player.relicProgression.pending,initial.player.relicProgression.pending);
+  assert.equal(stored.gameplayProgress.tower.weekKey,initial.gameplayProgress.tower.weekKey);
+  assert.equal(c.vGameplaySelectTowerBand(1),false);
+  assert.equal(c.RelicProgressionSystem.getLastTowerEntryDiagnostic().reason,'pending-blocked');
+ }finally{Date.now=realNow;}
+});
 test('ordinary save refuses a new Tower week while formal pending remains',()=>{
  const realNow=Date.now,oldTime=Date.UTC(2026,9,27),newTime=Date.UTC(2026,10,3);
  try{

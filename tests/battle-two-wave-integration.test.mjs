@@ -93,6 +93,164 @@ for(const [name,mode,build,size] of [
   });
 }
 
+test('Tower real launcher distinguishes core defeat from direct loss and protects replacement from stale exit',()=>{
+  for(const origin of ['core','direct']){
+    const r=load();
+    assert.equal(r.run("window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'tower',waves:__waves})"),true);
+    r.enter();
+    assert.equal(r.run('battleActive'),true);
+    assert.ok(r.run('getExistingPartyIndexes().length')>0);
+    if(origin==='core'){
+      r.run('getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd()');
+    }else{
+      assert.equal(r.run('getExistingPartyIndexes().every(i=>getPartyCharacterByIndex(i).hp>0)'),true);
+      r.run('loseBattle()');
+    }
+    assert.deepEqual(r.json('__outcomes'),[]);
+    assert.equal(r.run('battleActive'),true);
+    r.presentation(2700);
+    assert.deepEqual(r.json('__outcomes'),['lose']);
+    assert.equal(r.run('battleActive'),false);
+  }
+  const r=load();
+  assert.equal(r.run("window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push('old:'+o.result),{mode:'tower',waves:__waves})"),true);
+  r.enter();
+  r.run("window.__oldToken=battleToken;getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd();");
+  const staleExit=Array.from(r.timers.values()).find(timer=>timer.ms===2700)?.fn;
+  assert.ok(staleExit,'original deferred loss callback must be scheduled');
+  r.run("window.__abortResult=v132AbortDungeonBattle('external');window.__replacement=GameplaySystem.buildTowerWaves(1);window.__replacementStarted=v132LaunchDungeonBattle(__replacement[0],o=>__outcomes.push('new:'+o.result),{mode:'tower',waves:__replacement});window.__replacementRun=v132ActiveDungeonRun;window.__replacementToken=battleToken;");
+  assert.equal(r.run('__abortResult && __replacementStarted'),true);
+  assert.equal(r.run('__oldToken!==__replacementToken'),true);
+  assert.deepEqual(r.json('__outcomes'),['old:external']);
+  assert.equal(r.run('battleActive'),true);
+  staleExit();
+  assert.equal(r.run('battleActive'),true,'stale loss exit must not end the replacement');
+  assert.equal(r.run('v132ActiveDungeonRun===__replacementRun && battleToken===__replacementToken'),true);
+  assert.deepEqual(r.json('__outcomes'),['old:external']);
+  r.enter();
+  r.run('getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd()');
+  r.presentation(2700);
+  assert.deepEqual(r.json('__outcomes'),['old:external','new:lose']);
+});
+
+test('stale Tower loss releases only its own presentation before replacement entry',()=>{
+  for(const stage of [0,720,1450])for(const mode of ['tower','daily']){
+    const r=load();
+    assert.equal(r.run("window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push('old:'+o.result),{mode:'tower',waves:__waves})"),true);
+    r.enter();
+    const doc=r.c.document,originalGet=doc.getElementById.bind(doc),label={textContent:'戰'};
+    const classes=()=>{const values=new Set();return {add:v=>values.add(v),remove:v=>values.delete(v),contains:v=>values.has(v),toggle(v){if(values.has(v)){values.delete(v);return false;}values.add(v);return true;},snapshot:()=>[...values].sort()};};
+    const pageClasses=classes(),overlayClasses=classes(),dataset={};
+    const page=new Proxy(originalGet('battlePage'),{get:(target,key)=>key==='classList'?pageClasses:Reflect.get(target,key)});
+    const overlay=new Proxy(originalGet('v141BattleTransition'),{get:(target,key)=>key==='classList'?overlayClasses:key==='dataset'?dataset:key==='querySelector'?()=>label:Reflect.get(target,key)});
+    doc.getElementById=id=>id==='battlePage'?page:id==='v141BattleTransition'?overlay:originalGet(id);
+    r.run('window.__saveCalls=0;saveGame=()=>{__saveCalls++;};getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);checkBattleEnd();');
+    const stale=Array.from(r.timers.values()).filter(timer=>[720,1450,2700].includes(timer.ms)).map(timer=>timer.fn);
+    assert.equal(stale.length,3);
+    if(stage>=720)r.presentation(720);
+    if(stage>=1450){r.presentation(1450);assert.equal(label.textContent,'戰鬥失敗');}
+    assert.equal(r.run("v132AbortDungeonBattle('external')"),true);
+    if(stage<1450){
+      dataset.v144Kind='lose';label.textContent='其他原有標記';stale[2]();
+      assert.equal(dataset.v144Kind,'lose');assert.equal(label.textContent,'其他原有標記');
+    }
+    r.run(`window.__replacement=GameplaySystem.buildTowerWaves(1);window.__replacementStarted=v132LaunchDungeonBattle(__replacement[0],o=>__outcomes.push('new:'+o.result),${mode==='tower'?"{mode:'tower',waves:__replacement}":"{mode:'daily'}"});window.__replacementRun=v132ActiveDungeonRun;window.__replacementToken=battleToken;`);
+    assert.equal(r.run('__replacementStarted'),true);
+    assert.notEqual(label.textContent,'戰鬥失敗');assert.notEqual(dataset.v144Kind,'lose');
+    const before=JSON.stringify({page:pageClasses.snapshot(),overlay:overlayClasses.snapshot(),label:label.textContent,dataset,saves:r.run('__saveCalls')});
+    stale.forEach(fn=>fn());
+    assert.equal(JSON.stringify({page:pageClasses.snapshot(),overlay:overlayClasses.snapshot(),label:label.textContent,dataset,saves:r.run('__saveCalls')}),before);
+    assert.equal(r.run('battleActive && v132ActiveDungeonRun===__replacementRun && battleToken===__replacementToken'),true);
+    r.enter();r.run('loseBattle()');r.presentation(2700);
+    assert.deepEqual(r.json('__outcomes'),['old:external','new:lose']);
+  }
+});
+
+test('Tower exit releases its guard after abort, busy entry, and callback errors',()=>{
+  for(const scenario of ['abort','busy','throw']){
+    const r=load();
+    assert.equal(r.run(`window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],${scenario==='throw'?"()=>{throw new Error('fixture callback');}":"o=>__outcomes.push('old:'+o.result)"},{mode:'tower',waves:__waves})`),true);
+    if(scenario==='busy'){
+      r.run('loseBattle()');
+      r.enter();r.run('loseBattle()');r.presentation(2700);
+      assert.deepEqual(r.json('__outcomes'),['old:lose']);
+      continue;
+    }
+    r.enter();r.run('loseBattle()');
+    if(scenario==='abort'){
+      const stale=Array.from(r.timers.values()).find(timer=>timer.ms===2700)?.fn;assert.ok(stale);
+      assert.equal(r.run("v132AbortDungeonBattle('external')"),true);stale();
+    }else{
+      r.presentation(720);r.presentation(1450);
+      assert.throws(()=>r.presentation(2700),/fixture callback/);
+    }
+    assert.equal(r.run("window.__retry=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__retry[0],o=>__outcomes.push('new:'+o.result),{mode:'tower',waves:__retry})"),true);
+    r.enter();r.run('loseBattle()');assert.ok([...r.timers.values()].some(timer=>timer.ms===2700),scenario+' replacement loss scheduled');r.presentation(2700);
+    assert.equal(r.json('__outcomes').at(-1),'new:lose');
+  }
+});
+
+test('Tower loss callback reentry cannot release the replacement entry',async()=>{
+  for(const throws of [false,true]){
+    const r=load();
+    assert.equal(r.run(`window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],()=>{__outcomes.push('old:lose');window.__retry=GameplaySystem.buildTowerWaves(1);window.__reentered=v132LaunchDungeonBattle(__retry[0],o=>__outcomes.push('new:'+o.result),{mode:'tower',waves:__retry});window.__newToken=battleToken;${throws?"throw new Error('reentry callback');":''}},{mode:'tower',waves:__waves})`),true);
+    r.enter();r.run('loseBattle()');r.presentation(720);r.presentation(1450);
+    if(throws)assert.throws(()=>r.presentation(2700),/reentry callback/);else r.presentation(2700);
+    assert.equal(r.run('__reentered && battleActive && battleToken===__newToken'),true);
+    assert.equal(r.run('FourSymbolsBattleFlow.isPresentationActive()'),true);
+    assert.equal(await r.run('v141PlayEscapeBattleExit(()=>true)'),false);
+    r.enter();r.run('loseBattle()');r.presentation(2700);
+    assert.deepEqual(r.json('__outcomes'),['old:lose','new:lose']);
+  }
+});
+
+test('Tower round-start defeat retains loss label through the entry-label callback',()=>{
+  const r=load(),doc=r.c.document,originalGet=doc.getElementById.bind(doc),label={textContent:'戰'},dataset={};
+  const overlay=new Proxy(originalGet('v141BattleTransition'),{get:(target,key)=>key==='dataset'?dataset:key==='querySelector'?()=>label:Reflect.get(target,key)});
+  doc.getElementById=id=>id==='v141BattleTransition'?overlay:originalGet(id);
+  assert.equal(r.run("window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'tower',waves:__waves})"),true);
+  r.enter();
+  const entryTimers=Array.from(r.timers.values()).filter(timer=>timer.ms===0);
+  const entryLabel=entryTimers.at(-1)?.fn;
+  assert.ok(entryLabel,'earlier entry label callback must be scheduled');
+  r.run('getExistingPartyIndexes().forEach(i=>getPartyCharacterByIndex(i).hp=0);startTurn(battleToken)');
+  assert.equal(label.textContent,'戰鬥失敗');assert.equal(dataset.v144Kind,'lose');
+  assert.equal(Array.from(r.timers.values()).filter(timer=>timer.ms===0).length,entryTimers.length);
+  entryLabel();
+  assert.equal(label.textContent,'戰鬥失敗');assert.equal(dataset.v144Kind,'lose');
+  assert.equal(r.run('v141HasTowerLossExit()'),true);
+  r.presentation(2700);assert.deepEqual(r.json('__outcomes'),['lose']);
+  assert.equal(r.run('v141HasTowerLossExit()'),false);
+});
+
+test('Tower label preserves accepted loss and rejects stale entry callbacks',()=>{
+  for(const mode of ['tower','daily']){
+    const r=load(),doc=r.c.document,originalGet=doc.getElementById.bind(doc),label={textContent:'戰'},dataset={};
+    const overlay=new Proxy(originalGet('v141BattleTransition'),{get:(target,key)=>key==='dataset'?dataset:key==='querySelector'?()=>label:Reflect.get(target,key)});
+    doc.getElementById=id=>id==='v141BattleTransition'?overlay:originalGet(id);
+    assert.equal(r.run("window.__waves=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push('old:'+o.result),{mode:'tower',waves:__waves})"),true);
+    const oldEntry=Array.from(r.timers.values()).filter(timer=>timer.ms===0).at(-1)?.fn;assert.ok(oldEntry);
+    assert.equal(dataset.v144Kind,'entry');
+    assert.equal(r.run('loseBattle()'),false,'entry-busy Tower loss was not accepted');
+    assert.equal(dataset.v144Kind,'entry');oldEntry();assert.equal(dataset.v144Kind,'entry');
+    r.enter();
+    const before=JSON.stringify({label:label.textContent,dataset});
+    r.run('startTurn(battleToken-1)');assert.equal(JSON.stringify({label:label.textContent,dataset}),before);
+    const query=r.c.v141HasTowerLossExit;r.c.v141HasTowerLossExit=undefined;
+    r.run('startTurn(battleToken)');assert.equal(JSON.stringify({label:label.textContent,dataset}),before);
+    r.c.v141HasTowerLossExit=query;
+    assert.equal(r.run("v132AbortDungeonBattle('external')"),true);
+    assert.equal(r.run(`window.__replacement=GameplaySystem.buildTowerWaves(1);v132LaunchDungeonBattle(__replacement[0],o=>__outcomes.push('new:'+o.result),${mode==='tower'?"{mode:'tower',waves:__replacement}":"{mode:'daily'}"})`),true);
+    r.enter();
+    const result=r.run('loseBattle()');
+    assert.equal(result,mode==='tower'?true:undefined);
+    assert.equal(dataset.v144Kind,'lose');const expected=label.textContent;
+    oldEntry();assert.equal(dataset.v144Kind,'lose');assert.equal(label.textContent,expected);
+    r.presentation(2700);assert.deepEqual(r.json('__outcomes'),['old:external','new:lose']);
+    assert.equal(r.run('v141HasTowerLossExit()'),false);
+  }
+});
+
 test('shared failure path stops pending wave and returns one loss',()=>{
   const r=load();
   r.run(`window.__waves=v174AbyssBuildWaves(20,0,0);v132LaunchDungeonBattle(__waves[0],o=>__outcomes.push(o.result),{mode:'abyss',waves:__waves});`);
