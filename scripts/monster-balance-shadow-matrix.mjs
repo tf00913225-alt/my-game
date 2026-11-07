@@ -6,7 +6,7 @@ import {fileURLToPath} from 'node:url';
 import {MonsterBalance} from '../js/combat/monster-balance-owner.mjs';
 const require=createRequire(import.meta.url);
 /** Reuse existing DOM fixture; execute actual current app/gameplay sources, not a copied stat formula. */
-export function loadLegacyRuntime(){
+export function loadLegacyRuntime({sourceTransform=(path,source)=>source}={}){
   const source=fs.readFileSync('tests/v170-final-spec-integration.test.js','utf8');
   const fixture=source.slice(source.indexOf('function makeUniversalNode()'),source.indexOf('function loadFinalRuntime()'));
   const context=new Function('vm','fs',fixture+';return makeContext();')(vm,fs);
@@ -17,10 +17,10 @@ export function loadLegacyRuntime(){
   const paths=[];
   for(const list of ['appScripts','gameplayScripts']){
     const block=build.match(new RegExp('const '+list+'=\\[([\\s\\S]*?)\\];'))[1];
-    for(const m of block.matchAll(/"([^"]+\.js)"/g)){paths.push(m[1]);vm.runInContext(fs.readFileSync(m[1],'utf8'),context,{filename:m[1],timeout:3000});}
+    for(const m of block.matchAll(/"([^"]+\.js)"/g)){paths.push(m[1]);vm.runInContext(sourceTransform(m[1],fs.readFileSync(m[1],'utf8')),context,{filename:m[1],timeout:3000});}
   }
   // Expose private production builders ONLY inside isolated diagnostic VM; repository source is never changed.
-  const tower=fs.readFileSync('js/gameplay-boss-tower-system.js','utf8').replace('    window.GameplaySystem=Object.freeze({','    window.__shadowTower={troop:buildTowerTroop,boss:buildTowerBossMonster};\n    window.GameplaySystem=Object.freeze({');
+  const tower=sourceTransform('js/gameplay-boss-tower-system.js',fs.readFileSync('js/gameplay-boss-tower-system.js','utf8')).replace('    window.GameplaySystem=Object.freeze({','    window.__shadowTower={troop:buildTowerTroop,boss:buildTowerBossMonster};\n    window.GameplaySystem=Object.freeze({');
   vm.runInContext(tower,context,{filename:'js/gameplay-boss-tower-system.js',timeout:3000});
   paths.push('js/gameplay-boss-tower-system.js');
   paths.push('js/59-abyss-two-tier-runtime.js');

@@ -202,6 +202,14 @@ window.MonsterBalanceDailyIdentities=Object.freeze({"daily.exp.regular":{"archet
 /* ACCOUNT_SAVE_OPERATIONS_OWNER_BEGIN */
 /* Fixed implementation of the original AccountSave Owner; no registration API. */
 (function(global){"use strict";if(global.FourSymbolsAccountSaveOperations)return;
+// This writer is still a v1 gameplay client. Refuse unsupported data before
+// backups, sidecars or metadata are changed; this is not v2 admission authority.
+function assertGameplayVersion(context,save){
+ const progress=save&&save.gameplayProgress;
+ if(progress&&Object.prototype.hasOwnProperty.call(progress,"version")&&progress.version!==1){
+  throw context.coded("account-gameplay-version-unsupported","A compatible gameplay client is required.");
+ }
+}
 function inspectBundle(context,uid,bundle){
  const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave}=context;
         uid=validUid(uid);
@@ -213,6 +221,7 @@ function inspectBundle(context,uid,bundle){
            Object.keys(bundle.sidecars).sort().join("|")!==[...BACKUP_SIDECARS].sort().join("|")){
             throw coded("account-cloud-bundle-invalid","Complete versioned same-cut cloud bundle is required.");
         }
+        assertGameplayVersion(context,bundle.gameSave);
         const optional=new Set(["announcement-read","bulk-sell-quality","patrol-character-index","task-tracker"]);
         for(const [name,row] of Object.entries(bundle.sidecars)){
             if(!row||Object.keys(row).sort().join("|")!=="raw|status")throw coded("account-cloud-bundle-invalid","Invalid sidecar record.");
@@ -222,7 +231,92 @@ function inspectBundle(context,uid,bundle){
         }
         return bundle;
     }
+let accountWriteActive=false;
+let migrationOwnerActive=false;
+const unresolvedMigrations=new Set();
+const unresolvedLocalWrites=new Set();
+function migrationIsUnresolved(uid){ return unresolvedMigrations.has(uid); }
+function localWriteIsUnresolved(uid){ return unresolvedLocalWrites.has(uid); }
+function migrationIsRunning(){ return migrationOwnerActive; }
 function writeForUid(context,uid,save,options={}){
+ uid=context.validUid(uid);
+ if(migrationIsUnresolved(uid))throw context.coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+ if(localWriteIsUnresolved(uid))throw context.coded("account-local-write-fenced","A local save result is unresolved in this page.");
+ if(accountWriteActive){ throw context.coded("account-save-reentrant","A save is already in progress."); }
+ accountWriteActive=true;
+ try{ return writeForUidOnce(context,uid,save,options); }
+ catch(error){
+  if(error?.code==="account-local-commit-unknown"||error?.code==="account-local-rollback-failed")unresolvedLocalWrites.add(uid);
+  throw error;
+ }
+ finally{ accountWriteActive=false; }
+}
+// Complete legacy migration is the only public command. The pending bypass and
+// restricted storage view remain private to this Owner's synchronous closure.
+function migrateLegacyToUid(context,uid,options={}){
+ const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,
+     accountKey,inspectLegacy,activate,migrationBackupKey,LEGACY_KEY,LEGACY_SIDECARS,MIGRATION_PENDING_PREFIX}=context;
+ if(accountWriteActive){ throw coded("account-save-reentrant","A save is already in progress."); }
+ accountWriteActive=true;migrationOwnerActive=true;
+ try{
+  uid=validUid(uid);
+  if(migrationIsUnresolved(uid))throw coded("account-migration-commit-unknown","Migration completion is unresolved in this page.");
+  if(localWriteIsUnresolved(uid))throw coded("account-local-write-fenced","A local save result is unresolved in this page.");
+  if(options.confirmed!==true)throw coded("migration-confirmation-required","Legacy migration requires explicit confirmation.");
+  const initialActiveUid=getActiveUid();
+  if(initialActiveUid&&initialActiveUid!==uid)throw coded("account-not-active","Migration UID does not match the active account.");
+  const legacy=inspectLegacy();
+  if(legacy.status!=="available")throw legacy.error||coded("legacy-missing","No safe legacy save exists.");
+  if(readForUid(uid).status!=="empty"||options.cloudHasCharacter===true)throw coded("migration-conflict","Migration requires an empty UID save.");
+  assertGameplayVersion(context,legacy.save);
+  const records=Object.entries(LEGACY_SIDECARS).map(([oldKey,suffix])=>({oldKey,suffix,target:accountKey(suffix,uid),raw:storage().getItem(oldKey)}));
+  for(const row of records){if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","An account sidecar already exists: "+row.suffix);}
+  if(!global.crypto||typeof global.crypto.getRandomValues!=="function")throw coded("migration-entropy-unavailable","Secure migration identity is unavailable.");
+  const random=new Uint8Array(16);global.crypto.getRandomValues(random);
+  const transactionId=Array.from(random,byte=>byte.toString(16).padStart(2,"0")).join("");
+  const markerKey=MIGRATION_PENDING_PREFIX+uid;
+  const marker=JSON.stringify({version:1,kind:"legacy",ownerUid:uid,transactionId});
+  if(marker.length>512||!/^[\x00-\x7f]*$/.test(marker))throw coded("migration-marker-invalid","Migration marker exceeds its fixed bound.");
+  const backupKey=migrationBackupKey(uid,transactionId),backups=[backupKey];
+  const backupRows=[{key:backupKey,raw:legacy.raw},...records.filter(row=>row.raw!==null).map(row=>({key:backupKey+":"+row.oldKey,raw:row.raw}))];
+  for(const row of backupRows){if(storage().getItem(row.key)!==null)throw coded("migration-backup-conflict","An existing backup must not be overwritten.");}
+  if(!initialActiveUid)activate(uid);
+  const checkUid=()=>{if(getActiveUid()!==uid)throw coded("account-not-active","Migration UID changed.");};
+  const checkSources=()=>{
+   if(storage().getItem(LEGACY_KEY)!==legacy.raw)throw coded("migration-source-changed","Legacy source changed.");
+   for(const row of records)if(storage().getItem(row.oldKey)!==row.raw)throw coded("migration-source-changed","Legacy sidecar changed.");
+  };
+  for(const row of backupRows){checkUid();storage().setItem(row.key,row.raw);if(storage().getItem(row.key)!==row.raw)throw coded("migration-backup-write-failed","Migration backup could not be verified.");if(row.key!==backupKey)backups.push(row.key);}
+  checkUid();checkSources();
+  if(readForUid(uid).status!=="empty")throw coded("migration-conflict","UID save changed during preparation.");
+  for(const row of records)if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","UID sidecar changed during preparation.");
+  storage().setItem(markerKey,marker);
+  if(storage().getItem(markerKey)!==marker)throw coded("account-migration-incomplete","Migration marker could not be verified.");
+  let poisoned=false;
+  const check=()=>{checkUid();if(storage().getItem(markerKey)!==marker)throw coded("account-migration-incomplete","Migration marker changed.");};
+  const allowed=new Set([saveKey(uid),metadataKey(uid)]);
+  const guardedStorage=()=>({
+   getItem(key){try{check();if(!allowed.has(key))throw Error("Migration storage key not allowed");const result=storage().getItem(key);check();return result;}catch(error){poisoned=true;throw error;}},
+   setItem(key,value){try{if(poisoned)throw Error("Migration storage is fenced");check();if(!allowed.has(key))throw Error("Migration storage key not allowed");storage().setItem(key,value);check();}catch(error){poisoned=true;throw error;}},
+   removeItem(key){try{if(poisoned)throw Error("Migration storage is fenced");check();if(!allowed.has(key))throw Error("Migration storage key not allowed");storage().removeItem(key);check();}catch(error){poisoned=true;throw error;}}
+  });
+  const internal={...context,storage:guardedStorage,readForUid:()=>{check();return {status:"empty",uid,save:null,metadata:null};}};
+  const result=writeForUidOnce(internal,uid,legacy.save,{source:"legacy-confirmed"});
+  const expectedMain=JSON.stringify(legacy.save),expectedMeta=JSON.stringify(result.metadata);
+  for(const row of records){
+   check();if(storage().getItem(row.target)!==null)throw coded("migration-sidecar-conflict","UID sidecar changed during migration.");
+   if(row.raw!==null){storage().setItem(row.target,row.raw);check();if(storage().getItem(row.target)!==row.raw)throw coded("account-migration-incomplete","Migrated sidecar could not be verified.");}
+  }
+  checkSources();check();
+  if(storage().getItem(saveKey(uid))!==expectedMain||storage().getItem(metadataKey(uid))!==expectedMeta)throw coded("account-migration-incomplete","Migrated main save could not be verified.");
+  for(const row of records)if(storage().getItem(row.target)!==row.raw)throw coded("account-migration-incomplete","Migrated sidecar cut changed.");
+  check();storage().removeItem(markerKey);
+  try{if(storage().getItem(markerKey)!==null)throw Error("Migration marker remains");}
+  catch(error){unresolvedMigrations.add(uid);throw coded("account-migration-commit-unknown","Migration completion could not be verified.",error);}
+  return {status:"migrated",uid,backupKey,backupKeys:backups,legacyKey:LEGACY_KEY};
+ }finally{migrationOwnerActive=false;accountWriteActive=false;}
+}
+function writeForUidOnce(context,uid,save,options={}){
  const {validUid,coded,storage,getActiveUid,saveKey,metadataKey,readForUid,fingerprint,createMigrationBackup,accountKey,SCHEMA_VERSION,BACKUP_SIDECARS,PLAIN_SIDECARS,parseSave}=context;
  const inspectCloudBundle=(uid,bundle)=>inspectBundle(context,uid,bundle);
         uid=validUid(uid);
@@ -235,6 +329,15 @@ function writeForUid(context,uid,save,options={}){
         const metaKey=metadataKey(uid);
         const previousRaw=storage().getItem(key);
         const previousMeta=storage().getItem(metaKey);
+        // The reader blocks orphan or malformed pending metadata before either
+        // local writes or the cloud-adoption same-cut early return / backup.
+        readForUid(uid);
+        assertGameplayVersion(context,save);
+        const previousSave=previousRaw?parseSave(previousRaw,"account-save-corrupt"):null;
+        assertGameplayVersion(context,previousSave);
+        if(previousSave?.gameplayProgress?.version===1&&save.gameplayProgress?.version!==1){
+            throw coded("account-gameplay-version-downgrade","Existing versioned gameplay progress must be preserved.");
+        }
         if(options.cloudBundle){
             const bundle=inspectCloudBundle(uid,options.cloudBundle),local=readForUid(uid);
             if(options.source!=="authoritative-cloud-read"||options.equipmentShopState||fingerprint(save)!==fingerprint(bundle.gameSave)){
@@ -289,7 +392,7 @@ function writeForUid(context,uid,save,options={}){
         }
         // The existing local equipment shop commits its batch receipt with
         // gold/inventory through this same rollback boundary. No Cloud authority.
-        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily"):null;
+        const shopKey=options.equipmentShopState?accountKey("equipment-shop-daily",uid):null;
         const previousShop=shopKey?storage().getItem(shopKey):null;
         const shopRaw=shopKey?JSON.stringify(options.equipmentShopState):null;
         let previousMetadata=null;
@@ -304,6 +407,26 @@ function writeForUid(context,uid,save,options={}){
             }
         }
         const raw=JSON.stringify(save);
+        // Preserve an unresolved Tower attempt's durable period in ordinary
+        // saves. Compare the exact bytes used below, never a second projection.
+        const towerPending=previousSave?.player?.relicProgression?.pending;
+        if(towerPending&&towerPending.kind==="tower"){
+            const week=towerPending.weekKey,oldWeek=previousSave?.gameplayProgress?.tower?.weekKey;
+            const validWeek=value=>{
+                if(typeof value!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(value)){return false;}
+                const date=new Date(value+"T00:00:00.000Z");
+                return Number.isFinite(date.getTime())&&date.getUTCFullYear()>=100&&date.toISOString().slice(0,10)===value&&date.getUTCDay()===1;
+            };
+            let candidate;
+            try{candidate=JSON.parse(raw);}catch(error){throw coded("account-tower-period-unresolved","Tower period cannot be verified.",error);}
+            const hasAttemptFields=["attemptVersion","ownerUid","attemptId","phase"].some(key=>Object.prototype.hasOwnProperty.call(towerPending,key));
+            const validAttemptIdentity=!hasAttemptFields||(towerPending.attemptVersion===1&&towerPending.ownerUid===uid&&
+                typeof towerPending.attemptId==="string"&&/^[a-f0-9]{32}$/.test(towerPending.attemptId)&&
+                ["preparing","launch-requested","cancelled-before-launch"].includes(towerPending.phase));
+            if(!validAttemptIdentity||!validWeek(week)||oldWeek!==week||candidate?.gameplayProgress?.tower?.weekKey!==week){
+                throw coded("account-tower-period-unresolved","Unresolved Tower period must be preserved.");
+            }
+        }
         const source=String(options.source||"local");
         const explicitBase=Object.prototype.hasOwnProperty.call(options,"cloudBaseFingerprint");
         const cloudBaseFingerprint=explicitBase
@@ -332,21 +455,50 @@ function writeForUid(context,uid,save,options={}){
                 ...(source==="hydration-normalization"?{normalizedMainFingerprint:fingerprint(save)}:{})}}:{}),
             updatedAt:Date.now()
         });
+        const marker=JSON.stringify({...(previousMetadata||{schemaVersion:SCHEMA_VERSION,ownerUid:uid}),
+            localWritePending:{version:1}});
+        // A marker readback failure is left blocked: do not guess whether it landed.
+        try{ storage().setItem(metaKey,marker); }
+        catch(error){ throw coded("account-save-write-failed","Local save marker could not be stored.",error); }
+        let metadataCommitted=false;
         try{
+            if(storage().getItem(metaKey)!==marker){ throw Error("Local save marker readback mismatch"); }
+        }catch(error){ throw coded("account-local-write-incomplete","Local save marker cannot be verified.",error); }
+        try{
+            if(getActiveUid()!==uid){ throw Error("Active UID changed before save"); }
             storage().setItem(key,raw);
+            if(storage().getItem(key)!==raw){ throw Error("Main save readback mismatch"); }
+            if(shopKey){
+                storage().setItem(shopKey,shopRaw);
+                if(storage().getItem(shopKey)!==shopRaw){ throw Error("Shop state readback mismatch"); }
+            }
+            if(getActiveUid()!==uid){ throw Error("Active UID changed during save"); }
             storage().setItem(metaKey,metadata);
-            if(shopKey){ storage().setItem(shopKey,shopRaw); }
+            metadataCommitted=true;
+            if(storage().getItem(metaKey)!==metadata){ throw Error("Final metadata readback mismatch"); }
         }catch(error){
+            // Once final metadata was written, destinations were already read
+            // back. Never roll them back after an uncertain final read: the
+            // marker may already be gone. Report uncertainty without mutation.
+            if(metadataCommitted){ throw coded("account-local-commit-unknown","Final metadata could not be verified; do not retry blindly.",error); }
             try{
                 if(previousRaw===null){ storage().removeItem(key); }else{ storage().setItem(key,previousRaw); }
+                if(storage().getItem(key)!==previousRaw){ throw Error("Main rollback readback mismatch"); }
+                if(shopKey){
+                    if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); }
+                    if(storage().getItem(shopKey)!==previousShop){ throw Error("Shop rollback readback mismatch"); }
+                }
+                // Restore metadata last, only after all destination bytes match.
                 if(previousMeta===null){ storage().removeItem(metaKey); }else{ storage().setItem(metaKey,previousMeta); }
-                if(shopKey){ if(previousShop===null){ storage().removeItem(shopKey); }else{ storage().setItem(shopKey,previousShop); } }
-            }catch(_){ }
-            throw coded("account-save-write-failed","Account save could not be committed atomically.",error);
+                if(storage().getItem(metaKey)!==previousMeta){ throw Error("Metadata rollback readback mismatch"); }
+            }catch(rollback){
+                throw coded("account-local-rollback-failed","Local save rollback could not be verified; preserve stored data and do not retry blindly.",rollback);
+            }
+            throw coded("account-save-write-failed","Local save failed; previous destination bytes were restored.",error);
         }
         return {uid,key,metadata:JSON.parse(metadata)};
     }
-Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid})});
+Object.defineProperty(global,"FourSymbolsAccountSaveOperations",{value:Object.freeze({inspectCloudBundle:inspectBundle,writeForUid,migrateLegacyToUid,migrationIsUnresolved,migrationIsRunning,localWriteIsUnresolved})});
 })(window);
 /* Bundle decisions only; destination and READY remain StartupStateMachine. */
 (function(global){"use strict";if(global.FourSymbolsCloudBundle)return;

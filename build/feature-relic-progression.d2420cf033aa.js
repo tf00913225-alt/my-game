@@ -311,6 +311,71 @@
         return normalizeProgressionState(host&&host.relicProgression);
     }
     let progressionState=readProgressionState();
+    let towerAttemptUnresolved=false;
+    function commitTowerPending(next,expected){
+        const host=progressionHost();
+        if(!host){ towerAttemptUnresolved=true;return false; }
+        const hadPrevious=Object.prototype.hasOwnProperty.call(host,"relicProgression");
+        let previous,previousHost;
+        try{
+            previous=clone(progressionState.pending);previousHost=clone(host.relicProgression);
+            progressionState.pending=next?clone(next):null;
+            host.relicProgression=clone(progressionState);
+            if(accountRepository.getActiveUid()!==ACTIVE_UID||typeof saveGame!=="function"||saveGame({source:"relic-progression"})!==true){ throw Error("Save not confirmed"); }
+            const saved=accountRepository.readForUid(ACTIVE_UID);
+            const actual=saved?.status==="ready"?saved.save?.player?.relicProgression?.pending:undefined;
+            if(accountRepository.getActiveUid()!==ACTIVE_UID||JSON.stringify(actual)!==JSON.stringify(expected)){ throw Error("Save readback mismatch"); }
+            return true;
+        }catch(_){
+            if(previous!==undefined){ progressionState.pending=previous; }
+            if(previousHost!==undefined){ host.relicProgression=previousHost; }
+            else if(!hadPrevious){ delete host.relicProgression; }
+            towerAttemptUnresolved=true;return false;
+        }
+    }
+    function validTowerAttempt(pending){
+        try{
+            if(!pending||typeof pending!=="object"||Array.isArray(pending)||
+                Object.keys(pending).sort().join("|")!=="attemptId|attemptVersion|baseline|beforeCounts|beforeGold|floor|kind|ownerUid|phase|rewards|startedAt|weekKey"||
+                pending.kind!=="tower"||pending.attemptVersion!==1||!ACTIVE_UID||pending.ownerUid!==ACTIVE_UID||
+                typeof pending.attemptId!=="string"||!/^[a-f0-9]{32}$/.test(pending.attemptId)||
+                !["preparing","launch-requested","cancelled-before-launch"].includes(pending.phase)||
+                !Number.isSafeInteger(pending.floor)||pending.floor<1||pending.floor>RELIC_TOWER_REWARD_CONFIG.floorCount||
+                !Number.isSafeInteger(pending.startedAt)||pending.startedAt<0||!Number.isSafeInteger(pending.beforeGold)||pending.beforeGold<0||
+                typeof pending.weekKey!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(pending.weekKey)){ return false; }
+            const date=new Date(pending.weekKey+"T00:00:00.000Z");
+            if(!Number.isFinite(date.getTime())||date.toISOString().slice(0,10)!==pending.weekKey||date.getUTCDay()!==1){ return false; }
+            if(gameplayRuntime.getWeekInfo(pending.startedAt)?.key!==pending.weekKey){ return false; }
+            const baseline=pending.baseline;
+            if(!baseline||typeof baseline!=="object"||Array.isArray(baseline)||Object.keys(baseline).sort().join("|")!=="claimed|historicalHighest"||
+                baseline.claimed!==false||!Number.isSafeInteger(baseline.historicalHighest)||baseline.historicalHighest<0||baseline.historicalHighest>RELIC_TOWER_REWARD_CONFIG.floorCount){ return false; }
+            const rewards=pending.rewards;
+            if(!Array.isArray(rewards)||!rewards.length||rewards.length>8||
+                !rewards.every(item=>item&&typeof item==="object"&&!Array.isArray(item)&&Object.keys(item).sort().join("|")==="count|itemId"&&
+                    typeof item.itemId==="string"&&item.itemId.length>0&&item.itemId.length<=128&&Number.isSafeInteger(item.count)&&item.count>0)){ return false; }
+            const variants=[false,true].map(firstEver=>JSON.stringify(towerRewardPlan(pending.floor,{firstEver}).rewards));
+            if(!variants.includes(JSON.stringify(rewards))){ return false; }
+            const counts=pending.beforeCounts;
+            if(!counts||typeof counts!=="object"||Array.isArray(counts)||
+                Object.keys(counts).sort().join("|")!==Object.keys(rewardCounts(rewards)).sort().join("|")||
+                !Object.values(counts).every(value=>Number.isSafeInteger(value)&&value>=0)){ return false; }
+            return true;
+        }catch(_){ return false; }
+    }
+    function validPreEntryCancellation(pending){
+        return validTowerAttempt(pending)&&pending.phase==="cancelled-before-launch";
+    }
+    function retirePreEntryCancellation(){
+        const pending=progressionState.pending;
+        if(towerAttemptUnresolved||!validPreEntryCancellation(pending)){ return false; }
+        try{
+            if(accountRepository.getActiveUid()!==ACTIVE_UID){ return false; }
+            const saved=accountRepository.readForUid(ACTIVE_UID);
+            const actual=saved?.status==="ready"?saved.save?.player?.relicProgression?.pending:undefined;
+            if(JSON.stringify(actual)!==JSON.stringify(pending)||accountRepository.getActiveUid()!==ACTIVE_UID){ towerAttemptUnresolved=true;return false; }
+        }catch(_){ towerAttemptUnresolved=true;return false; }
+        return commitTowerPending(null,null);
+    }
     function writeProgressionState(){
         const host=progressionHost();
         if(!host){ return false; }
@@ -678,7 +743,10 @@
                 return false;
             }
             progressionState.legacyTowerChoiceHandled=true;
-            writeProgressionState();
+            if(!writeProgressionState()){
+                notify("舊版第 50 層秘寶獎勵保存結果未確認，請先不要重複領取。");
+                return false;
+            }
             refreshInventoryUi();
             showRewardItems([{itemId:fragmentId,count:50}]);
             decorateTowerSurface();
@@ -711,12 +779,42 @@
         return typeof battleActive!=="undefined"&&!!battleActive;
     }
     function reconcilePending(){
+        if(towerAttemptUnresolved){ return "blocked-outcome"; }
         const pending=progressionState.pending;
         if(!pending){ return "none"; }
+        try{ if(!ACTIVE_UID||accountRepository.getActiveUid()!==ACTIVE_UID){ return "blocked-outcome"; } }
+        catch(_){ return "blocked-outcome"; }
+        const hasAttemptFields=pending.kind==="tower"&&["attemptVersion","ownerUid","attemptId","phase"].some(key=>Object.prototype.hasOwnProperty.call(pending,key));
+        if(pending.kind==="tower"&&pending.phase==="cancelled-before-launch"){
+            return validPreEntryCancellation(pending)?"pre-entry-cancelled":"blocked-outcome";
+        }
         if(battleStillActive()){ return "waiting"; }
         const state=gameplayRuntime.getSerializableState&&gameplayRuntime.getSerializableState();
         if(!state){ return "waiting"; }
+        // A different active week is not evidence of defeat or delivery. Keep
+        // the original operation intact until a period-aware settlement exists.
+        // Do not compare current inventory counts against an old-week receipt.
+        if(pending.kind==="tower"&&(!pending.weekKey||!state.tower||
+           state.tower.weekKey!==pending.weekKey)){ return "blocked-period"; }
+        if(hasAttemptFields&&!validTowerAttempt(pending)){ return "blocked-outcome"; }
+        if(pending.kind==="tower"&&pending.phase!==undefined&&pending.phase!=="launch-requested"){
+            return "blocked-outcome";
+        }
         if(pendingVictory(pending,state)){
+            // A live Tower claim can precede a failed or unknown save. Do not
+            // grant from it unless this exact pending and claim are also in a
+            // readable local account cut. This is not server victory evidence.
+            if(pending.kind==="tower"){
+                try{
+                    if(accountRepository.getActiveUid()!==ACTIVE_UID){ return "blocked-outcome"; }
+                    const stored=accountRepository.readForUid(ACTIVE_UID);
+                    const saved=stored?.status==="ready"?stored.save:null;
+                    if(accountRepository.getActiveUid()!==ACTIVE_UID||
+                       JSON.stringify(saved?.player?.relicProgression?.pending)!==JSON.stringify(pending)||
+                       saved?.gameplayProgress?.tower?.weekKey!==pending.weekKey||
+                       saved?.gameplayProgress?.tower?.claimedFloors?.[String(pending.floor)]!==true){ return "blocked-outcome"; }
+                }catch(_){ return "blocked-outcome"; }
+            }
             const already=receiptAlreadyDelivered(pending);
             if(!already&&!grantReceiptToTargets(pending)){
                 notify("秘寶獎勵尚未寫入：背包空間不足或資料暫時不可用。獎勵已保留，整理背包後重新開啟秘寶／玩法頁即可重試。");
@@ -726,7 +824,7 @@
                 progressionState.majorMilestoneClaims[String(pending.floor)]=true;
             }
             if(!already&&!writeProgressionState()){
-                notify("秘寶獎勵存檔失敗，獎勵收據已保留，重新載入後會安全補發且不重複累加。");
+                notify(pending.kind==="tower"?"四象塔秘寶獎勵保存結果未確認，請先不要重複領取。":"秘寶獎勵存檔失敗，獎勵收據已保留，重新載入後會安全補發且不重複累加。");
                 return "save-failed";
             }
             if(!already){
@@ -735,13 +833,18 @@
                 showRewardItems(pending.rewards,goldDelta);
             }
             progressionState.pending=null;
-            writeProgressionState();
+            const retired=writeProgressionState();
+            if(!retired&&pending.kind==="tower"){ return "save-failed"; }
             if(pending.kind==="tower"&&pending.floor===50&&progressionState.legacyTowerChoiceHandled===true){
                 neutralizeCurrentTowerLegacyChoice();
             }
             decorateAllSurfaces();
             return already?"already-delivered":"delivered";
         }
+        // Elapsed time and absence of a current claim are not evidence of loss.
+        // The existing Tower lifecycle has no durable terminal-result receipt;
+        // retain unknown outcomes instead of silently dropping their entitlement.
+        if(pending.kind==="tower"){ return "blocked-outcome"; }
         const age=Date.now()-integer(pending.startedAt);
         if(age>250||age>RECEIPT_STALE_MS){
             progressionState.pending=null;writeProgressionState();
@@ -761,11 +864,21 @@
         if(receiptMonitor&&typeof receiptMonitor.unref==="function"){ receiptMonitor.unref(); }
     }
 
+    function pendingBlocksEntry(label){
+        if(towerAttemptUnresolved){ return true; }
+        if(!progressionState.pending){ return false; }
+        if(validPreEntryCancellation(progressionState.pending)&&retirePreEntryCancellation()){ return false; }
+        if(progressionState.pending.kind==="tower"){
+            notify("尚有四象塔獎勵紀錄未結清，原紀錄已保留。為避免覆寫，本次"+label+"未開始；目前尚無自動復原流程。");
+        }
+        return true;
+    }
+
     const originalStartBoss=typeof window.vGameplayStartBoss==="function"?window.vGameplayStartBoss:null;
     if(originalStartBoss){
         window.vGameplayStartBoss=function(type,id){
             reconcilePending();
-            if(progressionState.pending){ return false; }
+            if(pendingBlocksEntry(" BOSS 挑戰")){ return false; }
             const pending=buildBossPending(type,id);
             if(pending&&!setPending(pending)){
                 notify("無法建立安全的秘寶獎勵收據，為避免掉落遺失，本次 BOSS 挑戰未開始。");
@@ -778,21 +891,75 @@
         };
     }
 
-    function wrapTowerStarter(original,targetResolver){
+    function makeTowerAttempt(pending){
+        if(!ACTIVE_UID||accountRepository.getActiveUid()!==ACTIVE_UID||!window.crypto?.getRandomValues){ return null; }
+        const bytes=new Uint8Array(16);
+        try{ window.crypto.getRandomValues(bytes); }catch(_){ return null; }
+        const attemptId=Array.from(bytes,value=>value.toString(16).padStart(2,"0")).join("");
+        pending.attemptVersion=1;pending.ownerUid=ACTIVE_UID;pending.attemptId=attemptId;pending.phase="preparing";
+        function matches(phase){
+            const current=progressionState.pending;
+            try{ return !towerAttemptUnresolved&&accountRepository.getActiveUid()===ACTIVE_UID&&current&&
+                current.kind==="tower"&&current.ownerUid===ACTIVE_UID&&current.attemptId===attemptId&&
+                current.floor===pending.floor&&current.weekKey===pending.weekKey&&current.phase===phase; }
+            catch(_){ return false; }
+        }
+        return Object.freeze({
+            matches:()=>matches("preparing"),
+            launchMatches:()=>matches("launch-requested"),
+            periodMatches:weekKey=>pending.weekKey===weekKey,
+            blockForPeriodChange:()=>{
+                if(matches("preparing")||matches("launch-requested")){ towerAttemptUnresolved=true; }
+            },
+            begin:()=>validTowerAttempt(pending)&&commitTowerPending(pending,pending),
+            markLaunchRequested:()=>{
+                if(!matches("preparing")){ return false; }
+                const next={...progressionState.pending,phase:"launch-requested"};
+                return commitTowerPending(next,next);
+            },
+            cancelBeforeLaunch:()=>{
+                if(!matches("preparing")){ return false; }
+                try{
+                    if(gameplayRuntime.getWeekInfo(Date.now())?.key!==pending.weekKey){ towerAttemptUnresolved=true;return false; }
+                }catch(_){ towerAttemptUnresolved=true;return false; }
+                const cancelled={...progressionState.pending,phase:"cancelled-before-launch"};
+                return commitTowerPending(cancelled,cancelled);
+            }
+        });
+    }
+
+    let lastTowerEntryDiagnostic={result:"not-observed",reason:"not-observed",pendingKind:"none",pendingPhase:"none"};
+    function recordTowerEntryDiagnostic(result,reason){
+        try{
+            const pending=progressionState.pending;
+            const kind=pending?.kind;
+            const phase=pending?.phase;
+            lastTowerEntryDiagnostic={result:result,reason:reason,
+                pendingKind:!pending?"none":kind==="tower"||kind==="boss"?kind:"other",
+                pendingPhase:!pending?"none":phase===undefined?"legacy":["preparing","launch-requested","cancelled-before-launch"].includes(phase)?phase:"other"};
+        }catch(_){ lastTowerEntryDiagnostic={result:"not-observed",reason:"not-observed",pendingKind:"other",pendingPhase:"other"}; }
+    }
+    function wrapTowerStarter(original,targetResolver,selectFloor){
         if(typeof original!=="function"){ return null; }
         return function(){
+            recordTowerEntryDiagnostic("not-observed","not-observed");
+            try{
             reconcilePending();
-            if(progressionState.pending){ return false; }
+            if(pendingBlocksEntry("爬塔挑戰")){ recordTowerEntryDiagnostic("rejected",towerAttemptUnresolved?"attempt-unresolved":"pending-blocked");return false; }
             const target=targetResolver.apply(this,arguments);
             const pending=buildTowerPending(target);
-            if(pending&&!setPending(pending)){
+            const attempt=pending?makeTowerAttempt(pending):null;
+            if(pending&&(!attempt||!attempt.begin())){
+                recordTowerEntryDiagnostic("rejected",attempt?"attempt-begin-unconfirmed":"attempt-unavailable");
                 notify("無法建立安全的秘寶獎勵收據，為避免里程碑遺失，本次爬塔挑戰未開始。");
                 return false;
             }
-            const started=original.apply(this,arguments);
-            if(!started&&pending){ progressionState.pending=null;writeProgressionState(); }
+            const started=selectFloor?original.call(this,target,attempt):original.call(this,attempt);
+            if(!started&&attempt){ attempt.cancelBeforeLaunch(); }
             else if(started){ ensureReceiptMonitor(); }
+            recordTowerEntryDiagnostic(started?"accepted":"rejected",started?"entry-accepted":"owner-returned-falsy");
             return started;
+            }catch(error){ recordTowerEntryDiagnostic("threw","entry-threw");throw error; }
         };
     }
     if(typeof window.vGameplayContinueTower==="function"){
@@ -804,7 +971,7 @@
     }
     if(typeof window.vGameplaySelectTowerBand==="function"){
         const original=window.vGameplaySelectTowerBand;
-        window.vGameplaySelectTowerBand=wrapTowerStarter(original,function(floor){ return floor; });
+        window.vGameplaySelectTowerBand=wrapTowerStarter(original,function(floor){ return floor; },true);
     }
 
     function craftStatus(relicId){
@@ -1186,7 +1353,8 @@
         estimateBossTarget:bossTargetEstimate,
         reconcileLevelMilestones:ensureFirstCharacterLevel20Relics,
         reconcilePending:reconcilePending,
-        getProgressionState:()=>clone(progressionState)
+        getProgressionState:()=>clone(progressionState),
+        getLastTowerEntryDiagnostic:()=>({...lastTowerEntryDiagnostic})
     });
 
     hydrateOwnedItemPresentation();

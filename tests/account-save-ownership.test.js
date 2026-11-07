@@ -17,12 +17,35 @@ function storage(seed=[]){
     };
 }
 function repository(store=storage()){
-    const context=vm.createContext({console,JSON,Date,Error,Object,Array,String,localStorage:store,window:null});
+    const context=vm.createContext({console,JSON,Date,Error,Object,Array,String,localStorage:store,window:null,crypto:require("node:crypto").webcrypto});
     context.window=context;
     vm.runInContext(source,context);
     return {repo:context.FourSymbolsAccountSave,store};
 }
 function code(expected){ return error=>error&&error.code===expected; }
+
+// Regression: a failed metadata commit followed by a failed main rollback
+// retains the pending marker; a new reader must never accept mixed bytes.
+{
+    const {repo,store}=repository();
+    const uid="uid-q61-double-failure";
+    repo.activate(uid);
+    repo.writeForUid(uid,{player:{id:"before"}},{source:"test"});
+    const mainKey=repo.saveKey(uid),metaKey=repo.metadataKey(uid);
+    const beforeMain=store.getItem(mainKey),beforeMeta=store.getItem(metaKey);
+    const set=store.setItem.bind(store);let metadataFailed=false;
+    let metadataWrites=0;
+    store.setItem=(key,value)=>{
+        if(key===metaKey&&++metadataWrites===2){metadataFailed=true;throw Error("metadata failure");}
+        if(key===mainKey&&metadataFailed&&value===beforeMain){throw Error("rollback failure");}
+        return set(key,value);
+    };
+    assert.throws(()=>repo.writeForUid(uid,{player:{id:"after"}},{source:"test"}),code("account-local-rollback-failed"));
+    assert.equal(JSON.parse(store.getItem(mainKey)).player.id,"after","failed rollback leaves new main bytes");
+    assert.notEqual(store.getItem(metaKey),beforeMeta,"pending marker remains");
+    const restarted=repository(store).repo;
+    assert.throws(()=>restarted.readForUid(uid),code("account-local-write-incomplete"));
+}
 
 {
     const {repo}=repository();
@@ -96,7 +119,7 @@ function code(expected){ return error=>error&&error.code===expected; }
     assert.equal(store.getItem("battle_full_version_save_v5"),legacy);
     assert.equal(repo.readForUid("uid-rollback").status,"empty","failed migration must roll account save back");
     assert.equal(JSON.parse(store.getItem("four_symbols_account:uid-rollback:element-box-state")).owner,"existing");
-    assert.ok([...store.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:uid-rollback:")),"failure keeps a recovery backup");
+    assert.ok(![...store.values.keys()].some(key=>key.startsWith("four_symbols_legacy_backup:uid-rollback:")),"preflight conflict must not write a backup");
 }
 
 {

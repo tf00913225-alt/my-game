@@ -41,7 +41,7 @@ assert.ok(dependencyGuardIndex>=0&&installedFlagIndex>dependencyGuardIndex,
         "a dependency-order miss must stay retryable instead of permanently claiming the owner");
 }
 
-function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null}={}){
+function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedPlayer=null,inventoryItems=null,gameplayOverride=null,noTimers=false,rejectTowerEntry=false,towerStarter=null,weekForStartedAt=null}={}){
     const store=new Map();
     const saveDoc={player:JSON.parse(JSON.stringify(savedPlayer||{id:"QA"})),inventoryItems:JSON.parse(JSON.stringify(inventoryItems||[]))};
     const localStorage={
@@ -77,15 +77,17 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
     const world=[40,60,80,100].map(level=>({id:"world-"+level,name:"W"+level,level,relic:level===40?"relic_returning_wheel":null}));
     let activeBattle=null;
     const context={
-        console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,
-        setTimeout,clearTimeout,setInterval,clearInterval,
+        console,JSON,Date,Math,Number,Object,Array,Map,Set,Promise,crypto:require("node:crypto").webcrypto,
+        setTimeout,clearTimeout,setInterval:noTimers?()=>1:setInterval,clearInterval,
         window:null,localStorage,gold:1000,
+        alert(message){ (context.notices||(context.notices=[])).push(message); },
         FourSymbolsEquipmentGems:{definitions:{gemVitalityI:{id:"gemVitalityI",name:"體質寶石",type:"gem",icon:"◆",stats:{vitality:1}}}},
         player:saveDoc.player,
         inventoryItems:saveDoc.inventoryItems,
         saveGame(){
             saveDoc.player=JSON.parse(JSON.stringify(context.player));
             saveDoc.inventoryItems=context.inventoryItems.map(item=>({...item,stats:{...(item.stats||{})}}));
+            saveDoc.gameplayProgress=JSON.parse(JSON.stringify(gameplayState));
             saveDoc.playerRelics=JSON.parse(JSON.stringify(owned));
             saveDoc.teamLoadout=JSON.parse(JSON.stringify(loadout));
             return true;
@@ -122,13 +124,14 @@ function makeContext({explicitRelics=false,uid="uid-a",withStarters=false,savedP
             towerConfig:{floorCount:100,relicChoices:[{id:"relic_nine_dragon_fire"},{id:"relic_cold_spring_jade"},{id:"relic_qinglan_feather"},{id:"relic_rock_mountain_seal"}]},
             personalBosses:personal,worldBosses:world,
             getSerializableState:()=>JSON.parse(JSON.stringify(gameplayState)),
+            getWeekInfo:instant=>({key:weekForStartedAt?weekForStartedAt(instant):gameplayState.tower.weekKey}),
             getActiveBattleState:()=>activeBattle
         }
     };
     if(withStarters){
         context.vGameplayStartBoss=(type,id)=>{activeBattle={mode:type,definitionId:id};return true;};
-        context.vGameplayContinueTower=()=>{activeBattle={mode:"tower"};return true;};
-        context.vGameplaySelectTowerBand=floor=>{activeBattle={mode:"tower",floor};return true;};
+        context.vGameplayContinueTower=attempt=>{if(towerStarter){return towerStarter(null,attempt,context);}if(attempt&&!attempt.markLaunchRequested()){return false;}activeBattle={mode:"tower"};return true;};
+        context.vGameplaySelectTowerBand=(floor,attempt)=>{if(towerStarter){return towerStarter(floor,attempt,context);}if(rejectTowerEntry){return false;}if(attempt&&!attempt.markLaunchRequested()){return false;}activeBattle={mode:"tower",floor};return true;};
     }
     context.__setActiveBattle=value=>{activeBattle=value;};
     context.window=context;
@@ -288,6 +291,7 @@ function add(context,id,count){
     const pending=context.RelicProgressionSystem.getProgressionState().pending;
     assert.ok(pending&&pending.floor===5);
     gameplayState.tower.claimedFloors["5"]=true;gameplayState.tower.completedFloor=5;gameplayState.tower.historicalHighest=5;
+    assert.equal(context.saveGame(),true);
     context.__setActiveBattle(null);
     assert.equal(context.RelicProgressionSystem.reconcilePending(),"delivered");
     const universal=context.RelicProgressionSystem.getItemCount("relicUniversalFragment");
@@ -305,6 +309,7 @@ function add(context,id,count){
     const pending=first.context.RelicProgressionSystem.getProgressionState().pending;
     assert.ok(pending.rewards.some(reward=>reward.itemId==="relicChoiceBoxBlue"));
     first.gameplayState.tower.claimedFloors["25"]=true;first.gameplayState.tower.completedFloor=25;first.gameplayState.tower.highestThisWeek=25;first.gameplayState.tower.historicalHighest=25;
+    assert.equal(first.context.saveGame(),true);
     first.context.__setActiveBattle(null);
     assert.equal(first.context.RelicProgressionSystem.reconcilePending(),"delivered");
     assert.equal(first.saveDoc.player.relicProgression.majorMilestoneClaims["25"],true);
@@ -322,6 +327,60 @@ function add(context,id,count){
 }
 
 /* UID isolation: separate account contexts do not share progression receipts or material inventory. */
+/* An unresolved old-week receipt cannot be cleared by age or a new-week claim. */
+{
+    const first=makeContext({withStarters:true,noTimers:true});
+    assert.equal(first.context.vGameplaySelectTowerBand(10),true);
+    const savedPlayer=JSON.parse(JSON.stringify(first.saveDoc.player));
+    savedPlayer.relicProgression.pending.startedAt=1;
+    const original=JSON.stringify(savedPlayer.relicProgression.pending);
+    const nextWeek=JSON.parse(JSON.stringify(first.gameplayState));
+    nextWeek.tower.weekKey="2026-09-14";
+    nextWeek.tower.claimedFloors={10:true};
+    const reload=makeContext({withStarters:true,noTimers:true,savedPlayer,gameplayOverride:nextWeek});
+    for(let retry=0;retry<3;retry++){
+        assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),"blocked-period");
+        assert.equal(JSON.stringify(reload.context.RelicProgressionSystem.getProgressionState().pending),original);
+        assert.equal(reload.context.vGameplaySelectTowerBand(10),false);
+        assert.equal(reload.context.vGameplayStartBoss("personal","personal-20"),false,
+            "shared unresolved pending also blocks Boss entry; no recovery is implied");
+    }
+    assert.equal(reload.context.RelicProgressionSystem.getItemCount("gemVitalityI"),0);
+    assert.equal(JSON.stringify(reload.saveDoc.player.relicProgression.pending),original);
+    assert.ok(reload.context.notices.some(message=>message.includes("BOSS 挑戰")&&message.includes("原紀錄已保留")));
+    assert.ok(reload.context.notices.some(message=>message.includes("爬塔挑戰")&&message.includes("尚無自動復原流程")));
+}
+
+/* No same-week claim is unknown, not a time-based proof of defeat. */
+{
+    const first=makeContext({withStarters:true,noTimers:true});
+    assert.equal(first.context.vGameplaySelectTowerBand(10),true);
+    const savedPlayer=JSON.parse(JSON.stringify(first.saveDoc.player));
+    savedPlayer.relicProgression.pending.startedAt=1;
+    const original=JSON.stringify(savedPlayer.relicProgression.pending);
+    const reload=makeContext({withStarters:true,noTimers:true,savedPlayer,
+        gameplayOverride:JSON.parse(JSON.stringify(first.gameplayState))});
+    for(let retry=0;retry<3;retry++){
+        assert.equal(reload.context.RelicProgressionSystem.reconcilePending(),"blocked-outcome");
+        assert.equal(JSON.stringify(reload.context.RelicProgressionSystem.getProgressionState().pending),original);
+        assert.equal(reload.context.vGameplaySelectTowerBand(10),false);
+        assert.equal(reload.context.vGameplayStartBoss("personal","personal-20"),false);
+    }
+    assert.equal(reload.context.RelicProgressionSystem.getItemCount("gemVitalityI"),0);
+    assert.equal(JSON.stringify(reload.saveDoc.player.relicProgression.pending),original);
+    assert.ok(reload.context.notices.some(message=>message.includes("原紀錄已保留")));
+}
+
+/* A rejected launch is still the original known-no-entry cancellation path. */
+{
+    const failed=makeContext({withStarters:true,noTimers:true,rejectTowerEntry:true});
+    assert.equal(failed.context.vGameplaySelectTowerBand(10),false);
+    assert.equal(failed.context.RelicProgressionSystem.getProgressionState().pending.phase,"cancelled-before-launch");
+    assert.equal(failed.saveDoc.player.relicProgression.pending.phase,"cancelled-before-launch");
+    assert.equal(failed.context.RelicProgressionSystem.reconcilePending(),"pre-entry-cancelled");
+    assert.equal(failed.context.vGameplayStartBoss("personal","personal-20"),true);
+}
+
 {
     const a=makeContext({uid:"uid-a"});
     add(a.context,"relicUniversalFragment",10);a.context.saveGame();
@@ -349,11 +408,109 @@ console.log("✓ Relic progression/drop system targeted tests passed.");
  assert.equal(context.vGameplaySelectTowerBand(10),true);
  assert.ok(context.RelicProgressionSystem.getProgressionState().pending.rewards.some(r=>r.itemId==='gemVitalityI'&&r.count===1));
  gameplayState.tower.claimedFloors['10']=true;gameplayState.tower.completedFloor=10;gameplayState.tower.historicalHighest=10;
+ assert.equal(context.saveGame(),true);
  context.__setActiveBattle(null);assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');
  assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),1);
  context.vGameplaySelectTowerBand(10);assert.equal(context.RelicProgressionSystem.getProgressionState().pending,null);
  gameplayState.tower.weekKey='2026-09-14';gameplayState.tower.claimedFloors={};
  context.vGameplaySelectTowerBand(10);gameplayState.tower.claimedFloors['10']=true;context.__setActiveBattle(null);
+ assert.equal(context.saveGame(),true);
  assert.equal(context.RelicProgressionSystem.reconcilePending(),'delivered');assert.equal(context.RelicProgressionSystem.getItemCount('gemVitalityI'),2);
  assert.ok(!context.RelicProgressionSystem.getTowerRewardPlan(25,{firstEver:false}).rewards.some(r=>r.itemId==='gemVitalityI'));
+}
+
+/* Pre-entry handles may cancel only their own confirmed preparing receipt. */
+for(const failure of ["false","throw","readback"]){
+ let launches=0;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:()=>{launches++;return true;}});
+ if(failure==="false")f.context.saveGame=()=>false;
+ if(failure==="throw")f.context.saveGame=()=>{throw Error("save failure");};
+ if(failure==="readback")f.context.FourSymbolsAccountSave.readForUid=()=>({status:"ready",save:{player:{relicProgression:{pending:null}}}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,failure);
+ assert.equal(launches,0,failure);
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,"unresolved begin blocks retry: "+failure);
+}
+{
+ let handle;
+ const initial=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(initial.context.vGameplaySelectTowerBand(5),true);assert.equal(handle.cancelBeforeLaunch(),true);
+ const saved=JSON.parse(JSON.stringify(initial.saveDoc.player));
+ const mutations=[
+  pending=>{pending.weekKey='2026-99-99';},pending=>{pending.weekKey='2026-09-08';},
+  pending=>{pending.ownerUid='foreign';},pending=>{pending.attemptId='bad';},
+  pending=>{pending.extra='unknown';},pending=>{pending.rewards[0].count++;},
+  pending=>{delete pending.attemptVersion;},pending=>{delete pending.phase;},
+  pending=>{pending.phase='launch-requested';pending.ownerUid='foreign';}
+ ];
+ for(const mutate of mutations){
+  const player=JSON.parse(JSON.stringify(saved));mutate(player.relicProgression.pending);
+  const f=makeContext({withStarters:true,noTimers:true,savedPlayer:player});
+  f.gameplayState.tower.claimedFloors['5']=true;
+  const before=JSON.stringify(f.saveDoc.player.relicProgression.pending);
+  assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+  assert.equal(f.context.vGameplaySelectTowerBand(5),false);
+  assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),before);
+  assert.equal(f.context.inventoryItems.length,0);
+ }
+}
+for(const failure of ['false','readback']){
+ let handle,launches=0;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;launches++;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);assert.equal(handle.cancelBeforeLaunch(),true);
+ const terminal=JSON.stringify(f.saveDoc.player.relicProgression.pending);
+ if(failure==='false')f.context.saveGame=()=>false;
+ if(failure==='readback'){
+  const read=f.context.FourSymbolsAccountSave.readForUid;let reads=0;
+  f.context.FourSymbolsAccountSave.readForUid=uid=>{if(++reads===2)throw Error('retire readback');return read(uid);};
+ }
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,failure);
+ assert.equal(launches,1,failure);
+ if(failure==='false')assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),terminal);
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,'unresolved retirement blocks retry: '+failure);
+}
+{
+ const f=makeContext({withStarters:true,noTimers:true});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ const before=JSON.stringify(f.saveDoc.player.relicProgression.pending),inventory=JSON.stringify(f.context.inventoryItems);
+ let writes=0;f.context.saveGame=()=>{writes++;return true;};
+ f.context.FourSymbolsAccountSave.getActiveUid=()=>"other-uid";
+ f.gameplayState.tower.claimedFloors['5']=true;f.context.__setActiveBattle(null);
+ assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome');
+ assert.equal(JSON.stringify(f.saveDoc.player.relicProgression.pending),before);
+ assert.equal(JSON.stringify(f.context.inventoryItems),inventory);assert.equal(writes,0);
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5,"extra"),true);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"preparing");
+ const first=handle;
+ assert.equal(first.cancelBeforeLaunch(),true);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"cancelled-before-launch");
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ const second=handle;
+ assert.equal(first.cancelBeforeLaunch(),false,"old attempt must not clear the new one");
+ assert.equal(f.saveDoc.player.relicProgression.pending.attemptId!==undefined,true);
+ assert.equal(second.markLaunchRequested(),true);
+ assert.equal(second.cancelBeforeLaunch(),false,"launcher phase cannot be cancelled");
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"launch-requested");
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplayContinueTower("unexpected"),true);
+ f.context.FourSymbolsAccountSave.getActiveUid=()=>"other-uid";
+ assert.equal(handle.cancelBeforeLaunch(),false);
+ assert.equal(f.saveDoc.player.relicProgression.pending.ownerUid,"uid-a");
+}
+{
+ let handle;
+ const f=makeContext({withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+ assert.equal(f.context.vGameplaySelectTowerBand(5),true);
+ f.context.saveGame=()=>false;
+ assert.equal(handle.cancelBeforeLaunch(),false);
+ assert.equal(f.saveDoc.player.relicProgression.pending.phase,"preparing");
+ f.gameplayState.tower.claimedFloors['5']=true;
+ assert.equal(f.context.RelicProgressionSystem.reconcilePending(),'blocked-outcome',"unknown cancellation cannot trigger reward reconciliation");
+ assert.equal(f.context.vGameplaySelectTowerBand(5),false,"unknown cancellation blocks new entry");
 }

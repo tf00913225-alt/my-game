@@ -3,15 +3,17 @@ import {readFileSync} from "node:fs";
 import test from "node:test";
 import vm from "node:vm";
 import {createRequire} from "node:module";
+import {createHash} from "node:crypto";
 import {storeHarness,selection,copy} from "../scripts/test-helpers/canonical-store-harness.mjs";
 const require=createRequire(import.meta.url);
 const {assembleCanonicalPlayableProjection}=require("../functions/src/canonical-snapshot");
 
 function deferredMigration(){
     const values=new Map([['battle_full_version_save_v5',JSON.stringify({player:{id:'legacy-original'}})]]),writes=[];
-    const store={getItem:key=>values.get(key)??null,setItem:(key,value)=>{writes.push(key);values.set(key,String(value));},
-        removeItem:key=>{writes.push(key);values.delete(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
-    const global={localStorage:store};global.window=global;vm.createContext(global);
+    let readFault=()=>false,afterWrite=()=>{},afterRemove=()=>{};
+    const store={getItem:key=>{if(readFault(key))throw Error('migration read fixture');return values.get(key)??null;},setItem:(key,value)=>{writes.push(key);values.set(key,String(value));afterWrite(key,String(value));},
+        removeItem:key=>{writes.push(key);values.delete(key);afterRemove(key);},key:index=>[...values.keys()][index]??null,get length(){return values.size;}};
+    const global={localStorage:store,crypto:require('node:crypto').webcrypto};global.window=global;vm.createContext(global);
     vm.runInContext(readFileSync(new URL('../js/startup/account-save-repository.js',import.meta.url),'utf8'),global);
     const repo=global.FourSymbolsAccountSave;repo.activate('migration-a');writes.length=0;
     let resume,reject;const shell=new Promise((yes,no)=>{resume=yes;reject=no;});
@@ -35,8 +37,35 @@ function deferredMigration(){
             state:()=>state,errors,ready};
     `);
     const f=make(global,shell,()=>vm.runInContext(operations,global));
-    return {...f,repo,global,values,writes,resume,reject};
+    return {...f,repo,global,values,writes,resume,reject,readFault:fn=>{readFault=fn;},afterWrite:fn=>{afterWrite=fn;},afterRemove:fn=>{afterRemove=fn;}};
 }
+
+test('actual migration startup reports unknown and never enters READY or deletes the committed main',async()=>{
+    const f=deferredMigration(),meta=f.repo.metadataKey('migration-a'),main=f.repo.saveKey('migration-a');
+    let final=false,failed=false;
+    f.afterWrite((key,value)=>{if(key===meta&&!value.includes('localWritePending'))final=true;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    const pending=f.run();f.resume();await pending;f.readFault(()=>false);
+    assert.equal(f.ready.length,0);
+    assert.equal(f.state(),'ERROR');
+    assert.equal(f.errors.at(-1)?.code,'account-local-commit-unknown');
+    assert.equal(JSON.parse(f.values.get(main)).player.id,'legacy-original');
+    assert.ok(f.values.has(meta));
+    assert.throws(()=>f.repo.readForUid('migration-a'),e=>e.code==='account-migration-incomplete');
+    assert.equal(f.writes.filter(key=>key===main).length,1,'no cleanup or compensating save');
+});
+
+test('actual migration Startup does not enter READY after marker removal read is unknown',async()=>{
+    const f=deferredMigration(),key='four_symbols_migration_pending:migration-a';let removed=false,failed=false;
+    f.afterRemove(value=>{if(value===key)removed=true;});
+    f.readFault(value=>{if(value===key&&removed&&!failed){failed=true;return true;}return false;});
+    const pending=f.run();f.resume();await pending;f.readFault(()=>false);
+    assert.equal(f.ready.length,0);assert.equal(f.state(),'ERROR');
+    assert.equal(f.errors.at(-1)?.code,'account-migration-commit-unknown');
+    assert.equal(f.values.has(key),false);
+    assert.throws(()=>f.repo.readForUid('migration-a'),e=>e.code==='account-migration-commit-unknown');
+    assert.equal(JSON.parse(f.values.get(f.repo.saveKey('migration-a'))).player.id,'legacy-original');
+});
 
 test('deferred original writer refuses unloaded migration and save before any writes',()=>{
     const f=deferredMigration(),before=JSON.stringify([...f.values]);
@@ -175,10 +204,10 @@ async function lawfulCuts(){
     return {h,cuts};
 }
 function adoptionFixture(uid){
-    const values=new Map(),ready=[],errors=[];let fault=()=>false;
-    const storage={getItem:key=>values.get(key)??null,
-        setItem(key,value){if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
-        removeItem(key){if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
+    const values=new Map(),ready=[],errors=[],writes=[],creations=[];let fault=()=>false,readFault=()=>false;
+    const storage={getItem:key=>{if(readFault(key))throw Error('read fixture');return values.get(key)??null;},
+        setItem(key,value){writes.push({key,operation:'set'});if(fault(key,value))throw Error('quota fixture');values.set(key,String(value));},
+        removeItem(key){writes.push({key,operation:'remove'});if(fault(key,null))throw Error('quota fixture');values.delete(key);}};
     const noop=()=>{},context={console,localStorage:storage,JSON,Date,Error,Object,Array,String,
         player:{},player2:null,player3:null,characters:[],characterEquipment:{fire:{}},characterSkillLoadouts:{fire:{skillLevels:{},equippedSkills:[]}},
         autoConfig:{},autoConfig2:{},autoConfig3:{},inventoryItems:[],sharedExp:0,gold:0,
@@ -209,7 +238,7 @@ function adoptionFixture(uid){
     const empty=source.slice(source.indexOf('    function safeCloudEmpty('),source.indexOf('    function cloudPayload('));
     const resolver=source.slice(source.indexOf('    async function resolveSaveFor('),source.indexOf('    function requireAuth('));
     const enter=source.slice(source.indexOf('    async function enterReady('),source.indexOf('    async function enterCreation('));
-    const make=new Function('global','firebase','ready','errors',`
+    const make=new Function('global','firebase','ready','errors','creations',`
         let transitionToken=0,activeUser,resolvedUid,saveResolved,cloudResult,lastError,state;
         const STATES={SAVE_LOADING:'SAVE_LOADING',READY:'READY',OFFLINE_READY:'OFFLINE_READY'},showCity=()=>{},startAppShell=()=>{},transition=value=>{state=value;},showLoader=()=>{},status=()=>{},accountUi=()=>{},mark=()=>{};
         const requireAppShell=()=>global.__appShellWait||Promise.resolve(),domReady=()=>Promise.resolve(),hideLoader=()=>Promise.resolve();
@@ -217,10 +246,10 @@ function adoptionFixture(uid){
         const document=global.document,CustomEvent=global.CustomEvent,emit=(name,detail)=>{if(name==='four-symbols:startup-ready')ready.push(detail);};
         const sessionView=()=>JSON.stringify(firebase.getGameSessionState());
         const fail=error=>{errors.push(error);return {blocked:true,error};};
-        const migration=()=>({blocked:true}),enterCreation=async()=>({creation:true});
+        const migration=()=>({blocked:true}),enterCreation=async()=>{creations.push(true);return {creation:true};};
         ${empty}\n${payload}\n${enter}\n${resolver}\nreturn resolveSaveFor;`);
-    const resolve=make(context,firebase,ready,errors);
-    return {repo,values,ready,errors,reads,runtime:context,fault:fn=>{fault=fn;},session:value=>{session=value;},
+    const resolve=make(context,firebase,ready,errors,creations);
+    return {repo,values,ready,errors,reads,writes,creations,runtime:context,fault:fn=>{fault=fn;},readFault:fn=>{readFault=fn;},session:value=>{session=value;},
         async load(bundle,{published=true,mutate,waiting}={}){
             const before=ready.length;
             response=waiting||{uid,exists:true,serverConfirmed:true,data:{ownerUid:uid,serverRevision:bundle.serverRevision,
@@ -352,6 +381,199 @@ test('bundle failures never fall back to main-only and storage interruption pres
     assert.throws(()=>f.repo.readForUid(h.uid),e=>e.code==='account-cloud-adoption-incomplete');
     assert.throws(()=>f.repo.writeForUid(h.uid,cuts[0].gameSave),e=>e.code==='account-cloud-adoption-incomplete');
     assert.ok([...f.values.keys()].some(key=>key.startsWith('four_symbols_migration_backup:')));
+});
+
+test('Tower v2 is rejected by canonical consumers without changing v1 source bytes or hashes',async()=>{
+    const {h}=await lawfulCuts();
+    const storeRaw=JSON.stringify([...h.data]);
+    const records=copy(h.data.get(h.root+'/recoveryArchives/'+h.revision).sourceRecords);
+    const api=require('../functions/src/canonical-snapshot');
+    const valid=api.assembleCanonicalPlayableProjection(h.uid,h.revision,records);
+    assert.equal(records.progress.gameplayProgress.version,1);
+    const raw=JSON.stringify(records),hash=createHash('sha256').update(raw).digest('hex');
+    const incompatible=copy(records);incompatible.progress.gameplayProgress.version=2;
+    const invalidRaw=JSON.stringify(incompatible),invalidHash=createHash('sha256').update(invalidRaw).digest('hex');
+    for(const consumer of [
+        ()=>api.assembleCanonicalSnapshot(h.uid,h.revision,incompatible),
+        ()=>api.assembleCanonicalPlayableProjection(h.uid,h.revision,incompatible),
+        ()=>api.assembleCanonicalCloudReadCandidate(h.uid,h.revision,h.revision,incompatible)
+    ]){
+        assert.throws(consumer,/gameplay progress/);
+        assert.equal(JSON.stringify(incompatible),invalidRaw);
+        assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),invalidHash);
+        assert.equal(JSON.stringify(records),raw);
+        assert.equal(createHash('sha256').update(JSON.stringify(records)).digest('hex'),hash);
+        assert.equal(JSON.stringify([...h.data]),storeRaw,'validation must not write the source store');
+    }
+    assert.equal(api.assembleCanonicalPlayableProjection(h.uid,h.revision,records).projection.sourceSnapshotSha256,
+        valid.projection.sourceSnapshotSha256);
+    assert.equal(valid.projection.authoritativeStateReady,false);
+});
+
+test('actual cloud bundle adoption blocks Tower v2 and preserves existing UID storage',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const before=[...f.values],writesBefore=f.writes.length,incompatible=copy(cuts[1]);
+    incompatible.gameSave.gameplayProgress.version=2;
+    const raw=JSON.stringify(incompatible),hash=createHash('sha256').update(raw).digest('hex');
+    const readyBefore=f.ready.length;
+    assert.equal((await f.load(incompatible)).blocked,true);
+    assert.equal(f.ready.length,readyBefore);
+    assert.deepEqual([...f.values],before);
+    assert.deepEqual(f.writes.slice(writesBefore),[
+        {key:'four_symbols_active_uid',operation:'set'},
+        {key:'four_symbols_active_uid',operation:'set'}
+    ],'Boot reasserts active UID; it must not write the main save, metadata or sidecars');
+    assert.equal(JSON.stringify(incompatible),raw);
+    assert.equal(createHash('sha256').update(JSON.stringify(incompatible)).digest('hex'),hash);
+    assert.equal(f.errors.at(-1).code,'account-gameplay-version-unsupported');
+});
+
+test('actual Startup rejects an orphan migration marker before READY or character creation',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    const pendingKey='four_symbols_migration_pending:'+h.uid;
+    const raw=JSON.stringify({version:1,kind:'legacy',ownerUid:h.uid,transactionId:'a'.repeat(32)});
+    f.values.set(pendingKey,raw);
+    const result=await f.load(cuts[0]);
+    assert.equal(result.blocked,true);
+    assert.equal(f.ready.length,0);
+    assert.equal(f.creations.length,0);
+    assert.equal(f.errors.at(-1)?.code,'account-migration-incomplete');
+    assert.equal(f.values.get(pendingKey),raw);
+    assert.equal(f.values.has(f.repo.saveKey(h.uid)),false);
+    assert.equal(f.values.has(f.repo.metadataKey(h.uid)),false);
+});
+
+test('actual saveGame returns false for uncertain commit but later same-page writes cannot overwrite',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const metaKey=f.repo.metadataKey(h.uid),mainKey=f.repo.saveKey(h.uid);
+    let finalWrite=false,failed=false;
+    f.fault((key,value)=>{if(key===metaKey&&value&&!value.includes('localWritePending'))finalWrite=true;return false;});
+    f.readFault(key=>{if(key===metaKey&&finalWrite&&!failed){failed=true;return true;}return false;});
+    f.runtime.gold=4321;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(JSON.parse(f.values.get(mainKey)).gold,4321,'after state was already committed');
+    f.readFault(()=>false);f.fault(()=>false);
+    f.runtime.gold=1234; // A caller restoring its earlier in-memory value.
+    const before=[...f.values],writesBefore=f.writes.length;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(JSON.parse(f.values.get(mainKey)).gold,4321,'the committed value is not overwritten');
+    assert.deepEqual([...f.values],before);
+    assert.equal(f.writes.length,writesBefore,'retry must not write or remove storage keys');
+});
+
+test('actual Relic grant rollback cannot overwrite an uncertain actual saveGame commit',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true});
+    relic.context.player.level=20;
+    relic.context.saveGame=options=>{
+        f.runtime.player=relic.context.player;
+        f.runtime.inventoryItems=relic.context.inventoryItems;
+        return f.runtime.saveGame(options);
+    };
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(relic.context.RelicProgressionSystem.reconcileLevelMilestones(),false);
+    f.readFault(()=>false);f.fault(()=>false);
+    const committed=f.values.get(main),committedSave=JSON.parse(committed);
+    assert.equal(committedSave.player.relicProgression.firstCharacterLevel20Grant,true,
+        'actual Relic grant was in the committed bytes');
+    assert.equal(relic.context.player.relicProgression.firstCharacterLevel20Grant,false,
+        'actual Relic caller restored its in-memory state on false');
+    const writesBefore=f.writes.length;
+    assert.equal(f.runtime.saveGame({source:'relic-progression'}),false);
+    assert.equal(f.writes.length,writesBefore);
+    assert.equal(f.values.get(main),committed,'later actual saveGame cannot overwrite the committed bytes');
+});
+
+test('uncertain actual saveGame cancellation blocks a new Tower attempt',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),createRequire(import.meta.url));
+    let handle;
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
+    relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
+    relic.context.saveGame=options=>{
+        f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;
+        return f.runtime.saveGame(options);
+    };
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),true);
+    {const cut=f.repo.readForUid(h.uid).save,pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(handle.cancelBeforeLaunch(),false);
+    assert.equal(failed,true,'cancellation must reach the injected final metadata read failure');
+    f.readFault(()=>false);f.fault(()=>false);
+    const committed=f.values.get(main),writes=f.writes.length;
+    assert.equal(JSON.parse(committed).player.relicProgression.pending.phase,'cancelled-before-launch');
+    assert.equal(relic.context.RelicProgressionSystem.getProgressionState().pending.phase,'preparing');
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(f.writes.length,writes);assert.equal(f.values.get(main),committed);
+});
+
+test('uncertain actual saveGame initial Tower receipt never calls starter',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
+    let calls=0;
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:()=>{calls++;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
+    relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
+    relic.context.saveGame=options=>{f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;return f.runtime.saveGame(options);};
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(failed,true,'initial receipt must reach the injected final metadata read failure');
+    f.readFault(()=>false);f.fault(()=>false);
+    assert.equal(calls,0);assert.equal(JSON.parse(f.values.get(main)).player.relicProgression.pending.phase,'preparing');
+    {const cut=JSON.parse(f.values.get(main)),pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);assert.equal(calls,0);
+});
+
+test('uncertain actual saveGame retirement cannot start a new Tower attempt',async()=>{
+    const {h,cuts}=await lawfulCuts(),f=adoptionFixture(h.uid);
+    assert.equal((await f.load(cuts[0])).ready,true);
+    const relicTest=readFileSync(new URL('./v174-relic-progression-drop-system.test.js',import.meta.url),'utf8');
+    const fixtureCode=relicTest.slice(relicTest.indexOf('function makeContext('),relicTest.indexOf('\nfunction add('));
+    const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
+        vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
+    let handle,calls=0;
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:(floor,attempt)=>{calls++;handle=attempt;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
+    relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
+    relic.context.saveGame=options=>{f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;return f.runtime.saveGame(options);};
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),true);
+    {const cut=f.repo.readForUid(h.uid).save,pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
+    assert.equal(handle.cancelBeforeLaunch(),true);
+    const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
+    f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
+    f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(failed,true,'retirement must reach the injected final metadata read failure');
+    f.readFault(()=>false);f.fault(()=>false);
+    assert.equal(calls,1);assert.equal(JSON.parse(f.values.get(main)).player.relicProgression.pending,null);
+    assert.equal(relic.context.RelicProgressionSystem.getProgressionState().pending.phase,'cancelled-before-launch');
+    const writes=f.writes.length;assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(calls,1);assert.equal(f.writes.length,writes);
 });
 
 test('actual enterReady refuses Session takeover across app-shell and visual awaits',async()=>{

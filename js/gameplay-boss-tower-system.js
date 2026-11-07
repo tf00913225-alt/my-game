@@ -7,6 +7,97 @@
 (function installGameplayBossTowerSystem(){
     "use strict";
 
+    const ELEMENT_ORDER=Object.freeze(["fire","earth","water","wind"]);
+    const DAY_MS=86400000;
+    const WEEK_MS=7*DAY_MS;
+    const WEEK_ANCHOR=Date.UTC(1970,0,5);
+    const Q61_MIGRATION_EVENT="tower-taipei-week-v2";
+
+    function towerInstant(value){
+        if(value===undefined){ return Date.now(); }
+        if(typeof value==="number"&&Number.isFinite(value)){ return value; }
+        if(value!==null&&typeof value==="object"){
+            // Date's internal-slot check also accepts a valid cross-realm Date.
+            try{
+                const epoch=Date.prototype.getTime.call(value);
+                if(Number.isFinite(epoch)){ return epoch; }
+            }catch(_){ }
+        }
+        if(typeof value==="string"){
+            const parts=/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})(?:\.\d{1,3})?(Z|[+-]\d{2}:\d{2})$/.exec(value);
+            if(parts){
+                const [year,month,day,hour,minute,second]=parts.slice(1,7).map(Number);
+                const date=new Date(0);
+                date.setUTCFullYear(year,month-1,day);
+                const zone=parts[7],validZone=zone==="Z"||
+                    Number(zone.slice(1,3))<=23&&Number(zone.slice(4,6))<=59;
+                if(year>=100&&date.getUTCFullYear()===year&&date.getUTCMonth()===month-1&&
+                   date.getUTCDate()===day&&hour<=23&&minute<=59&&second<=59&&validZone&&
+                   Number.isFinite(Date.parse(value))){ return Date.parse(value); }
+            }
+        }
+        throw new RangeError("Invalid Tower calendar instant");
+    }
+
+    // Calendar identity only: this does not authorize entry, migration or rewards.
+    // utc-v1 remains the live policy until the Q61 settlement/admission gates pass.
+    function towerPeriodInfo(now,policy){
+        if(policy!=="utc-v1"&&policy!=="taipei-v2"){
+            throw new RangeError("Unsupported Tower calendar policy");
+        }
+        const instant=new Date(towerInstant(now));
+        if(!Number.isFinite(instant.getTime())||instant.getUTCFullYear()<100||instant.getUTCFullYear()>9999){
+            throw new RangeError("Invalid Tower calendar instant");
+        }
+        const offset=policy==="taipei-v2"?8*60*60*1000:0;
+        const local=new Date(instant.getTime()+offset);
+        if(!Number.isFinite(local.getTime())){ throw new RangeError("Invalid Tower calendar instant"); }
+        const midnight=Date.UTC(local.getUTCFullYear(),local.getUTCMonth(),local.getUTCDate());
+        const monday=midnight-((local.getUTCDay()+6)%7)*DAY_MS;
+        const index=Math.floor((monday-WEEK_ANCHOR)/WEEK_MS);
+        const element=ELEMENT_ORDER[((index%ELEMENT_ORDER.length)+ELEMENT_ORDER.length)%ELEMENT_ORDER.length];
+        const key=new Date(monday).toISOString().slice(0,10);
+        const startMs=monday-offset,endMs=startMs+WEEK_MS;
+        return {policy,key,element,index,startMs,endMs,
+            periodId:policy+":"+key};
+    }
+
+    // Calendar-only classification, not a validator for claims/history/pending.
+    // Callers must not treat it as a trusted migration receipt or apply it to
+    // player data: durable CAS/settlement and full source validation are not wired.
+    function classifyTowerCalendarTransition(source,now){
+        const target=towerPeriodInfo(now,"taipei-v2");
+        const blocked=reason=>({action:"blocked",reason,target});
+        if(!source||![1,2].includes(source.version)||!source.tower){
+            return blocked("missing-or-unsupported-source");
+        }
+        const key=source.tower.weekKey;
+        if(typeof key!=="string"||!/^\d{4}-\d{2}-\d{2}$/.test(key)){
+            return blocked("invalid-period");
+        }
+        const date=new Date(key+"T00:00:00Z");
+        if(!Number.isFinite(date.getTime())||date.getUTCFullYear()<100||
+           date.toISOString().slice(0,10)!==key||date.getUTCDay()!==1){
+            return blocked("invalid-period");
+        }
+        const policy=source.version===1?"utc-v1":"taipei-v2";
+        const prior=towerPeriodInfo(date.getTime()+(source.version===2?-8*60*60*1000:0),policy);
+        if(source.tower.element!==prior.element){ return blocked("conflicting-element"); }
+        if(key>target.key){ return blocked("future-period"); }
+        // Equal logical Monday retains rights; different actual weeks never alias.
+        // No rewards are produced here, and no missed weeks are backfilled.
+        return {action:key===target.key?"retain":"reset",target,prior,
+            migrationEvent:source.version===1?Q61_MIGRATION_EVENT:null,
+            requiresSettlement:true};
+    }
+
+    // Requiring this Owner for policy tests must never hydrate or persist a save.
+    if(typeof window==="undefined"){
+        if(typeof module!=="undefined"&&module.exports){
+            module.exports=Object.freeze({towerPeriodInfo,classifyTowerCalendarTransition});
+        }
+        return;
+    }
     if(typeof window==="undefined"||window.__gameplayBossTowerInstalled){ return; }
     window.__gameplayBossTowerInstalled=true;
 
@@ -16,10 +107,6 @@
     const STATE_VERSION=1;
     const TOWER_UNLOCK_LEVEL=30;
     const TOWER_FLOORS=100;
-    const WEEK_MS=7*24*60*60*1000;
-    const UTC_WEEK_ANCHOR=Date.UTC(1970,0,5);
-
-    const ELEMENT_ORDER=Object.freeze(["fire","earth","water","wind"]);
     const ELEMENTS=Object.freeze({
         fire:Object.freeze({label:"火",style:"爆擊 +15%、造成傷害 +15%",color:"#c85a3d",glow:"rgba(200,90,61,.3)",skills:Object.freeze(["fireRocket","explosiveFlurry","dragonSlash"]),supports:Object.freeze(["rage"])}),
         earth:Object.freeze({label:"土",style:"防禦 +15%、最大生命 +15%",color:"#a77a46",glow:"rgba(167,122,70,.3)",skills:Object.freeze(["stoneSlash","flyingSandStrike","dustStorm"]),supports:Object.freeze(["rockWall"])}),
@@ -108,12 +195,8 @@
     }
 
     function utcWeekInfo(now){
-        const instant=new Date(now===undefined?Date.now():now);
-        const midnight=Date.UTC(instant.getUTCFullYear(),instant.getUTCMonth(),instant.getUTCDate());
-        const monday=midnight-((instant.getUTCDay()+6)%7)*24*60*60*1000;
-        const index=Math.floor((monday-UTC_WEEK_ANCHOR)/WEEK_MS);
-        const element=ELEMENT_ORDER[((index%ELEMENT_ORDER.length)+ELEMENT_ORDER.length)%ELEMENT_ORDER.length];
-        return {key:new Date(monday).toISOString().slice(0,10),element:element,index:index};
+        const week=towerPeriodInfo(now,"utc-v1");
+        return {key:week.key,element:week.element,index:week.index};
     }
 
     function defaultTower(now){
@@ -125,6 +208,9 @@
     }
     function normalizeState(raw,now){
         const source=raw&&typeof raw==="object"?raw:{};
+        if(Object.prototype.hasOwnProperty.call(source,"version")&&source.version!==STATE_VERSION){
+            throw Object.assign(new Error("Unsupported gameplay progress version"),{code:"gameplay-progress-version-unsupported"});
+        }
         const normalized=defaultState(now);
         PERSONAL_BOSSES.forEach(definition=>{
             const entry=source.personal&&source.personal[definition.id]||{};
@@ -159,6 +245,10 @@
 
     const initialMainSave=readMainSave();
     const initialStoredState=initialMainSave&&initialMainSave.gameplayProgress;
+    // A v1 runtime must never normalize a future schema into a writable v1 save.
+    // AccountSave independently refuses writes; do not install battle callbacks.
+    if(initialStoredState&&Object.prototype.hasOwnProperty.call(initialStoredState,"version")&&
+       initialStoredState.version!==STATE_VERSION){ return; }
     let state=normalizeState(initialStoredState);
     const initialStateNeedsPersist=JSON.stringify(initialStoredState||null)!==JSON.stringify(state);
     let bossTab="personal";
@@ -183,12 +273,13 @@
     function serializableState(){ ensureCurrentTowerWeek();state.version=STATE_VERSION;return copy(state); }
     function persist(){
         ensureCurrentTowerWeek();
-        if(typeof saveGame==="function"){ saveGame();return; }
+        if(typeof saveGame==="function"){ return saveGame()===true; }
         const save=readMainSave();
         if(save&&typeof save==="object"){
             save.gameplayProgress=serializableState();
-            try{ ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,save,{source:"boss-tower"}); }catch(_){ }
+            try{ return !!ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,save,{source:"boss-tower"}); }catch(_){ }
         }
+        return false;
     }
     function highestCharacterLevel(){
         if(typeof window.v133GetHighestCreatedCharacterLevel==="function"){
@@ -1320,16 +1411,18 @@
         const amount=120+floor*18+(elite?180:0)+(boss?450:0)+(milestone?700:0);addGold(amount);
         state.tower.claimedFloors[String(floor)]=true;
         if(floor===50){ state.tower.pendingRelicChoice=true; }
-        if(typeof window.v141ShowBlackGoldReward==="function"){ window.v141ShowBlackGoldReward({gold:amount,exp:0,items:[]}); }
-        return true;
+        return amount;
     }
     function completeTowerFloor(floor,outcome){
         const won=!!(outcome&&outcome.result==="win");
+        let saved=false,reward=false;
         if(won){
             if(floor>state.tower.completedFloor){ state.tower.completedFloor=floor; }
             state.tower.highestThisWeek=Math.max(state.tower.highestThisWeek,floor);
             state.tower.historicalHighest=Math.max(state.tower.historicalHighest,floor);
-            towerReward(floor);persist();
+            reward=towerReward(floor);
+            try{ saved=persist(); }catch(_){ saved=false; }
+            if(!saved){ cancelTowerAutoAdvance(true); }
         }else{
             cancelTowerAutoAdvance(true);
         }
@@ -1339,7 +1432,10 @@
         if(typeof showPage==="function"){ showPage("tower"); }
         renderTowerPage();
 
-        if(!won){ return; }
+        if(won&&saved&&reward&&typeof window.v141ShowBlackGoldReward==="function"){
+            try{ window.v141ShowBlackGoldReward({gold:reward,exp:0,items:[]}); }catch(_){ }
+        }
+        if(!won||!saved){ return; }
         if(
             towerAutoAdvanceEnabled&&
             state.tower.completedFloor<TOWER_FLOORS&&
@@ -1352,22 +1448,76 @@
             renderTowerPage();
         }
     }
-    function startTowerFloor(floor){
+    // Draft-only qualification; not connected to battle outcome or storage.
+    // A true result is not a terminal receipt or proof of a particular run.
+    function isValidTowerDefeatedParty(indexes,getCharacter){
+        try{
+            if(!Array.isArray(indexes)||indexes.length===0||typeof getCharacter!=="function"){ return false; }
+            const seen=new Set();
+            for(const index of indexes){
+                if(!Number.isSafeInteger(index)||index<0||index>5||seen.has(index)){ return false; }
+                seen.add(index);
+                const character=getCharacter(index);
+                if(!character||typeof character!=="object"||typeof character.hp!=="number"||
+                   !Number.isFinite(character.hp)||character.hp>0){ return false; }
+            }
+            return true;
+        }catch(_){ return false; }
+    }
+    function startTowerFloor(floor,attempt){
         ensureCurrentTowerWeek();
         const target=clamp(Math.floor(numeric(floor,state.tower.completedFloor+1)),1,TOWER_FLOORS);
         if(battleStarting||highestCharacterLevel()<TOWER_UNLOCK_LEVEL||state.tower.pendingRelicChoice||target>state.tower.completedFloor+1){ return false; }
         const waves=buildTowerWaves(target);
         const roster=waves[0];
         const towerBoss=waves[1].find(monster=>monster&&monster.vGameplayTowerBoss===true)||null;
-        activeBattleContext={
+        const context={
             mode:"tower",
             floor:target,
+            weekKey:state.tower.weekKey,
+            element:state.tower.element,
             towerBoss:towerBoss,
             expectedPartySize:expectedPartySizeForLevel(target)
         };
+        activeBattleContext=context;
         battleStarting=true;
+        let launcherCalled=false;
+        const current=()=>{
+            try{ return activeBattleContext===context&&ACCOUNT_REPOSITORY.getActiveUid()===ACTIVE_UID&&(!attempt||attempt.matches()); }
+            catch(_){ return false; }
+        };
+        const cancelPreparation=()=>{
+            if(!current()||launcherCalled){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
+            if(attempt){ attempt.cancelBeforeLaunch(); }
+            if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+            return false;
+        };
+        const samePeriod=()=>{
+            try{
+                const week=utcWeekInfo();
+                return week.key===context.weekKey&&week.element===context.element&&
+                    (!attempt||attempt.periodMatches(context.weekKey));
+            }catch(_){ return false; }
+        };
+        const stopForPeriodChange=()=>{
+            if(attempt){ attempt.blockForPeriodChange(); }
+            if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+            return false;
+        };
         const launch=()=>{
+            if(!current()){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
             waves.flat().forEach(bindTowerMonsterIdentity);
+            if(attempt&&!attempt.markLaunchRequested()){
+                if(activeBattleContext===context){ battleStarting=false;activeBattleContext=null; }
+                return false;
+            }
+            try{
+                if(activeBattleContext!==context||ACCOUNT_REPOSITORY.getActiveUid()!==ACTIVE_UID||attempt&&!attempt.launchMatches()){ return false; }
+            }catch(_){ return false; }
+            if(!samePeriod()){ return stopForPeriodChange(); }
+            launcherCalled=true;
             const started=window.v132LaunchDungeonBattle(
                 roster,
                 outcome=>completeTowerFloor(target,outcome),
@@ -1378,33 +1528,27 @@
             return true;
         };
         if(typeof window.v154PreparePortraitsForEncounter!=="function"){
-            battleStarting=false;
-            activeBattleContext=null;
             console.warn("[tower-portrait] shared encounter preparation owner unavailable");
-            return false;
+            return cancelPreparation();
         }
-        const preparation=window.v154PreparePortraitsForEncounter(waves.flat());
+        let preparation;
+        try{ preparation=window.v154PreparePortraitsForEncounter(waves.flat()); }
+        catch(error){ console.warn("[tower-portrait] encounter preparation failed",error);return cancelPreparation(); }
         if(preparation&&typeof preparation.then!=="function"){
             if(preparation.state!=="ready"){
-                battleStarting=false;
-                activeBattleContext=null;
-                return false;
+                return cancelPreparation();
             }
             return launch();
         }
         Promise.resolve(preparation).then(prepared=>{
             if(!prepared||prepared.state!=="ready"){
-                battleStarting=false;
-                activeBattleContext=null;
                 console.warn("[tower-portrait] shared encounter preparation failed");
-                return false;
+                return cancelPreparation();
             }
             return launch();
         }).catch(error=>{
-            battleStarting=false;
-            activeBattleContext=null;
             console.warn("[tower-portrait] encounter preparation failed",error);
-            return false;
+            return cancelPreparation();
         });
         return true;
     }
@@ -1456,7 +1600,7 @@
     window.vGameplayOpenBossDetail=openBossDetail;
     window.vGameplayCloseBossDetail=function(){ bossDetail=null;renderBossPage(); };
     window.vGameplayStartBoss=startBoss;
-    window.vGameplayContinueTower=function(){ return startTowerFloor(state.tower.completedFloor>=TOWER_FLOORS?TOWER_FLOORS:state.tower.completedFloor+1); };
+    window.vGameplayContinueTower=function(attempt){ return startTowerFloor(state.tower.completedFloor>=TOWER_FLOORS?TOWER_FLOORS:state.tower.completedFloor+1,attempt); };
     window.vGameplayToggleTowerAutoAdvance=toggleTowerAutoAdvance;
     window.vGameplayToggleTowerOverview=function(){ towerOverviewOpen=!towerOverviewOpen;renderTowerPage(); };
     window.vGameplaySelectTowerBand=startTowerFloor;
@@ -1509,6 +1653,7 @@
         towerConfig:TOWER_CONFIG,
         bossBalance:BOSS_BALANCE,
         getSerializableState:serializableState,
+        getCurrentStateSnapshot:function(){ return copy(state); },
         normalizeState:normalizeState,
         getWeekInfo:utcWeekInfo,
          getTowerFloorKind:towerFloorKind,

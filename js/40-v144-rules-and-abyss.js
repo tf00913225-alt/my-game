@@ -496,7 +496,21 @@
     if(typeof startTurn==="function"){
         const previousStartTurnForLabel=startTurn;
         startTurn=function(){
+            const run=window.v132ActiveDungeonRun;
+            const tower=run&&run.mode==="tower";
+            const token=tower?battleToken:null;
             const result=previousStartTurnForLabel.apply(this,arguments);
+            if(tower){
+                const current=()=>battleActive&&battleToken===token&&arguments[0]===token&&window.v132ActiveDungeonRun===run&&
+                    typeof window.v141HasTowerLossExit==="function"&&!window.v141HasTowerLossExit();
+                if(!current()){ return result; }
+                setTransitionLabel("進入戰場","entry");
+                setTimeout(()=>{
+                    const overlay=document.getElementById("v141BattleTransition");
+                    if(current()&&overlay?.dataset.v144Kind==="entry"){ setTransitionLabel("進入戰場","entry"); }
+                },0);
+                return result;
+            }
             setTransitionLabel("進入戰場","entry");
             setTimeout(()=>setTransitionLabel("進入戰場","entry"),0);
             return result;
@@ -513,7 +527,12 @@
     if(typeof loseBattle==="function"){
         const previousLoseBattleForLabel=loseBattle;
         loseBattle=function(){
+            const run=window.v132ActiveDungeonRun;
+            const tower=run&&run.mode==="tower";
+            const token=tower?battleToken:null;
             const result=previousLoseBattleForLabel.apply(this,arguments);
+            if(tower&&(result!==true||!battleActive||battleToken!==token||window.v132ActiveDungeonRun!==run||
+                typeof window.v141HasTowerLossExit!=="function"||!window.v141HasTowerLossExit())){ return result; }
             setTransitionLabel("戰鬥失敗","lose");
             return result;
         };

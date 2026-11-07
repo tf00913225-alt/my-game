@@ -7,8 +7,8 @@ const content=fs.readFileSync('js/27-v132-content-expansion.js','utf8');
 const inventoryEnd='    window.v132RunInventoryTransaction=runInventoryTransaction;';
 const inventoryOwner=content.slice(content.indexOf('    function getItemInventoryCapacity('),content.indexOf(inventoryEnd)+inventoryEnd.length);
 function fixture(seed=new Map(),uid='shop-A'){
- let failKey=null,day='2026-10-06',success=0,reenter=null;
- const store={getItem:k=>seed.get(k)??null,setItem(k,v){if(k===failKey)throw Error('quota');seed.set(k,String(v));},removeItem:k=>seed.delete(k)};
+ let failKey=null,failOnce=false,day='2026-10-06',success=0,reenter=null,saveCalls=0,saveError=null;
+ const store={getItem:k=>seed.get(k)??null,setItem(k,v){if(k===failKey){if(failOnce){failKey=null;failOnce=false;}throw Error('quota');}seed.set(k,String(v));},removeItem:k=>seed.delete(k)};
  const body={innerHTML:'',querySelector:()=>true};
  class Clock extends Date{constructor(...args){super(...(args.length?args:[day+'T12:00:00']));}}
  const c=vm.createContext({console:{error(){}},localStorage:store,Date:Clock,setTimeout(){},alert(){},gold:100000,inventoryItems:[],
@@ -18,12 +18,12 @@ function fixture(seed=new Map(),uid='shop-A'){
  });c.window=c;c.FourSymbolsEquipmentReforge=require("../functions/src/equipment-reforge");c.FourSymbolsEquipmentFactory=require("../js/equipment-factory");
  c.FourSymbolsInventoryStackPolicy=require('../functions/src/inventory-stack-policy');
  vm.runInContext(repoSource,c);const repo=c.FourSymbolsAccountSave;repo.activate(uid);
- c.saveGame=options=>{if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems,...(c.player?{player:c.player}:{})},options);return true;}catch(_){return false;}};
+ c.saveGame=options=>{saveCalls++;saveError=null;if(reenter){const fn=reenter;reenter=null;fn();}try{repo.writeForUid(repo.getActiveUid(),{gold:c.gold,inventoryItems:c.inventoryItems,...(c.player?{player:c.player}:{})},options);return true;}catch(error){saveError=error?.code||null;return false;}};
  c.rpgAlert=(_message,o)=>{if(o.tone==='success')success++;return Promise.resolve();};
  vm.runInContext(require('../.github/scripts/fixtures/item-slot-owner.cjs'),c);
  vm.runInContext(inventoryOwner,c);vm.runInContext(gear,c);
  const key=repo.accountKey('equipment-shop-daily');
- return {c,repo,seed,key,body,read:()=>c.FourSymbolsEquipmentShop.render(),buy:(i,id)=>c.v17346BuyEquipmentShopOffer(i,id),fail:k=>failKey=k,day:d=>day=d,reenter:fn=>reenter=fn,success:()=>success};
+ return {c,repo,seed,key,body,read:()=>c.FourSymbolsEquipmentShop.render(),buy:(i,id)=>c.v17346BuyEquipmentShopOffer(i,id),fail:k=>{failKey=k;failOnce=false;},failOnce:k=>{failKey=k;failOnce=true;},day:d=>day=d,reenter:fn=>reenter=fn,success:()=>success,saveCalls:()=>saveCalls,saveError:()=>saveError};
 }
 test('canonical renderer owns six deterministic cards, stable batch IDs and explicit missing-art placeholders',()=>{
  assert.doesNotMatch(ui,/SHOP_EQUIPMENT_PREVIEW|function renderEquipmentShop|equipmentShopOffers|equipment-shop-daily/);
@@ -62,9 +62,20 @@ test('insufficient gold/full inventory never mark sold',()=>{
 test('main, metadata or shop storage failure roll back all prior bytes, runtime and success UI',()=>{
  for(const target of ['main','metadata','shop']){
   const f=fixture();f.seed.set(f.key,JSON.stringify({date:'2026-10-06',refreshCount:0}));const before=new Map(f.seed);
-  f.fail(target==='main'?f.repo.saveKey('shop-A'):target==='metadata'?f.repo.metadataKey('shop-A'):f.key);
+  f.failOnce(target==='main'?f.repo.saveKey('shop-A'):target==='metadata'?f.repo.metadataKey('shop-A'):f.key);
   assert.equal(f.buy(0),false,target);assert.equal(f.c.gold,100000);assert.equal(f.c.inventoryItems.length,0);assert.equal(f.success(),0);assert.deepEqual(f.seed,before);assert.doesNotMatch(f.read(),/已購買/);
  }
+});
+test('persistent main write failure retains the pending marker and blocks blind retry',()=>{
+ const f=fixture();f.seed.set(f.key,JSON.stringify({date:'2026-10-06',refreshCount:0}));const before=new Map(f.seed);
+ f.fail(f.repo.saveKey('shop-A'));assert.equal(f.buy(0),false);
+ assert.equal(f.c.gold,100000);assert.equal(f.c.inventoryItems.length,0);assert.equal(f.success(),0);
+ assert.equal(f.seed.get(f.repo.saveKey('shop-A')),before.get(f.repo.saveKey('shop-A')));
+ assert.equal(f.seed.get(f.key),before.get(f.key));
+ assert.deepEqual(JSON.parse(f.seed.get(f.repo.metadataKey('shop-A'))).localWritePending,{version:1});
+ assert.throws(()=>f.repo.readForUid('shop-A'),error=>error.code==='account-local-write-fenced');
+ assert.throws(()=>fixture(f.seed).repo.readForUid('shop-A'),error=>error.code==='account-local-write-incomplete');
+ f.fail(null);const retained=new Map(f.seed),calls=f.saveCalls();assert.equal(f.buy(0),false);assert.equal(f.saveCalls(),calls+1);assert.equal(f.saveError(),'account-local-write-fenced');assert.deepEqual(f.seed,retained);
 });
 test('corrupt shop state blocks purchase and refresh, UID B does not inherit A receipts',()=>{
  const f=fixture();f.seed.set(f.key,'{bad');assert.equal(f.buy(0),false);assert.equal(f.c.v17345RefreshEquipmentShop(),false);assert.match(f.read(),/購買與刷新已暫停/);
@@ -126,9 +137,19 @@ test('lesson rendered offer and purchased armor retain the exact cached UID and 
  const f=equipmentLessonFixture(),factory=f.c.FourSymbolsEquipmentFactory;let created=[];
  f.c.FourSymbolsEquipmentFactory={...factory,starter:id=>{const item=factory.starter(id);created.push(item);return item;}};
  const first=f.read(),shown=created[0];assert.equal(created.length,1);assert.ok(first.includes(shown.name));assert.equal(first,f.read());
- f.fail(f.repo.saveKey('shop-A'));assert.equal(f.buyLesson(),false);assert.equal(f.read(),first);assert.equal(created.length,1);
+ f.failOnce(f.repo.saveKey('shop-A'));assert.equal(f.buyLesson(),false);assert.equal(f.read(),first);assert.equal(created.length,1);
  f.fail(null);assert.equal(f.buyLesson(),true);assert.equal(f.c.inventoryItems[0].v141Uid,shown.v141Uid);assert.equal(f.c.inventoryItems[0].name,shown.name);
  assert.doesNotMatch(f.read(),/chapter1TutorialArmorBuy/);
+});
+
+test('lesson persistent write failure preserves pending and refuses a later retry',()=>{
+ const f=equipmentLessonFixture(),root=JSON.stringify(f.c.player.adventureProgress),money=f.c.gold;
+ f.fail(f.repo.saveKey('shop-A'));assert.equal(f.buyLesson(),false);
+ assert.equal(f.c.gold,money);assert.equal(f.c.inventoryItems.length,0);
+ assert.equal(JSON.stringify(f.c.player.adventureProgress),root);
+ assert.deepEqual(JSON.parse(f.seed.get(f.repo.metadataKey('shop-A'))).localWritePending,{version:1});
+ f.fail(null);const retained=new Map(f.seed),calls=f.saveCalls();
+ assert.equal(f.buyLesson(),false);assert.equal(f.saveCalls(),calls+1);assert.equal(f.saveError(),'account-local-write-fenced');assert.deepEqual(f.seed,retained);
 });
 
 test('a different lesson owner intent cannot reuse another character cached offer',()=>{
