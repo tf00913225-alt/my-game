@@ -273,12 +273,13 @@
     function serializableState(){ ensureCurrentTowerWeek();state.version=STATE_VERSION;return copy(state); }
     function persist(){
         ensureCurrentTowerWeek();
-        if(typeof saveGame==="function"){ saveGame();return; }
+        if(typeof saveGame==="function"){ return saveGame()===true; }
         const save=readMainSave();
         if(save&&typeof save==="object"){
             save.gameplayProgress=serializableState();
-            try{ ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,save,{source:"boss-tower"}); }catch(_){ }
+            try{ return !!ACCOUNT_REPOSITORY.writeForUid(ACTIVE_UID,save,{source:"boss-tower"}); }catch(_){ }
         }
+        return false;
     }
     function highestCharacterLevel(){
         if(typeof window.v133GetHighestCreatedCharacterLevel==="function"){
@@ -1410,16 +1411,18 @@
         const amount=120+floor*18+(elite?180:0)+(boss?450:0)+(milestone?700:0);addGold(amount);
         state.tower.claimedFloors[String(floor)]=true;
         if(floor===50){ state.tower.pendingRelicChoice=true; }
-        if(typeof window.v141ShowBlackGoldReward==="function"){ window.v141ShowBlackGoldReward({gold:amount,exp:0,items:[]}); }
-        return true;
+        return amount;
     }
     function completeTowerFloor(floor,outcome){
         const won=!!(outcome&&outcome.result==="win");
+        let saved=false,reward=false;
         if(won){
             if(floor>state.tower.completedFloor){ state.tower.completedFloor=floor; }
             state.tower.highestThisWeek=Math.max(state.tower.highestThisWeek,floor);
             state.tower.historicalHighest=Math.max(state.tower.historicalHighest,floor);
-            towerReward(floor);persist();
+            reward=towerReward(floor);
+            try{ saved=persist(); }catch(_){ saved=false; }
+            if(!saved){ cancelTowerAutoAdvance(true); }
         }else{
             cancelTowerAutoAdvance(true);
         }
@@ -1429,7 +1432,10 @@
         if(typeof showPage==="function"){ showPage("tower"); }
         renderTowerPage();
 
-        if(!won){ return; }
+        if(won&&saved&&reward&&typeof window.v141ShowBlackGoldReward==="function"){
+            try{ window.v141ShowBlackGoldReward({gold:reward,exp:0,items:[]}); }catch(_){ }
+        }
+        if(!won||!saved){ return; }
         if(
             towerAutoAdvanceEnabled&&
             state.tower.completedFloor<TOWER_FLOORS&&

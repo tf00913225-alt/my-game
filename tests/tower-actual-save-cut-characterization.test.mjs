@@ -54,6 +54,60 @@ test('same-week Tower completion and Relic receipt reconciliation keep original 
  assert.equal(c.RelicProgressionSystem.reconcilePending(),'none');
  assert.deepEqual(JSON.parse(JSON.stringify(c.inventoryItems)),JSON.parse(JSON.stringify(saved.inventoryItems)));
 });
+for(const outcome of ['guard-reject','commit-unknown','rollback-failed','success'])test('Tower win '+outcome+' preserves cleanup and gates automatic continuation',()=>{
+ const c=loadIntegrated();installOriginalSave(c);let now=Date.UTC(2026,9,27);
+ c.Date=class extends Date{static now(){return now;}};
+ const week=c.GameplaySystem.getWeekInfo(now);
+ c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:0,claimedFloors:{}}},now);
+ assert.equal(c.saveGame(),true);assert.equal(c.vGameplayToggleTowerAutoAdvance(true),true);
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const before=c.localStorage.snapshot(),popups=[],timeouts=[];
+ c.v141ShowBlackGoldReward=value=>popups.push(value);
+ c.setTimeout=(fn,ms)=>{timeouts.push(ms);return timeouts.length;};
+ const set=c.localStorage.setItem,get=c.localStorage.getItem,meta='four_symbols_save_meta:boss-tower-test';
+ let markerWrites=0,armed=false,failed=false;
+ c.localStorage.setItem=(key,value)=>{if(key===meta&&String(value).includes('localWritePending'))markerWrites++;
+  if(outcome==='rollback-failed'&&key==='four_symbols_save:boss-tower-test'){failed=true;throw Error('fixture main and rollback');}
+  const result=set(key,value);if(outcome==='commit-unknown'&&key===meta&&!String(value).includes('localWritePending'))armed=true;return result;};
+ c.localStorage.getItem=key=>{if(outcome==='commit-unknown'&&key===meta&&armed&&!failed){failed=true;throw Error('fixture final readback');}return get(key);};
+ if(outcome==='guard-reject')now+=7*86400000;
+ c.battleActive=false;c.lastBattleCallback({result:'win'});
+ assert.equal(c.GameplaySystem.getActiveBattleState(),null);
+ if(outcome==='success'){
+  assert.equal(popups.length,1);assert.ok(timeouts.includes(1000));assert.equal(markerWrites,1);
+  assert.equal(c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.gameplayProgress.tower.claimedFloors['1'],true);
+ }else{
+  assert.equal(popups.length,0);assert.equal(timeouts.includes(1000),false);
+  if(outcome==='guard-reject'){assert.equal(markerWrites,0);assert.deepEqual(c.localStorage.snapshot(),before);}
+  else{assert.equal(failed,true);assert.equal(markerWrites,1);assert.throws(()=>c.FourSymbolsAccountSave.readForUid('boss-tower-test'),e=>e.code==='account-local-write-fenced');}
+ }
+});
+for(const outcome of ['false','undefined','throw'])test('Tower win treats save '+outcome+' as unconfirmed',()=>{
+ const c=loadIntegrated();assert.equal(c.vGameplayToggleTowerAutoAdvance(true),true);assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const popups=[],timeouts=[];let saves=0;c.v141ShowBlackGoldReward=value=>popups.push(value);c.setTimeout=(fn,ms)=>{timeouts.push(ms);return timeouts.length;};
+ c.saveGame=()=>{saves++;if(outcome==='throw')throw Error('fixture save');return outcome==='false'?false:undefined;};
+ c.battleActive=false;c.lastBattleCallback({result:'win'});
+ assert.equal(saves,1);assert.equal(popups.length,0);assert.equal(timeouts.includes(1000),false);
+ assert.equal(c.GameplaySystem.getActiveBattleState(),null);
+});
+test('Tower popup failure occurs after context cleanup without another save',()=>{
+ const c=loadIntegrated();assert.equal(c.vGameplaySelectTowerBand(1),true);let saves=0;
+ c.saveGame=()=>{saves++;return true;};c.v141ShowBlackGoldReward=()=>{throw Error('fixture popup');};
+ c.battleActive=false;assert.doesNotThrow(()=>c.lastBattleCallback({result:'win'}));
+ assert.equal(saves,1);assert.equal(c.GameplaySystem.getActiveBattleState(),null);
+});
+test('claimed Tower replay does not issue a duplicate reward popup',()=>{
+ const c=loadIntegrated(),week=c.GameplaySystem.getWeekInfo(Date.now());
+ c.GameplaySystem.debugReloadState({tower:{weekKey:week.key,completedFloor:1,claimedFloors:{'1':true}}},Date.now());
+ assert.equal(c.vGameplaySelectTowerBand(1),true);let popups=0;c.saveGame=()=>true;c.v141ShowBlackGoldReward=()=>{popups++;};
+ const before=c.gold;c.battleActive=false;c.lastBattleCallback({result:'win'});
+ assert.equal(c.gold,before);assert.equal(popups,0);
+});
+test('Boss completion keeps original save exception behavior',()=>{
+ const c=loadIntegrated();assert.equal(c.vGameplayStartBoss('personal','personal-20'),true);
+ const original=Error('fixture Boss save');c.saveGame=()=>{throw original;};
+ c.battleActive=false;assert.throws(()=>c.lastBattleCallback({result:'win'}),error=>error===original);
+});
 for(const fault of ['marker','final-readback'])test('Relic reports retirement '+fault+' as save-failed without retry',()=>{
  const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
  c.v132AddItemToInventory=(definition,count)=>{let stack=c.inventoryItems.find(item=>item.id===definition.id);if(!stack){stack={id:definition.id,count:0};c.inventoryItems.push(stack);}stack.count+=count;return true;};
