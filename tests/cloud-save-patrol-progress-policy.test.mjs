@@ -103,7 +103,15 @@ test('ambiguous declarations, identities and unsupported executable or period sh
         [inputs[1],'goal:10,','goal:10,unknown:true,'],
     ]){
         const target=path.join(directory,file),original=fs.readFileSync(target,'utf8');
-        const mutated=original.replace(oldText,newText);assert.notEqual(mutated,original,oldText);fs.writeFileSync(target,mutated);
+        let mutated;
+        if(oldText==='.toISOString()'){
+            const start=original.indexOf('function ensureDailyQuestsCurrent(){'),end=original.indexOf('\n}',start);
+            assert.ok(start>=0&&end>start,'daily quest reset owner must exist');
+            const owner=original.slice(start,end),matches=owner.match(/\.toISOString\(\)/g)||[];
+            assert.equal(matches.length,1,'daily quest reset must contain exactly one ISO conversion');
+            mutated=original.slice(0,start)+owner.replace(oldText,newText)+original.slice(end);
+        }else{mutated=original.replace(oldText,newText);}
+        assert.notEqual(mutated,original,oldText);fs.writeFileSync(target,mutated);
         const before=snapshot(directory);await assert.rejects(buildPatrolProgressPolicy(directory),undefined,oldText);
         assert.deepEqual(snapshot(directory),before);fs.writeFileSync(target,original);
     }

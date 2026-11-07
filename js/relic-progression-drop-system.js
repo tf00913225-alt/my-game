@@ -816,7 +816,8 @@
                 showRewardItems(pending.rewards,goldDelta);
             }
             progressionState.pending=null;
-            writeProgressionState();
+            const retired=writeProgressionState();
+            if(!retired&&pending.kind==="tower"){ return "save-failed"; }
             if(pending.kind==="tower"&&pending.floor===50&&progressionState.legacyTowerChoiceHandled===true){
                 neutralizeCurrentTowerLegacyChoice();
             }

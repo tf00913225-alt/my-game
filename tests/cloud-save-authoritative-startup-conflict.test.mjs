@@ -501,17 +501,21 @@ test('uncertain actual saveGame cancellation blocks a new Tower attempt',async()
     const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
         vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),createRequire(import.meta.url));
     let handle;
-    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:(floor,attempt)=>{handle=attempt;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
     relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
     relic.context.saveGame=options=>{
         f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;
         return f.runtime.saveGame(options);
     };
     assert.equal(relic.context.vGameplaySelectTowerBand(5),true);
+    {const cut=f.repo.readForUid(h.uid).save,pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
     const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
     f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
     f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
     assert.equal(handle.cancelBeforeLaunch(),false);
+    assert.equal(failed,true,'cancellation must reach the injected final metadata read failure');
     f.readFault(()=>false);f.fault(()=>false);
     const committed=f.values.get(main),writes=f.writes.length;
     assert.equal(JSON.parse(committed).player.relicProgression.pending.phase,'cancelled-before-launch');
@@ -528,15 +532,19 @@ test('uncertain actual saveGame initial Tower receipt never calls starter',async
     const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
         vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
     let calls=0;
-    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,towerStarter:()=>{calls++;return true;}});
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:()=>{calls++;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
     relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
     relic.context.saveGame=options=>{f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;return f.runtime.saveGame(options);};
     const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
     f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
     f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
     assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(failed,true,'initial receipt must reach the injected final metadata read failure');
     f.readFault(()=>false);f.fault(()=>false);
     assert.equal(calls,0);assert.equal(JSON.parse(f.values.get(main)).player.relicProgression.pending.phase,'preparing');
+    {const cut=JSON.parse(f.values.get(main)),pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
     assert.equal(relic.context.vGameplaySelectTowerBand(5),false);assert.equal(calls,0);
 });
 
@@ -548,14 +556,19 @@ test('uncertain actual saveGame retirement cannot start a new Tower attempt',asy
     const makeRelic=new Function('vm','source','require',fixtureCode+'\nreturn makeContext;')(
         vm,readFileSync(new URL('../js/relic-progression-drop-system.js',import.meta.url),'utf8'),require);
     let handle,calls=0;
-    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,towerStarter:(floor,attempt)=>{calls++;handle=attempt;return true;}});
+    const relic=makeRelic({uid:h.uid,withStarters:true,noTimers:true,gameplayOverride:f.repo.readForUid(h.uid).save.gameplayProgress,towerStarter:(floor,attempt)=>{calls++;handle=attempt;return true;}});
+    {const instant=Date.parse(f.repo.readForUid(h.uid).save.gameplayProgress.tower.weekKey+'T12:00:00Z');relic.context.Date=class extends Date{static now(){return instant;}};}
+    f.runtime.GameplaySystem={getSerializableState:()=>({version:1,...relic.context.GameplaySystem.getSerializableState()})};
     relic.context.FourSymbolsAccountSave.readForUid=uid=>f.repo.readForUid(uid);
     relic.context.saveGame=options=>{f.runtime.player=relic.context.player;f.runtime.inventoryItems=relic.context.inventoryItems;return f.runtime.saveGame(options);};
-    assert.equal(relic.context.vGameplaySelectTowerBand(5),true);assert.equal(handle.cancelBeforeLaunch(),true);
+    assert.equal(relic.context.vGameplaySelectTowerBand(5),true);
+    {const cut=f.repo.readForUid(h.uid).save,pending=cut.player.relicProgression.pending;assert.equal(pending.weekKey,cut.gameplayProgress.tower.weekKey);assert.equal(pending.ownerUid,h.uid);assert.equal(new Date(pending.startedAt).toISOString().slice(0,10),pending.weekKey);}
+    assert.equal(handle.cancelBeforeLaunch(),true);
     const meta=f.repo.metadataKey(h.uid),main=f.repo.saveKey(h.uid);let final=false,failed=false;
     f.fault((key,value)=>{if(key===meta&&value&&!value.includes('localWritePending'))final=true;return false;});
     f.readFault(key=>{if(key===meta&&final&&!failed){failed=true;return true;}return false;});
     assert.equal(relic.context.vGameplaySelectTowerBand(5),false);
+    assert.equal(failed,true,'retirement must reach the injected final metadata read failure');
     f.readFault(()=>false);f.fault(()=>false);
     assert.equal(calls,1);assert.equal(JSON.parse(f.values.get(main)).player.relicProgression.pending,null);
     assert.equal(relic.context.RelicProgressionSystem.getProgressionState().pending.phase,'cancelled-before-launch');

@@ -54,6 +54,37 @@ test('same-week Tower completion and Relic receipt reconciliation keep original 
  assert.equal(c.RelicProgressionSystem.reconcilePending(),'none');
  assert.deepEqual(JSON.parse(JSON.stringify(c.inventoryItems)),JSON.parse(JSON.stringify(saved.inventoryItems)));
 });
+for(const fault of ['marker','final-readback'])test('Relic reports retirement '+fault+' as save-failed without retry',()=>{
+ const c=loadIntegrated();installOriginalSave(c);assert.equal(c.saveGame(),true);
+ c.v132AddItemToInventory=(definition,count)=>{let stack=c.inventoryItems.find(item=>item.id===definition.id);if(!stack){stack={id:definition.id,count:0};c.inventoryItems.push(stack);}stack.count+=count;return true;};
+ c.v132RunInventoryTransaction=operation=>operation();
+ assert.equal(c.vGameplaySelectTowerBand(1),true);
+ const receipt=c.FourSymbolsAccountSave.readForUid('boss-tower-test').save.player.relicProgression.pending;
+ c.battleActive=false;c.lastBattleCallback({result:'win'});
+ const set=c.localStorage.setItem,get=c.localStorage.getItem,meta='four_symbols_save_meta:boss-tower-test';
+ let failed=false,armed=false,retirementMarkers=0;
+ c.localStorage.setItem=(key,value)=>{
+  const retirement=c.player.relicProgression?.pending===null;
+  if(retirement&&key===meta&&String(value).includes('localWritePending')){
+   retirementMarkers++;if(fault==='marker'&&!failed){failed=true;throw Error('retirement marker');}
+  }
+  const result=set(key,value);
+  if(retirement&&fault==='final-readback'&&key===meta&&!String(value).includes('localWritePending'))armed=true;
+  return result;
+ };
+ c.localStorage.getItem=key=>{if(key===meta&&armed&&!failed){failed=true;throw Error('retirement final readback');}return get(key);};
+ assert.equal(c.RelicProgressionSystem.reconcilePending(),'save-failed');
+ assert.equal(failed,true);assert.equal(retirementMarkers,1);
+ const stored=JSON.parse(c.localStorage.snapshot()['four_symbols_save:boss-tower-test']);
+ assert.equal(stored.gameplayProgress.tower.claimedFloors['1'],true);
+ for(const reward of receipt.rewards)assert.equal(stored.inventoryItems.find(item=>item.id===reward.itemId)?.count,reward.count);
+ assert.equal(stored.player.relicProgression.pending===null,fault==='final-readback');
+ assert.notEqual(c.player.relicProgression.pending,null);
+ if(fault==='final-readback'){
+  assert.throws(()=>c.FourSymbolsAccountSave.readForUid('boss-tower-test'),e=>e.code==='account-local-write-fenced');
+  assert.throws(()=>c.FourSymbolsAccountSave.writeForUid('boss-tower-test',stored),e=>e.code==='account-local-write-fenced');
+ }
+});
 test('ordinary save refuses a new Tower week while formal pending remains',()=>{
  const realNow=Date.now,oldTime=Date.UTC(2026,9,27),newTime=Date.UTC(2026,10,3);
  try{
