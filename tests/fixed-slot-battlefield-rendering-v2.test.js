@@ -129,7 +129,7 @@ const transitionContext={
     setTimeout(callback){timers.push(callback);}
 };
 vm.createContext(transitionContext);
-vm.runInContext(transitionSource.slice(transitionSource.indexOf("    const startedEntryTokens="),transitionSource.indexOf("    function collectRewardSummary(")),transitionContext);
+vm.runInContext('let transitionRunning=false;let towerLossExit=null;let transitionOwner=0;'+transitionSource.slice(transitionSource.indexOf("    const startedEntryTokens="),transitionSource.indexOf("    function collectRewardSummary(")),transitionContext);
 transitionContext.window.v141PrepareBattleRender();
 transitionContext.window.v141AfterBattleRender();
 assert.ok(pageClasses.has("v141-preparing-entry"));
