@@ -1227,9 +1227,20 @@ function map(){
   const available=C.available(s.chapter);
   root.innerHTML='<div class="taoxi-map-art" role="img" aria-label="雲山溪谷與桃花村落"></div>'+header('四象江湖大地圖')+
     '<div class="taoxi-map-lock lock-one">尚未開放</div><div class="taoxi-map-lock lock-two">尚未開放</div><div class="taoxi-map-lock lock-three">黑松林 · 規劃中</div>'+
-    '<button type="button" class="taoxi-region" data-village '+(!available?'disabled':'')+'><span aria-hidden="true">◇</span><strong>桃溪村</strong><small>'+(available?'進入探索':'完成前 5 關及新手教學後開放')+'</small></button>'+
-    '<p class="taoxi-map-caption">點選亮起的區域，踏入江湖。</p>';
-  bindBack(close);root.querySelector('[data-village]').addEventListener('click',()=>scene('village'));root.focus({preventScroll:true});
+    '<button type="button" class="taoxi-region'+(!available?' is-locked':'')+'" data-village aria-expanded="false" aria-controls="taoxiRegionInfo"><span aria-hidden="true">◇</span><strong>桃溪村</strong><small>'+(available?'查看地點資訊':'尚未解鎖 · 查看條件')+'</small></button>'+
+    '<p class="taoxi-map-caption">點選桃溪村查看資訊，再確認進入探索。</p>'+
+    '<section id="taoxiRegionInfo" class="taoxi-region-info" aria-labelledby="taoxiRegionTitle" hidden><h2 id="taoxiRegionTitle">桃溪村</h2><p>解鎖條件：完成前 5 關及新手教學。</p><p data-region-status></p><button type="button" data-enter-village>進入探索</button></section>';
+  const region=root.querySelector('[data-village]'),info=root.querySelector('#taoxiRegionInfo'),enter=root.querySelector('[data-enter-village]');
+  function refreshRegionInfo(){
+    enter.disabled=true;
+    try{const unlocked=C.available(progress.snapshot().chapter);enter.disabled=!unlocked;root.querySelector('[data-region-status]').textContent=unlocked?'已開放':'尚未解鎖';}
+    catch(error){root.querySelector('[data-region-status]').textContent=error.message;}
+  }
+  bindBack(()=>{if(!info.hidden){info.hidden=true;region.setAttribute('aria-expanded','false');region.focus({preventScroll:true});}else close();});
+  region.addEventListener('click',()=>{if(!sameOwner()){leave();return;}refreshRegionInfo();info.hidden=false;region.setAttribute('aria-expanded','true');info.focus({preventScroll:true});});
+  info.tabIndex=-1;
+  enter.addEventListener('click',()=>{if(!sameOwner()){leave();return;}refreshRegionInfo();if(!info.hidden&&!enter.disabled)scene('village');});
+  root.focus({preventScroll:true});
 }
 function objectMarkup(object){
   const arrow=object.autoInteract?'<span class="taoxi-entry-arrow" aria-hidden="true"><svg viewBox="0 0 64 96" focusable="false"><g stroke="#a56108" stroke-width="2" stroke-linejoin="round"><path fill="#fff5a0" d="M4 10 32 2 60 10 32 23Z"/><path fill="#ffe73e" d="M4 10 32 23 32 36 9 25Z"/><path fill="#ffb81f" d="M32 23 60 10 55 25 32 36Z"/><path fill="#fff388" d="M7 46 32 37 57 46 32 59Z"/><path fill="#ffe132" d="M7 46 32 59 32 93Z"/><path fill="#f5a714" d="M32 59 57 46 32 93Z"/></g><path d="M9 10 32 5 54 11M12 46 32 40 51 46" fill="none" stroke="#fffce0" stroke-width="3" stroke-linecap="round"/></svg></span>':'';
